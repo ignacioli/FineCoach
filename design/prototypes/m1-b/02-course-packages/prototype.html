@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FineCoach · M1-B · 课包与课时调整</title>
+  <style>
+    :root {
+      --bg: oklch(0.93 0 0);
+      --surface: oklch(0.99 0 0);
+      --fg: oklch(0.22 0 0);
+      --muted: oklch(0.46 0 0);
+      --border: oklch(0.78 0 0);
+      --accent: oklch(0.28 0 0);
+      --fill: oklch(0.90 0 0);
+      --fill-2: oklch(0.85 0 0);
+      --danger: oklch(0.42 0.12 25);
+      --phone-w: 393px;
+      --phone-h: 852px;
+      --tap: 44px;
+      --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Heiti SC", sans-serif;
+      --mono: ui-monospace, Menlo, "SF Mono", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    body {
+      font-family: var(--font);
+      color: var(--fg);
+      background: var(--bg);
+      line-height: 1.45;
+    }
+    button, input, textarea, select { font: inherit; color: inherit; }
+    button { cursor: pointer; background: none; border: 0; }
+    img { display: none; }
+
+    .spec-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .spec-bar b { font-weight: 600; color: var(--fg); }
+
+    .board {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) var(--phone-w) minmax(240px, 1fr);
+      gap: 28px;
+      align-items: start;
+      justify-content: center;
+      padding: 28px 24px 48px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .rail h2 {
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .note {
+      border: 1px dashed var(--border);
+      background: var(--surface);
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--fg);
+      margin-bottom: 10px;
+    }
+    .note ol, .note ul { padding-left: 1.15em; }
+    .note li { margin: 4px 0; }
+    .note .k { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .scene-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .scene-btn {
+      min-height: var(--tap);
+      text-align: left;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--fg);
+    }
+    .scene-btn:hover { background: oklch(0.94 0 0); }
+    .scene-btn[aria-current="true"] { background: var(--fill); border-color: var(--fg); }
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible {
+      outline: 2px solid var(--fg);
+      outline-offset: 2px;
+    }
+    .check { font-size: 13px; }
+    .check li { margin: 6px 0; color: var(--muted); }
+    .now { margin-top: 12px; padding: 10px 12px; border: 1px solid var(--fg); background: var(--surface); font-size: 13px; }
+
+    .device-wrap { width: var(--phone-w); }
+    .device-caption {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 8px;
+      font-family: var(--mono);
+    }
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      border-radius: 54px;
+      border: 11px solid oklch(0.18 0 0);
+      background: oklch(0.97 0 0);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 18px 40px oklch(0.55 0 0 / 0.18);
+    }
+    .island {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      width: 126px;
+      height: 36px;
+      margin-left: -63px;
+      background: oklch(0.12 0 0);
+      border-radius: 20px;
+      z-index: 5;
+    }
+    .status {
+      height: 54px;
+      padding: 14px 28px 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .status-sys { display: flex; gap: 6px; align-items: center; }
+    .sig, .bat { display: inline-block; height: 10px; background: var(--fg); }
+    .sig { width: 16px; clip-path: polygon(0 70%, 35% 45%, 65% 20%, 100% 0, 100% 100%, 0 100%); }
+    .bat { width: 22px; height: 11px; border: 1.5px solid var(--fg); background: transparent; position: relative; }
+    .bat::after { content: ""; position: absolute; inset: 2px 8px 2px 2px; background: var(--fg); }
+    .home-bar {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      width: 134px;
+      height: 5px;
+      margin-left: -67px;
+      background: oklch(0.22 0 0);
+      border-radius: 3px;
+      z-index: 5;
+    }
+    .app {
+      position: absolute;
+      inset: 54px 0 24px;
+      display: flex;
+      flex-direction: column;
+      background: oklch(0.97 0 0);
+    }
+    .screen { display: none; flex: 1; flex-direction: column; min-height: 0; }
+    .screen.is-on { display: flex; }
+
+    .nav {
+      min-height: var(--tap);
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex: none;
+    }
+    .nav h1 {
+      flex: 1;
+      font-size: 17px;
+      font-weight: 650;
+      text-align: center;
+    }
+    .nav-side { width: 72px; display: flex; align-items: center; }
+    .nav-side.end { justify-content: flex-end; gap: 2px; width: auto; min-width: 72px; }
+    .icon-btn, .text-btn {
+      min-width: var(--tap);
+      min-height: var(--tap);
+      padding: 0 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fg);
+      font-size: 15px;
+      font-weight: 560;
+    }
+    .icon-btn:hover, .text-btn:hover, .ghost:hover { background: oklch(0.93 0 0); }
+    .text-btn { min-width: auto; }
+
+    .body { flex: 1; overflow: auto; padding: 16px 16px 20px; }
+    .body.tight { padding: 0; }
+
+    .primary, .ghost, .danger-btn {
+      min-height: var(--tap);
+      width: 100%;
+      padding: 0 16px;
+      font-size: 17px;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+    .primary { background: var(--accent); color: oklch(0.99 0 0); }
+    .primary:hover { background: oklch(0.16 0 0); color: oklch(0.99 0 0); }
+    .ghost { border: 1px solid var(--border); background: var(--surface); color: var(--fg); }
+    .danger-btn { border: 1px solid var(--danger); color: var(--danger); background: var(--surface); }
+    .danger-btn:hover { background: oklch(0.95 0.02 25); color: var(--danger); }
+    .btn-row { display: flex; gap: 8px; margin-top: 12px; }
+    .btn-row .primary, .btn-row .ghost, .btn-row .danger-btn { margin-top: 0; flex: 1; }
+
+    .sec-label {
+      font-size: 12px;
+      font-weight: 650;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      padding: 14px 0 6px;
+      text-transform: uppercase;
+    }
+    .sec-label.flush { padding-left: 16px; padding-right: 16px; }
+
+    .card {
+      margin: 0 0 10px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      text-align: left;
+      color: var(--fg);
+      width: 100%;
+    }
+    .card:hover { background: oklch(0.96 0 0); }
+    .card.is-active { border-color: var(--fg); border-width: 1.5px; }
+    .card-name { font-size: 16px; font-weight: 600; }
+    .card-meta {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      align-items: center;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border: 1px solid var(--fg);
+      color: var(--fg);
+      background: var(--surface);
+    }
+    .status-pill.fill { background: var(--fill); }
+    .status-pill.dash { border-style: dashed; }
+    .warn-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border: 1px dashed var(--fg);
+      color: var(--fg);
+    }
+    .balance {
+      font-size: 28px;
+      font-weight: 650;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+      margin: 4px 0 2px;
+    }
+    .balance em { font-style: normal; font-size: 15px; font-weight: 500; color: var(--muted); margin-left: 4px; }
+
+    .field-label { display: block; font-size: 13px; font-weight: 600; margin: 14px 0 6px; }
+    .req { color: var(--muted); font-weight: 400; }
+    .field, .area, .select {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 16px;
+    }
+    .area { min-height: 88px; resize: vertical; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .err { color: var(--danger); font-size: 13px; margin-top: 6px; display: none; }
+    .err.show { display: block; }
+    .row-inline { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .list-row {
+      width: 100%;
+      min-height: 56px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      text-align: left;
+      color: var(--fg);
+    }
+    .list-row:hover { background: oklch(0.95 0 0); }
+    .list-row .main { flex: 1; min-width: 0; }
+    .list-row .name { font-size: 16px; font-weight: 600; }
+    .list-row .sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .list-row .delta {
+      font-size: 16px;
+      font-weight: 650;
+      font-variant-numeric: tabular-nums;
+      flex: none;
+      min-width: 40px;
+      text-align: right;
+    }
+    .chev { width: 8px; height: 8px; border-right: 1.5px solid var(--muted); border-top: 1.5px solid var(--muted); transform: rotate(45deg); flex: none; }
+
+    .detail-block {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .detail-block h3 { font-size: 13px; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
+    .detail-line { font-size: 16px; margin: 4px 0; }
+    .detail-line em { font-style: normal; color: var(--muted); font-size: 13px; display: block; margin-top: 2px; }
+    .kv { display: grid; grid-template-columns: 88px 1fr; gap: 6px 10px; font-size: 15px; margin-top: 8px; }
+    .kv dt { color: var(--muted); }
+    .kv dd { font-weight: 500; }
+
+    .callout {
+      border: 1px dashed var(--fg);
+      background: var(--surface);
+      padding: 12px;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+    .callout b { display: block; font-size: 15px; margin-bottom: 4px; }
+    .callout p { color: var(--muted); }
+
+    .choice {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      text-align: left;
+      margin-bottom: 8px;
+      color: var(--fg);
+    }
+    .choice:hover { background: oklch(0.95 0 0); }
+    .choice[aria-pressed="true"] { border-color: var(--fg); background: var(--fill); }
+    .choice .t { font-size: 16px; font-weight: 600; display: block; }
+    .choice .d { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    .demo-card {
+      margin: 0 16px 10px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      width: calc(100% - 32px);
+      text-align: left;
+      color: var(--fg);
+    }
+    .demo-card:hover { background: oklch(0.96 0 0); }
+    .demo-card .top { display: flex; gap: 10px; align-items: flex-start; }
+    .demo-card .time { font-weight: 650; min-width: 52px; font-variant-numeric: tabular-nums; }
+    .demo-card .who { font-size: 16px; font-weight: 600; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+    .empty {
+      padding: 40px 24px;
+      text-align: center;
+    }
+    .empty-box {
+      width: 72px;
+      height: 48px;
+      border: 1px dashed var(--border);
+      margin: 0 auto 16px;
+    }
+    .empty h2 { font-size: 18px; margin-bottom: 8px; }
+    .empty p { font-size: 15px; color: var(--muted); }
+
+    .scrim {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: oklch(0.22 0 0 / 0.28);
+      z-index: 8;
+    }
+    .scrim.on { display: block; }
+    .sheet {
+      display: none;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--fg);
+      z-index: 9;
+      padding: 12px 16px 28px;
+      max-height: 78%;
+      overflow: auto;
+    }
+    .sheet.on { display: block; }
+    .sheet h2 { font-size: 17px; font-weight: 650; margin-bottom: 6px; }
+    .sheet .lead { font-size: 14px; color: var(--muted); margin-bottom: 12px; }
+    .menu-item {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 0 4px;
+      text-align: left;
+      font-size: 16px;
+      color: var(--fg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .menu-item:hover { background: oklch(0.94 0 0); }
+    .menu-item.danger { color: var(--danger); }
+
+    .dest {
+      flex: 1;
+      margin: 20px 16px;
+      border: 1px dashed var(--fg);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      gap: 8px;
+    }
+    .dest h2 { font-size: 20px; }
+    .dest p { font-size: 15px; color: var(--muted); }
+    .bound {
+      margin-top: 16px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    .toast {
+      display: none;
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: 36px;
+      z-index: 15;
+      background: var(--fg);
+      color: oklch(0.99 0 0);
+      padding: 12px 14px;
+      font-size: 14px;
+      text-align: center;
+    }
+    .toast.on { display: block; }
+
+    .stamp {
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    @media (max-width: 1100px) {
+      .board { grid-template-columns: 1fr; justify-items: center; }
+      .rail { width: min(520px, 100%); }
+    }
+  </style>
+</head>
+<body>
+  <header class="spec-bar" data-od-id="page-header">
+    <div>stage=<b>M1-B</b></div>
+    <div>module=<b>02-course-packages</b></div>
+    <div>version=<b>v0.1</b></div>
+    <div>coverage=<b>this module only</b></div>
+    <div>data=<b>虚构数据</b></div>
+    <div>network=<b>无外部资源</b></div>
+    <div>review=<b>产品负责人走查通过</b></div>
+  </header>
+
+  <div class="board">
+    <aside class="rail" data-od-id="annotation-left">
+      <h2>走查说明</h2>
+      <div class="note">
+        低保真线框，与 M1-B/01 同视觉语言。本模块只做课包与课时调整，不含付款、发票或账单。
+      </div>
+      <div class="note">
+        <span class="k">本模块不做</span>
+        <ul>
+          <li>付款 / 发票 / 欠费 / 退款</li>
+          <li>重建「今日」列表（仅课包异常出口）</li>
+          <li>训练记录器内部动作编辑</li>
+        </ul>
+      </div>
+      <div class="note">
+        <span class="k">建议路径</span>
+        <ol>
+          <li>看小周有效课包 → 课时调整历史</li>
+          <li>新建课包 → 触发「须先结束当前」</li>
+          <li>关联完成自动 −1；临时课选扣或不扣</li>
+          <li>余额不足结束提示；缺席询问；重开返还</li>
+          <li>人工调整写原因；今日警告只进出口</li>
+        </ol>
+      </div>
+      <h2 style="margin-top:18px">场景</h2>
+      <div class="scene-list" data-od-id="scene-list">
+        <button type="button" class="scene-btn" data-od-id="scene-hub" data-scene="hub" aria-current="true">A · 小周课包详情</button>
+        <button type="button" class="scene-btn" data-od-id="scene-create" data-scene="create">B · 新建（一有效拦截）</button>
+        <button type="button" class="scene-btn" data-od-id="scene-auto" data-scene="auto">C · 关联完成自动扣课</button>
+        <button type="button" class="scene-btn" data-od-id="scene-temp" data-scene="temp">D · 临时课结束选择</button>
+        <button type="button" class="scene-btn" data-od-id="scene-zero" data-scene="zero">E · 余额不足结束提示</button>
+        <button type="button" class="scene-btn" data-od-id="scene-noshow" data-scene="noshow">F · 学员缺席询问</button>
+        <button type="button" class="scene-btn" data-od-id="scene-reopen" data-scene="reopen">G · 重开已完成返还</button>
+        <button type="button" class="scene-btn" data-od-id="scene-manual" data-scene="manual">H · 人工调整与历史</button>
+        <button type="button" class="scene-btn" data-od-id="scene-today-warn" data-scene="today-warn">I · 今日警告出口</button>
+      </div>
+    </aside>
+
+    <div class="device-wrap">
+      <div class="device-caption">iPhone 15 · 393×852 · 44pt</div>
+      <div class="phone" data-od-id="iphone-frame" role="application" aria-label="FineCoach 课包与课时调整线框原型">
+        <div class="island" aria-hidden="true"></div>
+        <div class="status">
+          <span>9:41</span>
+          <span class="status-sys"><span class="sig" aria-hidden="true"></span><span class="bat" aria-hidden="true"></span></span>
+        </div>
+        <div class="app" id="app">
+
+          <!-- Hub: student package -->
+          <section class="screen is-on" data-screen="hub" data-od-id="screen-hub">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="hub-back" id="btn-hub-back">学员</button>
+              </div>
+              <h1 data-od-id="hub-title">课包</h1>
+              <div class="nav-side end">
+                <button type="button" class="text-btn" data-od-id="hub-add" id="btn-hub-add">新建</button>
+              </div>
+            </div>
+            <div class="body" id="hub-body" data-od-id="hub-body"></div>
+          </section>
+
+          <!-- Package detail -->
+          <section class="screen" data-screen="pkg-detail" data-od-id="screen-pkg-detail">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="pkg-back" id="btn-pkg-back">返回</button>
+              </div>
+              <h1 data-od-id="pkg-title">课包详情</h1>
+              <div class="nav-side end">
+                <button type="button" class="text-btn" data-od-id="pkg-more" id="btn-pkg-more" aria-haspopup="menu" aria-expanded="false">更多</button>
+              </div>
+            </div>
+            <div class="body" id="pkg-body" data-od-id="pkg-body"></div>
+          </section>
+
+          <!-- Create / edit form -->
+          <section class="screen" data-screen="pkg-form" data-od-id="screen-pkg-form">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="form-cancel" id="btn-form-cancel">取消</button>
+              </div>
+              <h1 data-od-id="form-title">新建课包</h1>
+              <div class="nav-side end">
+                <button type="button" class="text-btn" data-od-id="form-save" id="btn-form-save">保存</button>
+              </div>
+            </div>
+            <div class="body" data-od-id="form-body">
+              <div class="callout" id="form-gate" data-od-id="one-active-gate" hidden>
+                <b>同一学员只能有一个有效课包</b>
+                <p>请先结束或归档当前有效课包。旧课包会留在历史中，不会删除。</p>
+                <button type="button" class="ghost" id="btn-gate-archive" data-od-id="cta-gate-archive" style="margin-top:8px">结束当前课包</button>
+              </div>
+              <label class="field-label" for="f-name">名称 <span class="req">选填</span></label>
+              <input class="field" id="f-name" data-od-id="field-name" type="text" placeholder="例如：暑期减脂 20 次">
+              <p class="hint" id="f-name-hint">未填写时使用默认名称。</p>
+
+              <label class="field-label" for="f-total">总课时 <span class="req">必填</span></label>
+              <input class="field" id="f-total" data-od-id="field-total" type="number" min="1" step="1" value="20">
+              <p class="err" id="err-total">请填写至少 1 的总课时。</p>
+
+              <div class="row-inline">
+                <div>
+                  <label class="field-label" for="f-start">开始日期</label>
+                  <input class="field" id="f-start" data-od-id="field-start" type="date">
+                  <p class="hint">默认今天</p>
+                </div>
+                <div>
+                  <label class="field-label" for="f-end">结束日期 <span class="req">选填</span></label>
+                  <input class="field" id="f-end" data-od-id="field-end" type="date">
+                </div>
+              </div>
+              <p class="hint" style="margin-top:12px">不记录价格、付款或欠费。剩余课时在保存后等于总课时。</p>
+            </div>
+          </section>
+
+          <!-- Package history -->
+          <section class="screen" data-screen="pkg-history" data-od-id="screen-pkg-history">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="hist-back" id="btn-hist-back">返回</button>
+              </div>
+              <h1>课包历史</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body tight" id="hist-body" data-od-id="hist-body"></div>
+          </section>
+
+          <!-- Adjustment list -->
+          <section class="screen" data-screen="adj-list" data-od-id="screen-adj-list">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="adj-back" id="btn-adj-back">返回</button>
+              </div>
+              <h1>课时调整</h1>
+              <div class="nav-side end">
+                <button type="button" class="text-btn" data-od-id="adj-manual" id="btn-adj-open-manual">调整</button>
+              </div>
+            </div>
+            <div class="body tight" id="adj-body" data-od-id="adj-body"></div>
+          </section>
+
+          <!-- Manual adjust -->
+          <section class="screen" data-screen="adj-manual" data-od-id="screen-adj-manual">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="manual-cancel" id="btn-manual-cancel">取消</button>
+              </div>
+              <h1>人工调整</h1>
+              <div class="nav-side end">
+                <button type="button" class="text-btn" data-od-id="manual-save" id="btn-manual-save">保存</button>
+              </div>
+            </div>
+            <div class="body">
+              <div class="callout" data-od-id="manual-rule">
+                <b>不会静默改写余额</b>
+                <p>每次人工修正都会生成一条可追溯的课时调整记录。</p>
+              </div>
+              <label class="field-label">方向</label>
+              <div class="btn-row" style="margin-top:0">
+                <button type="button" class="choice" id="m-dir-minus" data-od-id="manual-dir-deduct" aria-pressed="true" style="margin:0;flex:1">
+                  <span class="t">扣减</span>
+                </button>
+                <button type="button" class="choice" id="m-dir-plus" data-od-id="manual-dir-return" aria-pressed="false" style="margin:0;flex:1">
+                  <span class="t">返还 / 增加</span>
+                </button>
+              </div>
+              <label class="field-label" for="m-amount">课时数</label>
+              <input class="field" id="m-amount" data-od-id="field-manual-amount" type="number" min="1" step="1" value="1">
+              <p class="err" id="err-manual-amount">请填写至少 1。</p>
+              <label class="field-label" for="m-reason">原因 <span class="req">必填</span></label>
+              <textarea class="area" id="m-reason" data-od-id="field-manual-reason" placeholder="例如：体验课补扣、口头协商返还"></textarea>
+              <p class="err" id="err-manual-reason">请填写原因，便于日后核对。</p>
+            </div>
+          </section>
+
+          <!-- Flow: appointment-linked complete -->
+          <section class="screen" data-screen="flow-auto" data-od-id="screen-flow-auto">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="auto-back" id="btn-auto-back">返回</button>
+              </div>
+              <h1>结束训练</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body" id="auto-body" data-od-id="auto-body"></div>
+          </section>
+
+          <!-- Flow: temporary session -->
+          <section class="screen" data-screen="flow-temp" data-od-id="screen-flow-temp">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="temp-back" id="btn-temp-back">返回</button>
+              </div>
+              <h1>临时课 · 课包</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body" id="temp-body" data-od-id="temp-body"></div>
+          </section>
+
+          <!-- Flow: zero / expired -->
+          <section class="screen" data-screen="flow-zero" data-od-id="screen-flow-zero">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="zero-back" id="btn-zero-back">返回</button>
+              </div>
+              <h1>结束训练</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body" id="zero-body" data-od-id="zero-body"></div>
+          </section>
+
+          <!-- Flow: no-show -->
+          <section class="screen" data-screen="flow-noshow" data-od-id="screen-flow-noshow">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="noshow-back" id="btn-noshow-back">返回</button>
+              </div>
+              <h1>学员缺席</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body" id="noshow-body" data-od-id="noshow-body"></div>
+          </section>
+
+          <!-- Flow: reopen -->
+          <section class="screen" data-screen="flow-reopen" data-od-id="screen-flow-reopen">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="reopen-back" id="btn-reopen-back">返回</button>
+              </div>
+              <h1>重新打开训练</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body" id="reopen-body" data-od-id="reopen-body"></div>
+          </section>
+
+          <!-- Today warning destination only -->
+          <section class="screen" data-screen="dest-today" data-od-id="screen-dest-today">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="dest-today-back" id="btn-dest-today-back">返回</button>
+              </div>
+              <h1>今日 · 出口</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body tight">
+              <p class="sec-label flush">来源芯片（示意 · 非今日页）</p>
+              <div class="demo-card" data-od-id="today-warn-chip-sample" aria-hidden="true">
+                <div class="top">
+                  <div class="time">10:00</div>
+                  <div>
+                    <div class="who">小周 <span class="warn-chip">余额不足</span></div>
+                    <div class="card-meta">60 分钟 · 待上课 · 警告可点</div>
+                  </div>
+                </div>
+              </div>
+              <div class="dest" data-od-id="today-warn-destination" style="margin-top:8px">
+                <h2>课包异常 · 目的地</h2>
+                <p>今日卡片只显示简洁警告。本模块不重建今日列表；点击后进入课包详情。</p>
+                <button type="button" class="primary" id="btn-dest-open-pkg" data-od-id="cta-open-pkg-from-warn" style="margin-top:8px">打开小周课包</button>
+                <div class="bound">BOUND · M1-B/01 TODAY WARN → M1-B/02 PACKAGE</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Generic destination -->
+          <section class="screen" data-screen="dest" data-od-id="screen-dest">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="dest-back" id="btn-dest-back">返回</button>
+              </div>
+              <h1 id="dest-nav-title">出口</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="dest" id="dest-panel" data-od-id="generic-destination">
+              <h2 id="dest-h">其他模块</h2>
+              <p id="dest-p">本原型仅覆盖课包模块。</p>
+              <div class="bound" id="dest-bound">BOUND</div>
+            </div>
+          </section>
+
+          <div class="scrim" id="scrim" data-od-id="scrim"></div>
+          <div class="sheet" id="sheet" data-od-id="action-sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title"></div>
+          <div class="toast" id="toast" data-od-id="toast" role="status"></div>
+        </div>
+        <div class="home-bar" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <aside class="rail" data-od-id="annotation-right">
+      <h2>当前</h2>
+      <div class="now" id="now-label" data-od-id="now-label">小周 · 有效课包</div>
+      <h2 style="margin-top:18px">验收</h2>
+      <ul class="check" data-od-id="acceptance">
+        <li id="chk-create">□ 创建课包（名称选填 / 总课时必填）</li>
+        <li id="chk-one">□ 一学员一有效 · 须先结束</li>
+        <li id="chk-deduct">□ 关联完成自动 −1 / 临时课选择</li>
+        <li id="chk-noshow">□ 缺席询问扣课</li>
+        <li id="chk-return">□ 重开返还 + 调整行可见</li>
+        <li id="chk-list">□ 调整历史与人工调整</li>
+      </ul>
+      <div class="note" style="margin-top:14px">
+        <span class="k">规则摘要</span>
+        <ul>
+          <li>过期 / 余额 0 不拦训练，结束时提示，永不自动负余额</li>
+          <li>取消 / 请假不扣；缺席才问</li>
+          <li>每次变更写课时调整行，禁止静默改余额</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    (function () {
+      var TODAY = "2026-08-21";
+      var STUDENT = { id: "s-zhou", name: "小周" };
+
+      function seedPackages() {
+        return [
+          {
+            id: "pkg-active",
+            name: "暑期减脂 20 次",
+            total: 20,
+            remaining: 6,
+            start: "2026-06-01",
+            end: "2026-09-30",
+            status: "active"
+          },
+          {
+            id: "pkg-old",
+            name: "春季基础 12 次",
+            total: 12,
+            remaining: 0,
+            start: "2026-03-01",
+            end: "2026-05-31",
+            status: "archived",
+            archivedAt: "2026-05-31"
+          }
+        ];
+      }
+
+      function seedAdj() {
+        return [
+          {
+            id: "adj-1",
+            type: "deduct",
+            delta: -1,
+            reason: "关联课程完成 · 幂等扣减",
+            at: "8月18日 19:12",
+            packageId: "pkg-active",
+            sessionKey: "sess-0818"
+          },
+          {
+            id: "adj-2",
+            type: "deduct",
+            delta: -1,
+            reason: "关联课程完成 · 幂等扣减",
+            at: "8月11日 19:08",
+            packageId: "pkg-active",
+            sessionKey: "sess-0811"
+          },
+          {
+            id: "adj-3",
+            type: "manual",
+            delta: -1,
+            reason: "体验课补扣",
+            at: "8月5日 10:22",
+            packageId: "pkg-active",
+            sessionKey: ""
+          },
+          {
+            id: "adj-4",
+            type: "deduct",
+            delta: -1,
+            reason: "关联课程完成 · 幂等扣减",
+            at: "5月28日 18:40",
+            packageId: "pkg-old",
+            sessionKey: "sess-0528"
+          }
+        ];
+      }
+
+      var state = {
+        screen: "hub",
+        scene: "hub",
+        packages: seedPackages(),
+        adjustments: seedAdj(),
+        viewingPkg: "pkg-active",
+        formLocked: false,
+        manualDir: -1,
+        tempChoice: "package",
+        zeroChoice: "skip",
+        deductedKeys: { "sess-0818": true, "sess-0811": true, "sess-0528": true },
+        completedSession: {
+          key: "sess-demo-complete",
+          title: "8月20日 · 下肢",
+          linked: true,
+          deducted: true,
+          reopened: false
+        },
+        checks: { create: false, one: false, deduct: false, noshow: false, ret: false, list: false },
+        destFrom: "hub",
+        toastTimer: null
+      };
+
+      var $ = function (id) { return document.getElementById(id); };
+      var screens = document.querySelectorAll(".screen");
+
+      function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, function (c) {
+          return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c];
+        });
+      }
+
+      function activePkg() {
+        for (var i = 0; i < state.packages.length; i++) {
+          if (state.packages[i].status === "active") return state.packages[i];
+        }
+        return null;
+      }
+
+      function pkgById(id) {
+        for (var i = 0; i < state.packages.length; i++) {
+          if (state.packages[i].id === id) return state.packages[i];
+        }
+        return null;
+      }
+
+      function usedOf(p) {
+        return Math.max(0, p.total - p.remaining);
+      }
+
+      function isExpired(p) {
+        return !!(p.end && p.end < TODAY);
+      }
+
+      function warnLabel(p) {
+        if (!p) return "无有效课包";
+        if (p.remaining <= 0) return "余额不足";
+        if (isExpired(p)) return "已过期";
+        return "";
+      }
+
+      function typeLabel(t) {
+        if (t === "deduct") return "扣减";
+        if (t === "return") return "返还";
+        return "人工";
+      }
+
+      function defaultName(total) {
+        return "课包 · " + total + " 次";
+      }
+
+      function stampNow() {
+        return "8月21日 " + (new Date().getHours()) + ":" + String(new Date().getMinutes()).padStart(2, "0");
+      }
+
+      function toast(msg) {
+        var el = $("toast");
+        el.textContent = msg;
+        el.classList.add("on");
+        if (state.toastTimer) clearTimeout(state.toastTimer);
+        state.toastTimer = setTimeout(function () { el.classList.remove("on"); }, 1800);
+      }
+
+      function closeSheet() {
+        $("sheet").classList.remove("on");
+        $("scrim").classList.remove("on");
+        $("sheet").innerHTML = "";
+        var more = $("btn-pkg-more");
+        if (more) more.setAttribute("aria-expanded", "false");
+      }
+
+      function openSheet(html) {
+        $("sheet").innerHTML = html;
+        $("sheet").classList.add("on");
+        $("scrim").classList.add("on");
+      }
+
+      function markCheck(key) {
+        state.checks[key] = true;
+        renderChecks();
+      }
+
+      function renderChecks() {
+        var map = [
+          ["chk-create", "create", "创建课包（名称选填 / 总课时必填）"],
+          ["chk-one", "one", "一学员一有效 · 须先结束"],
+          ["chk-deduct", "deduct", "关联完成自动 −1 / 临时课选择"],
+          ["chk-noshow", "noshow", "缺席询问扣课"],
+          ["chk-return", "ret", "重开返还 + 调整行可见"],
+          ["chk-list", "list", "调整历史与人工调整"]
+        ];
+        map.forEach(function (row) {
+          var el = $(row[0]);
+          if (!el) return;
+          el.textContent = (state.checks[row[1]] ? "☑ " : "□ ") + row[2];
+          el.style.color = state.checks[row[1]] ? "var(--fg)" : "var(--muted)";
+        });
+      }
+
+      function nowCopy() {
+        var p = activePkg();
+        if (state.screen === "hub") return "小周 · 课包总览" + (p ? " · 余 " + p.remaining : " · 无有效");
+        if (state.screen === "pkg-detail") {
+          var v = pkgById(state.viewingPkg);
+          return (v ? v.name : "课包") + " · 详情";
+        }
+        if (state.screen === "pkg-form") return state.formLocked ? "新建 · 须先结束当前" : "新建课包";
+        if (state.screen === "pkg-history") return "课包历史";
+        if (state.screen === "adj-list") return "课时调整 · " + state.adjustments.length + " 条";
+        if (state.screen === "adj-manual") return "人工调整";
+        if (state.screen === "flow-auto") return "关联完成 · 自动扣课";
+        if (state.screen === "flow-temp") return "临时课 · 选择扣课";
+        if (state.screen === "flow-zero") return "余额不足 · 结束提示";
+        if (state.screen === "flow-noshow") return "学员缺席 · 询问扣课";
+        if (state.screen === "flow-reopen") return "重新打开 · 返还后果";
+        if (state.screen === "dest-today") return "今日警告 · 仅出口";
+        if (state.screen === "dest") return "模块出口";
+        return "—";
+      }
+
+      function show(name) {
+        state.screen = name;
+        screens.forEach(function (el) {
+          el.classList.toggle("is-on", el.getAttribute("data-screen") === name);
+        });
+        closeSheet();
+        $("now-label").textContent = nowCopy();
+        document.querySelectorAll(".scene-btn").forEach(function (b) {
+          b.setAttribute("aria-current", b.getAttribute("data-scene") === state.scene ? "true" : "false");
+        });
+        if (name === "hub") renderHub();
+        if (name === "pkg-detail") renderPkgDetail();
+        if (name === "pkg-history") renderHistory();
+        if (name === "adj-list") renderAdjList();
+        if (name === "flow-auto") renderAuto();
+        if (name === "flow-temp") renderTemp();
+        if (name === "flow-zero") renderZero();
+        if (name === "flow-noshow") renderNoshow();
+        if (name === "flow-reopen") renderReopen();
+      }
+
+      function pushAdj(entry) {
+        state.adjustments.unshift(entry);
+        markCheck("list");
+      }
+
+      function applyDelta(pkg, delta, opts) {
+        opts = opts || {};
+        if (!pkg) return { ok: false, reason: "无课包" };
+        if (opts.sessionKey && state.deductedKeys[opts.sessionKey] && delta < 0) {
+          return { ok: false, reason: "idempotent", already: true };
+        }
+        if (opts.sessionKey && !state.deductedKeys[opts.sessionKey] && delta > 0 && opts.requirePriorDeduct) {
+          return { ok: false, reason: "no-prior" };
+        }
+        var next = pkg.remaining + delta;
+        if (next < 0 && !opts.allowNegative) {
+          return { ok: false, reason: "would-negative" };
+        }
+        pkg.remaining = next;
+        if (opts.sessionKey && delta < 0) state.deductedKeys[opts.sessionKey] = true;
+        if (opts.sessionKey && delta > 0) delete state.deductedKeys[opts.sessionKey];
+        return { ok: true };
+      }
+
+      function renderHub() {
+        var p = activePkg();
+        var html = "";
+        html += '<p class="sec-label" style="padding-top:0">学员</p>';
+        html += '<div class="detail-block" data-od-id="student-chip"><div class="detail-line"><b>' +
+          escapeHtml(STUDENT.name) + '</b><em>内部编号 ' + STUDENT.id + " · 改名不改编号</em></div></div>";
+
+        if (p) {
+          var warn = warnLabel(p);
+          html += '<p class="sec-label">有效课包</p>';
+          html += '<button type="button" class="card is-active" data-od-id="card-active-package" id="card-active">';
+          html += '<div class="card-name">' + escapeHtml(p.name) +
+            ' <span class="status-pill fill">有效</span>';
+          if (warn) html += ' <span class="warn-chip" data-od-id="chip-pkg-warn">' + warn + "</span>";
+          html += "</div>";
+          html += '<div class="balance" data-od-id="balance-remaining">' + p.remaining + "<em>/ " + p.total + " 剩余</em></div>";
+          html += '<div class="card-meta">已用 ' + usedOf(p) + " · " + p.start + (p.end ? " → " + p.end : " · 无结束日") + "</div>";
+          html += '<p class="stamp">点开查看详情与课时调整</p></button>';
+        } else {
+          html += '<div class="empty" data-od-id="empty-active"><div class="empty-box"></div>';
+          html += "<h2>暂无有效课包</h2><p>可以新建课包。训练仍可开始，结束时再处理扣课。</p></div>";
+        }
+
+        html += '<button type="button" class="ghost" id="btn-open-adj" data-od-id="cta-open-adjustments">课时调整历史</button>';
+        html += '<button type="button" class="ghost" id="btn-open-hist" data-od-id="cta-open-pkg-history">课包历史</button>';
+        html += '<button type="button" class="primary" id="btn-hub-create" data-od-id="cta-create-package" style="margin-top:16px">新建课包</button>';
+
+        html += '<p class="sec-label">演示入口</p>';
+        html += '<button type="button" class="ghost" id="btn-demo-auto" data-od-id="cta-demo-auto">关联完成 · 自动扣课</button>';
+        html += '<button type="button" class="ghost" id="btn-demo-temp" data-od-id="cta-demo-temp">临时课结束</button>';
+        html += '<button type="button" class="ghost" id="btn-demo-zero" data-od-id="cta-demo-zero">余额不足结束</button>';
+        html += '<button type="button" class="ghost" id="btn-demo-noshow" data-od-id="cta-demo-noshow">学员缺席</button>';
+        html += '<button type="button" class="ghost" id="btn-demo-reopen" data-od-id="cta-demo-reopen">重新打开已完成</button>';
+
+        $("hub-body").innerHTML = html;
+      }
+
+      function renderPkgDetail() {
+        var p = pkgById(state.viewingPkg);
+        if (!p) { show("hub"); return; }
+        var warn = warnLabel(p);
+        var html = "";
+        html += '<div class="detail-block" data-od-id="pkg-summary">';
+        html += "<h3>课包</h3>";
+        html += '<div class="detail-line"><b>' + escapeHtml(p.name) + "</b>";
+        html += '<em>' + (p.status === "active" ? "有效" : "已归档") +
+          (warn ? " · " + warn : "") + "</em></div>";
+        html += '<div class="balance">' + p.remaining + "<em>/ " + p.total + " 剩余</em></div>";
+        html += '<dl class="kv">';
+        html += "<dt>总课时</dt><dd>" + p.total + "</dd>";
+        html += "<dt>已使用</dt><dd>" + usedOf(p) + "</dd>";
+        html += "<dt>开始</dt><dd>" + p.start + "</dd>";
+        html += "<dt>结束</dt><dd>" + (p.end || "未设置") + "</dd>";
+        html += "</dl>";
+        html += '<p class="stamp">id=' + p.id + " · 不含价格与付款</p></div>";
+
+        if (p.status === "active") {
+          html += '<div class="callout" data-od-id="rule-no-block">';
+          html += "<b>过期或余额不足不阻止训练</b>";
+          html += "<p>可继续开始与记录。结束时提示，不自动产生负余额。</p></div>";
+        }
+
+        html += '<button type="button" class="primary" id="btn-pkg-adj" data-od-id="cta-pkg-adjustments">查看课时调整</button>';
+        if (p.status === "active") {
+          html += '<button type="button" class="ghost" id="btn-pkg-manual" data-od-id="cta-pkg-manual">人工调整</button>';
+          html += '<button type="button" class="danger-btn" id="btn-pkg-archive" data-od-id="cta-archive-package">结束 / 归档</button>';
+        }
+        $("pkg-body").innerHTML = html;
+      }
+
+      function renderHistory() {
+        var html = "";
+        var list = state.packages.slice().sort(function (a, b) {
+          if (a.status === b.status) return (b.start > a.start ? 1 : -1);
+          return a.status === "active" ? -1 : 1;
+        });
+        if (!list.length) {
+          html = '<div class="empty"><div class="empty-box"></div><h2>暂无课包</h2></div>';
+        } else {
+          list.forEach(function (p) {
+            html += '<button type="button" class="list-row" data-pkg="' + p.id + '" data-od-id="hist-row-' + p.id + '">';
+            html += '<div class="main"><div class="name">' + escapeHtml(p.name) + "</div>";
+            html += '<div class="sub">' + (p.status === "active" ? "有效" : "历史") +
+              " · 余 " + p.remaining + " / " + p.total + " · " + p.start + (p.end ? " → " + p.end : "") + "</div></div>";
+            html += '<span class="chev" aria-hidden="true"></span></button>';
+          });
+        }
+        $("hist-body").innerHTML = html;
+      }
+
+      function renderAdjList() {
+        var html = "";
+        if (!state.adjustments.length) {
+          html = '<div class="empty"><div class="empty-box"></div><h2>暂无调整</h2><p>扣减、返还与人工修正都会出现在这里。</p></div>';
+        } else {
+          html += '<p class="sec-label flush">全部记录 · 新到旧</p>';
+          state.adjustments.forEach(function (a) {
+            var pkg = pkgById(a.packageId);
+            var sign = a.delta > 0 ? "+" + a.delta : String(a.delta);
+            html += '<div class="list-row" data-od-id="adj-row-' + a.id + '" style="cursor:default">';
+            html += '<div class="main"><div class="name">' + typeLabel(a.type) + " · " + escapeHtml(a.reason) + "</div>";
+            html += '<div class="sub">' + a.at + (pkg ? " · " + escapeHtml(pkg.name) : "") +
+              (a.sessionKey ? " · " + a.sessionKey : "") + "</div></div>";
+            html += '<div class="delta" aria-label="变更">' + sign + "</div></div>";
+          });
+        }
+        $("adj-body").innerHTML = html;
+        markCheck("list");
+      }
+
+      function renderAuto() {
+        var p = activePkg();
+        var key = "sess-auto-demo";
+        var already = !!state.deductedKeys[key];
+        var html = "";
+        html += '<div class="callout" data-od-id="auto-explain">';
+        html += "<b>关联课程安排 · 正常完成</b>";
+        html += "<p>自动且仅扣减 1 次。再次点「确认结束」不会重复扣课（幂等）。</p></div>";
+        html += '<div class="detail-block"><h3>本次训练</h3>';
+        html += '<div class="detail-line">小周 · 下肢 · 已关联课包</div>';
+        html += "<div class="detail-line"><em>sessionKey=" + key + "</em></div></div>";
+        if (p) {
+          html += '<div class="detail-block" data-od-id="auto-balance"><h3>当前课包</h3>';
+          html += '<div class="detail-line">' + escapeHtml(p.name) + "</div>";
+          html += '<div class="balance">' + p.remaining + "<em>剩余</em></div></div>";
+        }
+        if (already) {
+          html += '<div class="callout"><b>已扣过 · 幂等保护</b><p>本会话已有扣减记录，不会再次 −1。</p></div>';
+          html += '<button type="button" class="primary" id="btn-auto-confirm" data-od-id="cta-auto-confirm-again">再次确认结束</button>';
+          html += '<button type="button" class="ghost" id="btn-auto-see-adj" data-od-id="cta-auto-see-adj">查看课时调整</button>';
+        } else {
+          html += '<button type="button" class="primary" id="btn-auto-confirm" data-od-id="cta-auto-confirm">确认结束并扣 1 课时</button>';
+          html += '<button type="button" class="ghost" id="btn-auto-cancel-leave" data-od-id="cta-cancel-leave">改为取消 / 请假（不扣课）</button>';
+        }
+        $("auto-body").innerHTML = html;
+      }
+
+      function renderTemp() {
+        var p = activePkg();
+        var html = "";
+        html += '<div class="callout" data-od-id="temp-explain">';
+        html += "<b>临时课程 · 未预先关联课包</b>";
+        html += "<p>结束时由教练选择：扣当前有效课包，或不扣课。</p></div>";
+        html += '<label class="field-label">选择</label>';
+        html += '<button type="button" class="choice" id="temp-pkg" data-od-id="choice-temp-package" aria-pressed="' +
+          (state.tempChoice === "package") + '"><span class="t">扣当前课包 −1</span>';
+        html += '<span class="d">' + (p ? escapeHtml(p.name) + " · 余 " + p.remaining : "无有效课包") + "</span></button>";
+        html += '<button type="button" class="choice" id="temp-skip" data-od-id="choice-temp-skip" aria-pressed="' +
+          (state.tempChoice === "skip") + '"><span class="t">不扣课</span>';
+        html += '<span class="d">余额不变，也不写扣减行</span></button>';
+        html += '<button type="button" class="primary" id="btn-temp-confirm" data-od-id="cta-temp-confirm">确认结束</button>';
+        $("temp-body").innerHTML = html;
+      }
+
+      function renderZero() {
+        var p = activePkg();
+        var html = "";
+        html += '<div class="callout" data-od-id="zero-explain">';
+        html += "<b>训练已可结束 · 课包不可自动扣</b>";
+        html += "<p>过期或余额不足不阻止记录。不自动产生负余额；请选择不扣课，或去做人工调整。</p></div>";
+        if (p) {
+          html += '<div class="detail-block"><h3>课包状态</h3>';
+          html += '<div class="detail-line">' + escapeHtml(p.name) +
+            ' <span class="warn-chip">' + (warnLabel(p) || "正常") + "</span></div>";
+          html += '<div class="balance">' + p.remaining + "<em>剩余 · 总 " + p.total + "</em></div></div>";
+        } else {
+          html += '<div class="detail-block"><div class="detail-line">无有效课包</div></div>';
+        }
+        html += '<button type="button" class="choice" id="zero-skip" data-od-id="choice-zero-skip" aria-pressed="' +
+          (state.zeroChoice === "skip") + '"><span class="t">不扣课</span><span class="d">结束训练，余额不变</span></button>';
+        html += '<button type="button" class="choice" id="zero-manual" data-od-id="choice-zero-manual" aria-pressed="' +
+          (state.zeroChoice === "manual") + '"><span class="t">人工调整…</span><span class="d">打开调整表单，显式改余额并写原因</span></button>';
+        html += '<button type="button" class="primary" id="btn-zero-confirm" data-od-id="cta-zero-confirm">确认</button>';
+        $("zero-body").innerHTML = html;
+      }
+
+      function renderNoshow() {
+        var p = activePkg();
+        var html = "";
+        html += '<div class="callout" data-od-id="noshow-explain">';
+        html += "<b>标记学员缺席</b>";
+        html += "<p>取消或正常请假不扣课。缺席时必须询问是否扣除 1 课时。</p></div>";
+        html += '<div class="detail-block"><h3>课程安排</h3>';
+        html += '<div class="detail-line">今天 10:00 · 小周 · 60 分钟</div>';
+        html += "<div class="detail-line"><em>状态将变为：学员缺席</em></div></div>";
+        if (p) {
+          html += '<p class="hint">当前课包余 ' + p.remaining + " 次</p>";
+        }
+        html += '<button type="button" class="primary" id="btn-noshow-yes" data-od-id="cta-noshow-deduct">扣除 1 课时</button>';
+        html += '<button type="button" class="ghost" id="btn-noshow-no" data-od-id="cta-noshow-skip">不扣课</button>';
+        $("noshow-body").innerHTML = html;
+      }
+
+      function renderReopen() {
+        var s = state.completedSession;
+        var p = activePkg();
+        var html = "";
+        html += '<div class="callout" data-od-id="reopen-explain">';
+        html += "<b>重新打开已完成训练</b>";
+        html += "<p>普通编辑不改完成状态。只有明确「重新打开」才恢复为训练中，并返还此前扣减。</p></div>";
+        html += '<div class="detail-block"><h3>已完成训练</h3>';
+        html += '<div class="detail-line">' + escapeHtml(s.title) + "</div>";
+        html += "<div class="detail-line"><em>key=" + s.key + " · 此前" +
+          (s.deducted && !s.reopened ? "已扣 1 次" : (s.reopened ? "已返还" : "未扣课")) + "</em></div></div>";
+        if (p) {
+          html += '<div class="detail-block"><h3>课包后果预览</h3>';
+          html += '<div class="detail-line">当前剩余 ' + p.remaining + "</div>";
+          if (s.deducted && !s.reopened) {
+            html += '<div class="detail-line">重新打开后将 <b>+1 返还</b>，并写入课时调整行</div>';
+          } else if (s.reopened) {
+            html += '<div class="detail-line">已返还，不会再次返还</div>';
+          }
+          html += "</div>";
+        }
+        if (!s.reopened && s.deducted) {
+          html += '<button type="button" class="primary" id="btn-reopen-confirm" data-od-id="cta-reopen-confirm">重新打开并返还</button>';
+        } else {
+          html += '<button type="button" class="ghost" id="btn-reopen-see" data-od-id="cta-reopen-see-adj">查看课时调整</button>';
+        }
+        $("reopen-body").innerHTML = html;
+      }
+
+      function openForm(forceGate) {
+        var p = activePkg();
+        state.formLocked = !!(p && forceGate !== false);
+        $("form-gate").hidden = !state.formLocked;
+        $("f-name").value = "";
+        $("f-total").value = "20";
+        $("f-start").value = TODAY;
+        $("f-end").value = "";
+        $("err-total").classList.remove("show");
+        $("f-name-hint").textContent = "未填写时默认「" + defaultName(20) + "」。";
+        var fields = ["f-name", "f-total", "f-start", "f-end", "btn-form-save"];
+        fields.forEach(function (id) {
+          var el = $(id);
+          if (!el) return;
+          if (el.tagName === "BUTTON") el.disabled = state.formLocked;
+          else el.disabled = state.formLocked;
+        });
+        show("pkg-form");
+      }
+
+      function archiveActive(thenCreate) {
+        var p = activePkg();
+        if (!p) {
+          if (thenCreate) { state.formLocked = false; openForm(false); }
+          return;
+        }
+        p.status = "archived";
+        p.archivedAt = TODAY;
+        markCheck("one");
+        toast("已结束「" + p.name + "」，已进入历史");
+        if (thenCreate) {
+          state.formLocked = false;
+          openForm(false);
+        } else {
+          state.viewingPkg = p.id;
+          show("pkg-detail");
+        }
+      }
+
+      function savePackage() {
+        if (state.formLocked) {
+          toast("请先结束当前有效课包");
+          markCheck("one");
+          return;
+        }
+        if (activePkg()) {
+          state.formLocked = true;
+          $("form-gate").hidden = false;
+          markCheck("one");
+          toast("同一学员只能有一个有效课包");
+          return;
+        }
+        var total = parseInt($("f-total").value, 10);
+        if (!total || total < 1) {
+          $("err-total").classList.add("show");
+          return;
+        }
+        $("err-total").classList.remove("show");
+        var name = ($("f-name").value || "").trim() || defaultName(total);
+        var start = $("f-start").value || TODAY;
+        var end = $("f-end").value || "";
+        var id = "pkg-" + Date.now();
+        var pkg = {
+          id: id,
+          name: name,
+          total: total,
+          remaining: total,
+          start: start,
+          end: end,
+          status: "active"
+        };
+        state.packages.unshift(pkg);
+        state.viewingPkg = id;
+        markCheck("create");
+        toast("已创建课包 · 剩余 " + total);
+        show("pkg-detail");
+      }
+
+      function saveManual() {
+        var p = activePkg();
+        if (!p) { toast("无有效课包可调整"); return; }
+        var amount = parseInt($("m-amount").value, 10);
+        var reason = ($("m-reason").value || "").trim();
+        var ok = true;
+        if (!amount || amount < 1) { $("err-manual-amount").classList.add("show"); ok = false; }
+        else $("err-manual-amount").classList.remove("show");
+        if (!reason) { $("err-manual-reason").classList.add("show"); ok = false; }
+        else $("err-manual-reason").classList.remove("show");
+        if (!ok) return;
+        var delta = state.manualDir < 0 ? -amount : amount;
+        var res = applyDelta(p, delta, { allowNegative: false });
+        if (!res.ok && res.reason === "would-negative") {
+          toast("不会自动变成负余额，请减小扣减数");
+          return;
+        }
+        pushAdj({
+          id: "adj-" + Date.now(),
+          type: "manual",
+          delta: delta,
+          reason: reason,
+          at: stampNow(),
+          packageId: p.id,
+          sessionKey: ""
+        });
+        markCheck("list");
+        toast((delta < 0 ? "已扣减 " : "已增加 ") + Math.abs(delta) + " · 已记入调整");
+        show("adj-list");
+      }
+
+      function openDest(kind) {
+        state.destFrom = state.screen;
+        if (kind === "students") {
+          $("dest-nav-title").textContent = "学员";
+          $("dest-h").textContent = "学员列表";
+          $("dest-p").textContent = "出口到学员模块。本原型不展开学员内部页。";
+          $("dest-bound").textContent = "BOUND · M1-A/02 STUDENTS";
+        } else {
+          $("dest-nav-title").textContent = "出口";
+          $("dest-h").textContent = "其他模块";
+          $("dest-p").textContent = "本模块只覆盖课包与课时调整。";
+          $("dest-bound").textContent = "BOUND";
+        }
+        show("dest");
+      }
+
+      function setScene(scene) {
+        state.scene = scene;
+        if (scene === "hub") {
+          state.packages = seedPackages();
+          state.adjustments = seedAdj();
+          state.deductedKeys = { "sess-0818": true, "sess-0811": true, "sess-0528": true };
+          state.completedSession = { key: "sess-demo-complete", title: "8月20日 · 下肢", linked: true, deducted: true, reopened: false };
+          show("hub");
+        } else if (scene === "create") {
+          state.packages = seedPackages();
+          openForm(true);
+          markCheck("one");
+        } else if (scene === "auto") {
+          state.packages = seedPackages();
+          delete state.deductedKeys["sess-auto-demo"];
+          show("flow-auto");
+        } else if (scene === "temp") {
+          state.packages = seedPackages();
+          state.tempChoice = "package";
+          show("flow-temp");
+        } else if (scene === "zero") {
+          state.packages = seedPackages();
+          var p = activePkg();
+          if (p) p.remaining = 0;
+          state.zeroChoice = "skip";
+          show("flow-zero");
+        } else if (scene === "noshow") {
+          state.packages = seedPackages();
+          show("flow-noshow");
+        } else if (scene === "reopen") {
+          state.packages = seedPackages();
+          state.completedSession = { key: "sess-demo-complete", title: "8月20日 · 下肢", linked: true, deducted: true, reopened: false };
+          state.deductedKeys["sess-demo-complete"] = true;
+          show("flow-reopen");
+        } else if (scene === "manual") {
+          state.packages = seedPackages();
+          state.adjustments = seedAdj();
+          state.manualDir = -1;
+          $("m-amount").value = "1";
+          $("m-reason").value = "";
+          $("m-dir-minus").setAttribute("aria-pressed", "true");
+          $("m-dir-plus").setAttribute("aria-pressed", "false");
+          show("adj-list");
+        } else if (scene === "today-warn") {
+          show("dest-today");
+        }
+        $("now-label").textContent = nowCopy();
+        document.querySelectorAll(".scene-btn").forEach(function (b) {
+          b.setAttribute("aria-current", b.getAttribute("data-scene") === state.scene ? "true" : "false");
+        });
+      }
+
+      /* events */
+      document.querySelectorAll(".scene-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          setScene(btn.getAttribute("data-scene"));
+        });
+      });
+
+      $("scrim").addEventListener("click", closeSheet);
+
+      $("btn-hub-back").addEventListener("click", function () { openDest("students"); });
+      $("btn-hub-add").addEventListener("click", function () { openForm(true); });
+      $("btn-form-cancel").addEventListener("click", function () { show("hub"); });
+      $("btn-form-save").addEventListener("click", savePackage);
+      $("btn-gate-archive").addEventListener("click", function () { archiveActive(true); });
+      $("f-total").addEventListener("input", function () {
+        var t = parseInt($("f-total").value, 10) || 20;
+        $("f-name-hint").textContent = "未填写时默认「" + defaultName(t) + "」。";
+      });
+
+      $("btn-pkg-back").addEventListener("click", function () { show("hub"); });
+      $("btn-hist-back").addEventListener("click", function () { show("hub"); });
+      $("btn-adj-back").addEventListener("click", function () {
+        if (state.viewingPkg) show("pkg-detail");
+        else show("hub");
+      });
+      $("btn-adj-open-manual").addEventListener("click", function () {
+        state.manualDir = -1;
+        $("m-amount").value = "1";
+        $("m-reason").value = "";
+        $("m-dir-minus").setAttribute("aria-pressed", "true");
+        $("m-dir-plus").setAttribute("aria-pressed", "false");
+        show("adj-manual");
+      });
+      $("btn-manual-cancel").addEventListener("click", function () { show("adj-list"); });
+      $("btn-manual-save").addEventListener("click", saveManual);
+      $("m-dir-minus").addEventListener("click", function () {
+        state.manualDir = -1;
+        $("m-dir-minus").setAttribute("aria-pressed", "true");
+        $("m-dir-plus").setAttribute("aria-pressed", "false");
+      });
+      $("m-dir-plus").addEventListener("click", function () {
+        state.manualDir = 1;
+        $("m-dir-minus").setAttribute("aria-pressed", "false");
+        $("m-dir-plus").setAttribute("aria-pressed", "true");
+      });
+
+      $("btn-auto-back").addEventListener("click", function () { show("hub"); });
+      $("btn-temp-back").addEventListener("click", function () { show("hub"); });
+      $("btn-zero-back").addEventListener("click", function () { show("hub"); });
+      $("btn-noshow-back").addEventListener("click", function () { show("hub"); });
+      $("btn-reopen-back").addEventListener("click", function () { show("hub"); });
+      $("btn-dest-today-back").addEventListener("click", function () { show("hub"); });
+      $("btn-dest-back").addEventListener("click", function () { show(state.destFrom || "hub"); });
+      $("btn-dest-open-pkg").addEventListener("click", function () {
+        state.viewingPkg = (activePkg() || state.packages[0]).id;
+        show("pkg-detail");
+      });
+
+      $("btn-pkg-more").addEventListener("click", function () {
+        var p = pkgById(state.viewingPkg);
+        if (!p) return;
+        $("btn-pkg-more").setAttribute("aria-expanded", "true");
+        var html = '<h2 id="sheet-title">课包操作</h2><p class="lead">' + escapeHtml(p.name) + "</p>";
+        html += '<button type="button" class="menu-item" id="sheet-adj">课时调整历史</button>';
+        if (p.status === "active") {
+          html += '<button type="button" class="menu-item" id="sheet-manual">人工调整</button>';
+          html += '<button type="button" class="menu-item danger" id="sheet-archive">结束 / 归档</button>';
+        }
+        html += '<button type="button" class="ghost" id="sheet-close" style="margin-top:12px">关闭</button>';
+        openSheet(html);
+      });
+
+      document.getElementById("app").addEventListener("click", function (e) {
+        var t = e.target.closest("button, .list-row");
+        if (!t) return;
+        var id = t.id;
+
+        if (id === "card-active" || (t.getAttribute && t.getAttribute("data-od-id") === "card-active-package")) {
+          var ap = activePkg();
+          if (ap) { state.viewingPkg = ap.id; show("pkg-detail"); }
+          return;
+        }
+        if (id === "btn-hub-create") { openForm(true); return; }
+        if (id === "btn-open-adj") { show("adj-list"); return; }
+        if (id === "btn-open-hist") { show("pkg-history"); return; }
+        if (id === "btn-demo-auto") { setScene("auto"); return; }
+        if (id === "btn-demo-temp") { setScene("temp"); return; }
+        if (id === "btn-demo-zero") { setScene("zero"); return; }
+        if (id === "btn-demo-noshow") { setScene("noshow"); return; }
+        if (id === "btn-demo-reopen") { setScene("reopen"); return; }
+
+        if (id === "btn-pkg-adj") { show("adj-list"); return; }
+        if (id === "btn-pkg-manual") {
+          state.manualDir = -1;
+          $("m-amount").value = "1";
+          $("m-reason").value = "";
+          show("adj-manual");
+          return;
+        }
+        if (id === "btn-pkg-archive") {
+          openSheet(
+            '<h2 id="sheet-title">结束当前课包？</h2>' +
+            '<p class="lead">结束后不再有效，记录保留在历史中。之后才能为小周新建有效课包。</p>' +
+            '<button type="button" class="danger-btn" id="sheet-archive-confirm">确认结束</button>' +
+            '<button type="button" class="ghost" id="sheet-close">取消</button>'
+          );
+          return;
+        }
+
+        if (t.classList.contains("list-row") && t.getAttribute("data-pkg")) {
+          state.viewingPkg = t.getAttribute("data-pkg");
+          show("pkg-detail");
+          return;
+        }
+
+        if (id === "sheet-close") { closeSheet(); return; }
+        if (id === "sheet-adj") { closeSheet(); show("adj-list"); return; }
+        if (id === "sheet-manual") { closeSheet(); show("adj-manual"); return; }
+        if (id === "sheet-archive" || id === "sheet-archive-confirm") {
+          closeSheet();
+          archiveActive(false);
+          return;
+        }
+
+        if (id === "btn-auto-confirm") {
+          var p = activePkg();
+          var key = "sess-auto-demo";
+          var res = applyDelta(p, -1, { sessionKey: key });
+          if (res.already) {
+            toast("幂等：本会话已扣过，未重复扣减");
+            markCheck("deduct");
+            renderAuto();
+            return;
+          }
+          if (!res.ok && res.reason === "would-negative") {
+            toast("余额不足，不会自动变成负数");
+            show("flow-zero");
+            return;
+          }
+          if (res.ok) {
+            pushAdj({
+              id: "adj-" + Date.now(),
+              type: "deduct",
+              delta: -1,
+              reason: "关联课程完成 · 幂等扣减",
+              at: stampNow(),
+              packageId: p.id,
+              sessionKey: key
+            });
+            markCheck("deduct");
+            toast("已扣 1 课时 · 已写入调整");
+            renderAuto();
+          }
+          return;
+        }
+        if (id === "btn-auto-cancel-leave") {
+          toast("取消 / 请假：不扣课，无调整行");
+          show("hub");
+          return;
+        }
+        if (id === "btn-auto-see-adj") { show("adj-list"); return; }
+
+        if (id === "temp-pkg") { state.tempChoice = "package"; renderTemp(); return; }
+        if (id === "temp-skip") { state.tempChoice = "skip"; renderTemp(); return; }
+        if (id === "btn-temp-confirm") {
+          if (state.tempChoice === "skip") {
+            toast("不扣课 · 未写入扣减");
+            markCheck("deduct");
+            show("hub");
+            return;
+          }
+          var tp = activePkg();
+          if (!tp) { toast("无有效课包，请选择不扣课或先建课包"); return; }
+          var tres = applyDelta(tp, -1, { sessionKey: "sess-temp-" + Date.now() });
+          if (!tres.ok && tres.reason === "would-negative") {
+            toast("余额不足，改走结束提示");
+            show("flow-zero");
+            return;
+          }
+          if (tres.ok) {
+            pushAdj({
+              id: "adj-" + Date.now(),
+              type: "deduct",
+              delta: -1,
+              reason: "临时课结束 · 教练选择扣课",
+              at: stampNow(),
+              packageId: tp.id,
+              sessionKey: ""
+            });
+            markCheck("deduct");
+            toast("已扣 1 课时");
+            show("adj-list");
+          }
+          return;
+        }
+
+        if (id === "zero-skip") { state.zeroChoice = "skip"; renderZero(); return; }
+        if (id === "zero-manual") { state.zeroChoice = "manual"; renderZero(); return; }
+        if (id === "btn-zero-confirm") {
+          if (state.zeroChoice === "manual") {
+            show("adj-manual");
+            return;
+          }
+          toast("不扣课结束 · 余额未变（无负余额）");
+          markCheck("deduct");
+          show("hub");
+          return;
+        }
+
+        if (id === "btn-noshow-yes") {
+          var np = activePkg();
+          if (!np) { toast("无有效课包"); return; }
+          var nres = applyDelta(np, -1, { sessionKey: "noshow-" + Date.now() });
+          if (!nres.ok && nres.reason === "would-negative") {
+            toast("余额不足，不会自动扣成负数");
+            show("flow-zero");
+            return;
+          }
+          if (nres.ok) {
+            pushAdj({
+              id: "adj-" + Date.now(),
+              type: "deduct",
+              delta: -1,
+              reason: "学员缺席 · 教练确认扣课",
+              at: stampNow(),
+              packageId: np.id,
+              sessionKey: ""
+            });
+            markCheck("noshow");
+            toast("缺席已记 · 已扣 1 课时");
+            show("adj-list");
+          }
+          return;
+        }
+        if (id === "btn-noshow-no") {
+          markCheck("noshow");
+          toast("缺席已记 · 不扣课");
+          show("hub");
+          return;
+        }
+
+        if (id === "btn-reopen-confirm") {
+          var rp = activePkg();
+          var s = state.completedSession;
+          if (!rp || !s.deducted || s.reopened) return;
+          var rres = applyDelta(rp, 1, { sessionKey: s.key });
+          if (rres.ok) {
+            s.reopened = true;
+            pushAdj({
+              id: "adj-" + Date.now(),
+              type: "return",
+              delta: 1,
+              reason: "重新打开已完成训练 · 返还此前扣减",
+              at: stampNow(),
+              packageId: rp.id,
+              sessionKey: s.key
+            });
+            markCheck("ret");
+            toast("已返还 1 课时 · 调整行已生成");
+            renderReopen();
+          }
+          return;
+        }
+        if (id === "btn-reopen-see") { show("adj-list"); return; }
+      });
+
+      renderChecks();
+      show("hub");
+    })();
+  </script>
+</body>
+</html>

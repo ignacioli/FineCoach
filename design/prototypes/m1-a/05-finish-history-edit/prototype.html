@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FineCoach · M1-A · 结束 · 总结 · 历史 · 编辑</title>
+  <style>
+    :root {
+      --bg: oklch(0.93 0 0);
+      --surface: oklch(0.99 0 0);
+      --fg: oklch(0.22 0 0);
+      --muted: oklch(0.46 0 0);
+      --border: oklch(0.78 0 0);
+      --accent: oklch(0.28 0 0);
+      --fill: oklch(0.90 0 0);
+      --fill-2: oklch(0.85 0 0);
+      --danger: oklch(0.42 0.12 25);
+      --phone-w: 393px;
+      --phone-h: 852px;
+      --tap: 44px;
+      --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Heiti SC", sans-serif;
+      --mono: ui-monospace, Menlo, "SF Mono", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    body {
+      font-family: var(--font);
+      color: var(--fg);
+      background: var(--bg);
+      line-height: 1.45;
+    }
+    button, input, textarea, select { font: inherit; color: inherit; }
+    button { cursor: pointer; background: none; border: 0; }
+    img { display: none; }
+
+    .spec-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .spec-bar b { font-weight: 600; color: var(--fg); }
+
+    .board {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) var(--phone-w) minmax(240px, 1fr);
+      gap: 28px;
+      align-items: start;
+      justify-content: center;
+      padding: 28px 24px 48px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .rail h2 {
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .note {
+      border: 1px dashed var(--border);
+      background: var(--surface);
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--fg);
+      margin-bottom: 10px;
+    }
+    .note ol, .note ul { padding-left: 1.15em; }
+    .note li { margin: 4px 0; }
+    .note .k { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .scene-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .scene-btn {
+      min-height: var(--tap);
+      text-align: left;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--fg);
+    }
+    .scene-btn:hover { background: oklch(0.94 0 0); }
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid var(--fg);
+      outline-offset: 2px;
+    }
+    .scene-btn[aria-current="true"] { background: var(--fill); border-color: var(--fg); }
+    .check { font-size: 13px; }
+    .check li { margin: 6px 0; color: var(--muted); }
+    .now {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border: 1px solid var(--fg);
+      background: var(--surface);
+      font-size: 13px;
+    }
+
+    .device-wrap { width: var(--phone-w); }
+    .device-caption {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 8px;
+      font-family: var(--mono);
+    }
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      border-radius: 54px;
+      border: 11px solid oklch(0.18 0 0);
+      background: oklch(0.97 0 0);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 18px 40px oklch(0.55 0 0 / 0.18);
+    }
+    .island {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      width: 126px;
+      height: 36px;
+      margin-left: -63px;
+      background: oklch(0.12 0 0);
+      border-radius: 20px;
+      z-index: 5;
+    }
+    .status {
+      height: 54px;
+      padding: 14px 28px 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .status-sys { display: flex; gap: 6px; align-items: center; }
+    .sig, .bat { display: inline-block; height: 10px; background: var(--fg); }
+    .sig { width: 16px; clip-path: polygon(0 70%, 35% 45%, 65% 20%, 100% 0, 100% 100%, 0 100%); }
+    .bat { width: 22px; height: 11px; border: 1.5px solid var(--fg); background: transparent; position: relative; }
+    .bat::after { content: ""; position: absolute; inset: 2px 8px 2px 2px; background: var(--fg); }
+    .home-bar {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      width: 134px;
+      height: 5px;
+      margin-left: -67px;
+      background: oklch(0.22 0 0);
+      border-radius: 3px;
+      z-index: 5;
+    }
+    .app {
+      position: absolute;
+      inset: 54px 0 24px;
+      display: flex;
+      flex-direction: column;
+      background: oklch(0.97 0 0);
+    }
+    .screen { display: none; flex: 1; flex-direction: column; min-height: 0; }
+    .screen.is-on { display: flex; }
+
+    .nav {
+      min-height: var(--tap);
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .nav h1 {
+      flex: 1;
+      font-size: 17px;
+      font-weight: 650;
+      text-align: center;
+    }
+    .nav-side { width: 88px; display: flex; align-items: center; }
+    .nav-side.end { justify-content: flex-end; gap: 4px; width: auto; min-width: 88px; }
+    .icon-btn, .text-btn {
+      min-width: var(--tap);
+      min-height: var(--tap);
+      padding: 0 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fg);
+      font-size: 15px;
+      font-weight: 560;
+    }
+    .icon-btn:hover, .text-btn:hover, .ghost:hover { background: oklch(0.93 0 0); }
+    .text-btn { min-width: auto; }
+
+    .body { flex: 1; overflow: auto; padding: 16px 16px 20px; }
+    .body.tight { padding: 0; }
+    .kicker { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .lead { font-size: 15px; color: var(--fg); margin-bottom: 12px; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .stamp {
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .primary, .ghost {
+      min-height: var(--tap);
+      width: 100%;
+      padding: 0 16px;
+      font-size: 17px;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+    .primary { background: var(--accent); color: oklch(0.99 0 0); }
+    .primary:hover { background: oklch(0.16 0 0); color: oklch(0.99 0 0); }
+    .primary:disabled {
+      background: var(--fill-2);
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+    .ghost { border: 1px solid var(--border); background: var(--surface); color: var(--fg); }
+    .ghost.warn { border-color: var(--fg); }
+
+    .field-label { display: block; font-size: 13px; font-weight: 600; margin: 14px 0 6px; }
+    .req { color: var(--muted); font-weight: 400; }
+    .field, .area {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 16px;
+    }
+    .area { min-height: 72px; resize: vertical; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      min-height: var(--tap);
+      padding: 0 14px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      color: var(--fg);
+    }
+    .chip:hover { background: oklch(0.94 0 0); }
+    .chip[aria-pressed="true"] { border-color: var(--fg); background: var(--fill); font-weight: 650; }
+
+    .meta-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .pill {
+      min-height: 28px;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      background: var(--fill);
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .pill.stale {
+      border-color: var(--fg);
+      background: var(--surface);
+      font-weight: 650;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .card-h {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .card-h b { flex: 1; font-size: 16px; font-weight: 650; }
+    .card-sub { font-size: 13px; color: var(--muted); }
+    .set-row {
+      display: grid;
+      grid-template-columns: 28px 1fr 1fr auto;
+      gap: 6px;
+      align-items: center;
+      margin-top: 6px;
+    }
+    .set-row span { font-size: 13px; color: var(--muted); }
+    .set-row input {
+      min-height: 40px;
+      border: 1px solid var(--border);
+      background: oklch(0.96 0 0);
+      padding: 0 8px;
+      font-size: 15px;
+      width: 100%;
+    }
+    .set-row.read span.val {
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      font-size: 15px;
+      color: var(--fg);
+      border: 1px solid transparent;
+      padding: 0 4px;
+    }
+    .last-box {
+      margin-top: 8px;
+      padding: 8px 10px;
+      border: 1px dashed var(--border);
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .last-box b { color: var(--fg); font-weight: 600; }
+
+    .row {
+      width: 100%;
+      min-height: 64px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      text-align: left;
+      color: var(--fg);
+    }
+    .row:hover { background: oklch(0.95 0 0); }
+    .row-main { flex: 1; min-width: 0; }
+    .row-name { font-size: 17px; font-weight: 600; }
+    .row-sub { font-size: 13px; color: var(--muted); margin-top: 2px; overflow-wrap: anywhere; }
+    .chev {
+      width: 8px; height: 8px;
+      border-right: 1.5px solid var(--muted);
+      border-top: 1.5px solid var(--muted);
+      transform: rotate(45deg);
+      flex: none;
+    }
+
+    .foot {
+      padding: 10px 16px 14px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .foot .primary { margin-top: 0; }
+    .foot .ghost { margin-top: 8px; }
+    .autosave {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      min-height: 18px;
+      margin-bottom: 6px;
+    }
+
+    .reorder {
+      min-width: var(--tap);
+      min-height: var(--tap);
+      border: 1px solid var(--border);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex: none;
+    }
+    .reorder:hover { background: oklch(0.94 0 0); }
+    .reorder:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .scrim {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: oklch(0.22 0 0 / 0.28);
+      z-index: 8;
+    }
+    .scrim.on { display: block; }
+    .sheet {
+      display: none;
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      z-index: 9;
+      background: var(--surface);
+      border-top: 1px solid var(--fg);
+      padding: 16px 16px 28px;
+    }
+    .sheet.on { display: block; }
+    .sheet h3 { font-size: 17px; font-weight: 650; margin-bottom: 6px; }
+    .sheet p { font-size: 14px; color: var(--muted); margin-bottom: 12px; }
+    .sheet-act {
+      width: 100%;
+      min-height: var(--tap);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      margin-top: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      text-align: left;
+      padding: 0 14px;
+    }
+    .sheet-act:hover { background: oklch(0.94 0 0); }
+    .sheet-act.rec { border-color: var(--fg); background: var(--fill); }
+    .sheet-act.danger { color: var(--danger); }
+    .sheet-cancel {
+      width: 100%;
+      min-height: var(--tap);
+      margin-top: 10px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .sheet-cancel:hover { background: oklch(0.94 0 0); }
+
+    .toast {
+      display: none;
+      position: absolute;
+      left: 50%;
+      bottom: 36px;
+      transform: translateX(-50%);
+      z-index: 12;
+      min-height: 40px;
+      padding: 10px 14px;
+      background: var(--fg);
+      color: oklch(0.99 0 0);
+      font-size: 14px;
+      font-weight: 560;
+      max-width: 90%;
+      text-align: center;
+    }
+    .toast.on { display: flex; align-items: center; }
+
+    .dest {
+      flex: 1;
+      margin: 20px 16px;
+      border: 1px dashed var(--fg);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      gap: 8px;
+    }
+    .dest h2 { font-size: 20px; }
+    .dest p { font-size: 15px; color: var(--muted); }
+    .bound {
+      margin-top: 16px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    .sec-h {
+      font-size: 13px;
+      font-weight: 650;
+      color: var(--muted);
+      padding: 14px 16px 6px;
+    }
+
+    .banner-warn {
+      margin-bottom: 12px;
+      padding: 10px 12px;
+      border: 1px solid var(--fg);
+      background: var(--fill);
+      font-size: 14px;
+    }
+    .banner-warn b { display: block; margin-bottom: 4px; }
+    .banner-warn span { color: var(--muted); font-size: 13px; }
+
+    .callout-primary {
+      margin-top: 8px;
+      padding: 12px;
+      border: 2px solid var(--fg);
+      background: var(--surface);
+    }
+    .callout-primary .tag {
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .ex-note {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 1100px) {
+      .board { grid-template-columns: 1fr; justify-items: center; }
+      .rail { width: min(520px, 100%); }
+    }
+  </style>
+</head>
+<body>
+  <header class="spec-bar" data-od-id="page-header">
+    <div>stage=<b>M1-A</b></div>
+    <div>module=<b>05-finish-history-edit</b></div>
+    <div>version=<b>v0.1</b></div>
+    <div>coverage=<b>this module only</b></div>
+    <div>data=<b>虚构数据</b></div>
+    <div>network=<b>无外部资源</b></div>
+    <div>review=<b>产品负责人走查通过</b></div>
+  </header>
+
+  <div class="board">
+    <aside class="rail" data-od-id="annotation-left">
+      <h2>走查说明</h2>
+      <div class="note">
+        低保真线框。本模块覆盖：结束训练（草稿处理）→ 训练总结 → 历史列表 → 只读详情 → 编辑完成记录 → 分享报告过期标注。
+      </div>
+      <div class="note">
+        <span class="k">本模块不做</span>
+        <ul>
+          <li>课包扣减 / 课时返还 / 重新打开训练</li>
+          <li>图表、筛选、趋势、个人最佳（M1-B）</li>
+          <li>分享报告内部页（仅出口到模块 06）</li>
+        </ul>
+      </div>
+      <div class="note">
+        <span class="k">建议路径</span>
+        <ol>
+          <li>场景 A：结束含草稿 → 丢弃并进入总结</li>
+          <li>生成分享报告（出口 06）或完成并返回</li>
+          <li>历史 → 打开 8月18日 → 编辑</li>
+          <li>改组数后见「已过期」与重新生成</li>
+        </ol>
+      </div>
+      <h2>演示场景</h2>
+      <div class="scene-list">
+        <button type="button" class="scene-btn" data-od-id="scene-end-draft" data-scene="end-draft">A · 结束含草稿</button>
+        <button type="button" class="scene-btn" data-od-id="scene-empty" data-scene="empty">B · 空训放弃</button>
+        <button type="button" class="scene-btn" data-od-id="scene-summary" data-scene="summary">C · 训练总结</button>
+        <button type="button" class="scene-btn" data-od-id="scene-history" data-scene="history">D · 历史列表</button>
+        <button type="button" class="scene-btn" data-od-id="scene-detail" data-scene="detail">E · 详情只读</button>
+        <button type="button" class="scene-btn" data-od-id="scene-edit-stale" data-scene="edit-stale">F · 编辑后过期</button>
+      </div>
+    </aside>
+
+    <div class="device-wrap">
+      <p class="device-caption">iPhone 竖屏 393×852 · 浅色 · 系统字体</p>
+      <div class="phone" data-od-id="iphone-frame" role="application" aria-label="FineCoach 结束与历史模块线框原型">
+        <div class="island" aria-hidden="true"></div>
+        <div class="status">
+          <span>9:41</span>
+          <span class="status-sys" aria-hidden="true"><i class="sig"></i><i class="bat"></i></span>
+        </div>
+        <div class="app" id="app">
+
+          <!-- 课中记录（本模块入口，简化） -->
+          <section class="screen" data-screen="recorder" data-od-id="screen-recorder">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="recorder-to-history" id="btn-rec-hist">历史</button>
+              </div>
+              <h1>课中记录</h1>
+              <div class="nav-side end">
+                <span class="stamp" id="rec-timer" style="margin:0">00:48:00</span>
+              </div>
+            </div>
+            <div class="body" id="recorder-body"></div>
+            <div class="foot">
+              <button type="button" class="primary" data-od-id="cta-end-training" id="btn-end">结束训练</button>
+            </div>
+          </section>
+
+          <!-- 训练总结 -->
+          <section class="screen" data-screen="summary" data-od-id="screen-summary">
+            <div class="nav">
+              <div class="nav-side"></div>
+              <h1 data-od-id="summary-title">训练总结</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body" id="summary-body"></div>
+            <div class="foot">
+              <div class="callout-primary" data-od-id="cta-share-wrap">
+                <div class="tag">HIGHLIGHT</div>
+                <button type="button" class="primary" data-od-id="cta-generate-share" id="btn-share" style="margin-top:0">生成分享报告</button>
+              </div>
+              <button type="button" class="ghost" data-od-id="cta-done-return" id="btn-done-return">完成并返回学员</button>
+              <p class="hint" style="text-align:center">可跳过分享。M1-A 无课包步骤。</p>
+            </div>
+          </section>
+
+          <!-- 历史列表 -->
+          <section class="screen" data-screen="history" data-od-id="screen-history">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="history-back" id="btn-hist-back">返回</button>
+              </div>
+              <h1 data-od-id="history-title">训练历史</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <p class="sec-h" data-od-id="history-student">小周 · 新的在上</p>
+            <div class="body tight" id="history-body"></div>
+          </section>
+
+          <!-- 课程详情（只读） -->
+          <section class="screen" data-screen="detail" data-od-id="screen-detail">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="detail-back" id="btn-det-back">返回</button>
+              </div>
+              <h1 data-od-id="detail-title">训练记录</h1>
+              <div class="nav-side end">
+                <button type="button" class="text-btn" data-od-id="cta-edit-session" id="btn-edit">编辑</button>
+              </div>
+            </div>
+            <div class="body" id="detail-body"></div>
+            <div class="foot" id="detail-foot" hidden></div>
+          </section>
+
+          <!-- 编辑模式 -->
+          <section class="screen" data-screen="edit" data-od-id="screen-edit">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="edit-done" id="btn-edit-done">完成</button>
+              </div>
+              <h1 data-od-id="edit-title">编辑训练记录</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body" id="edit-body"></div>
+            <div class="foot">
+              <p class="autosave" id="autosave-status" data-od-id="autosave-status">已自动保存</p>
+              <p class="hint" style="text-align:center;margin:0">至少保留 1 个已完成组，否则无法保存为空课。</p>
+            </div>
+          </section>
+
+          <!-- 分享报告出口 → 06 -->
+          <section class="screen" data-screen="dest-share" data-od-id="screen-dest-share">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="dest-share-back" id="btn-share-back">返回</button>
+              </div>
+              <h1>分享报告</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="dest">
+              <h2 data-od-id="dest-share-title">已到达分享报告</h2>
+              <p id="dest-share-copy">本模块到此结束。报告预览与发送属于模块 06，此处仅作目的地示意。</p>
+              <p class="bound" id="dest-share-bound">—— 模块边界 · 06-share-report 未绘制 ——</p>
+              <button type="button" class="ghost" data-od-id="dest-share-to-history" id="btn-share-hist" style="margin-top:16px">查看训练历史</button>
+            </div>
+          </section>
+
+          <div class="scrim" id="scrim" data-od-id="scrim"></div>
+          <div class="sheet" id="sheet" data-od-id="action-sheet" role="dialog" aria-modal="true">
+            <h3 id="sheet-title"></h3>
+            <p id="sheet-msg"></p>
+            <div id="sheet-acts"></div>
+            <button type="button" class="sheet-cancel" id="sheet-cancel">取消</button>
+          </div>
+          <div class="toast" id="toast" data-od-id="toast"></div>
+        </div>
+        <div class="home-bar" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <aside class="rail" data-od-id="annotation-right">
+      <h2>当前</h2>
+      <div class="now" id="now-label">—</div>
+      <h2 style="margin-top:18px">验收要点</h2>
+      <ul class="check">
+        <li>结束先处理草稿 / 空训二次确认</li>
+        <li>总结：建议重点可改、时长可改、三类备注</li>
+        <li>主 CTA「生成分享报告」+ 次要「完成并返回」</li>
+        <li>历史倒序 · 详情默认只读 · 上次同动作</li>
+        <li>编辑自动保存；改后报告「已过期」</li>
+        <li>无重新打开 / 无课包 / 无图表</li>
+      </ul>
+    </aside>
+  </div>
+
+  <script>
+  (function () {
+    var FOCUS_POOL = ["下肢", "臀", "推类", "拉类", "核心", "上肢", "全身"];
+    var MUSCLE_TO_FOCUS = {
+      "股四头肌": "下肢",
+      "腘绳肌": "下肢",
+      "臀大肌": "臀",
+      "胸大肌": "推类",
+      "三角肌前束": "推类",
+      "背阔肌": "拉类",
+      "竖脊肌": "拉类",
+      "腹直肌": "核心"
+    };
+
+    function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+    function seedHistory() {
+      return [
+        {
+          id: "h-z1",
+          date: "8月18日",
+          week: "周二",
+          focus: ["下肢"],
+          durationMin: 48,
+          shareStatus: "shared",
+          coachNote: "右膝提醒已口头说明，下节继续控深。",
+          exNotes: { "ex-sq": "底部停顿略短" },
+          studentSummary: "今天下肢主练深蹲与硬拉，课后注意拉伸。",
+          exercises: [
+            {
+              id: "ex-sq", name: "杠铃深蹲", muscle: "股四头肌",
+              last: { date: "8月11日", text: "55×8 · 60×6 · 60×6" },
+              sets: [
+                { w: "60", r: "8" },
+                { w: "70", r: "6" },
+                { w: "70", r: "6" }
+              ]
+            },
+            {
+              id: "ex-rdl", name: "罗马尼亚硬拉", muscle: "腘绳肌",
+              last: { date: "8月4日", text: "50×10 · 50×10" },
+              sets: [
+                { w: "55", r: "8" },
+                { w: "55", r: "8" }
+              ]
+            },
+            {
+              id: "ex-lung", name: "保加利亚分腿蹲", muscle: "臀大肌",
+              last: { date: "8月11日", text: "12×10 /侧" },
+              sets: [
+                { w: "12", r: "10" },
+                { w: "12", r: "10" }
+              ]
+            }
+          ]
+        },
+        {
+          id: "h-z2",
+          date: "8月11日",
+          week: "周二",
+          focus: ["推类"],
+          durationMin: 52,
+          shareStatus: "shared",
+          coachNote: "",
+          exNotes: {},
+          studentSummary: "推类日，卧推有进步。",
+          exercises: [
+            {
+              id: "ex-bp", name: "杠铃卧推", muscle: "胸大肌",
+              last: { date: "8月4日", text: "40×8 · 45×6" },
+              sets: [
+                { w: "45", r: "8" },
+                { w: "50", r: "6" },
+                { w: "50", r: "5" }
+              ]
+            },
+            {
+              id: "ex-ohp", name: "哑铃推举", muscle: "三角肌前束",
+              last: null,
+              sets: [
+                { w: "12", r: "10" },
+                { w: "12", r: "10" }
+              ]
+            }
+          ]
+        },
+        {
+          id: "h-z3",
+          date: "8月4日",
+          week: "周二",
+          focus: ["拉类"],
+          durationMin: 45,
+          shareStatus: "none",
+          coachNote: "肩胛控制一般。",
+          exNotes: { "ex-row": "肘部别外展" },
+          studentSummary: "",
+          exercises: [
+            {
+              id: "ex-row", name: "哑铃划船", muscle: "背阔肌",
+              last: null,
+              sets: [
+                { w: "16", r: "10" },
+                { w: "16", r: "10" },
+                { w: "16", r: "8" }
+              ]
+            },
+            {
+              id: "ex-pull", name: "高位下拉", muscle: "背阔肌",
+              last: null,
+              sets: [
+                { w: "35", r: "12" },
+                { w: "35", r: "10" }
+              ]
+            }
+          ]
+        },
+        {
+          id: "h-z4",
+          date: "7月28日",
+          week: "周二",
+          focus: ["核心", "全身"],
+          durationMin: 40,
+          shareStatus: "none",
+          coachNote: "",
+          exNotes: {},
+          studentSummary: "核心激活课，感受还不错。",
+          exercises: [
+            {
+              id: "ex-plank", name: "平板支撑", muscle: "腹直肌",
+              last: null,
+              sets: [
+                { w: "—", r: "45s" },
+                { w: "—", r: "40s" }
+              ]
+            }
+          ]
+        }
+      ];
+    }
+
+    function liveSessionWithDrafts() {
+      return {
+        student: "小周",
+        elapsedSec: 48 * 60,
+        exercises: [
+          {
+            id: "ex-sq", name: "杠铃深蹲", muscle: "股四头肌",
+            sets: [
+              { status: "done", w: "60", r: "8" },
+              { status: "done", w: "70", r: "6" },
+              { status: "draft", w: "70", r: "6" }
+            ]
+          },
+          {
+            id: "ex-rdl", name: "罗马尼亚硬拉", muscle: "腘绳肌",
+            sets: [
+              { status: "done", w: "55", r: "8" },
+              { status: "pending", w: "55", r: "8" }
+            ]
+          },
+          {
+            id: "ex-lung", name: "保加利亚分腿蹲", muscle: "臀大肌",
+            sets: [
+              { status: "done", w: "12", r: "10" }
+            ]
+          }
+        ]
+      };
+    }
+
+    function emptyLiveSession() {
+      return {
+        student: "小周",
+        elapsedSec: 6 * 60,
+        exercises: [
+          {
+            id: "ex-sq", name: "杠铃深蹲", muscle: "股四头肌",
+            sets: [
+              { status: "pending", w: "60", r: "8" },
+              { status: "draft", w: "", r: "" }
+            ]
+          }
+        ]
+      };
+    }
+
+    var state = {
+      scene: "end-draft",
+      screen: "recorder",
+      live: liveSessionWithDrafts(),
+      history: seedHistory(),
+      activeId: "h-z1",
+      summaryDraft: null,
+      destFrom: "summary",
+      editDirty: false,
+      toastTimer: null
+    };
+
+    var el = {
+      now: document.getElementById("now-label"),
+      recorderBody: document.getElementById("recorder-body"),
+      recTimer: document.getElementById("rec-timer"),
+      summaryBody: document.getElementById("summary-body"),
+      historyBody: document.getElementById("history-body"),
+      detailBody: document.getElementById("detail-body"),
+      detailFoot: document.getElementById("detail-foot"),
+      editBody: document.getElementById("edit-body"),
+      autosave: document.getElementById("autosave-status"),
+      scrim: document.getElementById("scrim"),
+      sheet: document.getElementById("sheet"),
+      sheetTitle: document.getElementById("sheet-title"),
+      sheetMsg: document.getElementById("sheet-msg"),
+      sheetActs: document.getElementById("sheet-acts"),
+      toast: document.getElementById("toast"),
+      destCopy: document.getElementById("dest-share-copy")
+    };
+
+    function showScreen(name) {
+      state.screen = name;
+      document.querySelectorAll(".screen").forEach(function (s) {
+        s.classList.toggle("is-on", s.getAttribute("data-screen") === name);
+      });
+      updateChrome();
+    }
+
+    function closeSheet() {
+      el.scrim.classList.remove("on");
+      el.sheet.classList.remove("on");
+      el.sheetActs.innerHTML = "";
+    }
+
+    function openSheet(title, msg, acts) {
+      el.sheetTitle.textContent = title;
+      el.sheetMsg.textContent = msg;
+      el.sheetActs.innerHTML = "";
+      acts.forEach(function (a) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "sheet-act" + (a.rec ? " rec" : "") + (a.danger ? " danger" : "");
+        b.textContent = a.label;
+        b.addEventListener("click", function () {
+          closeSheet();
+          if (a.fn) a.fn();
+        });
+        el.sheetActs.appendChild(b);
+      });
+      el.scrim.classList.add("on");
+      el.sheet.classList.add("on");
+    }
+
+    function toast(msg) {
+      el.toast.textContent = msg;
+      el.toast.classList.add("on");
+      clearTimeout(state.toastTimer);
+      state.toastTimer = setTimeout(function () {
+        el.toast.classList.remove("on");
+      }, 1800);
+    }
+
+    function fmtTime(sec) {
+      var h = Math.floor(sec / 3600);
+      var m = Math.floor((sec % 3600) / 60);
+      var s = sec % 60;
+      function z(n) { return n < 10 ? "0" + n : String(n); }
+      return z(h) + ":" + z(m) + ":" + z(s);
+    }
+
+    function countLive(status) {
+      var n = 0;
+      state.live.exercises.forEach(function (ex) {
+        ex.sets.forEach(function (set) {
+          if (set.status === status) n += 1;
+        });
+      });
+      return n;
+    }
+
+    function countDoneSets(session) {
+      var n = 0;
+      session.exercises.forEach(function (ex) {
+        n += ex.sets.length;
+      });
+      return n;
+    }
+
+    function suggestFocusFromLive() {
+      var map = {};
+      state.live.exercises.forEach(function (ex) {
+        var hasDone = ex.sets.some(function (s) { return s.status === "done"; });
+        if (!hasDone) return;
+        var f = MUSCLE_TO_FOCUS[ex.muscle];
+        if (f) map[f] = true;
+      });
+      return Object.keys(map);
+    }
+
+    function buildCompletedFromLive() {
+      var focus = suggestFocusFromLive();
+      var exercises = [];
+      var exNotes = {};
+      state.live.exercises.forEach(function (ex) {
+        var done = ex.sets.filter(function (s) { return s.status === "done"; });
+        if (!done.length) return;
+        exercises.push({
+          id: ex.id,
+          name: ex.name,
+          muscle: ex.muscle,
+          last: null,
+          sets: done.map(function (s) { return { w: s.w, r: s.r }; })
+        });
+      });
+      return {
+        id: "h-today",
+        date: "今天",
+        week: "周五",
+        focus: focus.slice(),
+        durationMin: Math.max(1, Math.round(state.live.elapsedSec / 60)),
+        shareStatus: "none",
+        coachNote: "",
+        exNotes: exNotes,
+        studentSummary: "",
+        exercises: exercises
+      };
+    }
+
+    function updateChrome() {
+      var label = "场景 " + state.scene + " · ";
+      if (state.screen === "recorder") label += "课中记录 · 结束入口";
+      else if (state.screen === "summary") label += "训练总结";
+      else if (state.screen === "history") label += "小周 · 历史倒序";
+      else if (state.screen === "detail") label += "记录详情 · 只读";
+      else if (state.screen === "edit") label += "编辑训练记录";
+      else if (state.screen === "dest-share") label += "出口 · 模块 06";
+      el.now.textContent = label;
+
+      document.querySelectorAll(".scene-btn").forEach(function (b) {
+        b.setAttribute("aria-current", b.getAttribute("data-scene") === state.scene ? "true" : "false");
+      });
+    }
+
+    function renderRecorder() {
+      var html = '<p class="kicker">小周 · 进行中</p>';
+      html += '<p class="stamp">已完成 ' + countLive("done") + " 组 · 待完成/草稿 " + (countLive("draft") + countLive("pending")) + " 组</p>";
+      state.live.exercises.forEach(function (ex) {
+        html += '<div class="card" data-od-id="live-ex-' + ex.id + '">';
+        html += '<div class="card-h"><b>' + ex.name + '</b><span class="card-sub">' + ex.muscle + "</span></div>";
+        ex.sets.forEach(function (set, i) {
+          var tag = set.status === "done" ? "已完成" : (set.status === "pending" ? "待完成" : "草稿");
+          html += '<div class="set-row read"><span>' + (i + 1) + "</span>";
+          html += '<span class="val">' + (set.w || "—") + " kg</span>";
+          html += '<span class="val">' + (set.r || "—") + " 次</span>";
+          html += '<span>' + tag + "</span></div>";
+        });
+        html += "</div>";
+      });
+      el.recorderBody.innerHTML = html;
+      el.recTimer.textContent = fmtTime(state.live.elapsedSec);
+    }
+
+    function renderSummary() {
+      var d = state.summaryDraft;
+      if (!d) return;
+      var html = '<p class="kicker">小周 · ' + d.date + " · 刚结束</p>";
+      html += '<p class="stamp">无课包扣减步骤 · M1-A</p>';
+
+      html += '<label class="field-label">训练重点 <span class="req">建议自完成动作主练肌群 · 可改 · 可不选</span></label>';
+      html += '<div class="chips" id="focus-chips" data-od-id="field-focus" role="group">';
+      FOCUS_POOL.forEach(function (f) {
+        var on = d.focus.indexOf(f) >= 0;
+        html += '<button type="button" class="chip" data-focus="' + f + '" aria-pressed="' + on + '">' + f + "</button>";
+      });
+      html += "</div>";
+      html += '<p class="hint">未确认训练重点不阻止结束。</p>';
+
+      html += '<label class="field-label" for="f-duration">训练时长（分钟） <span class="req">自动记录 · 可修正</span></label>';
+      html += '<input class="field" id="f-duration" data-od-id="field-duration" type="number" min="1" max="300" value="' + d.durationMin + '">';
+
+      html += '<label class="field-label" for="f-coach">教练备注 <span class="req">私有 · 永不进报告</span></label>';
+      html += '<textarea class="area" id="f-coach" data-od-id="field-coach-note" placeholder="状态、伤病反馈、下节关注点">' + (d.coachNote || "") + "</textarea>";
+
+      html += '<label class="field-label">动作私有备注 <span class="req">默认不分享</span></label>';
+      d.exercises.forEach(function (ex) {
+        var note = (d.exNotes && d.exNotes[ex.id]) || "";
+        html += '<p class="field-label" style="margin-top:8px;font-weight:500">' + ex.name + "</p>";
+        html += '<input class="field" data-ex-note="' + ex.id + '" data-od-id="field-ex-note-' + ex.id + '" placeholder="本课该动作问题或提示" value="' + note.replace(/"/g, "&quot;") + '">';
+      });
+
+      html += '<label class="field-label" for="f-student">学员课后总结 <span class="req">选填 · 可进报告</span></label>';
+      html += '<textarea class="area" id="f-student" data-od-id="field-student-summary" placeholder="反馈、鼓励、课后建议">' + (d.studentSummary || "") + "</textarea>";
+
+      html += '<p class="field-label" style="margin-top:16px">本课动作顺序</p>';
+      d.exercises.forEach(function (ex, idx) {
+        html += '<div class="card" data-od-id="summary-ex-' + ex.id + '">';
+        html += '<div class="card-h"><b>' + (idx + 1) + ". " + ex.name + '</b><span class="card-sub">' + ex.sets.length + " 组</span></div>";
+        ex.sets.forEach(function (set, i) {
+          html += '<div class="set-row read"><span>' + (i + 1) + '</span><span class="val">' + set.w + ' kg</span><span class="val">' + set.r + ' 次</span><span></span></div>';
+        });
+        html += "</div>";
+      });
+
+      el.summaryBody.innerHTML = html;
+
+      el.summaryBody.querySelectorAll("[data-focus]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var f = btn.getAttribute("data-focus");
+          var i = d.focus.indexOf(f);
+          if (i >= 0) d.focus.splice(i, 1);
+          else d.focus.push(f);
+          btn.setAttribute("aria-pressed", i < 0 ? "true" : "false");
+        });
+      });
+      document.getElementById("f-duration").addEventListener("change", function (e) {
+        var v = parseInt(e.target.value, 10);
+        if (!isNaN(v) && v > 0) d.durationMin = v;
+      });
+      document.getElementById("f-coach").addEventListener("input", function (e) {
+        d.coachNote = e.target.value;
+      });
+      document.getElementById("f-student").addEventListener("input", function (e) {
+        d.studentSummary = e.target.value;
+      });
+      el.summaryBody.querySelectorAll("[data-ex-note]").forEach(function (inp) {
+        inp.addEventListener("input", function () {
+          d.exNotes[inp.getAttribute("data-ex-note")] = inp.value;
+        });
+      });
+    }
+
+    function commitSummaryToHistory() {
+      var d = clone(state.summaryDraft);
+      var idx = state.history.findIndex(function (h) { return h.id === d.id; });
+      if (idx >= 0) state.history[idx] = d;
+      else state.history.unshift(d);
+      state.activeId = d.id;
+    }
+
+    function renderHistory() {
+      var html = "";
+      state.history.forEach(function (h) {
+        var focus = (h.focus && h.focus.length) ? h.focus.join(" · ") : "未标重点";
+        var share = h.shareStatus === "stale" ? "分享报告已过期" : (h.shareStatus === "shared" ? "已生成过报告" : "未分享");
+        html += '<button type="button" class="row" data-od-id="history-row-' + h.id + '" data-hid="' + h.id + '">';
+        html += '<div class="row-main"><div class="row-name">' + h.date + " · " + h.week + "</div>";
+        html += '<div class="row-sub">' + focus + " · " + h.durationMin + " 分钟 · " + countDoneSets(h) + " 组 · " + share + "</div></div>";
+        html += '<span class="chev" aria-hidden="true"></span></button>';
+      });
+      el.historyBody.innerHTML = html;
+      el.historyBody.querySelectorAll("[data-hid]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          state.activeId = btn.getAttribute("data-hid");
+          renderDetail();
+          showScreen("detail");
+        });
+      });
+    }
+
+    function activeSession() {
+      return state.history.find(function (h) { return h.id === state.activeId; }) || state.history[0];
+    }
+
+    function renderDetail() {
+      var h = activeSession();
+      var html = "";
+      if (h.shareStatus === "stale") {
+        html += '<div class="banner-warn" data-od-id="stale-banner">';
+        html += "<b>分享报告已过期</b>";
+        html += "<span>编辑后统计已更新。先前报告不再准确，需重新生成。</span></div>";
+      }
+      html += '<div class="meta-bar">';
+      html += '<span class="pill">' + h.date + " · " + h.week + "</span>";
+      html += '<span class="pill">' + h.durationMin + " 分钟</span>";
+      if (h.focus && h.focus.length) {
+        h.focus.forEach(function (f) {
+          html += '<span class="pill">' + f + "</span>";
+        });
+      } else {
+        html += '<span class="pill">未标重点</span>';
+      }
+      if (h.shareStatus === "stale") html += '<span class="pill stale" data-od-id="badge-stale">已过期</span>';
+      else if (h.shareStatus === "shared") html += '<span class="pill">已分享</span>';
+      html += "</div>";
+
+      html += '<p class="kicker">只读 · 点右上角编辑</p>';
+
+      if (h.coachNote) {
+        html += '<p class="field-label">教练备注 <span class="req">私有</span></p>';
+        html += '<div class="card"><div class="card-sub">' + h.coachNote + "</div></div>";
+      }
+      if (h.studentSummary) {
+        html += '<p class="field-label">学员课后总结</p>';
+        html += '<div class="card"><div class="card-sub">' + h.studentSummary + "</div></div>";
+      }
+
+      h.exercises.forEach(function (ex) {
+        html += '<div class="card" data-od-id="detail-ex-' + ex.id + '">';
+        html += '<div class="card-h"><b>' + ex.name + '</b><span class="card-sub">' + ex.muscle + "</span></div>";
+        if (ex.last) {
+          html += '<div class="last-box" data-od-id="last-same-' + ex.id + '">上次同动作 · <b>' + ex.last.date + "</b> · " + ex.last.text + "</div>";
+        } else {
+          html += '<div class="last-box">上次同动作 · 无历史可比数据</div>';
+        }
+        ex.sets.forEach(function (set, i) {
+          html += '<div class="set-row read"><span>' + (i + 1) + '</span><span class="val">' + set.w + ' kg</span><span class="val">' + set.r + ' 次</span><span></span></div>';
+        });
+        var en = h.exNotes && h.exNotes[ex.id];
+        if (en) html += '<p class="ex-note">动作私有备注：' + en + "</p>";
+        html += "</div>";
+      });
+
+      el.detailBody.innerHTML = html;
+
+      if (h.shareStatus === "stale") {
+        el.detailFoot.hidden = false;
+        el.detailFoot.innerHTML =
+          '<button type="button" class="primary" data-od-id="cta-regen-share" id="btn-regen">重新生成分享报告</button>' +
+          '<p class="hint" style="text-align:center">前往模块 06 · 本页不绘制报告内容</p>';
+        document.getElementById("btn-regen").onclick = function () {
+          state.destFrom = "detail";
+          el.destCopy.textContent = "因记录已编辑，需重新生成分享报告。报告预览与发送属于模块 06。";
+          showScreen("dest-share");
+        };
+      } else {
+        el.detailFoot.hidden = true;
+        el.detailFoot.innerHTML = "";
+      }
+    }
+
+    function markStaleIfNeeded() {
+      var h = activeSession();
+      if (h.shareStatus === "shared" || h.shareStatus === "stale") {
+        h.shareStatus = "stale";
+      }
+    }
+
+    function recountAndValidate(h) {
+      h.exercises = h.exercises.filter(function (ex) { return ex.sets.length > 0; });
+      return countDoneSets(h) > 0;
+    }
+
+    function renderEdit() {
+      var h = activeSession();
+      var html = '<p class="stamp">自动保存 · 改动后重新计数</p>';
+      if (h.shareStatus === "shared" || h.shareStatus === "stale") {
+        html += '<div class="banner-warn" data-od-id="edit-stale-hint"><b>编辑将使已有分享报告过期</b><span>保存改动后需重新生成报告。</span></div>';
+      }
+
+      html += '<label class="field-label" for="e-duration">时长（分钟）</label>';
+      html += '<input class="field" id="e-duration" data-od-id="edit-duration" type="number" min="1" max="300" value="' + h.durationMin + '">';
+
+      html += '<label class="field-label" for="e-coach">教练备注</label>';
+      html += '<textarea class="area" id="e-coach" data-od-id="edit-coach">' + (h.coachNote || "") + "</textarea>";
+
+      html += '<label class="field-label" for="e-student">学员课后总结</label>';
+      html += '<textarea class="area" id="e-student" data-od-id="edit-student">' + (h.studentSummary || "") + "</textarea>";
+
+      h.exercises.forEach(function (ex, exIdx) {
+        html += '<div class="card" data-od-id="edit-ex-' + ex.id + '">';
+        html += '<div class="card-h">';
+        html += '<button type="button" class="reorder" data-move="up" data-exi="' + exIdx + '" aria-label="上移" ' + (exIdx === 0 ? "disabled" : "") + ">↑</button>";
+        html += '<button type="button" class="reorder" data-move="down" data-exi="' + exIdx + '" aria-label="下移" ' + (exIdx === h.exercises.length - 1 ? "disabled" : "") + ">↓</button>";
+        html += "<b>" + ex.name + '</b><span class="card-sub">' + ex.sets.length + " 组</span></div>";
+
+        html += '<input class="field" data-ex-note="' + ex.id + '" data-od-id="edit-ex-note-' + ex.id + '" placeholder="动作私有备注" value="' + ((h.exNotes && h.exNotes[ex.id]) || "").replace(/"/g, "&quot;") + '" style="margin-bottom:8px">';
+
+        ex.sets.forEach(function (set, si) {
+          html += '<div class="set-row">';
+          html += "<span>" + (si + 1) + "</span>";
+          html += '<input data-w="' + exIdx + "-" + si + '" inputmode="decimal" aria-label="重量" value="' + set.w + '">';
+          html += '<input data-r="' + exIdx + "-" + si + '" inputmode="numeric" aria-label="次数" value="' + set.r + '">';
+          html += '<button type="button" class="text-btn" data-del-set="' + exIdx + "-" + si + '" style="min-width:44px;color:var(--danger)">删</button>';
+          html += "</div>";
+        });
+        html += '<button type="button" class="ghost" data-add-set="' + exIdx + '" style="margin-top:8px">添加一组</button>';
+        html += "</div>";
+      });
+
+      el.editBody.innerHTML = html;
+      el.autosave.textContent = state.editDirty ? "正在保存…" : "已自动保存";
+
+      function autosave(msg) {
+        if (!recountAndValidate(h)) {
+          toast("不能保存空的已完成课程");
+          el.autosave.textContent = "未保存 · 至少保留 1 组";
+          renderEdit();
+          return;
+        }
+        markStaleIfNeeded();
+        state.editDirty = false;
+        el.autosave.textContent = msg || "已自动保存 · 已重新计数";
+        toast(msg || "已自动保存");
+        renderEdit();
+      }
+
+      document.getElementById("e-duration").addEventListener("change", function (e) {
+        var v = parseInt(e.target.value, 10);
+        if (!isNaN(v) && v > 0) {
+          h.durationMin = v;
+          autosave("时长已更新");
+        }
+      });
+      document.getElementById("e-coach").addEventListener("change", function (e) {
+        h.coachNote = e.target.value;
+        autosave();
+      });
+      document.getElementById("e-student").addEventListener("change", function (e) {
+        h.studentSummary = e.target.value;
+        autosave();
+      });
+      el.editBody.querySelectorAll("[data-ex-note]").forEach(function (inp) {
+        inp.addEventListener("change", function () {
+          if (!h.exNotes) h.exNotes = {};
+          h.exNotes[inp.getAttribute("data-ex-note")] = inp.value;
+          autosave();
+        });
+      });
+      el.editBody.querySelectorAll("[data-w],[data-r]").forEach(function (inp) {
+        inp.addEventListener("change", function () {
+          var key = inp.getAttribute("data-w") || inp.getAttribute("data-r");
+          var parts = key.split("-");
+          var ei = +parts[0], si = +parts[1];
+          if (inp.hasAttribute("data-w")) h.exercises[ei].sets[si].w = inp.value;
+          else h.exercises[ei].sets[si].r = inp.value;
+          autosave("组数据已更新");
+        });
+      });
+      el.editBody.querySelectorAll("[data-del-set]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var parts = btn.getAttribute("data-del-set").split("-");
+          var ei = +parts[0], si = +parts[1];
+          var totalBefore = countDoneSets(h);
+          if (totalBefore <= 1) {
+            toast("不能保存空的已完成课程");
+            el.autosave.textContent = "未保存 · 至少保留 1 组";
+            return;
+          }
+          h.exercises[ei].sets.splice(si, 1);
+          autosave("已删除一组");
+        });
+      });
+      el.editBody.querySelectorAll("[data-add-set]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var ei = +btn.getAttribute("data-add-set");
+          var last = h.exercises[ei].sets[h.exercises[ei].sets.length - 1];
+          h.exercises[ei].sets.push({ w: last ? last.w : "", r: last ? last.r : "" });
+          autosave("已添加一组");
+        });
+      });
+      el.editBody.querySelectorAll("[data-move]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var ei = +btn.getAttribute("data-exi");
+          var dir = btn.getAttribute("data-move");
+          var swap = dir === "up" ? ei - 1 : ei + 1;
+          if (swap < 0 || swap >= h.exercises.length) return;
+          var tmp = h.exercises[ei];
+          h.exercises[ei] = h.exercises[swap];
+          h.exercises[swap] = tmp;
+          autosave("动作顺序已更新");
+        });
+      });
+    }
+
+    function tryEndTraining() {
+      var done = countLive("done");
+      var draftish = countLive("draft") + countLive("pending");
+
+      if (done === 0) {
+        openSheet("没有已完成的组", "空课程不能保存为已完成记录。可放弃本次训练，或返回继续录入。", [
+          {
+            label: "返回继续",
+            rec: true,
+            fn: function () {}
+          },
+          {
+            label: "放弃本次训练",
+            danger: true,
+            fn: function () {
+              state.live = null;
+              toast("已放弃，未写入历史");
+              state.history = seedHistory();
+              renderHistory();
+              showScreen("history");
+            }
+          }
+        ]);
+        return;
+      }
+
+      if (draftish > 0) {
+        openSheet("仍有待完成数据", "共 " + draftish + " 组待完成或未确认草稿。", [
+          {
+            label: "返回处理",
+            rec: true,
+            fn: function () {}
+          },
+          {
+            label: "丢弃待完成并结束",
+            danger: true,
+            fn: function () {
+              goToSummaryFromLive();
+            }
+          }
+        ]);
+        return;
+      }
+
+      goToSummaryFromLive();
+    }
+
+    function goToSummaryFromLive() {
+      state.summaryDraft = buildCompletedFromLive();
+      state.live = null;
+      renderSummary();
+      showScreen("summary");
+    }
+
+    function applyScene(scene) {
+      state.scene = scene;
+      closeSheet();
+      state.history = seedHistory();
+      state.summaryDraft = null;
+      state.editDirty = false;
+
+      if (scene === "end-draft") {
+        state.live = liveSessionWithDrafts();
+        renderRecorder();
+        showScreen("recorder");
+      } else if (scene === "empty") {
+        state.live = emptyLiveSession();
+        renderRecorder();
+        showScreen("recorder");
+      } else if (scene === "summary") {
+        state.live = liveSessionWithDrafts();
+        state.summaryDraft = buildCompletedFromLive();
+        renderSummary();
+        showScreen("summary");
+      } else if (scene === "history") {
+        renderHistory();
+        showScreen("history");
+      } else if (scene === "detail") {
+        state.activeId = "h-z1";
+        renderDetail();
+        showScreen("detail");
+      } else if (scene === "edit-stale") {
+        state.activeId = "h-z1";
+        var h = activeSession();
+        h.shareStatus = "stale";
+        if (h.exercises[0] && h.exercises[0].sets[0]) {
+          h.exercises[0].sets[0].w = "72.5";
+        }
+        renderEdit();
+        showScreen("edit");
+      }
+    }
+
+    document.getElementById("btn-end").addEventListener("click", tryEndTraining);
+    document.getElementById("btn-rec-hist").addEventListener("click", function () {
+      renderHistory();
+      showScreen("history");
+    });
+    document.getElementById("btn-share").addEventListener("click", function () {
+      commitSummaryToHistory();
+      var h = activeSession();
+      h.shareStatus = "shared";
+      state.destFrom = "summary";
+      el.destCopy.textContent = "由训练总结进入。报告预览与发送属于模块 06，此处仅作目的地示意。";
+      showScreen("dest-share");
+    });
+    document.getElementById("btn-done-return").addEventListener("click", function () {
+      commitSummaryToHistory();
+      renderHistory();
+      showScreen("history");
+      toast("已完成 · 未分享");
+    });
+    document.getElementById("btn-hist-back").addEventListener("click", function () {
+      if (state.live) {
+        renderRecorder();
+        showScreen("recorder");
+      } else {
+        toast("学员详情在模块 02 · 本页停在历史");
+      }
+    });
+    document.getElementById("btn-det-back").addEventListener("click", function () {
+      renderHistory();
+      showScreen("history");
+    });
+    document.getElementById("btn-edit").addEventListener("click", function () {
+      renderEdit();
+      showScreen("edit");
+    });
+    document.getElementById("btn-edit-done").addEventListener("click", function () {
+      var h = activeSession();
+      if (!recountAndValidate(h)) {
+        toast("不能保存空的已完成课程");
+        return;
+      }
+      renderDetail();
+      showScreen("detail");
+    });
+    document.getElementById("btn-share-back").addEventListener("click", function () {
+      if (state.destFrom === "detail") {
+        renderDetail();
+        showScreen("detail");
+      } else {
+        renderSummary();
+        showScreen("summary");
+      }
+    });
+    document.getElementById("btn-share-hist").addEventListener("click", function () {
+      renderHistory();
+      showScreen("history");
+    });
+    document.getElementById("sheet-cancel").addEventListener("click", closeSheet);
+    el.scrim.addEventListener("click", closeSheet);
+
+    document.querySelectorAll(".scene-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        applyScene(btn.getAttribute("data-scene"));
+      });
+    });
+
+    applyScene("end-draft");
+  })();
+  </script>
+</body>
+</html>

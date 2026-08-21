@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FineCoach · M1-A · 分享报告</title>
+  <style>
+    :root {
+      --bg: oklch(0.93 0 0);
+      --surface: oklch(0.99 0 0);
+      --fg: oklch(0.22 0 0);
+      --muted: oklch(0.46 0 0);
+      --border: oklch(0.78 0 0);
+      --accent: oklch(0.28 0 0);
+      --fill: oklch(0.90 0 0);
+      --fill-2: oklch(0.85 0 0);
+      --danger: oklch(0.42 0.12 25);
+      --phone-w: 393px;
+      --phone-h: 852px;
+      --tap: 44px;
+      --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Heiti SC", sans-serif;
+      --mono: ui-monospace, Menlo, "SF Mono", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    body {
+      font-family: var(--font);
+      color: var(--fg);
+      background: var(--bg);
+      line-height: 1.45;
+    }
+    button, input, textarea, select { font: inherit; color: inherit; }
+    button { cursor: pointer; background: none; border: 0; }
+    img { display: none; }
+
+    .spec-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .spec-bar span { color: var(--muted); }
+    .spec-bar b { font-weight: 600; color: var(--fg); }
+
+    .board {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) var(--phone-w) minmax(240px, 1fr);
+      gap: 28px;
+      align-items: start;
+      justify-content: center;
+      padding: 28px 24px 48px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .rail h2 {
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .note {
+      border: 1px dashed var(--border);
+      background: var(--surface);
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--fg);
+      margin-bottom: 10px;
+    }
+    .note ol, .note ul { padding-left: 1.15em; }
+    .note li { margin: 4px 0; }
+    .note .k { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .scene-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .scene-btn {
+      min-height: var(--tap);
+      text-align: left;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--fg);
+    }
+    .scene-btn:hover { background: oklch(0.94 0 0); }
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid var(--fg);
+      outline-offset: 2px;
+    }
+    .scene-btn[aria-current="true"] { background: var(--fill); border-color: var(--fg); }
+    .check { font-size: 13px; }
+    .check li { margin: 6px 0; color: var(--muted); }
+    .now {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border: 1px solid var(--fg);
+      background: var(--surface);
+      font-size: 13px;
+    }
+
+    .device-wrap { width: var(--phone-w); }
+    .device-caption {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 8px;
+      font-family: var(--mono);
+    }
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      border-radius: 54px;
+      border: 11px solid oklch(0.18 0 0);
+      background: oklch(0.97 0 0);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 18px 40px oklch(0.55 0 0 / 0.18);
+    }
+    .island {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      width: 126px;
+      height: 36px;
+      margin-left: -63px;
+      background: oklch(0.12 0 0);
+      border-radius: 20px;
+      z-index: 5;
+    }
+    .status {
+      height: 54px;
+      padding: 14px 28px 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .status-sys { display: flex; gap: 6px; align-items: center; }
+    .sig, .bat { display: inline-block; height: 10px; background: var(--fg); }
+    .sig { width: 16px; clip-path: polygon(0 70%, 35% 45%, 65% 20%, 100% 0, 100% 100%, 0 100%); }
+    .bat { width: 22px; height: 11px; border: 1.5px solid var(--fg); background: transparent; position: relative; }
+    .bat::after { content: ""; position: absolute; inset: 2px 8px 2px 2px; background: var(--fg); }
+    .home-bar {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      width: 134px;
+      height: 5px;
+      margin-left: -67px;
+      background: oklch(0.22 0 0);
+      border-radius: 3px;
+      z-index: 5;
+    }
+    .app {
+      position: absolute;
+      inset: 54px 0 24px;
+      display: flex;
+      flex-direction: column;
+      background: oklch(0.97 0 0);
+    }
+    .screen { display: none; flex: 1; flex-direction: column; min-height: 0; }
+    .screen.is-on { display: flex; }
+
+    .nav {
+      min-height: var(--tap);
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .nav h1 {
+      flex: 1;
+      font-size: 17px;
+      font-weight: 650;
+      text-align: center;
+    }
+    .nav-side { width: 88px; display: flex; align-items: center; }
+    .nav-side.end { justify-content: flex-end; gap: 4px; width: auto; min-width: 88px; }
+    .icon-btn, .text-btn {
+      min-width: var(--tap);
+      min-height: var(--tap);
+      padding: 0 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fg);
+      font-size: 15px;
+      font-weight: 560;
+    }
+    .icon-btn:hover, .text-btn:hover, .ghost:hover { background: oklch(0.93 0 0); }
+    .text-btn { min-width: auto; }
+
+    .body { flex: 1; overflow: auto; padding: 16px 16px 20px; }
+    .body.tight { padding: 0; }
+    .kicker { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .lead { font-size: 15px; color: var(--fg); margin-bottom: 12px; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .stamp {
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .primary, .ghost {
+      min-height: var(--tap);
+      width: 100%;
+      padding: 0 16px;
+      font-size: 17px;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+    .primary { background: var(--accent); color: oklch(0.99 0 0); }
+    .primary:hover { background: oklch(0.16 0 0); color: oklch(0.99 0 0); }
+    .ghost { border: 1px solid var(--border); background: var(--surface); color: var(--fg); }
+
+    .callout-primary {
+      border: 1px solid var(--fg);
+      background: var(--surface);
+      padding: 14px;
+      margin: 8px 0 4px;
+    }
+    .callout-primary p { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+    .callout-primary .primary { margin-top: 0; }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 12px 0 16px;
+    }
+    .stat {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 12px;
+      min-height: 64px;
+    }
+    .stat b { display: block; font-size: 20px; font-weight: 650; }
+    .stat span { font-size: 12px; color: var(--muted); }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 18px 0 8px;
+    }
+    .toggle-row {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      margin-bottom: 8px;
+      color: var(--fg);
+    }
+    .toggle-row:hover { background: oklch(0.95 0 0); }
+    .toggle-row.is-off { opacity: 0.72; }
+    .toggle-row.is-locked {
+      border-style: dashed;
+      background: oklch(0.96 0 0);
+      cursor: default;
+      opacity: 1;
+    }
+    .toggle-row.is-locked:hover { background: oklch(0.96 0 0); }
+    .toggle-main { flex: 1; min-width: 0; }
+    .toggle-main b { display: block; font-size: 15px; font-weight: 600; }
+    .toggle-main span { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .switch {
+      width: 48px;
+      height: 28px;
+      border: 1.5px solid var(--fg);
+      border-radius: 14px;
+      position: relative;
+      flex: none;
+      background: var(--surface);
+    }
+    .switch::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      background: var(--fg);
+      border-radius: 50%;
+      transition: left 0.12s ease;
+    }
+    .switch.on {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .switch.on::after {
+      left: 23px;
+      background: oklch(0.99 0 0);
+    }
+    .switch.off-muted {
+      border-color: var(--border);
+      background: var(--fill);
+    }
+    .switch.off-muted::after { background: var(--muted); }
+    .pill {
+      display: inline-block;
+      font-size: 11px;
+      padding: 2px 6px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+    .pill.warn { border-color: var(--fg); color: var(--fg); }
+    .pill.ban {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .field-label { display: block; font-size: 13px; font-weight: 600; margin: 14px 0 6px; }
+    .req { color: var(--muted); font-weight: 400; }
+    .field {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 16px;
+    }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .chip {
+      min-height: var(--tap);
+      padding: 0 14px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      color: var(--fg);
+    }
+    .chip:hover { background: oklch(0.94 0 0); }
+    .chip[aria-pressed="true"] { border-color: var(--fg); background: var(--fill); }
+
+    .ban-box {
+      border: 1px dashed var(--danger);
+      background: oklch(0.97 0.01 25);
+      padding: 12px;
+      margin: 12px 0 4px;
+      font-size: 13px;
+    }
+    .ban-box b { display: block; margin-bottom: 6px; color: var(--danger); }
+    .ban-box ul { padding-left: 1.1em; color: var(--fg); }
+    .ban-box li { margin: 3px 0; }
+
+    .dock {
+      padding: 10px 16px 12px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .dock .primary, .dock .ghost { margin-top: 0; }
+    .dock-row { display: flex; gap: 8px; }
+    .dock-row .ghost, .dock-row .primary { flex: 1; }
+
+    .preview-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+    .preview-meta b { color: var(--fg); font-weight: 600; }
+    .page-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      overflow-x: auto;
+    }
+    .page-tab {
+      min-height: var(--tap);
+      min-width: var(--tap);
+      padding: 0 14px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 14px;
+      flex: none;
+      color: var(--fg);
+    }
+    .page-tab:hover { background: oklch(0.94 0 0); }
+    .page-tab[aria-current="true"] { border-color: var(--fg); background: var(--fill); }
+
+    .report-card {
+      border: 1px solid var(--fg);
+      background: var(--fill);
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .report-card .rc-kicker {
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .report-card h3 {
+      font-size: 18px;
+      font-weight: 650;
+      margin-bottom: 4px;
+    }
+    .report-card .rc-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .gb-block {
+      border: 1px dashed var(--border);
+      background: oklch(0.94 0 0);
+      padding: 10px;
+      margin-bottom: 8px;
+    }
+    .gb-block:last-child { margin-bottom: 0; }
+    .gb-title {
+      font-size: 12px;
+      font-weight: 650;
+      color: var(--muted);
+      margin-bottom: 6px;
+      letter-spacing: 0.03em;
+    }
+    .gb-line {
+      height: 10px;
+      background: var(--fill-2);
+      margin: 6px 0;
+    }
+    .gb-line.short { width: 62%; }
+    .gb-line.mid { width: 78%; }
+    .gb-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 13px;
+      padding: 4px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .gb-row:last-child { border-bottom: 0; }
+    .gb-row span { color: var(--muted); }
+    .page-stamp {
+      text-align: center;
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .scrim {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: oklch(0.22 0 0 / 0.34);
+      z-index: 10;
+    }
+    .scrim.on { display: block; }
+    .share-sheet {
+      display: none;
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      bottom: 28px;
+      z-index: 11;
+      border: 2px dashed var(--fg);
+      background: var(--surface);
+      padding: 14px 12px 16px;
+      max-height: calc(100% - 80px);
+      overflow: auto;
+    }
+    .share-sheet.on { display: block; }
+    .share-sheet .bound-label {
+      font-size: 11px;
+      font-family: var(--mono);
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .share-sheet h2 {
+      font-size: 15px;
+      font-weight: 650;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    .share-sheet .file-name {
+      text-align: center;
+      font-size: 13px;
+      font-family: var(--mono);
+      color: var(--fg);
+      margin-bottom: 12px;
+      padding: 8px;
+      border: 1px dashed var(--border);
+      background: oklch(0.96 0 0);
+      overflow-wrap: anywhere;
+    }
+    .share-apps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .share-app {
+      min-height: 72px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--fg);
+    }
+    .share-app:hover { background: oklch(0.94 0 0); }
+    .share-ico {
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--border);
+      background: var(--fill);
+      display: grid;
+      place-items: center;
+      font-size: 10px;
+      font-family: var(--mono);
+      color: var(--muted);
+    }
+    .share-actions { display: flex; flex-direction: column; gap: 8px; }
+    .share-actions .ghost,
+    .share-actions .primary { margin-top: 0; }
+
+    .toast {
+      display: none;
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: 48px;
+      z-index: 12;
+      min-height: var(--tap);
+      padding: 10px 14px;
+      border: 1px solid var(--fg);
+      background: var(--surface);
+      font-size: 14px;
+      text-align: center;
+      align-items: center;
+      justify-content: center;
+    }
+    .toast.on { display: flex; }
+
+    .dest {
+      flex: 1;
+      margin: 20px 16px;
+      border: 1px dashed var(--fg);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      gap: 8px;
+    }
+    .dest h2 { font-size: 20px; }
+    .dest p { font-size: 15px; color: var(--muted); }
+    .bound {
+      margin-top: 16px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    @media (max-width: 1100px) {
+      .board { grid-template-columns: 1fr; justify-items: center; }
+      .rail { width: min(520px, 100%); }
+    }
+  </style>
+</head>
+<body>
+  <header class="spec-bar" data-od-id="page-header">
+    <div>stage=<b>M1-A</b></div>
+    <div>module=<b>06-share-report</b></div>
+    <div>version=<b>v0.1</b></div>
+    <div>coverage=<b>this module only</b></div>
+    <div>data=<b>虚构数据</b></div>
+    <div>network=<b>无外部资源</b></div>
+    <div>review=<b>产品负责人走查通过</b></div>
+  </header>
+
+  <div class="board">
+    <aside class="rail" data-od-id="annotation-left">
+      <h2>走查说明</h2>
+      <div class="note">
+        低保真线框。本模块覆盖：训练总结入口 → 模块勾选 → 只读预览分页 → iOS 系统分享面板边界。灰盒报告卡，非照片。
+      </div>
+      <div class="note">
+        <span class="k">本模块不做</span>
+        <ul>
+          <li>微信 SDK / 直达微信入口</li>
+          <li>个人最佳（M1-B）/ 肌群示意图</li>
+          <li>永久保存报告图、相册自动写入</li>
+          <li>禁止字段临时解锁</li>
+          <li>学员端交互页</li>
+        </ul>
+      </div>
+      <div class="note">
+        <span class="k">建议路径</span>
+        <ol>
+          <li>训练总结点「生成分享报告」（不自动生成）</li>
+          <li>确认默认模块；训练容量默认关</li>
+          <li>预览灰盒分页与通用文件名</li>
+          <li>分享 → 虚线系统面板 → 取消回到预览</li>
+          <li>用场景 B/D 看空总结与多图拆分</li>
+        </ol>
+      </div>
+      <h2>演示场景</h2>
+      <div class="scene-list">
+        <button type="button" class="scene-btn" data-od-id="scene-default" data-scene="default">A · 默认模块 · 有课后总结</button>
+        <button type="button" class="scene-btn" data-od-id="scene-no-summary" data-scene="no-summary">B · 无课后总结 · 隐藏模块</button>
+        <button type="button" class="scene-btn" data-od-id="scene-capacity" data-scene="capacity">C · 开启训练容量</button>
+        <button type="button" class="scene-btn" data-od-id="scene-multipage" data-scene="multipage">D · 超长拆分多图</button>
+        <button type="button" class="scene-btn" data-od-id="scene-name" data-scene="name">E · 隐藏 / 覆盖显示名</button>
+      </div>
+    </aside>
+
+    <div class="device-wrap">
+      <p class="device-caption">iPhone 竖屏 393×852 · 浅色 · 系统字体</p>
+      <div class="phone" data-od-id="iphone-frame" role="application" aria-label="FineCoach 分享报告线框原型">
+        <div class="island" aria-hidden="true"></div>
+        <div class="status">
+          <span>9:41</span>
+          <span class="status-sys" aria-hidden="true"><i class="sig"></i><i class="bat"></i></span>
+        </div>
+        <div class="app" id="app">
+
+          <!-- 入口：训练总结 -->
+          <section class="screen is-on" data-screen="summary" data-od-id="screen-summary">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="summary-back" id="btn-summary-exit">完成</button>
+              </div>
+              <h1 data-od-id="summary-title">训练总结</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p class="stamp">入口 · 模块 05 → 06 · 不自动生成</p>
+              <p class="kicker" id="summary-kicker">学员 · 小周 · 今日已完成</p>
+              <p class="lead" id="summary-lead">背部 · 推拉 · 58 分钟 · 12 组已确认</p>
+              <div class="stat-grid" data-od-id="summary-stats">
+                <div class="stat"><b>12</b><span>已确认组</span></div>
+                <div class="stat"><b>58</b><span>分钟</span></div>
+                <div class="stat"><b>5</b><span>动作</span></div>
+                <div class="stat"><b>—</b><span>不显示容量</span></div>
+              </div>
+              <p class="hint" id="summary-notes-hint">教练备注与动作私有备注仅本机可见，永不进入报告。</p>
+              <div class="callout-primary" data-od-id="cta-share-wrap">
+                <p>由你主动生成。App 不会弹窗催促，也不会在结束后自动出图。</p>
+                <button type="button" class="primary" data-od-id="cta-generate-share" id="btn-generate">生成分享报告</button>
+              </div>
+              <button type="button" class="ghost" data-od-id="cta-done-skip" id="btn-skip-share">完成并返回学员</button>
+              <p class="hint" style="text-align:center;margin-top:10px">可跳过分享。每次生成都从隐私安全默认开始。</p>
+            </div>
+          </section>
+
+          <!-- 模块配置 -->
+          <section class="screen" data-screen="compose" data-od-id="screen-compose">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="compose-back" id="btn-compose-back">返回</button>
+              </div>
+              <h1 data-od-id="compose-title">报告内容</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p class="kicker">本次一次性选项 · 不记住上次开关</p>
+              <p class="lead">勾选允许分享的模块。禁止字段无入口，不可临时解锁。</p>
+
+              <p class="section-label">显示名称 · 仅本报告</p>
+              <div class="chips" role="group" aria-label="显示名称选项" data-od-id="name-mode-group">
+                <button type="button" class="chip" id="name-mode-show" data-name-mode="show" aria-pressed="true">显示档案名</button>
+                <button type="button" class="chip" id="name-mode-hide" data-name-mode="hide" aria-pressed="false">隐藏名称</button>
+                <button type="button" class="chip" id="name-mode-override" data-name-mode="override" aria-pressed="false">本次覆盖</button>
+              </div>
+              <div id="name-override-wrap" hidden>
+                <label class="field-label" for="f-name-override">本次显示名 <span class="req">不改档案</span></label>
+                <input class="field" id="f-name-override" data-od-id="field-name-override" maxlength="20" placeholder="例如 周同学" autocomplete="off">
+              </div>
+              <p class="hint" id="name-hint">默认使用学员档案显示名称「小周」。覆盖只影响本张报告。</p>
+
+              <p class="section-label">默认模块</p>
+              <div id="module-list" data-od-id="module-list"></div>
+
+              <div class="ban-box" data-od-id="forbidden-annotation">
+                <b>永久禁止 · 预览 / 图片 / 文件名均不出现</b>
+                <ul>
+                  <li>性别</li>
+                  <li>身体数据、围度 / 变化</li>
+                  <li>伤病、注意事项</li>
+                  <li>教练备注、动作私有备注</li>
+                  <li>电话 / 微信</li>
+                  <li>左右差异分析</li>
+                </ul>
+                <p class="hint" style="margin-top:8px;margin-bottom:0">无临时解锁。个人最佳属 M1-B，本阶段不提供。</p>
+              </div>
+            </div>
+            <div class="dock">
+              <button type="button" class="primary" data-od-id="cta-to-preview" id="btn-to-preview">生成预览</button>
+            </div>
+          </section>
+
+          <!-- 预览 -->
+          <section class="screen" data-screen="preview" data-od-id="screen-preview">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="preview-back" id="btn-preview-back">调整</button>
+              </div>
+              <h1 data-od-id="preview-title">报告预览</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <div class="preview-meta" data-od-id="preview-meta">
+                <span>分页=<b id="meta-pages">1 张长图</b></span>
+                <span>文件名=<b id="meta-filename">session-report-20260821.png</b></span>
+              </div>
+              <p class="hint" style="margin-top:0;margin-bottom:10px" data-od-id="filename-annotation">
+                文件名使用通用会话标识，不含学员姓名或敏感词。App 不永久保存报告图。
+              </p>
+              <div class="page-tabs" id="page-tabs" data-od-id="page-tabs" hidden></div>
+              <div id="preview-pages" data-od-id="preview-pages"></div>
+            </div>
+            <div class="dock">
+              <div class="dock-row">
+                <button type="button" class="ghost" data-od-id="cta-preview-cancel" id="btn-preview-cancel">关闭</button>
+                <button type="button" class="primary" data-od-id="cta-share" id="btn-share">分享</button>
+              </div>
+              <p class="hint" style="text-align:center">调用系统分享面板 · 无微信 SDK</p>
+            </div>
+          </section>
+
+          <!-- 跳过分享出口 -->
+          <section class="screen" data-screen="dest-skip" data-od-id="screen-dest-skip">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="dest-skip-back" id="btn-dest-skip-back">返回</button>
+              </div>
+              <h1>学员</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="dest">
+              <h2 data-od-id="dest-skip-title">未分享 · 已结束</h2>
+              <p>不标记「已发送」。可随时从历史重新进入生成报告。</p>
+              <p class="bound">—— 模块边界 · 返回学员列表属 01 / 02 ——</p>
+              <button type="button" class="ghost" data-od-id="dest-skip-regen" id="btn-dest-regen" style="margin-top:16px">再次从总结进入</button>
+            </div>
+          </section>
+
+          <div class="scrim" id="scrim" data-od-id="share-scrim"></div>
+          <div class="share-sheet" id="share-sheet" data-od-id="system-share-sheet" role="dialog" aria-labelledby="share-sheet-title" aria-modal="true">
+            <p class="bound-label">iOS 系统分享面板 · 虚线边界 · 非微信 SDK</p>
+            <h2 id="share-sheet-title">分享图片</h2>
+            <div class="file-name" data-od-id="share-filename" id="share-filename">session-report-20260821.png</div>
+            <div class="share-apps" aria-hidden="true">
+              <div class="share-app"><span class="share-ico">MSG</span>信息</div>
+              <div class="share-app"><span class="share-ico">MAIL</span>邮件</div>
+              <div class="share-app"><span class="share-ico">IM?</span>兼容 IM</div>
+              <div class="share-app"><span class="share-ico">…</span>更多</div>
+            </div>
+            <p class="hint" style="text-align:center;margin:0 0 12px">微信是否出现取决于设备安装与系统兼容，本 App 不接入微信 SDK。</p>
+            <div class="share-actions">
+              <button type="button" class="primary" data-od-id="share-simulate-success" id="btn-share-ok">模拟发送成功</button>
+              <button type="button" class="ghost" data-od-id="share-simulate-fail" id="btn-share-fail">模拟失败</button>
+              <button type="button" class="ghost" data-od-id="share-cancel" id="btn-share-cancel">取消</button>
+            </div>
+          </div>
+          <div class="toast" id="toast" data-od-id="toast" role="status"></div>
+        </div>
+        <div class="home-bar" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <aside class="rail" data-od-id="annotation-right">
+      <h2>验收要点</h2>
+      <ul class="check">
+        <li>仅从「生成分享报告」进入</li>
+        <li>每次重置为隐私默认</li>
+        <li>训练容量默认关；无个人最佳</li>
+        <li>空课后总结不显示该模块</li>
+        <li>禁止字段标注可见且不可开</li>
+        <li>预览展示最终分页灰盒</li>
+        <li>分享=系统面板虚线；取消不标已发送</li>
+        <li>通用文件名，无学员姓名</li>
+      </ul>
+      <div class="now" id="now-state" data-od-id="now-state">当前：训练总结 · 未生成</div>
+      <div class="note" style="margin-top:12px">
+        <span class="k">发送状态</span>
+        <p id="sent-state" style="margin-top:6px">未标记已发送（正确：取消/失败亦不标记）</p>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+  (function () {
+    var PROFILE_NAME = "小周";
+    var FILENAME = "session-report-20260821.png";
+
+    var DEFAULT_MODULES = [
+      { id: "name", label: "显示名称", hint: "由上方名称选项控制", fixed: true, on: true },
+      { id: "date", label: "日期", hint: "2026-08-21 · 周四", fixed: false, on: true },
+      { id: "sets", label: "动作与已确认组", hint: "只含已确认 Set", fixed: false, on: true },
+      { id: "duration", label: "训练时长", hint: "58 分钟", fixed: false, on: true },
+      { id: "focus", label: "训练重点", hint: "文字部位 · 无肌群图", fixed: false, on: true },
+      { id: "summary", label: "学员课后总结", hint: "已填写则默认开", fixed: false, on: true, needsSummary: true },
+      { id: "capacity", label: "当前训练容量", hint: "M1-A 默认关闭 · 可开", fixed: false, on: false },
+      { id: "pr", label: "个人最佳", hint: "M1-B · 本阶段不可用", fixed: true, on: false, banned: true }
+    ];
+
+    var EXERCISES_SHORT = [
+      { name: "杠铃划船", detail: "4 组 · 60kg × 8" },
+      { name: "坐姿划船", detail: "3 组 · 45kg × 10" },
+      { name: "引体向上", detail: "3 组 · 自重 × 6" },
+      { name: "面拉", detail: "2 组 · 15kg × 12" }
+    ];
+    var EXERCISES_LONG = EXERCISES_SHORT.concat([
+      { name: "哑铃单臂划船", detail: "3 组 · 22kg × 10" },
+      { name: "直臂下压", detail: "3 组 · 25kg × 12" },
+      { name: "反向飞鸟", detail: "3 组 · 8kg × 15" },
+      { name: "农夫行走", detail: "2 组 · 24kg · 40s" },
+      { name: "死虫", detail: "2 组 · 45s" },
+      { name: "猫牛式", detail: "2 组 · 60s" }
+    ]);
+
+    var state = {
+      screen: "summary",
+      scene: "default",
+      hasStudentSummary: true,
+      forceMultipage: false,
+      nameMode: "show",
+      nameOverride: "",
+      modules: [],
+      previewPage: 0,
+      markedSent: false,
+      sheetOpen: false
+    };
+
+    var el = {
+      now: document.getElementById("now-state"),
+      sent: document.getElementById("sent-state"),
+      moduleList: document.getElementById("module-list"),
+      nameOverrideWrap: document.getElementById("name-override-wrap"),
+      nameOverride: document.getElementById("f-name-override"),
+      nameHint: document.getElementById("name-hint"),
+      pageTabs: document.getElementById("page-tabs"),
+      previewPages: document.getElementById("preview-pages"),
+      metaPages: document.getElementById("meta-pages"),
+      metaFilename: document.getElementById("meta-filename"),
+      shareFilename: document.getElementById("share-filename"),
+      scrim: document.getElementById("scrim"),
+      sheet: document.getElementById("share-sheet"),
+      toast: document.getElementById("toast"),
+      summaryKicker: document.getElementById("summary-kicker"),
+      summaryLead: document.getElementById("summary-lead")
+    };
+
+    var toastTimer = null;
+
+    function cloneDefaults() {
+      return DEFAULT_MODULES.map(function (m) {
+        return {
+          id: m.id,
+          label: m.label,
+          hint: m.hint,
+          fixed: m.fixed,
+          on: m.on,
+          needsSummary: !!m.needsSummary,
+          banned: !!m.banned
+        };
+      });
+    }
+
+    function resetPrivacyDefaults() {
+      state.modules = cloneDefaults();
+      state.nameMode = "show";
+      state.nameOverride = "";
+      el.nameOverride.value = "";
+      applySummaryVisibility();
+      /* capacity always starts off; PR never on */
+      state.modules.forEach(function (m) {
+        if (m.id === "capacity") m.on = false;
+        if (m.id === "pr") m.on = false;
+      });
+      state.previewPage = 0;
+      state.markedSent = false;
+      closeSheet();
+    }
+
+    function applySummaryVisibility() {
+      state.modules.forEach(function (m) {
+        if (m.needsSummary) {
+          if (!state.hasStudentSummary) {
+            m.on = false;
+            m.hidden = true;
+          } else {
+            m.hidden = false;
+            m.on = true;
+          }
+        }
+      });
+    }
+
+    function displayName() {
+      if (state.nameMode === "hide") return null;
+      if (state.nameMode === "override") {
+        var v = (state.nameOverride || el.nameOverride.value || "").trim();
+        return v || "（未填写覆盖名）";
+      }
+      return PROFILE_NAME;
+    }
+
+    function activeContentModules() {
+      return state.modules.filter(function (m) {
+        if (m.banned || m.hidden) return false;
+        if (m.id === "name") return state.nameMode !== "hide";
+        return m.on;
+      });
+    }
+
+    function exerciseList() {
+      return state.forceMultipage ? EXERCISES_LONG : EXERCISES_SHORT;
+    }
+
+    function buildPages() {
+      var mods = activeContentModules();
+      var ex = exerciseList();
+      var pages = [];
+      var includeSets = mods.some(function (m) { return m.id === "sets"; });
+      var headerBits = [];
+      var name = displayName();
+      if (name) headerBits.push(name);
+      if (mods.some(function (m) { return m.id === "date"; })) headerBits.push("2026-08-21");
+      if (mods.some(function (m) { return m.id === "focus"; })) headerBits.push("背部 · 推拉");
+      if (mods.some(function (m) { return m.id === "duration"; })) headerBits.push("58 分钟");
+
+      function makePage(title, blocks, pageIndex, total) {
+        return { title: title, blocks: blocks, pageIndex: pageIndex, total: total };
+      }
+
+      if (!includeSets || !state.forceMultipage) {
+        var blocks = [];
+        if (headerBits.length) {
+          blocks.push({ type: "header", lines: headerBits });
+        }
+        if (includeSets) {
+          blocks.push({ type: "sets", items: ex });
+        }
+        if (mods.some(function (m) { return m.id === "capacity"; })) {
+          blocks.push({ type: "capacity", value: "约 18,400 kg · 本次会话估算" });
+        }
+        if (mods.some(function (m) { return m.id === "summary"; }) && state.hasStudentSummary) {
+          blocks.push({
+            type: "summary",
+            text: "今天背部发力更集中，注意肩胛后收下压。回家做 5 分钟胸椎活动即可。"
+          });
+        }
+        var total = 1;
+        pages.push(makePage("训练报告", blocks, 0, total));
+        return pages;
+      }
+
+      /* multipage: header+first half / second half+capacity+summary */
+      var mid = Math.ceil(ex.length / 2);
+      var p1 = [];
+      if (headerBits.length) p1.push({ type: "header", lines: headerBits });
+      p1.push({ type: "sets", items: ex.slice(0, mid) });
+      var p2 = [];
+      p2.push({ type: "sets", items: ex.slice(mid), continued: true });
+      if (mods.some(function (m) { return m.id === "capacity"; })) {
+        p2.push({ type: "capacity", value: "约 24,600 kg · 本次会话估算" });
+      }
+      if (mods.some(function (m) { return m.id === "summary"; }) && state.hasStudentSummary) {
+        p2.push({
+          type: "summary",
+          text: "今天背部发力更集中，注意肩胛后收下压。回家做 5 分钟胸椎活动即可。"
+        });
+      }
+      pages.push(makePage("训练报告", p1, 0, 2));
+      pages.push(makePage("训练报告 · 续", p2, 1, 2));
+      return pages;
+    }
+
+    function renderModules() {
+      var html = "";
+      state.modules.forEach(function (m) {
+        if (m.hidden) return;
+        if (m.banned) {
+          html += '<div class="toggle-row is-locked" data-od-id="module-' + m.id + '" aria-disabled="true">';
+          html += '<div class="toggle-main"><b>' + m.label + ' <span class="pill ban">不可用</span></b>';
+          html += "<span>" + m.hint + "</span></div>";
+          html += '<span class="switch off-muted" aria-hidden="true"></span></div>';
+          return;
+        }
+        if (m.id === "name") {
+          html += '<div class="toggle-row is-locked" data-od-id="module-name-info">';
+          html += '<div class="toggle-main"><b>' + m.label + '</b>';
+          html += "<span>由顶部「显示 / 隐藏 / 覆盖」控制，不改学员档案</span></div>";
+          html += '<span class="switch ' + (state.nameMode === "hide" ? "off-muted" : "on") + '" aria-hidden="true"></span></div>';
+          return;
+        }
+        var on = m.on;
+        html += '<button type="button" class="toggle-row' + (on ? "" : " is-off") + '" data-module="' + m.id + '" data-od-id="module-' + m.id + '">';
+        html += '<div class="toggle-main"><b>' + m.label;
+        if (m.id === "capacity") html += ' <span class="pill warn">默认关</span>';
+        html += "</b><span>" + m.hint + "</span></div>";
+        html += '<span class="switch' + (on ? " on" : " off-muted") + '" aria-hidden="true"></span></button>';
+      });
+      if (!state.hasStudentSummary) {
+        html += '<div class="toggle-row is-locked" data-od-id="module-summary-empty">';
+        html += '<div class="toggle-main"><b>学员课后总结 <span class="pill">未填写 · 已隐藏</span></b>';
+        html += "<span>空内容不进入报告，也不显示开关</span></div>";
+        html += '<span class="switch off-muted" aria-hidden="true"></span></div>';
+      }
+      el.moduleList.innerHTML = html;
+    }
+
+    function renderNameMode() {
+      document.querySelectorAll("[data-name-mode]").forEach(function (btn) {
+        btn.setAttribute("aria-pressed", btn.getAttribute("data-name-mode") === state.nameMode ? "true" : "false");
+      });
+      el.nameOverrideWrap.hidden = state.nameMode !== "override";
+      if (state.nameMode === "hide") {
+        el.nameHint.textContent = "本报告不显示学员名称。档案中的「" + PROFILE_NAME + "」不变。";
+      } else if (state.nameMode === "override") {
+        el.nameHint.textContent = "覆盖仅用于本张报告，不写入学员档案。";
+      } else {
+        el.nameHint.textContent = "默认使用学员档案显示名称「" + PROFILE_NAME + "」。覆盖只影响本张报告。";
+      }
+    }
+
+    function renderBlock(block) {
+      var html = "";
+      if (block.type === "header") {
+        html += '<div class="gb-block" data-od-id="gb-header"><div class="gb-title">页眉</div>';
+        block.lines.forEach(function (line) {
+          html += '<div class="gb-row"><b>' + escapeHtml(line) + "</b><span>灰盒</span></div>";
+        });
+        html += "</div>";
+      } else if (block.type === "sets") {
+        html += '<div class="gb-block" data-od-id="gb-sets"><div class="gb-title">动作与已确认组' + (block.continued ? " · 续" : "") + "</div>";
+        block.items.forEach(function (it) {
+          html += '<div class="gb-row"><b>' + escapeHtml(it.name) + "</b><span>" + escapeHtml(it.detail) + "</span></div>";
+        });
+        html += "</div>";
+      } else if (block.type === "capacity") {
+        html += '<div class="gb-block" data-od-id="gb-capacity"><div class="gb-title">当前训练容量</div>';
+        html += '<div class="gb-line mid"></div>';
+        html += '<div class="gb-row"><b>' + escapeHtml(block.value) + "</b><span>可选模块</span></div></div>";
+      } else if (block.type === "summary") {
+        html += '<div class="gb-block" data-od-id="gb-summary"><div class="gb-title">学员课后总结</div>';
+        html += '<p style="font-size:13px;line-height:1.5">' + escapeHtml(block.text) + "</p></div>";
+      }
+      return html;
+    }
+
+    function renderPreview() {
+      var pages = buildPages();
+      var total = pages.length;
+      el.metaFilename.textContent = FILENAME;
+      el.shareFilename.textContent = FILENAME;
+      if (total === 1) {
+        el.metaPages.textContent = "1 张长图";
+        el.pageTabs.hidden = true;
+        el.pageTabs.innerHTML = "";
+      } else {
+        el.metaPages.textContent = total + " 张有序图片";
+        el.pageTabs.hidden = false;
+        var tabs = "";
+        for (var i = 0; i < total; i++) {
+          tabs += '<button type="button" class="page-tab" data-page="' + i + '" data-od-id="page-tab-' + (i + 1) + '"' +
+            (i === state.previewPage ? ' aria-current="true"' : "") + ">图 " + (i + 1) + "/" + total + "</button>";
+        }
+        el.pageTabs.innerHTML = tabs;
+      }
+      if (state.previewPage >= total) state.previewPage = 0;
+      var page = pages[state.previewPage];
+      var html = '<article class="report-card" data-od-id="report-card-' + (state.previewPage + 1) + '">';
+      html += '<p class="rc-kicker">GREYBOX · 只读图片预览 · 非照片</p>';
+      html += "<h3>" + escapeHtml(page.title) + "</h3>";
+      html += '<p class="rc-sub">最终分页结果 · 第 ' + (page.pageIndex + 1) + " / " + page.total + " 张</p>";
+      page.blocks.forEach(function (b) { html += renderBlock(b); });
+      /* prove forbidden fields absent */
+      html += '<div class="gb-block" data-od-id="gb-absent-check"><div class="gb-title">本图不含</div>';
+      html += '<div class="gb-line short"></div>';
+      html += '<p class="hint" style="margin:0">性别 · 身体数据 · 围度 · 伤病 · 教练备注 · 动作私有备注 · 电话/微信 · 左右差异</p></div>';
+      html += "</article>";
+      html += '<p class="page-stamp">' + FILENAME + (total > 1 ? " · part-" + (state.previewPage + 1) : "") + "</p>";
+      el.previewPages.innerHTML = html;
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function showScreen(name) {
+      state.screen = name;
+      document.querySelectorAll(".screen").forEach(function (s) {
+        s.classList.toggle("is-on", s.getAttribute("data-screen") === name);
+      });
+      updateNow();
+    }
+
+    function updateNow() {
+      var label = "当前：";
+      if (state.screen === "summary") label += "训练总结 · 等待主动生成";
+      else if (state.screen === "compose") label += "报告内容 · 隐私默认已加载";
+      else if (state.screen === "preview") {
+        var pages = buildPages();
+        label += "预览 · " + pages.length + " 张 · 文件名通用";
+      } else if (state.screen === "dest-skip") label += "已跳过分享 · 返回边界";
+      if (state.sheetOpen) label += " · 系统分享面板打开";
+      el.now.textContent = label;
+      el.sent.textContent = state.markedSent
+        ? "异常：已标记已发送（本原型不应出现）"
+        : "未标记已发送（正确：取消/失败亦不标记）";
+    }
+
+    function openSheet() {
+      state.sheetOpen = true;
+      el.scrim.classList.add("on");
+      el.sheet.classList.add("on");
+      updateNow();
+    }
+
+    function closeSheet() {
+      state.sheetOpen = false;
+      el.scrim.classList.remove("on");
+      el.sheet.classList.remove("on");
+      updateNow();
+    }
+
+    function toast(msg) {
+      el.toast.textContent = msg;
+      el.toast.classList.add("on");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () { el.toast.classList.remove("on"); }, 1800);
+    }
+
+    function enterComposeFromSummary() {
+      resetPrivacyDefaults();
+      renderNameMode();
+      renderModules();
+      showScreen("compose");
+    }
+
+    function applyScene(scene) {
+      state.scene = scene;
+      document.querySelectorAll(".scene-btn").forEach(function (btn) {
+        btn.setAttribute("aria-current", btn.getAttribute("data-scene") === scene ? "true" : "false");
+      });
+
+      state.hasStudentSummary = true;
+      state.forceMultipage = false;
+      el.summaryKicker.textContent = "学员 · " + PROFILE_NAME + " · 今日已完成";
+      el.summaryLead.textContent = "背部 · 推拉 · 58 分钟 · 12 组已确认";
+
+      if (scene === "no-summary") {
+        state.hasStudentSummary = false;
+        el.summaryLead.textContent = "背部 · 推拉 · 58 分钟 · 12 组 · 课后总结未填";
+      } else if (scene === "capacity") {
+        /* open compose with capacity on after reset */
+      } else if (scene === "multipage") {
+        state.forceMultipage = true;
+        el.summaryLead.textContent = "背部 · 推拉 · 72 分钟 · 27 组 · 将拆分多图";
+      } else if (scene === "name") {
+        /* will set name mode after compose */
+      }
+
+      resetPrivacyDefaults();
+
+      if (scene === "capacity") {
+        showScreen("summary");
+        enterComposeFromSummary();
+        var cap = state.modules.find(function (m) { return m.id === "capacity"; });
+        if (cap) cap.on = true;
+        renderModules();
+      } else if (scene === "multipage") {
+        showScreen("summary");
+        enterComposeFromSummary();
+        renderModules();
+        state.previewPage = 0;
+        renderPreview();
+        showScreen("preview");
+      } else if (scene === "name") {
+        showScreen("summary");
+        enterComposeFromSummary();
+        state.nameMode = "override";
+        state.nameOverride = "周同学";
+        el.nameOverride.value = "周同学";
+        renderNameMode();
+        renderModules();
+      } else if (scene === "no-summary") {
+        showScreen("summary");
+        enterComposeFromSummary();
+      } else {
+        showScreen("summary");
+        closeSheet();
+      }
+      updateNow();
+    }
+
+    /* events */
+    document.getElementById("btn-generate").addEventListener("click", function () {
+      enterComposeFromSummary();
+      toast("已载入隐私安全默认");
+    });
+
+    document.getElementById("btn-skip-share").addEventListener("click", function () {
+      state.markedSent = false;
+      showScreen("dest-skip");
+      toast("已完成 · 未分享");
+    });
+
+    document.getElementById("btn-summary-exit").addEventListener("click", function () {
+      state.markedSent = false;
+      showScreen("dest-skip");
+    });
+
+    document.getElementById("btn-compose-back").addEventListener("click", function () {
+      showScreen("summary");
+    });
+
+    document.getElementById("btn-to-preview").addEventListener("click", function () {
+      if (state.nameMode === "override") {
+        state.nameOverride = el.nameOverride.value.trim();
+      }
+      state.previewPage = 0;
+      renderPreview();
+      showScreen("preview");
+    });
+
+    document.getElementById("btn-preview-back").addEventListener("click", function () {
+      renderModules();
+      renderNameMode();
+      showScreen("compose");
+    });
+
+    document.getElementById("btn-preview-cancel").addEventListener("click", function () {
+      state.markedSent = false;
+      showScreen("summary");
+      toast("已关闭预览 · 未标记发送");
+    });
+
+    document.getElementById("btn-share").addEventListener("click", function () {
+      openSheet();
+    });
+
+    document.getElementById("btn-share-cancel").addEventListener("click", function () {
+      state.markedSent = false;
+      closeSheet();
+      showScreen("preview");
+      toast("已取消 · 返回预览 · 未标记已发送");
+    });
+
+    document.getElementById("btn-share-fail").addEventListener("click", function () {
+      state.markedSent = false;
+      closeSheet();
+      showScreen("preview");
+      toast("分享失败 · 返回预览 · 未标记已发送");
+    });
+
+    document.getElementById("btn-share-ok").addEventListener("click", function () {
+      /* success still does not persist image; we show feedback but do not claim permanent save */
+      state.markedSent = false;
+      closeSheet();
+      showScreen("preview");
+      toast("已交给系统 · App 不永久保存图片 · 不记已发送");
+      updateNow();
+    });
+
+    el.scrim.addEventListener("click", function () {
+      state.markedSent = false;
+      closeSheet();
+      showScreen("preview");
+      toast("已取消 · 返回预览");
+    });
+
+    document.getElementById("btn-dest-skip-back").addEventListener("click", function () {
+      showScreen("summary");
+    });
+
+    document.getElementById("btn-dest-regen").addEventListener("click", function () {
+      showScreen("summary");
+    });
+
+    el.moduleList.addEventListener("click", function (e) {
+      var row = e.target.closest("[data-module]");
+      if (!row) return;
+      var id = row.getAttribute("data-module");
+      var mod = state.modules.find(function (m) { return m.id === id; });
+      if (!mod || mod.fixed || mod.banned) return;
+      mod.on = !mod.on;
+      renderModules();
+    });
+
+    document.querySelectorAll("[data-name-mode]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        state.nameMode = btn.getAttribute("data-name-mode");
+        renderNameMode();
+        renderModules();
+      });
+    });
+
+    el.nameOverride.addEventListener("input", function () {
+      state.nameOverride = el.nameOverride.value;
+    });
+
+    el.pageTabs.addEventListener("click", function (e) {
+      var tab = e.target.closest("[data-page]");
+      if (!tab) return;
+      state.previewPage = parseInt(tab.getAttribute("data-page"), 10) || 0;
+      renderPreview();
+    });
+
+    document.querySelectorAll(".scene-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        applyScene(btn.getAttribute("data-scene"));
+      });
+    });
+
+    /* boot */
+    applyScene("default");
+  })();
+  </script>
+</body>
+</html>

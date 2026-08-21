@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FineCoach · M1-A · 设置 · 备份与恢复</title>
+  <style>
+    :root {
+      --bg: oklch(0.93 0 0);
+      --surface: oklch(0.99 0 0);
+      --fg: oklch(0.22 0 0);
+      --muted: oklch(0.46 0 0);
+      --border: oklch(0.78 0 0);
+      --accent: oklch(0.28 0 0);
+      --fill: oklch(0.90 0 0);
+      --fill-2: oklch(0.85 0 0);
+      --danger: oklch(0.42 0.12 25);
+      --ok: oklch(0.38 0.06 145);
+      --phone-w: 393px;
+      --phone-h: 852px;
+      --tap: 44px;
+      --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Heiti SC", sans-serif;
+      --mono: ui-monospace, Menlo, "SF Mono", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    body {
+      font-family: var(--font);
+      color: var(--fg);
+      background: var(--bg);
+      line-height: 1.45;
+    }
+    button, input, textarea, select { font: inherit; color: inherit; }
+    button { cursor: pointer; background: none; border: 0; }
+    img { display: none; }
+
+    .spec-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .spec-bar b { font-weight: 600; color: var(--fg); }
+
+    .board {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) var(--phone-w) minmax(240px, 1fr);
+      gap: 28px;
+      align-items: start;
+      justify-content: center;
+      padding: 28px 24px 48px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .rail h2 {
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .note {
+      border: 1px dashed var(--border);
+      background: var(--surface);
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--fg);
+      margin-bottom: 10px;
+    }
+    .note ol, .note ul { padding-left: 1.15em; }
+    .note li { margin: 4px 0; }
+    .note .k { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .scene-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .scene-btn {
+      min-height: var(--tap);
+      text-align: left;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--fg);
+    }
+    .scene-btn:hover { background: oklch(0.94 0 0); }
+    button:focus-visible,
+    input:focus-visible {
+      outline: 2px solid var(--fg);
+      outline-offset: 2px;
+    }
+    .scene-btn[aria-current="true"] { background: var(--fill); border-color: var(--fg); }
+    .check { font-size: 13px; }
+    .check li { margin: 6px 0; color: var(--muted); }
+    .now {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border: 1px solid var(--fg);
+      background: var(--surface);
+      font-size: 13px;
+    }
+
+    .device-wrap { width: var(--phone-w); }
+    .device-caption {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 8px;
+      font-family: var(--mono);
+    }
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      border-radius: 54px;
+      border: 11px solid oklch(0.18 0 0);
+      background: oklch(0.97 0 0);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 18px 40px oklch(0.55 0 0 / 0.18);
+    }
+    .island {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      width: 126px;
+      height: 36px;
+      margin-left: -63px;
+      background: oklch(0.12 0 0);
+      border-radius: 20px;
+      z-index: 5;
+    }
+    .status {
+      height: 54px;
+      padding: 14px 28px 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .status-sys { display: flex; gap: 6px; align-items: center; }
+    .sig, .bat { display: inline-block; height: 10px; background: var(--fg); }
+    .sig { width: 16px; clip-path: polygon(0 70%, 35% 45%, 65% 20%, 100% 0, 100% 100%, 0 100%); }
+    .bat { width: 22px; height: 11px; border: 1.5px solid var(--fg); background: transparent; position: relative; }
+    .bat::after { content: ""; position: absolute; inset: 2px 8px 2px 2px; background: var(--fg); }
+    .home-bar {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      width: 134px;
+      height: 5px;
+      margin-left: -67px;
+      background: oklch(0.22 0 0);
+      border-radius: 3px;
+      z-index: 5;
+    }
+    .app {
+      position: absolute;
+      inset: 54px 0 24px;
+      display: flex;
+      flex-direction: column;
+      background: oklch(0.97 0 0);
+    }
+    .screen { display: none; flex: 1; flex-direction: column; min-height: 0; }
+    .screen.is-on { display: flex; }
+
+    .nav {
+      min-height: var(--tap);
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex: none;
+    }
+    .nav h1 {
+      flex: 1;
+      font-size: 17px;
+      font-weight: 650;
+      text-align: center;
+    }
+    .nav-side { width: 72px; display: flex; align-items: center; }
+    .nav-side.end { justify-content: flex-end; width: auto; min-width: 72px; }
+    .icon-btn, .text-btn {
+      min-width: var(--tap);
+      min-height: var(--tap);
+      padding: 0 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fg);
+      font-size: 15px;
+      font-weight: 560;
+    }
+    .icon-btn:hover, .text-btn:hover, .ghost:hover { background: oklch(0.93 0 0); }
+    .text-btn { min-width: auto; }
+
+    .body { flex: 1; overflow: auto; padding: 16px 16px 20px; }
+    .body.tight { padding: 0; }
+
+    .kicker { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .lead { font-size: 15px; color: var(--fg); margin-bottom: 14px; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .err { color: var(--danger); font-size: 13px; margin-top: 6px; display: none; }
+    .err.show { display: block; }
+
+    .primary, .ghost, .danger-btn {
+      min-height: var(--tap);
+      width: 100%;
+      padding: 0 16px;
+      font-size: 17px;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+    .primary { background: var(--accent); color: oklch(0.99 0 0); }
+    .primary:hover { background: oklch(0.16 0 0); color: oklch(0.99 0 0); }
+    .primary:disabled {
+      background: var(--fill-2);
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+    .ghost { border: 1px solid var(--border); background: var(--surface); color: var(--fg); }
+    .danger-btn {
+      border: 1px solid var(--danger);
+      background: var(--surface);
+      color: var(--danger);
+    }
+    .danger-btn:hover { background: oklch(0.96 0.02 25); color: var(--danger); }
+    .stack-bottom { margin-top: 16px; }
+
+    .group-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      padding: 14px 16px 6px;
+      text-transform: uppercase;
+    }
+    .row {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      text-align: left;
+      color: var(--fg);
+    }
+    .row:hover { background: oklch(0.95 0 0); }
+    .row-main { flex: 1; min-width: 0; }
+    .row-name { font-size: 16px; font-weight: 560; }
+    .row-sub { font-size: 13px; color: var(--muted); margin-top: 2px; overflow-wrap: anywhere; }
+    .row-value { font-size: 15px; color: var(--muted); flex: none; }
+    .chev {
+      width: 8px; height: 8px;
+      border-right: 1.5px solid var(--muted);
+      border-top: 1.5px solid var(--muted);
+      transform: rotate(45deg);
+      flex: none;
+    }
+
+    .seg {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 8px 0 4px;
+    }
+    .seg-btn {
+      min-height: var(--tap);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 16px;
+      font-weight: 560;
+      color: var(--fg);
+    }
+    .seg-btn:hover { background: oklch(0.94 0 0); }
+    .seg-btn[aria-pressed="true"] {
+      border-color: var(--fg);
+      background: var(--fill);
+    }
+
+    .field-label { display: block; font-size: 13px; font-weight: 600; margin: 14px 0 6px; }
+    .field {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 16px;
+    }
+    .field.is-err { border-color: var(--danger); }
+
+    .callout {
+      border: 1px solid var(--border);
+      background: var(--fill);
+      padding: 12px 14px;
+      font-size: 14px;
+      margin: 12px 0;
+    }
+    .callout.warn {
+      border-color: var(--fg);
+      background: var(--surface);
+    }
+    .callout.danger {
+      border-color: var(--danger);
+      background: oklch(0.97 0.02 25);
+    }
+    .callout.ok {
+      border-color: var(--ok);
+      background: oklch(0.97 0.02 145);
+    }
+    .callout b { display: block; margin-bottom: 4px; }
+    .callout ul { padding-left: 1.15em; margin-top: 6px; }
+    .callout li { margin: 3px 0; }
+
+    .content-list {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      margin: 10px 0;
+    }
+    .content-list li {
+      list-style: none;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      display: flex;
+      gap: 8px;
+    }
+    .content-list li:last-child { border-bottom: 0; }
+    .content-list .mark {
+      width: 18px;
+      flex: none;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .sys-bound {
+      margin: 12px 0;
+      border: 2px dashed var(--fg);
+      background: var(--surface);
+      padding: 16px 14px;
+      min-height: 160px;
+    }
+    .sys-bound .bound-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .sys-bound h3 { font-size: 16px; margin-bottom: 8px; }
+    .sys-bound p { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+    .sys-row {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      background: var(--fill);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-align: left;
+      margin-bottom: 8px;
+      color: var(--fg);
+    }
+    .sys-row:hover { background: oklch(0.92 0 0); }
+    .sys-ico {
+      width: 28px; height: 28px;
+      border: 1px solid var(--fg);
+      flex: none;
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+      font-family: var(--mono);
+    }
+    .sys-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .sys-actions .ghost,
+    .sys-actions .primary {
+      margin-top: 0;
+      flex: 1;
+      font-size: 15px;
+    }
+
+    .switch-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: var(--tap);
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .switch-track {
+      width: 48px;
+      height: 28px;
+      border: 1.5px solid var(--fg);
+      border-radius: 14px;
+      background: var(--fill);
+      position: relative;
+      flex: none;
+    }
+    .switch-track[aria-checked="true"] { background: var(--accent); }
+    .switch-thumb {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      background: var(--surface);
+      border: 1px solid var(--fg);
+      border-radius: 50%;
+      transition: left 0.15s ease;
+    }
+    .switch-track[aria-checked="true"] .switch-thumb { left: 23px; background: oklch(0.99 0 0); }
+
+    .summary-grid {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      margin: 12px 0;
+    }
+    .summary-grid .cell {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 15px;
+    }
+    .summary-grid .cell:last-child { border-bottom: 0; }
+    .summary-grid .cell span { color: var(--muted); }
+    .summary-grid .cell b { font-weight: 650; }
+
+    .scrim {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: oklch(0.22 0 0 / 0.28);
+      z-index: 8;
+    }
+    .scrim.on { display: block; }
+    .popover {
+      display: none;
+      position: absolute;
+      top: 98px;
+      right: 12px;
+      width: 200px;
+      background: var(--surface);
+      border: 1px solid var(--fg);
+      z-index: 9;
+      padding: 6px 0;
+    }
+    .popover.on { display: block; }
+    .menu-item {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 0 14px;
+      text-align: left;
+      font-size: 16px;
+      color: var(--fg);
+    }
+    .menu-item:hover { background: oklch(0.94 0 0); }
+    .menu-item .sub { display: block; font-size: 12px; color: var(--muted); }
+
+    .toast {
+      display: none;
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: 36px;
+      z-index: 12;
+      min-height: var(--tap);
+      padding: 12px 14px;
+      background: var(--accent);
+      color: oklch(0.99 0 0);
+      font-size: 14px;
+      text-align: center;
+    }
+    .toast.on { display: flex; align-items: center; justify-content: center; }
+
+    .banner {
+      margin: 12px 16px 0;
+      min-height: var(--tap);
+      padding: 10px 12px;
+      border: 1px solid var(--fg);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: calc(100% - 32px);
+      text-align: left;
+      color: var(--fg);
+    }
+    .banner b { display: block; font-size: 15px; }
+    .banner span { font-size: 13px; color: var(--muted); }
+
+    .rules { border-top: 1px solid var(--border); }
+    .rule {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 15px;
+    }
+    .rule em {
+      font-style: normal;
+      color: var(--muted);
+      display: block;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .ph {
+      height: 10px;
+      background: var(--fill-2);
+      margin: 8px 0;
+    }
+
+    @media (max-width: 1100px) {
+      .board { grid-template-columns: 1fr; justify-items: center; }
+      .rail { width: min(520px, 100%); }
+    }
+  </style>
+</head>
+<body>
+  <header class="spec-bar" data-od-id="page-header">
+    <div>stage=<b>M1-A</b></div>
+    <div>module=<b>07-backup-restore-settings</b></div>
+    <div>version=<b>v0.1</b></div>
+    <div>coverage=<b>this module only</b></div>
+    <div>data=<b>虚构数据</b></div>
+    <div>network=<b>无外部资源</b></div>
+    <div>review=<b>产品负责人走查通过</b></div>
+  </header>
+
+  <div class="board">
+    <aside class="rail" data-od-id="annotation-left">
+      <h2>走查说明</h2>
+      <div class="note">
+        低保真线框，匹配 01 灰盒语言。本模块只覆盖设置：单位、备份与恢复、隐私说明、关于。
+      </div>
+      <div class="note">
+        <span class="k">本模块不做</span>
+        <ul>
+          <li>账号 / 云同步 / 社交 / 通知默认值（M1-B）</li>
+          <li>自动备份、密码找回、数据合并恢复</li>
+          <li>通讯录 / 相册 / 相机 / 通知权限请求</li>
+        </ul>
+      </div>
+      <div class="note">
+        <span class="k">备份内容 · M1-A 列表</span>
+        <ul>
+          <li>全部学员与敏感字段、课程记录、自定义动作、设置</li>
+          <li>内置动作目录不重复打包，保留稳定引用</li>
+        </ul>
+        <span class="k" style="display:block;margin-top:8px">M1-B 未来内容（注释，非当前 UI 列表项）</span>
+        <ul>
+          <li>课包、课程安排等将进入后续备份范围</li>
+        </ul>
+      </div>
+      <div class="note">
+        <span class="k">建议路径</span>
+        <ol>
+          <li>学员列表 → 更多 → 设置</li>
+          <li>导出：设密 → 确认 → 系统文件选择器</li>
+          <li>恢复：选文件 → 密码 → 完整替换确认 → 成功摘要</li>
+          <li>用右侧场景看密码错误 / 损坏 / 不兼容</li>
+        </ol>
+      </div>
+      <h2>演示场景</h2>
+      <div class="scene-list">
+        <button type="button" class="scene-btn" data-od-id="scene-settings" data-scene="settings">A · 设置根</button>
+        <button type="button" class="scene-btn" data-od-id="scene-export" data-scene="export">B · 导出成功</button>
+        <button type="button" class="scene-btn" data-od-id="scene-restore-ok" data-scene="restore-ok">C · 恢复成功</button>
+        <button type="button" class="scene-btn" data-od-id="scene-fail-pw" data-scene="fail-pw">D · 密码错误</button>
+        <button type="button" class="scene-btn" data-od-id="scene-fail-corrupt" data-scene="fail-corrupt">E · 文件损坏</button>
+        <button type="button" class="scene-btn" data-od-id="scene-fail-ver" data-scene="fail-ver">F · 版本不兼容</button>
+      </div>
+    </aside>
+
+    <div class="device-wrap">
+      <p class="device-caption">iPhone 竖屏 393×852 · 浅色 · 系统字体</p>
+      <div class="phone" data-od-id="iphone-frame" role="application" aria-label="FineCoach 设置与备份线框原型">
+        <div class="island" aria-hidden="true"></div>
+        <div class="status">
+          <span>9:41</span>
+          <span class="status-sys" aria-hidden="true"><i class="sig"></i><i class="bat"></i></span>
+        </div>
+        <div class="app" id="app">
+
+          <!-- 学员列表入口：更多 → 设置 -->
+          <section class="screen is-on" data-screen="list" data-od-id="screen-student-list">
+            <div class="nav">
+              <div class="nav-side"></div>
+              <h1>学员</h1>
+              <div class="nav-side end">
+                <button type="button" class="text-btn" data-od-id="cta-add-stub" tabindex="-1" aria-disabled="true">添加学员</button>
+                <button type="button" class="icon-btn" data-od-id="cta-more" id="btn-more" aria-haspopup="menu" aria-expanded="false" aria-label="更多">
+                  <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><circle cx="5" cy="11" r="1.6" fill="currentColor"/><circle cx="11" cy="11" r="1.6" fill="currentColor"/><circle cx="17" cy="11" r="1.6" fill="currentColor"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="body tight">
+              <button type="button" class="row" data-od-id="row-student-zhou" tabindex="-1">
+                <div class="row-main"><div class="row-name">小周</div><div class="row-sub">增肌 · 晚班</div></div>
+                <span class="chev" aria-hidden="true"></span>
+              </button>
+              <button type="button" class="row" data-od-id="row-student-lin" tabindex="-1">
+                <div class="row-main"><div class="row-name">林可</div><div class="row-sub">减脂</div></div>
+                <span class="chev" aria-hidden="true"></span>
+              </button>
+              <button type="button" class="row" data-od-id="row-student-chen" tabindex="-1">
+                <div class="row-main"><div class="row-name">陈一</div><div class="row-sub">体态</div></div>
+                <span class="chev" aria-hidden="true"></span>
+              </button>
+            </div>
+          </section>
+
+          <!-- 设置根 -->
+          <section class="screen" data-screen="settings" data-od-id="screen-settings">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="settings-back" id="btn-settings-back">返回</button>
+              </div>
+              <h1 data-od-id="settings-title">设置</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body tight">
+              <p class="group-label">显示</p>
+              <button type="button" class="row" data-od-id="nav-units" id="btn-nav-units">
+                <div class="row-main">
+                  <div class="row-name">单位</div>
+                  <div class="row-sub">重量显示 kg / lb</div>
+                </div>
+                <span class="row-value" id="units-value">kg</span>
+                <span class="chev" aria-hidden="true"></span>
+              </button>
+
+              <p class="group-label">数据</p>
+              <button type="button" class="row" data-od-id="nav-backup" id="btn-nav-backup">
+                <div class="row-main">
+                  <div class="row-name">备份与恢复</div>
+                  <div class="row-sub">仅手动 · 密码加密</div>
+                </div>
+                <span class="chev" aria-hidden="true"></span>
+              </button>
+
+              <p class="group-label">说明</p>
+              <button type="button" class="row" data-od-id="nav-privacy" id="btn-nav-privacy">
+                <div class="row-main">
+                  <div class="row-name">隐私说明</div>
+                  <div class="row-sub">本地优先 · 无账号</div>
+                </div>
+                <span class="chev" aria-hidden="true"></span>
+              </button>
+              <button type="button" class="row" data-od-id="nav-about" id="btn-nav-about">
+                <div class="row-main">
+                  <div class="row-name">关于</div>
+                  <div class="row-sub">版本与范围</div>
+                </div>
+                <span class="chev" aria-hidden="true"></span>
+              </button>
+
+              <p class="group-label">可选</p>
+              <div class="switch-row" data-od-id="row-haptics">
+                <div class="row-main">
+                  <div class="row-name">触觉反馈</div>
+                  <div class="row-sub">尊重系统「铃声和触感」关闭</div>
+                </div>
+                <button type="button" class="switch-track" id="btn-haptics" data-od-id="toggle-haptics" role="switch" aria-checked="true" aria-label="触觉反馈">
+                  <span class="switch-thumb" aria-hidden="true"></span>
+                </button>
+              </div>
+              <p class="hint" style="padding:8px 16px 16px">仅作辅助反馈，不以震动作为唯一状态提示。系统关闭触感时，App 不再触发。</p>
+            </div>
+          </section>
+
+          <!-- 单位 -->
+          <section class="screen" data-screen="units" data-od-id="screen-units">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-go="settings">返回</button>
+              </div>
+              <h1>单位</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p class="kicker">全局重量显示</p>
+              <p class="lead">切换只转换<strong>显示</strong>，不改写历史数值含义。单个动作仍可覆盖全局默认。</p>
+              <div class="seg" role="group" aria-label="重量单位">
+                <button type="button" class="seg-btn" data-od-id="unit-kg" id="unit-kg" aria-pressed="true">千克 kg</button>
+                <button type="button" class="seg-btn" data-od-id="unit-lb" id="unit-lb" aria-pressed="false">磅 lb</button>
+              </div>
+              <div class="callout">
+                <b>示例</b>
+                历史记录存 60（kg 口径）。切到 lb 后显示约 132.3 lb；切回 kg 仍是 60，不是重新录入。
+              </div>
+              <p class="hint">自定义身体指标使用创建时定义的单位，不受此处影响（M1-B）。</p>
+            </div>
+          </section>
+
+          <!-- 备份与恢复枢纽 -->
+          <section class="screen" data-screen="backup" data-od-id="screen-backup">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-go="settings">返回</button>
+              </div>
+              <h1>备份与恢复</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p class="kicker">仅教练主动操作 · 无自动备份</p>
+              <p class="lead">导出加密文件到你选择的位置；恢复时完整替换当前本机数据。</p>
+
+              <div class="callout warn" data-od-id="backup-contents-note">
+                <b>本次备份将包含（M1-A）</b>
+                <ul class="content-list" style="border:0;margin:8px 0 0;background:transparent">
+                  <li><span class="mark">·</span>全部学员及敏感字段（电话、微信、伤病注意等）</li>
+                  <li><span class="mark">·</span>全部课程记录（Session）</li>
+                  <li><span class="mark">·</span>自定义动作</li>
+                  <li><span class="mark">·</span>设置（含单位等）</li>
+                  <li><span class="mark">·</span>内置动作：不重复打包，保留稳定引用与资源版本</li>
+                </ul>
+              </div>
+              <p class="hint">课包、课程安排等属 M1-B，当前备份列表不展示为已纳入项。</p>
+
+              <button type="button" class="primary" data-od-id="cta-export" id="btn-start-export">导出完整备份</button>
+              <button type="button" class="ghost" data-od-id="cta-restore" id="btn-start-restore">从备份恢复</button>
+            </div>
+          </section>
+
+          <!-- 导出：设密码 -->
+          <section class="screen" data-screen="export-pw" data-od-id="screen-export-password">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-go="backup">取消</button>
+              </div>
+              <h1>设置备份密码</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <div class="callout danger" data-od-id="export-pw-warning">
+                <b>密码不会被保存</b>
+                App 不存储、不上传、不找回此密码。遗失后无法打开该备份文件。
+              </div>
+              <label class="field-label" for="ex-pw">备份密码</label>
+              <input class="field" id="ex-pw" data-od-id="field-export-password" type="password" autocomplete="new-password" placeholder="至少 8 位">
+              <label class="field-label" for="ex-pw2">再次确认</label>
+              <input class="field" id="ex-pw2" data-od-id="field-export-password-confirm" type="password" autocomplete="new-password" placeholder="再输入一次">
+              <p class="err" id="err-export-pw">两次密码不一致，或长度不足 8 位</p>
+              <div class="stack-bottom">
+                <button type="button" class="primary" data-od-id="cta-export-next" id="btn-export-pw-next">继续</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- 导出：系统文件选择器 -->
+          <section class="screen" data-screen="export-picker" data-od-id="screen-export-picker">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" id="btn-export-picker-cancel">取消</button>
+              </div>
+              <h1>保存备份</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p class="kicker">密码已确认 · 下一步由系统决定位置</p>
+              <div class="sys-bound" data-od-id="sys-file-picker-export">
+                <p class="bound-label">iOS 系统文件选择器 · 虚线边界 · 非 App UI</p>
+                <h3>存储到…</h3>
+                <p>由你选择本机、iCloud Drive 或其他云盘位置。App 不自动上传。</p>
+                <button type="button" class="sys-row" data-od-id="picker-loc-icloud" id="pick-icloud">
+                  <span class="sys-ico">IC</span>
+                  <span class="row-main"><b class="row-name">iCloud Drive</b><span class="row-sub">虚构位置</span></span>
+                </button>
+                <button type="button" class="sys-row" data-od-id="picker-loc-onmyiphone" id="pick-onmy">
+                  <span class="sys-ico">IP</span>
+                  <span class="row-main"><b class="row-name">我的 iPhone</b><span class="row-sub">FineCoach</span></span>
+                </button>
+                <div class="sys-actions">
+                  <button type="button" class="ghost" id="btn-picker-cancel2">取消</button>
+                  <button type="button" class="primary" data-od-id="cta-export-save" id="btn-export-save" disabled>存储</button>
+                </div>
+              </div>
+              <p class="hint">文件名示例：FineCoach-backup-2026-08-21.fcbak（虚构）</p>
+            </div>
+          </section>
+
+          <!-- 导出成功 -->
+          <section class="screen" data-screen="export-done" data-od-id="screen-export-done">
+            <div class="nav">
+              <div class="nav-side"></div>
+              <h1>导出完成</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <div class="callout ok" data-od-id="export-success">
+                <b>加密备份已交给系统保存</b>
+                App 未保存密码，也未自动上传到任何服务。
+              </div>
+              <div class="summary-grid" data-od-id="export-summary">
+                <div class="cell"><span>学员</span><b>3</b></div>
+                <div class="cell"><span>课程记录</span><b>12</b></div>
+                <div class="cell"><span>自定义动作</span><b>5</b></div>
+                <div class="cell"><span>内置动作</span><b>引用保留 · 未打包</b></div>
+              </div>
+              <button type="button" class="primary" data-od-id="cta-export-done" data-go="backup">回到备份与恢复</button>
+            </div>
+          </section>
+
+          <!-- 恢复：系统选文件 -->
+          <section class="screen" data-screen="restore-picker" data-od-id="screen-restore-picker">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-go="backup">取消</button>
+              </div>
+              <h1>选择备份</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <div class="sys-bound" data-od-id="sys-file-picker-restore">
+                <p class="bound-label">iOS 系统文件选择器 · 虚线边界 · 非 App UI</p>
+                <h3>打开文件</h3>
+                <p>选择先前导出的加密备份。此时尚未改动任何本机数据。</p>
+                <button type="button" class="sys-row" data-od-id="picker-file-ok" id="pick-file-ok">
+                  <span class="sys-ico">FB</span>
+                  <span class="row-main"><b class="row-name">FineCoach-backup-0801.fcbak</b><span class="row-sub">有效样本 · 虚构</span></span>
+                </button>
+                <button type="button" class="sys-row" data-od-id="picker-file-corrupt" id="pick-file-corrupt">
+                  <span class="sys-ico">??</span>
+                  <span class="row-main"><b class="row-name">backup-damaged.fcbak</b><span class="row-sub">损坏样本 · 走查用</span></span>
+                </button>
+                <button type="button" class="sys-row" data-od-id="picker-file-old" id="pick-file-old">
+                  <span class="sys-ico">V0</span>
+                  <span class="row-main"><b class="row-name">legacy-v0.fcbak</b><span class="row-sub">不兼容版本 · 走查用</span></span>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- 恢复：输入密码 -->
+          <section class="screen" data-screen="restore-pw" data-od-id="screen-restore-password">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-go="restore-picker">返回</button>
+              </div>
+              <h1>输入备份密码</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p class="kicker" id="restore-file-label">已选：FineCoach-backup-0801.fcbak</p>
+              <label class="field-label" for="re-pw">备份密码</label>
+              <input class="field" id="re-pw" data-od-id="field-restore-password" type="password" autocomplete="off" placeholder="导出时设置的密码">
+              <p class="err" id="err-restore-pw">密码错误。当前本机数据未改动。</p>
+              <div class="callout">
+                <b>校验前不改写数据</b>
+                密码错误、文件损坏或不兼容时，现有学员与课程保持原样。
+              </div>
+              <div class="stack-bottom">
+                <button type="button" class="primary" data-od-id="cta-restore-validate" id="btn-restore-validate">校验并继续</button>
+                <button type="button" class="ghost" data-go="restore-picker">换一个文件</button>
+              </div>
+              <p class="hint">演示：密码 <span style="font-family:var(--mono)">coach2026</span> 可通过；其他触发密码错误。</p>
+            </div>
+          </section>
+
+          <!-- 恢复：完整替换确认 -->
+          <section class="screen" data-screen="restore-confirm" data-od-id="screen-restore-confirm">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-go="restore-pw">返回</button>
+              </div>
+              <h1>确认恢复</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <div class="callout danger" data-od-id="restore-replace-warning">
+                <b>将完整替换本机全部数据</b>
+                M1-A 不支持合并。恢复后，当前学员、课程记录、自定义动作与设置都会被备份内容覆盖。
+              </div>
+              <div class="callout warn">
+                <b>建议先导出当前数据</b>
+                若尚未备份此刻的本机内容，请先取消并完成一次导出。
+              </div>
+              <div class="summary-grid" data-od-id="restore-preview">
+                <div class="cell"><span>备份内学员</span><b>3</b></div>
+                <div class="cell"><span>备份内课程</span><b>12</b></div>
+                <div class="cell"><span>自定义动作</span><b>5</b></div>
+                <div class="cell"><span>合并选项</span><b>无 · 仅完整替换</b></div>
+              </div>
+              <button type="button" class="danger-btn" data-od-id="cta-restore-execute" id="btn-restore-execute">确认完整替换</button>
+              <button type="button" class="ghost" data-od-id="cta-restore-export-first" id="btn-export-first">先导出当前数据</button>
+              <button type="button" class="ghost" data-go="backup">取消</button>
+            </div>
+          </section>
+
+          <!-- 恢复成功 -->
+          <section class="screen" data-screen="restore-done" data-od-id="screen-restore-done">
+            <div class="nav">
+              <div class="nav-side"></div>
+              <h1>恢复成功</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <div class="callout ok" data-od-id="restore-success">
+                <b>本机数据已替换为备份内容</b>
+                内置动作引用已校验可用；未打包的内置目录由当前 App 版本重建。
+              </div>
+              <div class="summary-grid" data-od-id="restore-summary">
+                <div class="cell"><span>学员</span><b>3</b></div>
+                <div class="cell"><span>课程记录</span><b>12</b></div>
+                <div class="cell"><span>自定义动作</span><b>5</b></div>
+                <div class="cell"><span>设置</span><b>已恢复</b></div>
+                <div class="cell"><span>单位</span><b id="restored-unit">kg</b></div>
+              </div>
+              <button type="button" class="primary" data-od-id="cta-restore-done" data-go="list">查看学员列表</button>
+              <button type="button" class="ghost" data-go="settings">回到设置</button>
+            </div>
+          </section>
+
+          <!-- 恢复失败：密码 / 损坏 / 不兼容 -->
+          <section class="screen" data-screen="restore-fail" data-od-id="screen-restore-fail">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" id="btn-fail-back">返回</button>
+              </div>
+              <h1>无法恢复</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <div class="callout danger" data-od-id="restore-fail-banner">
+                <b id="fail-title">校验未通过</b>
+                <span id="fail-body">当前本机数据未改动。</span>
+              </div>
+              <div class="banner" data-od-id="fail-data-unchanged" style="margin:0 0 16px;width:100%">
+                <span><b>数据状态</b><span>学员、课程与设置均保持恢复前原样</span></span>
+              </div>
+              <button type="button" class="primary" data-od-id="cta-fail-retry" id="btn-fail-retry">重试</button>
+              <button type="button" class="ghost" data-od-id="cta-fail-other-file" data-go="restore-picker">选择另一个文件</button>
+              <button type="button" class="ghost" data-go="backup">回到备份与恢复</button>
+            </div>
+          </section>
+
+          <!-- 隐私说明 -->
+          <section class="screen" data-screen="privacy" data-od-id="screen-privacy">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-go="settings">返回</button>
+              </div>
+              <h1>隐私说明</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p class="kicker">M1-A · 本地优先</p>
+              <div class="rules" data-od-id="privacy-rules">
+                <div class="rule">数据默认只保存在本机。<em>无账号、无服务器同步、无多设备实时同步。</em></div>
+                <div class="rule">分享边界由你主动发起。<em>系统分享面板只在你点分享时出现；电话、微信、伤病与教练私有备注永不进入分享报告。</em></div>
+                <div class="rule">不接入远程分析或崩溃 SDK。<em>仅可保留不含敏感信息的本地诊断，且由你主动导出。</em></div>
+                <div class="rule">本阶段不请求系统权限。<em>不访问通讯录、相册、相机；不请求通知权限。文件导入导出仅在你主动操作时调用系统界面。</em></div>
+                <div class="rule">依赖设备锁屏。<em>无独立 App 密码锁或 Face ID；敏感内容不写入日志或通知正文。</em></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 关于 -->
+          <section class="screen" data-screen="about" data-od-id="screen-about">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-go="settings">返回</button>
+              </div>
+              <h1>关于</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p class="kicker">FineCoach</p>
+              <div class="summary-grid" data-od-id="about-meta">
+                <div class="cell"><span>阶段</span><b>M1-A</b></div>
+                <div class="cell"><span>原型</span><b>07 · v0.1</b></div>
+                <div class="cell"><span>界面语言</span><b>简体中文</b></div>
+                <div class="cell"><span>账号</span><b>无</b></div>
+                <div class="cell"><span>网络</span><b>核心功能不依赖</b></div>
+              </div>
+              <div class="callout">
+                <b>本阶段范围</b>
+                学员、训练记录、动作库、分享报告、手动加密备份。课包、排课、提醒默认值属 M1-B。
+              </div>
+              <p class="hint">虚构数据 · 无外部资源 · 产品负责人走查通过</p>
+            </div>
+          </section>
+
+        </div>
+
+        <div class="scrim" id="scrim" data-od-id="more-scrim"></div>
+        <div class="popover" id="popover" role="menu" data-od-id="more-menu">
+          <button type="button" class="menu-item" data-od-id="menu-library" id="menu-library">动作库<span class="sub">出口 · 见模块 03</span></button>
+          <button type="button" class="menu-item" data-od-id="menu-settings" id="menu-settings">设置<span class="sub">本模块</span></button>
+        </div>
+        <div class="toast" id="toast" data-od-id="toast" role="status"></div>
+        <div class="home-bar" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <aside class="rail" data-od-id="annotation-right">
+      <h2>验收对照</h2>
+      <ul class="check">
+        <li>✓ 设置根：单位 / 备份与恢复 / 隐私 / 关于 + 可选触觉</li>
+        <li>✓ 导出：设密 + 确认 → 系统文件选择器虚线边界</li>
+        <li>✓ 恢复：选文件 → 密码 → 完整替换确认 → 成功摘要</li>
+        <li>✓ 失败：当前数据不变 · 可重试 / 换文件</li>
+        <li>✓ 隐私：本地 · 无账号 · 分享边界 · 无分析 SDK · 无权限请求</li>
+      </ul>
+      <div class="now" id="now-label">当前：学员列表 · 点「更多」进入设置</div>
+    </aside>
+  </div>
+
+  <script>
+  (function () {
+    var state = {
+      screen: "list",
+      unit: "kg",
+      haptics: true,
+      pickerLoc: null,
+      restoreFile: null,
+      failKind: null,
+      moreOpen: false
+    };
+
+    var FAIL = {
+      password: {
+        title: "密码错误",
+        body: "无法解密该备份。当前本机数据未改动。可重试或选择另一个文件。",
+        retry: "restore-pw"
+      },
+      corrupt: {
+        title: "文件损坏或无法读取",
+        body: "备份完整性校验失败。当前本机数据未改动。",
+        retry: "restore-picker"
+      },
+      incompatible: {
+        title: "版本不兼容",
+        body: "该备份无法被当前 App 解析。当前本机数据未改动。",
+        retry: "restore-picker"
+      }
+    };
+
+    var $ = function (sel, root) { return (root || document).querySelector(sel); };
+    var $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
+
+    function showToast(msg) {
+      var t = $("#toast");
+      t.textContent = msg;
+      t.classList.add("on");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(function () { t.classList.remove("on"); }, 1800);
+    }
+
+    function setMore(open) {
+      state.moreOpen = open;
+      $("#scrim").classList.toggle("on", open);
+      $("#popover").classList.toggle("on", open);
+      $("#btn-more").setAttribute("aria-expanded", open ? "true" : "false");
+    }
+
+    function setUnit(u) {
+      state.unit = u;
+      $("#unit-kg").setAttribute("aria-pressed", u === "kg" ? "true" : "false");
+      $("#unit-lb").setAttribute("aria-pressed", u === "lb" ? "true" : "false");
+      $("#units-value").textContent = u;
+      $("#restored-unit").textContent = u;
+    }
+
+    function setHaptics(on) {
+      state.haptics = on;
+      $("#btn-haptics").setAttribute("aria-checked", on ? "true" : "false");
+    }
+
+    function paintFail() {
+      var f = FAIL[state.failKind] || FAIL.password;
+      $("#fail-title").textContent = f.title;
+      $("#fail-body").textContent = f.body;
+    }
+
+    function updateNow() {
+      var map = {
+        list: "学员列表 · 点「更多」→ 设置",
+        settings: "设置根 · 单位 / 备份 / 隐私 / 关于",
+        units: "单位 · 仅改显示口径",
+        backup: "备份与恢复枢纽",
+        "export-pw": "导出 · 设置并确认密码",
+        "export-picker": "导出 · 系统文件选择器边界",
+        "export-done": "导出成功摘要",
+        "restore-picker": "恢复 · 系统选文件边界",
+        "restore-pw": "恢复 · 输入密码并校验",
+        "restore-confirm": "恢复 · 完整替换确认（无合并）",
+        "restore-done": "恢复成功摘要",
+        "restore-fail": "恢复失败 · 数据未改动",
+        privacy: "隐私说明",
+        about: "关于"
+      };
+      $("#now-label").textContent = "当前：" + (map[state.screen] || state.screen);
+      $$(".scene-btn").forEach(function (b) {
+        var sc = b.getAttribute("data-scene");
+        var cur = false;
+        if (sc === "settings" && state.screen === "settings") cur = true;
+        if (sc === "export" && (state.screen === "export-done" || state.screen === "export-picker")) cur = true;
+        if (sc === "restore-ok" && state.screen === "restore-done") cur = true;
+        if (sc === "fail-pw" && state.failKind === "password" && state.screen === "restore-fail") cur = true;
+        if (sc === "fail-corrupt" && state.failKind === "corrupt" && state.screen === "restore-fail") cur = true;
+        if (sc === "fail-ver" && state.failKind === "incompatible" && state.screen === "restore-fail") cur = true;
+        b.setAttribute("aria-current", cur ? "true" : "false");
+      });
+    }
+
+    function go(name) {
+      state.screen = name;
+      setMore(false);
+      $$(".screen").forEach(function (s) {
+        s.classList.toggle("is-on", s.getAttribute("data-screen") === name);
+      });
+      if (name === "restore-fail") paintFail();
+      if (name === "export-picker") {
+        state.pickerLoc = null;
+        $("#btn-export-save").disabled = true;
+        $$("#pick-icloud, #pick-onmy").forEach(function (el) {
+          el.style.borderColor = "";
+        });
+      }
+      updateNow();
+    }
+
+    function resetExportFields() {
+      $("#ex-pw").value = "";
+      $("#ex-pw2").value = "";
+      $("#ex-pw").classList.remove("is-err");
+      $("#ex-pw2").classList.remove("is-err");
+      $("#err-export-pw").classList.remove("show");
+    }
+
+    function resetRestorePw() {
+      $("#re-pw").value = "";
+      $("#re-pw").classList.remove("is-err");
+      $("#err-restore-pw").classList.remove("show");
+    }
+
+    // —— navigation ——
+    $("#btn-more").addEventListener("click", function () { setMore(!state.moreOpen); });
+    $("#scrim").addEventListener("click", function () { setMore(false); });
+    $("#menu-settings").addEventListener("click", function () { go("settings"); });
+    $("#menu-library").addEventListener("click", function () {
+      setMore(false);
+      showToast("动作库属模块 03 · 本原型不展开");
+    });
+    $("#btn-settings-back").addEventListener("click", function () { go("list"); });
+
+    $("#btn-nav-units").addEventListener("click", function () { go("units"); });
+    $("#btn-nav-backup").addEventListener("click", function () { go("backup"); });
+    $("#btn-nav-privacy").addEventListener("click", function () { go("privacy"); });
+    $("#btn-nav-about").addEventListener("click", function () { go("about"); });
+
+    $$("[data-go]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        go(btn.getAttribute("data-go"));
+      });
+    });
+
+    // —— units ——
+    $("#unit-kg").addEventListener("click", function () { setUnit("kg"); });
+    $("#unit-lb").addEventListener("click", function () { setUnit("lb"); });
+
+    // —— haptics ——
+    $("#btn-haptics").addEventListener("click", function () {
+      setHaptics(!state.haptics);
+      showToast(state.haptics ? "已开 · 仍尊重系统触感关闭" : "已关 · 不触发触觉");
+    });
+
+    // —— export ——
+    $("#btn-start-export").addEventListener("click", function () {
+      resetExportFields();
+      go("export-pw");
+    });
+    $("#btn-export-pw-next").addEventListener("click", function () {
+      var a = $("#ex-pw").value;
+      var b = $("#ex-pw2").value;
+      var ok = a.length >= 8 && a === b;
+      $("#ex-pw").classList.toggle("is-err", !ok);
+      $("#ex-pw2").classList.toggle("is-err", !ok);
+      $("#err-export-pw").classList.toggle("show", !ok);
+      if (!ok) return;
+      go("export-picker");
+    });
+    function cancelExportPicker() {
+      go("export-pw");
+    }
+    $("#btn-export-picker-cancel").addEventListener("click", cancelExportPicker);
+    $("#btn-picker-cancel2").addEventListener("click", cancelExportPicker);
+    function selectLoc(id, el) {
+      state.pickerLoc = id;
+      $$("#pick-icloud, #pick-onmy").forEach(function (n) { n.style.borderColor = ""; });
+      el.style.borderColor = "var(--fg)";
+      $("#btn-export-save").disabled = false;
+    }
+    $("#pick-icloud").addEventListener("click", function () { selectLoc("icloud", this); });
+    $("#pick-onmy").addEventListener("click", function () { selectLoc("onmy", this); });
+    $("#btn-export-save").addEventListener("click", function () {
+      if (!state.pickerLoc) return;
+      go("export-done");
+      showToast("已保存到系统所选位置");
+    });
+
+    // —— restore ——
+    $("#btn-start-restore").addEventListener("click", function () {
+      state.restoreFile = null;
+      go("restore-picker");
+    });
+    $("#pick-file-ok").addEventListener("click", function () {
+      state.restoreFile = "ok";
+      state.failKind = null;
+      $("#restore-file-label").textContent = "已选：FineCoach-backup-0801.fcbak";
+      resetRestorePw();
+      go("restore-pw");
+    });
+    $("#pick-file-corrupt").addEventListener("click", function () {
+      state.restoreFile = "corrupt";
+      state.failKind = "corrupt";
+      paintFail();
+      go("restore-fail");
+    });
+    $("#pick-file-old").addEventListener("click", function () {
+      state.restoreFile = "old";
+      state.failKind = "incompatible";
+      paintFail();
+      go("restore-fail");
+    });
+    $("#btn-restore-validate").addEventListener("click", function () {
+      var pw = $("#re-pw").value;
+      if (pw !== "coach2026") {
+        state.failKind = "password";
+        $("#re-pw").classList.add("is-err");
+        $("#err-restore-pw").classList.add("show");
+        paintFail();
+        go("restore-fail");
+        return;
+      }
+      $("#re-pw").classList.remove("is-err");
+      $("#err-restore-pw").classList.remove("show");
+      go("restore-confirm");
+    });
+    $("#btn-restore-execute").addEventListener("click", function () {
+      go("restore-done");
+      showToast("恢复完成 · 已完整替换");
+    });
+    $("#btn-export-first").addEventListener("click", function () {
+      resetExportFields();
+      go("export-pw");
+      showToast("建议先完成导出再恢复");
+    });
+    $("#btn-fail-back").addEventListener("click", function () {
+      var f = FAIL[state.failKind] || FAIL.password;
+      go(f.retry);
+    });
+    $("#btn-fail-retry").addEventListener("click", function () {
+      var f = FAIL[state.failKind] || FAIL.password;
+      if (f.retry === "restore-pw") resetRestorePw();
+      go(f.retry);
+    });
+
+    // —— scenes ——
+    function applyScene(id) {
+      setUnit("kg");
+      setHaptics(true);
+      resetExportFields();
+      resetRestorePw();
+      state.failKind = null;
+      state.restoreFile = null;
+      state.pickerLoc = null;
+      if (id === "settings") {
+        go("settings");
+      } else if (id === "export") {
+        go("export-done");
+      } else if (id === "restore-ok") {
+        go("restore-done");
+      } else if (id === "fail-pw") {
+        state.failKind = "password";
+        state.restoreFile = "ok";
+        $("#restore-file-label").textContent = "已选：FineCoach-backup-0801.fcbak";
+        paintFail();
+        go("restore-fail");
+      } else if (id === "fail-corrupt") {
+        state.failKind = "corrupt";
+        paintFail();
+        go("restore-fail");
+      } else if (id === "fail-ver") {
+        state.failKind = "incompatible";
+        paintFail();
+        go("restore-fail");
+      }
+    }
+    $$(".scene-btn").forEach(function (b) {
+      b.addEventListener("click", function () {
+        applyScene(b.getAttribute("data-scene"));
+      });
+    });
+
+    setUnit("kg");
+    setHaptics(true);
+    go("list");
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,2110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FineCoach · M1-A · 课中训练记录</title>
+  <style>
+    :root {
+      --bg: oklch(0.93 0 0);
+      --surface: oklch(0.99 0 0);
+      --fg: oklch(0.22 0 0);
+      --muted: oklch(0.46 0 0);
+      --border: oklch(0.78 0 0);
+      --accent: oklch(0.28 0 0);
+      --fill: oklch(0.90 0 0);
+      --fill-2: oklch(0.85 0 0);
+      --danger: oklch(0.42 0.12 25);
+      --phone-w: 393px;
+      --phone-h: 852px;
+      --tap: 44px;
+      --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Heiti SC", sans-serif;
+      --mono: ui-monospace, Menlo, "SF Mono", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    body {
+      font-family: var(--font);
+      color: var(--fg);
+      background: var(--bg);
+      line-height: 1.45;
+    }
+    button, input, textarea, select { font: inherit; color: inherit; }
+    button { cursor: pointer; background: none; border: 0; }
+    img { display: none; }
+    input[type="number"] { -moz-appearance: textfield; }
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+    .spec-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .spec-bar b { font-weight: 600; color: var(--fg); }
+
+    .board {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) var(--phone-w) minmax(240px, 1fr);
+      gap: 28px;
+      align-items: start;
+      justify-content: center;
+      padding: 28px 24px 48px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .rail h2 {
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .note {
+      border: 1px dashed var(--border);
+      background: var(--surface);
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--fg);
+      margin-bottom: 10px;
+    }
+    .note ol, .note ul { padding-left: 1.15em; }
+    .note li { margin: 4px 0; }
+    .note .k { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .scene-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .scene-btn {
+      min-height: var(--tap);
+      text-align: left;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--fg);
+    }
+    .scene-btn:hover { background: oklch(0.94 0 0); }
+    .scene-btn[aria-current="true"] { background: var(--fill); border-color: var(--fg); }
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid var(--fg);
+      outline-offset: 2px;
+    }
+    .check { font-size: 13px; }
+    .check li { margin: 6px 0; color: var(--muted); }
+    .now {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border: 1px solid var(--fg);
+      background: var(--surface);
+      font-size: 13px;
+    }
+
+    .device-wrap { width: var(--phone-w); }
+    .device-caption {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 8px;
+      font-family: var(--mono);
+    }
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      border-radius: 54px;
+      border: 11px solid oklch(0.18 0 0);
+      background: oklch(0.97 0 0);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 18px 40px oklch(0.55 0 0 / 0.18);
+    }
+    .island {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      width: 126px;
+      height: 36px;
+      margin-left: -63px;
+      background: oklch(0.12 0 0);
+      border-radius: 20px;
+      z-index: 5;
+    }
+    .status {
+      height: 54px;
+      padding: 14px 28px 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .status-sys { display: flex; gap: 6px; align-items: center; }
+    .sig, .bat { display: inline-block; height: 10px; background: var(--fg); }
+    .sig { width: 16px; clip-path: polygon(0 70%, 35% 45%, 65% 20%, 100% 0, 100% 100%, 0 100%); }
+    .bat { width: 22px; height: 11px; border: 1.5px solid var(--fg); background: transparent; position: relative; }
+    .bat::after { content: ""; position: absolute; inset: 2px 8px 2px 2px; background: var(--fg); }
+    .home-bar {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      width: 134px;
+      height: 5px;
+      margin-left: -67px;
+      background: oklch(0.22 0 0);
+      border-radius: 3px;
+      z-index: 5;
+    }
+    .app {
+      position: absolute;
+      inset: 54px 0 24px;
+      display: flex;
+      flex-direction: column;
+      background: oklch(0.97 0 0);
+    }
+    .screen { display: none; flex: 1; flex-direction: column; min-height: 0; }
+    .screen.is-on { display: flex; }
+
+    .nav {
+      min-height: var(--tap);
+      padding: 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex: none;
+    }
+    .nav h1 {
+      flex: 1;
+      font-size: 17px;
+      font-weight: 650;
+      text-align: center;
+      min-width: 0;
+    }
+    .nav-side { width: 72px; display: flex; align-items: center; }
+    .nav-side.end { justify-content: flex-end; width: auto; min-width: 72px; gap: 2px; }
+    .icon-btn, .text-btn {
+      min-width: var(--tap);
+      min-height: var(--tap);
+      padding: 0 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fg);
+      font-size: 15px;
+      font-weight: 560;
+    }
+    .icon-btn:hover, .text-btn:hover, .ghost:hover, .linkish:hover { background: oklch(0.93 0 0); }
+    .text-btn { min-width: auto; }
+    .text-btn.danger { color: var(--danger); }
+
+    .body { flex: 1; overflow: auto; padding: 12px 16px 20px; -webkit-overflow-scrolling: touch; }
+    .body.tight { padding: 0; }
+
+    .primary, .ghost {
+      min-height: var(--tap);
+      width: 100%;
+      padding: 0 16px;
+      font-size: 17px;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+    .primary { background: var(--accent); color: oklch(0.99 0 0); }
+    .primary:hover { background: oklch(0.16 0 0); color: oklch(0.99 0 0); }
+    .primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .ghost { border: 1px solid var(--border); background: var(--surface); color: var(--fg); }
+    .ghost.danger { color: var(--danger); border-color: var(--danger); }
+
+    .banner {
+      margin: 10px 16px 0;
+      min-height: var(--tap);
+      padding: 10px 12px;
+      border: 1px solid var(--fg);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: calc(100% - 32px);
+      text-align: left;
+      color: var(--fg);
+    }
+    .banner:hover { background: oklch(0.94 0 0); }
+    .banner-ico {
+      width: 28px;
+      height: 28px;
+      border: 1.5px solid var(--fg);
+      display: grid;
+      place-items: center;
+      flex: none;
+    }
+    .banner b { display: block; font-size: 15px; }
+    .banner span { font-size: 13px; color: var(--muted); }
+    .banner-go { margin-left: auto; font-size: 15px; font-weight: 600; flex: none; color: var(--fg); }
+
+    .kicker { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .lead { font-size: 15px; margin-bottom: 12px; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .err { color: var(--danger); font-size: 13px; margin-top: 4px; }
+    .meta-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex: none;
+    }
+    .pill {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border: 1px solid var(--fg);
+      background: var(--fill);
+    }
+    .pill.warn {
+      border-color: var(--danger);
+      color: var(--danger);
+      background: oklch(0.96 0.02 25);
+    }
+    .timer {
+      font-family: var(--mono);
+      font-size: 18px;
+      font-weight: 650;
+      letter-spacing: 0.02em;
+    }
+    .save-st {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .save-st.err { color: var(--danger); font-weight: 600; }
+
+    .ex-block {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      margin-bottom: 12px;
+    }
+    .ex-head {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-height: var(--tap);
+      padding: 6px 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .drag-handle {
+      width: var(--tap);
+      height: var(--tap);
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      flex: none;
+      cursor: grab;
+      border: 1px dashed var(--border);
+    }
+    .drag-handle:active { cursor: grabbing; background: var(--fill); }
+    .ex-title { flex: 1; min-width: 0; font-size: 16px; font-weight: 650; text-align: left; }
+    .ex-title small { display: block; font-size: 11px; font-weight: 500; color: var(--muted); margin-top: 2px; }
+    .caution-chip {
+      font-size: 12px;
+      min-height: 32px;
+      padding: 0 8px;
+      border: 1px solid var(--danger);
+      color: var(--danger);
+      background: oklch(0.97 0.01 25);
+      flex: none;
+    }
+    .caution-chip:hover { background: oklch(0.94 0.02 25); color: var(--danger); }
+    .caution-box {
+      margin: 0 10px 8px;
+      padding: 10px;
+      border: 1px dashed var(--danger);
+      font-size: 13px;
+      color: var(--fg);
+      background: oklch(0.97 0.01 25);
+    }
+    .set-table { width: 100%; }
+    .set-cols {
+      display: grid;
+      grid-template-columns: 36px 1fr 1fr 40px;
+      gap: 6px;
+      padding: 6px 10px;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .set-cols.lr { grid-template-columns: 36px 1fr 1fr 1fr 1fr 40px; }
+    .set-cols.dur { grid-template-columns: 36px 1fr 1fr 40px; }
+    .set-cols.reps-only { grid-template-columns: 36px 1fr 40px; }
+    .set-row {
+      display: grid;
+      grid-template-columns: 36px 1fr 1fr 40px;
+      gap: 6px;
+      align-items: center;
+      padding: 6px 10px;
+      border-top: 1px solid var(--border);
+      min-height: 52px;
+    }
+    .set-row.lr { grid-template-columns: 36px 1fr 1fr 1fr 1fr 40px; }
+    .set-row.dur { grid-template-columns: 36px 1fr 1fr 40px; }
+    .set-row.reps-only { grid-template-columns: 36px 1fr 40px; }
+    .set-row.is-done { background: oklch(0.96 0 0); }
+    .set-row.is-pending { background: oklch(0.98 0.02 95); }
+    .set-row.is-draft { background: var(--surface); }
+    .set-num {
+      font-size: 13px;
+      font-weight: 650;
+      text-align: center;
+      color: var(--muted);
+    }
+    .set-row.is-done .set-num { color: var(--fg); }
+    .cell {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid var(--border);
+      background: oklch(0.97 0 0);
+      padding: 0 8px;
+      font-size: 16px;
+      text-align: center;
+    }
+    .cell:focus { border-color: var(--fg); background: var(--surface); }
+    .cell.is-bad { border-color: var(--danger); }
+    .set-more {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+    }
+    .set-more:hover { background: oklch(0.93 0 0); color: var(--fg); }
+    .ex-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 8px 10px 10px;
+      border-top: 1px solid var(--border);
+    }
+    .tool {
+      min-height: 36px;
+      padding: 0 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 13px;
+      font-weight: 560;
+    }
+    .tool:hover { background: oklch(0.94 0 0); }
+    .tool.primaryish { border-color: var(--fg); font-weight: 650; }
+    .last-box, .note-box {
+      margin: 0 10px 10px;
+      padding: 10px;
+      border: 1px dashed var(--border);
+      font-size: 13px;
+    }
+    .last-box button {
+      margin-top: 8px;
+      min-height: 36px;
+      padding: 0 10px;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .last-box button:hover { background: oklch(0.94 0 0); }
+    .note-box textarea {
+      width: 100%;
+      min-height: 64px;
+      border: 1px solid var(--border);
+      padding: 8px;
+      font-size: 14px;
+      resize: vertical;
+      background: var(--surface);
+    }
+
+    .footer-bar {
+      flex: none;
+      padding: 8px 12px 12px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      gap: 8px;
+    }
+    .footer-bar .ghost, .footer-bar .primary {
+      margin-top: 0;
+      flex: 1;
+      font-size: 15px;
+    }
+
+    .empty {
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .empty-box {
+      width: 72px;
+      height: 48px;
+      border: 1px dashed var(--border);
+      margin: 0 auto 14px;
+    }
+    .empty h2 { font-size: 17px; margin-bottom: 6px; }
+    .empty p { font-size: 14px; color: var(--muted); }
+
+    .tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      overflow-x: auto;
+      flex: none;
+    }
+    .tab {
+      flex: none;
+      min-height: var(--tap);
+      padding: 0 12px;
+      font-size: 13px;
+      font-weight: 560;
+      color: var(--muted);
+      border-bottom: 2px solid transparent;
+    }
+    .tab[aria-selected="true"] {
+      color: var(--fg);
+      font-weight: 650;
+      border-bottom-color: var(--fg);
+    }
+    .tab:hover { background: oklch(0.95 0 0); color: var(--fg); }
+    .search-wrap {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex: none;
+    }
+    .search {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      background: oklch(0.95 0 0);
+      font-size: 16px;
+    }
+    .search::placeholder { color: var(--muted); }
+    .pick-row {
+      width: 100%;
+      min-height: 56px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      text-align: left;
+    }
+    .pick-row:hover { background: oklch(0.95 0 0); }
+    .pick-main { flex: 1; min-width: 0; }
+    .pick-name { font-size: 16px; font-weight: 600; }
+    .pick-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .star { font-size: 14px; color: var(--muted); flex: none; width: 20px; text-align: center; }
+    .star.on { color: var(--fg); }
+
+    .scrim {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: oklch(0.22 0 0 / 0.28);
+      z-index: 8;
+    }
+    .scrim.on { display: block; }
+    .sheet {
+      display: none;
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--fg);
+      z-index: 9;
+      padding: 12px 12px 28px;
+      max-height: 70%;
+      overflow: auto;
+    }
+    .sheet.on { display: block; }
+    .sheet h3 { font-size: 16px; text-align: center; margin-bottom: 8px; }
+    .sheet p.sub { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 12px; }
+    .sheet-opt {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 0 14px;
+      text-align: left;
+      font-size: 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--fg);
+    }
+    .sheet-opt:hover { background: oklch(0.95 0 0); }
+    .sheet-opt.danger { color: var(--danger); }
+    .sheet-opt .sub { display: block; font-size: 12px; color: var(--muted); }
+    .sheet-opt.rec { font-weight: 650; background: var(--fill); }
+    .sheet-cancel {
+      width: 100%;
+      min-height: var(--tap);
+      margin-top: 8px;
+      border: 1px solid var(--border);
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .sheet-cancel:hover { background: oklch(0.94 0 0); }
+    .popover {
+      display: none;
+      position: absolute;
+      top: 98px;
+      right: 12px;
+      width: 210px;
+      background: var(--surface);
+      border: 1px solid var(--fg);
+      z-index: 9;
+      padding: 6px 0;
+    }
+    .popover.on { display: block; }
+    .menu-item {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 0 14px;
+      text-align: left;
+      font-size: 15px;
+      color: var(--fg);
+    }
+    .menu-item:hover { background: oklch(0.94 0 0); }
+    .menu-item.danger { color: var(--danger); }
+    .menu-item .sub { display: block; font-size: 12px; color: var(--muted); }
+
+    .toast {
+      display: none;
+      position: absolute;
+      left: 50%;
+      bottom: 36px;
+      transform: translateX(-50%);
+      z-index: 12;
+      min-height: 40px;
+      padding: 10px 14px;
+      background: var(--fg);
+      color: oklch(0.99 0 0);
+      font-size: 14px;
+      font-weight: 560;
+      max-width: 90%;
+      text-align: center;
+    }
+    .toast.on { display: flex; align-items: center; gap: 10px; }
+    .toast button {
+      color: oklch(0.99 0 0);
+      font-weight: 700;
+      text-decoration: underline;
+      min-height: 32px;
+      padding: 0 4px;
+    }
+
+    .dest {
+      flex: 1;
+      margin: 20px 16px;
+      border: 1px dashed var(--fg);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      gap: 8px;
+    }
+    .dest h2 { font-size: 20px; }
+    .dest p { font-size: 15px; color: var(--muted); }
+    .bound {
+      margin-top: 16px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    .field-label { display: block; font-size: 13px; font-weight: 600; margin: 12px 0 6px; }
+    .field, .area {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 16px;
+    }
+    .area { min-height: 80px; resize: vertical; }
+    .chips { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .chip {
+      min-height: var(--tap);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+    }
+    .chip:hover { background: oklch(0.94 0 0); }
+    .chip[aria-pressed="true"] { border-color: var(--fg); background: var(--fill); font-weight: 650; }
+
+    .row {
+      width: 100%;
+      min-height: 64px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      text-align: left;
+    }
+    .row:hover { background: oklch(0.95 0 0); }
+    .row-main { flex: 1; min-width: 0; }
+    .row-name { font-size: 17px; font-weight: 600; }
+    .row-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .chev {
+      width: 8px; height: 8px;
+      border-right: 1.5px solid var(--muted);
+      border-top: 1.5px solid var(--muted);
+      transform: rotate(45deg);
+      flex: none;
+    }
+
+    .anno-float {
+      position: absolute;
+      left: 18px;
+      top: 118px;
+      z-index: 6;
+      max-width: 200px;
+      padding: 8px 10px;
+      border: 1px dashed var(--fg);
+      background: oklch(0.99 0 0 / 0.95);
+      font-size: 11px;
+      color: var(--muted);
+      pointer-events: none;
+      display: none;
+    }
+    .anno-float.on { display: block; }
+
+    @media (max-width: 1100px) {
+      .board { grid-template-columns: 1fr; justify-items: center; }
+      .rail { width: min(520px, 100%); }
+    }
+  </style>
+</head>
+<body>
+  <header class="spec-bar" data-od-id="page-header">
+    <div>stage=<b>M1-A</b></div>
+    <div>module=<b>04-core-training</b></div>
+    <div>version=<b>v0.1</b></div>
+    <div>coverage=<b>this module only</b></div>
+    <div>data=<b>虚构数据</b></div>
+    <div>network=<b>无外部资源</b></div>
+    <div>review=<b>产品负责人走查通过</b></div>
+  </header>
+
+  <div class="board">
+    <aside class="rail" data-od-id="annotation-left">
+      <h2>走查说明</h2>
+      <div class="note">
+        低保真线框。从学员详情空白开训；扁平动作列表。本模块不含模板、分区、课包、有氧模式、休息计时、自觉量度。
+      </div>
+      <div class="note">
+        <span class="k">建议路径</span>
+        <ol>
+          <li>小周详情 → 开始训练</li>
+          <li>添加动作 → 选「杠铃深蹲」</li>
+          <li>填重量与次数 → 失焦自动确认</li>
+          <li>添加一组 / 复制上一组</li>
+          <li>结束训练 → 训练总结出口</li>
+        </ol>
+      </div>
+      <div class="note">
+        <span class="k">本模块不做</span>
+        <ul>
+          <li>训练模板 / 课程分区 / 课包扣减</li>
+          <li>有氧专用模式 / 休息倒计时</li>
+          <li>自觉用力程度 / 剩余次数储备</li>
+          <li>分享报告与训练总结内部页</li>
+        </ul>
+      </div>
+      <h2>演示场景</h2>
+      <div class="scene-list">
+        <button type="button" class="scene-btn" data-od-id="scene-blank" data-scene="blank">A · 空白开训</button>
+        <button type="button" class="scene-btn" data-od-id="scene-active" data-scene="active">B · 训练中录入</button>
+        <button type="button" class="scene-btn" data-od-id="scene-picker" data-scene="picker">C · 统一选动作</button>
+        <button type="button" class="scene-btn" data-od-id="scene-banner" data-scene="banner">D · 离开后横幅</button>
+        <button type="button" class="scene-btn" data-od-id="scene-dup" data-scene="dup">E · 再次开训拦截</button>
+        <button type="button" class="scene-btn" data-od-id="scene-savefail" data-scene="savefail">F · 本地保存失败</button>
+        <button type="button" class="scene-btn" data-od-id="scene-enddraft" data-scene="enddraft">G · 结束含草稿</button>
+      </div>
+      <div class="now" id="now-label" data-od-id="now-label">当前：—</div>
+    </aside>
+
+    <div class="device-wrap">
+      <p class="device-caption">iPhone 竖屏 393×852 · 浅色 · 系统字体</p>
+      <div class="phone" data-od-id="iphone-frame" role="application" aria-label="FineCoach 课中训练线框原型">
+        <div class="island" aria-hidden="true"></div>
+        <div class="status">
+          <span>9:41</span>
+          <span class="status-sys" aria-hidden="true"><i class="sig"></i><i class="bat"></i></span>
+        </div>
+        <div class="app" id="app">
+
+          <!-- 学员详情：空白开训入口 -->
+          <section class="screen" data-screen="detail" data-od-id="screen-student-detail">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="detail-back" id="btn-detail-back">学员</button>
+              </div>
+              <h1>小周</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p class="kicker">学员详情 · 本模块入口</p>
+              <p class="lead">从空白课程记录开始。无模板、无分区预填。</p>
+              <button type="button" class="primary" data-od-id="cta-start-training" id="btn-start">开始训练</button>
+              <p class="hint">若已有进行中的训练，将跳转到现有课程并提供继续或结束，不允许两节同时进行。</p>
+              <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:14px;">
+                <p class="kicker">上次训练摘要（示意）</p>
+                <p style="font-size:15px;">3 天前 · 下肢 · 48 分钟</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- 学员列表 + 训练中横幅 -->
+          <section class="screen" data-screen="list" data-od-id="screen-student-list">
+            <div class="nav">
+              <div class="nav-side"></div>
+              <h1>学员</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <button type="button" class="banner" id="train-banner" data-od-id="banner-in-progress" hidden>
+              <span class="banner-ico" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg></span>
+              <span><b>训练中</b><span id="banner-sub">小周 · 点此返回</span></span>
+              <span class="banner-go">继续</span>
+            </button>
+            <div class="body tight">
+              <button type="button" class="row" data-od-id="list-row-zhou" id="row-zhou">
+                <div class="row-main">
+                  <div class="row-name">小周</div>
+                  <div class="row-sub">活跃 · 男</div>
+                </div>
+                <span class="chev" aria-hidden="true"></span>
+              </button>
+              <button type="button" class="row" data-od-id="list-row-ming">
+                <div class="row-main">
+                  <div class="row-name">阿明</div>
+                  <div class="row-sub">活跃 · 男</div>
+                </div>
+                <span class="chev" aria-hidden="true"></span>
+              </button>
+            </div>
+          </section>
+
+          <!-- 课中记录器 -->
+          <section class="screen" data-screen="recorder" data-od-id="screen-recorder">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="recorder-leave" id="btn-leave" aria-label="暂时离开">离开</button>
+              </div>
+              <h1 data-od-id="recorder-title">小周</h1>
+              <div class="nav-side end">
+                <button type="button" class="icon-btn" data-od-id="recorder-more" id="btn-rec-more" aria-label="更多" aria-haspopup="menu">
+                  <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><circle cx="5" cy="11" r="1.6" fill="currentColor"/><circle cx="11" cy="11" r="1.6" fill="currentColor"/><circle cx="17" cy="11" r="1.6" fill="currentColor"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="meta-row" data-od-id="recorder-meta">
+              <span class="pill" id="status-pill">训练中</span>
+              <span class="timer" id="elapsed" data-od-id="elapsed-timer">00:00</span>
+              <span class="save-st" id="save-status" data-od-id="save-status">已保存</span>
+            </div>
+            <div class="body" id="recorder-body" data-od-id="recorder-body"></div>
+            <div class="footer-bar">
+              <button type="button" class="ghost" data-od-id="cta-add-exercise" id="btn-add-ex">添加动作</button>
+              <button type="button" class="primary" data-od-id="cta-end-training" id="btn-end">结束训练</button>
+            </div>
+          </section>
+
+          <!-- 统一动作选择 -->
+          <section class="screen" data-screen="picker" data-od-id="screen-exercise-picker">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="picker-cancel" id="btn-picker-back">取消</button>
+              </div>
+              <h1>添加动作</h1>
+              <div class="nav-side end">
+                <button type="button" class="text-btn" data-od-id="cta-quick-create" id="btn-quick-create">快速创建</button>
+              </div>
+            </div>
+            <div class="tabs" role="tablist" data-od-id="picker-tabs">
+              <button type="button" class="tab" role="tab" data-tab="recent-student" aria-selected="true">该学员近期</button>
+              <button type="button" class="tab" role="tab" data-tab="recent-used" aria-selected="false">最近使用</button>
+              <button type="button" class="tab" role="tab" data-tab="fav" aria-selected="false">收藏</button>
+              <button type="button" class="tab" role="tab" data-tab="search" aria-selected="false">搜索</button>
+            </div>
+            <div class="search-wrap" id="picker-search-wrap" hidden>
+              <input class="search" id="picker-search" data-od-id="picker-search" type="search" placeholder="搜索动作名称" enterkeyhint="search">
+            </div>
+            <div class="body tight" id="picker-list" data-od-id="picker-list"></div>
+          </section>
+
+          <!-- 快速创建自定义 -->
+          <section class="screen" data-screen="create-ex" data-od-id="screen-quick-create">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" id="btn-create-back">取消</button>
+              </div>
+              <h1>快速创建</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <label class="field-label" for="ce-name">动作名称</label>
+              <input class="field" id="ce-name" data-od-id="field-custom-name" maxlength="30" placeholder="例如 哑铃侧平举">
+              <p class="err" id="ce-name-err" hidden>请填写名称</p>
+              <p class="field-label">记录方式</p>
+              <div class="chips" id="ce-mode" data-od-id="field-record-mode">
+                <button type="button" class="chip" data-mode="weight_reps" aria-pressed="true">重量+次数</button>
+                <button type="button" class="chip" data-mode="reps" aria-pressed="false">仅次数</button>
+                <button type="button" class="chip" data-mode="duration" aria-pressed="false">时长</button>
+                <button type="button" class="chip" data-mode="unilateral" aria-pressed="false">可分左右</button>
+              </div>
+              <p class="hint">本页仅课中快速创建。可存为自定义动作或仅本次。</p>
+              <p class="field-label">保存范围</p>
+              <div class="chips" id="ce-scope">
+                <button type="button" class="chip" data-scope="custom" aria-pressed="true">存为自定义</button>
+                <button type="button" class="chip" data-scope="once" aria-pressed="false">仅本次</button>
+              </div>
+              <button type="button" class="primary" data-od-id="cta-create-add" id="btn-create-add">创建并添加</button>
+            </div>
+          </section>
+
+          <!-- 训练总结出口 -->
+          <section class="screen" data-screen="summary-dest" data-od-id="screen-summary-dest">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" id="btn-dest-home">学员</button>
+              </div>
+              <h1>训练总结</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="dest" data-od-id="dest-module-05">
+              <h2>已到达训练总结</h2>
+              <p>本模块到此结束。训练总结与分享报告属于模块 05，此处仅作出口示意。</p>
+              <p id="dest-stats" style="color:var(--fg);font-size:15px;"></p>
+              <div class="bound">MODULE 05 BOUNDARY</div>
+            </div>
+          </section>
+
+        </div>
+
+        <div class="scrim" id="scrim" data-od-id="scrim"></div>
+        <div class="popover" id="rec-menu" data-od-id="recorder-menu" role="menu">
+          <button type="button" class="menu-item" data-act="sim-fail">模拟保存失败</button>
+          <button type="button" class="menu-item" data-act="retry-save">重试保存</button>
+          <button type="button" class="menu-item danger" data-act="end">结束训练</button>
+        </div>
+        <div class="sheet" id="sheet" data-od-id="action-sheet" role="dialog" aria-modal="true">
+          <h3 id="sheet-title">选项</h3>
+          <p class="sub" id="sheet-sub" hidden></p>
+          <div id="sheet-opts"></div>
+          <button type="button" class="sheet-cancel" id="sheet-cancel">取消</button>
+        </div>
+        <div class="toast" id="toast" data-od-id="toast" role="status"></div>
+        <div class="anno-float" id="anno-bg" data-od-id="anno-timer-bg">计时在后台继续（标注）</div>
+        <div class="home-bar" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <aside class="rail" data-od-id="annotation-right">
+      <h2>验收核对</h2>
+      <ul class="check">
+        <li>顶部：训练中 · 计时 · 已保存（无手动保存）</li>
+        <li>统一选择：近期 / 最近 / 收藏 / 搜索 / 快速创建</li>
+        <li>重量+次数主行；完成/失焦自动确认</li>
+        <li>添加一组空白；复制上一组待完成</li>
+        <li>左右默认共用，不同时再展开</li>
+        <li>二级：组备注、上次同动作、有注意事项</li>
+        <li>动作拖动手柄；组按创建序，删后重编号</li>
+        <li>草稿删即撤；已完成经二级菜单</li>
+        <li>二次开训跳现有；离开有横幅</li>
+        <li>空训/草稿结束确认；出口仅总结</li>
+      </ul>
+    </aside>
+  </div>
+
+  <script>
+(function () {
+  "use strict";
+
+  var LIBRARY = [
+    { id: "sq", name: "杠铃深蹲", mode: "weight_reps", load: "总负重", unilateral: false, fav: true, caution: "右膝旧伤，深蹲时注意深度" },
+    { id: "bp", name: "杠铃卧推", mode: "weight_reps", load: "总负重", unilateral: false, fav: true, caution: null },
+    { id: "rdl", name: "罗马尼亚硬拉", mode: "weight_reps", load: "总负重", unilateral: false, fav: false, caution: null },
+    { id: "dbp", name: "哑铃肩推", mode: "weight_reps", load: "单侧重量", unilateral: true, fav: true, caution: null },
+    { id: "pu", name: "引体向上", mode: "reps", load: null, unilateral: false, fav: false, caution: null },
+    { id: "plank", name: "平板支撑", mode: "duration", load: null, unilateral: false, fav: true, caution: null },
+    { id: "lu", name: "哑铃弓步", mode: "weight_reps", load: "单侧重量", unilateral: true, fav: false, caution: "有注意事项：髋部紧绷" },
+    { id: "cr", name: "绳索面拉", mode: "weight_reps", load: "器械显示", unilateral: false, fav: false, caution: null }
+  ];
+
+  var LAST_SETS = {
+    sq: [{ w: "60", r: "8" }, { w: "70", r: "6" }, { w: "70", r: "6" }],
+    bp: [{ w: "50", r: "8" }, { w: "55", r: "6" }],
+    dbp: [{ w: "14", r: "10" }, { w: "14", r: "10" }],
+    pu: [{ r: "8" }, { r: "6" }],
+    plank: [{ m: "1", s: "00" }]
+  };
+
+  var STUDENT_RECENT = ["sq", "bp", "dbp", "plank"];
+  var RECENT_USED = ["sq", "rdl", "pu", "cr", "bp"];
+  var FAV_IDS = LIBRARY.filter(function (x) { return x.fav; }).map(function (x) { return x.id; });
+
+  function uid() { return "id" + Math.random().toString(36).slice(2, 9); }
+
+  function fmtTime(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    var h = Math.floor(sec / 3600);
+    var m = Math.floor((sec % 3600) / 60);
+    var s = sec % 60;
+    var mm = (m < 10 ? "0" : "") + m;
+    var ss = (s < 10 ? "0" : "") + s;
+    if (h > 0) return h + ":" + mm + ":" + ss;
+    return mm + ":" + ss;
+  }
+
+  function cloneSet(s) {
+    return {
+      id: uid(),
+      status: s.status || "draft",
+      w: s.w == null ? "" : String(s.w),
+      r: s.r == null ? "" : String(s.r),
+      m: s.m == null ? "" : String(s.m),
+      s: s.s == null ? "" : String(s.s),
+      wL: s.wL == null ? "" : String(s.wL),
+      rL: s.rL == null ? "" : String(s.rL),
+      wR: s.wR == null ? "" : String(s.wR),
+      rR: s.rR == null ? "" : String(s.rR),
+      note: s.note || "",
+      split: !!s.split,
+      source: s.source || "manual",
+      edited: !!s.edited
+    };
+  }
+
+  function emptySet() {
+    return cloneSet({ status: "draft", source: "blank" });
+  }
+
+  function findLib(id) {
+    for (var i = 0; i < LIBRARY.length; i++) if (LIBRARY[i].id === id) return LIBRARY[i];
+    return null;
+  }
+
+  var state = {
+    scene: "blank",
+    screen: "detail",
+    session: null,
+    pickerTab: "recent-student",
+    pickerQ: "",
+    createMode: "weight_reps",
+    createScope: "custom",
+    saveOk: true,
+    undo: null,
+    sheetCtx: null,
+    dragFrom: null,
+    tick: null,
+    toastTimer: null
+  };
+
+  var el = {
+    now: document.getElementById("now-label"),
+    scrim: document.getElementById("scrim"),
+    sheet: document.getElementById("sheet"),
+    sheetTitle: document.getElementById("sheet-title"),
+    sheetSub: document.getElementById("sheet-sub"),
+    sheetOpts: document.getElementById("sheet-opts"),
+    toast: document.getElementById("toast"),
+    recMenu: document.getElementById("rec-menu"),
+    banner: document.getElementById("train-banner"),
+    bannerSub: document.getElementById("banner-sub"),
+    recorderBody: document.getElementById("recorder-body"),
+    elapsed: document.getElementById("elapsed"),
+    saveStatus: document.getElementById("save-status"),
+    pickerList: document.getElementById("picker-list"),
+    pickerSearchWrap: document.getElementById("picker-search-wrap"),
+    pickerSearch: document.getElementById("picker-search"),
+    annoBg: document.getElementById("anno-bg"),
+    destStats: document.getElementById("dest-stats")
+  };
+
+  function showScreen(name) {
+    state.screen = name;
+    document.querySelectorAll(".screen").forEach(function (s) {
+      s.classList.toggle("is-on", s.getAttribute("data-screen") === name);
+    });
+    el.annoBg.classList.toggle("on", name === "recorder" && state.session);
+    closeOverlays();
+    updateChrome();
+  }
+
+  function closeOverlays() {
+    el.scrim.classList.remove("on");
+    el.sheet.classList.remove("on");
+    el.recMenu.classList.remove("on");
+    state.sheetCtx = null;
+  }
+
+  function toast(msg, undoLabel, undoFn) {
+    clearTimeout(state.toastTimer);
+    el.toast.innerHTML = "";
+    el.toast.appendChild(document.createTextNode(msg));
+    if (undoLabel && undoFn) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.textContent = undoLabel;
+      b.addEventListener("click", function () {
+        undoFn();
+        el.toast.classList.remove("on");
+      });
+      el.toast.appendChild(b);
+    }
+    el.toast.classList.add("on");
+    state.toastTimer = setTimeout(function () {
+      el.toast.classList.remove("on");
+      state.undo = null;
+    }, 3200);
+  }
+
+  function openSheet(title, sub, opts) {
+    el.sheetTitle.textContent = title;
+    if (sub) {
+      el.sheetSub.hidden = false;
+      el.sheetSub.textContent = sub;
+    } else {
+      el.sheetSub.hidden = true;
+    }
+    el.sheetOpts.innerHTML = "";
+    opts.forEach(function (o) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "sheet-opt" + (o.danger ? " danger" : "") + (o.rec ? " rec" : "");
+      b.innerHTML = o.label + (o.sub ? '<span class="sub">' + o.sub + "</span>" : "");
+      b.addEventListener("click", function () {
+        closeOverlays();
+        o.fn();
+      });
+      el.sheetOpts.appendChild(b);
+    });
+    el.scrim.classList.add("on");
+    el.sheet.classList.add("on");
+  }
+
+  function markSaved() {
+    if (!state.session) return;
+    if (!state.saveOk) {
+      el.saveStatus.textContent = "保存失败 · 点此重试";
+      el.saveStatus.className = "save-st err";
+      return;
+    }
+    state.session.dirty = false;
+    el.saveStatus.textContent = "已保存";
+    el.saveStatus.className = "save-st";
+  }
+
+  function failSave() {
+    state.saveOk = false;
+    if (state.session) state.session.dirty = true;
+    el.saveStatus.textContent = "保存失败 · 点此重试";
+    el.saveStatus.className = "save-st err";
+    toast("本地保存失败，请重试");
+  }
+
+  function retrySave() {
+    state.saveOk = true;
+    markSaved();
+    toast("已重新保存");
+  }
+
+  function startTicker() {
+    clearInterval(state.tick);
+    state.tick = setInterval(function () {
+      if (!state.session || !state.session.active) return;
+      state.session.elapsed = Math.floor((Date.now() - state.session.startedAt) / 1000);
+      if (state.screen === "recorder") el.elapsed.textContent = fmtTime(state.session.elapsed);
+      if (state.screen === "list" && !el.banner.hidden) {
+        el.bannerSub.textContent = "小周 · " + fmtTime(state.session.elapsed) + " · 后台继续计时";
+      }
+    }, 1000);
+  }
+
+  function newSession() {
+    state.session = {
+      active: true,
+      student: "小周",
+      startedAt: Date.now(),
+      elapsed: 0,
+      exercises: [],
+      dirty: false
+    };
+    state.saveOk = true;
+    startTicker();
+  }
+
+  function countCompleted() {
+    var n = 0;
+    if (!state.session) return 0;
+    state.session.exercises.forEach(function (ex) {
+      ex.sets.forEach(function (s) { if (s.status === "done") n++; });
+    });
+    return n;
+  }
+
+  function countPending() {
+    var n = 0;
+    if (!state.session) return 0;
+    state.session.exercises.forEach(function (ex) {
+      ex.sets.forEach(function (s) {
+        if (s.status === "draft" || s.status === "pending") n++;
+      });
+    });
+    return n;
+  }
+
+  function hasAnyContent() {
+    return state.session && state.session.exercises.length > 0;
+  }
+
+  function updateChrome() {
+    var label = "当前：";
+    if (state.screen === "detail") label += "学员详情 · 空白开训";
+    else if (state.screen === "list") label += "学员列表" + (state.session && state.session.active ? " · 训练中横幅" : "");
+    else if (state.screen === "recorder") label += "课中记录 · " + (state.session ? state.session.exercises.length + " 个动作" : "");
+    else if (state.screen === "picker") label += "统一选动作 · " + state.pickerTab;
+    else if (state.screen === "create-ex") label += "快速创建自定义";
+    else if (state.screen === "summary-dest") label += "训练总结出口（模块 05）";
+    el.now.textContent = label;
+
+    document.querySelectorAll(".scene-btn").forEach(function (b) {
+      b.setAttribute("aria-current", b.getAttribute("data-scene") === state.scene ? "true" : "false");
+    });
+
+    if (state.session && state.session.active) {
+      el.elapsed.textContent = fmtTime(state.session.elapsed);
+      markSaved();
+      el.banner.hidden = state.screen !== "list";
+      el.bannerSub.textContent = "小周 · " + fmtTime(state.session.elapsed) + " · 后台继续计时";
+    } else {
+      el.banner.hidden = true;
+    }
+  }
+
+  function modeClass(ex) {
+    if (ex.mode === "duration") return "dur";
+    if (ex.mode === "reps") return "reps-only";
+    if (ex.unilateral && ex.splitLR) return "lr";
+    return "";
+  }
+
+  function validateWeight(v) {
+    if (v === "" || v == null) return { ok: false, blank: true };
+    if (!/^\d+(\.\d{1,2})?$/.test(v)) return { ok: false };
+    var n = Number(v);
+    if (n < 0) return { ok: false };
+    return { ok: true, blank: false };
+  }
+
+  function validateReps(v) {
+    if (v === "" || v == null) return { ok: false };
+    if (!/^[1-9]\d*$/.test(v)) return { ok: false };
+    return { ok: true };
+  }
+
+  function validateDuration(m, s) {
+    var mm = m === "" ? NaN : Number(m);
+    var ss = s === "" ? NaN : Number(s);
+    if (!Number.isInteger(mm) || mm < 0) return { ok: false };
+    if (!Number.isInteger(ss) || ss < 0 || ss > 59) return { ok: false };
+    if (mm === 0 && ss === 0) return { ok: false };
+    return { ok: true };
+  }
+
+  function setIsValid(ex, set) {
+    if (ex.mode === "duration") return validateDuration(set.m, set.s).ok;
+    if (ex.mode === "reps") {
+      if (ex.unilateral && set.split) {
+        return validateReps(set.rL).ok && validateReps(set.rR).ok;
+      }
+      return validateReps(set.r).ok;
+    }
+    // weight + reps
+    if (ex.unilateral && set.split) {
+      var wL = validateWeight(set.wL);
+      var wR = validateWeight(set.wR);
+      // blank weight not allowed for confirm? Actually weight can be blank ≠ 0 meaning bodyweight?
+      // Spec: blank ≠ 0; for weight+reps both needed. Blank weight means incomplete.
+      return wL.ok && wR.ok && validateReps(set.rL).ok && validateReps(set.rR).ok;
+    }
+    var w = validateWeight(set.w);
+    return w.ok && validateReps(set.r).ok;
+  }
+
+  function tryConfirmSet(ex, set) {
+    if (set.status === "done") return;
+    if (!setIsValid(ex, set)) return;
+    // 复制/历史上次预填：保持待完成，直至实际修改或菜单「标记完成」
+    if (set.status === "pending" && !set.edited) return;
+    set.status = "done";
+    set.source = "manual";
+    markSaved();
+    renderRecorder();
+  }
+
+  function renderRecorder() {
+    var body = el.recorderBody;
+    body.innerHTML = "";
+    if (!state.session) return;
+
+    if (state.session.exercises.length === 0) {
+      body.innerHTML =
+        '<div class="empty" data-od-id="recorder-empty">' +
+        '<div class="empty-box"></div>' +
+        "<h2>尚未添加动作</h2>" +
+        "<p>从空白开始。点下方「添加动作」进入统一选择页。</p>" +
+        "</div>";
+      return;
+    }
+
+    state.session.exercises.forEach(function (ex, exIdx) {
+      var block = document.createElement("div");
+      block.className = "ex-block";
+      block.setAttribute("data-od-id", "exercise-" + ex.libId);
+      block.setAttribute("draggable", "false");
+
+      var head = document.createElement("div");
+      head.className = "ex-head";
+
+      var handle = document.createElement("button");
+      handle.type = "button";
+      handle.className = "drag-handle";
+      handle.setAttribute("data-od-id", "drag-handle-" + ex.id);
+      handle.setAttribute("aria-label", "拖动排序");
+      handle.title = "拖动手柄 · 可调整动作顺序";
+      handle.innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="6" cy="5" r="1.2" fill="currentColor"/><circle cx="12" cy="5" r="1.2" fill="currentColor"/><circle cx="6" cy="9" r="1.2" fill="currentColor"/><circle cx="12" cy="9" r="1.2" fill="currentColor"/><circle cx="6" cy="13" r="1.2" fill="currentColor"/><circle cx="12" cy="13" r="1.2" fill="currentColor"/></svg>';
+      handle.addEventListener("pointerdown", function (e) {
+        e.preventDefault();
+        state.dragFrom = exIdx;
+        openSheet("调整顺序", "拖动手柄示意 · 本线框用上移/下移代替真实拖拽", [
+          {
+            label: "上移",
+            fn: function () { moveEx(exIdx, -1); }
+          },
+          {
+            label: "下移",
+            fn: function () { moveEx(exIdx, 1); }
+          }
+        ]);
+      });
+
+      var titleBtn = document.createElement("button");
+      titleBtn.type = "button";
+      titleBtn.className = "ex-title";
+      titleBtn.setAttribute("data-od-id", "ex-title-" + ex.id);
+      var subBits = [];
+      if (ex.load) subBits.push(ex.load);
+      if (ex.mode === "weight_reps") subBits.push("重量+次数");
+      if (ex.mode === "reps") subBits.push("仅次数");
+      if (ex.mode === "duration") subBits.push("时长");
+      if (ex.unilateral) subBits.push(ex.splitLR ? "左右分开" : "左右共用");
+      titleBtn.innerHTML = ex.name + "<small>" + subBits.join(" · ") + "</small>";
+      titleBtn.addEventListener("click", function () { openExMenu(ex, exIdx); });
+
+      head.appendChild(handle);
+      head.appendChild(titleBtn);
+
+      if (ex.caution) {
+        var chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "caution-chip";
+        chip.setAttribute("data-od-id", "caution-" + ex.id);
+        chip.textContent = "有注意事项";
+        chip.addEventListener("click", function () {
+          ex.showCaution = !ex.showCaution;
+          renderRecorder();
+        });
+        head.appendChild(chip);
+      }
+
+      var moreEx = document.createElement("button");
+      moreEx.type = "button";
+      moreEx.className = "set-more";
+      moreEx.setAttribute("aria-label", "动作菜单");
+      moreEx.innerHTML = "···";
+      moreEx.addEventListener("click", function () { openExMenu(ex, exIdx); });
+      head.appendChild(moreEx);
+
+      block.appendChild(head);
+
+      if (ex.caution && ex.showCaution) {
+        var box = document.createElement("div");
+        box.className = "caution-box";
+        box.setAttribute("data-od-id", "caution-content-" + ex.id);
+        box.textContent = ex.caution;
+        block.appendChild(box);
+      }
+
+      var mc = modeClass(ex);
+      var cols = document.createElement("div");
+      cols.className = "set-cols" + (mc ? " " + mc : "");
+      if (ex.mode === "duration") {
+        cols.innerHTML = "<span>组</span><span>分</span><span>秒</span><span></span>";
+      } else if (ex.mode === "reps") {
+        cols.innerHTML = "<span>组</span><span>次数</span><span></span>";
+      } else if (ex.unilateral && ex.splitLR) {
+        cols.innerHTML = "<span>组</span><span>左重量</span><span>左次数</span><span>右重量</span><span>右次数</span><span></span>";
+      } else {
+        cols.innerHTML = "<span>组</span><span>重量</span><span>次数</span><span></span>";
+      }
+      block.appendChild(cols);
+
+      var table = document.createElement("div");
+      table.className = "set-table";
+
+      ex.sets.forEach(function (set, setIdx) {
+        var row = document.createElement("div");
+        var stClass = set.status === "done" ? "is-done" : (set.status === "pending" ? "is-pending" : "is-draft");
+        row.className = "set-row " + stClass + (mc ? " " + mc : "");
+        row.setAttribute("data-od-id", "set-row-" + set.id);
+
+        var num = document.createElement("div");
+        num.className = "set-num";
+        num.textContent = String(setIdx + 1);
+        row.appendChild(num);
+
+        function bindCell(key, placeholder, validator) {
+          var inp = document.createElement("input");
+          inp.className = "cell";
+          inp.setAttribute("data-od-id", "set-" + key + "-" + set.id);
+          inp.inputMode = key === "w" || key.indexOf("w") === 0 ? "decimal" : "numeric";
+          inp.placeholder = placeholder;
+          inp.value = set[key] || "";
+          inp.addEventListener("input", function () {
+            var next = inp.value.trim();
+            if (next !== (set[key] || "")) set.edited = true;
+            set[key] = next;
+            if (validator && set[key] !== "" && !validator(set[key]).ok) {
+              inp.classList.add("is-bad");
+            } else {
+              inp.classList.remove("is-bad");
+            }
+            markSaved();
+          });
+          inp.addEventListener("blur", function () {
+            tryConfirmSet(ex, set);
+            if (!setIsValid(ex, set) && hasPartial(ex, set)) {
+              set.status = set.status === "done" ? "done" : (set.source === "copy" || set.source === "history" ? "pending" : "draft");
+              renderRecorder();
+            }
+          });
+          inp.addEventListener("keydown", function (ev) {
+            if (ev.key === "Enter") {
+              ev.preventDefault();
+              inp.blur();
+            }
+          });
+          row.appendChild(inp);
+          return inp;
+        }
+
+        function hasPartial(ex0, set0) {
+          if (ex0.mode === "duration") return set0.m !== "" || set0.s !== "";
+          if (ex0.mode === "reps") return set0.r !== "" || set0.rL !== "" || set0.rR !== "";
+          return set0.w !== "" || set0.r !== "" || set0.wL !== "" || set0.rL !== "";
+        }
+
+        if (ex.mode === "duration") {
+          bindCell("m", "分", function (v) { return { ok: /^\d+$/.test(v) }; });
+          bindCell("s", "秒", function (v) { return { ok: /^\d{1,2}$/.test(v) && Number(v) <= 59 }; });
+        } else if (ex.mode === "reps") {
+          bindCell("r", "次", validateReps);
+        } else if (ex.unilateral && ex.splitLR) {
+          bindCell("wL", "左kg", validateWeight);
+          bindCell("rL", "左次", validateReps);
+          bindCell("wR", "右kg", validateWeight);
+          bindCell("rR", "右次", validateReps);
+        } else {
+          bindCell("w", "kg", validateWeight);
+          bindCell("r", "次", validateReps);
+        }
+
+        var more = document.createElement("button");
+        more.type = "button";
+        more.className = "set-more";
+        more.setAttribute("data-od-id", "set-more-" + set.id);
+        more.setAttribute("aria-label", "组菜单");
+        more.textContent = "···";
+        more.addEventListener("click", function () { openSetMenu(ex, exIdx, set, setIdx); });
+        row.appendChild(more);
+
+        if (set.note) {
+          row.title = "备注：" + set.note;
+        }
+
+        table.appendChild(row);
+      });
+
+      block.appendChild(table);
+
+      if (ex.showLast) {
+        var last = document.createElement("div");
+        last.className = "last-box";
+        last.setAttribute("data-od-id", "last-time-" + ex.id);
+        var hist = LAST_SETS[ex.libId];
+        if (hist) {
+          last.innerHTML = "<b>上次同动作</b><br>" + hist.map(function (h, i) {
+            if (h.m != null) return (i + 1) + " · " + h.m + "分" + (h.s || "00") + "秒";
+            if (h.w != null) return (i + 1) + " · " + h.w + " kg × " + h.r;
+            return (i + 1) + " · " + h.r + " 次";
+          }).join("　");
+          var copyBtn = document.createElement("button");
+          copyBtn.type = "button";
+          copyBtn.textContent = "复制上次全部组（保持待完成）";
+          copyBtn.addEventListener("click", function () {
+            hist.forEach(function (h) {
+              var ns = emptySet();
+              ns.status = "pending";
+              ns.source = "history";
+              if (h.w != null) { ns.w = h.w; ns.r = h.r; }
+              else if (h.m != null) { ns.m = h.m; ns.s = h.s || "0"; }
+              else { ns.r = h.r; }
+              ex.sets.push(ns);
+            });
+            markSaved();
+            renderRecorder();
+            toast("已复制为待完成");
+          });
+          last.appendChild(copyBtn);
+        } else {
+          last.textContent = "暂无该学员上次同动作数据";
+        }
+        block.appendChild(last);
+      }
+
+      if (ex.showNote) {
+        var nb = document.createElement("div");
+        nb.className = "note-box";
+        var ta = document.createElement("textarea");
+        ta.placeholder = "本组/动作私有备注，不进入分享";
+        ta.value = ex.note || "";
+        ta.addEventListener("change", function () {
+          ex.note = ta.value;
+          markSaved();
+        });
+        nb.appendChild(ta);
+        block.appendChild(nb);
+      }
+
+      var tools = document.createElement("div");
+      tools.className = "ex-tools";
+
+      var addSet = document.createElement("button");
+      addSet.type = "button";
+      addSet.className = "tool primaryish";
+      addSet.setAttribute("data-od-id", "cta-add-set-" + ex.id);
+      addSet.textContent = "添加一组";
+      addSet.addEventListener("click", function () {
+        ex.sets.push(emptySet());
+        markSaved();
+        renderRecorder();
+      });
+      tools.appendChild(addSet);
+
+      var copyPrev = document.createElement("button");
+      copyPrev.type = "button";
+      copyPrev.className = "tool";
+      copyPrev.setAttribute("data-od-id", "cta-copy-prev-" + ex.id);
+      copyPrev.textContent = "复制上一组";
+      copyPrev.disabled = ex.sets.length === 0;
+      copyPrev.addEventListener("click", function () {
+        var prev = ex.sets[ex.sets.length - 1];
+        var ns = cloneSet(prev);
+        ns.status = "pending";
+        ns.source = "copy";
+        ns.id = uid();
+        ex.sets.push(ns);
+        markSaved();
+        renderRecorder();
+        toast("已复制 · 待完成");
+      });
+      tools.appendChild(copyPrev);
+
+      if (ex.unilateral) {
+        var lr = document.createElement("button");
+        lr.type = "button";
+        lr.className = "tool";
+        lr.setAttribute("data-od-id", "cta-toggle-lr-" + ex.id);
+        lr.textContent = ex.splitLR ? "合并左右" : "分开左右";
+        lr.addEventListener("click", function () {
+          if (!ex.splitLR) {
+            ex.splitLR = true;
+            ex.sets.forEach(function (s) {
+              s.split = true;
+              if (s.w && !s.wL) { s.wL = s.w; s.wR = s.w; }
+              if (s.r && !s.rL) { s.rL = s.r; s.rR = s.r; }
+            });
+          } else {
+            ex.splitLR = false;
+            ex.sets.forEach(function (s) {
+              s.split = false;
+              if (s.wL && s.wR && s.wL === s.wR) s.w = s.wL;
+              if (s.rL && s.rR && s.rL === s.rR) s.r = s.rL;
+            });
+          }
+          markSaved();
+          renderRecorder();
+        });
+        tools.appendChild(lr);
+      }
+
+      var lastBtn = document.createElement("button");
+      lastBtn.type = "button";
+      lastBtn.className = "tool";
+      lastBtn.textContent = ex.showLast ? "收起上次" : "上次同动作";
+      lastBtn.addEventListener("click", function () {
+        ex.showLast = !ex.showLast;
+        renderRecorder();
+      });
+      tools.appendChild(lastBtn);
+
+      var noteBtn = document.createElement("button");
+      noteBtn.type = "button";
+      noteBtn.className = "tool";
+      noteBtn.textContent = ex.showNote ? "收起备注" : "动作备注";
+      noteBtn.addEventListener("click", function () {
+        ex.showNote = !ex.showNote;
+        renderRecorder();
+      });
+      tools.appendChild(noteBtn);
+
+      block.appendChild(tools);
+      body.appendChild(block);
+    });
+  }
+
+  function moveEx(idx, dir) {
+    var arr = state.session.exercises;
+    var to = idx + dir;
+    if (to < 0 || to >= arr.length) return;
+    var t = arr[idx];
+    arr[idx] = arr[to];
+    arr[to] = t;
+    markSaved();
+    renderRecorder();
+  }
+
+  function renumberHint() {
+    /* sets display by index — delete already re-renders numbers */
+  }
+
+  function openSetMenu(ex, exIdx, set, setIdx) {
+    var opts = [];
+    if (set.status === "done") {
+      opts.push({
+        label: "撤销完成",
+        fn: function () {
+          set.status = "draft";
+          markSaved();
+          renderRecorder();
+        }
+      });
+      opts.push({
+        label: "本组备注",
+        fn: function () {
+          var n = window.prompt("本组备注", set.note || "");
+          if (n != null) { set.note = n; markSaved(); renderRecorder(); }
+        }
+      });
+      opts.push({
+        label: "删除已完成组",
+        danger: true,
+        sub: "将重新编号，可短暂撤销",
+        fn: function () { deleteSet(ex, setIdx, true); }
+      });
+    } else {
+      opts.push({
+        label: "标记完成",
+        fn: function () {
+          if (!setIsValid(ex, set)) {
+            toast("请先填写有效数值");
+            return;
+          }
+          set.status = "done";
+          markSaved();
+          renderRecorder();
+        }
+      });
+      opts.push({
+        label: "删除草稿",
+        danger: true,
+        sub: "立即删除，可短暂撤销",
+        fn: function () { deleteSet(ex, setIdx, false); }
+      });
+    }
+    openSheet("第 " + (setIdx + 1) + " 组", set.status === "done" ? "已完成" : (set.status === "pending" ? "待完成" : "草稿"), opts);
+  }
+
+  function deleteSet(ex, setIdx, wasDone) {
+    var removed = ex.sets.splice(setIdx, 1)[0];
+    renumberHint();
+    markSaved();
+    renderRecorder();
+    var snap = { exId: ex.id, idx: setIdx, set: removed };
+    toast(wasDone ? "已删除组" : "已删除草稿", "撤销", function () {
+      var target = state.session.exercises.filter(function (e) { return e.id === snap.exId; })[0];
+      if (!target) return;
+      target.sets.splice(snap.idx, 0, snap.set);
+      markSaved();
+      renderRecorder();
+    });
+  }
+
+  function openExMenu(ex, exIdx) {
+    var doneCount = ex.sets.filter(function (s) { return s.status === "done"; }).length;
+    var opts = [
+      {
+        label: doneCount ? "删除动作（含 " + doneCount + " 组已完成）" : "删除动作",
+        danger: true,
+        sub: doneCount ? "需确认 · 删除后可短暂撤销" : "立即删除 · 可短暂撤销",
+        fn: function () {
+          if (doneCount) {
+            openSheet("确认删除动作", "将删除 " + doneCount + " 组已完成记录", [
+              {
+                label: "确认删除",
+                danger: true,
+                fn: function () { deleteEx(exIdx); }
+              }
+            ]);
+          } else {
+            deleteEx(exIdx);
+          }
+        }
+      }
+    ];
+    openSheet(ex.name, null, opts);
+  }
+
+  function deleteEx(exIdx) {
+    var removed = state.session.exercises.splice(exIdx, 1)[0];
+    markSaved();
+    renderRecorder();
+    toast("已删除动作", "撤销", function () {
+      state.session.exercises.splice(exIdx, 0, removed);
+      markSaved();
+      renderRecorder();
+    });
+  }
+
+  function addExerciseFromLib(lib, forceDup) {
+    if (!state.session) return;
+    var existing = state.session.exercises.filter(function (e) { return e.libId === lib.id; })[0];
+    if (existing && !forceDup) {
+      openSheet("本课已有该动作", lib.name, [
+        {
+          label: "前往已有动作",
+          rec: true,
+          sub: "推荐",
+          fn: function () {
+            showScreen("recorder");
+            renderRecorder();
+            toast("已定位到「" + lib.name + "」");
+          }
+        },
+        {
+          label: "仍然再次添加",
+          fn: function () { addExerciseFromLib(lib, true); }
+        }
+      ]);
+      return;
+    }
+
+    var ex = {
+      id: uid(),
+      libId: lib.id,
+      name: lib.name,
+      mode: lib.mode === "unilateral" ? "weight_reps" : lib.mode,
+      load: lib.load,
+      unilateral: !!lib.unilateral || lib.mode === "unilateral",
+      splitLR: false,
+      caution: lib.caution,
+      showCaution: false,
+      showLast: false,
+      showNote: false,
+      note: "",
+      sets: [emptySet()]
+    };
+    state.session.exercises.push(ex);
+    markSaved();
+    showScreen("recorder");
+    renderRecorder();
+  }
+
+  function renderPicker() {
+    var ids;
+    if (state.pickerTab === "recent-student") ids = STUDENT_RECENT;
+    else if (state.pickerTab === "recent-used") ids = RECENT_USED;
+    else if (state.pickerTab === "fav") ids = FAV_IDS;
+    else {
+      var q = (state.pickerQ || "").trim();
+      ids = LIBRARY.filter(function (x) {
+        return !q || x.name.indexOf(q) >= 0;
+      }).map(function (x) { return x.id; });
+    }
+
+    el.pickerSearchWrap.hidden = state.pickerTab !== "search";
+    el.pickerList.innerHTML = "";
+
+    if (ids.length === 0) {
+      el.pickerList.innerHTML = '<div class="empty"><h2>无匹配动作</h2><p>可改用搜索或快速创建。</p></div>';
+      return;
+    }
+
+    ids.forEach(function (id) {
+      var lib = findLib(id);
+      if (!lib) return;
+      var row = document.createElement("button");
+      row.type = "button";
+      row.className = "pick-row";
+      row.setAttribute("data-od-id", "pick-" + lib.id);
+      var modeLabel = lib.mode === "duration" ? "时长" : (lib.mode === "reps" ? "仅次数" : "重量+次数");
+      row.innerHTML =
+        '<span class="star' + (lib.fav ? " on" : "") + '" aria-hidden="true">' + (lib.fav ? "★" : "☆") + "</span>" +
+        '<span class="pick-main"><span class="pick-name">' + lib.name + '</span>' +
+        '<span class="pick-sub">' + modeLabel + (lib.load ? " · " + lib.load : "") + (lib.unilateral ? " · 可分左右" : "") + "</span></span>";
+      row.addEventListener("click", function () { addExerciseFromLib(lib, false); });
+      el.pickerList.appendChild(row);
+    });
+  }
+
+  function requestStart() {
+    if (state.session && state.session.active) {
+      openSheet("已有进行中的训练", "同一时间只允许一节。已跳转到现有课程。", [
+        {
+          label: "继续训练",
+          rec: true,
+          fn: function () {
+            showScreen("recorder");
+            renderRecorder();
+          }
+        },
+        {
+          label: "结束现有训练",
+          danger: true,
+          fn: function () { beginEndFlow(); }
+        }
+      ]);
+      showScreen("recorder");
+      renderRecorder();
+      return;
+    }
+    newSession();
+    showScreen("recorder");
+    renderRecorder();
+    markSaved();
+  }
+
+  function leaveRecorder() {
+    if (!state.session) {
+      showScreen("list");
+      return;
+    }
+    // autosaved
+    markSaved();
+    showScreen("list");
+    updateChrome();
+    toast("已自动保存 · 可从横幅返回");
+  }
+
+  function beginEndFlow() {
+    if (!state.session) return;
+
+    if (!state.saveOk) {
+      openSheet("保存尚未成功", "结束前请重试保存，避免丢失已确认数据。", [
+        {
+          label: "重试保存",
+          rec: true,
+          fn: function () {
+            retrySave();
+          }
+        },
+        {
+          label: "仍要结束",
+          danger: true,
+          fn: function () { continueEndAfterSaveWarn(); }
+        }
+      ]);
+      return;
+    }
+    continueEndAfterSaveWarn();
+  }
+
+  function continueEndAfterSaveWarn() {
+    var done = countCompleted();
+    var draftish = 0;
+    state.session.exercises.forEach(function (ex) {
+      ex.sets.forEach(function (s) {
+        if (s.status === "pending") draftish++;
+        else if (s.status === "draft") {
+          if (s.w || s.r || s.m || s.s || s.wL || s.rL || s.wR || s.rR) draftish++;
+        }
+      });
+    });
+
+    var reallyEmpty = done === 0 && draftish === 0;
+    if (reallyEmpty) {
+      openSheet("放弃本次训练？", "尚未记录任何有效训练组。", [
+        {
+          label: "放弃并离开",
+          danger: true,
+          fn: function () {
+            state.session = null;
+            clearInterval(state.tick);
+            showScreen("detail");
+            updateChrome();
+          }
+        },
+        {
+          label: "返回继续",
+          rec: true,
+          fn: function () {}
+        }
+      ]);
+      return;
+    }
+
+    if (draftish > 0) {
+      openSheet("仍有待完成数据", "共 " + draftish + " 组待完成或未确认草稿。", [
+        {
+          label: "返回处理",
+          rec: true,
+          fn: function () {}
+        },
+        {
+          label: "丢弃待完成并结束",
+          danger: true,
+          fn: function () {
+            state.session.exercises.forEach(function (ex) {
+              ex.sets = ex.sets.filter(function (s) { return s.status === "done"; });
+            });
+            state.session.exercises = state.session.exercises.filter(function (ex) { return ex.sets.length > 0; });
+            finishToSummary();
+          }
+        }
+      ]);
+      return;
+    }
+
+    finishToSummary();
+  }
+
+  function finishToSummary() {
+    var done = countCompleted();
+    var mins = state.session ? Math.floor(state.session.elapsed / 60) : 0;
+    var exN = state.session ? state.session.exercises.length : 0;
+    el.destStats.textContent = "小周 · " + exN + " 个动作 · " + done + " 组已完成 · 约 " + mins + " 分钟";
+    state.session.active = false;
+    clearInterval(state.tick);
+    state.session = null;
+    showScreen("summary-dest");
+    updateChrome();
+  }
+
+  function seedActiveDemo() {
+    newSession();
+    state.session.startedAt = Date.now() - 12 * 60 * 1000;
+    state.session.elapsed = 12 * 60;
+    var sq = findLib("sq");
+    addExerciseFromLib(sq, true);
+    var ex = state.session.exercises[0];
+    ex.sets = [
+      cloneSet({ status: "done", w: "60", r: "8", source: "manual" }),
+      cloneSet({ status: "done", w: "70", r: "6", source: "manual" }),
+      emptySet()
+    ];
+    ex.caution = sq.caution;
+    markSaved();
+  }
+
+  function applyScene(scene) {
+    state.scene = scene;
+    closeOverlays();
+    clearInterval(state.tick);
+    state.session = null;
+    state.saveOk = true;
+
+    if (scene === "blank") {
+      showScreen("detail");
+    } else if (scene === "active") {
+      seedActiveDemo();
+      showScreen("recorder");
+      renderRecorder();
+    } else if (scene === "picker") {
+      seedActiveDemo();
+      state.pickerTab = "recent-student";
+      showScreen("picker");
+      renderPicker();
+    } else if (scene === "banner") {
+      seedActiveDemo();
+      showScreen("list");
+    } else if (scene === "dup") {
+      seedActiveDemo();
+      showScreen("detail");
+      setTimeout(function () { requestStart(); }, 50);
+    } else if (scene === "savefail") {
+      seedActiveDemo();
+      showScreen("recorder");
+      renderRecorder();
+      failSave();
+    } else if (scene === "enddraft") {
+      seedActiveDemo();
+      var ex = state.session.exercises[0];
+      var p = cloneSet({ status: "pending", w: "70", r: "6", source: "copy" });
+      ex.sets.push(p);
+      showScreen("recorder");
+      renderRecorder();
+      setTimeout(function () { beginEndFlow(); }, 80);
+    }
+    updateChrome();
+  }
+
+  // ——— wiring ———
+  document.getElementById("btn-start").addEventListener("click", requestStart);
+  document.getElementById("btn-detail-back").addEventListener("click", function () {
+    showScreen("list");
+  });
+  document.getElementById("row-zhou").addEventListener("click", function () {
+    showScreen("detail");
+  });
+  document.getElementById("btn-leave").addEventListener("click", leaveRecorder);
+  document.getElementById("train-banner").addEventListener("click", function () {
+    showScreen("recorder");
+    renderRecorder();
+  });
+  document.getElementById("btn-add-ex").addEventListener("click", function () {
+    state.pickerTab = "recent-student";
+    state.pickerQ = "";
+    el.pickerSearch.value = "";
+    document.querySelectorAll(".tab").forEach(function (t) {
+      t.setAttribute("aria-selected", t.getAttribute("data-tab") === "recent-student" ? "true" : "false");
+    });
+    showScreen("picker");
+    renderPicker();
+  });
+  document.getElementById("btn-picker-back").addEventListener("click", function () {
+    showScreen("recorder");
+    renderRecorder();
+  });
+  document.getElementById("btn-end").addEventListener("click", beginEndFlow);
+  document.getElementById("btn-dest-home").addEventListener("click", function () {
+    showScreen("list");
+  });
+
+  document.getElementById("btn-rec-more").addEventListener("click", function () {
+    el.scrim.classList.add("on");
+    el.recMenu.classList.add("on");
+  });
+  el.recMenu.querySelectorAll(".menu-item").forEach(function (item) {
+    item.addEventListener("click", function () {
+      var act = item.getAttribute("data-act");
+      closeOverlays();
+      if (act === "sim-fail") failSave();
+      else if (act === "retry-save") retrySave();
+      else if (act === "end") beginEndFlow();
+    });
+  });
+
+  el.saveStatus.addEventListener("click", function () {
+    if (!state.saveOk) retrySave();
+  });
+
+  document.querySelectorAll(".tab").forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      state.pickerTab = tab.getAttribute("data-tab");
+      document.querySelectorAll(".tab").forEach(function (t) {
+        t.setAttribute("aria-selected", t === tab ? "true" : "false");
+      });
+      renderPicker();
+      updateChrome();
+    });
+  });
+
+  el.pickerSearch.addEventListener("input", function () {
+    state.pickerQ = el.pickerSearch.value;
+    renderPicker();
+  });
+
+  document.getElementById("btn-quick-create").addEventListener("click", function () {
+    document.getElementById("ce-name").value = "";
+    document.getElementById("ce-name-err").hidden = true;
+    state.createMode = "weight_reps";
+    state.createScope = "custom";
+    document.querySelectorAll("#ce-mode .chip").forEach(function (c) {
+      c.setAttribute("aria-pressed", c.getAttribute("data-mode") === "weight_reps" ? "true" : "false");
+    });
+    document.querySelectorAll("#ce-scope .chip").forEach(function (c) {
+      c.setAttribute("aria-pressed", c.getAttribute("data-scope") === "custom" ? "true" : "false");
+    });
+    showScreen("create-ex");
+  });
+  document.getElementById("btn-create-back").addEventListener("click", function () {
+    showScreen("picker");
+    renderPicker();
+  });
+  document.querySelectorAll("#ce-mode .chip").forEach(function (c) {
+    c.addEventListener("click", function () {
+      state.createMode = c.getAttribute("data-mode");
+      document.querySelectorAll("#ce-mode .chip").forEach(function (x) {
+        x.setAttribute("aria-pressed", x === c ? "true" : "false");
+      });
+    });
+  });
+  document.querySelectorAll("#ce-scope .chip").forEach(function (c) {
+    c.addEventListener("click", function () {
+      state.createScope = c.getAttribute("data-scope");
+      document.querySelectorAll("#ce-scope .chip").forEach(function (x) {
+        x.setAttribute("aria-pressed", x === c ? "true" : "false");
+      });
+    });
+  });
+  document.getElementById("btn-create-add").addEventListener("click", function () {
+    var name = document.getElementById("ce-name").value.trim();
+    if (!name) {
+      document.getElementById("ce-name-err").hidden = false;
+      return;
+    }
+    var mode = state.createMode === "unilateral" ? "weight_reps" : state.createMode;
+    var lib = {
+      id: "c_" + uid(),
+      name: name,
+      mode: mode,
+      load: mode === "weight_reps" ? "总负重" : null,
+      unilateral: state.createMode === "unilateral",
+      fav: false,
+      caution: null
+    };
+    LIBRARY.push(lib);
+    addExerciseFromLib(lib, true);
+    toast(state.createScope === "once" ? "已添加（仅本次）" : "已添加并保存为自定义");
+  });
+
+  el.scrim.addEventListener("click", closeOverlays);
+  document.getElementById("sheet-cancel").addEventListener("click", closeOverlays);
+
+  document.querySelectorAll(".scene-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      applyScene(btn.getAttribute("data-scene"));
+    });
+  });
+
+  applyScene("blank");
+})();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FineCoach · M1-A · 动作库</title>
+  <style>
+    :root {
+      --bg: oklch(0.93 0 0);
+      --surface: oklch(0.99 0 0);
+      --fg: oklch(0.22 0 0);
+      --muted: oklch(0.46 0 0);
+      --border: oklch(0.78 0 0);
+      --accent: oklch(0.28 0 0);
+      --fill: oklch(0.90 0 0);
+      --fill-2: oklch(0.85 0 0);
+      --danger: oklch(0.42 0.12 25);
+      --phone-w: 393px;
+      --phone-h: 852px;
+      --tap: 44px;
+      --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Heiti SC", sans-serif;
+      --mono: ui-monospace, Menlo, "SF Mono", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    body {
+      font-family: var(--font);
+      color: var(--fg);
+      background: var(--bg);
+      line-height: 1.45;
+    }
+    button, input, textarea, select { font: inherit; color: inherit; }
+    button { cursor: pointer; background: none; border: 0; }
+    img { display: none; }
+
+    .spec-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .spec-bar b { font-weight: 600; color: var(--fg); }
+
+    .board {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) var(--phone-w) minmax(240px, 1fr);
+      gap: 28px;
+      align-items: start;
+      justify-content: center;
+      padding: 28px 24px 48px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .rail h2 {
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .note {
+      border: 1px dashed var(--border);
+      background: var(--surface);
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--fg);
+      margin-bottom: 10px;
+    }
+    .note ol, .note ul { padding-left: 1.15em; }
+    .note li { margin: 4px 0; }
+    .note .k { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .scene-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .scene-btn {
+      min-height: var(--tap);
+      text-align: left;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--fg);
+    }
+    .scene-btn:hover { background: oklch(0.94 0 0); }
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid var(--fg);
+      outline-offset: 2px;
+    }
+    .scene-btn[aria-current="true"] { background: var(--fill); border-color: var(--fg); }
+    .check { font-size: 13px; }
+    .check li { margin: 6px 0; color: var(--muted); }
+    .now { margin-top: 12px; padding: 10px 12px; border: 1px solid var(--fg); background: var(--surface); font-size: 13px; }
+
+    .device-wrap { width: var(--phone-w); }
+    .device-caption {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 8px;
+      font-family: var(--mono);
+    }
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      border-radius: 54px;
+      border: 11px solid oklch(0.18 0 0);
+      background: oklch(0.97 0 0);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 18px 40px oklch(0.55 0 0 / 0.18);
+    }
+    .island {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      width: 126px;
+      height: 36px;
+      margin-left: -63px;
+      background: oklch(0.12 0 0);
+      border-radius: 20px;
+      z-index: 5;
+    }
+    .status {
+      height: 54px;
+      padding: 14px 28px 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .status-sys { display: flex; gap: 6px; align-items: center; }
+    .sig, .bat { display: inline-block; height: 10px; background: var(--fg); }
+    .sig { width: 16px; clip-path: polygon(0 70%, 35% 45%, 65% 20%, 100% 0, 100% 100%, 0 100%); }
+    .bat { width: 22px; height: 11px; border: 1.5px solid var(--fg); background: transparent; position: relative; }
+    .bat::after { content: ""; position: absolute; inset: 2px 8px 2px 2px; background: var(--fg); }
+    .home-bar {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      width: 134px;
+      height: 5px;
+      margin-left: -67px;
+      background: oklch(0.22 0 0);
+      border-radius: 3px;
+      z-index: 5;
+    }
+    .app {
+      position: absolute;
+      inset: 54px 0 24px;
+      display: flex;
+      flex-direction: column;
+      background: oklch(0.97 0 0);
+    }
+    .screen { display: none; flex: 1; flex-direction: column; min-height: 0; }
+    .screen.is-on { display: flex; }
+
+    .nav {
+      min-height: var(--tap);
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex: none;
+    }
+    .nav h1 {
+      flex: 1;
+      font-size: 17px;
+      font-weight: 650;
+      text-align: center;
+    }
+    .nav-side { width: 72px; display: flex; align-items: center; }
+    .nav-side.end { justify-content: flex-end; gap: 4px; width: auto; min-width: 72px; }
+    .icon-btn, .text-btn {
+      min-width: var(--tap);
+      min-height: var(--tap);
+      padding: 0 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fg);
+      font-size: 15px;
+      font-weight: 560;
+    }
+    .icon-btn:hover, .text-btn:hover, .ghost:hover { background: oklch(0.93 0 0); }
+    .text-btn { min-width: auto; }
+
+    .body { flex: 1; overflow: auto; padding: 16px 16px 20px; }
+    .body.tight { padding: 0; }
+
+    .primary, .ghost, .danger-btn {
+      min-height: var(--tap);
+      width: 100%;
+      padding: 0 16px;
+      font-size: 17px;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+    .primary { background: var(--accent); color: oklch(0.99 0 0); }
+    .primary:hover { background: oklch(0.16 0 0); color: oklch(0.99 0 0); }
+    .ghost { border: 1px solid var(--border); background: var(--surface); color: var(--fg); }
+    .danger-btn {
+      border: 1px solid var(--danger);
+      background: var(--surface);
+      color: var(--danger);
+    }
+    .danger-btn:hover { background: oklch(0.96 0.02 25); color: var(--danger); }
+
+    .search-wrap { padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--surface); flex: none; }
+    .search {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      background: oklch(0.95 0 0);
+      font-size: 16px;
+    }
+    .search::placeholder { color: var(--muted); }
+
+    .seg {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0;
+      margin: 10px 16px 0;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      flex: none;
+    }
+    .seg-btn {
+      min-height: var(--tap);
+      font-size: 14px;
+      font-weight: 560;
+      color: var(--fg);
+      border-right: 1px solid var(--border);
+    }
+    .seg-btn:last-child { border-right: 0; }
+    .seg-btn:hover { background: oklch(0.94 0 0); }
+    .seg-btn[aria-pressed="true"] { background: var(--fill); font-weight: 650; }
+
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex: none;
+      overflow-x: auto;
+    }
+    .filter-chip {
+      flex: none;
+      min-height: 36px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 13px;
+      color: var(--fg);
+      white-space: nowrap;
+    }
+    .filter-chip:hover { background: oklch(0.94 0 0); }
+    .filter-chip[aria-pressed="true"] { border-color: var(--fg); background: var(--fill); }
+
+    .cat-label {
+      padding: 10px 16px 4px;
+      font-size: 12px;
+      font-weight: 650;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      background: oklch(0.97 0 0);
+    }
+    .list-foot {
+      padding: 14px 16px 28px;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      font-family: var(--mono);
+    }
+
+    .row {
+      width: 100%;
+      min-height: 64px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      text-align: left;
+      color: var(--fg);
+    }
+    .row:hover { background: oklch(0.95 0 0); }
+    .row-main { flex: 1; min-width: 0; }
+    .row-name { font-size: 16px; font-weight: 600; }
+    .row-sub { font-size: 12px; color: var(--muted); margin-top: 2px; overflow-wrap: anywhere; }
+    .star {
+      width: 22px;
+      height: 22px;
+      flex: none;
+      border: 1.5px solid var(--border);
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .star.on { border-color: var(--fg); color: var(--fg); background: var(--fill); }
+    .chev { width: 8px; height: 8px; border-right: 1.5px solid var(--muted); border-top: 1.5px solid var(--muted); transform: rotate(45deg); flex: none; }
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      padding: 1px 6px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    .empty {
+      padding: 48px 24px;
+      text-align: center;
+    }
+    .empty-box {
+      width: 72px;
+      height: 48px;
+      border: 1px dashed var(--border);
+      margin: 0 auto 16px;
+    }
+    .empty h2 { font-size: 18px; margin-bottom: 8px; }
+    .empty p { font-size: 15px; color: var(--muted); }
+
+    .field-label { display: block; font-size: 13px; font-weight: 600; margin: 14px 0 6px; }
+    .req { color: var(--muted); font-weight: 400; }
+    .field, .area {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 16px;
+    }
+    .area { min-height: 72px; resize: vertical; }
+    .field.is-err, .chips.is-err { border-color: var(--danger); }
+    .err { color: var(--danger); font-size: 13px; margin-top: 6px; display: none; }
+    .err.show { display: block; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .chips {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 4px;
+      border: 1px solid transparent;
+    }
+    .chips.cols-1 { grid-template-columns: 1fr; }
+    .chip {
+      min-height: var(--tap);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--fg);
+      padding: 0 10px;
+      text-align: center;
+    }
+    .chip:hover { background: oklch(0.94 0 0); }
+    .chip[aria-pressed="true"] { border-color: var(--fg); background: var(--fill); }
+
+    .meta { margin-top: 4px; }
+    .meta-row {
+      display: flex;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 15px;
+    }
+    .meta-k { width: 96px; flex: none; color: var(--muted); font-size: 13px; }
+    .meta-v { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+    .anno {
+      margin-top: 16px;
+      padding: 10px 12px;
+      border: 1px dashed var(--border);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .lock-note {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      background: var(--fill);
+      font-size: 13px;
+      color: var(--fg);
+    }
+    .kicker { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .title { font-size: 24px; font-weight: 650; letter-spacing: -0.02em; margin-bottom: 8px; }
+    .alias { font-size: 14px; color: var(--muted); margin-bottom: 12px; }
+
+    .sheet-choice {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .choice-card {
+      min-height: 72px;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      text-align: left;
+      color: var(--fg);
+    }
+    .choice-card:hover { background: oklch(0.95 0 0); }
+    .choice-card b { display: block; font-size: 16px; margin-bottom: 4px; }
+    .choice-card span { font-size: 13px; color: var(--muted); }
+
+    .dest {
+      flex: 1;
+      margin: 20px 16px;
+      border: 1px dashed var(--fg);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      gap: 8px;
+    }
+    .dest h2 { font-size: 20px; }
+    .dest p { font-size: 15px; color: var(--muted); }
+    .bound {
+      margin-top: 16px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+    .ph {
+      height: 10px;
+      background: var(--fill-2);
+      margin: 8px 0;
+    }
+
+    .toast {
+      display: none;
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: 40px;
+      z-index: 10;
+      min-height: var(--tap);
+      padding: 12px 14px;
+      background: var(--accent);
+      color: oklch(0.99 0 0);
+      font-size: 14px;
+      text-align: center;
+    }
+    .toast.on { display: block; }
+
+    .scrim {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: oklch(0.22 0 0 / 0.28);
+      z-index: 8;
+    }
+    .scrim.on { display: block; }
+    .sheet {
+      display: none;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 9;
+      background: var(--surface);
+      border-top: 1px solid var(--fg);
+      padding: 16px 16px 28px;
+      max-height: 70%;
+      overflow: auto;
+    }
+    .sheet.on { display: block; }
+    .sheet h3 { font-size: 16px; margin-bottom: 12px; text-align: center; }
+    .sheet-opt {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 0 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 15px;
+      color: var(--fg);
+    }
+    .sheet-opt:hover { background: oklch(0.95 0 0); }
+    .sheet-opt[aria-pressed="true"] { font-weight: 650; background: var(--fill); }
+    .sheet-cancel {
+      margin-top: 12px;
+      width: 100%;
+      min-height: var(--tap);
+      border: 1px solid var(--border);
+      font-size: 16px;
+      font-weight: 560;
+    }
+    .sheet-cancel:hover { background: oklch(0.94 0 0); }
+
+    @media (max-width: 1100px) {
+      .board { grid-template-columns: 1fr; justify-items: center; }
+      .rail { width: min(520px, 100%); }
+    }
+  </style>
+</head>
+<body>
+  <header class="spec-bar" data-od-id="page-header">
+    <div>stage=<b>M1-A</b></div>
+    <div>module=<b>03-exercise-library</b></div>
+    <div>version=<b>v0.1</b></div>
+    <div>coverage=<b>this module only</b></div>
+    <div>data=<b>虚构数据</b></div>
+    <div>network=<b>无外部资源</b></div>
+    <div>review=<b>产品负责人走查通过</b></div>
+  </header>
+
+  <div class="board">
+    <aside class="rail" data-od-id="annotation-left">
+      <h2>走查说明</h2>
+      <div class="note">
+        低保真线框。从学员列表「更多 → 动作库」进入。本文件只覆盖动作库与自定义动作，不含训练记录器内部。
+      </div>
+      <div class="note">
+        <span class="k">本模块不做</span>
+        <ul>
+          <li>有氧 / 模板 / 课程分区 / 个人最佳</li>
+          <li>教学图片、动图、视频</li>
+          <li>主观用力感受、登录</li>
+        </ul>
+      </div>
+      <div class="note">
+        <span class="k">建议路径</span>
+        <ol>
+          <li>浏览内置 · 切分类 / 筛器械部位</li>
+          <li>打开杠铃深蹲详情 · 看稳定编号与负重口径</li>
+          <li>新建自定义 · 故意填「杠铃深蹲」看冲突</li>
+          <li>切到自定义 · 打开「对握划船变式」· 归档</li>
+          <li>场景 D 看课中快速创建出口</li>
+          <li>场景 F / G 看搜索空态与冲突态</li>
+        </ol>
+      </div>
+      <h2>演示场景</h2>
+      <div class="scene-list">
+        <button type="button" class="scene-btn" data-od-id="scene-root" data-scene="root">A · 动作库根 · 内置</button>
+        <button type="button" class="scene-btn" data-od-id="scene-detail" data-scene="detail">B · 内置动作详情</button>
+        <button type="button" class="scene-btn" data-od-id="scene-create" data-scene="create">C · 新建自定义</button>
+        <button type="button" class="scene-btn" data-od-id="scene-quick" data-scene="quick">D · 课中快速创建（出口）</button>
+        <button type="button" class="scene-btn" data-od-id="scene-used" data-scene="used">E · 已用自定义 · 归档</button>
+        <button type="button" class="scene-btn" data-od-id="scene-search" data-scene="search">F · 搜索有结果 / 无结果</button>
+        <button type="button" class="scene-btn" data-od-id="scene-conflict" data-scene="conflict">G · 名称冲突</button>
+      </div>
+    </aside>
+
+    <div class="device-wrap">
+      <p class="device-caption">iPhone 竖屏 393×852 · 浅色 · 系统字体</p>
+      <div class="phone" data-od-id="iphone-frame" role="application" aria-label="FineCoach 动作库线框原型">
+        <div class="island" aria-hidden="true"></div>
+        <div class="status">
+          <span>9:41</span>
+          <span class="status-sys" aria-hidden="true"><i class="sig"></i><i class="bat"></i></span>
+        </div>
+        <div class="app" id="app">
+
+          <!-- 动作库根 -->
+          <section class="screen is-on" data-screen="library" data-od-id="screen-library">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="lib-back" id="btn-lib-back">返回</button>
+              </div>
+              <h1 data-od-id="lib-title">动作库</h1>
+              <div class="nav-side end">
+                <button type="button" class="text-btn" data-od-id="cta-create-custom" id="btn-create">新建</button>
+              </div>
+            </div>
+            <div class="search-wrap">
+              <input class="search" id="search" data-od-id="field-search" type="search" placeholder="搜索名称或别名" aria-label="按名称或别名搜索动作" enterkeyhint="search">
+            </div>
+            <div class="seg" role="tablist" aria-label="动作范围" data-od-id="lib-segments">
+              <button type="button" class="seg-btn" data-tab="builtin" aria-pressed="true" data-od-id="tab-builtin">内置</button>
+              <button type="button" class="seg-btn" data-tab="custom" aria-pressed="false" data-od-id="tab-custom">自定义</button>
+              <button type="button" class="seg-btn" data-tab="fav" aria-pressed="false" data-od-id="tab-fav">收藏</button>
+            </div>
+            <div class="filter-bar" data-od-id="filter-bar">
+              <button type="button" class="filter-chip" id="btn-eq" data-od-id="filter-equipment" aria-pressed="false">器械 · 全部</button>
+              <button type="button" class="filter-chip" id="btn-part" data-od-id="filter-part" aria-pressed="false">部位 · 全部</button>
+            </div>
+            <div class="body tight" id="lib-body" data-od-id="lib-list"></div>
+          </section>
+
+          <!-- 内置详情 -->
+          <section class="screen" data-screen="builtin-detail" data-od-id="screen-builtin-detail">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="builtin-back" id="btn-builtin-back">返回</button>
+              </div>
+              <h1>动作详情</h1>
+              <div class="nav-side end">
+                <button type="button" class="icon-btn" data-od-id="builtin-fav" id="btn-builtin-fav" aria-label="收藏" aria-pressed="false">☆</button>
+              </div>
+            </div>
+            <div class="body" id="builtin-body"></div>
+          </section>
+
+          <!-- 新建 / 编辑自定义 -->
+          <section class="screen" data-screen="custom-form" data-od-id="screen-custom-form">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="form-cancel" id="btn-form-back">取消</button>
+              </div>
+              <h1 id="form-title">新建自定义</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p class="kicker" id="form-kicker">名称与记录方式必填；其余可留空</p>
+              <label class="field-label" for="f-name">动作名称 <span class="req">必填</span></label>
+              <input class="field" id="f-name" data-od-id="field-name" maxlength="40" autocomplete="off" placeholder="例如 弹力带侧平举">
+              <p class="err" id="err-name">请填写动作名称</p>
+              <p class="err" id="err-dup">已有同名动作，请换一个名称。不会自动改名。</p>
+
+              <p class="field-label" id="mode-legend">记录方式 <span class="req">必填</span></p>
+              <div class="chips" id="mode-group" role="group" aria-labelledby="mode-legend" data-od-id="field-mode">
+                <button type="button" class="chip" data-mode="weight-reps" aria-pressed="false">重量与次数</button>
+                <button type="button" class="chip" data-mode="reps" aria-pressed="false">仅次数</button>
+                <button type="button" class="chip" data-mode="duration" aria-pressed="false">时长</button>
+                <button type="button" class="chip" data-mode="sides" aria-pressed="false">左右侧</button>
+              </div>
+              <p class="err" id="err-mode">请选择记录方式</p>
+
+              <label class="field-label" for="f-eq">器械 <span class="req">选填</span></label>
+              <input class="field" id="f-eq" data-od-id="field-equipment" maxlength="20" placeholder="如 弹力带、哑铃">
+
+              <label class="field-label" for="f-part">训练部位 <span class="req">选填</span></label>
+              <input class="field" id="f-part" data-od-id="field-part" maxlength="20" placeholder="如 肩、背">
+
+              <label class="field-label" for="f-note">说明 <span class="req">选填</span></label>
+              <textarea class="area" id="f-note" data-od-id="field-note" maxlength="120" placeholder="可选备注，不含教学图"></textarea>
+
+              <p class="hint" id="form-id-hint" hidden></p>
+              <button type="button" class="primary" data-od-id="cta-save-custom" id="btn-save-custom">保存到动作库</button>
+              <button type="button" class="danger-btn" data-od-id="cta-archive" id="btn-archive" hidden>归档</button>
+              <p class="hint" id="archive-hint" hidden>已在历史课程中使用。归档后列表不再显示，历史仍按原名称与编号展示。</p>
+            </div>
+          </section>
+
+          <!-- 课中快速创建：仅目的地选择 -->
+          <section class="screen" data-screen="quick-create" data-od-id="screen-quick-create">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="quick-back" id="btn-quick-back">返回</button>
+              </div>
+              <h1>快速创建动作</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p class="kicker">课中添加 · 本模块只演示落点选择</p>
+              <h2 class="title">保存到哪里？</h2>
+              <p class="alias">名称与记录方式已在上一步填好（本原型不展开训练记录器）。</p>
+              <div class="sheet-choice">
+                <button type="button" class="choice-card" data-od-id="choice-session-only" id="choice-once">
+                  <b>仅本次</b>
+                  <span>只出现在当前课程，不进入动作库，不参与跨课比较。</span>
+                </button>
+                <button type="button" class="choice-card" data-od-id="choice-save-custom" id="choice-save">
+                  <b>保存为自定义</b>
+                  <span>写入我的动作库，获得稳定编号，可复用与比较。</span>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- 出口 -->
+          <section class="screen" data-screen="dest" data-od-id="screen-destination">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="dest-back" id="btn-dest-back">返回</button>
+              </div>
+              <h1 id="dest-nav">出口</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="dest" id="dest-card">
+              <div class="ph" style="width:40%;margin:0 auto"></div>
+              <h2 id="dest-title">目的地</h2>
+              <p id="dest-copy">本模块不展开此页面。</p>
+              <p class="bound" id="dest-bound">—— 模块边界 · 非本文件范围 ——</p>
+            </div>
+          </section>
+        </div>
+
+        <div class="scrim" id="scrim" data-od-id="filter-scrim"></div>
+        <div class="sheet" id="filter-sheet" data-od-id="filter-sheet" role="dialog" aria-label="筛选">
+          <h3 id="sheet-title">筛选</h3>
+          <div id="sheet-opts"></div>
+          <button type="button" class="sheet-cancel" id="sheet-cancel">完成</button>
+        </div>
+        <div class="toast" id="toast" data-od-id="toast" role="status"></div>
+        <div class="home-bar" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <aside class="rail" data-od-id="annotation-right">
+      <h2>当前画面</h2>
+      <div class="now" id="now-label">动作库根 · 内置</div>
+      <h2 style="margin-top:18px">必查状态</h2>
+      <ol class="check">
+        <li>内置列表：分类 + 约 12–20 代表项，脚注代表约 100–150 个</li>
+        <li>筛选：器械 / 部位；分段：内置｜自定义｜收藏</li>
+        <li>内置详情：稳定编号注解、别名、器械、肌群、记录方式、负重口径；核心定义不可改</li>
+        <li>新建自定义：名称 + 记录方式必填；重名行内错误，不自动改名</li>
+        <li>课中快速创建：仅本次 vs 保存为自定义（出口）</li>
+        <li>已用自定义：可改显示信息，编号不变；删除→归档</li>
+        <li>搜索有结果 / 无结果</li>
+        <li>无有氧、无教学媒体、无训练记录器内部</li>
+      </ol>
+    </aside>
+  </div>
+
+  <script>
+    (function () {
+      var CAT_ORDER = ["固定器械", "自由器械", "徒手", "热身", "拉伸/放松"];
+      var LOAD = {
+        total: "总负重",
+        perSide: "单侧或单只",
+        machine: "器械显示重量",
+        assist: "辅助重量",
+        none: "无负重"
+      };
+      var MODE = {
+        "weight-reps": "重量与次数",
+        reps: "仅次数",
+        duration: "时长",
+        sides: "左右侧"
+      };
+      var EQ_OPTS = ["全部", "杠铃", "哑铃", "固定器械", "徒手", "弹力带", "史密斯架"];
+      var PART_OPTS = ["全部", "胸", "背", "肩", "腿", "臀", "核心", "全身"];
+
+      var BUILTIN = [
+        { id: "fc-ex-chest-press", name: "坐姿推胸", aliases: ["器械推胸"], cat: "固定器械", eq: "固定器械", part: "胸", primary: "胸大肌", secondary: "肱三头肌、前三角", mode: "weight-reps", load: "machine", fav: false },
+        { id: "fc-ex-lat-pulldown", name: "高位下拉", aliases: ["背阔肌下拉"], cat: "固定器械", eq: "固定器械", part: "背", primary: "背阔肌", secondary: "肱二头肌", mode: "weight-reps", load: "machine", fav: true },
+        { id: "fc-ex-seated-row", name: "坐姿划船", aliases: ["器械划船"], cat: "固定器械", eq: "固定器械", part: "背", primary: "背阔肌", secondary: "菱形肌、后三角", mode: "weight-reps", load: "machine", fav: false },
+        { id: "fc-ex-leg-press", name: "腿举", aliases: ["腿推"], cat: "固定器械", eq: "固定器械", part: "腿", primary: "股四头肌", secondary: "臀大肌", mode: "weight-reps", load: "machine", fav: false },
+        { id: "fc-ex-smith-squat", name: "史密斯深蹲", aliases: ["史密斯架深蹲"], cat: "固定器械", eq: "史密斯架", part: "腿", primary: "股四头肌", secondary: "臀大肌", mode: "weight-reps", load: "machine", fav: false },
+        { id: "fc-ex-bb-squat", name: "杠铃深蹲", aliases: ["深蹲", "背蹲"], cat: "自由器械", eq: "杠铃", part: "腿", primary: "股四头肌", secondary: "臀大肌、竖脊肌", mode: "weight-reps", load: "total", fav: true },
+        { id: "fc-ex-bb-bench", name: "杠铃卧推", aliases: ["卧推", "平板卧推"], cat: "自由器械", eq: "杠铃", part: "胸", primary: "胸大肌", secondary: "肱三头肌、前三角", mode: "weight-reps", load: "total", fav: true },
+        { id: "fc-ex-db-ohp", name: "哑铃肩推", aliases: ["哑铃推举"], cat: "自由器械", eq: "哑铃", part: "肩", primary: "三角肌", secondary: "肱三头肌", mode: "weight-reps", load: "perSide", fav: false },
+        { id: "fc-ex-bb-dl", name: "杠铃硬拉", aliases: ["硬拉"], cat: "自由器械", eq: "杠铃", part: "背", primary: "竖脊肌", secondary: "臀大肌、腘绳肌", mode: "weight-reps", load: "total", fav: false },
+        { id: "fc-ex-db-fly", name: "哑铃飞鸟", aliases: ["飞鸟"], cat: "自由器械", eq: "哑铃", part: "胸", primary: "胸大肌", secondary: "前三角", mode: "weight-reps", load: "perSide", fav: false },
+        { id: "fc-ex-pushup", name: "俯卧撑", aliases: ["伏地挺身"], cat: "徒手", eq: "徒手", part: "胸", primary: "胸大肌", secondary: "肱三头肌、核心", mode: "reps", load: "none", fav: false },
+        { id: "fc-ex-pullup", name: "引体向上", aliases: ["引体"], cat: "徒手", eq: "徒手", part: "背", primary: "背阔肌", secondary: "肱二头肌", mode: "reps", load: "assist", fav: true },
+        { id: "fc-ex-bw-squat", name: "徒手深蹲", aliases: ["自重深蹲"], cat: "徒手", eq: "徒手", part: "腿", primary: "股四头肌", secondary: "臀大肌", mode: "reps", load: "none", fav: false },
+        { id: "fc-ex-plank", name: "平板支撑", aliases: ["棒式"], cat: "徒手", eq: "徒手", part: "核心", primary: "腹直肌", secondary: "腹横肌", mode: "duration", load: "none", fav: false },
+        { id: "fc-ex-jumping-jack", name: "开合跳", aliases: ["开合"], cat: "热身", eq: "徒手", part: "全身", primary: "全身激活", secondary: "—", mode: "duration", load: "none", fav: false },
+        { id: "fc-ex-high-knees", name: "原地高抬腿", aliases: ["高抬腿"], cat: "热身", eq: "徒手", part: "全身", primary: "髋屈肌", secondary: "核心", mode: "duration", load: "none", fav: false },
+        { id: "fc-ex-ham-stretch", name: "站姿腘绳肌拉伸", aliases: ["大腿后侧拉伸"], cat: "拉伸/放松", eq: "徒手", part: "腿", primary: "腘绳肌", secondary: "—", mode: "duration", load: "none", fav: false },
+        { id: "fc-ex-cat-cow", name: "猫牛式", aliases: ["猫式伸展"], cat: "拉伸/放松", eq: "徒手", part: "背", primary: "脊柱活动度", secondary: "—", mode: "duration", load: "none", fav: false }
+      ];
+
+      var customs = [
+        { id: "fc-cx-band-raise", name: "弹力带侧平举", aliases: [], cat: "自定义", eq: "弹力带", part: "肩", primary: "中三角", secondary: "", mode: "weight-reps", load: "total", fav: true, used: false, archived: false, note: "" },
+        { id: "fc-cx-neutral-row", name: "对握划船变式", aliases: ["中立握划船"], cat: "自定义", eq: "哑铃", part: "背", primary: "背阔肌", secondary: "肱二头肌", mode: "sides", load: "perSide", fav: false, used: true, archived: false, note: "学员小周常用" }
+      ];
+
+      var state = {
+        screen: "library",
+        tab: "builtin",
+        eq: "全部",
+        part: "全部",
+        q: "",
+        selectedBuiltin: null,
+        editCustomId: null,
+        formMode: null,
+        sheetKind: null,
+        conflictMode: false
+      };
+
+      var el = {
+        now: document.getElementById("now-label"),
+        libBody: document.getElementById("lib-body"),
+        search: document.getElementById("search"),
+        builtinBody: document.getElementById("builtin-body"),
+        formTitle: document.getElementById("form-title"),
+        formKicker: document.getElementById("form-kicker"),
+        fName: document.getElementById("f-name"),
+        fEq: document.getElementById("f-eq"),
+        fPart: document.getElementById("f-part"),
+        fNote: document.getElementById("f-note"),
+        errName: document.getElementById("err-name"),
+        errDup: document.getElementById("err-dup"),
+        errMode: document.getElementById("err-mode"),
+        modeGroup: document.getElementById("mode-group"),
+        btnArchive: document.getElementById("btn-archive"),
+        archiveHint: document.getElementById("archive-hint"),
+        formIdHint: document.getElementById("form-id-hint"),
+        btnEq: document.getElementById("btn-eq"),
+        btnPart: document.getElementById("btn-part"),
+        scrim: document.getElementById("scrim"),
+        sheet: document.getElementById("filter-sheet"),
+        sheetTitle: document.getElementById("sheet-title"),
+        sheetOpts: document.getElementById("sheet-opts"),
+        toast: document.getElementById("toast"),
+        destNav: document.getElementById("dest-nav"),
+        destTitle: document.getElementById("dest-title"),
+        destCopy: document.getElementById("dest-copy")
+      };
+
+      function showScreen(name) {
+        state.screen = name;
+        document.querySelectorAll(".screen").forEach(function (s) {
+          s.classList.toggle("is-on", s.getAttribute("data-screen") === name);
+        });
+      }
+
+      function setNow(text) {
+        el.now.textContent = text;
+      }
+
+      function setSceneCurrent(scene) {
+        document.querySelectorAll(".scene-btn").forEach(function (b) {
+          b.setAttribute("aria-current", b.getAttribute("data-scene") === scene ? "true" : "false");
+        });
+      }
+
+      function toast(msg) {
+        el.toast.textContent = msg;
+        el.toast.classList.add("on");
+        clearTimeout(toast._t);
+        toast._t = setTimeout(function () { el.toast.classList.remove("on"); }, 1800);
+      }
+
+      function allActiveNames(excludeId) {
+        var names = [];
+        BUILTIN.forEach(function (x) { names.push({ id: x.id, name: x.name }); });
+        customs.forEach(function (x) {
+          if (x.archived) return;
+          if (excludeId && x.id === excludeId) return;
+          names.push({ id: x.id, name: x.name });
+        });
+        return names;
+      }
+
+      function nameTaken(name, excludeId) {
+        var n = (name || "").trim();
+        if (!n) return false;
+        return allActiveNames(excludeId).some(function (x) { return x.name === n; });
+      }
+
+      function matchesFilters(item) {
+        if (state.eq !== "全部" && item.eq !== state.eq) return false;
+        if (state.part !== "全部" && item.part !== state.part) return false;
+        var q = state.q.trim();
+        if (!q) return true;
+        var blob = [item.name].concat(item.aliases || []).join(" ");
+        return blob.indexOf(q) !== -1;
+      }
+
+      function updateFilterChips() {
+        el.btnEq.textContent = "器械 · " + state.eq;
+        el.btnEq.setAttribute("aria-pressed", state.eq !== "全部" ? "true" : "false");
+        el.btnPart.textContent = "部位 · " + state.part;
+        el.btnPart.setAttribute("aria-pressed", state.part !== "全部" ? "true" : "false");
+      }
+
+      function updateTabs() {
+        document.querySelectorAll(".seg-btn").forEach(function (b) {
+          b.setAttribute("aria-pressed", b.getAttribute("data-tab") === state.tab ? "true" : "false");
+        });
+      }
+
+      function starBtn(on, id) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "star" + (on ? " on" : "");
+        b.setAttribute("aria-label", on ? "取消收藏" : "收藏");
+        b.setAttribute("aria-pressed", on ? "true" : "false");
+        b.textContent = on ? "★" : "☆";
+        b.setAttribute("data-od-id", "star-" + id);
+        b.addEventListener("click", function (e) {
+          e.stopPropagation();
+          var item = BUILTIN.find(function (x) { return x.id === id; }) || customs.find(function (x) { return x.id === id; });
+          if (!item) return;
+          item.fav = !item.fav;
+          renderLibrary();
+        });
+        return b;
+      }
+
+      function makeRow(item, kind) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "row";
+        btn.setAttribute("data-od-id", "row-" + item.id);
+        var main = document.createElement("div");
+        main.className = "row-main";
+        var name = document.createElement("div");
+        name.className = "row-name";
+        name.textContent = item.name;
+        if (kind === "custom" && item.used) {
+          var tag = document.createElement("span");
+          tag.className = "tag";
+          tag.textContent = "已用于历史";
+          name.appendChild(tag);
+        }
+        var sub = document.createElement("div");
+        sub.className = "row-sub";
+        sub.textContent = [item.eq, item.part, MODE[item.mode] || ""].filter(Boolean).join(" · ");
+        main.appendChild(name);
+        main.appendChild(sub);
+        btn.appendChild(starBtn(!!item.fav, item.id));
+        btn.appendChild(main);
+        var chev = document.createElement("span");
+        chev.className = "chev";
+        chev.setAttribute("aria-hidden", "true");
+        btn.appendChild(chev);
+        btn.addEventListener("click", function () {
+          if (kind === "builtin") openBuiltin(item.id);
+          else openCustomEdit(item.id);
+        });
+        return btn;
+      }
+
+      function renderLibrary() {
+        updateTabs();
+        updateFilterChips();
+        el.libBody.innerHTML = "";
+        var items = [];
+        if (state.tab === "builtin") {
+          items = BUILTIN.filter(matchesFilters);
+        } else if (state.tab === "custom") {
+          items = customs.filter(function (x) { return !x.archived && matchesFilters(x); });
+        } else {
+          items = BUILTIN.concat(customs.filter(function (x) { return !x.archived; }))
+            .filter(function (x) { return x.fav && matchesFilters(x); });
+        }
+
+        if (!items.length) {
+          var empty = document.createElement("div");
+          empty.className = "empty";
+          empty.setAttribute("data-od-id", "lib-empty");
+          var box = document.createElement("div");
+          box.className = "empty-box";
+          var h = document.createElement("h2");
+          var p = document.createElement("p");
+          if (state.q.trim()) {
+            h.textContent = "无匹配动作";
+            p.textContent = "试试别的关键词，或清除筛选后再搜。";
+          } else if (state.tab === "custom") {
+            h.textContent = "还没有自定义动作";
+            p.textContent = "点右上角「新建」，或在课中快速创建并保存。";
+          } else if (state.tab === "fav") {
+            h.textContent = "暂无收藏";
+            p.textContent = "在列表左侧星标，或详情页收藏。";
+          } else {
+            h.textContent = "无匹配动作";
+            p.textContent = "调整器械或部位筛选。";
+          }
+          empty.appendChild(box);
+          empty.appendChild(h);
+          empty.appendChild(p);
+          el.libBody.appendChild(empty);
+          return;
+        }
+
+        if (state.tab === "builtin" && !state.q.trim() && state.eq === "全部" && state.part === "全部") {
+          CAT_ORDER.forEach(function (cat) {
+            var group = items.filter(function (x) { return x.cat === cat; });
+            if (!group.length) return;
+            var lab = document.createElement("div");
+            lab.className = "cat-label";
+            lab.textContent = cat;
+            el.libBody.appendChild(lab);
+            group.forEach(function (item) {
+              el.libBody.appendChild(makeRow(item, "builtin"));
+            });
+          });
+          var foot = document.createElement("p");
+          foot.className = "list-foot";
+          foot.setAttribute("data-od-id", "lib-scale-note");
+          foot.textContent = "代表约 100–150 个 · 本页仅示意抽样";
+          el.libBody.appendChild(foot);
+        } else {
+          items.forEach(function (item) {
+            var kind = BUILTIN.some(function (b) { return b.id === item.id; }) ? "builtin" : "custom";
+            el.libBody.appendChild(makeRow(item, kind));
+          });
+          if (state.q.trim()) {
+            var foot2 = document.createElement("p");
+            foot2.className = "list-foot";
+            foot2.textContent = "找到 " + items.length + " 个";
+            el.libBody.appendChild(foot2);
+          }
+        }
+      }
+
+      function openBuiltin(id) {
+        var item = BUILTIN.find(function (x) { return x.id === id; });
+        if (!item) return;
+        state.selectedBuiltin = id;
+        var favBtn = document.getElementById("btn-builtin-fav");
+        favBtn.textContent = item.fav ? "★" : "☆";
+        favBtn.setAttribute("aria-pressed", item.fav ? "true" : "false");
+        el.builtinBody.innerHTML = "";
+        var kick = document.createElement("p");
+        kick.className = "kicker";
+        kick.textContent = item.cat + " · 内置";
+        var title = document.createElement("h2");
+        title.className = "title";
+        title.setAttribute("data-od-id", "builtin-name");
+        title.textContent = item.name;
+        var alias = document.createElement("p");
+        alias.className = "alias";
+        alias.textContent = item.aliases.length ? ("别名：" + item.aliases.join("、")) : "无别名";
+        el.builtinBody.appendChild(kick);
+        el.builtinBody.appendChild(title);
+        el.builtinBody.appendChild(alias);
+
+        function addMeta(k, v) {
+          var row = document.createElement("div");
+          row.className = "meta-row";
+          var kk = document.createElement("div");
+          kk.className = "meta-k";
+          kk.textContent = k;
+          var vv = document.createElement("div");
+          vv.className = "meta-v";
+          vv.textContent = v;
+          row.appendChild(kk);
+          row.appendChild(vv);
+          el.builtinBody.appendChild(row);
+        }
+        var meta = document.createElement("div");
+        meta.className = "meta";
+        el.builtinBody.appendChild(meta);
+        addMeta("器械", item.eq);
+        addMeta("主练肌群", item.primary);
+        addMeta("辅助肌群", item.secondary);
+        addMeta("记录方式", MODE[item.mode]);
+        addMeta("负重口径", LOAD[item.load]);
+
+        var lock = document.createElement("div");
+        lock.className = "lock-note";
+        lock.setAttribute("data-od-id", "builtin-locked");
+        lock.textContent = "内置核心定义不可由教练直接修改。可收藏、设本地别名或复制为自定义（别名入口不在本模块展开）。";
+        el.builtinBody.appendChild(lock);
+
+        var anno = document.createElement("div");
+        anno.className = "anno";
+        anno.setAttribute("data-od-id", "builtin-stable-id");
+        anno.innerHTML = "注解 · 稳定编号<br>" + item.id + "<br>显示名/收藏变化不得破坏历史关联";
+        el.builtinBody.appendChild(anno);
+
+        showScreen("builtin-detail");
+        setNow("内置详情 · " + item.name);
+        setSceneCurrent("detail");
+      }
+
+      function clearFormErrors() {
+        el.errName.classList.remove("show");
+        el.errDup.classList.remove("show");
+        el.errMode.classList.remove("show");
+        el.fName.classList.remove("is-err");
+        el.modeGroup.classList.remove("is-err");
+      }
+
+      function setModePressed(mode) {
+        state.formMode = mode;
+        el.modeGroup.querySelectorAll(".chip").forEach(function (c) {
+          c.setAttribute("aria-pressed", c.getAttribute("data-mode") === mode ? "true" : "false");
+        });
+      }
+
+      function openCustomCreate(opts) {
+        opts = opts || {};
+        state.editCustomId = null;
+        state.conflictMode = !!opts.conflict;
+        el.formTitle.textContent = "新建自定义";
+        el.formKicker.textContent = "名称与记录方式必填；其余可留空";
+        el.fName.value = opts.name || "";
+        el.fEq.value = "";
+        el.fPart.value = "";
+        el.fNote.value = "";
+        setModePressed(opts.mode || null);
+        el.btnArchive.hidden = true;
+        el.archiveHint.hidden = true;
+        el.formIdHint.hidden = true;
+        clearFormErrors();
+        if (opts.conflict) {
+          el.fName.classList.add("is-err");
+          el.errDup.classList.add("show");
+        }
+        showScreen("custom-form");
+        setNow(opts.conflict ? "名称冲突 · 新建自定义" : "新建自定义");
+        setSceneCurrent(opts.conflict ? "conflict" : "create");
+      }
+
+      function openCustomEdit(id) {
+        var item = customs.find(function (x) { return x.id === id && !x.archived; });
+        if (!item) return;
+        state.editCustomId = id;
+        state.conflictMode = false;
+        el.formTitle.textContent = "编辑自定义";
+        el.formKicker.textContent = item.used
+          ? "可改显示信息；稳定编号不变。删除改为归档。"
+          : "可改显示信息；稳定编号不变。";
+        el.fName.value = item.name;
+        el.fEq.value = item.eq || "";
+        el.fPart.value = item.part || "";
+        el.fNote.value = item.note || "";
+        setModePressed(item.mode);
+        el.btnArchive.hidden = false;
+        el.btnArchive.textContent = item.used ? "归档" : "删除";
+        el.archiveHint.hidden = !item.used;
+        el.formIdHint.hidden = false;
+        el.formIdHint.textContent = "稳定编号 " + item.id + (item.used ? " · 已用于历史课程" : "");
+        clearFormErrors();
+        showScreen("custom-form");
+        setNow("自定义 · " + item.name + (item.used ? "（已用）" : ""));
+        setSceneCurrent(item.used ? "used" : "create");
+      }
+
+      function openQuick() {
+        showScreen("quick-create");
+        setNow("课中快速创建 · 落点选择");
+        setSceneCurrent("quick");
+      }
+
+      function openDest(title, copy) {
+        el.destNav.textContent = title;
+        el.destTitle.textContent = title;
+        el.destCopy.textContent = copy;
+        showScreen("dest");
+      }
+
+      function openSheet(kind) {
+        state.sheetKind = kind;
+        var opts = kind === "eq" ? EQ_OPTS : PART_OPTS;
+        var cur = kind === "eq" ? state.eq : state.part;
+        el.sheetTitle.textContent = kind === "eq" ? "按器械筛选" : "按部位筛选";
+        el.sheetOpts.innerHTML = "";
+        opts.forEach(function (o) {
+          var b = document.createElement("button");
+          b.type = "button";
+          b.className = "sheet-opt";
+          b.textContent = o;
+          b.setAttribute("aria-pressed", o === cur ? "true" : "false");
+          b.addEventListener("click", function () {
+            if (kind === "eq") state.eq = o;
+            else state.part = o;
+            closeSheet();
+            renderLibrary();
+          });
+          el.sheetOpts.appendChild(b);
+        });
+        el.scrim.classList.add("on");
+        el.sheet.classList.add("on");
+      }
+
+      function closeSheet() {
+        state.sheetKind = null;
+        el.scrim.classList.remove("on");
+        el.sheet.classList.remove("on");
+      }
+
+      function goLibraryRoot() {
+        state.tab = "builtin";
+        state.eq = "全部";
+        state.part = "全部";
+        state.q = "";
+        el.search.value = "";
+        showScreen("library");
+        renderLibrary();
+        setNow("动作库根 · 内置");
+        setSceneCurrent("root");
+      }
+
+      /* events */
+      document.querySelectorAll(".seg-btn").forEach(function (b) {
+        b.addEventListener("click", function () {
+          state.tab = b.getAttribute("data-tab");
+          renderLibrary();
+          setNow("动作库 · " + ({ builtin: "内置", custom: "自定义", fav: "收藏" })[state.tab]);
+        });
+      });
+
+      el.search.addEventListener("input", function () {
+        state.q = el.search.value;
+        renderLibrary();
+        if (state.q.trim()) setNow(state.q.trim() ? ("搜索 · 「" + state.q.trim() + "」") : "动作库");
+      });
+
+      el.btnEq.addEventListener("click", function () { openSheet("eq"); });
+      el.btnPart.addEventListener("click", function () { openSheet("part"); });
+      document.getElementById("sheet-cancel").addEventListener("click", closeSheet);
+      el.scrim.addEventListener("click", closeSheet);
+
+      document.getElementById("btn-lib-back").addEventListener("click", function () {
+        openDest("学员列表", "返回学员根页面。本模块不展开学员列表。");
+        setNow("出口 · 返回学员列表");
+      });
+      document.getElementById("btn-create").addEventListener("click", function () { openCustomCreate(); });
+      document.getElementById("btn-builtin-back").addEventListener("click", function () {
+        showScreen("library");
+        renderLibrary();
+        setNow("动作库根 · 内置");
+        setSceneCurrent("root");
+      });
+      document.getElementById("btn-builtin-fav").addEventListener("click", function () {
+        var item = BUILTIN.find(function (x) { return x.id === state.selectedBuiltin; });
+        if (!item) return;
+        item.fav = !item.fav;
+        var favBtn = document.getElementById("btn-builtin-fav");
+        favBtn.textContent = item.fav ? "★" : "☆";
+        favBtn.setAttribute("aria-pressed", item.fav ? "true" : "false");
+        toast(item.fav ? "已收藏" : "已取消收藏");
+      });
+
+      document.getElementById("btn-form-back").addEventListener("click", function () {
+        showScreen("library");
+        if (state.editCustomId) state.tab = "custom";
+        renderLibrary();
+        setNow("动作库 · " + ({ builtin: "内置", custom: "自定义", fav: "收藏" })[state.tab]);
+        setSceneCurrent(state.tab === "custom" ? "used" : "root");
+      });
+
+      el.modeGroup.querySelectorAll(".chip").forEach(function (c) {
+        c.addEventListener("click", function () {
+          setModePressed(c.getAttribute("data-mode"));
+          el.errMode.classList.remove("show");
+          el.modeGroup.classList.remove("is-err");
+        });
+      });
+
+      el.fName.addEventListener("input", function () {
+        el.errName.classList.remove("show");
+        el.errDup.classList.remove("show");
+        el.fName.classList.remove("is-err");
+      });
+
+      document.getElementById("btn-save-custom").addEventListener("click", function () {
+        clearFormErrors();
+        var name = el.fName.value.trim();
+        var ok = true;
+        if (!name) {
+          el.errName.classList.add("show");
+          el.fName.classList.add("is-err");
+          ok = false;
+        } else if (nameTaken(name, state.editCustomId)) {
+          el.errDup.classList.add("show");
+          el.fName.classList.add("is-err");
+          ok = false;
+        }
+        if (!state.formMode) {
+          el.errMode.classList.add("show");
+          el.modeGroup.classList.add("is-err");
+          ok = false;
+        }
+        if (!ok) return;
+
+        if (state.editCustomId) {
+          var cur = customs.find(function (x) { return x.id === state.editCustomId; });
+          if (cur) {
+            cur.name = name;
+            cur.mode = state.formMode;
+            cur.eq = el.fEq.value.trim();
+            cur.part = el.fPart.value.trim();
+            cur.note = el.fNote.value.trim();
+          }
+          toast("已保存 · 编号未变");
+          state.tab = "custom";
+          showScreen("library");
+          renderLibrary();
+          setNow("自定义列表");
+          setSceneCurrent("used");
+          return;
+        }
+
+        var nid = "fc-cx-" + Date.now().toString(36);
+        customs.push({
+          id: nid,
+          name: name,
+          aliases: [],
+          cat: "自定义",
+          eq: el.fEq.value.trim() || "未填",
+          part: el.fPart.value.trim() || "未填",
+          primary: "",
+          secondary: "",
+          mode: state.formMode,
+          load: "total",
+          fav: false,
+          used: false,
+          archived: false,
+          note: el.fNote.value.trim()
+        });
+        toast("已保存到动作库");
+        state.tab = "custom";
+        showScreen("library");
+        renderLibrary();
+        setNow("自定义列表 · 新建成功");
+        setSceneCurrent("root");
+      });
+
+      document.getElementById("btn-archive").addEventListener("click", function () {
+        var cur = customs.find(function (x) { return x.id === state.editCustomId; });
+        if (!cur) return;
+        if (cur.used) {
+          cur.archived = true;
+          toast("已归档 · 历史仍可显示");
+        } else {
+          customs = customs.filter(function (x) { return x.id !== cur.id; });
+          toast("已删除");
+        }
+        state.tab = "custom";
+        showScreen("library");
+        renderLibrary();
+        setNow("自定义列表");
+        setSceneCurrent("used");
+      });
+
+      document.getElementById("btn-quick-back").addEventListener("click", function () {
+        openDest("训练记录", "返回进行中的训练。训练记录器内部不在本模块。");
+        setNow("出口 · 返回训练");
+      });
+      document.getElementById("choice-once").addEventListener("click", function () {
+        openDest("仅本次", "已作为仅本次动作加入当前课程，不进入动作库。");
+        setNow("出口 · 仅本次");
+        setSceneCurrent("quick");
+      });
+      document.getElementById("choice-save").addEventListener("click", function () {
+        openDest("保存为自定义", "已写入动作库并加入当前课程。稳定编号已生成。");
+        setNow("出口 · 保存为自定义");
+        setSceneCurrent("quick");
+      });
+      document.getElementById("btn-dest-back").addEventListener("click", function () {
+        var t = el.destTitle.textContent;
+        if (t.indexOf("仅本次") !== -1 || t.indexOf("保存为自定义") !== -1 || t.indexOf("训练记录") !== -1) {
+          openQuick();
+          return;
+        }
+        goLibraryRoot();
+      });
+
+      /* scenes */
+      document.querySelectorAll(".scene-btn").forEach(function (b) {
+        b.addEventListener("click", function () {
+          var scene = b.getAttribute("data-scene");
+          closeSheet();
+          if (scene === "root") {
+            goLibraryRoot();
+          } else if (scene === "detail") {
+            state.tab = "builtin";
+            state.eq = "全部";
+            state.part = "全部";
+            state.q = "";
+            el.search.value = "";
+            renderLibrary();
+            openBuiltin("fc-ex-bb-squat");
+          } else if (scene === "create") {
+            state.tab = "custom";
+            openCustomCreate();
+          } else if (scene === "quick") {
+            openQuick();
+          } else if (scene === "used") {
+            state.tab = "custom";
+            state.eq = "全部";
+            state.part = "全部";
+            state.q = "";
+            el.search.value = "";
+            var used = customs.find(function (x) { return x.id === "fc-cx-neutral-row"; });
+            if (used) used.archived = false;
+            openCustomEdit("fc-cx-neutral-row");
+          } else if (scene === "search") {
+            state.tab = "builtin";
+            state.eq = "全部";
+            state.part = "全部";
+            state.q = "深蹲";
+            el.search.value = "深蹲";
+            showScreen("library");
+            renderLibrary();
+            setNow("搜索 · 「深蹲」有结果；改成无词可看空态");
+            setSceneCurrent("search");
+            toast("提示：清空搜索或输入「斑马」可看无结果");
+          } else if (scene === "conflict") {
+            openCustomCreate({ name: "杠铃深蹲", mode: "weight-reps", conflict: true });
+          }
+        });
+      });
+
+      goLibraryRoot();
+    })();
+  </script>
+</body>
+</html>

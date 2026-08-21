@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FineCoach · M2 · 个人训练档案查看模式</title>
+  <style>
+    :root {
+      --bg: oklch(0.93 0 0);
+      --surface: oklch(0.99 0 0);
+      --fg: oklch(0.22 0 0);
+      --muted: oklch(0.46 0 0);
+      --border: oklch(0.78 0 0);
+      --accent: oklch(0.28 0 0);
+      --fill: oklch(0.90 0 0);
+      --fill-2: oklch(0.85 0 0);
+      --danger: oklch(0.42 0.12 25);
+      --ok: oklch(0.38 0.06 145);
+      --phone-w: 393px;
+      --phone-h: 852px;
+      --tap: 44px;
+      --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Heiti SC", sans-serif;
+      --mono: ui-monospace, Menlo, "SF Mono", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    body {
+      font-family: var(--font);
+      color: var(--fg);
+      background: var(--bg);
+      line-height: 1.45;
+    }
+    button, input { font: inherit; color: inherit; }
+    button { cursor: pointer; background: none; border: 0; }
+    img { display: none; }
+
+    .spec-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .spec-bar span { color: var(--muted); }
+    .spec-bar b { font-weight: 600; color: var(--fg); }
+
+    .board {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) var(--phone-w) minmax(240px, 1fr);
+      gap: 28px;
+      align-items: start;
+      justify-content: center;
+      padding: 28px 24px 48px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .rail h2 {
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .note {
+      border: 1px dashed var(--border);
+      background: var(--surface);
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--fg);
+      margin-bottom: 10px;
+    }
+    .note ol, .note ul { padding-left: 1.15em; }
+    .note li { margin: 4px 0; }
+    .note .k { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .scene-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .scene-btn {
+      min-height: var(--tap);
+      text-align: left;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--fg);
+    }
+    .scene-btn:hover { background: oklch(0.94 0 0); }
+    .scene-btn[aria-current="true"] { background: var(--fill); border-color: var(--fg); }
+    button:focus-visible,
+    input:focus-visible {
+      outline: 2px solid var(--fg);
+      outline-offset: 2px;
+    }
+    .check { font-size: 13px; }
+    .check li { margin: 6px 0; color: var(--muted); }
+    .now {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border: 1px solid var(--fg);
+      background: var(--surface);
+      font-size: 13px;
+    }
+
+    .device-wrap { width: var(--phone-w); }
+    .device-caption {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 8px;
+      font-family: var(--mono);
+    }
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      border-radius: 54px;
+      border: 11px solid oklch(0.18 0 0);
+      background: oklch(0.97 0 0);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 18px 40px oklch(0.55 0 0 / 0.18);
+    }
+    .island {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      width: 126px;
+      height: 36px;
+      margin-left: -63px;
+      background: oklch(0.12 0 0);
+      border-radius: 20px;
+      z-index: 5;
+    }
+    .status {
+      height: 54px;
+      padding: 14px 28px 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .status-sys { display: flex; gap: 6px; align-items: center; }
+    .sig, .bat { display: inline-block; height: 10px; background: var(--fg); }
+    .sig { width: 16px; clip-path: polygon(0 70%, 35% 45%, 65% 20%, 100% 0, 100% 100%, 0 100%); }
+    .bat { width: 22px; height: 11px; border: 1.5px solid var(--fg); background: transparent; position: relative; }
+    .bat::after { content: ""; position: absolute; inset: 2px 8px 2px 2px; background: var(--fg); }
+    .home-bar {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      width: 134px;
+      height: 5px;
+      margin-left: -67px;
+      background: oklch(0.22 0 0);
+      border-radius: 3px;
+      z-index: 5;
+    }
+    .app {
+      position: absolute;
+      inset: 54px 0 24px;
+      display: flex;
+      flex-direction: column;
+      background: oklch(0.97 0 0);
+    }
+    .screen { display: none; flex: 1; flex-direction: column; min-height: 0; }
+    .screen.is-on { display: flex; }
+
+    .nav {
+      min-height: var(--tap);
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex: none;
+    }
+    .nav h1 {
+      flex: 1;
+      font-size: 17px;
+      font-weight: 650;
+      text-align: center;
+    }
+    .nav-side { width: 72px; display: flex; align-items: center; }
+    .nav-side.end { justify-content: flex-end; width: auto; min-width: 72px; }
+    .icon-btn, .text-btn {
+      min-width: var(--tap);
+      min-height: var(--tap);
+      padding: 0 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fg);
+      font-size: 15px;
+      font-weight: 560;
+    }
+    .icon-btn:hover, .text-btn:hover, .ghost:hover { background: oklch(0.93 0 0); }
+    .text-btn { min-width: auto; }
+
+    .body { flex: 1; overflow: auto; padding: 16px 16px 20px; }
+    .body.tight { padding: 0; }
+    .body.pad-bottom { padding-bottom: 28px; }
+    .body.with-tab { padding-bottom: 12px; }
+
+    .kicker { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .title { font-size: 22px; font-weight: 650; letter-spacing: -0.02em; margin-bottom: 8px; }
+    .lead { font-size: 15px; color: var(--fg); margin-bottom: 14px; }
+
+    .primary, .ghost, .danger-btn {
+      min-height: var(--tap);
+      width: 100%;
+      padding: 0 16px;
+      font-size: 17px;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+    .primary { background: var(--accent); color: oklch(0.99 0 0); }
+    .primary:hover { background: oklch(0.16 0 0); color: oklch(0.99 0 0); }
+    .primary:disabled {
+      background: var(--fill-2);
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+    .ghost { border: 1px solid var(--border); background: var(--surface); color: var(--fg); }
+    .danger-btn {
+      border: 1px solid var(--danger);
+      background: oklch(0.97 0.02 25);
+      color: var(--danger);
+    }
+    .danger-btn:hover { background: oklch(0.94 0.03 25); color: var(--danger); }
+    .stack-bottom { margin-top: 16px; }
+
+    .profile-head {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .avatar {
+      width: 56px;
+      height: 56px;
+      border: 1px solid var(--fg);
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      color: var(--muted);
+      flex: none;
+    }
+    .profile-name { font-size: 20px; font-weight: 650; }
+    .profile-meta { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+    .section-label {
+      padding: 14px 16px 6px;
+      font-size: 12px;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .row {
+      width: 100%;
+      min-height: 64px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      text-align: left;
+      color: var(--fg);
+    }
+    .row:hover { background: oklch(0.95 0 0); }
+    .row-main { flex: 1; min-width: 0; }
+    .row-name { font-size: 16px; font-weight: 600; }
+    .row-sub { font-size: 13px; color: var(--muted); margin-top: 2px; overflow-wrap: anywhere; }
+    .chev {
+      width: 8px; height: 8px;
+      border-right: 1.5px solid var(--muted);
+      border-top: 1.5px solid var(--muted);
+      transform: rotate(45deg);
+      flex: none;
+    }
+
+    .callout {
+      border: 1px solid var(--border);
+      background: var(--fill);
+      padding: 12px 14px;
+      font-size: 14px;
+      margin: 0 0 14px;
+    }
+    .callout.warn {
+      border-color: var(--fg);
+      background: var(--surface);
+    }
+    .callout.danger {
+      border-color: var(--danger);
+      background: oklch(0.97 0.02 25);
+    }
+    .callout.ok {
+      border-color: var(--ok);
+      background: oklch(0.97 0.02 145);
+    }
+    .callout b { display: block; margin-bottom: 4px; }
+
+    .field-label { display: block; font-size: 13px; font-weight: 600; margin: 14px 0 6px; }
+    .field {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 16px;
+    }
+    .field.is-err { border-color: var(--danger); }
+    .err { color: var(--danger); font-size: 13px; margin-top: 6px; display: none; }
+    .err.show { display: block; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+    .block-title {
+      font-size: 13px;
+      font-weight: 650;
+      margin: 18px 0 8px;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+    .block-title:first-child { margin-top: 0; }
+
+    .preview {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      margin-top: 4px;
+    }
+    .preview .cell {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 14px;
+    }
+    .preview .cell:last-child { border-bottom: 0; }
+    .preview .cell span { color: var(--muted); }
+    .preview .cell b { font-weight: 650; }
+
+    .annot {
+      margin-top: 12px;
+      border: 1px dashed var(--border);
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    .sys-bound {
+      margin: 12px 0;
+      border: 2px dashed var(--fg);
+      background: var(--surface);
+      padding: 16px 14px;
+      min-height: 160px;
+    }
+    .sys-bound .bound-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .sys-bound h3 { font-size: 16px; margin-bottom: 8px; }
+    .sys-bound p { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+    .sys-row {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      background: var(--fill);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-align: left;
+      margin-bottom: 8px;
+      color: var(--fg);
+    }
+    .sys-row:hover { background: oklch(0.92 0 0); }
+    .sys-row[aria-pressed="true"] {
+      border-color: var(--fg);
+      background: var(--fill-2);
+    }
+    .sys-ico {
+      width: 28px; height: 28px;
+      border: 1px solid var(--fg);
+      flex: none;
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+      font-family: var(--mono);
+    }
+    .sys-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .sys-actions .ghost,
+    .sys-actions .primary {
+      margin-top: 0;
+      flex: 1;
+      font-size: 15px;
+    }
+
+    .file-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      background: var(--fill);
+      margin: 12px 0;
+    }
+    .file-chip .ico {
+      width: 36px; height: 36px;
+      border: 1px solid var(--fg);
+      display: grid;
+      place-items: center;
+      font-family: var(--mono);
+      font-size: 10px;
+      flex: none;
+    }
+    .file-chip b { display: block; font-size: 14px; }
+    .file-chip span { font-size: 12px; color: var(--muted); }
+
+    .chooser-card {
+      width: 100%;
+      min-height: 96px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      text-align: left;
+      margin-bottom: 12px;
+      color: var(--fg);
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .chooser-card:hover { background: oklch(0.95 0 0); }
+    .chooser-card .mark {
+      width: 36px; height: 36px;
+      border: 1px solid var(--fg);
+      display: grid;
+      place-items: center;
+      font-family: var(--mono);
+      font-size: 11px;
+      flex: none;
+    }
+    .chooser-card .name { font-size: 17px; font-weight: 650; }
+    .chooser-card .desc { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+    .brand-mark {
+      width: 64px; height: 64px;
+      border: 1.5px solid var(--fg);
+      display: grid;
+      place-items: center;
+      font-family: var(--mono);
+      font-size: 12px;
+      margin: 8px auto 18px;
+    }
+
+    .search-bar {
+      display: flex;
+      gap: 8px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex: none;
+    }
+    .search-bar .field { flex: 1; margin: 0; }
+    .filter-chip {
+      min-height: var(--tap);
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 14px;
+      font-weight: 560;
+      flex: none;
+      white-space: nowrap;
+    }
+    .filter-chip[aria-pressed="true"] {
+      border-color: var(--fg);
+      background: var(--fill);
+    }
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      padding: 10px 16px;
+      overflow-x: auto;
+      border-bottom: 1px solid var(--border);
+      background: oklch(0.97 0 0);
+      flex: none;
+    }
+
+    .tabbar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex: none;
+      min-height: 56px;
+    }
+    .tab {
+      min-height: 56px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 560;
+      color: var(--muted);
+    }
+    .tab:hover { background: oklch(0.95 0 0); color: var(--fg); }
+    .tab[aria-current="page"] { color: var(--fg); font-weight: 650; }
+    .tab-ico {
+      width: 22px; height: 22px;
+      border: 1.5px solid currentColor;
+      border-radius: 4px;
+    }
+
+    .readonly-tag {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      border: 1px solid var(--border);
+      padding: 2px 6px;
+      color: var(--muted);
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-bottom: 14px;
+    }
+    .metric {
+      background: var(--surface);
+      padding: 14px 12px;
+      min-height: 72px;
+    }
+    .metric .lab { font-size: 12px; color: var(--muted); }
+    .metric .val { font-size: 20px; font-weight: 650; margin-top: 4px; }
+
+    .trend-bar {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      height: 72px;
+      padding: 8px 0;
+      margin-top: 8px;
+    }
+    .trend-bar i {
+      flex: 1;
+      background: var(--fill-2);
+      border: 1px solid var(--border);
+      min-height: 8px;
+    }
+    .trend-bar i.on { background: var(--accent); border-color: var(--fg); }
+
+    .pick-list {
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .pick-row {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      color: var(--fg);
+      background: var(--surface);
+    }
+    .pick-row:last-child { border-bottom: 0; }
+    .pick-row:hover { background: oklch(0.95 0 0); }
+    .pick-main { flex: 1; min-width: 0; }
+    .pick-name { font-size: 15px; font-weight: 600; }
+    .pick-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .switch-track {
+      width: 48px;
+      height: 28px;
+      border: 1.5px solid var(--fg);
+      border-radius: 14px;
+      background: var(--fill);
+      position: relative;
+      flex: none;
+      pointer-events: none;
+    }
+    .switch-track[aria-checked="true"] { background: var(--accent); }
+    .switch-thumb {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      background: var(--surface);
+      border: 1px solid var(--fg);
+      border-radius: 50%;
+    }
+    .switch-track[aria-checked="true"] .switch-thumb {
+      left: 23px;
+      background: oklch(0.99 0 0);
+    }
+
+    .seg {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      margin-bottom: 12px;
+    }
+    .seg button {
+      min-height: var(--tap);
+      font-size: 14px;
+      font-weight: 560;
+      color: var(--muted);
+      border-right: 1px solid var(--border);
+    }
+    .seg button:last-child { border-right: 0; }
+    .seg button[aria-pressed="true"] {
+      background: var(--fill);
+      color: var(--fg);
+      font-weight: 650;
+    }
+
+    .empty {
+      padding: 28px 16px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .dest {
+      flex: 1;
+      margin: 20px 16px;
+      border: 1px dashed var(--fg);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      gap: 8px;
+    }
+    .dest h2 { font-size: 20px; }
+    .dest p { font-size: 15px; color: var(--muted); }
+    .bound {
+      margin-top: 16px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    @media (max-width: 1100px) {
+      .board { grid-template-columns: 1fr; justify-items: center; }
+      .rail { width: min(520px, 100%); }
+    }
+  </style>
+</head>
+<body>
+  <header class="spec-bar" data-od-id="page-header">
+    <div>stage=<b>M2</b></div>
+    <div>module=<b>02-viewer-mode</b></div>
+    <div>version=<b>v0.1</b></div>
+    <div>coverage=<b>this module only</b></div>
+    <div>data=<b>虚构数据</b></div>
+    <div>network=<b>无外部资源</b></div>
+    <div>review=<b>产品负责人走查通过</b></div>
+  </header>
+
+  <div class="board">
+    <aside class="rail" data-od-id="annotation-left">
+      <h2>走查说明</h2>
+      <div class="note">
+        低保真线框。本模块只覆盖：首次启动选择 → 导入个人训练档案 → 冲突拦截 / 同来源再导入 → 只读查看模式（浏览、搜索、筛选、显示设置、本机删除）。不是教练工作模式，也不是角色切换。
+      </div>
+      <div class="note">
+        <span class="k">本模块不做</span>
+        <ul>
+          <li>添加训练、编辑来源数据、生成教练工作数据</li>
+          <li>分享报告编写器、公开链接、远程撤回</li>
+          <li>多来源档案、教练工作空间内的身份切换</li>
+          <li>把档案混入已有教练数据（禁止合并）</li>
+        </ul>
+      </div>
+      <div class="note">
+        <span class="k">建议路径</span>
+        <ol>
+          <li>首次启动：导入个人训练档案</li>
+          <li>系统文件选择器 → 输入密码 → 进入查看首页</li>
+          <li>场景 C 看冲突拦截；场景 D 看同来源再导入</li>
+          <li>浏览课程 / 身体与趋势 · 仅显示设置</li>
+          <li>设置中删除本机导入档案</li>
+        </ol>
+      </div>
+      <h2>演示场景</h2>
+      <div class="scene-list">
+        <button type="button" class="scene-btn" data-od-id="scene-chooser" data-scene="chooser">A · 首次启动选择</button>
+        <button type="button" class="scene-btn" data-od-id="scene-import" data-scene="import">B · 导入流程</button>
+        <button type="button" class="scene-btn" data-od-id="scene-block" data-scene="block">C · 教练数据冲突</button>
+        <button type="button" class="scene-btn" data-od-id="scene-reimport" data-scene="reimport">D · 同来源再导入</button>
+        <button type="button" class="scene-btn" data-od-id="scene-viewer" data-scene="viewer">E · 只读查看首页</button>
+        <button type="button" class="scene-btn" data-od-id="scene-delete" data-scene="delete">F · 删除本机档案</button>
+      </div>
+    </aside>
+
+    <div class="device-wrap">
+      <p class="device-caption">iPhone 竖屏 393×852 · 浅色 · 系统字体</p>
+      <div class="phone" data-od-id="iphone-frame" role="application" aria-label="FineCoach 个人训练档案查看模式线框原型">
+        <div class="island" aria-hidden="true"></div>
+        <div class="status">
+          <span>9:41</span>
+          <span class="status-sys" aria-hidden="true"><i class="sig"></i><i class="bat"></i></span>
+        </div>
+        <div class="app" id="app">
+
+          <!-- A. 首次启动选择 -->
+          <section class="screen is-on" data-screen="chooser" data-od-id="screen-chooser">
+            <div class="nav">
+              <div class="nav-side"></div>
+              <h1 data-od-id="chooser-title">FineCoach</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <div class="brand-mark" aria-hidden="true">FC</div>
+              <p class="kicker" style="text-align:center">新安装 · 首次启动</p>
+              <h2 class="title" style="text-align:center">你打算如何使用？</h2>
+              <p class="lead" style="text-align:center">两种产品表面共用同一 App，但互不切换身份。选定后按各自流程进入。</p>
+              <button type="button" class="chooser-card" data-od-id="cta-choose-coach" id="btn-choose-coach">
+                <span class="mark">教</span>
+                <span>
+                  <span class="name">教练使用</span>
+                  <span class="desc">管理学员、排课与课堂记录。本模块不绘制教练工作流。</span>
+                </span>
+              </button>
+              <button type="button" class="chooser-card" data-od-id="cta-choose-import" id="btn-choose-import">
+                <span class="mark">导</span>
+                <span>
+                  <span class="name">导入个人训练档案</span>
+                  <span class="desc">只读查看教练交给你的加密档案。不是独立学员端。</span>
+                </span>
+              </button>
+              <div class="annot" data-od-id="annot-not-role-switch">
+                标注：不是教练工作空间内的角色切换 · 导入后进入独立只读表面
+              </div>
+            </div>
+          </section>
+
+          <!-- B1. 导入：文件选择 -->
+          <section class="screen" data-screen="import-pick" data-od-id="screen-import-pick">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="import-pick-back" data-go="chooser">返回</button>
+              </div>
+              <h1>导入档案</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p class="kicker">个人训练档案 · 加密文件</p>
+              <h2 class="title">选择档案文件</h2>
+              <p class="lead">通过系统文件选择器选取教练交付的加密档案。App 不托管、不提供公开链接。</p>
+              <div class="sys-bound" data-od-id="sys-file-picker">
+                <p class="bound-label">iOS 系统文件选择器 · 虚线边界 · 非 App UI</p>
+                <h3>选取档案</h3>
+                <p>演示：点选一个虚构档案文件，再继续。</p>
+                <button type="button" class="sys-row" data-od-id="pick-file-a" id="pick-file-a" aria-pressed="false">
+                  <span class="sys-ico">A1</span>
+                  <span><b>小周-个人训练档案-20260821.fca</b><br><span style="font-size:12px;color:var(--muted)">约 2.4 MB · 较新快照</span></span>
+                </button>
+                <button type="button" class="sys-row" data-od-id="pick-file-b" id="pick-file-b" aria-pressed="false">
+                  <span class="sys-ico">A0</span>
+                  <span><b>小周-个人训练档案-20260701.fca</b><br><span style="font-size:12px;color:var(--muted)">约 1.9 MB · 较旧快照</span></span>
+                </button>
+                <div class="sys-actions">
+                  <button type="button" class="ghost" id="btn-picker-cancel" data-go="chooser">取消</button>
+                  <button type="button" class="primary" data-od-id="cta-picker-next" id="btn-picker-next" disabled>使用所选文件</button>
+                </div>
+              </div>
+              <p class="hint">首次导入路径。若本机已有教练数据，将先进入冲突拦截（场景 C）。</p>
+            </div>
+          </section>
+
+          <!-- B2. 导入：密码 -->
+          <section class="screen" data-screen="import-pw" data-od-id="screen-import-password">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="import-pw-back" data-go="import-pick">返回</button>
+              </div>
+              <h1>输入档案密码</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <div class="file-chip" data-od-id="import-file-chip">
+                <div class="ico">档</div>
+                <div>
+                  <b id="import-file-name">小周-个人训练档案-20260821.fca</b>
+                  <span>加密 · 需教练交付时告知的密码</span>
+                </div>
+              </div>
+              <div class="callout warn" data-od-id="import-pw-policy">
+                <b>密码不会被保存</b>
+                App 不存储、不上传、不找回此密码。输错不会改动本机已有档案。
+              </div>
+              <label class="field-label" for="im-pw">档案密码</label>
+              <input class="field" id="im-pw" data-od-id="field-import-password" type="password" autocomplete="off" placeholder="输入教练告知的密码" maxlength="64">
+              <p class="err" id="err-import-pw">密码不正确，或文件无法解密</p>
+              <p class="hint">演示：任意 ≥ 4 位即视为成功；输入「错」触发失败并保留旧档案。</p>
+              <div class="stack-bottom">
+                <button type="button" class="primary" data-od-id="cta-import-unlock" id="btn-import-unlock">解锁并导入</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- B3. 导入成功 -->
+          <section class="screen" data-screen="import-ok" data-od-id="screen-import-ok">
+            <div class="nav">
+              <div class="nav-side"></div>
+              <h1>导入完成</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <div class="callout ok" data-od-id="import-ok-summary">
+                <b id="import-ok-title">个人训练档案已导入</b>
+                <span id="import-ok-body">已进入只读查看模式。本机仅保留一个档案来源。</span>
+              </div>
+              <div class="preview" data-od-id="import-ok-meta">
+                <div class="cell"><span>学员显示名</span><b>小周</b></div>
+                <div class="cell"><span>快照日期</span><b id="import-snap-date">2026-08-21</b></div>
+                <div class="cell"><span>已含内容</span><b>资料 · 身体 · 课程 · 趋势</b></div>
+                <div class="cell"><span>能力</span><b>只读浏览 · 搜索 · 显示设置</b></div>
+              </div>
+              <div class="annot" data-od-id="annot-no-remote-revoke">
+                标注：离线档案交付并导入后，教练无法远程撤回本机副本
+              </div>
+              <div class="stack-bottom">
+                <button type="button" class="primary" data-od-id="cta-enter-viewer" id="btn-enter-viewer">进入查看首页</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- C. 教练数据冲突拦截 -->
+          <section class="screen" data-screen="mix-block" data-od-id="screen-mix-block">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="mix-block-back" data-go="chooser">返回</button>
+              </div>
+              <h1>无法混入</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p class="kicker">本机已有教练工作数据</p>
+              <h2 class="title">不能把档案混入当前安装</h2>
+              <div class="callout danger" data-od-id="mix-block-warn">
+                <b>禁止合并</b>
+                同一安装不得把个人训练档案混入教练工作空间。不做逐条合并，也不提供「边教边看」的混合模式。
+              </div>
+              <div class="callout warn" data-od-id="mix-block-choices">
+                <b>请选择其一</b>
+                先完整备份并清除本机教练数据，再导入档案；或换一台没有教练数据的设备安装后导入。
+              </div>
+              <div class="stack-bottom">
+                <button type="button" class="primary" data-od-id="cta-block-backup-clear" id="btn-block-backup">先完整备份并清除教练数据</button>
+                <button type="button" class="ghost" data-od-id="cta-block-other-device" id="btn-block-device">换一台设备</button>
+                <button type="button" class="ghost" data-od-id="cta-block-cancel" data-go="chooser">取消导入</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- C 出口：备份清除边界 -->
+          <section class="screen" data-screen="block-dest" data-od-id="screen-block-dest">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="block-dest-back" data-go="mix-block">返回</button>
+              </div>
+              <h1 id="block-dest-nav">出口</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="dest">
+              <h2 id="block-dest-title">模块边界</h2>
+              <p id="block-dest-body">本模块未绘制该流程。</p>
+              <p class="bound" id="block-dest-bound">—— 模块边界 ——</p>
+              <button type="button" class="ghost" style="margin-top:16px" data-od-id="cta-block-dest-sim" id="btn-sim-cleared">演示：假设已清除，继续导入</button>
+            </div>
+          </section>
+
+          <!-- D. 同来源再导入确认 -->
+          <section class="screen" data-screen="reimport" data-od-id="screen-reimport">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="reimport-back" data-go="home">取消</button>
+              </div>
+              <h1>更新档案</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p class="kicker">同来源 · 身份校验通过</p>
+              <h2 class="title">用较新快照替换本机副本</h2>
+              <div class="callout warn" data-od-id="reimport-identity">
+                <b>已核对学员与档案稳定身份</b>
+                来源一致。将用所选完整快照整体替换旧版本，不做逐条合并。
+              </div>
+              <div class="preview" data-od-id="reimport-compare">
+                <div class="cell"><span>本机当前</span><b id="re-old">2026-07-01 快照</b></div>
+                <div class="cell"><span>即将导入</span><b id="re-new">2026-08-21 快照</b></div>
+                <div class="cell"><span>失败时</span><b>保留旧版本，数据不变</b></div>
+              </div>
+              <div class="seg" data-od-id="reimport-outcome-toggle" role="group" aria-label="演示结果">
+                <button type="button" id="re-ok" aria-pressed="true">演示成功替换</button>
+                <button type="button" id="re-fail" aria-pressed="false">演示失败保留</button>
+              </div>
+              <div class="stack-bottom">
+                <button type="button" class="primary" data-od-id="cta-reimport-confirm" id="btn-reimport-go">确认替换</button>
+                <button type="button" class="ghost" data-go="home">暂不更新</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- E1. 查看首页 -->
+          <section class="screen" data-screen="home" data-od-id="screen-viewer-home">
+            <div class="nav">
+              <div class="nav-side"></div>
+              <h1 data-od-id="home-title">我的训练<span class="readonly-tag">只读</span></h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="profile-head" data-od-id="viewer-profile">
+              <div class="avatar" aria-hidden="true">头像</div>
+              <div>
+                <div class="profile-name">小周</div>
+                <div class="profile-meta">男 · 增肌 · 快照 <span id="home-snap">2026-08-21</span></div>
+              </div>
+            </div>
+            <div class="body with-tab tight">
+              <p class="section-label">摘要</p>
+              <div class="metric-grid" data-od-id="home-metrics" style="margin:0 16px 8px; border-left:0; border-right:0;">
+                <div class="metric"><div class="lab">课程记录</div><div class="val" id="m-sessions">18</div></div>
+                <div class="metric"><div class="lab">身体测量</div><div class="val">6</div></div>
+                <div class="metric"><div class="lab">趋势</div><div class="val">3</div></div>
+                <div class="metric"><div class="lab">来源</div><div class="val" style="font-size:15px">单一档案</div></div>
+              </div>
+              <div class="callout" style="margin:12px 16px" data-od-id="home-readonly-note">
+                <b>只读查看</b>
+                可浏览、搜索、筛选与调整显示设置。不能添加训练、编辑来源或生成教练数据。
+              </div>
+              <p class="section-label">快捷入口</p>
+              <button type="button" class="row" data-od-id="home-to-sessions" data-tab="sessions">
+                <div class="row-main">
+                  <div class="row-name">浏览课程记录</div>
+                  <div class="row-sub">按时间倒序 · 可搜索筛选</div>
+                </div>
+                <span class="chev" aria-hidden="true"></span>
+              </button>
+              <button type="button" class="row" data-od-id="home-to-body" data-tab="body">
+                <div class="row-main">
+                  <div class="row-name">身体数据与趋势</div>
+                  <div class="row-sub">测量历史 · 趋势条形示意</div>
+                </div>
+                <span class="chev" aria-hidden="true"></span>
+              </button>
+              <button type="button" class="row" data-od-id="home-to-settings" data-tab="settings">
+                <div class="row-main">
+                  <div class="row-name">显示设置与档案管理</div>
+                  <div class="row-sub">单位显示 · 再导入 · 删除本机档案</div>
+                </div>
+                <span class="chev" aria-hidden="true"></span>
+              </button>
+              <div class="annot" style="margin:14px 16px 20px" data-od-id="annot-home-revoke">
+                离线档案无法被教练远程撤回 · 仅可在本机删除
+              </div>
+            </div>
+            <nav class="tabbar" data-od-id="tabbar-home" aria-label="查看模式导航">
+              <button type="button" class="tab" data-tab="home" aria-current="page"><span class="tab-ico" aria-hidden="true"></span>首页</button>
+              <button type="button" class="tab" data-tab="sessions"><span class="tab-ico" aria-hidden="true"></span>课程</button>
+              <button type="button" class="tab" data-tab="body"><span class="tab-ico" aria-hidden="true"></span>身体</button>
+              <button type="button" class="tab" data-tab="settings"><span class="tab-ico" aria-hidden="true"></span>设置</button>
+            </nav>
+          </section>
+
+          <!-- E2. 课程列表：搜索筛选 -->
+          <section class="screen" data-screen="sessions" data-od-id="screen-sessions">
+            <div class="nav">
+              <div class="nav-side"></div>
+              <h1>课程记录<span class="readonly-tag">只读</span></h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="search-bar">
+              <input class="field" id="session-q" data-od-id="field-session-search" type="search" placeholder="搜索部位或动作" autocomplete="off">
+            </div>
+            <div class="filter-row" data-od-id="session-filters">
+              <button type="button" class="filter-chip" data-filter="all" aria-pressed="true">全部</button>
+              <button type="button" class="filter-chip" data-filter="胸" aria-pressed="false">胸</button>
+              <button type="button" class="filter-chip" data-filter="背" aria-pressed="false">背</button>
+              <button type="button" class="filter-chip" data-filter="腿" aria-pressed="false">腿</button>
+            </div>
+            <div class="body with-tab tight" id="session-list" data-od-id="session-list"></div>
+            <nav class="tabbar" data-od-id="tabbar-sessions" aria-label="查看模式导航">
+              <button type="button" class="tab" data-tab="home"><span class="tab-ico" aria-hidden="true"></span>首页</button>
+              <button type="button" class="tab" data-tab="sessions" aria-current="page"><span class="tab-ico" aria-hidden="true"></span>课程</button>
+              <button type="button" class="tab" data-tab="body"><span class="tab-ico" aria-hidden="true"></span>身体</button>
+              <button type="button" class="tab" data-tab="settings"><span class="tab-ico" aria-hidden="true"></span>设置</button>
+            </nav>
+          </section>
+
+          <!-- E3. 课程详情只读 -->
+          <section class="screen" data-screen="session-detail" data-od-id="screen-session-detail">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="session-detail-back" data-go="sessions">返回</button>
+              </div>
+              <h1>课程详情</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p class="kicker" id="sd-date">2026-08-12 · 胸</p>
+              <h2 class="title" id="sd-title">胸部力量</h2>
+              <div class="callout" data-od-id="sd-readonly">
+                <b>只读</b>
+                无编辑、无添加训练组、无生成分享报告入口。
+              </div>
+              <p class="block-title">学员课后总结</p>
+              <div class="callout warn" id="sd-summary">今天卧推感觉稳定，肩部无不适。</div>
+              <p class="block-title">动作与完成组</p>
+              <div class="preview" id="sd-sets" data-od-id="sd-sets"></div>
+              <div class="annot">来源数据不可改 · 教练备注与伤病不在档案内</div>
+            </div>
+          </section>
+
+          <!-- E4. 身体与趋势 -->
+          <section class="screen" data-screen="body" data-od-id="screen-body">
+            <div class="nav">
+              <div class="nav-side"></div>
+              <h1>身体与趋势<span class="readonly-tag">只读</span></h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body with-tab">
+              <p class="kicker">档案内已包含的测量与趋势</p>
+              <h2 class="title">身体数据</h2>
+              <div class="preview" data-od-id="body-latest">
+                <div class="cell"><span>最近测量</span><b>2026-08-12</b></div>
+                <div class="cell"><span>体重</span><b id="body-weight">72.4 kg</b></div>
+                <div class="cell"><span>腰围</span><b>78 cm</b></div>
+                <div class="cell"><span>胸围</span><b>98 cm</b></div>
+              </div>
+              <p class="block-title">体重趋势（示意）</p>
+              <div class="callout" data-od-id="body-trend">
+                <b>近 6 次测量</b>
+                <div class="trend-bar" aria-hidden="true">
+                  <i style="height:40%"></i><i style="height:48%"></i><i style="height:55%" class="on"></i>
+                  <i style="height:62%" class="on"></i><i style="height:70%" class="on"></i><i style="height:78%" class="on"></i>
+                </div>
+                <p class="hint" style="margin:0">低保真条形仅示意趋势方向，非真实图表库。</p>
+              </div>
+              <p class="block-title">测量历史</p>
+              <button type="button" class="row" style="border:1px solid var(--border); border-bottom:0" disabled>
+                <div class="row-main"><div class="row-name">2026-08-12</div><div class="row-sub">72.4 kg · 腰 78</div></div>
+              </button>
+              <button type="button" class="row" style="border:1px solid var(--border); border-bottom:0" disabled>
+                <div class="row-main"><div class="row-name">2026-07-20</div><div class="row-sub">71.8 kg · 腰 79</div></div>
+              </button>
+              <button type="button" class="row" style="border:1px solid var(--border)" disabled>
+                <div class="row-main"><div class="row-name">2026-06-28</div><div class="row-sub">71.1 kg · 腰 80</div></div>
+              </button>
+              <p class="hint" style="margin-top:12px">列表只读展示，无新增测量入口。</p>
+            </div>
+            <nav class="tabbar" data-od-id="tabbar-body" aria-label="查看模式导航">
+              <button type="button" class="tab" data-tab="home"><span class="tab-ico" aria-hidden="true"></span>首页</button>
+              <button type="button" class="tab" data-tab="sessions"><span class="tab-ico" aria-hidden="true"></span>课程</button>
+              <button type="button" class="tab" data-tab="body" aria-current="page"><span class="tab-ico" aria-hidden="true"></span>身体</button>
+              <button type="button" class="tab" data-tab="settings"><span class="tab-ico" aria-hidden="true"></span>设置</button>
+            </nav>
+          </section>
+
+          <!-- E5. 设置：显示 + 再导入 + 删除 -->
+          <section class="screen" data-screen="settings" data-od-id="screen-settings">
+            <div class="nav">
+              <div class="nav-side"></div>
+              <h1>设置</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body with-tab">
+              <p class="kicker">查看模式 · 仅显示与档案管理</p>
+              <p class="block-title">显示设置</p>
+              <div class="pick-list" data-od-id="display-settings">
+                <button type="button" class="pick-row" data-od-id="toggle-unit" id="toggle-unit" aria-pressed="true">
+                  <div class="pick-main">
+                    <div class="pick-name">重量单位显示为公斤</div>
+                    <div class="pick-sub">仅改变本机显示，不改来源数值含义</div>
+                  </div>
+                  <span class="switch-track" aria-hidden="true" aria-checked="true"><span class="switch-thumb"></span></span>
+                </button>
+                <button type="button" class="pick-row" data-od-id="toggle-compact" id="toggle-compact" aria-pressed="false">
+                  <div class="pick-main">
+                    <div class="pick-name">紧凑课程列表</div>
+                    <div class="pick-sub">减少每行副文案</div>
+                  </div>
+                  <span class="switch-track" aria-hidden="true" aria-checked="false"><span class="switch-thumb"></span></span>
+                </button>
+              </div>
+              <p class="block-title">档案</p>
+              <div class="preview" data-od-id="settings-archive-meta">
+                <div class="cell"><span>当前快照</span><b id="set-snap">2026-08-21</b></div>
+                <div class="cell"><span>来源</span><b>单一教练来源 · 首版</b></div>
+                <div class="cell"><span>撤回</span><b>教练无法远程撤回</b></div>
+              </div>
+              <button type="button" class="ghost" data-od-id="cta-settings-reimport" id="btn-settings-reimport" style="margin-top:14px">导入同来源更新</button>
+              <p class="hint">将走文件选择 → 密码 → 身份校验 → 整包替换或失败保留。</p>
+              <button type="button" class="danger-btn" data-od-id="cta-settings-delete" id="btn-settings-delete">删除本机导入档案</button>
+              <div class="annot" data-od-id="annot-settings-limits">
+                无：添加训练 · 编辑来源 · 生成教练数据 · 分享报告编写
+              </div>
+            </div>
+            <nav class="tabbar" data-od-id="tabbar-settings" aria-label="查看模式导航">
+              <button type="button" class="tab" data-tab="home"><span class="tab-ico" aria-hidden="true"></span>首页</button>
+              <button type="button" class="tab" data-tab="sessions"><span class="tab-ico" aria-hidden="true"></span>课程</button>
+              <button type="button" class="tab" data-tab="body"><span class="tab-ico" aria-hidden="true"></span>身体</button>
+              <button type="button" class="tab" data-tab="settings" aria-current="page"><span class="tab-ico" aria-hidden="true"></span>设置</button>
+            </nav>
+          </section>
+
+          <!-- F. 删除确认 -->
+          <section class="screen" data-screen="delete" data-od-id="screen-delete">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="delete-back" data-go="settings">取消</button>
+              </div>
+              <h1>删除档案</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <div class="callout danger" data-od-id="delete-warn">
+                <b>将清除本机导入的个人训练档案</b>
+                删除后需重新选择档案文件并输入密码才能查看。教练端原始数据不受影响；教练也无法远程替你删除或撤回。
+              </div>
+              <div class="preview">
+                <div class="cell"><span>将删除</span><b>小周 · 快照 <span id="del-snap">2026-08-21</span></b></div>
+                <div class="cell"><span>不可恢复</span><b>除非再次导入文件</b></div>
+              </div>
+              <div class="stack-bottom">
+                <button type="button" class="danger-btn" data-od-id="cta-delete-confirm" id="btn-delete-confirm">确认删除本机档案</button>
+                <button type="button" class="ghost" data-go="settings">保留档案</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- 删除后空态 / 回到选择 -->
+          <section class="screen" data-screen="empty" data-od-id="screen-empty">
+            <div class="nav">
+              <div class="nav-side"></div>
+              <h1>FineCoach</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <div class="callout ok" data-od-id="empty-done">
+                <b>本机档案已删除</b>
+                查看模式数据已清除。可重新导入，或离开本模块。
+              </div>
+              <div class="stack-bottom">
+                <button type="button" class="primary" data-od-id="cta-empty-reimport" data-go="import-pick">重新导入档案</button>
+                <button type="button" class="ghost" data-od-id="cta-empty-chooser" data-go="chooser">回到首次启动选择</button>
+              </div>
+              <div class="annot">删除仅影响本机导入副本</div>
+            </div>
+          </section>
+
+          <!-- 模块边界：教练使用 -->
+          <section class="screen" data-screen="dest" data-od-id="screen-destination">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="dest-back" data-go="chooser">返回</button>
+              </div>
+              <h1 id="dest-nav">出口</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="dest">
+              <h2 id="dest-title">模块边界</h2>
+              <p id="dest-body">本模块未绘制该页面。</p>
+              <p class="bound" id="dest-bound">—— 模块边界 ——</p>
+            </div>
+          </section>
+
+        </div>
+        <div class="home-bar" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <aside class="rail" data-od-id="annotation-right">
+      <h2>当前状态</h2>
+      <div class="now" id="now-state">首次启动 · 选择使用方式</div>
+      <h2 style="margin-top:18px">验收核对</h2>
+      <ul class="check">
+        <li>✓ 首次启动：教练使用 / 导入档案</li>
+        <li>✓ 导入：文件边界 + 密码 → 查看首页</li>
+        <li>✓ 冲突：禁止混入 · 备份清除 / 换设备</li>
+        <li>✓ 同来源再导入：成功替换 / 失败保留</li>
+        <li>✓ 只读：浏览搜索筛选 + 显示设置</li>
+        <li>✓ 本机删除导入档案</li>
+        <li>✓ 标注：无法远程撤回</li>
+      </ul>
+      <div class="note" style="margin-top:14px">
+        <span class="k">演示开关</span>
+        <ul>
+          <li>场景 C：模拟「本机已有教练数据」</li>
+          <li>场景 D：同来源更新 · 可切成功/失败</li>
+          <li>密码含「错」→ 导入失败保留旧档</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    (function () {
+      var $ = function (sel) { return document.querySelector(sel); };
+      var $$ = function (sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); };
+
+      var SESSIONS = [
+        { id: "s1", date: "2026-08-12", focus: "胸", title: "胸部力量", summary: "今天卧推感觉稳定，肩部无不适。", sets: [
+          { name: "杠铃卧推", detail: "60 kg × 8 · 4 组" },
+          { name: "哑铃飞鸟", detail: "12 kg × 12 · 3 组" },
+          { name: "双杠臂屈伸", detail: "自重 × 10 · 3 组" }
+        ]},
+        { id: "s2", date: "2026-08-05", focus: "背", title: "背部拉升", summary: "引体向上有进步。", sets: [
+          { name: "引体向上", detail: "自重 × 6 · 4 组" },
+          { name: "坐姿划船", detail: "45 kg × 10 · 3 组" }
+        ]},
+        { id: "s3", date: "2026-07-28", focus: "腿", title: "下肢力量", summary: "深蹲深度更稳。", sets: [
+          { name: "杠铃深蹲", detail: "80 kg × 5 · 4 组" },
+          { name: "罗马尼亚硬拉", detail: "70 kg × 8 · 3 组" }
+        ]},
+        { id: "s4", date: "2026-07-14", focus: "胸", title: "胸部容量", summary: "容量周，控制节奏。", sets: [
+          { name: "哑铃卧推", detail: "22 kg × 10 · 4 组" },
+          { name: "绳索夹胸", detail: "15 × 12 · 3 组" }
+        ]},
+        { id: "s5", date: "2026-07-01", focus: "背", title: "背部基础", summary: "热身充分。", sets: [
+          { name: "高位下拉", detail: "40 kg × 10 · 4 组" }
+        ]}
+      ];
+
+      var FILES = {
+        a: { name: "小周-个人训练档案-20260821.fca", snap: "2026-08-21", label: "2026-08-21 快照", newer: true },
+        b: { name: "小周-个人训练档案-20260701.fca", snap: "2026-07-01", label: "2026-07-01 快照", newer: false }
+      };
+
+      var state = {
+        screen: "chooser",
+        pickFile: null,
+        snap: "2026-08-21",
+        hasArchive: false,
+        filter: "all",
+        query: "",
+        compact: false,
+        unitKg: true,
+        reimportOk: true,
+        reimportMode: false,
+        coachDataPresent: false
+      };
+
+      var NOW = {
+        chooser: "首次启动 · 选择使用方式",
+        "import-pick": "系统文件选择器 · 选取档案",
+        "import-pw": "输入档案密码",
+        "import-ok": "导入成功 · 可进查看首页",
+        "mix-block": "冲突拦截 · 禁止混入教练数据",
+        "block-dest": "模块边界 · 备份/换设备",
+        reimport: "同来源再导入 · 整包替换或失败保留",
+        home: "查看首页 · 只读摘要",
+        sessions: "课程列表 · 搜索与筛选",
+        "session-detail": "课程详情 · 只读",
+        body: "身体数据与趋势 · 只读",
+        settings: "显示设置 · 再导入 · 删除",
+        "delete": "确认删除本机档案",
+        empty: "本机档案已删除",
+        dest: "模块边界出口"
+      };
+
+      function setSceneCurrent(scene) {
+        $$(".scene-btn").forEach(function (btn) {
+          btn.setAttribute("aria-current", btn.getAttribute("data-scene") === scene ? "true" : "false");
+        });
+      }
+
+      function sceneFor(screen) {
+        var map = {
+          chooser: "chooser",
+          "import-pick": "import",
+          "import-pw": "import",
+          "import-ok": "import",
+          "mix-block": "block",
+          "block-dest": "block",
+          reimport: "reimport",
+          home: "viewer",
+          sessions: "viewer",
+          "session-detail": "viewer",
+          body: "viewer",
+          settings: "viewer",
+          "delete": "delete",
+          empty: "delete",
+          dest: "chooser"
+        };
+        return map[screen] || "chooser";
+      }
+
+      function showScreen(name) {
+        state.screen = name;
+        $$(".screen").forEach(function (el) {
+          el.classList.toggle("is-on", el.getAttribute("data-screen") === name);
+        });
+        $("#now-state").textContent = NOW[name] || name;
+        setSceneCurrent(sceneFor(name));
+      }
+
+      function openDest(title, body, bound) {
+        $("#dest-nav").textContent = "出口";
+        $("#dest-title").textContent = title;
+        $("#dest-body").textContent = body;
+        $("#dest-bound").textContent = bound || "—— 模块边界 ——";
+        showScreen("dest");
+      }
+
+      function openBlockDest(title, body, bound, showSim) {
+        $("#block-dest-nav").textContent = "出口";
+        $("#block-dest-title").textContent = title;
+        $("#block-dest-body").textContent = body;
+        $("#block-dest-bound").textContent = bound || "—— 模块边界 ——";
+        $("#btn-sim-cleared").style.display = showSim ? "block" : "none";
+        showScreen("block-dest");
+      }
+
+      function syncSnapLabels() {
+        var s = state.snap;
+        ["#home-snap", "#import-snap-date", "#set-snap", "#del-snap"].forEach(function (sel) {
+          var el = $(sel);
+          if (el) el.textContent = s;
+        });
+        $("#m-sessions").textContent = s === "2026-07-01" ? "12" : "18";
+      }
+
+      function selectedFile() {
+        return state.pickFile ? FILES[state.pickFile] : null;
+      }
+
+      function resetPicker() {
+        state.pickFile = null;
+        $("#pick-file-a").setAttribute("aria-pressed", "false");
+        $("#pick-file-b").setAttribute("aria-pressed", "false");
+        $("#btn-picker-next").disabled = true;
+      }
+
+      function resetPw() {
+        $("#im-pw").value = "";
+        $("#im-pw").classList.remove("is-err");
+        $("#err-import-pw").classList.remove("show");
+      }
+
+      function beginImport(reimport) {
+        state.reimportMode = !!reimport;
+        state.coachDataPresent = false;
+        resetPicker();
+        resetPw();
+        showScreen("import-pick");
+      }
+
+      function afterPickContinue() {
+        var f = selectedFile();
+        if (!f) return;
+        $("#import-file-name").textContent = f.name;
+        resetPw();
+        showScreen("import-pw");
+      }
+
+      function finishImportSuccess(f, replaced) {
+        state.hasArchive = true;
+        state.snap = f.snap;
+        syncSnapLabels();
+        $("#import-ok-title").textContent = replaced ? "档案已用较新快照替换" : "个人训练档案已导入";
+        $("#import-ok-body").textContent = replaced
+          ? "旧版本已整包替换。失败场景不会走到这里。"
+          : "已进入只读查看模式。本机仅保留一个档案来源。";
+        $("#import-snap-date").textContent = f.snap;
+        state.reimportMode = false;
+        showScreen("import-ok");
+      }
+
+      function tryUnlock() {
+        var pw = $("#im-pw").value.trim();
+        var f = selectedFile();
+        if (!f) return;
+
+        var fail = !pw || pw.length < 4 || pw.indexOf("错") !== -1;
+        if (fail) {
+          $("#im-pw").classList.add("is-err");
+          $("#err-import-pw").classList.add("show");
+          $("#err-import-pw").textContent = state.hasArchive
+            ? "导入失败，本机仍保留旧版本档案，数据未改动"
+            : "密码不正确，或文件无法解密";
+          return;
+        }
+
+        if (state.reimportMode && state.hasArchive) {
+          if (!f.newer && f.snap <= state.snap) {
+            $("#im-pw").classList.add("is-err");
+            $("#err-import-pw").classList.add("show");
+            $("#err-import-pw").textContent = "所选快照不比本机更新，未替换";
+            return;
+          }
+          $("#re-old").textContent = state.snap + " 快照";
+          $("#re-new").textContent = f.label;
+          state.reimportOk = true;
+          $("#re-ok").setAttribute("aria-pressed", "true");
+          $("#re-fail").setAttribute("aria-pressed", "false");
+          showScreen("reimport");
+          return;
+        }
+
+        finishImportSuccess(f, false);
+      }
+
+      function confirmReimport() {
+        var f = selectedFile();
+        if (!f) return;
+        if (!state.reimportOk) {
+          $("#import-ok-title").textContent = "替换失败，已保留旧版本";
+          $("#import-ok-body").textContent = "解密或校验未通过。本机快照仍为 " + state.snap + "，数据未改动。";
+          $("#import-snap-date").textContent = state.snap;
+          state.reimportMode = false;
+          showScreen("import-ok");
+          return;
+        }
+        finishImportSuccess(f, true);
+      }
+
+      function renderSessions() {
+        var q = (state.query || "").trim();
+        var list = SESSIONS.filter(function (s) {
+          if (state.filter !== "all" && s.focus !== state.filter) return false;
+          if (!q) return true;
+          var blob = s.title + s.focus + s.summary + s.sets.map(function (x) { return x.name; }).join("");
+          return blob.indexOf(q) !== -1;
+        });
+        if (state.snap === "2026-07-01") {
+          list = list.filter(function (s) { return s.date <= "2026-07-01"; });
+        }
+        var box = $("#session-list");
+        if (!list.length) {
+          box.innerHTML = '<div class="empty">没有匹配的课程记录</div>';
+          return;
+        }
+        box.innerHTML = list.map(function (s) {
+          var sub = state.compact ? s.focus : (s.focus + " · " + s.sets.length + " 个动作 · " + s.summary);
+          return (
+            '<button type="button" class="row" data-od-id="session-' + s.id + '" data-sid="' + s.id + '">' +
+              '<div class="row-main"><div class="row-name">' + s.date + " · " + s.title + '</div>' +
+              '<div class="row-sub">' + sub + '</div></div><span class="chev" aria-hidden="true"></span></button>'
+          );
+        }).join("");
+        $$("#session-list .row").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            openSession(btn.getAttribute("data-sid"));
+          });
+        });
+      }
+
+      function openSession(id) {
+        var s = SESSIONS.filter(function (x) { return x.id === id; })[0];
+        if (!s) return;
+        $("#sd-date").textContent = s.date + " · " + s.focus;
+        $("#sd-title").textContent = s.title;
+        $("#sd-summary").textContent = s.summary;
+        $("#sd-sets").innerHTML = s.sets.map(function (set) {
+          var detail = set.detail;
+          if (!state.unitKg) detail = detail.replace(/(\d+(?:\.\d+)?)\s*kg/g, function (_, n) {
+            return (Math.round(parseFloat(n) * 2.205 * 10) / 10) + " 磅";
+          });
+          return '<div class="cell"><span>' + set.name + '</span><b>' + detail + '</b></div>';
+        }).join("");
+        showScreen("session-detail");
+      }
+
+      function goTab(tab) {
+        if (tab === "home") showScreen("home");
+        else if (tab === "sessions") { renderSessions(); showScreen("sessions"); }
+        else if (tab === "body") {
+          $("#body-weight").textContent = state.unitKg ? "72.4 kg" : "159.6 磅";
+          showScreen("body");
+        }
+        else if (tab === "settings") showScreen("settings");
+      }
+
+      function applyScene(scene) {
+        if (scene === "chooser") {
+          state.coachDataPresent = false;
+          state.reimportMode = false;
+          showScreen("chooser");
+        } else if (scene === "import") {
+          state.hasArchive = false;
+          beginImport(false);
+        } else if (scene === "block") {
+          state.coachDataPresent = true;
+          state.reimportMode = false;
+          resetPicker();
+          showScreen("mix-block");
+        } else if (scene === "reimport") {
+          state.hasArchive = true;
+          state.snap = "2026-07-01";
+          syncSnapLabels();
+          state.pickFile = "a";
+          $("#re-old").textContent = "2026-07-01 快照";
+          $("#re-new").textContent = "2026-08-21 快照";
+          state.reimportOk = true;
+          $("#re-ok").setAttribute("aria-pressed", "true");
+          $("#re-fail").setAttribute("aria-pressed", "false");
+          showScreen("reimport");
+        } else if (scene === "viewer") {
+          state.hasArchive = true;
+          state.snap = "2026-08-21";
+          syncSnapLabels();
+          showScreen("home");
+        } else if (scene === "delete") {
+          state.hasArchive = true;
+          state.snap = "2026-08-21";
+          syncSnapLabels();
+          showScreen("delete");
+        }
+      }
+
+      // wire
+      syncSnapLabels();
+      renderSessions();
+      setSceneCurrent("chooser");
+
+      $("#btn-choose-coach").addEventListener("click", function () {
+        openDest(
+          "教练使用",
+          "教练工作流（学员、排课、训练、备份）不在本模块绘制。查看模式不是教练工作空间内的身份切换。",
+          "—— 模块边界 · 教练工作模式未绘制 ——"
+        );
+      });
+
+      $("#btn-choose-import").addEventListener("click", function () {
+        if (state.coachDataPresent) {
+          showScreen("mix-block");
+          return;
+        }
+        beginImport(false);
+      });
+
+      function selectFile(key) {
+        state.pickFile = key;
+        $("#pick-file-a").setAttribute("aria-pressed", key === "a" ? "true" : "false");
+        $("#pick-file-b").setAttribute("aria-pressed", key === "b" ? "true" : "false");
+        $("#btn-picker-next").disabled = false;
+      }
+      $("#pick-file-a").addEventListener("click", function () { selectFile("a"); });
+      $("#pick-file-b").addEventListener("click", function () { selectFile("b"); });
+      $("#btn-picker-next").addEventListener("click", afterPickContinue);
+
+      $("#btn-import-unlock").addEventListener("click", tryUnlock);
+      $("#btn-enter-viewer").addEventListener("click", function () {
+        showScreen("home");
+      });
+
+      $("#btn-block-backup").addEventListener("click", function () {
+        openBlockDest(
+          "完整备份并清除",
+          "完整备份与清除教练数据属于设置/备份模块，本模块仅声明必须先完成后再导入。",
+          "—— 模块边界 · 完整备份未绘制 ——",
+          true
+        );
+      });
+      $("#btn-block-device").addEventListener("click", function () {
+        openBlockDest(
+          "换一台设备",
+          "请在没有教练数据的设备上新安装 FineCoach，再走「导入个人训练档案」。本机不做合并。",
+          "—— 模块边界 · 换设备说明 ——",
+          false
+        );
+      });
+      $("#btn-sim-cleared").addEventListener("click", function () {
+        state.coachDataPresent = false;
+        beginImport(false);
+      });
+
+      $("#re-ok").addEventListener("click", function () {
+        state.reimportOk = true;
+        $("#re-ok").setAttribute("aria-pressed", "true");
+        $("#re-fail").setAttribute("aria-pressed", "false");
+      });
+      $("#re-fail").addEventListener("click", function () {
+        state.reimportOk = false;
+        $("#re-ok").setAttribute("aria-pressed", "false");
+        $("#re-fail").setAttribute("aria-pressed", "true");
+      });
+      $("#btn-reimport-go").addEventListener("click", confirmReimport);
+
+      $$("[data-tab]").forEach(function (el) {
+        el.addEventListener("click", function () {
+          var tab = el.getAttribute("data-tab");
+          if (!tab) return;
+          goTab(tab);
+        });
+      });
+
+      $$(".filter-chip").forEach(function (chip) {
+        chip.addEventListener("click", function () {
+          state.filter = chip.getAttribute("data-filter");
+          $$(".filter-chip").forEach(function (c) {
+            c.setAttribute("aria-pressed", c === chip ? "true" : "false");
+          });
+          renderSessions();
+        });
+      });
+
+      $("#session-q").addEventListener("input", function () {
+        state.query = $("#session-q").value;
+        renderSessions();
+      });
+
+      function wireToggle(btn, key, onChange) {
+        btn.addEventListener("click", function () {
+          state[key] = !state[key];
+          btn.setAttribute("aria-pressed", state[key] ? "true" : "false");
+          btn.querySelector(".switch-track").setAttribute("aria-checked", state[key] ? "true" : "false");
+          if (onChange) onChange();
+        });
+      }
+      wireToggle($("#toggle-unit"), "unitKg", function () {
+        $("#body-weight").textContent = state.unitKg ? "72.4 kg" : "159.6 磅";
+      });
+      wireToggle($("#toggle-compact"), "compact", function () {
+        renderSessions();
+      });
+
+      $("#btn-settings-reimport").addEventListener("click", function () {
+        beginImport(true);
+      });
+      $("#btn-settings-delete").addEventListener("click", function () {
+        showScreen("delete");
+      });
+      $("#btn-delete-confirm").addEventListener("click", function () {
+        state.hasArchive = false;
+        showScreen("empty");
+      });
+
+      $$("[data-go]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var go = btn.getAttribute("data-go");
+          if (go === "import-pick") { resetPicker(); resetPw(); }
+          if (go === "chooser") {
+            state.reimportMode = false;
+            state.coachDataPresent = false;
+          }
+          if (go === "sessions") renderSessions();
+          showScreen(go);
+        });
+      });
+
+      $$(".scene-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          applyScene(btn.getAttribute("data-scene"));
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

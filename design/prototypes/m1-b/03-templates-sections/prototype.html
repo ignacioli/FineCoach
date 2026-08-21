@@ -1,0 +1,1844 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FineCoach · M1-B · 训练模板与课程分区</title>
+  <style>
+    :root {
+      --bg: oklch(0.93 0 0);
+      --surface: oklch(0.99 0 0);
+      --fg: oklch(0.22 0 0);
+      --muted: oklch(0.46 0 0);
+      --border: oklch(0.78 0 0);
+      --accent: oklch(0.28 0 0);
+      --fill: oklch(0.90 0 0);
+      --fill-2: oklch(0.85 0 0);
+      --danger: oklch(0.42 0.12 25);
+      --phone-w: 393px;
+      --phone-h: 852px;
+      --tap: 44px;
+      --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Heiti SC", sans-serif;
+      --mono: ui-monospace, Menlo, "SF Mono", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    body {
+      font-family: var(--font);
+      color: var(--fg);
+      background: var(--bg);
+      line-height: 1.45;
+    }
+    button, input, textarea, select { font: inherit; color: inherit; }
+    button { cursor: pointer; background: none; border: 0; }
+    img { display: none; }
+
+    .spec-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .spec-bar b { font-weight: 600; color: var(--fg); }
+
+    .board {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) var(--phone-w) minmax(240px, 1fr);
+      gap: 28px;
+      align-items: start;
+      justify-content: center;
+      padding: 28px 24px 48px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .rail h2 {
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .note {
+      border: 1px dashed var(--border);
+      background: var(--surface);
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--fg);
+      margin-bottom: 10px;
+    }
+    .note ol, .note ul { padding-left: 1.15em; }
+    .note li { margin: 4px 0; }
+    .note .k { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .scene-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .scene-btn {
+      min-height: var(--tap);
+      text-align: left;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--fg);
+    }
+    .scene-btn:hover { background: oklch(0.94 0 0); }
+    .scene-btn[aria-current="true"] { background: var(--fill); border-color: var(--fg); }
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible {
+      outline: 2px solid var(--fg);
+      outline-offset: 2px;
+    }
+    .check { font-size: 13px; }
+    .check li { margin: 6px 0; color: var(--muted); }
+    .check li.ok { color: var(--fg); font-weight: 600; }
+    .now { margin-top: 12px; padding: 10px 12px; border: 1px solid var(--fg); background: var(--surface); font-size: 13px; }
+
+    .device-wrap { width: var(--phone-w); }
+    .device-caption {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 8px;
+      font-family: var(--mono);
+    }
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      border-radius: 54px;
+      border: 11px solid oklch(0.18 0 0);
+      background: oklch(0.97 0 0);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 18px 40px oklch(0.55 0 0 / 0.18);
+    }
+    .island {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      width: 126px;
+      height: 36px;
+      margin-left: -63px;
+      background: oklch(0.12 0 0);
+      border-radius: 20px;
+      z-index: 5;
+    }
+    .status {
+      height: 54px;
+      padding: 14px 28px 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .status-sys { display: flex; gap: 6px; align-items: center; }
+    .sig, .bat { display: inline-block; height: 10px; background: var(--fg); }
+    .sig { width: 16px; clip-path: polygon(0 70%, 35% 45%, 65% 20%, 100% 0, 100% 100%, 0 100%); }
+    .bat { width: 22px; height: 11px; border: 1.5px solid var(--fg); background: transparent; position: relative; }
+    .bat::after { content: ""; position: absolute; inset: 2px 8px 2px 2px; background: var(--fg); }
+    .home-bar {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      width: 134px;
+      height: 5px;
+      margin-left: -67px;
+      background: oklch(0.22 0 0);
+      border-radius: 3px;
+      z-index: 5;
+    }
+    .app {
+      position: absolute;
+      inset: 54px 0 24px;
+      display: flex;
+      flex-direction: column;
+      background: oklch(0.97 0 0);
+    }
+    .screen { display: none; flex: 1; flex-direction: column; min-height: 0; }
+    .screen.is-on { display: flex; }
+
+    .nav {
+      min-height: var(--tap);
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex: none;
+    }
+    .nav h1 {
+      flex: 1;
+      font-size: 17px;
+      font-weight: 650;
+      text-align: center;
+    }
+    .nav-side { width: 72px; display: flex; align-items: center; }
+    .nav-side.end { justify-content: flex-end; gap: 2px; width: auto; min-width: 72px; }
+    .icon-btn, .text-btn {
+      min-width: var(--tap);
+      min-height: var(--tap);
+      padding: 0 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fg);
+      font-size: 15px;
+      font-weight: 560;
+    }
+    .icon-btn:hover, .text-btn:hover, .ghost:hover { background: oklch(0.93 0 0); }
+    .text-btn { min-width: auto; }
+    .text-btn:disabled { color: var(--muted); }
+
+    .body { flex: 1; overflow: auto; padding: 16px 16px 20px; }
+    .body.tight { padding: 0; }
+
+    .primary, .ghost, .danger-btn {
+      min-height: var(--tap);
+      width: 100%;
+      padding: 0 16px;
+      font-size: 17px;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+    .primary { background: var(--accent); color: oklch(0.99 0 0); }
+    .primary:hover { background: oklch(0.16 0 0); color: oklch(0.99 0 0); }
+    .ghost { border: 1px solid var(--border); background: var(--surface); color: var(--fg); }
+    .danger-btn { border: 1px solid var(--danger); color: var(--danger); background: var(--surface); }
+    .danger-btn:hover { background: oklch(0.95 0.02 25); color: var(--danger); }
+    .btn-row { display: flex; gap: 8px; margin-top: 12px; }
+    .btn-row .primary, .btn-row .ghost, .btn-row .danger-btn { margin-top: 0; flex: 1; }
+
+    .sec-label {
+      font-size: 12px;
+      font-weight: 650;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      padding: 14px 16px 6px;
+      text-transform: uppercase;
+    }
+    .sec-label.inline { padding: 8px 0 6px; }
+
+    .field-label { display: block; font-size: 13px; font-weight: 600; margin: 14px 0 6px; }
+    .field-label:first-child { margin-top: 0; }
+    .req { color: var(--muted); font-weight: 500; }
+    .field, .area, .select {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 16px;
+    }
+    .area { min-height: 88px; resize: vertical; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+    .list-row {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      color: var(--fg);
+    }
+    .list-row:hover { background: oklch(0.95 0 0); }
+    .list-row .main { flex: 1; min-width: 0; }
+    .list-row .name { font-size: 16px; font-weight: 600; }
+    .list-row .sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .list-row .chev { color: var(--muted); font-size: 18px; flex: none; }
+
+    .callout {
+      border: 1px dashed var(--fg);
+      background: var(--surface);
+      padding: 12px;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    .callout b { display: block; font-size: 15px; margin-bottom: 4px; }
+    .callout p { color: var(--muted); }
+    .callout ul { margin: 6px 0 0 1.1em; color: var(--muted); }
+    .callout li { margin: 2px 0; }
+
+    .choice {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      text-align: left;
+      margin-bottom: 8px;
+      color: var(--fg);
+    }
+    .choice:hover { background: oklch(0.95 0 0); }
+    .choice[aria-pressed="true"] { border-color: var(--fg); background: var(--fill); }
+    .choice .t { font-size: 16px; font-weight: 600; display: block; }
+    .choice .d { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border: 1px solid var(--fg);
+      background: var(--surface);
+      color: var(--fg);
+      white-space: nowrap;
+    }
+    .pill.dash { border-style: dashed; color: var(--muted); border-color: var(--border); }
+    .pill.fill { background: var(--fill); }
+
+    .empty {
+      padding: 40px 24px;
+      text-align: center;
+    }
+    .empty-box {
+      width: 72px;
+      height: 48px;
+      border: 1px dashed var(--border);
+      margin: 0 auto 16px;
+    }
+    .empty h2 { font-size: 18px; margin-bottom: 8px; }
+    .empty p { font-size: 15px; color: var(--muted); }
+
+    .meta-bar {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 13px;
+      color: var(--muted);
+      flex: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      align-items: center;
+    }
+    .meta-bar strong { color: var(--fg); font-weight: 600; }
+
+    .section-block {
+      margin: 10px 0 14px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .section-head {
+      min-height: var(--tap);
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      background: oklch(0.96 0 0);
+    }
+    .section-head .title {
+      flex: 1;
+      font-size: 15px;
+      font-weight: 650;
+      min-width: 0;
+    }
+    .section-actions { display: flex; gap: 2px; flex: none; }
+    .section-actions .icon-btn { min-width: 40px; font-size: 13px; }
+
+    .ex-row {
+      display: flex;
+      align-items: stretch;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      min-height: var(--tap);
+    }
+    .ex-row:last-child { border-bottom: 0; }
+    .ex-row.is-drag { opacity: 0.55; background: var(--fill); }
+    .ex-row.is-over { outline: 2px solid var(--fg); outline-offset: -2px; }
+    .handle {
+      width: 40px;
+      min-height: var(--tap);
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      font-size: 14px;
+      letter-spacing: -1px;
+      cursor: grab;
+      flex: none;
+      border-right: 1px solid var(--border);
+      user-select: none;
+    }
+    .handle:active { cursor: grabbing; }
+    .ex-main {
+      flex: 1;
+      min-width: 0;
+      padding: 10px 12px;
+      text-align: left;
+      color: var(--fg);
+    }
+    .ex-main:hover { background: oklch(0.96 0 0); }
+    .ex-name { font-size: 15px; font-weight: 600; }
+    .ex-plan { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    .set-list { padding: 0 12px 10px 52px; display: flex; flex-direction: column; gap: 6px; }
+    .set-chip {
+      min-height: 36px;
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 13px;
+      background: var(--surface);
+    }
+    .set-chip.pending {
+      border: 1px dashed var(--border);
+      color: var(--muted);
+    }
+    .set-chip.done {
+      border: 1px solid var(--fg);
+      background: var(--fill);
+      color: var(--fg);
+      font-weight: 560;
+    }
+    .set-chip button {
+      min-height: 32px;
+      min-width: 64px;
+      padding: 0 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--fg);
+    }
+    .set-chip button:hover { background: oklch(0.93 0 0); }
+    .set-chip.done button { border-color: var(--fg); }
+
+    .flat-note {
+      margin: 0 16px 10px;
+      padding: 10px 12px;
+      border: 1px dashed var(--border);
+      font-size: 12px;
+      color: var(--muted);
+      background: var(--surface);
+    }
+
+    .footer-actions {
+      flex: none;
+      padding: 10px 16px 12px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .footer-actions .ghost,
+    .footer-actions .primary { margin-top: 0; }
+    .footer-actions .ghost + .ghost,
+    .footer-actions .ghost + .primary { margin-top: 8px; }
+
+    .scrim {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: oklch(0.22 0 0 / 0.28);
+      z-index: 8;
+    }
+    .scrim.on { display: block; }
+    .sheet {
+      display: none;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--fg);
+      z-index: 9;
+      padding: 12px 16px 28px;
+      max-height: 78%;
+      overflow: auto;
+    }
+    .sheet.on { display: block; }
+    .sheet h2 { font-size: 17px; font-weight: 650; margin-bottom: 6px; }
+    .sheet .lead { font-size: 14px; color: var(--muted); margin-bottom: 12px; }
+    .menu-item {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 0 4px;
+      text-align: left;
+      font-size: 16px;
+      color: var(--fg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .menu-item:hover { background: oklch(0.94 0 0); }
+    .menu-item.danger { color: var(--danger); }
+    .menu-item:disabled { color: var(--muted); }
+
+    .toast {
+      display: none;
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: 36px;
+      z-index: 15;
+      background: var(--fg);
+      color: oklch(0.99 0 0);
+      padding: 12px 14px;
+      font-size: 14px;
+      text-align: center;
+    }
+    .toast.on { display: block; }
+
+    .stamp {
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .plan-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    @media (max-width: 1100px) {
+      .board { grid-template-columns: 1fr; justify-items: center; }
+      .rail { width: min(520px, 100%); }
+    }
+  </style>
+</head>
+<body>
+  <header class="spec-bar" data-od-id="page-header">
+    <div>stage=<b>M1-B</b></div>
+    <div>module=<b>03-templates-sections</b></div>
+    <div>version=<b>v0.1</b></div>
+    <div>coverage=<b>this module only</b></div>
+    <div>data=<b>虚构数据</b></div>
+    <div>network=<b>无外部资源</b></div>
+    <div>review=<b>产品负责人走查通过</b></div>
+  </header>
+
+  <div class="board">
+    <aside class="rail" data-od-id="annotation-left">
+      <h2>走查说明</h2>
+      <div class="note">
+        低保真线框，与 M1-B/01 同视觉语言。本模块只覆盖<strong>通用训练模板</strong>与<strong>课程分区</strong>。
+      </div>
+      <div class="note">
+        <ul>
+          <li>空白 Session 默认仍是<strong>扁平列表</strong>；添加动作不必先建分区。</li>
+          <li>应用模板 = 本次独立快照；预填组保持<strong>待完成</strong>。</li>
+          <li>另存模板不复制学员信息、私有备注、学员课后总结。</li>
+          <li><span class="k">M1-A</span> 仅为扁平列表；跨分区拖动是 M1-B 能力。</li>
+        </ul>
+      </div>
+      <h2>场景</h2>
+      <div class="scene-list" data-od-id="scene-list">
+        <button type="button" class="scene-btn" data-od-id="scene-list-tpl" data-scene="list" aria-current="true">A · 模板列表与新建</button>
+        <button type="button" class="scene-btn" data-od-id="scene-save-as" data-scene="save-as">B · 另存已完成训练</button>
+        <button type="button" class="scene-btn" data-od-id="scene-chooser" data-scene="chooser">C · 开始训练选择器</button>
+        <button type="button" class="scene-btn" data-od-id="scene-apply" data-scene="apply">D · 应用模板（预填）</button>
+        <button type="button" class="scene-btn" data-od-id="scene-blank" data-scene="blank">E · 空白开始（扁平）</button>
+        <button type="button" class="scene-btn" data-od-id="scene-delete" data-scene="delete-section">F · 删除非空分区</button>
+        <button type="button" class="scene-btn" data-od-id="scene-drag" data-scene="drag">G · 跨分区拖动</button>
+      </div>
+    </aside>
+
+    <div class="device-wrap">
+      <div class="device-caption">iPhone 15 · 393×852 · 44pt</div>
+      <div class="phone" data-od-id="iphone-frame" role="application" aria-label="FineCoach 训练模板与课程分区线框原型">
+        <div class="island" aria-hidden="true"></div>
+        <div class="status" aria-hidden="true">
+          <span>9:41</span>
+          <span class="status-sys"><span class="sig"></span><span class="bat"></span></span>
+        </div>
+        <div class="app" id="app">
+
+          <!-- 模板列表 -->
+          <section class="screen is-on" data-screen="tpl-list" data-od-id="screen-tpl-list">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="tpl-list-back" id="btn-tpl-list-back">设置</button>
+              </div>
+              <h1 data-od-id="tpl-list-title">训练模板</h1>
+              <div class="nav-side end">
+                <button type="button" class="text-btn" data-od-id="tpl-list-add" id="btn-tpl-add">新建</button>
+              </div>
+            </div>
+            <div class="body tight" id="tpl-list-body" data-od-id="tpl-list-body"></div>
+          </section>
+
+          <!-- 新建 / 编辑模板 -->
+          <section class="screen" data-screen="tpl-form" data-od-id="screen-tpl-form">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="tpl-form-cancel" id="btn-form-cancel">取消</button>
+              </div>
+              <h1 data-od-id="tpl-form-title" id="form-title">新建模板</h1>
+              <div class="nav-side end">
+                <button type="button" class="text-btn" data-od-id="tpl-form-save" id="btn-form-save">保存</button>
+              </div>
+            </div>
+            <div class="body" data-od-id="tpl-form-body">
+              <label class="field-label" for="f-name">名称 <span class="req">必填</span></label>
+              <input class="field" id="f-name" data-od-id="field-tpl-name" type="text" placeholder="例如：推日 · 上肢力量" autocomplete="off">
+              <label class="field-label" for="f-focus">训练重点 <span class="req">选填</span></label>
+              <input class="field" id="f-focus" data-od-id="field-tpl-focus" type="text" placeholder="例如：胸 · 肩 · 三头" autocomplete="off">
+              <p class="hint">分区选填；保存有序动作及计划组数 / 重量 / 次数或时长。</p>
+              <div class="callout" data-od-id="form-section-note">
+                <b>分区可选</b>
+                <p>可先只保存扁平动作列表。需要时再在模板中添加分区。</p>
+              </div>
+              <div id="form-exercises" data-od-id="form-exercises"></div>
+              <button type="button" class="ghost" id="btn-form-add-ex" data-od-id="cta-form-add-ex">添加动作</button>
+              <button type="button" class="ghost" id="btn-form-add-sec" data-od-id="cta-form-add-sec">添加分区（选填）</button>
+            </div>
+          </section>
+
+          <!-- 模板详情 -->
+          <section class="screen" data-screen="tpl-detail" data-od-id="screen-tpl-detail">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="tpl-detail-back" id="btn-detail-back">返回</button>
+              </div>
+              <h1 data-od-id="tpl-detail-title">模板</h1>
+              <div class="nav-side end">
+                <button type="button" class="text-btn" data-od-id="tpl-detail-edit" id="btn-detail-edit">编辑</button>
+              </div>
+            </div>
+            <div class="body" id="tpl-detail-body" data-od-id="tpl-detail-body"></div>
+            <div class="footer-actions">
+              <button type="button" class="primary" id="btn-detail-apply" data-od-id="cta-apply-from-detail">应用到新训练</button>
+            </div>
+          </section>
+
+          <!-- 已完成训练 → 另存为模板 -->
+          <section class="screen" data-screen="save-as" data-od-id="screen-save-as">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="save-as-back" id="btn-save-as-back">返回</button>
+              </div>
+              <h1 data-od-id="save-as-title">另存为模板</h1>
+              <div class="nav-side end">
+                <button type="button" class="text-btn" data-od-id="save-as-save" id="btn-save-as-confirm">保存</button>
+              </div>
+            </div>
+            <div class="body" data-od-id="save-as-body">
+              <div class="callout" data-od-id="save-as-source">
+                <b>来源：已完成训练</b>
+                <p>小周 · 2026-08-18 · 推日 · 上肢 · 实际 6 组</p>
+              </div>
+              <div class="callout" data-od-id="save-as-exclude">
+                <b>不会复制</b>
+                <ul>
+                  <li>学员信息</li>
+                  <li>教练私有备注 / 动作私有备注</li>
+                  <li>学员课后总结</li>
+                </ul>
+                <p style="margin-top:8px">实际组将转为计划数据（组数 / 重量 / 次数或时长）。</p>
+              </div>
+              <label class="field-label" for="sa-name">模板名称 <span class="req">必填</span></label>
+              <input class="field" id="sa-name" data-od-id="field-save-as-name" type="text" value="推日 · 上肢力量" autocomplete="off">
+              <label class="field-label" for="sa-focus">训练重点 <span class="req">选填</span></label>
+              <input class="field" id="sa-focus" data-od-id="field-save-as-focus" type="text" value="胸 · 肩 · 三头" autocomplete="off">
+              <div class="sec-label inline">将转为计划的动作</div>
+              <div id="save-as-preview" data-od-id="save-as-preview"></div>
+            </div>
+          </section>
+
+          <!-- 开始训练选择器 -->
+          <section class="screen" data-screen="start-chooser" data-od-id="screen-start-chooser">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="chooser-cancel" id="btn-chooser-cancel">取消</button>
+              </div>
+              <h1 data-od-id="chooser-title">开始训练</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body" data-od-id="chooser-body">
+              <div class="callout" data-od-id="chooser-student">
+                <b>学员 · 小周</b>
+                <p>选择模板或空白开始。空白仍是一等入口。</p>
+              </div>
+              <button type="button" class="choice" id="btn-blank-start" data-od-id="cta-blank-start" aria-pressed="false">
+                <span class="t">空白开始</span>
+                <span class="d">默认扁平动作列表 · 可稍后添加分区</span>
+              </button>
+              <div class="sec-label inline">可用模板</div>
+              <div id="chooser-tpls" data-od-id="chooser-tpls"></div>
+            </div>
+          </section>
+
+          <!-- 课中 Session -->
+          <section class="screen" data-screen="session" data-od-id="screen-session">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="session-back" id="btn-session-back">退出</button>
+              </div>
+              <h1 data-od-id="session-title" id="session-title">训练中</h1>
+              <div class="nav-side end">
+                <button type="button" class="text-btn" data-od-id="session-more" id="btn-session-more" aria-haspopup="menu">更多</button>
+              </div>
+            </div>
+            <div class="meta-bar" id="session-meta" data-od-id="session-meta"></div>
+            <div class="body tight" id="session-body" data-od-id="session-body"></div>
+            <div class="footer-actions" data-od-id="session-footer">
+              <button type="button" class="ghost" id="btn-add-ex" data-od-id="cta-add-exercise">添加动作</button>
+              <button type="button" class="ghost" id="btn-add-sec" data-od-id="cta-add-section">添加分区</button>
+            </div>
+          </section>
+
+          <!-- 已完成训练入口（另存场景） -->
+          <section class="screen" data-screen="done-session" data-od-id="screen-done-session">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="done-back" id="btn-done-back">历史</button>
+              </div>
+              <h1 data-od-id="done-title">已完成训练</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body" data-od-id="done-body">
+              <div class="callout">
+                <b>小周 · 2026-08-18</b>
+                <p>推日 · 上肢 · 58 分钟 · 6 组已确认</p>
+              </div>
+              <div class="sec-label inline">本课动作（实际）</div>
+              <div id="done-preview" data-od-id="done-preview"></div>
+              <button type="button" class="primary" id="btn-open-save-as" data-od-id="cta-open-save-as">另存为模板</button>
+              <p class="hint">另存时转为计划数据；不带入学员与备注。</p>
+            </div>
+          </section>
+
+        </div>
+        <div class="scrim" id="scrim" data-od-id="scrim"></div>
+        <div class="sheet" id="sheet" data-od-id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title"></div>
+        <div class="toast" id="toast" data-od-id="toast" role="status"></div>
+        <div class="home-bar" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <aside class="rail" data-od-id="annotation-right">
+      <h2>完成判定</h2>
+      <ul class="check" id="check-list" data-od-id="check-list">
+        <li data-check="apply">□ 应用模板 → 独立快照 · 预填待完成</li>
+        <li data-check="blank">□ 空白开始（一等入口）</li>
+        <li data-check="delete-move">□ 删除非空分区 · 迁移动作</li>
+      </ul>
+      <div class="now" id="now-panel" data-od-id="now-panel">当前：模板列表</div>
+      <div class="note" style="margin-top:12px">
+        <b style="display:block;margin-bottom:4px">预填 vs 确认</b>
+        虚线框 +「待完成」= 模板/历史预填；实线填充 +「已完成」= 教练确认组。
+      </div>
+    </aside>
+  </div>
+
+  <script>
+  (function () {
+    "use strict";
+
+    var uid = 1;
+    function id(prefix) { return prefix + "-" + (uid++); }
+
+    function deepClone(v) { return JSON.parse(JSON.stringify(v)); }
+
+    var templates = [
+      {
+        id: "tpl-push",
+        name: "推日 · 上肢力量",
+        focus: "胸 · 肩 · 三头",
+        sections: [
+          {
+            id: "sec-wu",
+            name: "热身",
+            exercises: [
+              { id: "ex-band", name: "弹力带肩环绕", planned: { sets: 2, weight: "轻", reps: "15", duration: "" } }
+            ]
+          },
+          {
+            id: "sec-main",
+            name: "主训练",
+            exercises: [
+              { id: "ex-bench", name: "杠铃卧推", planned: { sets: 4, weight: "60kg", reps: "8", duration: "" } },
+              { id: "ex-ohp", name: "哑铃推举", planned: { sets: 3, weight: "16kg", reps: "10", duration: "" } }
+            ]
+          }
+        ],
+        flat: []
+      },
+      {
+        id: "tpl-pull-flat",
+        name: "拉日 · 背部（无分区）",
+        focus: "背 · 二头",
+        sections: [],
+        flat: [
+          { id: "ex-row", name: "坐姿划船", planned: { sets: 4, weight: "45kg", reps: "10", duration: "" } },
+          { id: "ex-pd", name: "高位下拉", planned: { sets: 3, weight: "40kg", reps: "12", duration: "" } }
+        ]
+      }
+    ];
+
+    var completedSource = {
+      student: "小周",
+      date: "2026-08-18",
+      focus: "胸 · 肩 · 三头",
+      privateNote: "（不会复制）左侧肩峰略紧",
+      summary: "（不会复制）今天推得不错",
+      exercises: [
+        { name: "杠铃卧推", actual: { sets: 4, weight: "62.5kg", reps: "8", duration: "" } },
+        { name: "哑铃推举", actual: { sets: 3, weight: "16kg", reps: "10", duration: "" } },
+        { name: "绳索下压", actual: { sets: 3, weight: "25kg", reps: "12", duration: "" } }
+      ]
+    };
+
+    var state = {
+      screen: "tpl-list",
+      scene: "list",
+      viewingTpl: null,
+      formMode: "create",
+      formDraft: null,
+      session: null,
+      checks: { apply: false, blank: false, "delete-move": false },
+      dragExId: null,
+      sheetCtx: null,
+      toastTimer: null
+    };
+
+    var $ = function (sel) { return document.querySelector(sel); };
+    var screens = document.querySelectorAll(".screen");
+
+    function toast(msg) {
+      var el = $("#toast");
+      el.textContent = msg;
+      el.classList.add("on");
+      clearTimeout(state.toastTimer);
+      state.toastTimer = setTimeout(function () { el.classList.remove("on"); }, 1800);
+    }
+
+    function markCheck(key) {
+      state.checks[key] = true;
+      var li = document.querySelector('[data-check="' + key + '"]');
+      if (!li) return;
+      li.classList.add("ok");
+      var map = {
+        apply: "✓ 应用模板 → 独立快照 · 预填待完成",
+        blank: "✓ 空白开始（一等入口）",
+        "delete-move": "✓ 删除非空分区 · 迁移动作"
+      };
+      li.textContent = map[key] || li.textContent;
+    }
+
+    function setNow(text) {
+      $("#now-panel").textContent = "当前：" + text;
+    }
+
+    function show(name) {
+      state.screen = name;
+      screens.forEach(function (s) {
+        s.classList.toggle("is-on", s.getAttribute("data-screen") === name);
+      });
+      closeSheet();
+      if (name === "tpl-list") { renderTplList(); setNow("模板列表"); }
+      if (name === "tpl-form") { renderForm(); setNow(state.formMode === "create" ? "新建模板" : "编辑模板"); }
+      if (name === "tpl-detail") { renderDetail(); setNow("模板详情"); }
+      if (name === "save-as") { renderSaveAs(); setNow("另存为模板"); }
+      if (name === "start-chooser") { renderChooser(); setNow("开始训练选择器"); }
+      if (name === "session") { renderSession(); setNow(state.session && state.session.mode === "blank" ? "空白训练（扁平）" : "应用模板后的训练"); }
+      if (name === "done-session") { renderDone(); setNow("已完成训练 · 另存入口"); }
+    }
+
+    function openSheet(html) {
+      $("#sheet").innerHTML = html;
+      $("#sheet").classList.add("on");
+      $("#scrim").classList.add("on");
+    }
+    function closeSheet() {
+      $("#sheet").classList.remove("on");
+      $("#scrim").classList.remove("on");
+      $("#sheet").innerHTML = "";
+      state.sheetCtx = null;
+    }
+
+    function findTpl(tid) {
+      for (var i = 0; i < templates.length; i++) {
+        if (templates[i].id === tid) return templates[i];
+      }
+      return null;
+    }
+
+    function countExercises(tpl) {
+      var n = (tpl.flat || []).length;
+      (tpl.sections || []).forEach(function (s) { n += s.exercises.length; });
+      return n;
+    }
+
+    function planLabel(p) {
+      if (!p) return "—";
+      var parts = [];
+      if (p.sets) parts.push(p.sets + " 组");
+      if (p.weight) parts.push(p.weight);
+      if (p.reps) parts.push(p.reps + " 次");
+      if (p.duration) parts.push(p.duration);
+      return parts.join(" · ") || "计划待填";
+    }
+
+    function renderTplList() {
+      var body = $("#tpl-list-body");
+      if (!templates.length) {
+        body.innerHTML =
+          '<div class="empty" data-od-id="tpl-empty">' +
+          '<div class="empty-box"></div><h2>还没有模板</h2>' +
+          '<p>从空白创建，或将已完成训练另存为模板。</p></div>';
+        return;
+      }
+      var html = '<div class="sec-label">我的模板 · ' + templates.length + '</div>';
+      templates.forEach(function (t) {
+        var secN = (t.sections || []).length;
+        var meta = (t.focus ? t.focus + " · " : "") + countExercises(t) + " 个动作" +
+          (secN ? " · " + secN + " 个分区" : " · 无分区");
+        html +=
+          '<button type="button" class="list-row" data-od-id="tpl-row-' + t.id + '" data-tpl="' + t.id + '">' +
+          '<div class="main"><div class="name">' + t.name + '</div>' +
+          '<div class="sub">' + meta + '</div></div>' +
+          '<span class="chev" aria-hidden="true">›</span></button>';
+      });
+      html +=
+        '<div style="padding:16px">' +
+        '<button type="button" class="ghost" id="btn-goto-chooser" data-od-id="cta-goto-chooser">演示：开始训练选择器</button>' +
+        '<button type="button" class="ghost" id="btn-goto-done" data-od-id="cta-goto-done" style="margin-top:8px">演示：另存已完成训练</button>' +
+        '</div>';
+      body.innerHTML = html;
+    }
+
+    function emptyFormDraft() {
+      return {
+        name: "",
+        focus: "",
+        sections: [],
+        flat: [
+          { id: id("ex"), name: "杠铃深蹲", planned: { sets: 4, weight: "80kg", reps: "6", duration: "" } }
+        ]
+      };
+    }
+
+    function renderForm() {
+      var d = state.formDraft;
+      $("#form-title").textContent = state.formMode === "create" ? "新建模板" : "编辑模板";
+      $("#f-name").value = d.name || "";
+      $("#f-focus").value = d.focus || "";
+      var box = $("#form-exercises");
+      var html = "";
+      if (d.sections.length) {
+        d.sections.forEach(function (sec, si) {
+          html += '<div class="section-block" data-od-id="form-sec-' + sec.id + '">';
+          html += '<div class="section-head"><span class="title">' + sec.name + '</span></div>';
+          sec.exercises.forEach(function (ex) {
+            html +=
+              '<div class="ex-row"><div class="ex-main" style="padding-left:12px">' +
+              '<div class="ex-name">' + ex.name + '</div>' +
+              '<div class="ex-plan">计划 · ' + planLabel(ex.planned) + '</div></div></div>';
+          });
+          if (!sec.exercises.length) {
+            html += '<div style="padding:12px;font-size:13px;color:var(--muted)">分区内暂无动作</div>';
+          }
+          html += '</div>';
+        });
+      }
+      if (d.flat.length) {
+        html += '<div class="sec-label inline">扁平动作（无分区）</div>';
+        d.flat.forEach(function (ex) {
+          html +=
+            '<div class="ex-row" style="border:1px solid var(--border);margin-bottom:8px">' +
+            '<div class="ex-main" style="padding-left:12px">' +
+            '<div class="ex-name">' + ex.name + '</div>' +
+            '<div class="ex-plan">计划 · ' + planLabel(ex.planned) + '</div></div></div>';
+        });
+      }
+      if (!d.sections.length && !d.flat.length) {
+        html = '<p class="hint">尚未添加动作。可直接保存仅含名称的空模板骨架，或先添加动作。</p>';
+      }
+      box.innerHTML = html;
+    }
+
+    function renderDetail() {
+      var t = findTpl(state.viewingTpl);
+      var body = $("#tpl-detail-body");
+      if (!t) { body.innerHTML = "<p>模板不存在</p>"; return; }
+      var html =
+        '<div class="callout" data-od-id="detail-meta">' +
+        "<b>" + t.name + "</b>" +
+        "<p>" + (t.focus || "未填训练重点") + " · " + countExercises(t) + " 个动作</p>" +
+        '<p class="stamp">编辑模板只影响未来 Session</p></div>';
+      if (t.sections.length) {
+        t.sections.forEach(function (sec) {
+          html += '<div class="sec-label inline">' + sec.name + "</div>";
+          sec.exercises.forEach(function (ex) {
+            html +=
+              '<div class="ex-row" style="border:1px solid var(--border);margin-bottom:8px">' +
+              '<div class="ex-main" style="padding-left:12px"><div class="ex-name">' + ex.name + "</div>" +
+              '<div class="ex-plan">计划 · ' + planLabel(ex.planned) + "</div></div></div>";
+          });
+        });
+      }
+      if (t.flat.length) {
+        html += '<div class="sec-label inline">扁平列表</div>';
+        t.flat.forEach(function (ex) {
+          html +=
+            '<div class="ex-row" style="border:1px solid var(--border);margin-bottom:8px">' +
+            '<div class="ex-main" style="padding-left:12px"><div class="ex-name">' + ex.name + "</div>" +
+            '<div class="ex-plan">计划 · ' + planLabel(ex.planned) + "</div></div></div>";
+        });
+      }
+      body.innerHTML = html;
+    }
+
+    function renderSaveAs() {
+      $("#sa-name").value = $("#sa-name").value || "推日 · 上肢力量";
+      $("#sa-focus").value = $("#sa-focus").value || completedSource.focus;
+      var box = $("#save-as-preview");
+      var html = "";
+      completedSource.exercises.forEach(function (ex) {
+        html +=
+          '<div class="ex-row" style="border:1px solid var(--border);margin-bottom:8px">' +
+          '<div class="ex-main" style="padding-left:12px">' +
+          '<div class="ex-name">' + ex.name + "</div>" +
+          '<div class="ex-plan">实际 ' + planLabel(ex.actual) + ' → 计划 ' + planLabel(ex.actual) + "</div>" +
+          "</div></div>";
+      });
+      box.innerHTML = html;
+    }
+
+    function renderDone() {
+      var box = $("#done-preview");
+      var html = "";
+      completedSource.exercises.forEach(function (ex) {
+        html +=
+          '<div class="ex-row" style="border:1px solid var(--border);margin-bottom:8px">' +
+          '<div class="ex-main" style="padding-left:12px">' +
+          '<div class="ex-name">' + ex.name + "</div>" +
+          '<div class="ex-plan">已确认 · ' + planLabel(ex.actual) + "</div></div></div>";
+      });
+      html +=
+        '<div class="callout" style="margin-top:8px"><b>本课私有内容（另存时剥离）</b>' +
+        "<p>私有备注：" + completedSource.privateNote + "</p>" +
+        "<p>课后总结：" + completedSource.summary + "</p></div>";
+      box.innerHTML = html;
+    }
+
+    function renderChooser() {
+      var box = $("#chooser-tpls");
+      var html = "";
+      templates.forEach(function (t) {
+        html +=
+          '<button type="button" class="choice" data-od-id="chooser-tpl-' + t.id + '" data-choose-tpl="' + t.id + '">' +
+          '<span class="t">' + t.name + "</span>" +
+          '<span class="d">' + (t.focus || "无训练重点") + " · " + countExercises(t) + " 动作 · 快照应用</span>" +
+          "</button>";
+      });
+      box.innerHTML = html;
+    }
+
+    function makeSetsFromPlanned(planned, status) {
+      var n = Math.max(1, Number(planned.sets) || 1);
+      var sets = [];
+      for (var i = 0; i < n; i++) {
+        sets.push({
+          id: id("set"),
+          status: status || "pending",
+          weight: planned.weight || "",
+          reps: planned.reps || "",
+          duration: planned.duration || ""
+        });
+      }
+      return sets;
+    }
+
+    function applyTemplateToSession(tpl) {
+      var snap = deepClone(tpl);
+      var session = {
+        id: id("sess"),
+        mode: "template",
+        sourceTplId: tpl.id,
+        sourceTplName: tpl.name,
+        student: "小周",
+        focus: snap.focus || "",
+        sections: [],
+        flat: [],
+        snapshotNote: "独立快照 · 之后改模板不影响本课"
+      };
+      if (snap.sections && snap.sections.length) {
+        session.sections = snap.sections.map(function (sec) {
+          return {
+            id: id("sec"),
+            name: sec.name,
+            exercises: sec.exercises.map(function (ex) {
+              return {
+                id: id("ex"),
+                name: ex.name,
+                sets: makeSetsFromPlanned(ex.planned, "pending")
+              };
+            })
+          };
+        });
+      } else {
+        session.flat = (snap.flat || []).map(function (ex) {
+          return {
+            id: id("ex"),
+            name: ex.name,
+            sets: makeSetsFromPlanned(ex.planned, "pending")
+          };
+        });
+      }
+      return session;
+    }
+
+    function blankSession() {
+      return {
+        id: id("sess"),
+        mode: "blank",
+        sourceTplId: null,
+        sourceTplName: null,
+        student: "小周",
+        focus: "",
+        sections: [],
+        flat: [],
+        snapshotNote: "空白开始 · 默认扁平列表"
+      };
+    }
+
+    function allExercises(session) {
+      var list = [];
+      (session.flat || []).forEach(function (ex) {
+        list.push({ ex: ex, sectionId: null });
+      });
+      (session.sections || []).forEach(function (sec) {
+        sec.exercises.forEach(function (ex) {
+          list.push({ ex: ex, sectionId: sec.id });
+        });
+      });
+      return list;
+    }
+
+    function findEx(session, exId) {
+      var i, j, sec;
+      for (i = 0; i < (session.flat || []).length; i++) {
+        if (session.flat[i].id === exId) return { ex: session.flat[i], sectionId: null, list: session.flat, index: i };
+      }
+      for (i = 0; i < (session.sections || []).length; i++) {
+        sec = session.sections[i];
+        for (j = 0; j < sec.exercises.length; j++) {
+          if (sec.exercises[j].id === exId) {
+            return { ex: sec.exercises[j], sectionId: sec.id, list: sec.exercises, index: j, section: sec };
+          }
+        }
+      }
+      return null;
+    }
+
+    function removeEx(session, exId) {
+      var found = findEx(session, exId);
+      if (!found) return null;
+      var ex = found.list.splice(found.index, 1)[0];
+      return ex;
+    }
+
+    function insertEx(session, ex, targetSectionId, beforeExId) {
+      var list, i;
+      if (!targetSectionId) {
+        list = session.flat;
+      } else {
+        for (i = 0; i < session.sections.length; i++) {
+          if (session.sections[i].id === targetSectionId) {
+            list = session.sections[i].exercises;
+            break;
+          }
+        }
+      }
+      if (!list) return;
+      if (beforeExId) {
+        for (i = 0; i < list.length; i++) {
+          if (list[i].id === beforeExId) {
+            list.splice(i, 0, ex);
+            return;
+          }
+        }
+      }
+      list.push(ex);
+    }
+
+    function renderSession() {
+      var s = state.session;
+      if (!s) return;
+      $("#session-title").textContent = s.mode === "blank" ? "空白训练" : "训练中";
+      var meta = $("#session-meta");
+      meta.innerHTML =
+        "<span><strong>" + s.student + "</strong></span>" +
+        (s.focus ? "<span>重点 · " + s.focus + "</span>" : "<span>重点 · 未填</span>") +
+        (s.sourceTplName
+          ? "<span>来自模板快照 · " + s.sourceTplName + "</span>"
+          : "<span>来源 · 空白</span>");
+
+      var body = $("#session-body");
+      var html = "";
+
+      if (s.mode === "blank" && !s.sections.length) {
+        html +=
+          '<div class="flat-note" data-od-id="m1a-flat-note">' +
+          "M1-A 仅为扁平列表。本课空白开始仍默认扁平；添加动作不必先建分区。分区是 M1-B 按需能力。" +
+          "</div>";
+      }
+      if (s.mode === "template") {
+        html +=
+          '<div class="flat-note" data-od-id="snapshot-note">' +
+          s.snapshotNote + " · 预填组均为待完成。" +
+          "</div>";
+      }
+
+      if (s.sections.length) {
+        s.sections.forEach(function (sec) {
+          html += renderSectionBlock(sec);
+        });
+      }
+
+      if (s.flat.length || (!s.sections.length && s.mode === "blank")) {
+        html += '<div class="sec-label">扁平动作</div>';
+        if (!s.flat.length) {
+          html +=
+            '<div class="empty" data-od-id="blank-empty" style="padding:24px">' +
+            "<h2>还没有动作</h2><p>直接添加动作即可，无需先建分区。</p></div>";
+        } else {
+          s.flat.forEach(function (ex) {
+            html += renderExercise(ex, null);
+          });
+          html += '<div class="drop-zone" data-drop-section="" style="height:8px"></div>';
+        }
+      }
+
+      body.innerHTML = html;
+      bindDrag();
+    }
+
+    function renderSectionBlock(sec) {
+      var html =
+        '<div class="section-block" data-od-id="section-' + sec.id + '" data-section-id="' + sec.id + '">' +
+        '<div class="section-head">' +
+        '<span class="title">' + sec.name +
+        ' <span class="pill" style="margin-left:6px">' + sec.exercises.length + "</span></span>" +
+        '<div class="section-actions">' +
+        '<button type="button" class="icon-btn" data-od-id="sec-rename-' + sec.id + '" data-act="rename-sec" data-sec="' + sec.id + '" aria-label="改名">改名</button>' +
+        '<button type="button" class="icon-btn" data-od-id="sec-up-' + sec.id + '" data-act="sec-up" data-sec="' + sec.id + '" aria-label="上移">↑</button>' +
+        '<button type="button" class="icon-btn" data-od-id="sec-down-' + sec.id + '" data-act="sec-down" data-sec="' + sec.id + '" aria-label="下移">↓</button>' +
+        '<button type="button" class="icon-btn" data-od-id="sec-del-' + sec.id + '" data-act="del-sec" data-sec="' + sec.id + '" aria-label="删除">删除</button>' +
+        "</div></div>";
+      if (!sec.exercises.length) {
+        html +=
+          '<div style="padding:12px;font-size:13px;color:var(--muted)" data-drop-section="' + sec.id + '">分区为空 · 可拖入动作</div>';
+      } else {
+        sec.exercises.forEach(function (ex) {
+          html += renderExercise(ex, sec.id);
+        });
+      }
+      html += "</div>";
+      return html;
+    }
+
+    function renderExercise(ex, sectionId) {
+      var html =
+        '<div class="ex-row" draggable="false" data-ex-id="' + ex.id + '" data-section-id="' + (sectionId || "") + '" data-od-id="ex-' + ex.id + '">' +
+        '<button type="button" class="handle" data-od-id="handle-' + ex.id + '" data-handle="' + ex.id + '" title="拖动手柄 · 跨分区移动" aria-label="拖动动作">⋮⋮</button>' +
+        '<div style="flex:1;min-width:0">' +
+        '<button type="button" class="ex-main" data-act="ex-detail" data-ex="' + ex.id + '">' +
+        '<div class="ex-name">' + ex.name + "</div>" +
+        '<div class="ex-plan">' + summarizeSets(ex.sets) + "</div>" +
+        "</button>";
+      if (ex.sets && ex.sets.length) {
+        html += '<div class="set-list">';
+        ex.sets.forEach(function (set, idx) {
+          var pending = set.status !== "done";
+          html +=
+            '<div class="set-chip ' + (pending ? "pending" : "done") + '" data-od-id="set-' + set.id + '">' +
+            "<span>第 " + (idx + 1) + " 组 · " +
+            [set.weight, set.reps ? set.reps + " 次" : "", set.duration].filter(Boolean).join(" · ") +
+            " · " + (pending ? "待完成" : "已完成") + "</span>" +
+            '<button type="button" data-act="toggle-set" data-ex="' + ex.id + '" data-set="' + set.id + '">' +
+            (pending ? "确认" : "撤销") + "</button></div>";
+        });
+        html += "</div>";
+      }
+      html += "</div></div>";
+      return html;
+    }
+
+    function summarizeSets(sets) {
+      if (!sets || !sets.length) return "无组";
+      var pending = 0, done = 0;
+      sets.forEach(function (s) { if (s.status === "done") done++; else pending++; });
+      return done + " 已完成 · " + pending + " 待完成";
+    }
+
+    function bindDrag() {
+      var handles = document.querySelectorAll("[data-handle]");
+      handles.forEach(function (h) {
+        h.addEventListener("dragstart", onDragStart);
+        h.setAttribute("draggable", "true");
+        var row = h.closest(".ex-row");
+        if (row) {
+          row.setAttribute("draggable", "true");
+          row.addEventListener("dragstart", onDragStart);
+          row.addEventListener("dragend", onDragEnd);
+        }
+      });
+      var rows = document.querySelectorAll(".ex-row[data-ex-id], .section-block, [data-drop-section]");
+      rows.forEach(function (el) {
+        el.addEventListener("dragover", onDragOver);
+        el.addEventListener("dragleave", onDragLeave);
+        el.addEventListener("drop", onDrop);
+      });
+    }
+
+    function onDragStart(e) {
+      var row = e.target.closest(".ex-row");
+      if (!row) return;
+      state.dragExId = row.getAttribute("data-ex-id");
+      row.classList.add("is-drag");
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", state.dragExId);
+    }
+    function onDragEnd() {
+      document.querySelectorAll(".is-drag, .is-over").forEach(function (el) {
+        el.classList.remove("is-drag");
+        el.classList.remove("is-over");
+      });
+      state.dragExId = null;
+    }
+    function onDragOver(e) {
+      if (!state.dragExId) return;
+      e.preventDefault();
+      var row = e.target.closest(".ex-row");
+      if (row) row.classList.add("is-over");
+    }
+    function onDragLeave(e) {
+      var row = e.target.closest(".ex-row");
+      if (row) row.classList.remove("is-over");
+    }
+    function onDrop(e) {
+      e.preventDefault();
+      var exId = state.dragExId || e.dataTransfer.getData("text/plain");
+      if (!exId || !state.session) return;
+      var targetRow = e.target.closest(".ex-row");
+      var targetSecEl = e.target.closest("[data-section-id], [data-drop-section]");
+      var targetSectionId = "";
+      var beforeExId = null;
+      if (targetRow && targetRow.getAttribute("data-ex-id") !== exId) {
+        beforeExId = targetRow.getAttribute("data-ex-id");
+        targetSectionId = targetRow.getAttribute("data-section-id") || "";
+      } else if (targetSecEl) {
+        targetSectionId = targetSecEl.getAttribute("data-section-id") ||
+          targetSecEl.getAttribute("data-drop-section") || "";
+      }
+      var ex = removeEx(state.session, exId);
+      if (!ex) return;
+      insertEx(state.session, ex, targetSectionId || null, beforeExId);
+      toast("已移动到" + (targetSectionId ? "目标分区" : "扁平列表"));
+      renderSession();
+    }
+
+    function openDeleteSectionSheet(secId) {
+      var s = state.session;
+      var sec = null;
+      for (var i = 0; i < s.sections.length; i++) {
+        if (s.sections[i].id === secId) { sec = s.sections[i]; break; }
+      }
+      if (!sec) return;
+      state.sheetCtx = { type: "del-sec", secId: secId };
+
+      if (!sec.exercises.length) {
+        openSheet(
+          '<h2 id="sheet-title">删除分区？</h2>' +
+          '<p class="lead">「' + sec.name + '」为空，可直接删除。</p>' +
+          '<button type="button" class="danger-btn" id="sheet-del-empty" data-od-id="cta-del-empty-sec">删除分区</button>' +
+          '<button type="button" class="ghost" id="sheet-close">取消</button>'
+        );
+        return;
+      }
+
+      var moveOpts = "";
+      s.sections.forEach(function (other) {
+        if (other.id === secId) return;
+        moveOpts +=
+          '<button type="button" class="menu-item" data-od-id="move-to-' + other.id + '" data-move-to="' + other.id + '">' +
+          "移动到「" + other.name + "」<span>›</span></button>";
+      });
+      moveOpts +=
+        '<button type="button" class="menu-item" data-od-id="move-to-flat" data-move-to="__flat__">' +
+        "移动到扁平列表<span>›</span></button>";
+
+      openSheet(
+        '<h2 id="sheet-title">删除非空分区</h2>' +
+        '<p class="lead">「' + sec.name + "」含 " + sec.exercises.length +
+        " 个动作。必须先选择：迁移动作，或连同动作一起删除。</p>" +
+        '<div class="sec-label inline" style="padding-left:0">迁移动作后删除分区</div>' +
+        moveOpts +
+        '<button type="button" class="danger-btn" id="sheet-del-with-ex" data-od-id="cta-del-with-exercises" style="margin-top:12px">连同动作一起删除</button>' +
+        '<button type="button" class="ghost" id="sheet-close">取消</button>'
+      );
+    }
+
+    function deleteSectionMoving(secId, target) {
+      var s = state.session;
+      var idx = -1, sec = null, i;
+      for (i = 0; i < s.sections.length; i++) {
+        if (s.sections[i].id === secId) { idx = i; sec = s.sections[i]; break; }
+      }
+      if (!sec) return;
+      var moved = sec.exercises.slice();
+      if (target === "__flat__") {
+        s.flat = s.flat.concat(moved);
+      } else {
+        for (i = 0; i < s.sections.length; i++) {
+          if (s.sections[i].id === target) {
+            s.sections[i].exercises = s.sections[i].exercises.concat(moved);
+            break;
+          }
+        }
+      }
+      s.sections.splice(idx, 1);
+      markCheck("delete-move");
+      closeSheet();
+      toast("已迁移动作并删除分区");
+      renderSession();
+    }
+
+    function deleteSectionWithExercises(secId) {
+      var s = state.session;
+      for (var i = 0; i < s.sections.length; i++) {
+        if (s.sections[i].id === secId) {
+          s.sections.splice(i, 1);
+          break;
+        }
+      }
+      markCheck("delete-move");
+      closeSheet();
+      toast("已删除分区及其中动作");
+      renderSession();
+    }
+
+    function moveSection(secId, dir) {
+      var list = state.session.sections;
+      var i, tmp;
+      for (i = 0; i < list.length; i++) {
+        if (list[i].id === secId) {
+          if (dir < 0 && i > 0) {
+            tmp = list[i - 1]; list[i - 1] = list[i]; list[i] = tmp;
+          }
+          if (dir > 0 && i < list.length - 1) {
+            tmp = list[i + 1]; list[i + 1] = list[i]; list[i] = tmp;
+          }
+          break;
+        }
+      }
+      renderSession();
+    }
+
+    function openMoveExerciseSheet(exId) {
+      var s = state.session;
+      var found = findEx(s, exId);
+      if (!found) return;
+      state.sheetCtx = { type: "move-ex", exId: exId };
+      var opts = "";
+      if (found.sectionId) {
+        opts +=
+          '<button type="button" class="menu-item" data-od-id="relocate-flat" data-relocate-to="__flat__">' +
+          "移到扁平列表<span>›</span></button>";
+      }
+      (s.sections || []).forEach(function (sec) {
+        if (sec.id === found.sectionId) return;
+        opts +=
+          '<button type="button" class="menu-item" data-od-id="relocate-' + sec.id + '" data-relocate-to="' + sec.id + '">' +
+          "移到「" + sec.name + "」<span>›</span></button>";
+      });
+      if (!opts) {
+        opts = '<p class="lead">当前没有其他分区可移入。请先添加分区。</p>';
+      }
+      openSheet(
+        '<h2 id="sheet-title">移动动作</h2>' +
+        '<p class="lead">「' + found.ex.name + "」· 手柄可拖动；此处为点击备用。</p>" +
+        '<p class="hint" style="margin-bottom:10px">M1-A 仅为扁平列表；跨分区移动是 M1-B 能力。</p>' +
+        opts +
+        '<button type="button" class="ghost" id="sheet-close" style="margin-top:8px">取消</button>'
+      );
+    }
+
+    function relocateExercise(exId, target) {
+      var ex = removeEx(state.session, exId);
+      if (!ex) return;
+      insertEx(state.session, ex, target === "__flat__" ? null : target, null);
+      closeSheet();
+      toast("已移动动作");
+      renderSession();
+    }
+
+    function openSessionMore() {
+      openSheet(
+        '<h2 id="sheet-title">训练操作</h2>' +
+        '<p class="lead">分区 CRUD · 添加动作不以分区为前提。</p>' +
+        '<button type="button" class="menu-item" id="sheet-add-ex">添加动作<span>›</span></button>' +
+        '<button type="button" class="menu-item" id="sheet-add-sec">添加分区<span>›</span></button>' +
+        '<button type="button" class="menu-item" id="sheet-close">关闭</button>'
+      );
+    }
+
+    function addExercisePrompt() {
+      var s = state.session;
+      var targets = '<button type="button" class="menu-item" data-add-ex-to="__flat__">加到扁平列表<span>›</span></button>';
+      (s.sections || []).forEach(function (sec) {
+        targets +=
+          '<button type="button" class="menu-item" data-add-ex-to="' + sec.id + '">加到「' + sec.name + "」<span>›</span></button>";
+      });
+      openSheet(
+        '<h2 id="sheet-title">添加动作</h2>' +
+        '<p class="lead">不必先建分区。演示动作：保加利亚分腿蹲。</p>' +
+        targets +
+        '<button type="button" class="ghost" id="sheet-close" style="margin-top:8px">取消</button>'
+      );
+    }
+
+    function addExerciseTo(target) {
+      var ex = {
+        id: id("ex"),
+        name: "保加利亚分腿蹲",
+        sets: makeSetsFromPlanned({ sets: 3, weight: "20kg", reps: "10", duration: "" }, "pending")
+      };
+      if (target === "__flat__" || !target) {
+        state.session.flat.push(ex);
+      } else {
+        for (var i = 0; i < state.session.sections.length; i++) {
+          if (state.session.sections[i].id === target) {
+            state.session.sections[i].exercises.push(ex);
+            break;
+          }
+        }
+      }
+      closeSheet();
+      toast("已添加动作（预填待完成）");
+      renderSession();
+    }
+
+    function addSectionPrompt() {
+      openSheet(
+        '<h2 id="sheet-title">添加分区</h2>' +
+        '<p class="lead">选填。空白课默认无分区。</p>' +
+        '<label class="field-label" for="new-sec-name">分区名称</label>' +
+        '<input class="field" id="new-sec-name" data-od-id="field-new-sec" type="text" value="辅助训练" autocomplete="off">' +
+        '<button type="button" class="primary" id="sheet-add-sec-confirm" data-od-id="cta-confirm-add-sec">添加</button>' +
+        '<button type="button" class="ghost" id="sheet-close">取消</button>'
+      );
+    }
+
+    function confirmAddSection() {
+      var name = ($("#new-sec-name") && $("#new-sec-name").value.trim()) || "新分区";
+      state.session.sections.push({ id: id("sec"), name: name, exercises: [] });
+      closeSheet();
+      toast("已添加分区「" + name + "」");
+      renderSession();
+    }
+
+    function renameSectionPrompt(secId) {
+      var sec = null;
+      for (var i = 0; i < state.session.sections.length; i++) {
+        if (state.session.sections[i].id === secId) { sec = state.session.sections[i]; break; }
+      }
+      if (!sec) return;
+      state.sheetCtx = { type: "rename", secId: secId };
+      openSheet(
+        '<h2 id="sheet-title">改名分区</h2>' +
+        '<label class="field-label" for="rename-sec">名称</label>' +
+        '<input class="field" id="rename-sec" data-od-id="field-rename-sec" type="text" value="' + sec.name + '" autocomplete="off">' +
+        '<button type="button" class="primary" id="sheet-rename-confirm">保存</button>' +
+        '<button type="button" class="ghost" id="sheet-close">取消</button>'
+      );
+    }
+
+    function setScene(scene) {
+      state.scene = scene;
+      document.querySelectorAll(".scene-btn").forEach(function (btn) {
+        btn.setAttribute("aria-current", btn.getAttribute("data-scene") === scene ? "true" : "false");
+      });
+      if (scene === "list") {
+        show("tpl-list");
+      } else if (scene === "save-as") {
+        show("done-session");
+      } else if (scene === "chooser") {
+        show("start-chooser");
+      } else if (scene === "apply") {
+        var tpl = findTpl("tpl-push");
+        state.session = applyTemplateToSession(tpl);
+        markCheck("apply");
+        show("session");
+        toast("已应用模板快照 · 全部待完成");
+      } else if (scene === "blank") {
+        state.session = blankSession();
+        markCheck("blank");
+        show("session");
+        toast("空白开始 · 扁平列表");
+      } else if (scene === "delete-section") {
+        state.session = applyTemplateToSession(findTpl("tpl-push"));
+        markCheck("apply");
+        show("session");
+        setTimeout(function () {
+          var first = state.session.sections[0];
+          if (first) openDeleteSectionSheet(first.id);
+        }, 120);
+        setNow("删除非空分区");
+      } else if (scene === "drag") {
+        state.session = applyTemplateToSession(findTpl("tpl-push"));
+        markCheck("apply");
+        show("session");
+        toast("按住 ⋮⋮ 手柄拖到其他分区");
+        setNow("跨分区拖动");
+      }
+    }
+
+    function saveNewTemplate() {
+      var name = $("#f-name").value.trim();
+      if (!name) {
+        toast("名称必填");
+        $("#f-name").focus();
+        return;
+      }
+      var draft = state.formDraft;
+      draft.name = name;
+      draft.focus = $("#f-focus").value.trim();
+      if (state.formMode === "edit" && state.viewingTpl) {
+        var t = findTpl(state.viewingTpl);
+        if (t) {
+          t.name = draft.name;
+          t.focus = draft.focus;
+          t.sections = deepClone(draft.sections);
+          t.flat = deepClone(draft.flat);
+        }
+        toast("模板已更新 · 不影响进行中/历史课");
+        show("tpl-detail");
+        return;
+      }
+      var neu = {
+        id: id("tpl"),
+        name: draft.name,
+        focus: draft.focus,
+        sections: deepClone(draft.sections),
+        flat: deepClone(draft.flat)
+      };
+      templates.unshift(neu);
+      state.viewingTpl = neu.id;
+      toast("模板已创建");
+      show("tpl-detail");
+    }
+
+    function saveAsTemplate() {
+      var name = $("#sa-name").value.trim();
+      if (!name) {
+        toast("名称必填");
+        $("#sa-name").focus();
+        return;
+      }
+      var flat = completedSource.exercises.map(function (ex) {
+        return {
+          id: id("ex"),
+          name: ex.name,
+          planned: {
+            sets: ex.actual.sets,
+            weight: ex.actual.weight,
+            reps: ex.actual.reps,
+            duration: ex.actual.duration || ""
+          }
+        };
+      });
+      var neu = {
+        id: id("tpl"),
+        name: name,
+        focus: $("#sa-focus").value.trim(),
+        sections: [],
+        flat: flat
+      };
+      templates.unshift(neu);
+      state.viewingTpl = neu.id;
+      toast("已另存为模板 · 未复制学员/备注/总结");
+      show("tpl-detail");
+    }
+
+    document.addEventListener("click", function (e) {
+      var t = e.target.closest("button, .list-row, .scene-btn");
+      if (!t) {
+        if (e.target.id === "scrim") closeSheet();
+        return;
+      }
+      var sid = t.id;
+      var scene = t.getAttribute("data-scene");
+      if (scene) { setScene(scene); return; }
+
+      if (t.classList.contains("list-row") && t.getAttribute("data-tpl")) {
+        state.viewingTpl = t.getAttribute("data-tpl");
+        show("tpl-detail");
+        return;
+      }
+
+      if (sid === "btn-tpl-add") {
+        state.formMode = "create";
+        state.formDraft = emptyFormDraft();
+        show("tpl-form");
+        return;
+      }
+      if (sid === "btn-form-cancel") { show("tpl-list"); return; }
+      if (sid === "btn-form-save") { saveNewTemplate(); return; }
+      if (sid === "btn-form-add-ex") {
+        state.formDraft.flat.push({
+          id: id("ex"),
+          name: "绳索飞鸟",
+          planned: { sets: 3, weight: "15kg", reps: "12", duration: "" }
+        });
+        renderForm();
+        toast("已添加动作到扁平列表");
+        return;
+      }
+      if (sid === "btn-form-add-sec") {
+        state.formDraft.sections.push({
+          id: id("sec"),
+          name: "放松",
+          exercises: [
+            { id: id("ex"), name: "泡沫轴放松", planned: { sets: 1, weight: "", reps: "", duration: "5 分钟" } }
+          ]
+        });
+        if (state.formDraft.flat.length) {
+          /* keep flat as-is; sections are optional overlay in template */
+        }
+        renderForm();
+        toast("已添加选填分区");
+        return;
+      }
+
+      if (sid === "btn-detail-back") { show("tpl-list"); return; }
+      if (sid === "btn-detail-edit") {
+        var cur = findTpl(state.viewingTpl);
+        if (!cur) return;
+        state.formMode = "edit";
+        state.formDraft = deepClone(cur);
+        show("tpl-form");
+        return;
+      }
+      if (sid === "btn-detail-apply") {
+        var tpl = findTpl(state.viewingTpl);
+        if (!tpl) return;
+        state.session = applyTemplateToSession(tpl);
+        markCheck("apply");
+        show("session");
+        toast("已生成独立快照 · 预填均为待完成");
+        return;
+      }
+
+      if (sid === "btn-goto-chooser") { show("start-chooser"); return; }
+      if (sid === "btn-goto-done") { show("done-session"); return; }
+      if (sid === "btn-tpl-list-back") { toast("模块边界：停留在本模块"); return; }
+
+      if (sid === "btn-open-save-as") { show("save-as"); return; }
+      if (sid === "btn-save-as-back") { show("done-session"); return; }
+      if (sid === "btn-save-as-confirm") { saveAsTemplate(); return; }
+      if (sid === "btn-done-back") { show("tpl-list"); return; }
+
+      if (sid === "btn-chooser-cancel") { show("tpl-list"); return; }
+      if (sid === "btn-blank-start") {
+        state.session = blankSession();
+        markCheck("blank");
+        show("session");
+        toast("空白开始 · 默认扁平列表");
+        return;
+      }
+      if (t.getAttribute("data-choose-tpl")) {
+        var ct = findTpl(t.getAttribute("data-choose-tpl"));
+        if (!ct) return;
+        state.session = applyTemplateToSession(ct);
+        markCheck("apply");
+        show("session");
+        toast("已应用模板 · 独立快照");
+        return;
+      }
+
+      if (sid === "btn-session-back") {
+        show(state.session && state.session.mode === "blank" ? "start-chooser" : "start-chooser");
+        return;
+      }
+      if (sid === "btn-session-more") { openSessionMore(); return; }
+      if (sid === "btn-add-ex") { addExercisePrompt(); return; }
+      if (sid === "btn-add-sec") { addSectionPrompt(); return; }
+
+      if (t.getAttribute("data-handle")) {
+        openMoveExerciseSheet(t.getAttribute("data-handle"));
+        return;
+      }
+
+      var act = t.getAttribute("data-act");
+      if (act === "del-sec") { openDeleteSectionSheet(t.getAttribute("data-sec")); return; }
+      if (act === "rename-sec") { renameSectionPrompt(t.getAttribute("data-sec")); return; }
+      if (act === "sec-up") { moveSection(t.getAttribute("data-sec"), -1); return; }
+      if (act === "sec-down") { moveSection(t.getAttribute("data-sec"), 1); return; }
+      if (act === "toggle-set") {
+        var found = findEx(state.session, t.getAttribute("data-ex"));
+        if (!found) return;
+        found.ex.sets.forEach(function (set) {
+          if (set.id === t.getAttribute("data-set")) {
+            set.status = set.status === "done" ? "pending" : "done";
+          }
+        });
+        renderSession();
+        return;
+      }
+
+      if (sid === "sheet-close" || t.id === "sheet-close") { closeSheet(); return; }
+      if (sid === "sheet-add-ex") { addExercisePrompt(); return; }
+      if (sid === "sheet-add-sec") { addSectionPrompt(); return; }
+      if (sid === "sheet-add-sec-confirm") { confirmAddSection(); return; }
+      if (sid === "sheet-rename-confirm") {
+        var nn = ($("#rename-sec") && $("#rename-sec").value.trim()) || "";
+        if (!nn || !state.sheetCtx) return;
+        for (var ri = 0; ri < state.session.sections.length; ri++) {
+          if (state.session.sections[ri].id === state.sheetCtx.secId) {
+            state.session.sections[ri].name = nn;
+            break;
+          }
+        }
+        closeSheet();
+        toast("分区已改名");
+        renderSession();
+        return;
+      }
+      if (sid === "sheet-del-empty") {
+        if (state.sheetCtx) deleteSectionWithExercises(state.sheetCtx.secId);
+        return;
+      }
+      if (sid === "sheet-del-with-ex") {
+        if (state.sheetCtx) deleteSectionWithExercises(state.sheetCtx.secId);
+        return;
+      }
+      if (t.getAttribute("data-move-to")) {
+        if (state.sheetCtx) deleteSectionMoving(state.sheetCtx.secId, t.getAttribute("data-move-to"));
+        return;
+      }
+      if (t.getAttribute("data-relocate-to")) {
+        if (state.sheetCtx && state.sheetCtx.exId) {
+          relocateExercise(state.sheetCtx.exId, t.getAttribute("data-relocate-to"));
+        }
+        return;
+      }
+      if (t.getAttribute("data-add-ex-to")) {
+        addExerciseTo(t.getAttribute("data-add-ex-to"));
+        return;
+      }
+    });
+
+    $("#scrim").addEventListener("click", closeSheet);
+
+    setScene("list");
+  })();
+  </script>
+</body>
+</html>

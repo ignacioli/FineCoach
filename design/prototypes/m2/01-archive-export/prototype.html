@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FineCoach · M2 · 导出个人训练档案</title>
+  <style>
+    :root {
+      --bg: oklch(0.93 0 0);
+      --surface: oklch(0.99 0 0);
+      --fg: oklch(0.22 0 0);
+      --muted: oklch(0.46 0 0);
+      --border: oklch(0.78 0 0);
+      --accent: oklch(0.28 0 0);
+      --fill: oklch(0.90 0 0);
+      --fill-2: oklch(0.85 0 0);
+      --danger: oklch(0.42 0.12 25);
+      --ok: oklch(0.38 0.06 145);
+      --phone-w: 393px;
+      --phone-h: 852px;
+      --tap: 44px;
+      --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Heiti SC", sans-serif;
+      --mono: ui-monospace, Menlo, "SF Mono", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    body {
+      font-family: var(--font);
+      color: var(--fg);
+      background: var(--bg);
+      line-height: 1.45;
+    }
+    button, input { font: inherit; color: inherit; }
+    button { cursor: pointer; background: none; border: 0; }
+    img { display: none; }
+
+    .spec-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .spec-bar span { color: var(--muted); }
+    .spec-bar b { font-weight: 600; color: var(--fg); }
+
+    .board {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) var(--phone-w) minmax(240px, 1fr);
+      gap: 28px;
+      align-items: start;
+      justify-content: center;
+      padding: 28px 24px 48px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .rail h2 {
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .note {
+      border: 1px dashed var(--border);
+      background: var(--surface);
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--fg);
+      margin-bottom: 10px;
+    }
+    .note ol, .note ul { padding-left: 1.15em; }
+    .note li { margin: 4px 0; }
+    .note .k { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .scene-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .scene-btn {
+      min-height: var(--tap);
+      text-align: left;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--fg);
+    }
+    .scene-btn:hover { background: oklch(0.94 0 0); }
+    .scene-btn[aria-current="true"] { background: var(--fill); border-color: var(--fg); }
+    button:focus-visible,
+    input:focus-visible {
+      outline: 2px solid var(--fg);
+      outline-offset: 2px;
+    }
+    .check { font-size: 13px; }
+    .check li { margin: 6px 0; color: var(--muted); }
+    .now {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border: 1px solid var(--fg);
+      background: var(--surface);
+      font-size: 13px;
+    }
+
+    .device-wrap { width: var(--phone-w); }
+    .device-caption {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 8px;
+      font-family: var(--mono);
+    }
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      border-radius: 54px;
+      border: 11px solid oklch(0.18 0 0);
+      background: oklch(0.97 0 0);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 18px 40px oklch(0.55 0 0 / 0.18);
+    }
+    .island {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      width: 126px;
+      height: 36px;
+      margin-left: -63px;
+      background: oklch(0.12 0 0);
+      border-radius: 20px;
+      z-index: 5;
+    }
+    .status {
+      height: 54px;
+      padding: 14px 28px 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .status-sys { display: flex; gap: 6px; align-items: center; }
+    .sig, .bat { display: inline-block; height: 10px; background: var(--fg); }
+    .sig { width: 16px; clip-path: polygon(0 70%, 35% 45%, 65% 20%, 100% 0, 100% 100%, 0 100%); }
+    .bat { width: 22px; height: 11px; border: 1.5px solid var(--fg); background: transparent; position: relative; }
+    .bat::after { content: ""; position: absolute; inset: 2px 8px 2px 2px; background: var(--fg); }
+    .home-bar {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      width: 134px;
+      height: 5px;
+      margin-left: -67px;
+      background: oklch(0.22 0 0);
+      border-radius: 3px;
+      z-index: 5;
+    }
+    .app {
+      position: absolute;
+      inset: 54px 0 24px;
+      display: flex;
+      flex-direction: column;
+      background: oklch(0.97 0 0);
+    }
+    .screen { display: none; flex: 1; flex-direction: column; min-height: 0; }
+    .screen.is-on { display: flex; }
+
+    .nav {
+      min-height: var(--tap);
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex: none;
+    }
+    .nav h1 {
+      flex: 1;
+      font-size: 17px;
+      font-weight: 650;
+      text-align: center;
+    }
+    .nav-side { width: 72px; display: flex; align-items: center; }
+    .nav-side.end { justify-content: flex-end; width: auto; min-width: 72px; }
+    .icon-btn, .text-btn {
+      min-width: var(--tap);
+      min-height: var(--tap);
+      padding: 0 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fg);
+      font-size: 15px;
+      font-weight: 560;
+    }
+    .icon-btn:hover, .text-btn:hover, .ghost:hover { background: oklch(0.93 0 0); }
+    .text-btn { min-width: auto; }
+
+    .body { flex: 1; overflow: auto; padding: 16px 16px 20px; }
+    .body.tight { padding: 0; }
+    .body.pad-bottom { padding-bottom: 28px; }
+
+    .kicker { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .title { font-size: 22px; font-weight: 650; letter-spacing: -0.02em; margin-bottom: 8px; }
+    .lead { font-size: 15px; color: var(--fg); margin-bottom: 14px; }
+
+    .primary, .ghost {
+      min-height: var(--tap);
+      width: 100%;
+      padding: 0 16px;
+      font-size: 17px;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+    .primary { background: var(--accent); color: oklch(0.99 0 0); }
+    .primary:hover { background: oklch(0.16 0 0); color: oklch(0.99 0 0); }
+    .primary:disabled {
+      background: var(--fill-2);
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+    .ghost { border: 1px solid var(--border); background: var(--surface); color: var(--fg); }
+    .stack-bottom { margin-top: 16px; }
+
+    .profile-head {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .avatar {
+      width: 56px;
+      height: 56px;
+      border: 1px solid var(--fg);
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      color: var(--muted);
+      flex: none;
+    }
+    .profile-name { font-size: 20px; font-weight: 650; }
+    .profile-meta { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+    .section-label {
+      padding: 14px 16px 6px;
+      font-size: 12px;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .row {
+      width: 100%;
+      min-height: 64px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      text-align: left;
+      color: var(--fg);
+    }
+    .row:hover { background: oklch(0.95 0 0); }
+    .row-main { flex: 1; min-width: 0; }
+    .row-name { font-size: 16px; font-weight: 600; }
+    .row-sub { font-size: 13px; color: var(--muted); margin-top: 2px; overflow-wrap: anywhere; }
+    .chev {
+      width: 8px; height: 8px;
+      border-right: 1.5px solid var(--muted);
+      border-top: 1.5px solid var(--muted);
+      transform: rotate(45deg);
+      flex: none;
+    }
+    .ph { height: 10px; background: var(--fill-2); margin: 8px 0; }
+
+    .callout {
+      border: 1px solid var(--border);
+      background: var(--fill);
+      padding: 12px 14px;
+      font-size: 14px;
+      margin: 0 0 14px;
+    }
+    .callout.warn {
+      border-color: var(--fg);
+      background: var(--surface);
+    }
+    .callout.danger {
+      border-color: var(--danger);
+      background: oklch(0.97 0.02 25);
+    }
+    .callout.ok {
+      border-color: var(--ok);
+      background: oklch(0.97 0.02 145);
+    }
+    .callout b { display: block; margin-bottom: 4px; }
+
+    .field-label { display: block; font-size: 13px; font-weight: 600; margin: 14px 0 6px; }
+    .field {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 16px;
+    }
+    .field.is-err { border-color: var(--danger); }
+    .err { color: var(--danger); font-size: 13px; margin-top: 6px; display: none; }
+    .err.show { display: block; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+    .block-title {
+      font-size: 13px;
+      font-weight: 650;
+      margin: 18px 0 8px;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+    .block-title:first-child { margin-top: 0; }
+
+    .pick-list {
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .pick-row {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      color: var(--fg);
+      background: var(--surface);
+    }
+    .pick-row:last-child { border-bottom: 0; }
+    .pick-row:hover:not(:disabled) { background: oklch(0.95 0 0); }
+    .pick-row:disabled {
+      color: var(--muted);
+      cursor: not-allowed;
+      background: oklch(0.96 0 0);
+    }
+    .pick-main { flex: 1; min-width: 0; }
+    .pick-name { font-size: 15px; font-weight: 600; }
+    .pick-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .pick-row:disabled .pick-sub { color: var(--muted); }
+
+    .switch-track {
+      width: 48px;
+      height: 28px;
+      border: 1.5px solid var(--fg);
+      border-radius: 14px;
+      background: var(--fill);
+      position: relative;
+      flex: none;
+      pointer-events: none;
+    }
+    .switch-track[aria-checked="true"] { background: var(--accent); }
+    .switch-thumb {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      background: var(--surface);
+      border: 1px solid var(--fg);
+      border-radius: 50%;
+    }
+    .switch-track[aria-checked="true"] .switch-thumb {
+      left: 23px;
+      background: oklch(0.99 0 0);
+    }
+    .pick-row:disabled .switch-track {
+      border-color: var(--border);
+      background: var(--fill-2);
+      opacity: 0.85;
+    }
+    .lock-tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      border: 1px solid var(--border);
+      padding: 2px 6px;
+      color: var(--muted);
+      flex: none;
+    }
+
+    .preview {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      margin-top: 4px;
+    }
+    .preview .cell {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 14px;
+    }
+    .preview .cell:last-child { border-bottom: 0; }
+    .preview .cell span { color: var(--muted); }
+    .preview .cell b { font-weight: 650; }
+    .preview .cell.off b { color: var(--muted); font-weight: 500; }
+
+    .annot {
+      margin-top: 12px;
+      border: 1px dashed var(--border);
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    .sys-bound {
+      margin: 12px 0;
+      border: 2px dashed var(--fg);
+      background: var(--surface);
+      padding: 16px 14px;
+      min-height: 180px;
+    }
+    .sys-bound .bound-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .sys-bound h3 { font-size: 16px; margin-bottom: 8px; }
+    .sys-bound p { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+    .sys-row {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      background: var(--fill);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-align: left;
+      margin-bottom: 8px;
+      color: var(--fg);
+    }
+    .sys-row:hover { background: oklch(0.92 0 0); }
+    .sys-row[aria-pressed="true"] {
+      border-color: var(--fg);
+      background: var(--fill-2);
+    }
+    .sys-ico {
+      width: 28px; height: 28px;
+      border: 1px solid var(--fg);
+      flex: none;
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+      font-family: var(--mono);
+    }
+    .sys-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .sys-actions .ghost,
+    .sys-actions .primary {
+      margin-top: 0;
+      flex: 1;
+      font-size: 15px;
+    }
+
+    .file-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      background: var(--fill);
+      margin: 12px 0;
+    }
+    .file-chip .ico {
+      width: 36px; height: 36px;
+      border: 1px solid var(--fg);
+      display: grid;
+      place-items: center;
+      font-family: var(--mono);
+      font-size: 10px;
+      flex: none;
+    }
+    .file-chip b { display: block; font-size: 14px; }
+    .file-chip span { font-size: 12px; color: var(--muted); }
+
+    .dest {
+      flex: 1;
+      margin: 20px 16px;
+      border: 1px dashed var(--fg);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      gap: 8px;
+    }
+    .dest h2 { font-size: 20px; }
+    .dest p { font-size: 15px; color: var(--muted); }
+    .bound {
+      margin-top: 16px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    @media (max-width: 1100px) {
+      .board { grid-template-columns: 1fr; justify-items: center; }
+      .rail { width: min(520px, 100%); }
+    }
+  </style>
+</head>
+<body>
+  <header class="spec-bar" data-od-id="page-header">
+    <div>stage=<b>M2</b></div>
+    <div>module=<b>01-archive-export</b></div>
+    <div>version=<b>v0.1</b></div>
+    <div>coverage=<b>this module only</b></div>
+    <div>data=<b>虚构数据</b></div>
+    <div>network=<b>无外部资源</b></div>
+    <div>review=<b>产品负责人走查通过</b></div>
+  </header>
+
+  <div class="board">
+    <aside class="rail" data-od-id="annotation-left">
+      <h2>走查说明</h2>
+      <div class="note">
+        低保真线框。本模块只覆盖：学员详情入口 → 白名单挑选与预览 → 密码确认 → 系统文件/分享面板交付。不是完整备份，也不是分享报告。
+      </div>
+      <div class="note">
+        <span class="k">本模块不做</span>
+        <ul>
+          <li>完整备份 / 恢复、定时导出、公开链接</li>
+          <li>学员端导入与 Viewer Mode</li>
+          <li>无密码档案、远程撤回</li>
+          <li>GIF / 视频动作媒体（仅文字 + 可再分发静态图占位）</li>
+        </ul>
+      </div>
+      <div class="note">
+        <span class="k">建议路径</span>
+        <ol>
+          <li>学员详情 → 导出个人训练档案</li>
+          <li>切换白名单，看预览摘要变化</li>
+          <li>确认永久排除不可解锁</li>
+          <li>阅读不可远程撤回警告 → 设密并确认</li>
+          <li>系统文件 / 分享面板交付</li>
+        </ol>
+      </div>
+      <h2>演示场景</h2>
+      <div class="scene-list">
+        <button type="button" class="scene-btn" data-od-id="scene-entry" data-scene="entry">A · 学员详情入口</button>
+        <button type="button" class="scene-btn" data-od-id="scene-whitelist" data-scene="whitelist">B · 白名单与预览</button>
+        <button type="button" class="scene-btn" data-od-id="scene-password" data-scene="password">C · 设密确认</button>
+        <button type="button" class="scene-btn" data-od-id="scene-deliver" data-scene="deliver">D · 系统交付面板</button>
+      </div>
+    </aside>
+
+    <div class="device-wrap">
+      <p class="device-caption">iPhone 竖屏 393×852 · 浅色 · 系统字体</p>
+      <div class="phone" data-od-id="iphone-frame" role="application" aria-label="FineCoach 个人训练档案导出线框原型">
+        <div class="island" aria-hidden="true"></div>
+        <div class="status">
+          <span>9:41</span>
+          <span class="status-sys" aria-hidden="true"><i class="sig"></i><i class="bat"></i></span>
+        </div>
+        <div class="app" id="app">
+
+          <!-- 1. 学员详情入口 -->
+          <section class="screen is-on" data-screen="detail" data-od-id="screen-student-detail">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="detail-back" id="btn-detail-back">学员</button>
+              </div>
+              <h1 data-od-id="detail-title">学员详情</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="profile-head" data-od-id="student-profile-head">
+              <div class="avatar" aria-hidden="true">头像</div>
+              <div>
+                <div class="profile-name">小周</div>
+                <div class="profile-meta">男 · 增肌 · 活跃</div>
+              </div>
+            </div>
+            <p class="section-label">资料摘要</p>
+            <div class="body tight">
+              <div class="row" style="pointer-events:none">
+                <div class="row-main">
+                  <div class="row-name">身体数据</div>
+                  <div class="row-sub">最近 2026-08-12 · 体重 / 围度</div>
+                </div>
+                <span class="chev" aria-hidden="true"></span>
+              </div>
+              <div class="row" style="pointer-events:none">
+                <div class="row-main">
+                  <div class="row-name">课程记录</div>
+                  <div class="row-sub">已完成 18 次 · 虚构数据</div>
+                </div>
+                <span class="chev" aria-hidden="true"></span>
+              </div>
+              <div class="ph" style="margin:16px"></div>
+              <p class="section-label">档案导出</p>
+              <button type="button" class="row" data-od-id="cta-export-archive" id="btn-export-entry">
+                <div class="row-main">
+                  <div class="row-name">导出个人训练档案</div>
+                  <div class="row-sub">白名单挑选 · 密码加密 · 交给学员</div>
+                </div>
+                <span class="chev" aria-hidden="true"></span>
+              </button>
+              <p class="hint" style="padding:10px 16px 20px">不同于设置里的完整备份，也不同于单次分享报告。仅本学员、教练主动发起。</p>
+            </div>
+          </section>
+
+          <!-- 2. 白名单挑选 + 预览 -->
+          <section class="screen" data-screen="whitelist" data-od-id="screen-whitelist">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="whitelist-cancel" data-go="detail">取消</button>
+              </div>
+              <h1 data-od-id="whitelist-title">导出档案</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body pad-bottom">
+              <p class="kicker">学员 · 小周 · 教练主动导出</p>
+              <h2 class="title">选择可导出内容</h2>
+              <p class="lead">仅白名单模块可选。永久排除项无法打开，也无解锁入口。</p>
+
+              <p class="block-title">允许导出（白名单）</p>
+              <div class="pick-list" id="whitelist-list" data-od-id="whitelist-picker"></div>
+
+              <p class="block-title">永久排除（不可解锁）</p>
+              <div class="pick-list" id="exclude-list" data-od-id="exclude-locked"></div>
+
+              <p class="block-title">预览摘要</p>
+              <div class="preview" id="preview-summary" data-od-id="preview-summary"></div>
+
+              <div class="annot" data-od-id="annot-v1-limits">
+                v1 约束：一次仅一个档案来源 · 动作含文字 + 可再分发静态图占位 · GIF/视频后续再加
+              </div>
+
+              <div class="stack-bottom">
+                <button type="button" class="primary" data-od-id="cta-whitelist-next" id="btn-whitelist-next">继续</button>
+                <p class="hint" id="whitelist-hint">至少选择一项白名单内容。</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- 3. 不可远程撤回警告 -->
+          <section class="screen" data-screen="warn" data-od-id="screen-revoke-warn">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="warn-back" data-go="whitelist">返回</button>
+              </div>
+              <h1>交付前确认</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p class="kicker">个人训练档案 · 加密文件</p>
+              <h2 class="title">学员导入后无法远程撤回</h2>
+              <div class="callout danger" data-od-id="warn-revoke">
+                <b>请向学员口头确认后再交付</b>
+                档案一旦交给学员并在其设备导入，FineCoach 无法让你远程撤销或改写对方本机副本。学员可在自己设备上删除导入档案。
+              </div>
+              <div class="callout warn" data-od-id="warn-not-backup">
+                <b>这不是完整备份</b>
+                不含课包、排课、课时调整、伤病、教练备注与联系方式。完整备份请到设置中单独导出。
+              </div>
+              <div class="callout" data-od-id="warn-one-source">
+                <b>v1 单一来源</b>
+                学员端首版一次只管理一个档案来源。多教练来源与跨来源趋势不在本模块。
+              </div>
+              <div class="stack-bottom">
+                <button type="button" class="primary" data-od-id="cta-warn-continue" data-go="password">我已了解，继续设密</button>
+                <button type="button" class="ghost" data-od-id="cta-warn-cancel" data-go="detail">取消导出</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- 4. 密码 + 确认 -->
+          <section class="screen" data-screen="password" data-od-id="screen-password">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="password-back" data-go="warn">返回</button>
+              </div>
+              <h1>设置档案密码</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p class="kicker">每次导出必须设密 · 不提供无密码选项</p>
+              <div class="callout warn" data-od-id="password-policy">
+                <b>密码不会被保存</b>
+                App 不存储、不上传、不找回此密码。遗失后学员无法打开该档案文件。
+              </div>
+              <label class="field-label" for="ex-pw">档案密码</label>
+              <input class="field" id="ex-pw" data-od-id="field-archive-password" type="password" autocomplete="off" placeholder="至少 8 位" maxlength="64">
+              <label class="field-label" for="ex-pw2">再次确认</label>
+              <input class="field" id="ex-pw2" data-od-id="field-archive-password-confirm" type="password" autocomplete="off" placeholder="再次输入同一密码" maxlength="64">
+              <p class="err" id="err-export-pw">两次密码不一致，或长度不足 8 位</p>
+              <p class="hint">不提供公开链接。下一步将生成加密文件，并交给系统文件 / 分享面板。</p>
+              <div class="stack-bottom">
+                <button type="button" class="primary" data-od-id="cta-password-next" id="btn-password-next">生成加密档案</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- 5. 系统文件 / 分享面板 -->
+          <section class="screen" data-screen="deliver" data-od-id="screen-deliver">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="deliver-cancel" id="btn-deliver-cancel">取消</button>
+              </div>
+              <h1>交付档案</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p class="kicker">密码已确认 · 加密文件已就绪</p>
+              <div class="file-chip" data-od-id="archive-file-chip">
+                <div class="ico">PTA</div>
+                <div>
+                  <b>小周-个人训练档案-20260821.fca</b>
+                  <span>加密 · 约 2.4 MB · 虚构文件名</span>
+                </div>
+              </div>
+              <div class="sys-bound" data-od-id="sys-share-panel">
+                <p class="bound-label">iOS 系统文件 / 分享面板 · 虚线边界 · 非 App UI</p>
+                <h3>交给学员</h3>
+                <p>App 不托管、不生成公开链接。由系统决定保存位置或分享目标。</p>
+                <button type="button" class="sys-row" data-od-id="deliver-files" id="pick-files" aria-pressed="false">
+                  <span class="sys-ico">FL</span>
+                  <span><b>存储到「文件」</b><br><span style="font-size:12px;color:var(--muted)">系统文件选择器</span></span>
+                </button>
+                <button type="button" class="sys-row" data-od-id="deliver-share" id="pick-share" aria-pressed="false">
+                  <span class="sys-ico">SH</span>
+                  <span><b>系统分享</b><br><span style="font-size:12px;color:var(--muted)">隔空投送 / 信息等 · 由系统决定</span></span>
+                </button>
+                <div class="sys-actions">
+                  <button type="button" class="ghost" id="btn-sys-cancel">取消</button>
+                  <button type="button" class="primary" data-od-id="cta-deliver-confirm" id="btn-deliver-confirm" disabled>完成交付</button>
+                </div>
+              </div>
+              <p class="hint">演示：先点选「文件」或「系统分享」，再点完成交付。</p>
+            </div>
+          </section>
+
+          <!-- 6. 完成 -->
+          <section class="screen" data-screen="done" data-od-id="screen-done">
+            <div class="nav">
+              <div class="nav-side"></div>
+              <h1>已交付</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <div class="callout ok" data-od-id="done-summary">
+                <b>加密个人训练档案已交给系统</b>
+                App 未保存密码，也未创建公开链接。学员导入后，你无法远程撤回。
+              </div>
+              <div class="preview" data-od-id="done-payload">
+                <div class="cell"><span>学员</span><b>小周</b></div>
+                <div class="cell"><span>交付方式</span><b id="done-channel">—</b></div>
+                <div class="cell"><span>已含模块</span><b id="done-modules">—</b></div>
+                <div class="cell"><span>永久排除</span><b>伤病 · 备注 · 课包 · 排课 · 联系方式</b></div>
+              </div>
+              <div class="annot">学员端导入与 Viewer Mode 不在本模块绘制。</div>
+              <div class="stack-bottom">
+                <button type="button" class="primary" data-od-id="cta-done-detail" data-go="detail">回到学员详情</button>
+                <button type="button" class="ghost" data-od-id="cta-done-again" id="btn-export-again">再次导出</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- 模块边界出口 -->
+          <section class="screen" data-screen="dest" data-od-id="screen-destination">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="dest-back" data-go="detail">返回</button>
+              </div>
+              <h1 id="dest-nav">出口</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="dest">
+              <h2 id="dest-title">模块边界</h2>
+              <p id="dest-body">本模块未绘制该页面。</p>
+              <p class="bound" id="dest-bound">—— 模块边界 ——</p>
+            </div>
+          </section>
+
+        </div>
+        <div class="home-bar" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <aside class="rail" data-od-id="annotation-right">
+      <h2>当前状态</h2>
+      <div class="now" id="now-state">学员详情 · 可点「导出个人训练档案」</div>
+      <h2 style="margin-top:18px">验收核对</h2>
+      <ul class="check">
+        <li>✓ 入口：导出个人训练档案</li>
+        <li>✓ 白名单挑选 + 预览摘要</li>
+        <li>✓ 永久排除不可解锁</li>
+        <li>✓ 密码 + 确认 → 加密文件</li>
+        <li>✓ 虚线系统文件/分享面板</li>
+        <li>✓ 导入后不可远程撤回警告</li>
+        <li>✓ 单一来源 / GIF 后续标注</li>
+      </ul>
+      <div class="note" style="margin-top:14px">
+        <span class="k">与邻近能力的边界</span>
+        <ul>
+          <li>完整备份 = 设置 · 全量教练数据</li>
+          <li>分享报告 = 单次课程只读图</li>
+          <li>本模块 = 单学员可移植档案</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    (function () {
+      var $ = function (sel) { return document.querySelector(sel); };
+      var $$ = function (sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); };
+
+      var ALLOWED = [
+        { id: "profile", name: "基本资料", sub: "显示名称与性别 · 不含电话/微信", preview: "基本资料（无联系方式）", count: "1 份", on: true },
+        { id: "body", name: "身体数据", sub: "体重、围度与测量历史", preview: "身体数据", count: "6 条测量", on: true },
+        { id: "sessions", name: "课程记录与训练组", sub: "Session / Set 完成记录", preview: "课程与训练组", count: "18 次 · 142 组", on: true },
+        { id: "trends", name: "趋势", sub: "可比较的历史趋势摘要", preview: "趋势", count: "3 条趋势", on: true },
+        { id: "summary", name: "学员课后总结", sub: "Student-facing Summary", preview: "学员课后总结", count: "12 条", on: false },
+        { id: "exercise", name: "动作文字内容", sub: "名称与说明 · 可再分发静态图占位", preview: "动作文字（+静态图占位）", count: "24 个动作", on: true }
+      ];
+
+      var EXCLUDED = [
+        { id: "injury", name: "伤病 / 注意事项", sub: "永久排除 · 无解锁" },
+        { id: "coach-note", name: "教练备注", sub: "Private Coach Note · 永久排除" },
+        { id: "ex-note", name: "动作私有备注", sub: "仅教练可见 · 永久排除" },
+        { id: "package", name: "课包", sub: "Course Package · 永久排除" },
+        { id: "appointment", name: "课程安排", sub: "Appointment · 永久排除" },
+        { id: "credit", name: "课时调整", sub: "Credit Adjustment · 永久排除" },
+        { id: "contact", name: "电话 / 微信", sub: "Student Contact Details · 永久排除" }
+      ];
+
+      var state = {
+        screen: "detail",
+        deliverChannel: null
+      };
+
+      var NOW = {
+        detail: "学员详情 · 可点「导出个人训练档案」",
+        whitelist: "白名单挑选 · 预览随开关更新",
+        warn: "交付前确认 · 不可远程撤回",
+        password: "设置并确认档案密码",
+        deliver: "系统文件 / 分享面板 · 虚线边界",
+        done: "已交付 · 无公开链接",
+        dest: "模块边界出口"
+      };
+
+      function renderWhitelist() {
+        var list = $("#whitelist-list");
+        list.innerHTML = ALLOWED.map(function (item) {
+          return (
+            '<button type="button" class="pick-row" data-od-id="allow-' + item.id + '" data-allow="' + item.id + '" aria-pressed="' + (item.on ? "true" : "false") + '">' +
+              '<div class="pick-main"><div class="pick-name">' + item.name + '</div><div class="pick-sub">' + item.sub + '</div></div>' +
+              '<span class="switch-track" aria-hidden="true" aria-checked="' + (item.on ? "true" : "false") + '"><span class="switch-thumb"></span></span>' +
+            '</button>'
+          );
+        }).join("");
+
+        $$("#whitelist-list .pick-row").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            var id = btn.getAttribute("data-allow");
+            var item = ALLOWED.filter(function (a) { return a.id === id; })[0];
+            if (!item) return;
+            item.on = !item.on;
+            btn.setAttribute("aria-pressed", item.on ? "true" : "false");
+            btn.querySelector(".switch-track").setAttribute("aria-checked", item.on ? "true" : "false");
+            renderPreview();
+            updateNextEnabled();
+          });
+        });
+      }
+
+      function renderExcludes() {
+        $("#exclude-list").innerHTML = EXCLUDED.map(function (item) {
+          return (
+            '<button type="button" class="pick-row" data-od-id="exclude-' + item.id + '" disabled aria-disabled="true">' +
+              '<div class="pick-main"><div class="pick-name">' + item.name + '</div><div class="pick-sub">' + item.sub + '</div></div>' +
+              '<span class="lock-tag">锁定</span>' +
+              '<span class="switch-track" aria-hidden="true" aria-checked="false"><span class="switch-thumb"></span></span>' +
+            '</button>'
+          );
+        }).join("");
+      }
+
+      function selectedItems() {
+        return ALLOWED.filter(function (a) { return a.on; });
+      }
+
+      function renderPreview() {
+        var selected = selectedItems();
+        var html;
+        if (!selected.length) {
+          html = '<div class="cell off"><span>将导出</span><b>尚未选择任何模块</b></div>';
+        } else {
+          html = selected.map(function (item) {
+            return '<div class="cell"><span>' + item.preview + '</span><b>' + item.count + '</b></div>';
+          }).join("");
+          html += '<div class="cell"><span>永久排除</span><b>7 类 · 不可改</b></div>';
+          html += '<div class="cell"><span>媒体</span><b>文字 + 静态图占位 · 无 GIF/视频</b></div>';
+        }
+        $("#preview-summary").innerHTML = html;
+      }
+
+      function updateNextEnabled() {
+        var ok = selectedItems().length > 0;
+        $("#btn-whitelist-next").disabled = !ok;
+        $("#whitelist-hint").textContent = ok
+          ? "预览仅摘要，不含排除字段。"
+          : "至少选择一项白名单内容。";
+      }
+
+      function setSceneCurrent(scene) {
+        $$(".scene-btn").forEach(function (btn) {
+          btn.setAttribute("aria-current", btn.getAttribute("data-scene") === scene ? "true" : "false");
+        });
+      }
+
+      function showScreen(name) {
+        state.screen = name;
+        $$(".screen").forEach(function (el) {
+          el.classList.toggle("is-on", el.getAttribute("data-screen") === name);
+        });
+        $("#now-state").textContent = NOW[name] || name;
+        var sceneMap = {
+          detail: "entry",
+          whitelist: "whitelist",
+          warn: "whitelist",
+          password: "password",
+          deliver: "deliver",
+          done: "deliver",
+          dest: "entry"
+        };
+        setSceneCurrent(sceneMap[name] || "entry");
+      }
+
+      function openDest(title, body, bound) {
+        $("#dest-nav").textContent = "出口";
+        $("#dest-title").textContent = title;
+        $("#dest-body").textContent = body;
+        $("#dest-bound").textContent = bound || "—— 模块边界 ——";
+        showScreen("dest");
+      }
+
+      function resetPasswordFields() {
+        $("#ex-pw").value = "";
+        $("#ex-pw2").value = "";
+        $("#ex-pw").classList.remove("is-err");
+        $("#ex-pw2").classList.remove("is-err");
+        $("#err-export-pw").classList.remove("show");
+      }
+
+      function resetDeliver() {
+        state.deliverChannel = null;
+        $("#pick-files").setAttribute("aria-pressed", "false");
+        $("#pick-share").setAttribute("aria-pressed", "false");
+        $("#btn-deliver-confirm").disabled = true;
+      }
+
+      function applyScene(scene) {
+        if (scene === "entry") {
+          showScreen("detail");
+        } else if (scene === "whitelist") {
+          showScreen("whitelist");
+        } else if (scene === "password") {
+          resetPasswordFields();
+          showScreen("password");
+        } else if (scene === "deliver") {
+          resetDeliver();
+          showScreen("deliver");
+        }
+      }
+
+      function finishDeliver() {
+        var channel = state.deliverChannel === "files" ? "系统文件" : "系统分享";
+        var mods = selectedItems().map(function (i) { return i.name; }).join(" · ");
+        $("#done-channel").textContent = channel;
+        $("#done-modules").textContent = mods || "—";
+        showScreen("done");
+      }
+
+      // wire
+      renderWhitelist();
+      renderExcludes();
+      renderPreview();
+      updateNextEnabled();
+      setSceneCurrent("entry");
+
+      $("#btn-export-entry").addEventListener("click", function () {
+        showScreen("whitelist");
+      });
+
+      $("#btn-detail-back").addEventListener("click", function () {
+        openDest("学员列表", "学员列表根页面不在本模块绘制。", "—— 模块边界 · 学员列表未绘制 ——");
+      });
+
+      $("#btn-whitelist-next").addEventListener("click", function () {
+        if (!selectedItems().length) return;
+        showScreen("warn");
+      });
+
+      $("#btn-password-next").addEventListener("click", function () {
+        var a = $("#ex-pw").value;
+        var b = $("#ex-pw2").value;
+        var ok = a.length >= 8 && a === b;
+        $("#ex-pw").classList.toggle("is-err", !ok);
+        $("#ex-pw2").classList.toggle("is-err", !ok);
+        $("#err-export-pw").classList.toggle("show", !ok);
+        if (!ok) return;
+        resetDeliver();
+        showScreen("deliver");
+      });
+
+      function selectChannel(ch) {
+        state.deliverChannel = ch;
+        $("#pick-files").setAttribute("aria-pressed", ch === "files" ? "true" : "false");
+        $("#pick-share").setAttribute("aria-pressed", ch === "share" ? "true" : "false");
+        $("#btn-deliver-confirm").disabled = false;
+      }
+
+      $("#pick-files").addEventListener("click", function () { selectChannel("files"); });
+      $("#pick-share").addEventListener("click", function () { selectChannel("share"); });
+
+      $("#btn-deliver-confirm").addEventListener("click", function () {
+        if (!state.deliverChannel) return;
+        finishDeliver();
+      });
+
+      function cancelDeliver() {
+        resetPasswordFields();
+        showScreen("password");
+      }
+      $("#btn-deliver-cancel").addEventListener("click", cancelDeliver);
+      $("#btn-sys-cancel").addEventListener("click", cancelDeliver);
+
+      $("#btn-export-again").addEventListener("click", function () {
+        resetPasswordFields();
+        resetDeliver();
+        showScreen("whitelist");
+      });
+
+      $$("[data-go]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var go = btn.getAttribute("data-go");
+          if (go === "password") resetPasswordFields();
+          if (go === "deliver") resetDeliver();
+          showScreen(go);
+        });
+      });
+
+      $$(".scene-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          applyScene(btn.getAttribute("data-scene"));
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -7,7 +7,7 @@
     "specs/ideas.md",
     "specs/CONTEXT.md"
   ],
-  "notes": "ideas.md 不是批准 PRD。本集合用于产品负责人走查。",
+  "notes": "ideas.md 不是批准 PRD。本集合已完成产品负责人走查，仍属 discovery 输入。",
   "visual": {
     "fidelity": "structured-greybox",
     "device": "iPhone portrait ~393x852",
@@ -42,7 +42,7 @@
       "path": "m1-a/03-exercise-library/prototype.html",
       "version": "v0.1",
       "coverage": "this module only",
-      "review": "待产品负责人走查"
+      "review": "产品负责人走查通过"
     },
     {
       "id": "m1-a/04-core-training",
@@ -51,7 +51,7 @@
       "path": "m1-a/04-core-training/prototype.html",
       "version": "v0.1",
       "coverage": "this module only",
-      "review": "待产品负责人走查"
+      "review": "产品负责人走查通过"
     },
     {
       "id": "m1-a/05-finish-history-edit",
@@ -60,7 +60,7 @@
       "path": "m1-a/05-finish-history-edit/prototype.html",
       "version": "v0.1",
       "coverage": "this module only",
-      "review": "待产品负责人走查"
+      "review": "产品负责人走查通过"
     },
     {
       "id": "m1-a/06-share-report",
@@ -69,7 +69,7 @@
       "path": "m1-a/06-share-report/prototype.html",
       "version": "v0.1",
       "coverage": "this module only",
-      "review": "待产品负责人走查"
+      "review": "产品负责人走查通过"
     },
     {
       "id": "m1-a/07-backup-restore-settings",
@@ -78,7 +78,7 @@
       "path": "m1-a/07-backup-restore-settings/prototype.html",
       "version": "v0.1",
       "coverage": "this module only",
-      "review": "待产品负责人走查"
+      "review": "产品负责人走查通过"
     },
     {
       "id": "m1-b/01-today-calendar-appointments",
@@ -87,7 +87,7 @@
       "path": "m1-b/01-today-calendar-appointments/prototype.html",
       "version": "v0.1",
       "coverage": "this module only",
-      "review": "待产品负责人走查"
+      "review": "产品负责人走查通过"
     },
     {
       "id": "m1-b/02-course-packages",
@@ -96,7 +96,7 @@
       "path": "m1-b/02-course-packages/prototype.html",
       "version": "v0.1",
       "coverage": "this module only",
-      "review": "待产品负责人走查"
+      "review": "产品负责人走查通过"
     },
     {
       "id": "m1-b/03-templates-sections",
@@ -105,7 +105,7 @@
       "path": "m1-b/03-templates-sections/prototype.html",
       "version": "v0.1",
       "coverage": "this module only",
-      "review": "待产品负责人走查"
+      "review": "产品负责人走查通过"
     },
     {
       "id": "m1-b/04-body-data-history-trends",
@@ -114,7 +114,7 @@
       "path": "m1-b/04-body-data-history-trends/prototype.html",
       "version": "v0.1",
       "coverage": "this module only",
-      "review": "待产品负责人走查"
+      "review": "产品负责人走查通过"
     },
     {
       "id": "m2/01-archive-export",
@@ -123,7 +123,7 @@
       "path": "m2/01-archive-export/prototype.html",
       "version": "v0.1",
       "coverage": "this module only",
-      "review": "待产品负责人走查"
+      "review": "产品负责人走查通过"
     },
     {
       "id": "m2/02-viewer-mode",
@@ -132,7 +132,7 @@
       "path": "m2/02-viewer-mode/prototype.html",
       "version": "v0.1",
       "coverage": "this module only",
-      "review": "待产品负责人走查"
+      "review": "产品负责人走查通过"
     }
   ]
 }

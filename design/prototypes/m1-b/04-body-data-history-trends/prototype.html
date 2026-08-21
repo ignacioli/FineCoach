@@ -1,0 +1,1965 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FineCoach · M1-B · 身体数据 · 历史与趋势</title>
+  <style>
+    :root {
+      --bg: oklch(0.93 0 0);
+      --surface: oklch(0.99 0 0);
+      --fg: oklch(0.22 0 0);
+      --muted: oklch(0.46 0 0);
+      --border: oklch(0.78 0 0);
+      --accent: oklch(0.28 0 0);
+      --fill: oklch(0.90 0 0);
+      --fill-2: oklch(0.85 0 0);
+      --danger: oklch(0.42 0.12 25);
+      --phone-w: 393px;
+      --phone-h: 852px;
+      --tap: 44px;
+      --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Heiti SC", sans-serif;
+      --mono: ui-monospace, Menlo, "SF Mono", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    body {
+      font-family: var(--font);
+      color: var(--fg);
+      background: var(--bg);
+      line-height: 1.45;
+    }
+    button, input, textarea, select { font: inherit; color: inherit; }
+    button { cursor: pointer; background: none; border: 0; }
+    img { display: none; }
+
+    .spec-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .spec-bar b { font-weight: 600; color: var(--fg); }
+
+    .board {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) var(--phone-w) minmax(240px, 1fr);
+      gap: 28px;
+      align-items: start;
+      justify-content: center;
+      padding: 28px 24px 48px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .rail h2 {
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .note {
+      border: 1px dashed var(--border);
+      background: var(--surface);
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--fg);
+      margin-bottom: 10px;
+    }
+    .note ol, .note ul { padding-left: 1.15em; }
+    .note li { margin: 4px 0; }
+    .note .k { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .scene-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .scene-btn {
+      min-height: var(--tap);
+      text-align: left;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--fg);
+    }
+    .scene-btn:hover { background: oklch(0.94 0 0); }
+    .scene-btn[aria-current="true"] { background: var(--fill); border-color: var(--fg); }
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible {
+      outline: 2px solid var(--fg);
+      outline-offset: 2px;
+    }
+    .check { font-size: 13px; }
+    .check li { margin: 6px 0; color: var(--muted); }
+    .check li.ok { color: var(--fg); font-weight: 600; }
+    .now { margin-top: 12px; padding: 10px 12px; border: 1px solid var(--fg); background: var(--surface); font-size: 13px; }
+
+    .device-wrap { width: var(--phone-w); }
+    .device-caption {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 8px;
+      font-family: var(--mono);
+    }
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      border-radius: 54px;
+      border: 11px solid oklch(0.18 0 0);
+      background: oklch(0.97 0 0);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 18px 40px oklch(0.55 0 0 / 0.18);
+    }
+    .island {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      width: 126px;
+      height: 36px;
+      margin-left: -63px;
+      background: oklch(0.12 0 0);
+      border-radius: 20px;
+      z-index: 5;
+    }
+    .status {
+      height: 54px;
+      padding: 14px 28px 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .status-sys { display: flex; gap: 6px; align-items: center; }
+    .sig, .bat { display: inline-block; height: 10px; background: var(--fg); }
+    .sig { width: 16px; clip-path: polygon(0 70%, 35% 45%, 65% 20%, 100% 0, 100% 100%, 0 100%); }
+    .bat { width: 22px; height: 11px; border: 1.5px solid var(--fg); background: transparent; position: relative; }
+    .bat::after { content: ""; position: absolute; inset: 2px 8px 2px 2px; background: var(--fg); }
+    .home-bar {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      width: 134px;
+      height: 5px;
+      margin-left: -67px;
+      background: oklch(0.22 0 0);
+      border-radius: 3px;
+      z-index: 5;
+    }
+    .app {
+      position: absolute;
+      inset: 54px 0 24px;
+      display: flex;
+      flex-direction: column;
+      background: oklch(0.97 0 0);
+    }
+    .screen { display: none; flex: 1; flex-direction: column; min-height: 0; }
+    .screen.is-on { display: flex; }
+
+    .nav {
+      min-height: var(--tap);
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex: none;
+    }
+    .nav h1 {
+      flex: 1;
+      font-size: 17px;
+      font-weight: 650;
+      text-align: center;
+    }
+    .nav-side { width: 72px; display: flex; align-items: center; }
+    .nav-side.end { justify-content: flex-end; gap: 2px; width: auto; min-width: 72px; }
+    .icon-btn, .text-btn {
+      min-width: var(--tap);
+      min-height: var(--tap);
+      padding: 0 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fg);
+      font-size: 15px;
+      font-weight: 560;
+    }
+    .icon-btn:hover, .text-btn:hover, .ghost:hover { background: oklch(0.93 0 0); }
+    .text-btn { min-width: auto; }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex: none;
+    }
+    .tab {
+      min-height: 36px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      border: 1px solid transparent;
+    }
+    .tab:hover { background: oklch(0.94 0 0); color: var(--fg); }
+    .tab[aria-selected="true"] {
+      color: var(--fg);
+      border-color: var(--fg);
+      background: var(--fill);
+    }
+
+    .body { flex: 1; overflow: auto; padding: 16px 16px 20px; }
+    .body.tight { padding: 0; }
+
+    .primary, .ghost, .danger-btn {
+      min-height: var(--tap);
+      width: 100%;
+      padding: 0 16px;
+      font-size: 17px;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+    .primary { background: var(--accent); color: oklch(0.99 0 0); }
+    .primary:hover { background: oklch(0.16 0 0); color: oklch(0.99 0 0); }
+    .ghost { border: 1px solid var(--border); background: var(--surface); color: var(--fg); }
+    .danger-btn { border: 1px solid var(--danger); color: var(--danger); background: var(--surface); }
+    .danger-btn:hover { background: oklch(0.95 0.02 25); color: var(--danger); }
+    .btn-row { display: flex; gap: 8px; margin-top: 12px; }
+    .btn-row .primary, .btn-row .ghost, .btn-row .danger-btn { margin-top: 0; flex: 1; }
+
+    .sec-label {
+      font-size: 12px;
+      font-weight: 650;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      padding: 14px 0 6px;
+      text-transform: uppercase;
+    }
+    .hero-name {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .meta { font-size: 14px; color: var(--muted); }
+
+    .block {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .block h3 { font-size: 15px; font-weight: 650; margin-bottom: 6px; }
+    .block p, .block .line { font-size: 14px; color: var(--fg); margin: 4px 0; }
+    .block .sub { font-size: 12px; color: var(--muted); }
+
+    .collapse-btn {
+      width: 100%;
+      min-height: var(--tap);
+      border: 1px dashed var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      font-size: 14px;
+      font-weight: 560;
+      color: var(--fg);
+      margin-bottom: 10px;
+    }
+    .collapse-btn:hover { background: oklch(0.95 0 0); }
+    .collapse-panel { display: none; margin-bottom: 10px; }
+    .collapse-panel.open { display: block; }
+
+    .privacy {
+      border: 1px dashed var(--border);
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--muted);
+      background: oklch(0.96 0 0);
+    }
+
+    .list-row {
+      width: 100%;
+      min-height: 56px;
+      padding: 10px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      background: transparent;
+      text-align: left;
+      color: var(--fg);
+    }
+    .list-row:hover { background: oklch(0.95 0 0); }
+    .list-row .main { flex: 1; min-width: 0; }
+    .list-row .name { font-size: 16px; font-weight: 600; }
+    .list-row .sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .list-row .val {
+      font-size: 15px;
+      font-weight: 650;
+      font-variant-numeric: tabular-nums;
+      flex: none;
+    }
+    .chev {
+      width: 8px; height: 8px;
+      border-right: 1.5px solid var(--muted);
+      border-top: 1.5px solid var(--muted);
+      transform: rotate(45deg);
+      flex: none;
+    }
+
+    .field-label { display: block; font-size: 13px; font-weight: 600; margin: 14px 0 6px; }
+    .req { color: var(--muted); font-weight: 400; }
+    .field, .select, .area {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 16px;
+    }
+    .area { min-height: 72px; resize: vertical; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .err { color: var(--danger); font-size: 13px; margin-top: 6px; display: none; }
+    .err.show { display: block; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      min-height: 40px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      display: inline-flex;
+      align-items: center;
+      font-size: 14px;
+      color: var(--fg);
+    }
+    .chip:hover { background: oklch(0.94 0 0); }
+    .chip[aria-pressed="true"] { border-color: var(--fg); background: var(--fill); }
+    .row-inline { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .chart {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 12px;
+      margin: 8px 0 12px;
+    }
+    .chart-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+    .chart-head b { font-size: 14px; }
+    .chart-head span { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+    .bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      height: 96px;
+      padding-top: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .bar {
+      flex: 1;
+      background: var(--fill-2);
+      border: 1px solid var(--fg);
+      min-height: 4px;
+      position: relative;
+    }
+    .bar.assist { background: oklch(0.92 0 0); border-style: dashed; }
+    .bar.sparse { opacity: 0.45; }
+    .bar-labels {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .bar-labels span {
+      flex: 1;
+      text-align: center;
+      font-size: 10px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .chart-empty {
+      height: 96px;
+      border: 1px dashed var(--border);
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      font-size: 13px;
+      background: oklch(0.97 0 0);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 650;
+      padding: 2px 7px;
+      border: 1px solid var(--fg);
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+    .tag.dash { border-style: dashed; }
+    .tag.off { background: var(--fill); }
+
+    .diff-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 8px 0;
+    }
+    .diff-cell {
+      border: 1px solid var(--border);
+      padding: 10px;
+      background: var(--surface);
+    }
+    .diff-cell .k { font-size: 12px; color: var(--muted); }
+    .diff-cell .v { font-size: 16px; font-weight: 650; margin-top: 2px; font-variant-numeric: tabular-nums; }
+    .diff-cell.up .v::after { content: " ↑"; font-size: 12px; }
+    .diff-cell.down .v::after { content: " ↓"; font-size: 12px; }
+
+    .callout {
+      border: 1px solid var(--fg);
+      background: var(--surface);
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .callout b { display: block; font-size: 15px; margin-bottom: 4px; }
+    .callout p { font-size: 13px; color: var(--muted); }
+    .forbid {
+      border: 1px dashed var(--danger);
+      color: var(--danger);
+      padding: 10px 12px;
+      font-size: 13px;
+      margin: 10px 0;
+      background: oklch(0.97 0.01 25);
+    }
+    .switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: var(--tap);
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      gap: 12px;
+    }
+    .switch-row span { font-size: 15px; }
+    .toggle {
+      width: 48px;
+      height: 28px;
+      border: 1.5px solid var(--fg);
+      border-radius: 14px;
+      position: relative;
+      flex: none;
+      background: var(--surface);
+    }
+    .toggle::after {
+      content: "";
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 18px; height: 18px;
+      background: var(--fg);
+      border-radius: 50%;
+    }
+    .toggle[aria-checked="true"] { background: var(--fill); }
+    .toggle[aria-checked="true"]::after { left: 23px; }
+    .toggle[disabled] { opacity: 0.45; cursor: not-allowed; }
+
+    .empty {
+      padding: 36px 16px;
+      text-align: center;
+    }
+    .empty-box {
+      width: 72px; height: 48px;
+      border: 1px dashed var(--border);
+      margin: 0 auto 16px;
+    }
+    .empty h2 { font-size: 17px; margin-bottom: 8px; }
+    .empty p { font-size: 14px; color: var(--muted); }
+
+    .scrim {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: oklch(0.22 0 0 / 0.28);
+      z-index: 8;
+    }
+    .scrim.on { display: block; }
+    .sheet {
+      display: none;
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--fg);
+      z-index: 9;
+      padding: 12px 16px 28px;
+      max-height: 78%;
+      overflow: auto;
+    }
+    .sheet.on { display: block; }
+    .sheet h2 { font-size: 17px; font-weight: 650; margin-bottom: 6px; }
+    .sheet .lead { font-size: 14px; color: var(--muted); margin-bottom: 12px; }
+    .menu-item {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 0 4px;
+      text-align: left;
+      font-size: 16px;
+      color: var(--fg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .menu-item:hover { background: oklch(0.94 0 0); }
+    .menu-item.danger { color: var(--danger); }
+    .toast {
+      display: none;
+      position: absolute;
+      left: 24px; right: 24px; bottom: 36px;
+      background: var(--fg);
+      color: oklch(0.99 0 0);
+      padding: 12px 14px;
+      font-size: 14px;
+      z-index: 12;
+      text-align: center;
+    }
+    .toast.on { display: block; }
+
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex: none;
+    }
+    .filter-pill {
+      min-height: 36px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 13px;
+      font-weight: 560;
+    }
+    .filter-pill:hover { background: oklch(0.94 0 0); }
+    .filter-pill.on { border-color: var(--fg); background: var(--fill); }
+
+    .set-row {
+      display: grid;
+      grid-template-columns: 36px 1fr 1fr 1fr;
+      gap: 6px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+    .set-row.head { color: var(--muted); font-weight: 600; border-bottom-color: var(--fg); }
+
+    @media (max-width: 980px) {
+      .board { grid-template-columns: 1fr; justify-items: center; }
+      .rail { width: 100%; max-width: 520px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="spec-bar" data-od-id="page-header">
+    <div>M1-B</div>
+    <div>04-body-data-history-trends</div>
+    <div>v0.1</div>
+    <div>scope=<b>本模块</b></div>
+    <div>data=<b>虚构数据</b></div>
+    <div>net=<b>无外部资源</b></div>
+    <div>review=<b>产品负责人走查通过</b></div>
+  </header>
+
+  <div class="board">
+    <aside class="rail" data-od-id="annotation-left">
+      <h2>硬约束</h2>
+      <div class="note" data-od-id="hard-notes">
+        <ul>
+          <li><b>身体数据永不进入 Share Report</b>（界面无临时放开）</li>
+          <li>伤病默认折叠 · 私有 · 非医疗建议</li>
+          <li>无 1RM · 无 RPE/RIR</li>
+          <li>同日同指标一条；再录=编辑当日</li>
+          <li>单位仅转换显示，不改写原始值</li>
+          <li>PR 为 Share Report <b>默认关闭</b>模块（本文件只做注释，不建报告）</li>
+        </ul>
+        <p class="k" style="margin-top:8px">Student · 小周 · 虚构</p>
+      </div>
+      <h2>场景</h2>
+      <div class="scene-list" data-od-id="scene-list">
+        <button type="button" class="scene-btn" data-scene="student" aria-current="true" data-od-id="scene-student">A · 学员详情（伤病折叠 · 身体二级）</button>
+        <button type="button" class="scene-btn" data-scene="body" data-od-id="scene-body">B · 身体录入 / 同日覆盖</button>
+        <button type="button" class="scene-btn" data-scene="trend" data-od-id="scene-trend">C · 指标趋势（含稀疏）</button>
+        <button type="button" class="scene-btn" data-scene="history" data-od-id="scene-history">D · 训练历史与筛选</button>
+        <button type="button" class="scene-btn" data-scene="compare" data-od-id="scene-compare">E · Session 比较（同训练重点）</button>
+        <button type="button" class="scene-btn" data-scene="ex-trend" data-od-id="scene-ex-trend">F · 动作趋势 · 辅助负载</button>
+        <button type="button" class="scene-btn" data-scene="pr" data-od-id="scene-pr">G · 个人最佳 · 分享注释</button>
+        <button type="button" class="scene-btn" data-scene="empty" data-od-id="scene-empty">H · 空状态 / 单位显示</button>
+      </div>
+    </aside>
+
+    <div class="device-wrap">
+      <div class="device-caption">iPhone 393×852 · 44pt · 低保真灰盒</div>
+      <div class="phone" data-od-id="iphone-frame" role="application" aria-label="FineCoach 身体数据历史趋势线框原型">
+        <div class="island" aria-hidden="true"></div>
+        <div class="status">
+          <span>9:41</span>
+          <span class="status-sys"><span class="sig" aria-hidden="true"></span><span class="bat" aria-hidden="true"></span></span>
+        </div>
+        <div class="app" id="app">
+          <!-- 学员详情 -->
+          <section class="screen is-on" data-screen="student" data-od-id="screen-student">
+            <div class="nav">
+              <div class="nav-side"><button type="button" class="text-btn" data-od-id="student-back" id="btn-stu-back">学员</button></div>
+              <h1 data-od-id="student-title">学员详情</h1>
+              <div class="nav-side end"><button type="button" class="text-btn" data-od-id="cta-units" id="btn-units">单位</button></div>
+            </div>
+            <div class="body" id="student-body" data-od-id="student-body"></div>
+          </section>
+
+          <!-- 身体指标总览 -->
+          <section class="screen" data-screen="body-hub" data-od-id="screen-body-hub">
+            <div class="nav">
+              <div class="nav-side"><button type="button" class="text-btn" data-go="student" data-od-id="body-hub-back">返回</button></div>
+              <h1 data-od-id="body-hub-title">身体数据</h1>
+              <div class="nav-side end"><button type="button" class="text-btn" id="btn-add-custom" data-od-id="cta-add-custom">自定义</button></div>
+            </div>
+            <div class="tabs" role="tablist" aria-label="学员模块" data-od-id="module-tabs">
+              <button type="button" class="tab" data-tab="body" aria-selected="true" data-od-id="tab-body">身体</button>
+              <button type="button" class="tab" data-tab="history" aria-selected="false" data-od-id="tab-history">历史</button>
+              <button type="button" class="tab" data-tab="trends" aria-selected="false" data-od-id="tab-trends">趋势</button>
+              <button type="button" class="tab" data-tab="pr" aria-selected="false" data-od-id="tab-pr">个人最佳</button>
+            </div>
+            <div class="body" id="body-hub-body" data-od-id="body-hub-body"></div>
+          </section>
+
+          <!-- 录入 / 编辑测量 -->
+          <section class="screen" data-screen="log" data-od-id="screen-log">
+            <div class="nav">
+              <div class="nav-side"><button type="button" class="text-btn" data-go="body-hub" data-od-id="log-cancel">取消</button></div>
+              <h1 id="log-title" data-od-id="log-title">录入</h1>
+              <div class="nav-side end"><button type="button" class="text-btn" id="btn-log-save" data-od-id="cta-log-save">保存</button></div>
+            </div>
+            <div class="body" id="log-body" data-od-id="log-body"></div>
+          </section>
+
+          <!-- 自定义指标 -->
+          <section class="screen" data-screen="custom" data-od-id="screen-custom">
+            <div class="nav">
+              <div class="nav-side"><button type="button" class="text-btn" data-go="body-hub" data-od-id="custom-cancel">取消</button></div>
+              <h1 data-od-id="custom-title">自定义指标</h1>
+              <div class="nav-side end"><button type="button" class="text-btn" id="btn-custom-save" data-od-id="cta-custom-save">创建</button></div>
+            </div>
+            <div class="body" data-od-id="custom-body">
+              <label class="field-label" for="c-name">名称 <span class="req">必填</span></label>
+              <input class="field" id="c-name" data-od-id="field-custom-name" placeholder="例如：小腿围" autocomplete="off">
+              <div class="err" id="c-name-err">请填写名称</div>
+              <label class="field-label" for="c-unit">单位 <span class="req">必填</span></label>
+              <input class="field" id="c-unit" data-od-id="field-custom-unit" placeholder="例如：cm" autocomplete="off">
+              <div class="err" id="c-unit-err">请填写单位</div>
+              <p class="hint">创建后生成稳定 ID；改名不破坏历史趋势。单位随创建时锁定，不随设置公英制改写。</p>
+            </div>
+          </section>
+
+          <!-- 单指标趋势 -->
+          <section class="screen" data-screen="metric-trend" data-od-id="screen-metric-trend">
+            <div class="nav">
+              <div class="nav-side"><button type="button" class="text-btn" data-go="body-hub" data-od-id="metric-back">返回</button></div>
+              <h1 id="metric-title" data-od-id="metric-title">趋势</h1>
+              <div class="nav-side end"><button type="button" class="text-btn" id="btn-metric-log" data-od-id="cta-metric-log">录入</button></div>
+            </div>
+            <div class="body" id="metric-body" data-od-id="metric-body"></div>
+          </section>
+
+          <!-- 训练历史 -->
+          <section class="screen" data-screen="history" data-od-id="screen-history">
+            <div class="nav">
+              <div class="nav-side"><button type="button" class="text-btn" data-go="student" data-od-id="history-back">返回</button></div>
+              <h1 data-od-id="history-title">训练历史</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="tabs" role="tablist" aria-label="学员模块">
+              <button type="button" class="tab" data-tab="body" aria-selected="false">身体</button>
+              <button type="button" class="tab" data-tab="history" aria-selected="true">历史</button>
+              <button type="button" class="tab" data-tab="trends" aria-selected="false">趋势</button>
+              <button type="button" class="tab" data-tab="pr" aria-selected="false">个人最佳</button>
+            </div>
+            <div class="filter-bar" data-od-id="history-filters">
+              <button type="button" class="filter-pill" id="flt-range" data-od-id="filter-date-range">日期范围</button>
+              <button type="button" class="filter-pill" id="flt-focus" data-od-id="filter-focus">训练重点</button>
+              <button type="button" class="filter-pill" id="flt-ex" data-od-id="filter-exercise">动作</button>
+              <button type="button" class="filter-pill" id="flt-clear" data-od-id="filter-clear">清除</button>
+            </div>
+            <div class="body tight" id="history-body" data-od-id="history-body"></div>
+          </section>
+
+          <!-- Session 详情 -->
+          <section class="screen" data-screen="session" data-od-id="screen-session">
+            <div class="nav">
+              <div class="nav-side"><button type="button" class="text-btn" data-go="history" data-od-id="session-back">历史</button></div>
+              <h1 id="session-title" data-od-id="session-title">课程记录</h1>
+              <div class="nav-side end"><button type="button" class="text-btn" id="btn-compare-pick" data-od-id="cta-compare-pick">比较</button></div>
+            </div>
+            <div class="body" id="session-body" data-od-id="session-body"></div>
+          </section>
+
+          <!-- Session 比较 -->
+          <section class="screen" data-screen="compare" data-od-id="screen-compare">
+            <div class="nav">
+              <div class="nav-side"><button type="button" class="text-btn" data-go="history" data-od-id="compare-back">返回</button></div>
+              <h1 data-od-id="compare-title">课程比较</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body" id="compare-body" data-od-id="compare-body"></div>
+          </section>
+
+          <!-- 动作趋势总览 -->
+          <section class="screen" data-screen="ex-hub" data-od-id="screen-ex-hub">
+            <div class="nav">
+              <div class="nav-side"><button type="button" class="text-btn" data-go="student" data-od-id="ex-hub-back">返回</button></div>
+              <h1 data-od-id="ex-hub-title">动作趋势</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="tabs" role="tablist">
+              <button type="button" class="tab" data-tab="body" aria-selected="false">身体</button>
+              <button type="button" class="tab" data-tab="history" aria-selected="false">历史</button>
+              <button type="button" class="tab" data-tab="trends" aria-selected="true">趋势</button>
+              <button type="button" class="tab" data-tab="pr" aria-selected="false">个人最佳</button>
+            </div>
+            <div class="body" id="ex-hub-body" data-od-id="ex-hub-body"></div>
+          </section>
+
+          <!-- 单动作趋势 -->
+          <section class="screen" data-screen="ex-trend" data-od-id="screen-ex-trend">
+            <div class="nav">
+              <div class="nav-side"><button type="button" class="text-btn" data-go="ex-hub" data-od-id="ex-trend-back">返回</button></div>
+              <h1 id="ex-trend-title" data-od-id="ex-trend-title">动作</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body" id="ex-trend-body" data-od-id="ex-trend-body"></div>
+          </section>
+
+          <!-- 个人最佳 -->
+          <section class="screen" data-screen="pr" data-od-id="screen-pr">
+            <div class="nav">
+              <div class="nav-side"><button type="button" class="text-btn" data-go="student" data-od-id="pr-back">返回</button></div>
+              <h1 data-od-id="pr-title">个人最佳</h1>
+              <div class="nav-side end"><button type="button" class="text-btn" id="btn-pr-annot" data-od-id="cta-pr-annot">分享注释</button></div>
+            </div>
+            <div class="tabs" role="tablist">
+              <button type="button" class="tab" data-tab="body" aria-selected="false">身体</button>
+              <button type="button" class="tab" data-tab="history" aria-selected="false">历史</button>
+              <button type="button" class="tab" data-tab="trends" aria-selected="false">趋势</button>
+              <button type="button" class="tab" data-tab="pr" aria-selected="true">个人最佳</button>
+            </div>
+            <div class="body" id="pr-body" data-od-id="pr-body"></div>
+          </section>
+
+          <!-- Share Report 模块注释（不生成报告） -->
+          <section class="screen" data-screen="share-annot" data-od-id="screen-share-annot">
+            <div class="nav">
+              <div class="nav-side"><button type="button" class="text-btn" data-go="pr" data-od-id="annot-back">返回</button></div>
+              <h1 data-od-id="annot-title">分享模块注释</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body" data-od-id="annot-body">
+              <div class="callout">
+                <b>本屏仅注释 · 不生成 Share Report</b>
+                <p>走查用：标明默认开/关与永久禁止项。报告产物在 M1-A 模块，此处不实现。</p>
+              </div>
+              <div class="sec-label">默认开启（示意）</div>
+              <div class="block">
+                <div class="line">学员显示名称 · 日期 · 动作与实际组 · 时长 · 训练重点 · 学员课后总结</div>
+              </div>
+              <div class="sec-label">默认关闭 · 可临时开启</div>
+              <div class="switch-row" data-od-id="pr-share-toggle-row">
+                <span>个人最佳 <span class="tag off">默认关</span></span>
+                <button type="button" class="toggle" id="tog-pr-share" role="switch" aria-checked="false" aria-label="个人最佳模块（默认关闭）" data-od-id="toggle-pr-share"></button>
+              </div>
+              <p class="hint">每次生成从安全默认开始；上次临时开启不自动沿用。</p>
+              <div class="sec-label">永久禁止</div>
+              <div class="forbid" data-od-id="forbid-body">
+                身体数据 · 增肌/减脂趋势 · 围度 · 自定义身体指标 — <b>永不进入 Share Report</b>，无临时放开入口。
+              </div>
+              <div class="forbid" data-od-id="forbid-injury">
+                伤病/注意事项 · 性别 · 私有备注 · 左右差异内部分析 — 永久禁止。
+              </div>
+              <p class="hint">本模块不提供 1RM、RPE。辅助负载不以最高重量排名。</p>
+            </div>
+          </section>
+
+          <!-- 单位设置 -->
+          <section class="screen" data-screen="units" data-od-id="screen-units">
+            <div class="nav">
+              <div class="nav-side"><button type="button" class="text-btn" data-go="student" data-od-id="units-back">返回</button></div>
+              <h1 data-od-id="units-title">单位显示</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body" data-od-id="units-body">
+              <div class="callout">
+                <b>仅转换显示</b>
+                <p>已存数值保持原始含义；切换公制/英制只改界面呈现。自定义指标用创建时单位。</p>
+              </div>
+              <div class="sec-label">重量 / 身高</div>
+              <div class="chips" id="unit-system" data-od-id="unit-system">
+                <button type="button" class="chip" data-unit="metric" aria-pressed="true" data-od-id="unit-metric">公制 kg · cm</button>
+                <button type="button" class="chip" data-unit="imperial" aria-pressed="false" data-od-id="unit-imperial">英制 lb · in</button>
+              </div>
+              <div class="sec-label">预览 · 小周最新体重</div>
+              <div class="block" id="unit-preview" data-od-id="unit-preview"></div>
+            </div>
+          </section>
+
+          <!-- 空状态演示 -->
+          <section class="screen" data-screen="empty" data-od-id="screen-empty">
+            <div class="nav">
+              <div class="nav-side"><button type="button" class="text-btn" data-go="student" data-od-id="empty-back">返回</button></div>
+              <h1 data-od-id="empty-title">空 / 稀疏趋势</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body" data-od-id="empty-body">
+              <div class="empty" data-od-id="empty-body-state">
+                <div class="empty-box"></div>
+                <h2>尚无身体测量</h2>
+                <p>身体数据允许完全空缺。可稍后录入身高、体重、围度或自定义指标。</p>
+              </div>
+              <div class="sec-label">稀疏样本 · 虚构</div>
+              <div class="chart" data-od-id="sparse-chart">
+                <div class="chart-head"><b>体重趋势</b><span>虚构 · 仅 2 点</span></div>
+                <div class="bars" id="sparse-bars"></div>
+                <div class="bar-labels"><span>08-01</span><span>—</span><span>—</span><span>08-18</span></div>
+                <p class="hint">点少时仍用填充柱编码；空白位降低不透明度，避免空轮廓。</p>
+              </div>
+              <button type="button" class="primary" data-go="body-hub" data-od-id="cta-empty-to-body">去身体数据</button>
+              <button type="button" class="ghost" id="btn-empty-units" data-od-id="cta-empty-to-units">单位显示（仅转换）</button>
+            </div>
+          </section>
+        </div>
+
+        <div class="scrim" id="scrim" data-od-id="scrim"></div>
+        <div class="sheet" id="sheet" data-od-id="sheet" role="dialog" aria-modal="true"></div>
+        <div class="toast" id="toast" data-od-id="toast" role="status"></div>
+        <div class="home-bar" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <aside class="rail" data-od-id="annotation-right">
+      <h2>完成判定</h2>
+      <ul class="check" id="check-list" data-od-id="check-list">
+        <li data-check="log">□ 身体录入 / 同日编辑</li>
+        <li data-check="filter">□ 历史筛选可点</li>
+        <li data-check="compare">□ Session 比较</li>
+        <li data-check="pr">□ PR + 分享注释</li>
+      </ul>
+      <div class="now" id="now-panel" data-od-id="now-panel">当前：学员详情</div>
+      <div class="note" style="margin-top:12px">
+        <b style="display:block;margin-bottom:4px">图表</b>
+        灰盒柱图使用填充编码（非空轮廓）。数值标注「虚构」。
+      </div>
+    </aside>
+  </div>
+
+  <script>
+  (function () {
+    "use strict";
+
+    var checks = { log: false, filter: false, compare: false, pr: false };
+    var unitSystem = "metric"; // display only
+    var injuryOpen = false;
+    var activeMetricId = "weight";
+    var activeSessionId = "s1";
+    var compareA = "s1";
+    var compareB = "s2";
+    var activeExerciseId = "ex-squat";
+    var editingRecordId = null;
+    var toastTimer = null;
+
+    var filters = { range: "all", focus: "all", exercise: "all" };
+
+    var metrics = [
+      { id: "height", name: "身高", unit: "cm", kind: "builtin", convertible: "length" },
+      { id: "weight", name: "体重", unit: "kg", kind: "builtin", convertible: "mass" },
+      { id: "bf", name: "体脂率", unit: "%", kind: "builtin", convertible: null },
+      { id: "chest", name: "胸围", unit: "cm", kind: "builtin", convertible: "length" },
+      { id: "waist", name: "腰围", unit: "cm", kind: "builtin", convertible: "length" },
+      { id: "hip", name: "臀围", unit: "cm", kind: "builtin", convertible: "length" },
+      { id: "arm", name: "上臂围", unit: "cm", kind: "builtin", convertible: "length" },
+      { id: "thigh", name: "大腿围", unit: "cm", kind: "builtin", convertible: "length" }
+    ];
+
+    // one record per metric per calendar day; value stored in metric base unit
+    var measurements = [
+      { id: "m1", metricId: "height", date: "2026-08-01", value: 178 },
+      { id: "m2", metricId: "weight", date: "2026-08-01", value: 76.2 },
+      { id: "m3", metricId: "weight", date: "2026-08-08", value: 75.4 },
+      { id: "m4", metricId: "weight", date: "2026-08-15", value: 74.9 },
+      { id: "m5", metricId: "weight", date: "2026-08-18", value: 74.6 },
+      { id: "m6", metricId: "bf", date: "2026-08-01", value: 18.5 },
+      { id: "m7", metricId: "bf", date: "2026-08-15", value: 17.8 },
+      { id: "m8", metricId: "waist", date: "2026-08-01", value: 82 },
+      { id: "m9", metricId: "waist", date: "2026-08-18", value: 80.5 },
+      { id: "m10", metricId: "chest", date: "2026-08-18", value: 98 }
+    ];
+
+    var sessions = [
+      {
+        id: "s1", date: "2026-08-18", focus: "腿 · 臀", durationMin: 58,
+        exercises: [
+          { id: "ex-squat", name: "杠铃深蹲", loadType: "total",
+            sets: [{ w: 100, r: 5 }, { w: 100, r: 5 }, { w: 105, r: 3 }] },
+          { id: "ex-rdl", name: "罗马尼亚硬拉", loadType: "total",
+            sets: [{ w: 80, r: 8 }, { w: 80, r: 8 }] },
+          { id: "ex-assist", name: "辅助引体向上", loadType: "assist",
+            sets: [{ w: 25, r: 8 }, { w: 20, r: 8 }] }
+        ]
+      },
+      {
+        id: "s2", date: "2026-08-11", focus: "腿 · 臀", durationMin: 55,
+        exercises: [
+          { id: "ex-squat", name: "杠铃深蹲", loadType: "total",
+            sets: [{ w: 95, r: 5 }, { w: 95, r: 5 }, { w: 100, r: 4 }] },
+          { id: "ex-legpress", name: "腿举", loadType: "machine",
+            sets: [{ w: 120, r: 10 }, { w: 120, r: 10 }] },
+          { id: "ex-assist", name: "辅助引体向上", loadType: "assist",
+            sets: [{ w: 30, r: 8 }, { w: 28, r: 8 }] }
+        ]
+      },
+      {
+        id: "s3", date: "2026-08-08", focus: "推 · 上肢", durationMin: 50,
+        exercises: [
+          { id: "ex-bench", name: "杠铃卧推", loadType: "total",
+            sets: [{ w: 70, r: 6 }, { w: 70, r: 6 }, { w: 72.5, r: 5 }] },
+          { id: "ex-ohp", name: "站姿推举", loadType: "total",
+            sets: [{ w: 40, r: 8 }, { w: 40, r: 8 }] },
+          { id: "ex-plank", name: "平板支撑", loadType: "duration",
+            sets: [{ d: 45 }, { d: 60 }] }
+        ]
+      },
+      {
+        id: "s4", date: "2026-08-04", focus: "腿 · 臀", durationMin: 52,
+        exercises: [
+          { id: "ex-squat", name: "杠铃深蹲", loadType: "total",
+            sets: [{ w: 90, r: 5 }, { w: 90, r: 5 }] },
+          { id: "ex-assist", name: "辅助引体向上", loadType: "assist",
+            sets: [{ w: 35, r: 6 }, { w: 32, r: 6 }] }
+        ]
+      },
+      {
+        id: "s5", date: "2026-07-28", focus: "拉 · 上肢", durationMin: 48,
+        exercises: [
+          { id: "ex-row", name: "杠铃划船", loadType: "total",
+            sets: [{ w: 60, r: 8, L: 60, R: 55 }, { w: 60, r: 8, L: 60, R: 58 }] },
+          { id: "ex-plank", name: "平板支撑", loadType: "duration",
+            sets: [{ d: 40 }, { d: 50 }] }
+        ]
+      }
+    ];
+
+    function $(sel, root) { return (root || document).querySelector(sel); }
+    function $all(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+
+    function toast(msg) {
+      var el = $("#toast");
+      el.textContent = msg;
+      el.classList.add("on");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () { el.classList.remove("on"); }, 1800);
+    }
+
+    function markCheck(key) {
+      checks[key] = true;
+      var li = document.querySelector('[data-check="' + key + '"]');
+      if (li) {
+        var labels = {
+          log: "✓ 身体录入 / 同日编辑",
+          filter: "✓ 历史筛选可点",
+          compare: "✓ Session 比较",
+          pr: "✓ PR + 分享注释"
+        };
+        li.textContent = labels[key];
+        li.classList.add("ok");
+      }
+    }
+
+    function setNow(text) {
+      $("#now-panel").textContent = "当前：" + text;
+    }
+
+    function showScreen(name) {
+      $all(".screen").forEach(function (s) {
+        s.classList.toggle("is-on", s.getAttribute("data-screen") === name);
+      });
+      closeSheet();
+    }
+
+    function openSheet(html) {
+      var sheet = $("#sheet");
+      sheet.innerHTML = html;
+      sheet.classList.add("on");
+      $("#scrim").classList.add("on");
+    }
+
+    function closeSheet() {
+      $("#sheet").classList.remove("on");
+      $("#scrim").classList.remove("on");
+    }
+
+    function metricById(id) {
+      for (var i = 0; i < metrics.length; i++) if (metrics[i].id === id) return metrics[i];
+      return null;
+    }
+
+    function sessionById(id) {
+      for (var i = 0; i < sessions.length; i++) if (sessions[i].id === id) return sessions[i];
+      return null;
+    }
+
+    function recordsForMetric(metricId) {
+      return measurements
+        .filter(function (m) { return m.metricId === metricId; })
+        .sort(function (a, b) { return a.date < b.date ? 1 : -1; });
+    }
+
+    function recordOnDay(metricId, date) {
+      for (var i = 0; i < measurements.length; i++) {
+        if (measurements[i].metricId === metricId && measurements[i].date === date) return measurements[i];
+      }
+      return null;
+    }
+
+    function displayValue(metric, raw) {
+      if (raw == null || isNaN(raw)) return "—";
+      if (unitSystem === "imperial" && metric.convertible === "mass") {
+        return (raw * 2.20462).toFixed(1) + " lb";
+      }
+      if (unitSystem === "imperial" && metric.convertible === "length") {
+        return (raw / 2.54).toFixed(1) + " in";
+      }
+      var u = metric.unit;
+      if (u === "%") return raw.toFixed(1) + " %";
+      if (Number.isInteger(raw)) return raw + " " + u;
+      return raw.toFixed(1) + " " + u;
+    }
+
+    function parseInputToBase(metric, inputStr) {
+      var n = parseFloat(String(inputStr).replace(",", "."));
+      if (isNaN(n)) return null;
+      if (unitSystem === "imperial" && metric.convertible === "mass") return n / 2.20462;
+      if (unitSystem === "imperial" && metric.convertible === "length") return n * 2.54;
+      return n;
+    }
+
+    function inputUnitLabel(metric) {
+      if (unitSystem === "imperial" && metric.convertible === "mass") return "lb";
+      if (unitSystem === "imperial" && metric.convertible === "length") return "in";
+      return metric.unit;
+    }
+
+    function latestFor(metricId) {
+      var list = recordsForMetric(metricId);
+      return list.length ? list[0] : null;
+    }
+
+    function uid(prefix) {
+      return prefix + "-" + Date.now().toString(36) + "-" + Math.floor(Math.random() * 1000);
+    }
+
+    function volumeOfSession(s) {
+      var vol = 0, sets = 0, reps = 0, durationSec = 0;
+      s.exercises.forEach(function (ex) {
+        if (ex.loadType === "assist") {
+          sets += ex.sets.length;
+          ex.sets.forEach(function (st) { reps += st.r || 0; durationSec += st.d || 0; });
+          return;
+        }
+        if (ex.loadType === "duration") {
+          ex.sets.forEach(function (st) {
+            sets += 1;
+            durationSec += st.d || 0;
+          });
+          return;
+        }
+        ex.sets.forEach(function (st) {
+          sets += 1;
+          reps += st.r || 0;
+          durationSec += st.d || 0;
+          if (st.w != null && st.r != null) vol += st.w * st.r;
+        });
+      });
+      return { volume: vol, sets: sets, reps: reps, durationMin: s.durationMin, durationSec: durationSec };
+    }
+
+    function renderBars(values, opts) {
+      opts = opts || {};
+      if (!values.length) return '<div class="chart-empty">暂无数据 · 虚构占位为空</div>';
+      var max = Math.max.apply(null, values.map(function (v) { return v.y; }).concat([1]));
+      var html = '<div class="bars">';
+      values.forEach(function (v) {
+        var h = Math.max(4, Math.round((v.y / max) * 88));
+        var cls = "bar" + (opts.assist ? " assist" : "") + (v.sparse ? " sparse" : "");
+        html += '<div class="' + cls + '" style="height:' + h + 'px" title="' + v.y + '"></div>';
+      });
+      html += "</div><div class=\"bar-labels\">";
+      values.forEach(function (v) {
+        html += "<span>" + (v.label || "") + "</span>";
+      });
+      html += "</div>";
+      return html;
+    }
+
+    /* ——— screens ——— */
+
+    function renderStudent() {
+      var w = latestFor("weight");
+      var html = "";
+      html += '<div class="hero-name" data-od-id="student-name">小周</div>';
+      html += '<div class="meta">男 · 训练目标：下肢力量 · 虚构档案</div>';
+
+      html += '<div class="sec-label">一级 · 常用</div>';
+      html += '<div class="block"><h3>课包摘要</h3><p class="line">剩余 8 / 20 课时 · 有效至 2026-12-31</p><p class="sub">课包细节见 M1-B/02</p></div>';
+
+      html += '<div class="sec-label">二级 · 身体与私有</div>';
+      html += '<button type="button" class="collapse-btn" id="btn-injury" aria-expanded="' + injuryOpen + '" data-od-id="cta-toggle-injury">' +
+        "<span>伤病 / 注意事项（私有）</span><span>" + (injuryOpen ? "收起" : "展开") + "</span></button>";
+      html += '<div class="collapse-panel' + (injuryOpen ? " open" : "") + '" id="injury-panel" data-od-id="injury-panel">';
+      html += '<div class="block"><p class="line">右膝偶尔不适 · 深蹲深度保守</p>';
+      html += '<p class="sub">最近更新 2026-08-10</p>';
+      html += '<div class="privacy" style="margin-top:8px">此区域为教练私有记录，不是医疗诊断或医疗建议。永不进入 Share Report。</div></div></div>';
+
+      html += '<button type="button" class="list-row" id="goto-body" data-od-id="cta-open-body">';
+      html += '<div class="main"><div class="name">身体数据</div><div class="sub">';
+      html += w ? ("最新体重 " + displayValue(metricById("weight"), w.value) + " · " + w.date) : "尚未录入";
+      html += '</div></div><span class="chev"></span></button>';
+
+      html += '<button type="button" class="list-row" data-go="history" data-od-id="cta-open-history">';
+      html += '<div class="main"><div class="name">训练历史</div><div class="sub">倒序 · 可筛选训练重点 / 动作</div></div><span class="chev"></span></button>';
+
+      html += '<button type="button" class="list-row" data-go="ex-hub" data-od-id="cta-open-trends">';
+      html += '<div class="main"><div class="name">动作趋势</div><div class="sub">逐组 · 容量 · 左右差 · 辅助负载</div></div><span class="chev"></span></button>';
+
+      html += '<button type="button" class="list-row" data-go="pr" data-od-id="cta-open-pr">';
+      html += '<div class="main"><div class="name">个人最佳</div><div class="sub">兼容口径 · 无 1RM</div></div><span class="chev"></span></button>';
+
+      html += '<div class="forbid" style="margin-top:14px" data-od-id="student-body-forbid-note">标注：身体数据永不出现在 Share Report。</div>';
+
+      $("#student-body").innerHTML = html;
+      setNow("学员详情 · 小周");
+    }
+
+    function renderBodyHub() {
+      var html = '<div class="callout"><b>小周 · 身体指标</b><p>同日同指标仅一条；再次录入将编辑该日记录。数据标注：虚构。</p></div>';
+      html += '<button type="button" class="primary" id="btn-quick-log" data-od-id="cta-quick-log" style="margin-top:0">录入今日测量</button>';
+      html += '<div class="sec-label">内置指标</div>';
+      metrics.filter(function (m) { return m.kind === "builtin"; }).forEach(function (m) {
+        var latest = latestFor(m.id);
+        html += '<button type="button" class="list-row" data-metric="' + m.id + '" data-od-id="metric-row-' + m.id + '">';
+        html += '<div class="main"><div class="name">' + m.name + '</div><div class="sub">';
+        html += latest ? (latest.date + " · 点此看趋势") : "尚无记录";
+        html += '</div></div><div class="val">' + (latest ? displayValue(m, latest.value) : "—") + '</div><span class="chev"></span></button>';
+      });
+      var customs = metrics.filter(function (m) { return m.kind === "custom"; });
+      html += '<div class="sec-label">自定义指标</div>';
+      if (!customs.length) {
+        html += '<p class="hint">尚无自定义指标。名称+单位必填，创建后稳定 ID。</p>';
+      } else {
+        customs.forEach(function (m) {
+          var latest = latestFor(m.id);
+          html += '<button type="button" class="list-row" data-metric="' + m.id + '" data-od-id="metric-row-' + m.id + '">';
+          html += '<div class="main"><div class="name">' + m.name + ' <span class="tag dash">' + m.id + '</span></div><div class="sub">单位 ' + m.unit + (latest ? " · " + latest.date : "") + '</div></div>';
+          html += '<div class="val">' + (latest ? displayValue(m, latest.value) : "—") + '</div><span class="chev"></span></button>';
+        });
+      }
+      $("#body-hub-body").innerHTML = html;
+      setNow("身体数据总览");
+    }
+
+    function openLog(metricId, recordId) {
+      activeMetricId = metricId || activeMetricId;
+      editingRecordId = recordId || null;
+      var m = metricById(activeMetricId);
+      var today = "2026-08-21";
+      var existing = editingRecordId
+        ? measurements.filter(function (x) { return x.id === editingRecordId; })[0]
+        : recordOnDay(activeMetricId, today);
+      var dateVal = existing ? existing.date : today;
+      var raw = existing ? existing.value : "";
+      var displayRaw = "";
+      if (raw !== "") {
+        if (unitSystem === "imperial" && m.convertible === "mass") displayRaw = (raw * 2.20462).toFixed(1);
+        else if (unitSystem === "imperial" && m.convertible === "length") displayRaw = (raw / 2.54).toFixed(1);
+        else displayRaw = String(raw);
+      }
+      var sameDay = !!recordOnDay(activeMetricId, dateVal) && !editingRecordId;
+      $("#log-title").textContent = existing || sameDay ? "编辑测量" : "录入测量";
+      var html = "";
+      if (existing || sameDay) {
+        html += '<div class="callout"><b>同日覆盖规则</b><p>该指标在 ' + dateVal + ' 已有记录；保存将更新当日值，不新增第二条。</p></div>';
+      }
+      html += '<label class="field-label">指标</label>';
+      html += '<select class="select" id="log-metric" data-od-id="field-log-metric">';
+      metrics.forEach(function (mm) {
+        html += '<option value="' + mm.id + '"' + (mm.id === activeMetricId ? " selected" : "") + ">" + mm.name + "（" + mm.unit + "）</option>";
+      });
+      html += "</select>";
+      html += '<label class="field-label" for="log-date">日期</label>';
+      html += '<input class="field" type="date" id="log-date" value="' + dateVal + '" data-od-id="field-log-date">';
+      html += '<label class="field-label" for="log-value">数值（' + inputUnitLabel(m) + "）</label>";
+      html += '<input class="field" id="log-value" inputmode="decimal" value="' + displayRaw + '" data-od-id="field-log-value" placeholder="虚构数值">';
+      html += '<div class="err" id="log-err">请输入有效数值</div>';
+      html += '<p class="hint">显示单位来自设置；保存按原始含义写入。无照片对比。</p>';
+      if (existing) {
+        html += '<button type="button" class="danger-btn" id="btn-log-delete" data-od-id="cta-log-delete">删除此记录</button>';
+      }
+      $("#log-body").innerHTML = html;
+      showScreen("log");
+      setNow("录入 / 编辑 · " + m.name);
+    }
+
+    function saveLog() {
+      var metricId = $("#log-metric").value;
+      var date = $("#log-date").value;
+      var m = metricById(metricId);
+      var base = parseInputToBase(m, $("#log-value").value);
+      if (base == null) {
+        $("#log-err").classList.add("show");
+        return;
+      }
+      $("#log-err").classList.remove("show");
+      var existing = recordOnDay(metricId, date);
+      if (editingRecordId) {
+        var rec = measurements.filter(function (x) { return x.id === editingRecordId; })[0];
+        if (rec) {
+          // if date/metric collide with another row, merge into that day
+          var clash = recordOnDay(metricId, date);
+          if (clash && clash.id !== rec.id) {
+            clash.value = base;
+            measurements = measurements.filter(function (x) { return x.id !== rec.id; });
+          } else {
+            rec.metricId = metricId;
+            rec.date = date;
+            rec.value = base;
+          }
+        }
+      } else if (existing) {
+        existing.value = base;
+        toast("已更新 " + date + " 的" + m.name);
+      } else {
+        measurements.push({ id: uid("m"), metricId: metricId, date: date, value: base });
+        toast("已保存 " + m.name);
+      }
+      editingRecordId = null;
+      markCheck("log");
+      activeMetricId = metricId;
+      renderMetricTrend();
+      showScreen("metric-trend");
+    }
+
+    function confirmDeleteRecord(recId) {
+      openSheet(
+        "<h2>删除测量？</h2>" +
+        '<p class="lead">删除后立即重算该指标趋势。此操作不可撤销（原型）。</p>' +
+        '<div class="btn-row"><button type="button" class="ghost" id="del-cancel">取消</button>' +
+        '<button type="button" class="danger-btn" id="del-confirm" data-od-id="cta-confirm-delete">删除并重算</button></div>'
+      );
+      $("#del-cancel").onclick = closeSheet;
+      $("#del-confirm").onclick = function () {
+        measurements = measurements.filter(function (x) { return x.id !== recId; });
+        closeSheet();
+        toast("已删除 · 趋势已重算");
+        markCheck("log");
+        renderMetricTrend();
+        showScreen("metric-trend");
+      };
+    }
+
+    function renderMetricTrend() {
+      var m = metricById(activeMetricId);
+      $("#metric-title").textContent = m.name;
+      var asc = recordsForMetric(activeMetricId).slice().reverse();
+      var html = '<div class="chart" data-od-id="metric-chart">';
+      html += '<div class="chart-head"><b>' + m.name + "趋势</b><span>虚构 · 填充编码</span></div>";
+      if (!asc.length) {
+        html += '<div class="chart-empty">尚无测量点</div>';
+      } else {
+        var vals = asc.map(function (r) {
+          return { y: r.value, label: r.date.slice(5), sparse: asc.length < 3 };
+        });
+        html += renderBars(vals);
+      }
+      html += "</div>";
+      html += '<p class="hint">单位显示：' + (unitSystem === "metric" ? "公制" : "英制") + " · 原始值未改写</p>";
+      html += '<div class="sec-label">历史记录 · 倒序</div>';
+      var desc = recordsForMetric(activeMetricId);
+      if (!desc.length) {
+        html += '<div class="empty"><div class="empty-box"></div><h2>无记录</h2><p>可录入第一条虚构数据。</p></div>';
+      } else {
+        desc.forEach(function (r) {
+          html += '<button type="button" class="list-row" data-edit-rec="' + r.id + '" data-od-id="rec-' + r.id + '">';
+          html += '<div class="main"><div class="name">' + r.date + '</div><div class="sub">点按编辑 · 删除需确认</div></div>';
+          html += '<div class="val">' + displayValue(m, r.value) + '</div><span class="chev"></span></button>';
+        });
+      }
+      $("#metric-body").innerHTML = html;
+      setNow("指标趋势 · " + m.name);
+    }
+
+    function filteredSessions() {
+      return sessions.filter(function (s) {
+        if (filters.focus !== "all" && s.focus !== filters.focus) return false;
+        if (filters.exercise !== "all") {
+          var hit = s.exercises.some(function (ex) { return ex.id === filters.exercise; });
+          if (!hit) return false;
+        }
+        if (filters.range === "30d") {
+          if (s.date < "2026-07-22") return false;
+        } else if (filters.range === "7d") {
+          if (s.date < "2026-08-14") return false;
+        }
+        return true;
+      }).sort(function (a, b) { return a.date < b.date ? 1 : -1; });
+    }
+
+    function renderHistory() {
+      $all(".filter-pill").forEach(function (p) { p.classList.remove("on"); });
+      if (filters.range !== "all") $("#flt-range").classList.add("on");
+      if (filters.focus !== "all") $("#flt-focus").classList.add("on");
+      if (filters.exercise !== "all") $("#flt-ex").classList.add("on");
+
+      var list = filteredSessions();
+      var html = "";
+      if (!list.length) {
+        html = '<div class="empty"><div class="empty-box"></div><h2>无匹配课程</h2><p>调整筛选条件，或清除筛选。</p></div>';
+      } else {
+        list.forEach(function (s) {
+          var sum = volumeOfSession(s);
+          html += '<button type="button" class="list-row" style="padding:12px 16px" data-session="' + s.id + '" data-od-id="hist-' + s.id + '">';
+          html += '<div class="main"><div class="name">' + s.date + ' · ' + s.focus + '</div>';
+          html += '<div class="sub">' + s.exercises.length + " 动作 · " + sum.sets + " 组 · " + s.durationMin + " 分钟 · 容量 " + Math.round(sum.volume) + "（虚构）</div></div>";
+          html += '<span class="chev"></span></button>';
+        });
+      }
+      $("#history-body").innerHTML = html;
+      setNow("训练历史 · 倒序");
+    }
+
+    function openFilterSheet(kind) {
+      var html = "";
+      if (kind === "range") {
+        html = "<h2>日期范围</h2><p class=\"lead\">筛选已完成课程（虚构日历）。</p>";
+        [["all", "全部"], ["30d", "近 30 天"], ["7d", "近 7 天"]].forEach(function (opt) {
+          html += '<button type="button" class="menu-item" data-set-range="' + opt[0] + '">' + opt[1] +
+            (filters.range === opt[0] ? " · 当前" : "") + "</button>";
+        });
+      } else if (kind === "focus") {
+        html = "<h2>训练重点</h2><p class=\"lead\">课程级标签。</p>";
+        html += '<button type="button" class="menu-item" data-set-focus="all">全部</button>';
+        var focuses = [];
+        sessions.forEach(function (s) { if (focuses.indexOf(s.focus) < 0) focuses.push(s.focus); });
+        focuses.forEach(function (f) {
+          html += '<button type="button" class="menu-item" data-set-focus="' + f + '">' + f + "</button>";
+        });
+      } else {
+        html = "<h2>动作</h2><p class=\"lead\">含该动作的课程。</p>";
+        html += '<button type="button" class="menu-item" data-set-ex="all">全部</button>';
+        var map = {};
+        sessions.forEach(function (s) {
+          s.exercises.forEach(function (ex) { map[ex.id] = ex.name; });
+        });
+        Object.keys(map).forEach(function (id) {
+          html += '<button type="button" class="menu-item" data-set-ex="' + id + '">' + map[id] + "</button>";
+        });
+      }
+      openSheet(html);
+    }
+
+    function renderSession() {
+      var s = sessionById(activeSessionId);
+      $("#session-title").textContent = s.date;
+      var sum = volumeOfSession(s);
+      var html = '<div class="callout"><b>' + s.focus + '</b><p>' + s.durationMin + " 分钟 · " + sum.sets + " 组 · 可计算容量 " + Math.round(sum.volume) + " kg·次（虚构；辅助负载不计入容量排名）</p></div>";
+      s.exercises.forEach(function (ex) {
+        html += '<div class="block" data-od-id="sess-ex-' + ex.id + '"><h3>' + ex.name;
+        if (ex.loadType === "assist") html += ' <span class="tag dash">辅助</span>';
+        html += "</h3>";
+        html += '<div class="set-row head"><span>#</span><span>重量</span><span>次数/时长</span><span>备注</span></div>';
+        ex.sets.forEach(function (st, i) {
+          var note = "";
+          if (st.L != null) note = "L" + st.L + "/R" + st.R;
+          if (ex.loadType === "duration") note = "时长型";
+          var mid = st.d != null ? (st.d + "s") : (st.r != null ? st.r : "—");
+          var w = st.w != null ? st.w : "—";
+          html += '<div class="set-row"><span>' + (i + 1) + "</span><span>" + w + "</span><span>" + mid + "</span><span>" + note + "</span></div>";
+        });
+        html += '<button type="button" class="ghost" style="margin-top:8px" data-open-ex="' + ex.id + '" data-od-id="cta-ex-from-sess-' + ex.id + '">查看动作趋势</button>';
+        html += "</div>";
+      });
+      html += '<button type="button" class="primary" id="btn-compare-same" data-od-id="cta-compare-same-focus">与同训练重点比较</button>';
+      $("#session-body").innerHTML = html;
+      setNow("课程详情 · " + s.date);
+    }
+
+    function renderCompare() {
+      var a = sessionById(compareA);
+      var b = sessionById(compareB);
+      var html = "";
+      if (a.focus !== b.focus) {
+        html += '<div class="forbid">训练重点不同，无法做课程级比较。请选择相同训练重点的课程。</div>';
+        html += '<button type="button" class="ghost" data-go="history">回历史重选</button>';
+        $("#compare-body").innerHTML = html;
+        setNow("比较 · 不可比");
+        return;
+      }
+      var sa = volumeOfSession(a);
+      var sb = volumeOfSession(b);
+      html += '<div class="callout"><b>相同训练重点：' + a.focus + '</b><p>' + a.date + "  vs  " + b.date + " · 虚构数据</p></div>";
+      html += '<div class="diff-grid">';
+      html += cell("总组数", sa.sets, sb.sets);
+      html += cell("总次数", sa.reps, sb.reps);
+      html += cell("时长(分)", sa.durationMin, sb.durationMin);
+      html += cell("可计算容量", Math.round(sa.volume), Math.round(sb.volume));
+      html += "</div>";
+
+      var mapA = {}, mapB = {};
+      a.exercises.forEach(function (ex) { mapA[ex.id] = ex; });
+      b.exercises.forEach(function (ex) { mapB[ex.id] = ex; });
+      var allIds = [];
+      Object.keys(mapA).concat(Object.keys(mapB)).forEach(function (id) {
+        if (allIds.indexOf(id) < 0) allIds.push(id);
+      });
+
+      html += '<div class="sec-label">共有动作差异</div>';
+      allIds.forEach(function (id) {
+        if (mapA[id] && mapB[id]) {
+          var topA = maxWeight(mapA[id]);
+          var topB = maxWeight(mapB[id]);
+          html += '<div class="block"><h3>' + mapA[id].name + (mapA[id].loadType === "assist" ? ' <span class="tag dash">辅助↓更好</span>' : "") + (mapA[id].loadType === "duration" ? ' <span class="tag dash">时长</span>' : "") + "</h3>";
+          if (mapA[id].loadType === "duration") {
+            var dA = 0, dB = 0;
+            mapA[id].sets.forEach(function (st) { if (st.d != null && st.d > dA) dA = st.d; });
+            mapB[id].sets.forEach(function (st) { if (st.d != null && st.d > dB) dB = st.d; });
+            html += '<p class="line">' + a.date + " 最长 " + dA + "s · " + b.date + " 最长 " + dB + "s</p></div>";
+          } else {
+            html += '<p class="line">' + a.date + " 顶值 " + topA + " · " + b.date + " 顶值 " + topB;
+            if (mapA[id].loadType === "assist") {
+              html += topA < topB ? " · 辅助下降（进步）" : topA > topB ? " · 辅助上升" : " · 持平";
+            }
+            html += "</p></div>";
+          }
+        }
+      });
+
+      html += '<div class="sec-label">不可比较 · 分开显示</div>';
+      allIds.forEach(function (id) {
+        if (mapA[id] && !mapB[id]) {
+          html += '<div class="block"><h3>' + mapA[id].name + '</h3><p class="sub">仅出现在 ' + a.date + "</p></div>";
+        } else if (!mapA[id] && mapB[id]) {
+          html += '<div class="block"><h3>' + mapB[id].name + '</h3><p class="sub">仅出现在 ' + b.date + "</p></div>";
+        }
+      });
+
+      html += '<div class="sec-label">更换对比课</div>';
+      html += '<label class="field-label">课程 A</label><select class="select" id="cmp-a" data-od-id="field-cmp-a">';
+      sessions.filter(function (s) { return s.focus === a.focus; }).forEach(function (s) {
+        html += '<option value="' + s.id + '"' + (s.id === compareA ? " selected" : "") + ">" + s.date + " · " + s.focus + "</option>";
+      });
+      html += '</select><label class="field-label">课程 B</label><select class="select" id="cmp-b" data-od-id="field-cmp-b">';
+      sessions.filter(function (s) { return s.focus === a.focus; }).forEach(function (s) {
+        html += '<option value="' + s.id + '"' + (s.id === compareB ? " selected" : "") + ">" + s.date + " · " + s.focus + "</option>";
+      });
+      html += '</select><button type="button" class="primary" id="btn-cmp-apply" data-od-id="cta-cmp-apply">应用比较</button>';
+
+      $("#compare-body").innerHTML = html;
+      markCheck("compare");
+      setNow("Session 比较 · " + a.focus);
+    }
+
+    function cell(label, a, b) {
+      var cls = a > b ? "up" : a < b ? "down" : "";
+      return '<div class="diff-cell ' + cls + '"><div class="k">' + label + '</div><div class="v">' + a + " / " + b + "</div></div>";
+    }
+
+    function maxWeight(ex) {
+      var max = 0;
+      ex.sets.forEach(function (st) { if (st.w != null && st.w > max) max = st.w; });
+      return max;
+    }
+
+    function renderExHub() {
+      var map = {};
+      sessions.forEach(function (s) {
+        s.exercises.forEach(function (ex) {
+          if (!map[ex.id]) map[ex.id] = { id: ex.id, name: ex.name, loadType: ex.loadType, count: 0 };
+          map[ex.id].count += 1;
+        });
+      });
+      var html = '<div class="callout"><b>动作级趋势</b><p>辅助负载：数值下降表示进步，不并入最高重量排名。无 1RM。</p></div>';
+      Object.keys(map).forEach(function (id) {
+        var ex = map[id];
+        html += '<button type="button" class="list-row" data-open-ex="' + id + '" data-od-id="ex-row-' + id + '">';
+        html += '<div class="main"><div class="name">' + ex.name;
+        if (ex.loadType === "assist") html += ' <span class="tag dash">辅助</span>';
+        html += '</div><div class="sub">出现于 ' + ex.count + " 次课程</div></div><span class=\"chev\"></span></button>";
+      });
+      $("#ex-hub-body").innerHTML = html;
+      setNow("动作趋势列表");
+    }
+
+    function renderExTrend() {
+      var name = activeExerciseId;
+      var loadType = "total";
+      var points = [];
+      sessions.slice().sort(function (a, b) { return a.date > b.date ? 1 : -1; }).forEach(function (s) {
+        s.exercises.forEach(function (ex) {
+          if (ex.id === activeExerciseId) {
+            name = ex.name;
+            loadType = ex.loadType;
+            points.push({ date: s.date, ex: ex, session: s });
+          }
+        });
+      });
+      $("#ex-trend-title").textContent = name;
+
+      var html = "";
+      if (loadType === "assist") {
+        html += '<div class="callout"><b>辅助负载 · 越低越好</b><p>不并入普通动作最高重量排名 · 虚构</p></div>';
+      } else if (loadType === "duration") {
+        html += '<div class="callout"><b>' + name + '</b><p>时长型 · 最长时长为兼容 PR · 无重量排名 · 虚构</p></div>';
+      } else {
+        html += '<div class="callout"><b>' + name + '</b><p>逐组 · 顶重量 · 最佳次数 · 容量 · 左右差（若有）</p></div>';
+      }
+
+      var chartVals = points.map(function (p) {
+        var y = 0;
+        if (loadType === "duration") {
+          p.ex.sets.forEach(function (st) { if (st.d != null && st.d > y) y = st.d; });
+        } else {
+          y = maxWeight(p.ex);
+        }
+        return { y: y, label: p.date.slice(5), sparse: points.length < 3 };
+      });
+      html += '<div class="chart" data-od-id="ex-chart"><div class="chart-head"><b>';
+      html += loadType === "assist" ? "辅助重量趋势" : loadType === "duration" ? "最长时长趋势" : "顶组重量趋势";
+      html += '</b><span>虚构 · 填充</span></div>';
+      html += renderBars(chartVals, { assist: loadType === "assist" });
+      html += "</div>";
+
+      var bestW = 0, bestRepsAtW = { w: 0, r: 0 }, bestDur = 0;
+      var lrDiff = null;
+      points.forEach(function (p) {
+        p.ex.sets.forEach(function (st) {
+          if (st.w != null && st.w > bestW) bestW = st.w;
+          if (st.w != null && st.r != null) {
+            if (st.w > bestRepsAtW.w || (st.w === bestRepsAtW.w && st.r > bestRepsAtW.r)) {
+              bestRepsAtW = { w: st.w, r: st.r };
+            }
+          }
+          if (st.d != null && st.d > bestDur) bestDur = st.d;
+          if (st.L != null && st.R != null) lrDiff = Math.abs(st.L - st.R);
+        });
+      });
+
+      html += '<div class="diff-grid">';
+      if (loadType === "assist") {
+        html += '<div class="diff-cell"><div class="k">最低辅助（更好）</div><div class="v">' + (points.length ? Math.min.apply(null, points.map(function (p) { return maxWeight(p.ex); })) : "—") + " kg</div></div>";
+        html += '<div class="diff-cell"><div class="k">排名说明</div><div class="v" style="font-size:13px;font-weight:500">不进最高重量榜</div></div>';
+      } else if (loadType === "duration") {
+        html += '<div class="diff-cell"><div class="k">最长时长</div><div class="v">' + bestDur + " s</div></div>";
+        html += '<div class="diff-cell"><div class="k">口径</div><div class="v" style="font-size:13px;font-weight:500">兼容时长 PR</div></div>';
+      } else {
+        html += '<div class="diff-cell"><div class="k">最高重量</div><div class="v">' + bestW + " kg</div></div>";
+        html += '<div class="diff-cell"><div class="k">同重量最多次</div><div class="v">' + bestRepsAtW.r + " @ " + bestRepsAtW.w + "</div></div>";
+      }
+      if (lrDiff != null) {
+        html += '<div class="diff-cell"><div class="k">左右差（内部）</div><div class="v">' + lrDiff + " kg</div></div>";
+      }
+      html += "</div>";
+
+      points.slice().reverse().forEach(function (p) {
+        html += '<div class="block"><h3>' + p.date + ' · ' + p.session.focus + '</h3>';
+        if (loadType === "duration") {
+          html += '<div class="set-row head"><span>#</span><span>—</span><span>时长(s)</span><span>—</span></div>';
+          p.ex.sets.forEach(function (st, i) {
+            html += '<div class="set-row"><span>' + (i + 1) + "</span><span>—</span><span>" + (st.d || "—") + "</span><span>—</span></div>";
+          });
+          html += '<p class="sub" style="margin-top:6px">时长型 · 不虚构身体重量容量</p></div>';
+        } else {
+          html += '<div class="set-row head"><span>#</span><span>重量</span><span>次数</span><span>L/R</span></div>';
+          p.ex.sets.forEach(function (st, i) {
+            html += '<div class="set-row"><span>' + (i + 1) + "</span><span>" + (st.w != null ? st.w : "—") + "</span><span>" + (st.r || "—") + "</span><span>" +
+              (st.L != null ? (st.L + "/" + st.R) : "—") + "</span></div>";
+          });
+          var vol = 0;
+          if (loadType !== "assist") p.ex.sets.forEach(function (st) { if (st.w && st.r) vol += st.w * st.r; });
+          html += '<p class="sub" style="margin-top:6px">' + (loadType === "assist" ? "辅助组 · 不计入容量排名" : ("本组容量 " + vol + "（虚构）")) + "</p></div>";
+        }
+      });
+
+      if (!points.length) {
+        html = '<div class="empty"><div class="empty-box"></div><h2>暂无该动作记录</h2><p>稀疏/空状态。</p></div>';
+      }
+
+      $("#ex-trend-body").innerHTML = html;
+      setNow("动作趋势 · " + name);
+    }
+
+    function computePRs() {
+      // compatible same-exercise: max weight, most reps at weight, longest duration
+      // assist excluded from max-weight ranking
+      var byEx = {};
+      sessions.forEach(function (s) {
+        s.exercises.forEach(function (ex) {
+          if (!byEx[ex.id]) byEx[ex.id] = { id: ex.id, name: ex.name, loadType: ex.loadType, sets: [] };
+          ex.sets.forEach(function (st) {
+            byEx[ex.id].sets.push({ date: s.date, st: st });
+          });
+        });
+      });
+      var list = [];
+      Object.keys(byEx).forEach(function (id) {
+        var ex = byEx[id];
+        if (ex.loadType === "assist") {
+          var minW = Infinity, minDate = "";
+          ex.sets.forEach(function (row) {
+            if (row.st.w != null && row.st.w < minW) { minW = row.st.w; minDate = row.date; }
+          });
+          list.push({
+            id: id, name: ex.name, assist: true,
+            lines: ["最低辅助 " + minW + " kg · " + minDate, "不参与最高重量 PR 排名"]
+          });
+          return;
+        }
+        if (ex.loadType === "duration") {
+          var bestD = { d: 0, date: "" };
+          ex.sets.forEach(function (row) {
+            if (row.st.d != null && row.st.d > bestD.d) bestD = { d: row.st.d, date: row.date };
+          });
+          list.push({
+            id: id, name: ex.name, assist: false,
+            lines: bestD.d ? ["最长时长 " + bestD.d + "s · " + bestD.date] : ["尚无兼容记录"]
+          });
+          return;
+        }
+        var maxW = 0, maxWDate = "";
+        var bestRep = { w: 0, r: 0, date: "" };
+        var bestDur = { d: 0, date: "" };
+        ex.sets.forEach(function (row) {
+          var st = row.st;
+          if (st.w != null && st.w > maxW) { maxW = st.w; maxWDate = row.date; }
+          if (st.w != null && st.r != null) {
+            if (st.w > bestRep.w || (st.w === bestRep.w && st.r > bestRep.r)) {
+              bestRep = { w: st.w, r: st.r, date: row.date };
+            }
+          }
+          if (st.d != null && st.d > bestDur.d) bestDur = { d: st.d, date: row.date };
+        });
+        var lines = [];
+        if (maxW) lines.push("最高重量 " + maxW + " kg · " + maxWDate);
+        if (bestRep.r) lines.push("同重量最多次 " + bestRep.r + " @ " + bestRep.w + " · " + bestRep.date);
+        if (bestDur.d) lines.push("最长时长 " + bestDur.d + "s · " + bestDur.date);
+        if (!lines.length) lines.push("尚无兼容记录");
+        list.push({ id: id, name: ex.name, assist: false, lines: lines });
+      });
+      return list;
+    }
+
+    function renderPR() {
+      var list = computePRs();
+      var html = '<div class="callout"><b>个人最佳 · 兼容口径</b><p>最高重量 · 同重量最多次 · 最长时长。无 1RM · 无综合进步分。虚构数据。</p></div>';
+      list.forEach(function (pr) {
+        html += '<div class="block" data-od-id="pr-card-' + pr.id + '"><h3>' + pr.name;
+        if (pr.assist) html += ' <span class="tag dash">辅助</span>';
+        html += "</h3>";
+        pr.lines.forEach(function (ln) { html += '<p class="line">' + ln + "</p>"; });
+        html += "</div>";
+      });
+      html += '<button type="button" class="ghost" id="btn-open-annot" data-od-id="cta-open-share-annot">查看 Share Report 模块注释</button>';
+      html += '<p class="hint">身体数据永不进入分享报告；PR 模块默认关闭。</p>';
+      $("#pr-body").innerHTML = html;
+      setNow("个人最佳");
+    }
+
+    function renderUnitPreview() {
+      var m = metricById("weight");
+      var latest = latestFor("weight");
+      var h = metricById("height");
+      var hl = latestFor("height");
+      var html = "<h3>显示预览</h3>";
+      html += '<p class="line">体重：' + (latest ? displayValue(m, latest.value) : "—") + "</p>";
+      html += '<p class="line">身高：' + (hl ? displayValue(h, hl.value) : "—") + "</p>";
+      html += '<p class="sub">存储仍为 kg/cm 语义；自定义指标单位不受此切换影响。</p>';
+      $("#unit-preview").innerHTML = html;
+    }
+
+    function syncTabs(activeTab) {
+      $all(".tab").forEach(function (t) {
+        t.setAttribute("aria-selected", t.getAttribute("data-tab") === activeTab ? "true" : "false");
+      });
+    }
+
+    function goTab(tab) {
+      syncTabs(tab);
+      if (tab === "body") { renderBodyHub(); showScreen("body-hub"); }
+      else if (tab === "history") { renderHistory(); showScreen("history"); }
+      else if (tab === "trends") { renderExHub(); showScreen("ex-hub"); }
+      else if (tab === "pr") { renderPR(); showScreen("pr"); markCheck("pr"); }
+    }
+
+    function paintSparseChart() {
+      var chart = document.querySelector('[data-od-id="sparse-chart"]');
+      if (!chart) return;
+      var head = chart.querySelector(".chart-head");
+      chart.innerHTML = "";
+      if (head) chart.appendChild(head);
+      var wrap = document.createElement("div");
+      wrap.innerHTML = renderBars([
+        { y: 76.2, label: "08-01" },
+        { y: 1, label: "—", sparse: true },
+        { y: 1, label: "—", sparse: true },
+        { y: 74.6, label: "08-18" }
+      ]);
+      while (wrap.firstChild) chart.appendChild(wrap.firstChild);
+      var hint = document.createElement("p");
+      hint.className = "hint";
+      hint.textContent = "点少时仍用填充柱编码；空白位降低不透明度，避免空轮廓。";
+      chart.appendChild(hint);
+    }
+
+    function goScene(scene) {
+      $all(".scene-btn").forEach(function (b) {
+        b.toggleAttribute("aria-current", b.getAttribute("data-scene") === scene);
+      });
+      if (scene === "student") { injuryOpen = false; renderStudent(); showScreen("student"); }
+      else if (scene === "body") { syncTabs("body"); renderBodyHub(); showScreen("body-hub"); openLog("weight"); }
+      else if (scene === "trend") { activeMetricId = "weight"; renderMetricTrend(); showScreen("metric-trend"); }
+      else if (scene === "history") { syncTabs("history"); renderHistory(); showScreen("history"); }
+      else if (scene === "compare") {
+        compareA = "s1"; compareB = "s2"; renderCompare(); showScreen("compare");
+      }
+      else if (scene === "ex-trend") { syncTabs("trends"); activeExerciseId = "ex-assist"; renderExTrend(); showScreen("ex-trend"); }
+      else if (scene === "pr") {
+        syncTabs("pr");
+        renderPR();
+        showScreen("pr");
+        markCheck("pr");
+        setNow("个人最佳 · 可进分享注释");
+      }
+      else if (scene === "empty") {
+        paintSparseChart();
+        showScreen("empty");
+        setNow("空 / 稀疏状态 · 可进单位");
+      }
+    }
+
+    /* events */
+    document.addEventListener("click", function (e) {
+      var t = e.target.closest("[data-go]");
+      if (t) {
+        var dest = t.getAttribute("data-go");
+        if (dest === "student") { renderStudent(); showScreen("student"); }
+        else if (dest === "body-hub") { renderBodyHub(); showScreen("body-hub"); }
+        else if (dest === "history") { renderHistory(); showScreen("history"); }
+        else if (dest === "ex-hub") { renderExHub(); showScreen("ex-hub"); }
+        else if (dest === "pr") { renderPR(); showScreen("pr"); }
+        return;
+      }
+
+      var scene = e.target.closest(".scene-btn");
+      if (scene) { goScene(scene.getAttribute("data-scene")); return; }
+
+      var tab = e.target.closest(".tab");
+      if (tab) { goTab(tab.getAttribute("data-tab")); return; }
+
+      if (e.target.closest("#btn-injury")) {
+        injuryOpen = !injuryOpen;
+        renderStudent();
+        return;
+      }
+      if (e.target.closest("#goto-body") || e.target.closest("#btn-quick-log")) {
+        renderBodyHub();
+        showScreen("body-hub");
+        if (e.target.closest("#btn-quick-log")) openLog("weight");
+        return;
+      }
+      if (e.target.closest("#btn-units") || e.target.closest('[data-od-id="cta-units"]') || e.target.closest("#btn-empty-units")) {
+        renderUnitPreview();
+        showScreen("units");
+        setNow("单位显示");
+        return;
+      }
+      if (e.target.closest("#btn-add-custom")) {
+        $("#c-name").value = "";
+        $("#c-unit").value = "";
+        $("#c-name-err").classList.remove("show");
+        $("#c-unit-err").classList.remove("show");
+        showScreen("custom");
+        setNow("创建自定义指标");
+        return;
+      }
+      if (e.target.closest("#btn-custom-save")) {
+        var nm = $("#c-name").value.trim();
+        var un = $("#c-unit").value.trim();
+        var ok = true;
+        if (!nm) { $("#c-name-err").classList.add("show"); ok = false; } else $("#c-name-err").classList.remove("show");
+        if (!un) { $("#c-unit-err").classList.add("show"); ok = false; } else $("#c-unit-err").classList.remove("show");
+        if (!ok) return;
+        var cid = "custom-" + nm.toLowerCase().replace(/\s+/g, "-") + "-" + Math.floor(Math.random() * 90 + 10);
+        metrics.push({ id: cid, name: nm, unit: un, kind: "custom", convertible: null });
+        toast("已创建 · ID " + cid);
+        markCheck("log");
+        activeMetricId = cid;
+        renderBodyHub();
+        showScreen("body-hub");
+        return;
+      }
+      if (e.target.closest("#btn-log-save")) { saveLog(); return; }
+      if (e.target.closest("#btn-metric-log")) { openLog(activeMetricId); return; }
+      if (e.target.closest("#btn-log-delete")) {
+        if (editingRecordId) confirmDeleteRecord(editingRecordId);
+        return;
+      }
+
+      var mrow = e.target.closest("[data-metric]");
+      if (mrow) {
+        activeMetricId = mrow.getAttribute("data-metric");
+        renderMetricTrend();
+        showScreen("metric-trend");
+        return;
+      }
+      var erec = e.target.closest("[data-edit-rec]");
+      if (erec) {
+        var rid = erec.getAttribute("data-edit-rec");
+        var rec = measurements.filter(function (x) { return x.id === rid; })[0];
+        if (rec) openLog(rec.metricId, rec.id);
+        return;
+      }
+
+      if (e.target.closest("#flt-range")) { openFilterSheet("range"); return; }
+      if (e.target.closest("#flt-focus")) { openFilterSheet("focus"); return; }
+      if (e.target.closest("#flt-ex")) { openFilterSheet("exercise"); return; }
+      if (e.target.closest("#flt-clear")) {
+        filters = { range: "all", focus: "all", exercise: "all" };
+        markCheck("filter");
+        renderHistory();
+        toast("已清除筛选");
+        return;
+      }
+      var sr = e.target.closest("[data-set-range]");
+      if (sr) {
+        filters.range = sr.getAttribute("data-set-range");
+        markCheck("filter");
+        closeSheet();
+        renderHistory();
+        return;
+      }
+      var sf = e.target.closest("[data-set-focus]");
+      if (sf) {
+        filters.focus = sf.getAttribute("data-set-focus");
+        markCheck("filter");
+        closeSheet();
+        renderHistory();
+        return;
+      }
+      var se = e.target.closest("[data-set-ex]");
+      if (se) {
+        filters.exercise = se.getAttribute("data-set-ex");
+        markCheck("filter");
+        closeSheet();
+        renderHistory();
+        return;
+      }
+
+      var hs = e.target.closest("[data-session]");
+      if (hs) {
+        activeSessionId = hs.getAttribute("data-session");
+        renderSession();
+        showScreen("session");
+        return;
+      }
+      if (e.target.closest("#btn-compare-pick") || e.target.closest("#btn-compare-same")) {
+        var cur = sessionById(activeSessionId);
+        compareA = activeSessionId;
+        var peer = sessions.filter(function (s) { return s.focus === cur.focus && s.id !== cur.id; })[0];
+        compareB = peer ? peer.id : activeSessionId;
+        renderCompare();
+        showScreen("compare");
+        return;
+      }
+      if (e.target.closest("#btn-cmp-apply")) {
+        compareA = $("#cmp-a").value;
+        compareB = $("#cmp-b").value;
+        renderCompare();
+        return;
+      }
+
+      var ox = e.target.closest("[data-open-ex]");
+      if (ox) {
+        activeExerciseId = ox.getAttribute("data-open-ex");
+        renderExTrend();
+        showScreen("ex-trend");
+        return;
+      }
+
+      if (e.target.closest("#btn-pr-annot") || e.target.closest("#btn-open-annot")) {
+        showScreen("share-annot");
+        markCheck("pr");
+        setNow("分享模块注释");
+        return;
+      }
+      if (e.target.closest("#tog-pr-share")) {
+        var tog = $("#tog-pr-share");
+        var on = tog.getAttribute("aria-checked") !== "true";
+        tog.setAttribute("aria-checked", on ? "true" : "false");
+        markCheck("pr");
+        toast(on ? "PR 模块临时开启（注释）" : "PR 模块恢复默认关闭");
+        return;
+      }
+
+      var unitBtn = e.target.closest("[data-unit]");
+      if (unitBtn) {
+        unitSystem = unitBtn.getAttribute("data-unit");
+        $all("#unit-system .chip").forEach(function (c) {
+          c.setAttribute("aria-pressed", c.getAttribute("data-unit") === unitSystem ? "true" : "false");
+        });
+        renderUnitPreview();
+        toast(unitSystem === "metric" ? "显示：公制" : "显示：英制");
+        return;
+      }
+
+      if (e.target.closest("#scrim")) closeSheet();
+      if (e.target.closest("#btn-stu-back")) toast("根级学员列表 · 本模块外");
+    });
+
+    $("#log-metric") && null;
+    document.addEventListener("change", function (e) {
+      if (e.target && e.target.id === "log-metric") {
+        activeMetricId = e.target.value;
+        var m = metricById(activeMetricId);
+        var lab = e.target.closest(".body").querySelector('label[for="log-value"]');
+        // refresh unit label by reopening lightly
+        var date = $("#log-date").value;
+        var existing = recordOnDay(activeMetricId, date);
+        editingRecordId = existing ? existing.id : null;
+        openLog(activeMetricId, editingRecordId);
+      }
+    });
+
+    paintSparseChart();
+    renderStudent();
+    showScreen("student");
+  })();
+  </script>
+</body>
+</html>
