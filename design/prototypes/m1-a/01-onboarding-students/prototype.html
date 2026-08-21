@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FineCoach · M1-A · 学员入门与列表</title>
+  <style>
+    :root {
+      --bg: oklch(0.93 0 0);
+      --surface: oklch(0.99 0 0);
+      --fg: oklch(0.22 0 0);
+      --muted: oklch(0.46 0 0);
+      --border: oklch(0.78 0 0);
+      --accent: oklch(0.28 0 0);
+      --fill: oklch(0.90 0 0);
+      --fill-2: oklch(0.85 0 0);
+      --danger: oklch(0.42 0.12 25);
+      --phone-w: 393px;
+      --phone-h: 852px;
+      --tap: 44px;
+      --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Heiti SC", sans-serif;
+      --mono: ui-monospace, Menlo, "SF Mono", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    body {
+      font-family: var(--font);
+      color: var(--fg);
+      background: var(--bg);
+      line-height: 1.45;
+    }
+    button, input, textarea, select { font: inherit; color: inherit; }
+    button { cursor: pointer; background: none; border: 0; }
+    img { display: none; }
+
+    .spec-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .spec-bar span { color: var(--muted); }
+    .spec-bar b { font-weight: 600; color: var(--fg); }
+
+    .board {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) var(--phone-w) minmax(240px, 1fr);
+      gap: 28px;
+      align-items: start;
+      justify-content: center;
+      padding: 28px 24px 48px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .rail h2 {
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .note {
+      border: 1px dashed var(--border);
+      background: var(--surface);
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--fg);
+      margin-bottom: 10px;
+    }
+    .note ol, .note ul { padding-left: 1.15em; }
+    .note li { margin: 4px 0; }
+    .note .k { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .scene-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .scene-btn {
+      min-height: var(--tap);
+      text-align: left;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--fg);
+    }
+    .scene-btn:hover { background: oklch(0.94 0 0); }
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid var(--fg);
+      outline-offset: 2px;
+    }
+    .scene-btn[aria-current="true"] { background: var(--fill); border-color: var(--fg); }
+    .check { font-size: 13px; }
+    .check li { margin: 6px 0; color: var(--muted); }
+    .now { margin-top: 12px; padding: 10px 12px; border: 1px solid var(--fg); background: var(--surface); font-size: 13px; }
+
+    .device-wrap { width: var(--phone-w); }
+    .device-caption {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 8px;
+      font-family: var(--mono);
+    }
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      border-radius: 54px;
+      border: 11px solid oklch(0.18 0 0);
+      background: oklch(0.97 0 0);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 18px 40px oklch(0.55 0 0 / 0.18);
+    }
+    .island {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      width: 126px;
+      height: 36px;
+      margin-left: -63px;
+      background: oklch(0.12 0 0);
+      border-radius: 20px;
+      z-index: 5;
+    }
+    .status {
+      height: 54px;
+      padding: 14px 28px 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .status-sys { display: flex; gap: 6px; align-items: center; }
+    .sig, .bat { display: inline-block; height: 10px; background: var(--fg); }
+    .sig { width: 16px; clip-path: polygon(0 70%, 35% 45%, 65% 20%, 100% 0, 100% 100%, 0 100%); }
+    .bat { width: 22px; height: 11px; border: 1.5px solid var(--fg); background: transparent; position: relative; }
+    .bat::after { content: ""; position: absolute; inset: 2px 8px 2px 2px; background: var(--fg); }
+    .home-bar {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      width: 134px;
+      height: 5px;
+      margin-left: -67px;
+      background: oklch(0.22 0 0);
+      border-radius: 3px;
+      z-index: 5;
+    }
+    .app {
+      position: absolute;
+      inset: 54px 0 24px;
+      display: flex;
+      flex-direction: column;
+      background: oklch(0.97 0 0);
+    }
+    .screen { display: none; flex: 1; flex-direction: column; min-height: 0; }
+    .screen.is-on { display: flex; }
+
+    .nav {
+      min-height: var(--tap);
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .nav h1 {
+      flex: 1;
+      font-size: 17px;
+      font-weight: 650;
+      text-align: center;
+    }
+    .nav-side { width: 88px; display: flex; align-items: center; }
+    .nav-side.end { justify-content: flex-end; gap: 4px; width: auto; min-width: 88px; }
+    .icon-btn, .text-btn {
+      min-width: var(--tap);
+      min-height: var(--tap);
+      padding: 0 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fg);
+      font-size: 15px;
+      font-weight: 560;
+    }
+    .icon-btn:hover, .text-btn:hover, .ghost:hover { background: oklch(0.93 0 0); }
+    .text-btn { min-width: auto; }
+
+    .body { flex: 1; overflow: auto; padding: 16px 16px 20px; }
+    .body.tight { padding: 0; }
+
+    .hero-mark {
+      width: 56px;
+      height: 56px;
+      border: 1px solid var(--fg);
+      margin: 12px 0 16px;
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    .kicker { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .title { font-size: 28px; font-weight: 650; letter-spacing: -0.02em; margin-bottom: 12px; }
+    .lead { font-size: 16px; color: var(--fg); margin-bottom: 16px; }
+    .rules { border-top: 1px solid var(--border); }
+    .rule { padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 15px; }
+    .rule em { font-style: normal; color: var(--muted); display: block; font-size: 13px; margin-top: 4px; }
+
+    .primary, .ghost {
+      min-height: var(--tap);
+      width: 100%;
+      padding: 0 16px;
+      font-size: 17px;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+    .primary { background: var(--accent); color: oklch(0.99 0 0); }
+    .primary:hover { background: oklch(0.16 0 0); color: oklch(0.99 0 0); }
+    .ghost { border: 1px solid var(--border); background: var(--surface); color: var(--fg); }
+    .stack-bottom { margin-top: 20px; }
+
+    .search-wrap { padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--surface); }
+    .search {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      background: oklch(0.95 0 0);
+      font-size: 16px;
+    }
+    .search::placeholder { color: var(--muted); }
+
+    .banner {
+      margin: 12px 16px 0;
+      min-height: var(--tap);
+      padding: 10px 12px;
+      border: 1px solid var(--fg);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: calc(100% - 32px);
+      text-align: left;
+      color: var(--fg);
+    }
+    .banner:hover { background: oklch(0.94 0 0); }
+    .banner-ico {
+      width: 28px;
+      height: 28px;
+      border: 1.5px solid var(--fg);
+      display: grid;
+      place-items: center;
+      flex: none;
+    }
+    .banner b { display: block; font-size: 15px; }
+    .banner span { font-size: 13px; color: var(--muted); }
+    .banner-go { margin-left: auto; font-size: 15px; font-weight: 600; flex: none; }
+
+    .row {
+      width: 100%;
+      min-height: 64px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      text-align: left;
+      color: var(--fg);
+    }
+    .row:hover { background: oklch(0.95 0 0); }
+    .row-main { flex: 1; min-width: 0; }
+    .row-name { font-size: 17px; font-weight: 600; }
+    .row-sub { font-size: 13px; color: var(--muted); margin-top: 2px; overflow-wrap: anywhere; }
+    .gender {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--fg);
+      flex: none;
+    }
+    .g-ico { width: 22px; height: 22px; display: block; }
+    .chev { width: 8px; height: 8px; border-right: 1.5px solid var(--muted); border-top: 1.5px solid var(--muted); transform: rotate(45deg); flex: none; }
+
+    .empty {
+      padding: 48px 24px;
+      text-align: center;
+    }
+    .empty-box {
+      width: 72px;
+      height: 48px;
+      border: 1px dashed var(--border);
+      margin: 0 auto 16px;
+    }
+    .empty h2 { font-size: 18px; margin-bottom: 8px; }
+    .empty p { font-size: 15px; color: var(--muted); }
+
+    .field-label { display: block; font-size: 13px; font-weight: 600; margin: 14px 0 6px; }
+    .req { color: var(--muted); font-weight: 400; }
+    .field, .area {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 16px;
+    }
+    .area { min-height: 88px; resize: vertical; }
+    .field.is-err, .chips.is-err { border-color: var(--danger); }
+    .err { color: var(--danger); font-size: 13px; margin-top: 6px; display: none; }
+    .err.show { display: block; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .chips { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 4px; border: 1px solid transparent; }
+    .chip {
+      min-height: var(--tap);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 15px;
+      color: var(--fg);
+    }
+    .chip:hover { background: oklch(0.94 0 0); }
+    .chip[aria-pressed="true"] { border-color: var(--fg); background: var(--fill); }
+    .skip-note { font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+    .scrim {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: oklch(0.22 0 0 / 0.28);
+      z-index: 8;
+    }
+    .scrim.on { display: block; }
+    .popover {
+      display: none;
+      position: absolute;
+      top: 98px;
+      right: 12px;
+      width: 200px;
+      background: var(--surface);
+      border: 1px solid var(--fg);
+      z-index: 9;
+      padding: 6px 0;
+    }
+    .popover.on { display: block; }
+    .menu-item {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 0 14px;
+      text-align: left;
+      font-size: 16px;
+      color: var(--fg);
+    }
+    .menu-item:hover { background: oklch(0.94 0 0); }
+    .menu-item .sub { display: block; font-size: 12px; color: var(--muted); }
+
+    .dest {
+      flex: 1;
+      margin: 20px 16px;
+      border: 1px dashed var(--fg);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      gap: 8px;
+    }
+    .dest h2 { font-size: 20px; }
+    .dest p { font-size: 15px; color: var(--muted); }
+    .bound {
+      margin-top: 16px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    .ph {
+      height: 10px;
+      background: var(--fill-2);
+      margin: 8px 0;
+    }
+
+    @media (max-width: 1100px) {
+      .board { grid-template-columns: 1fr; justify-items: center; }
+      .rail { width: min(520px, 100%); }
+    }
+  </style>
+</head>
+<body>
+  <header class="spec-bar" data-od-id="page-header">
+    <div>stage=<b>M1-A</b></div>
+    <div>module=<b>01-onboarding-students</b></div>
+    <div>version=<b>v0.1</b></div>
+    <div>coverage=<b>this module only</b></div>
+    <div>data=<b>虚构数据</b></div>
+    <div>network=<b>无外部资源</b></div>
+    <div>review=<b>产品负责人走查通过</b></div>
+  </header>
+
+  <div class="board">
+    <aside class="rail" data-od-id="annotation-left">
+      <h2>走查说明</h2>
+      <div class="note">
+        低保真线框，不是品牌视觉。灰盒 + 发丝线。本模块只覆盖首次说明与学员列表根页面。
+      </div>
+      <div class="note">
+        <span class="k">本模块不做</span>
+        <ul>
+          <li>登录 / 云同步 / 权限弹窗</li>
+          <li>底栏、「今日」、课程安排、课包、模板、身体数据</li>
+          <li>训练记录器、动作库与设置的内部页</li>
+        </ul>
+      </div>
+      <div class="note">
+        <span class="k">建议路径</span>
+        <ol>
+          <li>读完本地与隐私说明 → 开始使用</li>
+          <li>不填名称或性别 → 看行内错误</li>
+          <li>保存第一位学员 → 列表</li>
+          <li>搜索命中 / 无结果</li>
+          <li>右上角「更多」→ 动作库、设置（出口）</li>
+          <li>用右侧场景 C 看「训练中」横幅</li>
+        </ol>
+      </div>
+      <h2>演示场景</h2>
+      <div class="scene-list">
+        <button type="button" class="scene-btn" data-od-id="scene-first" data-scene="first">A · 首次启动</button>
+        <button type="button" class="scene-btn" data-od-id="scene-empty" data-scene="empty">B · 推迟创建后的空列表</button>
+        <button type="button" class="scene-btn" data-od-id="scene-list" data-scene="list">C · 已有学员 + 训练中</button>
+        <button type="button" class="scene-btn" data-od-id="scene-search" data-scene="search">D · 搜索无结果</button>
+      </div>
+    </aside>
+
+    <div class="device-wrap">
+      <p class="device-caption">iPhone 竖屏 393×852 · 浅色 · 系统字体</p>
+      <div class="phone" data-od-id="iphone-frame" role="application" aria-label="FineCoach 学员模块线框原型">
+        <div class="island" aria-hidden="true"></div>
+        <div class="status">
+          <span>9:41</span>
+          <span class="status-sys" aria-hidden="true"><i class="sig"></i><i class="bat"></i></span>
+        </div>
+        <div class="app" id="app">
+
+          <section class="screen is-on" data-screen="welcome" data-od-id="screen-welcome">
+            <div class="nav">
+              <div class="nav-side"></div>
+              <h1 data-od-id="welcome-title">FineCoach</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p class="kicker">首次打开 · 无账号</p>
+              <h2 class="title">课堂记录留在这台手机</h2>
+              <p class="lead">不注册、不登录。此刻也不会弹出通知、通讯录或其他系统权限。</p>
+              <div class="rules">
+                <div class="rule">学员资料与训练记录默认只保存在本机。<em>卸载或丢失设备会一起丢失，后续可在设置里手动备份。</em></div>
+                <div class="rule">分享给学员时，由你主动挑选摘要内容。<em>性别、伤病、电话、微信和教练私有备注不会进入分享。</em></div>
+                <div class="rule">学员本人不是使用者。<em>他们不安装、不登录、也不在本模块里操作数据。</em></div>
+              </div>
+              <div class="stack-bottom">
+                <button type="button" class="primary" data-od-id="cta-start" id="btn-start">开始使用</button>
+                <button type="button" class="ghost" data-od-id="cta-skip-first" id="btn-skip-welcome">稍后添加学员</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="screen" data-screen="form" data-od-id="screen-create-student">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="form-cancel" id="btn-form-back">取消</button>
+              </div>
+              <h1 id="form-title">添加学员</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p class="kicker" id="form-kicker">显示名称与性别必填，其余可跳过</p>
+              <label class="field-label" for="f-name">显示名称 <span class="req">必填</span></label>
+              <input class="field" id="f-name" data-od-id="field-name" maxlength="40" autocomplete="off" placeholder="昵称或网名，例如 小周">
+              <p class="err" id="err-name">请填写显示名称</p>
+              <p class="hint">允许重名。可用下方教练备注区分，不靠性别颜色区分。</p>
+
+              <p class="field-label" id="gender-legend">性别 <span class="req">必填</span></p>
+              <div class="chips" id="gender-group" role="group" aria-labelledby="gender-legend" data-od-id="field-gender">
+                <button type="button" class="chip" data-gender="male" aria-pressed="false"><svg class="g-ico" viewBox="0 0 22 22" aria-hidden="true"><rect x="1" y="1" width="20" height="20" fill="none" stroke="currentColor"/><polygon points="11,4 18,18 4,18" fill="none" stroke="currentColor"/></svg>男</button>
+                <button type="button" class="chip" data-gender="female" aria-pressed="false"><svg class="g-ico" viewBox="0 0 22 22" aria-hidden="true"><rect x="1" y="1" width="20" height="20" fill="none" stroke="currentColor"/><circle cx="11" cy="11" r="6" fill="none" stroke="currentColor"/></svg>女</button>
+                <button type="button" class="chip" data-gender="other" aria-pressed="false"><svg class="g-ico" viewBox="0 0 22 22" aria-hidden="true"><rect x="1" y="1" width="20" height="20" fill="none" stroke="currentColor"/><polygon points="11,4 18,11 11,18 4,11" fill="none" stroke="currentColor"/></svg>其他</button>
+                <button type="button" class="chip" data-gender="undisclosed" aria-pressed="false"><svg class="g-ico" viewBox="0 0 22 22" aria-hidden="true"><rect x="1" y="1" width="20" height="20" fill="none" stroke="currentColor"/><line x1="5" y1="11" x2="17" y2="11" stroke="currentColor"/></svg>不透露</button>
+              </div>
+              <p class="err" id="err-gender">请选择性别</p>
+
+              <label class="field-label" for="f-goal">训练目标 <span class="req">选填</span></label>
+              <input class="field" id="f-goal" data-od-id="field-goal" maxlength="40" placeholder="如增肌、减脂、体态，可留空">
+
+              <label class="field-label" for="f-note">注意事项 <span class="req">选填 · 仅教练可见</span></label>
+              <textarea class="area" id="f-note" data-od-id="field-notes" maxlength="200" placeholder="伤病或其他提醒，可留空"></textarea>
+
+              <label class="field-label" for="f-phone">电话 <span class="req">选填 · 手输</span></label>
+              <input class="field" id="f-phone" data-od-id="field-phone" inputmode="tel" placeholder="不读取系统通讯录">
+
+              <label class="field-label" for="f-wechat">微信 <span class="req">选填 · 手输</span></label>
+              <input class="field" id="f-wechat" data-od-id="field-wechat" placeholder="不调用微信能力">
+
+              <label class="field-label" for="f-remark">教练备注 <span class="req">选填 · 仅自己可见</span></label>
+              <input class="field" id="f-remark" data-od-id="field-remark" maxlength="20" placeholder="用于区分同名学员，如 晚班">
+
+              <p class="skip-note">身体数据不在本阶段，本表无身高、体重或围度字段。</p>
+              <button type="button" class="primary" data-od-id="cta-save-student" id="btn-save">保存学员</button>
+              <button type="button" class="ghost" data-od-id="cta-skip-create" id="btn-skip-form">稍后添加</button>
+            </div>
+          </section>
+
+          <section class="screen" data-screen="list" data-od-id="screen-student-list">
+            <div class="nav">
+              <div class="nav-side"></div>
+              <h1 data-od-id="list-title">学员</h1>
+              <div class="nav-side end">
+                <button type="button" class="text-btn" data-od-id="cta-add-student" id="btn-add">添加学员</button>
+                <button type="button" class="icon-btn" data-od-id="cta-more" id="btn-more" aria-haspopup="menu" aria-expanded="false" aria-label="更多">
+                  <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><circle cx="5" cy="11" r="1.6" fill="currentColor"/><circle cx="11" cy="11" r="1.6" fill="currentColor"/><circle cx="17" cy="11" r="1.6" fill="currentColor"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="search-wrap">
+              <input class="search" id="search" data-od-id="field-search" type="search" placeholder="搜索学员" aria-label="按显示名称搜索学员" enterkeyhint="search">
+            </div>
+            <button type="button" class="banner" id="banner" data-od-id="banner-in-progress" hidden>
+              <span class="banner-ico" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg></span>
+              <span><b>训练中</b><span id="banner-sub">进行中的训练可点此继续</span></span>
+              <span class="banner-go">继续训练</span>
+            </button>
+            <div class="body tight" id="list-body"></div>
+          </section>
+
+          <section class="screen" data-screen="dest" data-od-id="screen-destination">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="dest-back" id="btn-dest-back" aria-label="返回学员列表">返回</button>
+              </div>
+              <h1 id="dest-nav">出口</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="dest" id="dest-card">
+              <div class="ph" style="width:40%;margin:0 auto"></div>
+              <h2 id="dest-title">目的地</h2>
+              <p id="dest-copy">本模块不展开此页面。</p>
+              <p class="bound" id="dest-bound">—— 模块边界 · 非本文件范围 ——</p>
+            </div>
+          </section>
+        </div>
+        <div class="scrim" id="scrim" data-od-id="more-scrim"></div>
+        <div class="popover" id="menu" role="menu" aria-label="更多" data-od-id="more-menu">
+          <button type="button" class="menu-item" role="menuitem" data-od-id="menu-library" id="menu-library">动作库<span class="sub">本模块仅作为出口</span></button>
+          <button type="button" class="menu-item" role="menuitem" data-od-id="menu-settings" id="menu-settings">设置<span class="sub">本模块仅作为出口</span></button>
+        </div>
+        <div class="home-bar" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <aside class="rail" data-od-id="annotation-right">
+      <h2>当前画面</h2>
+      <div class="now" id="now-label">首次启动说明</div>
+      <h2 style="margin-top:18px">必查状态</h2>
+      <ol class="check">
+        <li>首次说明：本地存储 + 隐私边界，无权限、无登录</li>
+        <li>创建学员：名称 + 性别必填；目标 / 注意事项 / 电话 / 微信可跳过</li>
+        <li>缺名称或性别：行内错误，不能保存</li>
+        <li>推迟创建：空列表，用「添加学员」补第一位</li>
+        <li>已有列表：搜索、添加、更多 → 动作库 / 设置</li>
+        <li>同名学员用教练备注区分</li>
+        <li>「训练中」横幅可点，进入训练出口</li>
+        <li>搜索有结果 / 无结果</li>
+        <li>性别 = 图形 + 文字，不只靠颜色</li>
+      </ol>
+    </aside>
+  </div>
+
+  <script>
+    (function () {
+      var GENDER = {
+        male: { label: "男", icon: "tri" },
+        female: { label: "女", icon: "cir" },
+        other: { label: "其他", icon: "dia" },
+        undisclosed: { label: "不透露", icon: "bar" }
+      };
+      var SEED = [
+        { id: "s-zhou", name: "小周", gender: "female", goal: "减脂", remark: "", training: true },
+        { id: "s-ming", name: "阿明", gender: "male", goal: "增肌", remark: "晚班", training: false },
+        { id: "s-lin-a", name: "林林", gender: "other", goal: "", remark: "工作室午班", training: false },
+        { id: "s-lin-b", name: "林林", gender: "female", goal: "体态", remark: "晚间私教", training: false }
+      ];
+
+      var state = {
+        screen: "welcome",
+        students: [],
+        query: "",
+        gender: "",
+        formFirst: true,
+        dest: null,
+        scene: "first"
+      };
+
+      var $ = function (id) { return document.getElementById(id); };
+      var screens = document.querySelectorAll(".screen");
+
+      function genderIcon(kind) {
+        if (kind === "tri") return '<svg class="g-ico" viewBox="0 0 22 22" aria-hidden="true"><rect x="1" y="1" width="20" height="20" fill="none" stroke="currentColor"/><polygon points="11,4 18,18 4,18" fill="none" stroke="currentColor"/></svg>';
+        if (kind === "cir") return '<svg class="g-ico" viewBox="0 0 22 22" aria-hidden="true"><rect x="1" y="1" width="20" height="20" fill="none" stroke="currentColor"/><circle cx="11" cy="11" r="6" fill="none" stroke="currentColor"/></svg>';
+        if (kind === "dia") return '<svg class="g-ico" viewBox="0 0 22 22" aria-hidden="true"><rect x="1" y="1" width="20" height="20" fill="none" stroke="currentColor"/><polygon points="11,4 18,11 11,18 4,11" fill="none" stroke="currentColor"/></svg>';
+        return '<svg class="g-ico" viewBox="0 0 22 22" aria-hidden="true"><rect x="1" y="1" width="20" height="20" fill="none" stroke="currentColor"/><line x1="5" y1="11" x2="17" y2="11" stroke="currentColor"/></svg>';
+      }
+
+      function nowCopy() {
+        if (state.screen === "welcome") return "首次启动说明";
+        if (state.screen === "form") return state.formFirst ? "创建第一位学员" : "添加学员";
+        if (state.screen === "list") {
+          if (!state.students.length) return "学员列表 · 空";
+          if (state.query && !filtered().length) return "学员列表 · 搜索无结果";
+          if (state.query) return "学员列表 · 搜索结果";
+          return active() ? "学员列表 · 已有学员 + 训练中" : "学员列表 · 已有学员";
+        }
+        if (state.dest === "library") return "出口 · 动作库（不展开）";
+        if (state.dest === "settings") return "出口 · 设置（不展开）";
+        if (state.dest === "session") return "出口 · 继续训练（不展开）";
+        if (state.dest === "profile") return "出口 · 学员详情（不展开）";
+        return "—";
+      }
+
+      function show(name) {
+        state.screen = name;
+        screens.forEach(function (el) {
+          el.classList.toggle("is-on", el.getAttribute("data-screen") === name);
+        });
+        closeMenu();
+        $("now-label").textContent = nowCopy();
+        document.querySelectorAll(".scene-btn").forEach(function (b) {
+          b.setAttribute("aria-current", b.getAttribute("data-scene") === state.scene ? "true" : "false");
+        });
+      }
+
+      function closeMenu() {
+        $("menu").classList.remove("on");
+        $("scrim").classList.remove("on");
+        $("btn-more").setAttribute("aria-expanded", "false");
+      }
+
+      function openMenu() {
+        $("menu").classList.add("on");
+        $("scrim").classList.add("on");
+        $("btn-more").setAttribute("aria-expanded", "true");
+      }
+
+      function active() {
+        for (var i = 0; i < state.students.length; i++) if (state.students[i].training) return state.students[i];
+        return null;
+      }
+
+      function filtered() {
+        var q = state.query.trim();
+        if (!q) return state.students.slice();
+        return state.students.filter(function (s) { return s.name.indexOf(q) !== -1; });
+      }
+
+      function resetForm() {
+        state.gender = "";
+        $("f-name").value = "";
+        $("f-goal").value = "";
+        $("f-note").value = "";
+        $("f-phone").value = "";
+        $("f-wechat").value = "";
+        $("f-remark").value = "";
+        $("f-name").classList.remove("is-err");
+        $("gender-group").classList.remove("is-err");
+        $("err-name").classList.remove("show");
+        $("err-gender").classList.remove("show");
+        document.querySelectorAll(".chip").forEach(function (c) { c.setAttribute("aria-pressed", "false"); });
+      }
+
+      function openForm(first) {
+        state.formFirst = first;
+        resetForm();
+        $("form-title").textContent = first ? "第一位学员" : "添加学员";
+        $("form-kicker").textContent = first ? "创建后进入学员列表。名称与性别必填。" : "显示名称与性别必填，其余可跳过";
+        $("btn-skip-form").hidden = !first;
+        $("btn-form-back").textContent = first ? "返回" : "取消";
+        show("form");
+      }
+
+      function renderList() {
+        var rows = filtered();
+        var sess = active();
+        var banner = $("banner");
+        if (sess && !state.query) {
+          banner.hidden = false;
+          $("banner-sub").textContent = sess.name + " · 点此回到进行中的训练";
+        } else {
+          banner.hidden = true;
+        }
+
+        var html = "";
+        if (!state.students.length) {
+          html = '<div class="empty" data-od-id="empty-student-list"><div class="empty-box" aria-hidden="true"></div><h2>还没有学员</h2><p>点上方「添加学员」创建第一位。学员不是账号，只由你在本机管理。</p></div>';
+        } else if (!rows.length) {
+          html = '<div class="empty" data-od-id="empty-search"><div class="empty-box" aria-hidden="true"></div><h2>没有找到「' + escapeHtml(state.query) + '」</h2><p>试试显示名称中的其他字，或清空搜索。</p></div>';
+        } else {
+          rows.forEach(function (s) {
+            var g = GENDER[s.gender];
+            var bits = [];
+            if (s.goal) bits.push(s.goal);
+            if (s.remark) bits.push("备注 " + s.remark);
+            var sub = bits.length ? bits.join(" · ") : "无训练目标";
+            html += '<button type="button" class="row" data-od-id="student-row-' + s.id + '" data-id="' + s.id + '">' +
+              '<span class="gender" aria-label="性别：' + g.label + '">' + genderIcon(g.icon) + '<span>' + g.label + '</span></span>' +
+              '<span class="row-main"><span class="row-name">' + escapeHtml(s.name) + '</span><span class="row-sub">' + escapeHtml(sub) + '</span></span>' +
+              '<span class="chev" aria-hidden="true"></span></button>';
+          });
+        }
+        $("list-body").innerHTML = html;
+        $("list-body").querySelectorAll(".row").forEach(function (row) {
+          row.addEventListener("click", function () {
+            var id = row.getAttribute("data-id");
+            var s = state.students.filter(function (x) { return x.id === id; })[0];
+            openDest("profile", "学员", "学员详情", (s ? s.name : "") + " 的详情与开始训练不在本模块。", "—— 模块边界 · 学员详情 / 训练历史未绘制 ——");
+          });
+        });
+        $("now-label").textContent = nowCopy();
+      }
+
+      function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, function (c) {
+          return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c];
+        });
+      }
+
+      function openDest(key, nav, title, copy, bound) {
+        state.dest = key;
+        $("dest-nav").textContent = nav;
+        $("dest-title").textContent = title;
+        $("dest-copy").textContent = copy;
+        $("dest-bound").textContent = bound;
+        show("dest");
+      }
+
+      function goList() {
+        $("search").value = state.query;
+        renderList();
+        show("list");
+      }
+
+      $("btn-start").addEventListener("click", function () { openForm(true); });
+      $("btn-skip-welcome").addEventListener("click", function () {
+        state.students = [];
+        state.query = "";
+        state.scene = "empty";
+        goList();
+      });
+      $("btn-form-back").addEventListener("click", function () {
+        if (state.formFirst && !state.students.length) show("welcome");
+        else goList();
+      });
+      $("btn-skip-form").addEventListener("click", function () {
+        state.students = [];
+        state.query = "";
+        state.scene = "empty";
+        goList();
+      });
+      $("btn-add").addEventListener("click", function () { openForm(false); });
+      $("btn-more").addEventListener("click", function () {
+        if ($("menu").classList.contains("on")) closeMenu();
+        else openMenu();
+      });
+      $("scrim").addEventListener("click", closeMenu);
+      $("menu-library").addEventListener("click", function () {
+        openDest("library", "动作库", "动作库", "约 100–150 个内置动作与自定义动作将在其他模块绘制。此处仅证明入口存在。", "—— 模块边界 · 动作库未绘制 ——");
+      });
+      $("menu-settings").addEventListener("click", function () {
+        openDest("settings", "设置", "设置", "单位、备份与恢复、隐私说明和关于页将在其他模块绘制。无账号、无云同步。", "—— 模块边界 · 设置未绘制 ——");
+      });
+      $("banner").addEventListener("click", function () {
+        var s = active();
+        openDest("session", "训练中", "继续训练", (s ? s.name + " · " : "") + "进行中的训练记录器不在本模块。点返回可回到学员列表。", "—— 模块边界 · 训练记录未绘制 ——");
+      });
+      $("btn-dest-back").addEventListener("click", function () {
+        state.dest = null;
+        goList();
+      });
+      $("search").addEventListener("input", function () {
+        state.query = $("search").value;
+        if (state.query && !filtered().length) state.scene = "search";
+        renderList();
+      });
+
+      document.querySelectorAll(".chip").forEach(function (chip) {
+        chip.addEventListener("click", function () {
+          state.gender = chip.getAttribute("data-gender");
+          document.querySelectorAll(".chip").forEach(function (c) {
+            c.setAttribute("aria-pressed", c === chip ? "true" : "false");
+          });
+          $("gender-group").classList.remove("is-err");
+          $("err-gender").classList.remove("show");
+        });
+      });
+
+      $("f-name").addEventListener("input", function () {
+        if ($("f-name").value.trim()) {
+          $("f-name").classList.remove("is-err");
+          $("err-name").classList.remove("show");
+        }
+      });
+
+      $("btn-save").addEventListener("click", function () {
+        var name = $("f-name").value.trim();
+        var ok = true;
+        if (!name) {
+          $("f-name").classList.add("is-err");
+          $("err-name").classList.add("show");
+          ok = false;
+        }
+        if (!state.gender) {
+          $("gender-group").classList.add("is-err");
+          $("err-gender").classList.add("show");
+          ok = false;
+        }
+        if (!ok) return;
+        state.students.push({
+          id: "s-" + Date.now(),
+          name: name,
+          gender: state.gender,
+          goal: $("f-goal").value.trim(),
+          remark: $("f-remark").value.trim(),
+          training: false
+        });
+        state.query = "";
+        state.scene = state.students.length > 1 ? "list" : "list";
+        goList();
+      });
+
+      document.querySelectorAll(".scene-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var sc = btn.getAttribute("data-scene");
+          state.scene = sc;
+          state.query = "";
+          closeMenu();
+          if (sc === "first") {
+            state.students = [];
+            show("welcome");
+          } else if (sc === "empty") {
+            state.students = [];
+            goList();
+          } else if (sc === "list") {
+            state.students = SEED.map(function (s) { return Object.assign({}, s); });
+            goList();
+          } else if (sc === "search") {
+            state.students = SEED.map(function (s) { return Object.assign({}, s); });
+            state.query = "不存在的名字";
+            goList();
+          }
+        });
+      });
+
+      show("welcome");
+    })();
+  </script>
+</body>
+</html>

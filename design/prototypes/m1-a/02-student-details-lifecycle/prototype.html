@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FineCoach · M1-A · 学员详情与生命周期</title>
+  <style>
+    :root {
+      --bg: oklch(0.93 0 0);
+      --surface: oklch(0.99 0 0);
+      --fg: oklch(0.22 0 0);
+      --muted: oklch(0.46 0 0);
+      --border: oklch(0.78 0 0);
+      --accent: oklch(0.28 0 0);
+      --fill: oklch(0.90 0 0);
+      --fill-2: oklch(0.85 0 0);
+      --danger: oklch(0.42 0.12 25);
+      --phone-w: 393px;
+      --phone-h: 852px;
+      --tap: 44px;
+      --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Heiti SC", sans-serif;
+      --mono: ui-monospace, Menlo, "SF Mono", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    body {
+      font-family: var(--font);
+      color: var(--fg);
+      background: var(--bg);
+      line-height: 1.45;
+    }
+    button, input, textarea, select { font: inherit; color: inherit; }
+    button { cursor: pointer; background: none; border: 0; }
+    img { display: none; }
+
+    .spec-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .spec-bar span { color: var(--muted); }
+    .spec-bar b { font-weight: 600; color: var(--fg); }
+
+    .board {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) var(--phone-w) minmax(240px, 1fr);
+      gap: 28px;
+      align-items: start;
+      justify-content: center;
+      padding: 28px 24px 48px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .rail h2 {
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .note {
+      border: 1px dashed var(--border);
+      background: var(--surface);
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--fg);
+      margin-bottom: 10px;
+    }
+    .note ol, .note ul { padding-left: 1.15em; }
+    .note li { margin: 4px 0; }
+    .note .k { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .scene-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .scene-btn {
+      min-height: var(--tap);
+      text-align: left;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--fg);
+    }
+    .scene-btn:hover { background: oklch(0.94 0 0); }
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid var(--fg);
+      outline-offset: 2px;
+    }
+    .scene-btn[aria-current="true"] { background: var(--fill); border-color: var(--fg); }
+    .check { font-size: 13px; }
+    .check li { margin: 6px 0; color: var(--muted); }
+    .now { margin-top: 12px; padding: 10px 12px; border: 1px solid var(--fg); background: var(--surface); font-size: 13px; }
+
+    .device-wrap { width: var(--phone-w); }
+    .device-caption {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 8px;
+      font-family: var(--mono);
+    }
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      border-radius: 54px;
+      border: 11px solid oklch(0.18 0 0);
+      background: oklch(0.97 0 0);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 18px 40px oklch(0.55 0 0 / 0.18);
+    }
+    .island {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      width: 126px;
+      height: 36px;
+      margin-left: -63px;
+      background: oklch(0.12 0 0);
+      border-radius: 20px;
+      z-index: 5;
+    }
+    .status {
+      height: 54px;
+      padding: 14px 28px 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .status-sys { display: flex; gap: 6px; align-items: center; }
+    .sig, .bat { display: inline-block; height: 10px; background: var(--fg); }
+    .sig { width: 16px; clip-path: polygon(0 70%, 35% 45%, 65% 20%, 100% 0, 100% 100%, 0 100%); }
+    .bat { width: 22px; height: 11px; border: 1.5px solid var(--fg); background: transparent; position: relative; }
+    .bat::after { content: ""; position: absolute; inset: 2px 8px 2px 2px; background: var(--fg); }
+    .home-bar {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      width: 134px;
+      height: 5px;
+      margin-left: -67px;
+      background: oklch(0.22 0 0);
+      border-radius: 3px;
+      z-index: 5;
+    }
+    .app {
+      position: absolute;
+      inset: 54px 0 24px;
+      display: flex;
+      flex-direction: column;
+      background: oklch(0.97 0 0);
+    }
+    .screen { display: none; flex: 1; flex-direction: column; min-height: 0; }
+    .screen.is-on { display: flex; }
+
+    .nav {
+      min-height: var(--tap);
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .nav h1 {
+      flex: 1;
+      font-size: 17px;
+      font-weight: 650;
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+    .nav-side { width: 72px; display: flex; align-items: center; }
+    .nav-side.end { justify-content: flex-end; width: auto; min-width: 72px; }
+    .icon-btn, .text-btn {
+      min-width: var(--tap);
+      min-height: var(--tap);
+      padding: 0 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fg);
+      font-size: 15px;
+      font-weight: 560;
+    }
+    .icon-btn:hover, .text-btn:hover, .ghost:hover, .fold-head:hover, .hist:hover { background: oklch(0.93 0 0); }
+    .text-btn { min-width: auto; }
+
+    .body { flex: 1; overflow: auto; padding: 16px 16px 20px; }
+    .body.tight { padding: 12px 0 20px; }
+
+    .primary, .ghost, .danger-btn {
+      min-height: var(--tap);
+      width: 100%;
+      padding: 0 16px;
+      font-size: 17px;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+    .primary { background: var(--accent); color: oklch(0.99 0 0); }
+    .primary:hover { background: oklch(0.16 0 0); color: oklch(0.99 0 0); }
+    .primary:disabled, .danger-btn:disabled, .ghost:disabled {
+      background: var(--fill);
+      color: var(--muted);
+      border-color: var(--border);
+    }
+    .ghost { border: 1px solid var(--border); background: var(--surface); color: var(--fg); }
+    .danger-btn { border: 1px solid var(--danger); background: var(--surface); color: var(--danger); }
+    .danger-btn:hover { background: oklch(0.95 0.03 25); color: var(--danger); }
+
+    .banner {
+      margin: 0 16px 12px;
+      min-height: var(--tap);
+      padding: 10px 12px;
+      border: 1px solid var(--fg);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: calc(100% - 32px);
+      text-align: left;
+      color: var(--fg);
+    }
+    .banner:hover { background: oklch(0.94 0 0); }
+    .banner-ico {
+      width: 28px;
+      height: 28px;
+      border: 1.5px solid var(--fg);
+      display: grid;
+      place-items: center;
+      flex: none;
+    }
+    .banner b { display: block; font-size: 15px; }
+    .banner span { font-size: 13px; color: var(--muted); }
+    .banner-go { margin-left: auto; font-size: 15px; font-weight: 600; flex: none; color: var(--fg); }
+
+    .cta-pad { padding: 0 16px; }
+    .summary {
+      margin: 12px 16px 0;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 12px;
+      text-align: left;
+      width: calc(100% - 32px);
+      color: var(--fg);
+      min-height: var(--tap);
+    }
+    .summary:hover { background: oklch(0.95 0 0); }
+    .summary .kicker { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    .summary b { display: block; font-size: 16px; }
+    .summary p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+    .dash {
+      margin: 12px 16px 0;
+      border: 1px dashed var(--fg);
+      background: var(--surface);
+      padding: 12px;
+      font-size: 13px;
+    }
+    .dash .k { font-family: var(--mono); font-size: 11px; color: var(--muted); display: block; margin-bottom: 4px; }
+
+    .profile {
+      margin: 16px 16px 0;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 14px 12px;
+    }
+    .who { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .who strong { font-size: 22px; font-weight: 650; }
+    .gender {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--fg);
+      flex: none;
+    }
+    .g-ico { width: 22px; height: 22px; display: block; }
+    .stamp { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .kv { display: flex; gap: 10px; padding: 8px 0; border-top: 1px solid var(--border); font-size: 14px; }
+    .kv dt { width: 72px; color: var(--muted); flex: none; }
+    .kv dd { flex: 1; overflow-wrap: anywhere; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag {
+      border: 1px solid var(--border);
+      padding: 4px 8px;
+      font-size: 13px;
+      min-height: 28px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--fg);
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    .pill i {
+      width: 8px;
+      height: 8px;
+      border: 1.5px solid var(--fg);
+      display: inline-block;
+    }
+
+    .fold {
+      margin: 12px 16px 0;
+      width: calc(100% - 32px);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 0 12px;
+      color: var(--fg);
+    }
+    .fold-head {
+      width: 100%;
+      min-height: var(--tap);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-align: left;
+      color: var(--fg);
+    }
+    .fold-head b { flex: 1; font-size: 15px; }
+    .chev {
+      width: 8px;
+      height: 8px;
+      border-right: 1.5px solid var(--muted);
+      border-top: 1.5px solid var(--muted);
+      transform: rotate(45deg);
+      flex: none;
+    }
+    .fold[aria-expanded="true"] .chev { transform: rotate(135deg); }
+    .fold-body { margin-top: 4px; padding-bottom: 12px; font-size: 14px; display: none; }
+    .fold[aria-expanded="true"] .fold-body { display: block; }
+    .disc { font-size: 12px; color: var(--muted); margin-top: 8px; }
+
+    .sec-h {
+      margin: 18px 16px 0;
+      font-size: 13px;
+      font-weight: 650;
+      color: var(--muted);
+    }
+    .hist {
+      width: 100%;
+      min-height: 64px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      text-align: left;
+      color: var(--fg);
+    }
+    .hist-main { flex: 1; min-width: 0; }
+    .hist-name { font-size: 16px; font-weight: 600; }
+    .hist-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    .field-label { display: block; font-size: 13px; font-weight: 600; margin: 14px 0 6px; }
+    .req { color: var(--muted); font-weight: 400; }
+    .field, .area {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 16px;
+    }
+    .area { min-height: 96px; resize: vertical; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .err { color: var(--danger); font-size: 13px; margin-top: 6px; display: none; }
+    .err.show { display: block; }
+    .field.is-err { border-color: var(--danger); }
+    .chips { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .chips.wrap { display: flex; flex-wrap: wrap; }
+    .chips.wrap .chip { flex: 1 1 calc(50% - 8px); }
+    .chip {
+      min-height: var(--tap);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 15px;
+      color: var(--fg);
+    }
+    .chip:hover { background: oklch(0.94 0 0); }
+    .chip[aria-pressed="true"] { border-color: var(--fg); background: var(--fill); }
+
+    .scrim {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: oklch(0.22 0 0 / 0.28);
+      z-index: 8;
+    }
+    .scrim.on { display: block; }
+    .popover {
+      display: none;
+      position: absolute;
+      top: 98px;
+      right: 12px;
+      width: 220px;
+      background: var(--surface);
+      border: 1px solid var(--fg);
+      z-index: 9;
+      padding: 6px 0;
+    }
+    .popover.on { display: block; }
+    .menu-item {
+      width: 100%;
+      min-height: var(--tap);
+      padding: 0 14px;
+      text-align: left;
+      font-size: 16px;
+      color: var(--fg);
+    }
+    .menu-item:hover { background: oklch(0.94 0 0); }
+    .menu-item .sub { display: block; font-size: 12px; color: var(--muted); }
+    .menu-item.danger { color: var(--danger); }
+
+    .dest {
+      flex: 1;
+      margin: 20px 16px;
+      border: 1px dashed var(--fg);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      gap: 8px;
+    }
+    .dest h2 { font-size: 20px; }
+    .dest p { font-size: 15px; color: var(--muted); }
+    .bound {
+      margin-top: 16px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+    .mark {
+      align-self: center;
+      border: 1.5px solid var(--fg);
+      padding: 8px 12px;
+      font-size: 14px;
+      font-weight: 600;
+      min-height: var(--tap);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ph { height: 10px; background: var(--fill-2); margin: 8px 0; }
+    .affect li { margin: 6px 0; font-size: 15px; }
+    .twin {
+      margin-top: 10px;
+      width: 100%;
+      min-height: var(--tap);
+      border: 1px dashed var(--border);
+      padding: 8px 10px;
+      text-align: left;
+      font-size: 13px;
+      color: var(--fg);
+    }
+    .twin:hover { background: oklch(0.95 0 0); }
+
+    @media (max-width: 1100px) {
+      .board { grid-template-columns: 1fr; justify-items: center; }
+      .rail { width: min(520px, 100%); }
+    }
+  </style>
+</head>
+<body>
+  <header class="spec-bar" data-od-id="page-header">
+    <div>stage=<b>M1-A</b></div>
+    <div>module=<b>02-student-details-lifecycle</b></div>
+    <div>version=<b>v0.1</b></div>
+    <div>coverage=<b>this module only</b></div>
+    <div>data=<b>虚构数据</b></div>
+    <div>network=<b>无外部资源</b></div>
+    <div>review=<b>产品负责人走查通过</b></div>
+  </header>
+
+  <div class="board">
+    <aside class="rail" data-od-id="annotation-left">
+      <h2>走查说明</h2>
+      <div class="note">
+        低保真线框。灰盒 + 发丝线。本模块只覆盖学员详情与生命周期，从模块 01 学员列表进入。
+      </div>
+      <div class="note">
+        <span class="k">本模块不做</span>
+        <ul>
+          <li>底栏、「今日」、课程安排、课包、模板、身体数据、通知</li>
+          <li>训练记录器内部、训练记录编辑、设置内部页</li>
+          <li>登录 / 云同步 / 通讯录权限 / 微信能力</li>
+        </ul>
+      </div>
+      <div class="note">
+        <span class="k">建议路径</span>
+        <ol>
+          <li>小周详情：开始训练 → 上次摘要 → 资料</li>
+          <li>编辑选填项；改名后历史用新名称，编号不变</li>
+          <li>展开伤病/注意事项（默认折叠）</li>
+          <li>点历史进入训练记录详情出口</li>
+          <li>归档 → 已归档详情 → 恢复</li>
+          <li>永久删除（需输入显示名称）与训练中拦截</li>
+        </ol>
+      </div>
+      <h2>演示场景</h2>
+      <div class="scene-list">
+        <button type="button" class="scene-btn" data-od-id="scene-zhou" data-scene="zhou">A · 小周详情</button>
+        <button type="button" class="scene-btn" data-od-id="scene-training" data-scene="training">B · 训练中横幅</button>
+        <button type="button" class="scene-btn" data-od-id="scene-injuries" data-scene="injuries">C · 伤病展开</button>
+        <button type="button" class="scene-btn" data-od-id="scene-ming" data-scene="ming">阿明详情</button>
+        <button type="button" class="scene-btn" data-od-id="scene-lin" data-scene="lin">D · 同名林林</button>
+        <button type="button" class="scene-btn" data-od-id="scene-archived" data-scene="archived">E · 已归档</button>
+        <button type="button" class="scene-btn" data-od-id="scene-delete" data-scene="delete">F · 永久删除确认</button>
+        <button type="button" class="scene-btn" data-od-id="scene-blocked" data-scene="blocked">G · 删除被拦截</button>
+      </div>
+    </aside>
+
+    <div class="device-wrap">
+      <p class="device-caption">iPhone 竖屏 393×852 · 浅色 · 系统字体</p>
+      <div class="phone" data-od-id="iphone-frame" role="application" aria-label="FineCoach 学员详情线框原型">
+        <div class="island" aria-hidden="true"></div>
+        <div class="status">
+          <span>9:41</span>
+          <span class="status-sys" aria-hidden="true"><i class="sig"></i><i class="bat"></i></span>
+        </div>
+        <div class="app" id="app">
+
+          <section class="screen is-on" data-screen="detail" data-od-id="screen-student-detail">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="detail-back" id="btn-detail-back">返回</button>
+              </div>
+              <h1 id="detail-title">学员</h1>
+              <div class="nav-side end">
+                <button type="button" class="icon-btn" data-od-id="cta-more" id="btn-more" aria-haspopup="menu" aria-expanded="false" aria-label="更多">
+                  <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><circle cx="5" cy="11" r="1.6" fill="currentColor"/><circle cx="11" cy="11" r="1.6" fill="currentColor"/><circle cx="17" cy="11" r="1.6" fill="currentColor"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="body tight" id="detail-body"></div>
+          </section>
+
+          <section class="screen" data-screen="edit" data-od-id="screen-edit-profile">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="edit-cancel" id="btn-edit-cancel">取消</button>
+              </div>
+              <h1>编辑资料</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body" id="edit-body"></div>
+          </section>
+
+          <section class="screen" data-screen="injuries" data-od-id="screen-edit-injuries">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="injuries-cancel" id="btn-inj-cancel">取消</button>
+              </div>
+              <h1>注意事项</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p class="kicker stamp" style="margin-bottom:8px">仅教练可见 · 独立私有区域</p>
+              <label class="field-label" for="f-inj">伤病 / 注意事项</label>
+              <textarea class="area" id="f-inj" data-od-id="field-injuries" maxlength="400" placeholder="上课需留意的内容，可留空"></textarea>
+              <p class="disc">此内容不是医疗诊断或医疗建议。训练页只显示「有注意事项」，不展示原文。</p>
+              <p class="hint" id="inj-updated"></p>
+              <button type="button" class="primary" data-od-id="cta-save-injuries" id="btn-inj-save">保存</button>
+            </div>
+          </section>
+
+          <section class="screen" data-screen="archive" data-od-id="screen-archive-confirm">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="archive-cancel" id="btn-arch-cancel">取消</button>
+              </div>
+              <h1>归档学员</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p class="lead" id="arch-lead" style="font-size:16px;margin-bottom:12px"></p>
+              <ul class="affect">
+                <li>从活跃学员列表中隐藏</li>
+                <li>不能开始新训练</li>
+                <li>仍可查看训练历史</li>
+                <li>之后可以恢复为活跃</li>
+              </ul>
+              <p class="hint">归档不是删除。永久删除在「更多」的二级入口。</p>
+              <button type="button" class="primary" data-od-id="cta-confirm-archive" id="btn-arch-ok">归档</button>
+            </div>
+          </section>
+
+          <section class="screen" data-screen="delete" data-od-id="screen-delete-confirm">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="delete-cancel" id="btn-del-cancel">取消</button>
+              </div>
+              <h1>永久删除</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p style="font-size:16px;margin-bottom:12px" id="del-lead"></p>
+              <p class="field-label">将一并删除</p>
+              <ul class="affect" id="del-affect"></ul>
+              <button type="button" class="ghost" data-od-id="cta-backup-first" id="btn-backup">先备份（建议）</button>
+              <label class="field-label" for="f-del-name">输入显示名称以确认</label>
+              <input class="field" id="f-del-name" data-od-id="field-delete-name" maxlength="40" autocomplete="off" placeholder="须与当前显示名称一致">
+              <p class="err" id="err-del">显示名称不匹配</p>
+              <p class="hint">删除后无法从本页恢复。已分享的旧图片不会被远程改写。</p>
+              <button type="button" class="danger-btn" data-od-id="cta-confirm-delete" id="btn-del-ok" disabled>永久删除</button>
+            </div>
+          </section>
+
+          <section class="screen" data-screen="blocked" data-od-id="screen-delete-blocked">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="blocked-back" id="btn-block-back">返回</button>
+              </div>
+              <h1>无法删除</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p style="font-size:16px;margin-bottom:12px" id="block-lead"></p>
+              <p class="hint">状态不只靠颜色：当前为「训练中」，须先结束或继续完成该训练。</p>
+              <button type="button" class="primary" data-od-id="cta-blocked-continue" id="btn-block-go">继续训练</button>
+              <button type="button" class="ghost" data-od-id="cta-blocked-back" id="btn-block-detail">回到详情</button>
+            </div>
+          </section>
+
+          <section class="screen" data-screen="gone" data-od-id="screen-deleted">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="gone-back" id="btn-gone-back">返回</button>
+              </div>
+              <h1>已删除</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="body">
+              <p style="font-size:18px;font-weight:650;margin-bottom:8px" id="gone-title">学员已永久删除</p>
+              <p class="hint">活跃列表中不再显示该学员。本模块不重建学员列表。</p>
+              <button type="button" class="ghost" data-od-id="cta-gone-list" id="btn-gone-list">回到学员列表</button>
+            </div>
+          </section>
+
+          <section class="screen" data-screen="dest" data-od-id="screen-destination">
+            <div class="nav">
+              <div class="nav-side">
+                <button type="button" class="text-btn" data-od-id="dest-back" id="btn-dest-back">返回</button>
+              </div>
+              <h1 id="dest-nav">出口</h1>
+              <div class="nav-side end"></div>
+            </div>
+            <div class="dest" id="dest-card">
+              <div class="ph" style="width:40%;margin:0 auto"></div>
+              <h2 id="dest-title">目的地</h2>
+              <p id="dest-copy">本模块不展开此页面。</p>
+              <div id="dest-extra"></div>
+              <p class="bound" id="dest-bound">—— 模块边界 · 非本文件范围 ——</p>
+            </div>
+          </section>
+        </div>
+        <div class="scrim" id="scrim" data-od-id="more-scrim"></div>
+        <div class="popover" id="menu" role="menu" aria-label="更多" data-od-id="more-menu">
+          <button type="button" class="menu-item" role="menuitem" data-od-id="menu-edit" id="menu-edit">编辑资料<span class="sub">名称、性别与选填项</span></button>
+          <button type="button" class="menu-item" role="menuitem" data-od-id="menu-archive" id="menu-archive">归档学员<span class="sub">从活跃列表隐藏</span></button>
+          <button type="button" class="menu-item" role="menuitem" data-od-id="menu-restore" id="menu-restore">恢复学员<span class="sub">重新出现在活跃列表</span></button>
+          <button type="button" class="menu-item danger" role="menuitem" data-od-id="menu-delete" id="menu-delete">永久删除<span class="sub">二级入口 · 不可撤销</span></button>
+        </div>
+        <div class="home-bar" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <aside class="rail" data-od-id="annotation-right">
+      <h2>当前画面</h2>
+      <div class="now" id="now-label">学员详情 · 小周</div>
+      <h2 style="margin-top:18px">必查状态</h2>
+      <ol class="check">
+        <li>信息顺序：开始训练 → 上次训练摘要 → 资料；无下一节课卡片</li>
+        <li>性别 = 图形 + 文字，选项含男 / 女 / 其他 / 不透露</li>
+        <li>目标为芯片 + 自由文本，不自动开出训练内容</li>
+        <li>电话 / 微信手输，虚线标明不读通讯录</li>
+        <li>伤病默认折叠，有最近更新时间，声明非医疗诊断</li>
+        <li>训练页只预览「有注意事项」出口，不绘制记录器</li>
+        <li>两位林林用教练备注区分；备注不进分享报告</li>
+        <li>改名后稳定编号不变，历史显示新名称</li>
+        <li>历史倒序 3 条，点开为训练记录详情出口</li>
+        <li>归档后不能新开训练，可看历史并恢复</li>
+        <li>训练中不可永久删除；否则需输入显示名称并建议先备份</li>
+      </ol>
+    </aside>
+  </div>
+
+  <script>
+    (function () {
+      var GENDER = {
+        male: { label: "男", icon: "tri" },
+        female: { label: "女", icon: "cir" },
+        other: { label: "其他", icon: "dia" },
+        undisclosed: { label: "不透露", icon: "bar" }
+      };
+      var GOALS = ["增肌", "减脂", "体态", "体能"];
+      var HIST_ZHOU = [
+        { id: "h-z1", date: "8月18日", week: "周二", focus: "下肢", mins: "48 分钟" },
+        { id: "h-z2", date: "8月11日", week: "周二", focus: "推类", mins: "52 分钟" },
+        { id: "h-z3", date: "8月4日", week: "周二", focus: "拉类", mins: "45 分钟" }
+      ];
+      var HIST_MING = [
+        { id: "h-m1", date: "8月19日", week: "周三", focus: "下肢", mins: "55 分钟" },
+        { id: "h-m2", date: "8月12日", week: "周三", focus: "推类", mins: "50 分钟" },
+        { id: "h-m3", date: "8月5日", week: "周三", focus: "核心", mins: "40 分钟" }
+      ];
+      var HIST_LIN_A = [
+        { id: "h-la1", date: "8月17日", week: "周一", focus: "全身", mins: "42 分钟" },
+        { id: "h-la2", date: "8月10日", week: "周一", focus: "下肢", mins: "38 分钟" },
+        { id: "h-la3", date: "8月3日", week: "周一", focus: "体态", mins: "35 分钟" }
+      ];
+      var HIST_LIN_B = [
+        { id: "h-lb1", date: "8月16日", week: "周日", focus: "体态", mins: "40 分钟" },
+        { id: "h-lb2", date: "8月9日", week: "周日", focus: "核心", mins: "36 分钟" },
+        { id: "h-lb3", date: "8月2日", week: "周日", focus: "上肢", mins: "44 分钟" }
+      ];
+
+      function seed() {
+        return {
+          "s-zhou": {
+            id: "s-zhou", name: "小周", gender: "female",
+            goals: ["减脂"], goalText: "暑假前把体脂降一点",
+            phone: "138 0000 1111", wechat: "xiaozhou_fit", remark: "",
+            injuries: "右膝不适，深蹲时控制深度，以无痛范围为准。",
+            injuriesAt: "8月12日 21:18",
+            training: false, archived: false, history: HIST_ZHOU
+          },
+          "s-ming": {
+            id: "s-ming", name: "阿明", gender: "male",
+            goals: ["增肌"], goalText: "",
+            phone: "", wechat: "", remark: "晚班",
+            injuries: "", injuriesAt: "",
+            training: false, archived: false, history: HIST_MING
+          },
+          "s-lin-a": {
+            id: "s-lin-a", name: "林林", gender: "other",
+            goals: [], goalText: "",
+            phone: "139 0000 2222", wechat: "", remark: "工作室午班",
+            injuries: "", injuriesAt: "",
+            training: false, archived: false, history: HIST_LIN_A
+          },
+          "s-lin-b": {
+            id: "s-lin-b", name: "林林", gender: "female",
+            goals: ["体态"], goalText: "久坐圆肩",
+            phone: "", wechat: "linlin_night", remark: "晚间私教",
+            injuries: "左侧肩峰偶尔不适，过头推举放轻。",
+            injuriesAt: "8月9日 18:40",
+            training: false, archived: false, history: HIST_LIN_B
+          }
+        };
+      }
+
+      var state = {
+        screen: "detail",
+        students: seed(),
+        id: "s-zhou",
+        injuriesOpen: false,
+        dest: null,
+        destFrom: "detail",
+        scene: "zhou",
+        genderDraft: "",
+        goalsDraft: []
+      };
+
+      var $ = function (id) { return document.getElementById(id); };
+      var screens = document.querySelectorAll(".screen");
+
+      function student() { return state.students[state.id]; }
+
+      function genderIcon(kind) {
+        if (kind === "tri") return '<svg class="g-ico" viewBox="0 0 22 22" aria-hidden="true"><rect x="1" y="1" width="20" height="20" fill="none" stroke="currentColor"/><polygon points="11,4 18,18 4,18" fill="none" stroke="currentColor"/></svg>';
+        if (kind === "cir") return '<svg class="g-ico" viewBox="0 0 22 22" aria-hidden="true"><rect x="1" y="1" width="20" height="20" fill="none" stroke="currentColor"/><circle cx="11" cy="11" r="6" fill="none" stroke="currentColor"/></svg>';
+        if (kind === "dia") return '<svg class="g-ico" viewBox="0 0 22 22" aria-hidden="true"><rect x="1" y="1" width="20" height="20" fill="none" stroke="currentColor"/><polygon points="11,4 18,11 11,18 4,11" fill="none" stroke="currentColor"/></svg>';
+        return '<svg class="g-ico" viewBox="0 0 22 22" aria-hidden="true"><rect x="1" y="1" width="20" height="20" fill="none" stroke="currentColor"/><line x1="5" y1="11" x2="17" y2="11" stroke="currentColor"/></svg>';
+      }
+
+      function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, function (c) {
+          return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c];
+        });
+      }
+
+      function nowCopy() {
+        var s = student();
+        var n = s ? s.name : "";
+        if (state.screen === "detail") {
+          if (s && s.archived) return "已归档详情 · " + n;
+          if (s && s.training) return "学员详情 · " + n + " · 训练中";
+          if (state.injuriesOpen) return "学员详情 · " + n + " · 注意事项已展开";
+          return "学员详情 · " + n;
+        }
+        if (state.screen === "edit") return "编辑资料 · " + n;
+        if (state.screen === "injuries") return "编辑注意事项 · " + n;
+        if (state.screen === "archive") return "归档确认 · " + n;
+        if (state.screen === "delete") return "永久删除确认 · " + n;
+        if (state.screen === "blocked") return "删除被拦截 · 训练中";
+        if (state.screen === "gone") return "已永久删除";
+        if (state.dest === "list") return "出口 · 学员列表（模块 01）";
+        if (state.dest === "train") return "出口 · 训练记录器（模块 04）";
+        if (state.dest === "record") return "出口 · 训练记录详情（模块 05）";
+        if (state.dest === "backup") return "出口 · 设置备份";
+        return "—";
+      }
+
+      function closeMenu() {
+        $("menu").classList.remove("on");
+        $("scrim").classList.remove("on");
+        $("btn-more").setAttribute("aria-expanded", "false");
+      }
+
+      function show(name) {
+        state.screen = name;
+        screens.forEach(function (el) {
+          el.classList.toggle("is-on", el.getAttribute("data-screen") === name);
+        });
+        closeMenu();
+        $("now-label").textContent = nowCopy();
+        document.querySelectorAll(".scene-btn").forEach(function (b) {
+          b.setAttribute("aria-current", b.getAttribute("data-scene") === state.scene ? "true" : "false");
+        });
+      }
+
+      function twinId(s) {
+        if (s.id === "s-lin-a") return "s-lin-b";
+        if (s.id === "s-lin-b") return "s-lin-a";
+        return "";
+      }
+
+      function renderDetail() {
+        var s = student();
+        if (!s) return;
+        $("detail-title").textContent = s.name;
+        var g = GENDER[s.gender];
+        var last = s.history[0];
+        var html = "";
+        if (s.training) {
+          html += '<button type="button" class="banner" data-od-id="banner-in-progress" id="banner">' +
+            '<span class="banner-ico" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg></span>' +
+            '<span><b>训练中</b><span>进行中的训练可点此继续</span></span>' +
+            '<span class="banner-go">继续训练</span></button>';
+        }
+        html += '<div class="cta-pad">';
+        if (s.archived) {
+          html += '<p><span class="pill" data-od-id="status-archived"><i aria-hidden="true"></i>已归档</span></p>';
+          html += '<p class="hint" style="margin-top:10px">不能开始新训练。仍可查看下方历史，或恢复为活跃学员。</p>';
+          html += '<button type="button" class="primary" data-od-id="cta-restore-inline" id="btn-restore-inline">恢复学员</button>';
+        } else if (s.training) {
+          html += '<p class="hint" style="margin-top:4px">已有进行中的训练，主操作是上方「继续训练」。此处不并列第二个开课按钮。</p>';
+        } else {
+          html += '<button type="button" class="primary" data-od-id="cta-start-training" id="btn-start">开始训练</button>';
+        }
+        html += "</div>";
+        html += '<div class="dash" data-od-id="note-next-class-m1b"><span class="k">M1-A 不提供</span>下一节课将在 M1-B 出现。本页不伪造课程安排卡片。</div>';
+        if (last) {
+          html += '<button type="button" class="summary" data-od-id="last-session-summary" data-hid="' + last.id + '">' +
+            '<div class="kicker">上次完成的训练</div><b>' + last.date + " · " + last.focus + "</b>" +
+            "<p>" + last.week + " · " + last.mins + " · 点开查看该次记录</p></button>";
+        }
+        html += '<div class="profile" data-od-id="profile-block"><div class="who">';
+        html += '<span class="gender" aria-label="性别：' + g.label + '">' + genderIcon(g.icon) + "<span>" + g.label + "</span></span>";
+        html += "<strong>" + escapeHtml(s.name) + "</strong></div>";
+        html += '<p class="stamp">内部编号 ' + s.id + " · 改名不改变编号</p>";
+        if (s.remark) {
+          html += '<dl class="kv" data-od-id="coach-remark"><dt>教练备注</dt><dd>' + escapeHtml(s.remark) +
+            '<div class="disc">仅自己可见，永不进入分享报告。</div></dd></dl>';
+        }
+        html += '<dl class="kv"><dt>训练目标</dt><dd>';
+        if (s.goals.length || s.goalText) {
+          html += '<div class="tags">';
+          s.goals.forEach(function (t) { html += '<span class="tag">' + escapeHtml(t) + "</span>"; });
+          html += "</div>";
+          if (s.goalText) html += '<div style="margin-top:6px">' + escapeHtml(s.goalText) + "</div>";
+          html += '<p class="disc">目标不会自动生成训练内容。</p>';
+        } else html += "未填写";
+        html += "</dd></dl>";
+        html += '<dl class="kv"><dt>电话</dt><dd>' + (s.phone ? escapeHtml(s.phone) : "未填写") + "</dd></dl>";
+        html += '<dl class="kv"><dt>微信</dt><dd>' + (s.wechat ? escapeHtml(s.wechat) : "未填写") + "</dd></dl>";
+        html += '<p class="disc">电话与微信由教练手输。不读取系统通讯录，不请求联系人权限，不调用微信能力。</p>';
+        var tid = twinId(s);
+        if (tid) {
+          var o = state.students[tid];
+          html += '<button type="button" class="twin" data-od-id="cta-other-lin" id="btn-twin">同名学员：' +
+            escapeHtml(o.name) + " · 备注 " + escapeHtml(o.remark) + " · 查看另一位</button>";
+        }
+        html += "</div>";
+        var open = state.injuriesOpen ? "true" : "false";
+        html += '<div class="fold" data-od-id="injuries-region" id="injuries-box" aria-expanded="' + open + '">' +
+          '<button type="button" class="fold-head" id="btn-fold" aria-expanded="' + open + '"><b>注意事项</b><span class="stamp">' +
+          (s.injuriesAt ? "最近更新 " + s.injuriesAt : "未填写") +
+          '</span><span class="chev" aria-hidden="true"></span></button>' +
+          '<div class="fold-body">' +
+          (s.injuries ? escapeHtml(s.injuries) : "未填写。折叠存放，避免上课时直接露出。") +
+          '<p class="disc">此内容不是医疗诊断或医疗建议。仅教练可见，不进入分享报告。</p>' +
+          '<button type="button" class="ghost" id="btn-inj-edit" data-od-id="cta-edit-injuries">编辑注意事项</button>' +
+          "</div></div>";
+        html += '<p class="sec-h">训练历史 · 新的在上</p>';
+        s.history.forEach(function (h, i) {
+          html += '<button type="button" class="hist" data-od-id="history-item-' + (i + 1) + '" data-hid="' + h.id + '">' +
+            '<span class="hist-main"><span class="hist-name">' + h.date + " · " + h.focus + "</span>" +
+            '<span class="hist-sub">' + h.week + " · " + h.mins + " · " + escapeHtml(s.name) + "</span></span>" +
+            '<span class="chev" aria-hidden="true"></span></button>';
+        });
+        $("detail-body").innerHTML = html;
+        var banner = $("banner");
+        if (banner) banner.addEventListener("click", function () { openTrain(true); });
+        var start = $("btn-start");
+        if (start && !start.disabled) start.addEventListener("click", function () { openTrain(false); });
+        var rest = $("btn-restore-inline");
+        if (rest) rest.addEventListener("click", restoreStudent);
+        $("btn-fold").addEventListener("click", function () {
+          state.injuriesOpen = !state.injuriesOpen;
+          var on = state.injuriesOpen ? "true" : "false";
+          $("injuries-box").setAttribute("aria-expanded", on);
+          $("btn-fold").setAttribute("aria-expanded", on);
+          $("now-label").textContent = nowCopy();
+        });
+        $("btn-inj-edit").addEventListener("click", openInjuries);
+        $("detail-body").querySelectorAll(".summary, .hist").forEach(function (el) {
+          el.addEventListener("click", function () { openRecord(el.getAttribute("data-hid")); });
+        });
+        var twin = $("btn-twin");
+        if (twin) twin.addEventListener("click", function () {
+          state.id = tid;
+          state.scene = "lin";
+          state.injuriesOpen = false;
+          renderDetail();
+          show("detail");
+        });
+        $("now-label").textContent = nowCopy();
+      }
+
+      function renderEdit() {
+        var s = student();
+        state.genderDraft = s.gender;
+        state.goalsDraft = s.goals.slice();
+        var html = '<p class="stamp">内部编号 ' + s.id + " · 保存后历史记录改用新显示名称</p>";
+        html += '<label class="field-label" for="f-name">显示名称 <span class="req">必填</span></label>';
+        html += '<input class="field" id="f-name" data-od-id="field-name" maxlength="40" autocomplete="off" value="' + escapeHtml(s.name) + '">';
+        html += '<p class="err" id="err-name">请填写显示名称</p>';
+        html += '<p class="hint">允许重名。历史训练会显示新名称；已分享的旧文件不会被改写。</p>';
+        html += '<p class="field-label" id="gender-legend">性别 <span class="req">必填</span></p>';
+        html += '<div class="chips" id="gender-group" role="group" aria-labelledby="gender-legend" data-od-id="field-gender">';
+        ["male", "female", "other", "undisclosed"].forEach(function (k) {
+          var g = GENDER[k];
+          html += '<button type="button" class="chip" data-gender="' + k + '" aria-pressed="' + (k === s.gender ? "true" : "false") + '">' +
+            genderIcon(g.icon) + g.label + "</button>";
+        });
+        html += "</div>";
+        html += '<label class="field-label">训练目标 <span class="req">选填</span></label>';
+        html += '<div class="chips wrap" data-od-id="field-goal-chips">';
+        GOALS.forEach(function (t) {
+          html += '<button type="button" class="chip goal-chip" data-goal="' + t + '" aria-pressed="' + (s.goals.indexOf(t) >= 0 ? "true" : "false") + '">' + t + "</button>";
+        });
+        html += "</div>";
+        html += '<input class="field" id="f-goal" data-od-id="field-goal-text" maxlength="40" placeholder="补充说明，可留空" value="' + escapeHtml(s.goalText) + '" style="margin-top:8px">';
+        html += '<p class="hint">不会根据目标自动开出动作或组数。</p>';
+        html += '<label class="field-label" for="f-phone">电话 <span class="req">选填 · 手输</span></label>';
+        html += '<input class="field" id="f-phone" data-od-id="field-phone" inputmode="tel" placeholder="不读取系统通讯录" value="' + escapeHtml(s.phone) + '">';
+        html += '<div class="dash" style="margin:8px 0 0"><span class="k">系统边界</span>不请求联系人权限，也不从通讯录带入号码。</div>';
+        html += '<label class="field-label" for="f-wechat">微信 <span class="req">选填 · 手输</span></label>';
+        html += '<input class="field" id="f-wechat" data-od-id="field-wechat" placeholder="不调用微信能力" value="' + escapeHtml(s.wechat) + '">';
+        html += '<label class="field-label" for="f-remark">教练备注 <span class="req">选填 · 仅自己可见</span></label>';
+        html += '<input class="field" id="f-remark" data-od-id="field-remark" maxlength="20" placeholder="用于区分同名学员" value="' + escapeHtml(s.remark) + '">';
+        html += '<p class="hint">用于区分两位林林等情况。永不进入分享报告。</p>';
+        html += '<p class="hint">身体数据不在本阶段。伤病/注意事项在独立区域编辑。</p>';
+        html += '<button type="button" class="primary" data-od-id="cta-save-profile" id="btn-save">保存</button>';
+        $("edit-body").innerHTML = html;
+        $("gender-group").querySelectorAll(".chip").forEach(function (chip) {
+          chip.addEventListener("click", function () {
+            state.genderDraft = chip.getAttribute("data-gender");
+            $("gender-group").querySelectorAll(".chip").forEach(function (c) {
+              c.setAttribute("aria-pressed", c === chip ? "true" : "false");
+            });
+          });
+        });
+        $("edit-body").querySelectorAll(".goal-chip").forEach(function (chip) {
+          chip.addEventListener("click", function () {
+            var t = chip.getAttribute("data-goal");
+            var i = state.goalsDraft.indexOf(t);
+            if (i >= 0) state.goalsDraft.splice(i, 1);
+            else state.goalsDraft.push(t);
+            chip.setAttribute("aria-pressed", i >= 0 ? "false" : "true");
+          });
+        });
+        $("btn-save").addEventListener("click", saveEdit);
+      }
+
+      function saveEdit() {
+        var name = $("f-name").value.trim();
+        if (!name) {
+          $("f-name").classList.add("is-err");
+          $("err-name").classList.add("show");
+          return;
+        }
+        var s = student();
+        s.name = name;
+        s.gender = state.genderDraft;
+        s.goals = state.goalsDraft.slice();
+        s.goalText = $("f-goal").value.trim();
+        s.phone = $("f-phone").value.trim();
+        s.wechat = $("f-wechat").value.trim();
+        s.remark = $("f-remark").value.trim();
+        renderDetail();
+        show("detail");
+      }
+
+      function openInjuries() {
+        var s = student();
+        $("f-inj").value = s.injuries;
+        $("inj-updated").textContent = s.injuriesAt ? "当前最近更新 " + s.injuriesAt : "尚未保存过";
+        show("injuries");
+      }
+
+      function openDest(key, nav, title, copy, bound, extra) {
+        state.dest = key;
+        state.destFrom = state.screen === "dest" ? state.destFrom : state.screen;
+        $("dest-nav").textContent = nav;
+        $("dest-title").textContent = title;
+        $("dest-copy").textContent = copy;
+        $("dest-bound").textContent = bound;
+        $("dest-extra").innerHTML = extra || "";
+        show("dest");
+      }
+
+      function openTrain(resume) {
+        var s = student();
+        var extra = "";
+        if (s.injuries) {
+          extra = '<button type="button" class="mark" data-od-id="peek-has-notes" id="peek-notes"><span aria-hidden="true">!</span>有注意事项</button>' +
+            "<p>训练页只显示这一通用标识。点它也不会在本模块展开伤病原文。</p>";
+        }
+        openDest(
+          "train",
+          resume ? "训练中" : "开始训练",
+          resume ? "继续训练" : "开始训练",
+          (s.name + (resume ? " · 回到进行中的训练。" : " · 空白开始一次训练。")) + "训练记录器在模块 04，本页不绘制。",
+          "—— 模块边界 · 04-training-recorder 未绘制 ——",
+          extra
+        );
+        var peek = $("peek-notes");
+        if (peek) peek.addEventListener("click", function () {
+          $("dest-copy").textContent = "标识可点，但具体注意事项不在训练页展示。请回到学员详情展开「注意事项」。";
+        });
+      }
+
+      function openRecord(hid) {
+        var s = student();
+        var h = s.history.filter(function (x) { return x.id === hid; })[0] || s.history[0];
+        openDest(
+          "record",
+          "训练记录",
+          "训练记录详情",
+          s.name + " · " + h.date + " · " + h.focus + "。单次详情与编辑在模块 05。历史已改用当前显示名称。",
+          "—— 模块边界 · 05-session-detail 未绘制 ——"
+        );
+      }
+
+      function restoreStudent() {
+        var s = student();
+        s.archived = false;
+        renderDetail();
+        show("detail");
+      }
+
+      function goDetail() {
+        renderDetail();
+        show("detail");
+      }
+
+      $("btn-detail-back").addEventListener("click", function () {
+        openDest("list", "学员", "学员列表", "返回模块 01 的学员列表。本模块从该列表进入详情，不重做列表。", "—— 模块边界 · 01-onboarding-students ——");
+      });
+      $("btn-more").addEventListener("click", function () {
+        if ($("menu").classList.contains("on")) { closeMenu(); return; }
+        var s = student();
+        $("menu-archive").hidden = !s || s.archived;
+        $("menu-restore").hidden = !s || !s.archived;
+        $("menu").classList.add("on");
+        $("scrim").classList.add("on");
+        $("btn-more").setAttribute("aria-expanded", "true");
+      });
+      $("scrim").addEventListener("click", closeMenu);
+      $("menu-edit").addEventListener("click", function () { renderEdit(); show("edit"); });
+      $("menu-archive").addEventListener("click", function () {
+        $("arch-lead").textContent = "归档「" + student().name + "」之后：";
+        show("archive");
+      });
+      $("menu-restore").addEventListener("click", restoreStudent);
+      $("menu-delete").addEventListener("click", function () {
+        var s = student();
+        if (s.training) {
+          $("block-lead").textContent = s.name + " 有进行中的训练，不能永久删除。";
+          show("blocked");
+          return;
+        }
+        $("del-lead").textContent = "将永久删除「" + s.name + "」及其在本机的关联数据。";
+        $("del-affect").innerHTML =
+          "<li>显示名称、性别、训练目标</li><li>伤病 / 注意事项</li><li>教练备注</li>" +
+          "<li>电话与微信</li><li>" + s.history.length + " 条已完成训练记录</li>";
+        $("f-del-name").value = "";
+        $("f-del-name").classList.remove("is-err");
+        $("err-del").classList.remove("show");
+        $("btn-del-ok").disabled = true;
+        show("delete");
+      });
+      $("btn-edit-cancel").addEventListener("click", goDetail);
+      $("btn-inj-cancel").addEventListener("click", goDetail);
+      $("btn-inj-save").addEventListener("click", function () {
+        var s = student();
+        s.injuries = $("f-inj").value.trim();
+        s.injuriesAt = s.injuries ? "8月21日 21:05" : "";
+        state.injuriesOpen = !!s.injuries;
+        goDetail();
+      });
+      $("btn-arch-cancel").addEventListener("click", goDetail);
+      $("btn-arch-ok").addEventListener("click", function () {
+        student().archived = true;
+        goDetail();
+      });
+      $("btn-del-cancel").addEventListener("click", goDetail);
+      $("f-del-name").addEventListener("input", function () {
+        var ok = $("f-del-name").value.trim() === student().name;
+        $("btn-del-ok").disabled = !ok;
+        if (ok) {
+          $("f-del-name").classList.remove("is-err");
+          $("err-del").classList.remove("show");
+        }
+      });
+      $("btn-del-ok").addEventListener("click", function () {
+        if ($("f-del-name").value.trim() !== student().name) {
+          $("f-del-name").classList.add("is-err");
+          $("err-del").classList.add("show");
+          return;
+        }
+        $("gone-title").textContent = student().name + " 已永久删除";
+        delete state.students[state.id];
+        show("gone");
+      });
+      $("btn-backup").addEventListener("click", function () {
+        openDest("backup", "设置", "备份与恢复", "删除前建议先到设置导出加密备份。设置内部页不在本模块。", "—— 模块边界 · 设置未绘制 ——");
+      });
+      $("btn-block-back").addEventListener("click", goDetail);
+      $("btn-block-detail").addEventListener("click", goDetail);
+      $("btn-block-go").addEventListener("click", function () { openTrain(true); });
+      $("btn-gone-back").addEventListener("click", function () {
+        openDest("list", "学员", "学员列表", "该学员已删除，返回模块 01 的学员列表。", "—— 模块边界 · 01-onboarding-students ——");
+      });
+      $("btn-gone-list").addEventListener("click", function () { $("btn-gone-back").click(); });
+      $("btn-dest-back").addEventListener("click", function () {
+        var from = state.destFrom;
+        state.dest = null;
+        if (from === "delete") show("delete");
+        else if (from === "blocked") show("blocked");
+        else if (from === "gone") show("gone");
+        else goDetail();
+      });
+
+      function applyScene(sc) {
+        state.scene = sc;
+        state.students = seed();
+        state.injuriesOpen = false;
+        state.dest = null;
+        closeMenu();
+        if (sc === "zhou") {
+          state.id = "s-zhou";
+          goDetail();
+        } else if (sc === "training") {
+          state.id = "s-zhou";
+          state.students["s-zhou"].training = true;
+          goDetail();
+        } else if (sc === "injuries") {
+          state.id = "s-zhou";
+          state.injuriesOpen = true;
+          goDetail();
+        } else if (sc === "ming") {
+          state.id = "s-ming";
+          goDetail();
+        } else if (sc === "lin") {
+          state.id = "s-lin-a";
+          goDetail();
+        } else if (sc === "archived") {
+          state.id = "s-zhou";
+          state.students["s-zhou"].archived = true;
+          goDetail();
+        } else if (sc === "delete") {
+          state.id = "s-zhou";
+          $("del-lead").textContent = "将永久删除「小周」及其在本机的关联数据。";
+          $("del-affect").innerHTML =
+            "<li>显示名称、性别、训练目标</li><li>伤病 / 注意事项</li><li>教练备注</li>" +
+            "<li>电话与微信</li><li>3 条已完成训练记录</li>";
+          $("f-del-name").value = "";
+          $("btn-del-ok").disabled = true;
+          show("delete");
+        } else if (sc === "blocked") {
+          state.id = "s-zhou";
+          state.students["s-zhou"].training = true;
+          $("block-lead").textContent = "小周 有进行中的训练，不能永久删除。";
+          show("blocked");
+        }
+      }
+
+      document.querySelectorAll(".scene-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () { applyScene(btn.getAttribute("data-scene")); });
+      });
+
+      goDetail();
+    })();
+  </script>
+</body>
+</html>

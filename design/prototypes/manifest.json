@@ -1,0 +1,138 @@
+{
+  "product": "FineCoach",
+  "title": "低保真可点击线框",
+  "version": "v0.1",
+  "authority": "discovery-input",
+  "sourceDocuments": [
+    "specs/ideas.md",
+    "specs/CONTEXT.md"
+  ],
+  "notes": "ideas.md 不是批准 PRD。本集合用于产品负责人走查。",
+  "visual": {
+    "fidelity": "structured-greybox",
+    "device": "iPhone portrait ~393x852",
+    "locale": "zh-CN",
+    "colorScheme": "light-only",
+    "network": "none"
+  },
+  "data": "虚构数据",
+  "modules": [
+    {
+      "id": "m1-a/01-onboarding-students",
+      "stage": "M1-A",
+      "title": "首次说明与学员列表",
+      "path": "m1-a/01-onboarding-students/prototype.html",
+      "version": "v0.1",
+      "coverage": "this module only",
+      "review": "产品负责人走查通过"
+    },
+    {
+      "id": "m1-a/02-student-details-lifecycle",
+      "stage": "M1-A",
+      "title": "学员详情与生命周期",
+      "path": "m1-a/02-student-details-lifecycle/prototype.html",
+      "version": "v0.1",
+      "coverage": "this module only",
+      "review": "产品负责人走查通过"
+    },
+    {
+      "id": "m1-a/03-exercise-library",
+      "stage": "M1-A",
+      "title": "动作库与自定义动作",
+      "path": "m1-a/03-exercise-library/prototype.html",
+      "version": "v0.1",
+      "coverage": "this module only",
+      "review": "待产品负责人走查"
+    },
+    {
+      "id": "m1-a/04-core-training",
+      "stage": "M1-A",
+      "title": "课中训练记录",
+      "path": "m1-a/04-core-training/prototype.html",
+      "version": "v0.1",
+      "coverage": "this module only",
+      "review": "待产品负责人走查"
+    },
+    {
+      "id": "m1-a/05-finish-history-edit",
+      "stage": "M1-A",
+      "title": "结束训练、历史与编辑",
+      "path": "m1-a/05-finish-history-edit/prototype.html",
+      "version": "v0.1",
+      "coverage": "this module only",
+      "review": "待产品负责人走查"
+    },
+    {
+      "id": "m1-a/06-share-report",
+      "stage": "M1-A",
+      "title": "分享报告",
+      "path": "m1-a/06-share-report/prototype.html",
+      "version": "v0.1",
+      "coverage": "this module only",
+      "review": "待产品负责人走查"
+    },
+    {
+      "id": "m1-a/07-backup-restore-settings",
+      "stage": "M1-A",
+      "title": "设置、备份与恢复",
+      "path": "m1-a/07-backup-restore-settings/prototype.html",
+      "version": "v0.1",
+      "coverage": "this module only",
+      "review": "待产品负责人走查"
+    },
+    {
+      "id": "m1-b/01-today-calendar-appointments",
+      "stage": "M1-B",
+      "title": "今日、日历与课程安排",
+      "path": "m1-b/01-today-calendar-appointments/prototype.html",
+      "version": "v0.1",
+      "coverage": "this module only",
+      "review": "待产品负责人走查"
+    },
+    {
+      "id": "m1-b/02-course-packages",
+      "stage": "M1-B",
+      "title": "课包与课时调整",
+      "path": "m1-b/02-course-packages/prototype.html",
+      "version": "v0.1",
+      "coverage": "this module only",
+      "review": "待产品负责人走查"
+    },
+    {
+      "id": "m1-b/03-templates-sections",
+      "stage": "M1-B",
+      "title": "训练模板与课程分区",
+      "path": "m1-b/03-templates-sections/prototype.html",
+      "version": "v0.1",
+      "coverage": "this module only",
+      "review": "待产品负责人走查"
+    },
+    {
+      "id": "m1-b/04-body-data-history-trends",
+      "stage": "M1-B",
+      "title": "身体数据、历史与趋势",
+      "path": "m1-b/04-body-data-history-trends/prototype.html",
+      "version": "v0.1",
+      "coverage": "this module only",
+      "review": "待产品负责人走查"
+    },
+    {
+      "id": "m2/01-archive-export",
+      "stage": "M2",
+      "title": "导出个人训练档案",
+      "path": "m2/01-archive-export/prototype.html",
+      "version": "v0.1",
+      "coverage": "this module only",
+      "review": "待产品负责人走查"
+    },
+    {
+      "id": "m2/02-viewer-mode",
+      "stage": "M2",
+      "title": "档案查看模式",
+      "path": "m2/02-viewer-mode/prototype.html",
+      "version": "v0.1",
+      "coverage": "this module only",
+      "review": "待产品负责人走查"
+    }
+  ]
+}
