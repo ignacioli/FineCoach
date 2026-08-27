@@ -1,0 +1,42 @@
+{
+  "configurations" : [
+    {
+      "id" : "10000000-0000-4000-8000-000000000001",
+      "name" : "Debug",
+      "options" : {
+        "testTimeoutsEnabled" : true
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:FineCoach.xcodeproj",
+      "identifier" : "A020",
+      "name" : "FineCoach"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:FineCoach.xcodeproj",
+        "identifier" : "A021",
+        "name" : "FineCoachTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:FineCoach.xcodeproj",
+        "identifier" : "A022",
+        "name" : "FineCoachIntegrationTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:FineCoach.xcodeproj",
+        "identifier" : "A023",
+        "name" : "FineCoachUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

@@ -1,0 +1,26 @@
+{
+  "configurations" : [
+    {
+      "id" : "10000000-0000-4000-8000-000000000002",
+      "name" : "Debug",
+      "options" : { }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:FineCoach.xcodeproj",
+      "identifier" : "A020",
+      "name" : "FineCoach"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:FineCoach.xcodeproj",
+        "identifier" : "A021",
+        "name" : "FineCoachTests"
+      }
+    }
+  ],
+  "version" : 1
+}

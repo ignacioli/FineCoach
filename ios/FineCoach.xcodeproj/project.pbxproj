@@ -1,0 +1,215 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B100 /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100 /* AppEnvironment.swift */; };
+		B101 /* FineCoachApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101 /* FineCoachApp.swift */; };
+		B102 /* PrivacyCover.swift in Sources */ = {isa = PBXBuildFile; fileRef = A102 /* PrivacyCover.swift */; };
+		B103 /* ScenePrivacyCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A103 /* ScenePrivacyCoordinator.swift */; };
+		B110 /* DomainError.swift in Sources */ = {isa = PBXBuildFile; fileRef = A110 /* DomainError.swift */; };
+		B111 /* Identifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = A111 /* Identifiers.swift */; };
+		B112 /* ValidatedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = A112 /* ValidatedText.swift */; };
+		B113 /* NormalizedName.swift in Sources */ = {isa = PBXBuildFile; fileRef = A113 /* NormalizedName.swift */; };
+		B114 /* DecimalValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = A114 /* DecimalValue.swift */; };
+		B120 /* Protocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = A120 /* Protocols.swift */; };
+		B121 /* FaultInjectionBoundary.swift in Sources */ = {isa = PBXBuildFile; fileRef = A121 /* FaultInjectionBoundary.swift */; };
+		B130 /* SystemClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A130 /* SystemClock.swift */; };
+		B131 /* SecureRandomGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A131 /* SecureRandomGenerator.swift */; };
+		B132 /* ProtectedFileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A132 /* ProtectedFileStore.swift */; };
+		B133 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = A133 /* AppLogger.swift */; };
+		B140 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A140 /* PersistenceController.swift */; };
+		B141 /* PersistenceWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A141 /* PersistenceWriter.swift */; };
+		B142 /* StoreGeneration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A142 /* StoreGeneration.swift */; };
+		B143 /* CurrentGenerationPointer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A143 /* CurrentGenerationPointer.swift */; };
+		B150 /* Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = A150 /* Tokens.swift */; };
+		B160 /* FCButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A160 /* FCButton.swift */; };
+		B161 /* FCTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = A161 /* FCTextField.swift */; };
+		B162 /* FCSetRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A162 /* FCSetRow.swift */; };
+		B163 /* FCSaveStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A163 /* FCSaveStatusView.swift */; };
+		B170 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A172 /* Localizable.xcstrings */; };
+		B171 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A173 /* Assets.xcassets */; };
+		B172 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A171 /* PrivacyInfo.xcprivacy */; };
+		B173 /* FineCoachModel.xcdatamodeld in Resources */ = {isa = PBXBuildFile; fileRef = A175 /* FineCoachModel.xcdatamodeld */; };
+		B174 /* FineCoachModel.xcdatamodeld in FineCoachTests Resources */ = {isa = PBXBuildFile; fileRef = A175 /* FineCoachModel.xcdatamodeld */; };
+		B175 /* FineCoachModel.xcdatamodeld in FineCoachIntegrationTests Resources */ = {isa = PBXBuildFile; fileRef = A175 /* FineCoachModel.xcdatamodeld */; };
+		B200 /* SetupSmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200 /* SetupSmokeTests.swift */; };
+		B201 /* FictitiousFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = A201 /* FictitiousFixtures.swift */; };
+		B202 /* TestClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A202 /* TestClock.swift */; };
+		B203 /* TestIDGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A203 /* TestIDGenerator.swift */; };
+		B204 /* TemporaryProtectedDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A204 /* TemporaryProtectedDirectory.swift */; };
+		B205 /* FakeRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A205 /* FakeRenderer.swift */; };
+		B206 /* TestFaultInjector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A206 /* TestFaultInjector.swift */; };
+		B210 /* FoundationIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A210 /* FoundationIntegrationTests.swift */; };
+		B220 /* SetupSmokeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A220 /* SetupSmokeUITests.swift */; };
+		BF01 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F001 /* Foundation.framework */; };
+		BF02 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F002 /* SwiftUI.framework */; };
+		BF03 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F003 /* CoreData.framework */; };
+		BF04 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F004 /* Security.framework */; };
+		BF05 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F005 /* UIKit.framework */; };
+		BF06 /* OSLog.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F006 /* OSLog.framework */; };
+		BF07 /* Combine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F007 /* Combine.framework */; };
+		BF08 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F008 /* XCTest.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C001 /* Proxy for FineCoachTests */ = {isa = PBXContainerItemProxy; containerPortal = A000 /* Project object */; proxyType = 1; remoteGlobalIDString = A020; remoteInfo = FineCoach; };
+		C002 /* Proxy for FineCoachIntegrationTests */ = {isa = PBXContainerItemProxy; containerPortal = A000 /* Project object */; proxyType = 1; remoteGlobalIDString = A020; remoteInfo = FineCoach; };
+		C003 /* Proxy for FineCoachUITests */ = {isa = PBXContainerItemProxy; containerPortal = A000 /* Project object */; proxyType = 1; remoteGlobalIDString = A020; remoteInfo = FineCoach; };
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		A003 /* FineCoach.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FineCoach.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A004 /* FineCoachTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FineCoachTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A005 /* FineCoachIntegrationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FineCoachIntegrationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A006 /* FineCoachUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FineCoachUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A100 /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironment.swift; sourceTree = "<group>"; };
+		A101 /* FineCoachApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FineCoachApp.swift; sourceTree = "<group>"; };
+		A102 /* PrivacyCover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyCover.swift; sourceTree = "<group>"; };
+		A103 /* ScenePrivacyCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenePrivacyCoordinator.swift; sourceTree = "<group>"; };
+		A110 /* DomainError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DomainError.swift; sourceTree = "<group>"; };
+		A111 /* Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; };
+		A112 /* ValidatedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidatedText.swift; sourceTree = "<group>"; };
+		A113 /* NormalizedName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NormalizedName.swift; sourceTree = "<group>"; };
+		A114 /* DecimalValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecimalValue.swift; sourceTree = "<group>"; };
+		A120 /* Protocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Protocols.swift; sourceTree = "<group>"; };
+		A121 /* FaultInjectionBoundary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaultInjectionBoundary.swift; sourceTree = "<group>"; };
+		A130 /* SystemClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemClock.swift; sourceTree = "<group>"; };
+		A131 /* SecureRandomGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureRandomGenerator.swift; sourceTree = "<group>"; };
+		A132 /* ProtectedFileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtectedFileStore.swift; sourceTree = "<group>"; };
+		A133 /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
+		A140 /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
+		A141 /* PersistenceWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceWriter.swift; sourceTree = "<group>"; };
+		A142 /* StoreGeneration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreGeneration.swift; sourceTree = "<group>"; };
+		A143 /* CurrentGenerationPointer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentGenerationPointer.swift; sourceTree = "<group>"; };
+		A150 /* Tokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tokens.swift; sourceTree = "<group>"; };
+		A160 /* FCButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCButton.swift; sourceTree = "<group>"; };
+		A161 /* FCTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCTextField.swift; sourceTree = "<group>"; };
+		A162 /* FCSetRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCSetRow.swift; sourceTree = "<group>"; };
+		A163 /* FCSaveStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCSaveStatusView.swift; sourceTree = "<group>"; };
+		A170 /* FineCoach.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FineCoach.entitlements; sourceTree = "<group>"; };
+		A171 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		A172 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		A173 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A174 /* FineCoachV1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = FineCoachV1.xcdatamodel; sourceTree = "<group>"; };
+		A175 /* FineCoachModel.xcdatamodeld */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = FineCoachModel.xcdatamodeld; sourceTree = "<group>"; };
+		A200 /* SetupSmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupSmokeTests.swift; sourceTree = "<group>"; };
+		A201 /* FictitiousFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FictitiousFixtures.swift; sourceTree = "<group>"; };
+		A202 /* TestClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestClock.swift; sourceTree = "<group>"; };
+		A203 /* TestIDGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestIDGenerator.swift; sourceTree = "<group>"; };
+		A204 /* TemporaryProtectedDirectory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryProtectedDirectory.swift; sourceTree = "<group>"; };
+		A205 /* FakeRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeRenderer.swift; sourceTree = "<group>"; };
+		A206 /* TestFaultInjector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFaultInjector.swift; sourceTree = "<group>"; };
+		A210 /* FoundationIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationIntegrationTests.swift; sourceTree = "<group>"; };
+		A220 /* SetupSmokeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupSmokeUITests.swift; sourceTree = "<group>"; };
+		F001 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		F002 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		F003 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		F004 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		F005 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		F006 /* OSLog.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OSLog.framework; path = System/Library/Frameworks/OSLog.framework; sourceTree = SDKROOT; };
+		F007 /* Combine.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Combine.framework; path = System/Library/Frameworks/Combine.framework; sourceTree = SDKROOT; };
+		F008 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A051 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (BF01, BF02, BF03, BF04, BF05, BF06, BF07); runOnlyForDeploymentPostprocessing = 0; };
+		A054 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (BF08); runOnlyForDeploymentPostprocessing = 0; };
+		A057 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (BF08); runOnlyForDeploymentPostprocessing = 0; };
+		A05A /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (BF08); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A001 /* FineCoach */ = {isa = PBXGroup; children = (A400, A410, A420, A430, A440, A002); sourceTree = "<group>"; };
+		A002 /* Products */ = {isa = PBXGroup; children = (A003, A004, A005, A006); name = Products; sourceTree = "<group>"; };
+		A400 /* FineCoachApp */ = {isa = PBXGroup; children = (A101, A170, A171, A401, A402, A403, A404, A405); path = FineCoachApp; sourceTree = "<group>"; };
+		A401 /* App */ = {isa = PBXGroup; children = (A100, A102, A103); path = App; sourceTree = "<group>"; };
+		A402 /* Core */ = {isa = PBXGroup; children = (A411, A412, A413, A414, A415, A416, A417); path = Core; sourceTree = "<group>"; };
+		A403 /* DesignSystem */ = {isa = PBXGroup; children = (A150, A431); path = DesignSystem; sourceTree = "<group>"; };
+		A404 /* Features */ = {isa = PBXGroup; children = (A446, A441, A442, A443, A444, A445); path = Features; sourceTree = "<group>"; };
+		A405 /* Resources */ = {isa = PBXGroup; children = (A173, A172); path = Resources; sourceTree = "<group>"; };
+		A410 /* FineCoachTests */ = {isa = PBXGroup; children = (A200); path = FineCoachTests; sourceTree = "<group>"; };
+		A420 /* FineCoachIntegrationTests */ = {isa = PBXGroup; children = (A421); path = FineCoachIntegrationTests; sourceTree = "<group>"; };
+		A430 /* FineCoachUITests */ = {isa = PBXGroup; children = (A220); path = FineCoachUITests; sourceTree = "<group>"; };
+		A440 /* TestSupport */ = {isa = PBXGroup; children = (A450, A451, A452); path = TestSupport; sourceTree = "<group>"; };
+		A411 /* Domain */ = {isa = PBXGroup; children = (A110, A111, A112, A113, A114); path = Domain; sourceTree = "<group>"; };
+		A412 /* Application */ = {isa = PBXGroup; children = (A120, A121); path = Application; sourceTree = "<group>"; };
+		A413 /* Platform */ = {isa = PBXGroup; children = (A130, A131, A132, A133); path = Platform; sourceTree = "<group>"; };
+		A414 /* Persistence */ = {isa = PBXGroup; children = (A140, A141, A142, A143, A175); path = Persistence; sourceTree = "<group>"; };
+		A415 /* Recovery */ = {isa = PBXGroup; path = Recovery; sourceTree = "<group>"; };
+		A416 /* Reporting */ = {isa = PBXGroup; path = Reporting; sourceTree = "<group>"; };
+		A417 /* Backup */ = {isa = PBXGroup; path = Backup; sourceTree = "<group>"; };
+		A431 /* Components */ = {isa = PBXGroup; children = (A160, A161, A162, A163); path = Components; sourceTree = "<group>"; };
+		A441 /* ExerciseLibrary */ = {isa = PBXGroup; path = ExerciseLibrary; sourceTree = "<group>"; };
+		A442 /* ActiveSession */ = {isa = PBXGroup; path = ActiveSession; sourceTree = "<group>"; };
+		A443 /* History */ = {isa = PBXGroup; path = History; sourceTree = "<group>"; };
+		A444 /* ShareReport */ = {isa = PBXGroup; path = ShareReport; sourceTree = "<group>"; };
+		A445 /* BackupRestore */ = {isa = PBXGroup; path = BackupRestore; sourceTree = "<group>"; };
+		A450 /* Doubles */ = {isa = PBXGroup; children = (A202, A203, A204, A205); path = Doubles; sourceTree = "<group>"; };
+		A451 /* FaultInjection */ = {isa = PBXGroup; children = (A206); path = FaultInjection; sourceTree = "<group>"; };
+		A452 /* Fixtures */ = {isa = PBXGroup; children = (A201); path = Fixtures; sourceTree = "<group>"; };
+		A446 /* Students */ = {isa = PBXGroup; path = Students; sourceTree = "<group>"; };
+		A421 /* Foundation */ = {isa = PBXGroup; children = (A210); path = Foundation; sourceTree = "<group>"; };
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A020 /* FineCoach */ = {isa = PBXNativeTarget; buildConfigurationList = A030 /* App configurations */; buildPhases = (A050, A051, A052); buildRules = (); dependencies = (); name = FineCoach; productName = FineCoach; productReference = A003 /* FineCoach.app */; productType = "com.apple.product-type.application"; };
+		A021 /* FineCoachTests */ = {isa = PBXNativeTarget; buildConfigurationList = A033 /* Unit test configurations */; buildPhases = (A053, A054, A055); buildRules = (); dependencies = (D001); name = FineCoachTests; productName = FineCoachTests; productReference = A004 /* FineCoachTests.xctest */; productType = "com.apple.product-type.bundle.unit-test"; };
+		A022 /* FineCoachIntegrationTests */ = {isa = PBXNativeTarget; buildConfigurationList = A036 /* Integration test configurations */; buildPhases = (A056, A057, A058); buildRules = (); dependencies = (D002); name = FineCoachIntegrationTests; productName = FineCoachIntegrationTests; productReference = A005 /* FineCoachIntegrationTests.xctest */; productType = "com.apple.product-type.bundle.unit-test"; };
+		A023 /* FineCoachUITests */ = {isa = PBXNativeTarget; buildConfigurationList = A039 /* UI test configurations */; buildPhases = (A059, A05A, A05B); buildRules = (); dependencies = (D003); name = FineCoachUITests; productName = FineCoachUITests; productReference = A006 /* FineCoachUITests.xctest */; productType = "com.apple.product-type.bundle.ui-testing"; };
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A000 /* Project object */ = {isa = PBXProject; attributes = { LastUpgradeCheck = 2660; TargetAttributes = { A020 = { CreatedOnToolsVersion = 26.6; LastSwiftMigration = 2660; }; A021 = { CreatedOnToolsVersion = 26.6; TestTargetID = A020; }; A022 = { CreatedOnToolsVersion = 26.6; TestTargetID = A020; }; A023 = { CreatedOnToolsVersion = 26.6; TestTargetID = A020; }; }; }; buildConfigurationList = A010 /* Project configurations */; compatibilityVersion = "Xcode 16.0"; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, "zh-Hans"); mainGroup = A001 /* FineCoach */; productRefGroup = A002 /* Products */; projectDirPath = ""; projectRoot = ""; targets = (A020, A021, A022, A023); };
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A052 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (B170, B171, B172, B173); runOnlyForDeploymentPostprocessing = 0; };
+		A055 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (B174); runOnlyForDeploymentPostprocessing = 0; };
+		A058 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (B175); runOnlyForDeploymentPostprocessing = 0; };
+		A05B /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A050 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (B100, B101, B102, B103, B110, B111, B112, B113, B114, B120, B121, B130, B131, B132, B133, B140, B141, B142, B143, B150, B160, B161, B162, B163); runOnlyForDeploymentPostprocessing = 0; };
+		A053 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (B200, B201, B202, B203, B204, B205, B206); runOnlyForDeploymentPostprocessing = 0; };
+		A056 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (B201, B202, B203, B204, B205, B206, B210); runOnlyForDeploymentPostprocessing = 0; };
+		A059 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (B220); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D001 /* FineCoachTests depends on FineCoach */ = {isa = PBXTargetDependency; target = A020 /* FineCoach */; targetProxy = C001 /* Proxy for FineCoachTests */; };
+		D002 /* FineCoachIntegrationTests depends on FineCoach */ = {isa = PBXTargetDependency; target = A020 /* FineCoach */; targetProxy = C002 /* Proxy for FineCoachIntegrationTests */; };
+		D003 /* FineCoachUITests depends on FineCoach */ = {isa = PBXTargetDependency; target = A020 /* FineCoach */; targetProxy = C003 /* Proxy for FineCoachUITests */; };
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		A011 /* Project Debug */ = {isa = XCBuildConfiguration; buildSettings = { ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; ENABLE_TESTABILITY = YES; IPHONEOS_DEPLOYMENT_TARGET = 18.0; SDKROOT = iphoneos; SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG; SWIFT_STRICT_CONCURRENCY = complete; SWIFT_VERSION = 6.0; TARGETED_DEVICE_FAMILY = 1; }; name = Debug; };
+		A012 /* Project Release */ = {isa = XCBuildConfiguration; buildSettings = { ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; IPHONEOS_DEPLOYMENT_TARGET = 18.0; SDKROOT = iphoneos; SWIFT_STRICT_CONCURRENCY = complete; SWIFT_VERSION = 6.0; TARGETED_DEVICE_FAMILY = 1; }; name = Release; };
+		A031 /* App Debug */ = {isa = XCBuildConfiguration; buildSettings = { CODE_SIGN_ENTITLEMENTS = FineCoachApp/FineCoach.entitlements; CODE_SIGN_STYLE = Automatic; DEFINES_MODULE = YES; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = "精练教练"; INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports"; INFOPLIST_KEY_UILaunchScreen_Generation = YES; PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app; PRODUCT_NAME = FineCoach; SWIFT_EMIT_LOC_STRINGS = YES; SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG; }; name = Debug; };
+		A032 /* App Release */ = {isa = XCBuildConfiguration; buildSettings = { CODE_SIGN_ENTITLEMENTS = FineCoachApp/FineCoach.entitlements; CODE_SIGN_STYLE = Automatic; DEFINES_MODULE = YES; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = "精练教练"; INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports"; INFOPLIST_KEY_UILaunchScreen_Generation = YES; PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app; PRODUCT_NAME = FineCoach; SWIFT_EMIT_LOC_STRINGS = YES; }; name = Release; };
+		A034 /* Unit tests Debug */ = {isa = XCBuildConfiguration; buildSettings = { BUNDLE_LOADER = "$(TEST_HOST)"; GENERATE_INFOPLIST_FILE = YES; PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app.tests; PRODUCT_NAME = FineCoachTests; SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FineCoach.app/FineCoach"; }; name = Debug; };
+		A035 /* Unit tests Release */ = {isa = XCBuildConfiguration; buildSettings = { BUNDLE_LOADER = "$(TEST_HOST)"; GENERATE_INFOPLIST_FILE = YES; PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app.tests; PRODUCT_NAME = FineCoachTests; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FineCoach.app/FineCoach"; }; name = Release; };
+		A037 /* Integration tests Debug */ = {isa = XCBuildConfiguration; buildSettings = { BUNDLE_LOADER = "$(TEST_HOST)"; GENERATE_INFOPLIST_FILE = YES; PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app.integration-tests; PRODUCT_NAME = FineCoachIntegrationTests; SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FineCoach.app/FineCoach"; }; name = Debug; };
+		A038 /* Integration tests Release */ = {isa = XCBuildConfiguration; buildSettings = { BUNDLE_LOADER = "$(TEST_HOST)"; GENERATE_INFOPLIST_FILE = YES; PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app.integration-tests; PRODUCT_NAME = FineCoachIntegrationTests; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FineCoach.app/FineCoach"; }; name = Release; };
+		A03A /* UI tests Debug */ = {isa = XCBuildConfiguration; buildSettings = { GENERATE_INFOPLIST_FILE = YES; PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app.ui-tests; PRODUCT_NAME = FineCoachUITests; SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG; TEST_TARGET_NAME = FineCoach; }; name = Debug; };
+		A03B /* UI tests Release */ = {isa = XCBuildConfiguration; buildSettings = { GENERATE_INFOPLIST_FILE = YES; PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app.ui-tests; PRODUCT_NAME = FineCoachUITests; TEST_TARGET_NAME = FineCoach; }; name = Release; };
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A010 /* Project configurations */ = {isa = XCConfigurationList; buildConfigurations = (A011, A012); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		A030 /* App configurations */ = {isa = XCConfigurationList; buildConfigurations = (A031, A032); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		A033 /* Unit test configurations */ = {isa = XCConfigurationList; buildConfigurations = (A034, A035); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		A036 /* Integration test configurations */ = {isa = XCConfigurationList; buildConfigurations = (A037, A038); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		A039 /* UI test configurations */ = {isa = XCConfigurationList; buildConfigurations = (A03A, A03B); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+/* End XCConfigurationList section */
+	};
+	rootObject = A000 /* Project object */;
+}

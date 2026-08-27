@@ -2,32 +2,32 @@
 
 ## Project
 
-FineCoach (精练教练) is intended to become a local-first mobile App for recording gym classes and serving Coaches and Students.
+FineCoach (精练教练) is intended to become a local-first mobile App for recording gym classes and serving Coaches and Students. The approved M1-A scope uses one Coach operator and Student records.
 
-The precise user roles and product surfaces are not yet approved. Do not infer whether Students directly use the App, receive exported records, use a separate client, or have accounts. Resolve those questions in the product specification before designing behavior or architecture around them.
+Outside approved M1-A behavior, do not infer whether Students directly use the App, receive exported records, use a separate client, or have accounts. Resolve those questions in the relevant product specification before designing behavior or architecture around them.
 
 ## Current Artifacts and Authority
 
 - `specs/ideas.md` contains initial product ideas. It is not an approved specification or PRD and is not a source of binding requirements.
 - Treat requirement-style language, scope boundaries, acceptance scenarios, and technical questions in `specs/ideas.md` as discovery input that still requires confirmation.
 - `specs/CONTEXT.md` is the current working domain glossary. Use its terms consistently during discovery, but do not treat a term definition as proof that related product behavior has been approved.
-- There is currently no approved product specification or PRD in the repository. Do not silently promote `specs/ideas.md` into one.
-- When an approved specification is added, identify it explicitly here and define how it relates to the ideas document and glossary.
+- `specs/001-m1-a-core-session/spec.md` is the approved M1-A product specification; its approved `plan.md`, detailed design artifacts, and `tasks.md` govern the current implementation scope.
+- The approved M1-A artifacts override discovery input only within their explicit scope. Do not promote remaining ideas into requirements.
 
 ## Current Phase
 
-The repository is in product discovery and requirements definition. Delivery sequencing is approved: build and validate the iOS App first, then add Android later. No application framework, supported OS/version matrix, role model, database, synchronization model, backup format, exercise-asset source, report renderer, notification implementation, or distribution method has been approved.
+M1-A Phase 1 Setup and Phase 2 Foundation are the currently authorized iOS implementation scope. Phase 3 and later tasks have not started and require a subsequent implementation round. The approved stack is native Swift/SwiftUI on iOS 18.0+, using Apple frameworks and local Core Data persistence. Android and requirements outside the approved M1-A artifacts remain in discovery.
 
-Before implementation:
+Before implementing work outside approved M1-A scope:
 
 1. Resolve the target users, Coach/Student responsibilities, product surfaces, and primary workflows.
 2. Produce and approve a product specification or PRD with explicit goals, scope, exclusions, functional requirements, non-functional requirements, and acceptance scenarios.
 3. Produce a technical plan based on that approved document, with evidence for material architecture and dependency choices.
 4. Trace implementation tasks and validation back to approved requirements.
 
-Do not create application scaffolding or add dependencies merely to make progress before the product specification and technical plan are approved.
+Do not add adjacent product behavior, platforms, or dependencies merely to make progress beyond the approved M1-A plan.
 
-## Working Direction, Not Approved Scope
+## Outside M1-A: Working Direction, Not Approved Scope
 
 The confirmed working direction is a local-first gym-class record mobile App for Coaches and Students, delivered iOS first and Android later. Details in `specs/ideas.md`—including user access, platform implementation, scheduling, session recording, course packages, exercise content, sharing, privacy behavior, backup, and release boundaries—remain proposals until they are carried into an approved specification.
 
@@ -80,3 +80,26 @@ When code is introduced, document the canonical setup, build, test, lint, and fo
 - Do not commit unless explicitly requested.
 - Keep commits and pull requests scoped to one concern and reference the relevant approved requirement or decision.
 - Preserve unrelated and untracked work.
+
+## M1-A Setup Validation (T001-T008)
+
+The approved iOS implementation stack is native Swift/SwiftUI on iOS 18.0+, using Apple frameworks only. Run these commands from the repository root. Device SDK builds use `CODE_SIGNING_ALLOWED=NO` so setup validation does not require a signing team; use a real signing configuration separately for device installation.
+
+```sh
+xcodebuild -project ios/FineCoach.xcodeproj -list
+xcodebuild -project ios/FineCoach.xcodeproj -scheme FineCoach -showTestPlans
+xcodebuild -project ios/FineCoach.xcodeproj -scheme FineCoachTests -showTestPlans
+xcodebuild -project ios/FineCoach.xcodeproj -scheme FineCoachIntegrationTests -showTestPlans
+xcodebuild -project ios/FineCoach.xcodeproj -scheme FineCoachUITests -showTestPlans
+xcodebuild -project ios/FineCoach.xcodeproj -scheme FineCoach -configuration Debug -sdk iphoneos -derivedDataPath /tmp/FineCoachDD-AppDebug CODE_SIGNING_ALLOWED=NO build
+xcodebuild -project ios/FineCoach.xcodeproj -scheme FineCoach -configuration Release -sdk iphoneos -derivedDataPath /tmp/FineCoachDD-AppRelease CODE_SIGNING_ALLOWED=NO build
+xcodebuild -project ios/FineCoach.xcodeproj -scheme FineCoachTests -configuration Debug -sdk iphoneos -derivedDataPath /tmp/FineCoachDD-Unit CODE_SIGNING_ALLOWED=NO build-for-testing
+xcodebuild -project ios/FineCoach.xcodeproj -scheme FineCoachIntegrationTests -configuration Debug -sdk iphoneos -derivedDataPath /tmp/FineCoachDD-Integration CODE_SIGNING_ALLOWED=NO build-for-testing
+xcodebuild -project ios/FineCoach.xcodeproj -scheme FineCoachIntegrationTests -configuration Release -sdk iphoneos -derivedDataPath /tmp/FineCoachDD-IntegrationRelease CODE_SIGNING_ALLOWED=NO build-for-testing
+xcodebuild -project ios/FineCoach.xcodeproj -scheme FineCoachUITests -configuration Debug -sdk iphoneos -derivedDataPath /tmp/FineCoachDD-UI CODE_SIGNING_ALLOWED=NO build-for-testing
+! nm -j /tmp/FineCoachDD-AppRelease/Build/Products/Release-iphoneos/FineCoach.app/FineCoach | rg 'FaultInjection|FaultInjector|persistenceWriterSave|generationMetadataWrite|currentPointerReplace'
+xcrun swift-format lint --configuration .swift-format --recursive --parallel --strict ios/FineCoachApp ios/FineCoachTests ios/FineCoachIntegrationTests ios/FineCoachUITests ios/TestSupport
+xcrun swift-format format --configuration .swift-format --recursive --parallel --in-place ios/FineCoachApp ios/FineCoachTests ios/FineCoachIntegrationTests ios/FineCoachUITests ios/TestSupport
+```
+
+The four test plans are kept under `ios/FineCoach.xcodeproj/xcshareddata/xctestplans/` for project organization and mirrored at the Xcode project package root because Xcode 26 resolves the shared-scheme `container:` references from that package-root location. Do not run `xcodebuild test` as a substitute for physical-device acceptance; simulator/runtime availability and physical-device evidence are separate gates.

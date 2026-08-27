@@ -1,0 +1,30 @@
+{
+  "sourceLanguage" : "zh-Hans",
+  "strings" : {
+    "app.title" : {
+      "comment" : "Application title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "精练教练"
+          }
+        }
+      }
+    },
+    "storage.unavailable" : {
+      "comment" : "Shown when protected local storage cannot be opened",
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本地存储暂不可用"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

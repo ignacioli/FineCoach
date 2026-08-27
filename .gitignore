@@ -1,6 +1,14 @@
 # macOS
 .DS_Store
 
+# Swift / Xcode
+.build/
+DerivedData/
+*.swiftpm/
+Packages/
+xcuserdata/
+*.xcuserstate
+
 # Environment and local secrets
 .env
 .venv

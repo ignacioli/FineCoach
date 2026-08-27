@@ -1,0 +1,362 @@
+import CoreData
+import XCTest
+
+#if DEBUG
+    @testable import FineCoach
+#else
+    import FineCoach
+#endif
+
+#if DEBUG
+    private final class TransactionConcurrencyProbe: @unchecked Sendable {
+        private let lock = NSLock()
+        private var activeTransactions = 0
+        private(set) var maximumConcurrentTransactions = 0
+
+        func enter() {
+            lock.lock()
+            activeTransactions += 1
+            maximumConcurrentTransactions = max(maximumConcurrentTransactions, activeTransactions)
+            lock.unlock()
+        }
+
+        func leave() {
+            lock.lock()
+            activeTransactions -= 1
+            lock.unlock()
+        }
+    }
+#endif
+
+final class FoundationIntegrationTests: XCTestCase {
+    #if DEBUG
+        func testV1ModelLoadsWithApprovedEntitySurface() throws {
+            let model = try PersistenceController.loadBundledModel()
+            let entities = Set(model.entities.compactMap(\.name))
+            let expected: Set<String> = [
+                "StudentMO",
+                "ExerciseCatalogMO",
+                "ExerciseNameClaimMO",
+                "ExercisePreferenceMO",
+                "SessionMO",
+                "SessionExerciseMO",
+                "TrainingSetMO",
+                "ShareReportMO",
+                "AppSettingMO",
+                "ActiveSessionPointerMO",
+                "StoreGenerationMetadataMO",
+            ]
+            XCTAssertEqual(entities, expected)
+            XCTAssertEqual(
+                model.entities.first(where: { $0.name == "StudentMO" })?.attributesByName["id"]?.attributeType,
+                .UUIDAttributeType)
+        }
+
+        func testSingleWriterSerializesTransactionsAndPersistsValues() async throws {
+            let directory = try TemporaryProtectedDirectory()
+            let storeURL = directory.url.appendingPathComponent("generation/FineCoach.sqlite")
+            let controller = try PersistenceController(storeURL: storeURL)
+            let storeAudits = try controller.secureStoreArtifacts()
+            XCTAssertEqual(
+                storeAudits[storeURL]?.protectionRawValue,
+                FileProtectionType.completeUnlessOpen.rawValue
+            )
+            XCTAssertEqual(storeAudits[storeURL]?.isExcludedFromBackup, true)
+            for suffix in ["-wal", "-shm"] {
+                let artifactURL = URL(fileURLWithPath: storeURL.path + suffix)
+                if FileManager.default.fileExists(atPath: artifactURL.path) {
+                    XCTAssertEqual(
+                        storeAudits[artifactURL]?.protectionRawValue,
+                        FileProtectionType.completeUnlessOpen.rawValue
+                    )
+                    XCTAssertEqual(storeAudits[artifactURL]?.isExcludedFromBackup, true)
+                }
+            }
+            let writer = controller.writer
+            let probe = TransactionConcurrencyProbe()
+
+            try await withThrowingTaskGroup(of: Void.self) { group in
+                for index in 0..<32 {
+                    group.addTask {
+                        try await writer.transaction { context in
+                            probe.enter()
+                            defer { probe.leave() }
+
+                            let setting = NSEntityDescription.insertNewObject(
+                                forEntityName: "AppSettingMO",
+                                into: context
+                            )
+                            setting.setValue("test.setting.\(index)", forKey: "key")
+                            setting.setValue("value-\(index)", forKey: "typedValue")
+                            setting.setValue(Int64(1), forKey: "schemaVersion")
+                        }
+                    }
+                }
+                try await group.waitForAll()
+            }
+
+            XCTAssertEqual(probe.maximumConcurrentTransactions, 1)
+
+            let keys = try await writer.read { context -> [String] in
+                let request = NSFetchRequest<NSManagedObject>(entityName: "AppSettingMO")
+                request.sortDescriptors = [NSSortDescriptor(key: "key", ascending: true)]
+                return try context.fetch(request).compactMap { $0.value(forKey: "key") as? String }
+            }
+            XCTAssertEqual(Set(keys), Set((0..<32).map { "test.setting.\($0)" }))
+        }
+
+        func testIncompatibleModelDoesNotEraseExistingStore() async throws {
+            let directory = try TemporaryProtectedDirectory()
+            let storeURL = directory.url.appendingPathComponent("generation/FineCoach.sqlite")
+
+            do {
+                let controller = try PersistenceController(storeURL: storeURL)
+                try await controller.writer.transaction { context in
+                    let setting = NSEntityDescription.insertNewObject(
+                        forEntityName: "AppSettingMO",
+                        into: context
+                    )
+                    setting.setValue("preserved.marker", forKey: "key")
+                    setting.setValue("still-present", forKey: "typedValue")
+                    setting.setValue(Int64(1), forKey: "schemaVersion")
+                }
+            }
+
+            let incompatibleModel = NSManagedObjectModel()
+            let incompatibleEntity = NSEntityDescription()
+            incompatibleEntity.name = "DifferentSchema"
+            incompatibleEntity.managedObjectClassName = "NSManagedObject"
+            incompatibleModel.entities = [incompatibleEntity]
+
+            XCTAssertThrowsError(
+                try PersistenceController(storeURL: storeURL, model: incompatibleModel)
+            )
+
+            XCTAssertTrue(FileManager.default.fileExists(atPath: storeURL.path))
+            let reopened = try PersistenceController(storeURL: storeURL)
+            let values = try await reopened.writer.read { context in
+                let request = NSFetchRequest<NSManagedObject>(entityName: "AppSettingMO")
+                return try context.fetch(request).map { object in
+                    (
+                        object.value(forKey: "key") as? String,
+                        object.value(forKey: "typedValue") as? String
+                    )
+                }
+            }
+            XCTAssertEqual(values.count, 1)
+            XCTAssertEqual(values.first?.0, "preserved.marker")
+            XCTAssertEqual(values.first?.1, "still-present")
+        }
+
+        func testProtectedDirectoryAndAtomicFileReadBackPolicy() throws {
+            let directory = try TemporaryProtectedDirectory()
+            let protectedStore = ProtectedFileStore()
+            let businessDirectory = directory.url.appendingPathComponent("business", isDirectory: true)
+            let businessAudit = try protectedStore.prepareDirectory(at: businessDirectory, policy: .business)
+            XCTAssertEqual(businessAudit.protectionRawValue, FileProtectionType.completeUnlessOpen.rawValue)
+            XCTAssertTrue(businessAudit.isExcludedFromBackup)
+
+            let reportURL = businessDirectory.appendingPathComponent("report-001.png")
+            let reportAudit = try protectedStore.atomicReplace(
+                data: Data([0x01, 0x02, 0x03]),
+                at: reportURL,
+                policy: .ephemeralReport
+            )
+            XCTAssertEqual(reportAudit.protectionRawValue, FileProtectionType.complete.rawValue)
+            XCTAssertTrue(reportAudit.isExcludedFromBackup)
+            XCTAssertEqual(try Data(contentsOf: reportURL), Data([0x01, 0x02, 0x03]))
+
+            let candidateURL = businessDirectory.appendingPathComponent("candidate.bin")
+            let candidateData = Data([0x0A, 0x0B, 0x0C])
+            let candidateAudit = try protectedStore.atomicReplace(
+                data: candidateData,
+                at: candidateURL,
+                policy: .backupCandidate
+            )
+            XCTAssertEqual(
+                candidateAudit.protectionRawValue,
+                FileProtectionType.completeUnlessOpen.rawValue
+            )
+            XCTAssertTrue(candidateAudit.isExcludedFromBackup)
+            XCTAssertEqual(try protectedStore.readData(from: candidateURL), candidateData)
+
+            let remainingNames = try FileManager.default.contentsOfDirectory(
+                at: businessDirectory,
+                includingPropertiesForKeys: nil
+            ).map(\.lastPathComponent).sorted()
+            XCTAssertEqual(remainingNames, ["candidate.bin", "report-001.png"])
+        }
+
+        func testGenerationPointerAndMetadataRejectMismatchWithoutChangingPointer() throws {
+            let temporaryDirectory = try TemporaryProtectedDirectory()
+            let directory = StoreGenerationDirectory(rootURL: temporaryDirectory.url)
+            let pointerStore = CurrentGenerationPointerStore(url: directory.currentPointerURL)
+            let metadataStore = StoreGenerationMetadataStore(directory: directory)
+            let protectedStore = ProtectedFileStore()
+            let first = UUID(uuidString: "33333333-3333-4333-8333-333333333333")!
+            let second = UUID(uuidString: "44444444-4444-4444-8444-444444444444")!
+            try protectedStore.prepareDirectory(at: directory.generationURL(for: first))
+            try metadataStore.write(
+                try StoreGenerationMetadata(
+                    generationUUID: first,
+                    createdAtUTC: Date(timeIntervalSince1970: 0),
+                    validationState: .current
+                )
+            )
+            try pointerStore.replace(with: try CurrentGenerationPointer(generationUUID: first))
+
+            XCTAssertThrowsError(try CurrentGenerationPointer(generationUUID: second, schemaVersion: 2))
+            XCTAssertEqual(try pointerStore.read()?.generationUUID, first)
+
+            let mismatchedMetadata = try StoreGenerationMetadata(
+                generationUUID: second,
+                createdAtUTC: Date(timeIntervalSince1970: 1),
+                validationState: .current
+            )
+            let encoder = JSONEncoder()
+            encoder.dateEncodingStrategy = .iso8601
+            encoder.outputFormatting = [.sortedKeys]
+            try protectedStore.atomicReplace(
+                data: encoder.encode(mismatchedMetadata),
+                at: directory.metadataURL(for: first),
+                policy: .business
+            )
+
+            XCTAssertThrowsError(try metadataStore.validate(generationUUID: first)) { error in
+                XCTAssertEqual(error as? StoreGenerationError, .metadataMismatch)
+            }
+            XCTAssertEqual(try pointerStore.read()?.generationUUID, first)
+            XCTAssertTrue(try protectedStore.audit(url: directory.currentPointerURL).isExcludedFromBackup)
+            XCTAssertTrue(try protectedStore.audit(url: directory.metadataURL(for: first)).isExcludedFromBackup)
+        }
+
+        @MainActor
+        func testCompositionRootFailsClosedWhenPointerGenerationIsIncomplete() throws {
+            let temporaryDirectory = try TemporaryProtectedDirectory()
+            let directory = StoreGenerationDirectory(rootURL: temporaryDirectory.url)
+            let generationUUID = UUID(uuidString: "55555555-5555-4555-8555-555555555555")!
+            try CurrentGenerationPointerStore(url: directory.currentPointerURL).replace(
+                with: try CurrentGenerationPointer(generationUUID: generationUUID)
+            )
+
+            XCTAssertThrowsError(try AppEnvironment(rootURL: temporaryDirectory.url)) { error in
+                XCTAssertEqual(error as? StoreGenerationError, .invalidGeneration)
+            }
+        }
+
+        func testLoggerCanaryOnlyExposesFixedNonBusinessValues() {
+            let logger = AppLogger(subsystem: "com.finecoach.tests", category: "canary")
+            logger.info(.modelLoaded, operation: .startup)
+            logger.failure(.writerTransaction, operation: .persistence, category: .persistenceFailed)
+
+            let fixedValues =
+                (AppLogEvent.allCases.map(\.rawValue) + AppLogOperation.allCases.map(\.rawValue)
+                + AppLogErrorCategory.allCases.map(\.rawValue)).joined(separator: "|")
+            let forbiddenBusinessValues = [
+                FictitiousFixtures.student.displayName,
+                FictitiousFixtures.student.trainingGoal,
+                FictitiousFixtures.student.syntheticNote,
+                FictitiousFixtures.student.id.uuidString,
+            ]
+            for value in forbiddenBusinessValues {
+                XCTAssertFalse(fixedValues.contains(value))
+            }
+        }
+
+        func testFaultInjectionBoundaryIsExplicitlyDebugOnly() throws {
+            let injector = TestFaultInjector(failingPoints: [.persistenceWriterSave])
+            XCTAssertThrowsError(try injector.check(.persistenceWriterSave))
+            try injector.check(.currentPointerReplace)
+        }
+
+        func testFaultInjectionAdaptersInterruptRealWriteBoundaries() async throws {
+            let directory = try TemporaryProtectedDirectory()
+
+            let writerInjector = TestFaultInjector(failingPoints: [.persistenceWriterSave])
+            let controller = try PersistenceController(
+                storeURL: directory.url.appendingPathComponent("writer/FineCoach.sqlite"),
+                faultInjectionBoundary: FaultInjectionBoundary(injector: writerInjector)
+            )
+            do {
+                try await controller.writer.transaction { context in
+                    let setting = NSEntityDescription.insertNewObject(
+                        forEntityName: "AppSettingMO",
+                        into: context
+                    )
+                    setting.setValue("must-not-save", forKey: "key")
+                    setting.setValue("synthetic", forKey: "typedValue")
+                    setting.setValue(Int64(1), forKey: "schemaVersion")
+                }
+                XCTFail("Expected the writer fault point to interrupt the save")
+            } catch {
+                XCTAssertEqual(
+                    error as? FaultInjectionError,
+                    .injected(.persistenceWriterSave)
+                )
+            }
+            let savedCount = try await controller.writer.read { context in
+                try context.count(for: NSFetchRequest(entityName: "AppSettingMO"))
+            }
+            XCTAssertEqual(savedCount, 0)
+
+            let generationDirectory = StoreGenerationDirectory(
+                rootURL: directory.url.appendingPathComponent("generation")
+            )
+            let generationUUID = UUID(uuidString: "66666666-6666-4666-8666-666666666666")!
+            let metadataInjector = TestFaultInjector(failingPoints: [.generationMetadataWrite])
+            let metadataStore = StoreGenerationMetadataStore(
+                directory: generationDirectory,
+                faultInjectionBoundary: FaultInjectionBoundary(injector: metadataInjector)
+            )
+            XCTAssertThrowsError(
+                try metadataStore.write(
+                    StoreGenerationMetadata(
+                        generationUUID: generationUUID,
+                        createdAtUTC: Date(timeIntervalSince1970: 0),
+                        validationState: .candidate
+                    )
+                )
+            )
+            XCTAssertFalse(
+                FileManager.default.fileExists(
+                    atPath: generationDirectory.metadataURL(for: generationUUID).path
+                )
+            )
+
+            let pointerInjector = TestFaultInjector(failingPoints: [.currentPointerReplace])
+            let pointerStore = CurrentGenerationPointerStore(
+                url: generationDirectory.currentPointerURL,
+                faultInjectionBoundary: FaultInjectionBoundary(injector: pointerInjector)
+            )
+            XCTAssertThrowsError(
+                try pointerStore.replace(
+                    with: CurrentGenerationPointer(generationUUID: generationUUID)
+                )
+            )
+            XCTAssertNil(try pointerStore.read())
+        }
+    #else
+        func testReleaseArtifactsExcludeFaultInjectionSymbols() throws {
+            let testBundle = Bundle(for: FoundationIntegrationTests.self)
+            let appBundleURL = testBundle.bundleURL
+                .deletingLastPathComponent()
+                .deletingLastPathComponent()
+            let appBundle = Bundle(url: appBundleURL)
+            let appExecutableURL = try XCTUnwrap(appBundle?.executableURL)
+            let forbiddenSymbols = [
+                "FaultInjectionPoint",
+                "FaultInjectionError",
+                "TestFaultInjector",
+                "FaultInjectionBoundary",
+            ]
+
+            let executableData = try Data(contentsOf: appExecutableURL)
+            for symbol in forbiddenSymbols {
+                XCTAssertFalse(
+                    executableData.range(of: Data(symbol.utf8)) != nil,
+                    "Release app contains forbidden fault-injection symbol \(symbol)"
+                )
+            }
+        }
+    #endif
+}
