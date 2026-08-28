@@ -86,7 +86,9 @@ public final class AppEnvironment: ObservableObject {
         }
 
         let controller: PersistenceController
+        let generationUUID: UUID
         if let existing = try pointerStore.read() {
+            generationUUID = existing.generationUUID
             let generationURL = directory.generationURL(for: existing.generationUUID)
             var isDirectory: ObjCBool = false
             guard fileManager.fileExists(atPath: generationURL.path, isDirectory: &isDirectory),
@@ -119,7 +121,7 @@ public final class AppEnvironment: ObservableObject {
             guard existingGenerations.isEmpty else {
                 throw StoreGenerationError.pointerMismatch
             }
-            let generationUUID = UUID()
+            generationUUID = UUID()
             let newPointer = try CurrentGenerationPointer(generationUUID: generationUUID)
             try protectedStore.prepareDirectory(
                 at: directory.generationURL(for: generationUUID),
@@ -148,9 +150,15 @@ public final class AppEnvironment: ObservableObject {
             clock: clock,
             ids: idGenerator
         )
+        let recoveryStore = ActiveSessionRecoveryStore(
+            url: directory.activeRecoveryURL,
+            protectedFileStore: protectedStore
+        )
         self.sessionUseCases = ActiveSessionUseCases(
             sessionRepository: sessions,
             studentRepository: repository,
+            recoveryStore: recoveryStore,
+            storeGenerationUUID: generationUUID,
             clock: clock,
             ids: idGenerator
         )

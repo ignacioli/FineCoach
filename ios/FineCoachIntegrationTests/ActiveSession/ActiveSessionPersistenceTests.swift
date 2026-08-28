@@ -368,6 +368,11 @@
                 sessionUseCases: ActiveSessionUseCases(
                     sessionRepository: sessionRepository,
                     studentRepository: studentRepository,
+                    recoveryStore: ActiveSessionRecoveryStore(
+                        url: directory.url.appendingPathComponent("active-session-recovery-v1.json"),
+                        protectedFileStore: ProtectedFileStore()
+                    ),
+                    storeGenerationUUID: UUID(uuidString: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa")!,
                     clock: clock,
                     ids: ids
                 )

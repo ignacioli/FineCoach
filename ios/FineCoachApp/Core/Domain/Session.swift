@@ -245,9 +245,25 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
         return replacing(exercises: cleaned, revision: nextRevision, updatedAtUTC: now)
     }
 
+    public func applyingCoachAdjustedDuration(_ seconds: DecimalValue, now: Date) throws -> Session {
+        try ensureInProgress()
+        guard seconds.decimal >= 0, seconds.isInteger else {
+            throw DomainError.invalidNumber
+        }
+        return replacing(
+            durationNeedsReview: false,
+            coachAdjustedDurationSeconds: .some(seconds),
+            revision: nextRevision,
+            updatedAtUTC: now
+        )
+    }
+
     public func finished(now: Date) throws -> Session {
         try ensureInProgress()
         guard finishGate == .canComplete else {
+            throw DomainError.invalidState
+        }
+        if durationNeedsReview && coachAdjustedDurationSeconds == nil {
             throw DomainError.invalidState
         }
         return replacing(
@@ -318,6 +334,11 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
     private func replacing(
         state: SessionState? = nil,
         exercises: [SessionExercise]? = nil,
+        elapsedSeconds: DecimalValue? = nil,
+        lastCheckpointUTC: Date? = nil,
+        interruptionStartedAtUTC: Date?? = nil,
+        durationNeedsReview: Bool? = nil,
+        coachAdjustedDurationSeconds: DecimalValue?? = nil,
         revision: UInt64,
         updatedAtUTC: Date,
         completedAtUTC: Date? = nil
@@ -327,11 +348,11 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
             studentID: studentID,
             state: state ?? self.state,
             startedAtUTC: startedAtUTC,
-            lastCheckpointUTC: updatedAtUTC,
-            elapsedSeconds: elapsedSeconds,
-            interruptionStartedAtUTC: interruptionStartedAtUTC,
-            durationNeedsReview: durationNeedsReview,
-            coachAdjustedDurationSeconds: coachAdjustedDurationSeconds,
+            lastCheckpointUTC: lastCheckpointUTC ?? updatedAtUTC,
+            elapsedSeconds: elapsedSeconds ?? self.elapsedSeconds,
+            interruptionStartedAtUTC: interruptionStartedAtUTC ?? self.interruptionStartedAtUTC,
+            durationNeedsReview: durationNeedsReview ?? self.durationNeedsReview,
+            coachAdjustedDurationSeconds: coachAdjustedDurationSeconds ?? self.coachAdjustedDurationSeconds,
             trainingFocus: trainingFocus,
             studentFacingSummary: studentFacingSummary,
             privateCoachNote: privateCoachNote,
@@ -340,6 +361,23 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
             updatedAtUTC: updatedAtUTC,
             completedAtUTC: completedAtUTC ?? self.completedAtUTC,
             exercises: exercises ?? self.exercises
+        )
+    }
+
+    public func updatingTiming(
+        elapsedSeconds: DecimalValue,
+        lastCheckpointUTC: Date,
+        interruptionStartedAtUTC: Date?,
+        durationNeedsReview: Bool,
+        now: Date
+    ) -> Session {
+        replacing(
+            elapsedSeconds: elapsedSeconds,
+            lastCheckpointUTC: lastCheckpointUTC,
+            interruptionStartedAtUTC: .some(interruptionStartedAtUTC),
+            durationNeedsReview: durationNeedsReview,
+            revision: nextRevision,
+            updatedAtUTC: now
         )
     }
 }

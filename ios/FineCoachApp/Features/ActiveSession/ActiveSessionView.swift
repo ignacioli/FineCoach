@@ -21,7 +21,9 @@ struct ActiveSessionView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
-                FCSaveStatusView(status: viewModel.saveStatus)
+                SaveStatusView(status: viewModel.saveStatus) {
+                    Task { await viewModel.retrySave() }
+                }
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage).foregroundStyle(FCSemanticColors.destructive)
                 }
@@ -59,7 +61,10 @@ struct ActiveSessionView: View {
                 }
 
                 if viewModel.session?.state == .inProgress {
-                    FCButton(title: String(localized: "session.action.finish")) {
+                    FCButton(
+                        title: String(localized: "session.action.finish"),
+                        isEnabled: viewModel.canCompleteSession
+                    ) {
                         viewModel.requestFinish()
                     }
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionFinish)
@@ -98,6 +103,14 @@ struct ActiveSessionView: View {
                     } else {
                         Color.clear.onAppear { viewModel.returnToDrafts() }
                     }
+                case .durationReview:
+                    DurationReviewFlow(
+                        elapsedSeconds: viewModel.session?.elapsedSeconds.canonicalString ?? "0",
+                        onCancel: { viewModel.returnToDrafts() },
+                        onConfirm: { seconds in
+                            Task { await viewModel.confirmDurationReview(seconds) }
+                        }
+                    )
                 }
             }
         }

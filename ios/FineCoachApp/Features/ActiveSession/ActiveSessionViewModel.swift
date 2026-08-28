@@ -4,6 +4,7 @@ import Foundation
 enum ActiveSessionSheet: Identifiable, Equatable {
     case finish(SessionFinishGate)
     case deleteExercise(StableUUID)
+    case durationReview
 
     var id: String {
         switch self {
@@ -11,6 +12,8 @@ enum ActiveSessionSheet: Identifiable, Equatable {
             return "finish-\(String(describing: gate))"
         case .deleteExercise(let id):
             return "delete-\(id.rawValue.uuidString)"
+        case .durationReview:
+            return "duration-review"
         }
     }
 }
@@ -19,7 +22,7 @@ enum ActiveSessionSheet: Identifiable, Equatable {
 final class ActiveSessionViewModel: ObservableObject {
     @Published var session: Session?
     @Published var errorMessage: String?
-    @Published var saveStatus: FCSaveStatusView.Status = .saved
+    @Published var saveStatus: PersistenceProjectionStatus = .saved(revision: 0)
     @Published var exerciseName = ""
     @Published var recordMode: RecordMode = .weightReps
     @Published var isAddingExercise = false
@@ -61,14 +64,28 @@ final class ActiveSessionViewModel: ObservableObject {
         return "\(String(localized: "session.stats.completedLabel")) \(count)"
     }
 
+    var canCompleteSession: Bool {
+        if case .saved = saveStatus {
+            return session?.state == .inProgress
+        }
+        return false
+    }
+
     func load() async {
         do {
+            _ = try await useCases.reconcileOnLaunch()
             session = try await useCases.startOrOpen(studentID: studentID)
             selectedExerciseID = session?.exercises.last?.id
             errorMessage = nil
-            saveStatus = .saved
+            saveStatus = useCases.saveStatus
         } catch {
             present(error)
+        }
+    }
+
+    func retrySave() async {
+        await run {
+            self.session = try await self.useCases.retry()
         }
     }
 
@@ -216,14 +233,32 @@ final class ActiveSessionViewModel: ObservableObject {
     }
 
     func requestFinish() {
-        guard let gate = session?.finishGate else {
+        guard let session else {
             return
         }
+        if case .failed = saveStatus {
+            return
+        }
+        if session.durationNeedsReview && session.coachAdjustedDurationSeconds == nil {
+            presentedSheet = .durationReview
+            return
+        }
+        let gate = session.finishGate
         if gate == .canComplete {
             Task { await finishNow() }
             return
         }
         presentedSheet = .finish(gate)
+    }
+
+    func confirmDurationReview(_ seconds: String) async {
+        presentedSheet = nil
+        await run {
+            self.session = try await self.useCases.applyCoachAdjustedDuration(try DecimalValue(seconds))
+        }
+        if session?.finishGate == .canComplete, session?.coachAdjustedDurationSeconds != nil {
+            requestFinish()
+        }
     }
 
     func abandon() async {
@@ -303,14 +338,14 @@ final class ActiveSessionViewModel: ObservableObject {
         do {
             try await work()
             errorMessage = nil
-            saveStatus = .saved
+            saveStatus = useCases.saveStatus
         } catch {
             present(error)
         }
     }
 
     private func present(_ error: Error) {
-        saveStatus = .failed
+        saveStatus = useCases.saveStatus
         errorMessage = (error as? LocalizedError)?.errorDescription ?? String(localized: "student.error.generic")
     }
 }

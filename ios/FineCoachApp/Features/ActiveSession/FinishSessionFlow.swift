@@ -66,3 +66,39 @@ struct FinishSessionFlow: View {
         }
     }
 }
+
+struct DurationReviewFlow: View {
+    let elapsedSeconds: String
+    let onCancel: () -> Void
+    let onConfirm: (String) -> Void
+    @State private var durationText: String
+
+    init(elapsedSeconds: String, onCancel: @escaping () -> Void, onConfirm: @escaping (String) -> Void) {
+        self.elapsedSeconds = elapsedSeconds
+        self.onCancel = onCancel
+        self.onConfirm = onConfirm
+        _durationText = State(initialValue: elapsedSeconds)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+            Text(String(localized: "session.duration.reviewLead"))
+                .foregroundStyle(FCSemanticColors.secondaryText)
+            FCTextField(String(localized: "session.field.duration"), text: $durationText)
+                .accessibilityIdentifier(FCAccessibilityID.activeSessionDurationValue)
+            FCButton(title: String(localized: "session.duration.confirm")) {
+                onConfirm(durationText)
+            }
+            .accessibilityIdentifier(FCAccessibilityID.activeSessionDurationConfirm)
+            Button(String(localized: "student.flow.cancel"), action: onCancel)
+                .frame(minHeight: 44)
+            Spacer()
+        }
+        .padding(FCPrimitives.spacingMedium)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .background(FCSemanticColors.background)
+        .navigationTitle(String(localized: "session.duration.reviewTitle"))
+        .navigationBarTitleDisplayMode(.inline)
+        .accessibilityIdentifier(FCAccessibilityID.activeSessionDurationReview)
+    }
+}

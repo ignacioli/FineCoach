@@ -78,6 +78,14 @@ public enum FCAccessibilityID {
     public static let activeSessionReturnToDrafts = "activeSession.returnToDrafts"
     public static let activeSessionCompletedStatus = "activeSession.completedStatus"
     public static let activeSessionEmptyHint = "activeSession.emptyHint"
+    public static let activeSessionSaveStatusSaving = "activeSession.saveStatus.saving"
+    public static let activeSessionSaveStatusSaved = "activeSession.saveStatus.saved"
+    public static let activeSessionSaveStatusFailed = "activeSession.saveStatus.failed"
+    public static let activeSessionRetry = "activeSession.retry"
+    public static let activeSessionFinishBlocked = "activeSession.finishBlocked"
+    public static let activeSessionDurationReview = "activeSession.durationReview"
+    public static let activeSessionDurationValue = "activeSession.durationValue"
+    public static let activeSessionDurationConfirm = "activeSession.durationConfirm"
 
     public static func exerciseAt(_ index: Int) -> String {
         "activeSession.exercise.at.\(index)"

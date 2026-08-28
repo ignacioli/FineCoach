@@ -3,12 +3,19 @@ import Foundation
 public struct ActiveSessionUseCases: Sendable {
     private let sessionRepository: CoreDataSessionRepository
     private let studentRepository: CoreDataStudentRepository
+    private let coordinator: ActiveSessionCoordinator
     private let clock: any Clock
     private let ids: any IDGenerator
+
+    public var saveStatus: PersistenceProjectionStatus {
+        coordinator.saveStatus
+    }
 
     public init(
         sessionRepository: CoreDataSessionRepository,
         studentRepository: CoreDataStudentRepository,
+        recoveryStore: ActiveSessionRecoveryStore,
+        storeGenerationUUID: UUID,
         clock: any Clock,
         ids: any IDGenerator
     ) {
@@ -16,10 +23,28 @@ public struct ActiveSessionUseCases: Sendable {
         self.studentRepository = studentRepository
         self.clock = clock
         self.ids = ids
+        self.coordinator = ActiveSessionCoordinator(
+            sessionRepository: sessionRepository,
+            recoveryStore: recoveryStore,
+            storeGenerationUUID: storeGenerationUUID,
+            clock: clock
+        )
+    }
+
+    public func reconcileOnLaunch() async throws -> RecoveryLaunchDecision {
+        try await coordinator.reconcileOnLaunch()
+    }
+
+    public func retry() async throws -> Session {
+        try await coordinator.retry()
+    }
+
+    public func checkpointOnBackground() async throws -> Session? {
+        try await coordinator.checkpointOnBackground()
     }
 
     public func startOrOpen(studentID: StableUUID) async throws -> Session {
-        if let active = try await sessionRepository.loadActive() {
+        if let active = try await coordinator.workingCopy() {
             return active
         }
         let student = try await studentRepository.student(id: studentID)
@@ -31,7 +56,7 @@ public struct ActiveSessionUseCases: Sendable {
             studentID: student.id,
             now: clock.nowUTC()
         )
-        return try await sessionRepository.save(session)
+        return try await coordinator.persist(session)
     }
 
     public func loadActive() async throws -> Session? {
@@ -104,8 +129,13 @@ public struct ActiveSessionUseCases: Sendable {
         try await mutate { try $0.discardingUnresolvedSets(now: clock.nowUTC()) }
     }
 
+    public func applyCoachAdjustedDuration(_ seconds: DecimalValue) async throws -> Session {
+        try await mutate { try $0.applyingCoachAdjustedDuration(seconds, now: clock.nowUTC()) }
+    }
+
     public func finish() async throws -> Session {
-        try await mutate { try $0.finished(now: clock.nowUTC()) }
+        try await coordinator.ensureProjectionReadyForCompletion()
+        return try await mutate { try $0.finished(now: clock.nowUTC()) }
     }
 
     public func abandonEmpty() async throws -> Session {
@@ -113,9 +143,9 @@ public struct ActiveSessionUseCases: Sendable {
     }
 
     private func mutate(_ transform: (Session) throws -> Session) async throws -> Session {
-        guard let current = try await sessionRepository.loadActive() else {
+        guard let current = try await coordinator.workingCopy() else {
             throw DomainError.notFound
         }
-        return try await sessionRepository.save(transform(current))
+        return try await coordinator.persist(transform(current))
     }
 }

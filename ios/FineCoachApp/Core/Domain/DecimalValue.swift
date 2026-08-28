@@ -71,6 +71,16 @@ public struct DecimalValue: Hashable, Codable, Sendable, Comparable {
         return rounded == decimal
     }
 
+    public func adding(_ other: DecimalValue) throws -> DecimalValue {
+        let sum = NSDecimalNumber(decimal: decimal).adding(NSDecimalNumber(decimal: other.decimal))
+        return try DecimalValue(sum.stringValue)
+    }
+
+    public static func seconds(_ interval: TimeInterval) throws -> DecimalValue {
+        let clamped = max(0, interval.rounded(.down))
+        return try DecimalValue(String(Int(clamped)))
+    }
+
     public static func < (lhs: DecimalValue, rhs: DecimalValue) -> Bool {
         NSDecimalNumber(decimal: lhs.decimal).compare(NSDecimalNumber(decimal: rhs.decimal)) == .orderedAscending
     }
