@@ -8,13 +8,14 @@ public final class AppEnvironment: ObservableObject {
     public let persistenceWriter: PersistenceWriter?
     public let studentUseCases: StudentUseCases?
     public let sessionUseCases: ActiveSessionUseCases?
+    public let exerciseUseCases: ExerciseLibraryUseCases?
     public let startupErrorDescription: String?
     private let studentRepository: CoreDataStudentRepository?
     private let sessionRepository: CoreDataSessionRepository?
 
     public var isStorageAvailable: Bool {
         persistenceController != nil && persistenceWriter != nil && studentUseCases != nil
-            && sessionUseCases != nil
+            && sessionUseCases != nil && exerciseUseCases != nil
     }
 
     public static func bootstrap() -> AppEnvironment {
@@ -41,6 +42,26 @@ public final class AppEnvironment: ObservableObject {
             preconditionFailure("Session use cases require available local storage.")
         }
         return sessionUseCases
+    }
+
+    func requireExerciseUseCases() -> ExerciseLibraryUseCases {
+        guard let exerciseUseCases else {
+            preconditionFailure("Exercise use cases require available local storage.")
+        }
+        return exerciseUseCases
+    }
+
+    /// Seeds the placeholder built-in catalog once local storage is open.
+    /// Call from `RootNavigation.loadInitialState` alongside onboarding load; do not call from `init`.
+    func prepareExerciseCatalog() async {
+        guard let exerciseUseCases else {
+            return
+        }
+        do {
+            try await exerciseUseCases.seedIfNeeded()
+        } catch {
+            return
+        }
     }
 
     public init(
@@ -143,10 +164,16 @@ public final class AppEnvironment: ObservableObject {
         self.persistenceWriter = controller.writer
         let repository = CoreDataStudentRepository(writer: controller.writer)
         let sessions = CoreDataSessionRepository(writer: controller.writer)
+        let exercises = CoreDataExerciseRepository(writer: controller.writer)
         self.studentRepository = repository
         self.sessionRepository = sessions
         self.studentUseCases = StudentUseCases(
             repository: repository,
+            clock: clock,
+            ids: idGenerator
+        )
+        self.exerciseUseCases = ExerciseLibraryUseCases(
+            repository: exercises,
             clock: clock,
             ids: idGenerator
         )
@@ -157,6 +184,7 @@ public final class AppEnvironment: ObservableObject {
         self.sessionUseCases = ActiveSessionUseCases(
             sessionRepository: sessions,
             studentRepository: repository,
+            exerciseRepository: exercises,
             recoveryStore: recoveryStore,
             storeGenerationUUID: generationUUID,
             clock: clock,
@@ -172,6 +200,7 @@ public final class AppEnvironment: ObservableObject {
         self.sessionRepository = nil
         self.studentUseCases = nil
         self.sessionUseCases = nil
+        self.exerciseUseCases = nil
         self.startupErrorDescription = (failure as? LocalizedError)?.errorDescription ?? "本地存储暂不可用。"
     }
 

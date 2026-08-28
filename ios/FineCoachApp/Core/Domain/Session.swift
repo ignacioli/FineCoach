@@ -140,6 +140,30 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
         return replacing(exercises: exercises + [exercise], revision: nextRevision, updatedAtUTC: now)
     }
 
+    public func addingCatalogExercise(
+        id: StableUUID,
+        item: ExerciseCatalogItem,
+        now: Date
+    ) throws -> Session {
+        try ensureInProgress()
+        guard item.lifecycle == .active else {
+            throw DomainError.invalidState
+        }
+        let sourceKind: ExerciseSourceKind = item.kind == .builtIn ? .builtIn : .custom
+        let exercise = try SessionExercise(
+            id: id,
+            sessionID: self.id,
+            orderIndex: UInt32(exercises.count),
+            sourceKind: sourceKind,
+            sourceID: item.id,
+            displayNameSnapshot: item.canonicalName,
+            recordModeSnapshot: item.recordMode,
+            actionPrivateNote: nil,
+            sets: []
+        )
+        return replacing(exercises: exercises + [exercise], revision: nextRevision, updatedAtUTC: now)
+    }
+
     public func reorderingExercises(ids: [StableUUID], now: Date) throws -> Session {
         try ensureInProgress()
         guard ids.count == exercises.count, Set(ids).count == ids.count else {

@@ -1,0 +1,66 @@
+{
+  "metadataVersion": "placeholder.1",
+  "exercises": [
+    {
+      "id": "fc.placeholder.squat",
+      "canonicalName": "占位深蹲",
+      "recordMode": "weightReps",
+      "provenanceRef": "placeholder.squat"
+    },
+    {
+      "id": "fc.placeholder.pullup",
+      "canonicalName": "占位引体",
+      "recordMode": "reps",
+      "provenanceRef": "placeholder.pullup"
+    },
+    {
+      "id": "fc.placeholder.plank",
+      "canonicalName": "占位支撑",
+      "recordMode": "duration",
+      "provenanceRef": "placeholder.plank"
+    }
+  ],
+  "provenance": {
+    "catalogID": "fc.placeholder",
+    "contentVersion": "placeholder.1",
+    "isFictionalPlaceholder": true,
+    "records": [
+      {
+        "recordID": "placeholder.squat",
+        "sourceIdentifier": "fc.fictional.source.placeholder",
+        "authorOrOwner": "FineCoach fictional placeholder — not for redistribution",
+        "licenseIdentifier": "fc.fictional.license.placeholder",
+        "licenseText": "FineCoach fictional placeholder — not for redistribution",
+        "redistributionAllowed": false,
+        "attributionRequirement": "FineCoach fictional placeholder — not for redistribution",
+        "contentVersion": "placeholder.1",
+        "reviewDate": "1970-01-01",
+        "reviewerEvidence": "FineCoach fictional placeholder — not for redistribution"
+      },
+      {
+        "recordID": "placeholder.pullup",
+        "sourceIdentifier": "fc.fictional.source.placeholder",
+        "authorOrOwner": "FineCoach fictional placeholder — not for redistribution",
+        "licenseIdentifier": "fc.fictional.license.placeholder",
+        "licenseText": "FineCoach fictional placeholder — not for redistribution",
+        "redistributionAllowed": false,
+        "attributionRequirement": "FineCoach fictional placeholder — not for redistribution",
+        "contentVersion": "placeholder.1",
+        "reviewDate": "1970-01-01",
+        "reviewerEvidence": "FineCoach fictional placeholder — not for redistribution"
+      },
+      {
+        "recordID": "placeholder.plank",
+        "sourceIdentifier": "fc.fictional.source.placeholder",
+        "authorOrOwner": "FineCoach fictional placeholder — not for redistribution",
+        "licenseIdentifier": "fc.fictional.license.placeholder",
+        "licenseText": "FineCoach fictional placeholder — not for redistribution",
+        "redistributionAllowed": false,
+        "attributionRequirement": "FineCoach fictional placeholder — not for redistribution",
+        "contentVersion": "placeholder.1",
+        "reviewDate": "1970-01-01",
+        "reviewerEvidence": "FineCoach fictional placeholder — not for redistribution"
+      }
+    ]
+  }
+}

@@ -71,6 +71,7 @@ When code is introduced, document the canonical setup, build, test, lint, and fo
 - Use `mobile-ux-designer` during discovery and approved feature design for iOS-first journeys, interaction states, accessibility, prototypes, and usability validation.
 - Use `mobile-solution-architect` after PRD approval, or for explicitly authorized architecture discovery, to produce the technical plan and focused ADRs.
 - Use `ios-swiftui-dev` only if the approved technical plan selects native Swift and SwiftUI. Its existence does not pre-approve that stack.
+- Use `mobile-code-reviewer` only when the user explicitly asks for a mobile code review. Do not launch it after ordinary implementation. When that explicit review is requested, use it instead of `code-reviewer` or `fs-reviewer` for mobile UI, lifecycle, persistence, or platform-API changes.
 - Use `mobile-reliability-tester` after an executable mobile slice exists for lifecycle, migration, offline, permission, accessibility, and device/simulator evidence.
 - Use `mobile-privacy-security-reviewer` as an independent read-only gate for architecture and implementation milestones involving sensitive data or platform privacy controls.
 - Do not create or route work to an Android implementation agent until the Android phase starts and its stack and compatibility contract are approved.

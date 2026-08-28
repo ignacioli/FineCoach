@@ -52,7 +52,7 @@ struct ActiveSessionView: View {
                 }
 
                 if viewModel.isAddingExercise {
-                    addExerciseForm
+                    QuickCreateExerciseFlow(viewModel: viewModel)
                 } else if viewModel.session?.state == .inProgress {
                     FCButton(title: String(localized: "session.action.addExercise")) {
                         viewModel.isAddingExercise = true
@@ -113,29 +113,6 @@ struct ActiveSessionView: View {
                     )
                 }
             }
-        }
-    }
-
-    private var addExerciseForm: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
-            FCTextField(String(localized: "session.field.exerciseName"), text: $viewModel.exerciseName)
-                .accessibilityIdentifier(FCAccessibilityID.activeSessionExerciseName)
-            HStack(spacing: FCPrimitives.spacingSmall) {
-                modeChip(
-                    .weightReps, title: String(localized: "session.mode.weightReps"),
-                    id: FCAccessibilityID.activeSessionModeWeightReps)
-            }
-            HStack(spacing: FCPrimitives.spacingSmall) {
-                modeChip(
-                    .reps, title: String(localized: "session.mode.reps"), id: FCAccessibilityID.activeSessionModeReps)
-                modeChip(
-                    .duration, title: String(localized: "session.mode.duration"),
-                    id: FCAccessibilityID.activeSessionModeDuration)
-            }
-            FCButton(title: String(localized: "session.action.saveExercise")) {
-                Task { await viewModel.saveExercise() }
-            }
-            .accessibilityIdentifier(FCAccessibilityID.activeSessionSaveExercise)
         }
     }
 
@@ -210,24 +187,6 @@ struct ActiveSessionView: View {
         .padding(FCPrimitives.spacingSmall)
         .background(FCSemanticColors.elevatedSurface)
         .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSmall))
-    }
-
-    private func modeChip(_ mode: RecordMode, title: String, id: String) -> some View {
-        Button(title) {
-            viewModel.recordMode = mode
-        }
-        .frame(minHeight: 44)
-        .padding(.horizontal, FCPrimitives.spacingSmall)
-        .background(
-            viewModel.recordMode == mode ? FCSemanticColors.primaryText : FCSemanticColors.separator
-        )
-        .foregroundStyle(
-            viewModel.recordMode == mode ? FCSemanticColors.elevatedSurface : FCSemanticColors.primaryText
-        )
-        .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSmall))
-        .accessibilityIdentifier(id)
-        .accessibilityLabel(title)
-        .accessibilityAddTraits(viewModel.recordMode == mode ? [.isSelected] : [])
     }
 
     private func modeTitle(_ mode: RecordMode) -> String {

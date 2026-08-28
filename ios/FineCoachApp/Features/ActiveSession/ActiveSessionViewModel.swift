@@ -24,6 +24,7 @@ final class ActiveSessionViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var saveStatus: PersistenceProjectionStatus = .saved(revision: 0)
     @Published var exerciseName = ""
+    @Published var exerciseNameConflict: String?
     @Published var recordMode: RecordMode = .weightReps
     @Published var isAddingExercise = false
     @Published var weight = ""
@@ -90,6 +91,7 @@ final class ActiveSessionViewModel: ObservableObject {
     }
 
     func saveExercise() async {
+        exerciseNameConflict = nil
         let name = exerciseName
         let mode = recordMode
         await run {
@@ -97,11 +99,20 @@ final class ActiveSessionViewModel: ObservableObject {
                 displayName: name,
                 recordMode: mode
             )
-            self.session = updated
-            self.selectedExerciseID = updated.exercises.last?.id
-            self.exerciseName = ""
-            self.isAddingExercise = false
-            self.resetSetFields(for: mode)
+            self.applySavedExercise(updated, mode: mode)
+        }
+    }
+
+    func saveExerciseToLibrary() async {
+        exerciseNameConflict = nil
+        let name = exerciseName
+        let mode = recordMode
+        await run {
+            let updated = try await self.useCases.addCustomToLibraryAndSession(
+                name: name,
+                recordMode: mode
+            )
+            self.applySavedExercise(updated, mode: mode)
         }
     }
 
@@ -323,6 +334,15 @@ final class ActiveSessionViewModel: ObservableObject {
         }
     }
 
+    private func applySavedExercise(_ updated: Session, mode: RecordMode) {
+        session = updated
+        selectedExerciseID = updated.exercises.last?.id
+        exerciseName = ""
+        exerciseNameConflict = nil
+        isAddingExercise = false
+        resetSetFields(for: mode)
+    }
+
     private func resetSetFields(for mode: RecordMode) {
         weight = ""
         reps = ""
@@ -338,6 +358,7 @@ final class ActiveSessionViewModel: ObservableObject {
         do {
             try await work()
             errorMessage = nil
+            exerciseNameConflict = nil
             saveStatus = useCases.saveStatus
         } catch {
             present(error)
@@ -346,6 +367,12 @@ final class ActiveSessionViewModel: ObservableObject {
 
     private func present(_ error: Error) {
         saveStatus = useCases.saveStatus
+        if error as? DomainError == .conflict {
+            exerciseNameConflict = String(localized: "exercise.conflict")
+            errorMessage = nil
+            return
+        }
+        exerciseNameConflict = nil
         errorMessage = (error as? LocalizedError)?.errorDescription ?? String(localized: "student.error.generic")
     }
 }

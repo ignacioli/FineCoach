@@ -134,6 +134,14 @@ struct StudentListView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if !viewModel.showsArchived {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(String(localized: "exercise.library.entry")) {
+                        path.append(.exerciseLibrary)
+                    }
+                    .frame(minWidth: 44, minHeight: 44)
+                    .accessibilityIdentifier(FCAccessibilityID.exerciseLibraryEntry)
+                    .accessibilityLabel(String(localized: "exercise.library.entry"))
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(String(localized: "student.list.add")) {
                         path.append(.editor(.add))

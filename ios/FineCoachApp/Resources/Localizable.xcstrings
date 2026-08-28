@@ -705,6 +705,18 @@
         "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "保存动作" } }
       }
     },
+    "session.action.saveSessionOnly" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "仅本次" } }
+      }
+    },
+    "session.action.saveToLibrary" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "保存到动作库" } }
+      }
+    },
     "session.action.addSet" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -865,6 +877,102 @@
       "extractionState" : "manual",
       "localizations" : {
         "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "确认时长" } }
+      }
+    },
+    "exercise.library.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "动作库" } }
+      }
+    },
+    "exercise.library.entry" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "动作库" } }
+      }
+    },
+    "exercise.library.search" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "搜索动作" } }
+      }
+    },
+    "exercise.library.addCustom" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "新建自定义动作" } }
+      }
+    },
+    "exercise.library.showHidden" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "显示已隐藏" } }
+      }
+    },
+    "exercise.library.favorite" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "收藏" } }
+      }
+    },
+    "exercise.library.hide" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "隐藏" } }
+      }
+    },
+    "exercise.library.unhide" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "取消隐藏" } }
+      }
+    },
+    "exercise.kind.builtIn" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "内置" } }
+      }
+    },
+    "exercise.kind.custom" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "自定义" } }
+      }
+    },
+    "exercise.editor.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "自定义动作" } }
+      }
+    },
+    "exercise.editor.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "动作名称" } }
+      }
+    },
+    "exercise.editor.save" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "保存" } }
+      }
+    },
+    "exercise.editor.archive" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "归档" } }
+      }
+    },
+    "exercise.editor.restore" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "恢复" } }
+      }
+    },
+    "exercise.conflict" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "名称与已有动作冲突，未改名。" } }
       }
     }
   },

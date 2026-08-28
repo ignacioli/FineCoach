@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "provenance.schema.json",
+  "$comment": "Documentation only. FineCoach validates ExerciseProvenanceManifest in Swift and does not execute this schema at runtime.",
+  "title": "ExerciseProvenanceManifest",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "catalogID",
+    "contentVersion",
+    "isFictionalPlaceholder",
+    "records"
+  ],
+  "properties": {
+    "catalogID": {
+      "type": "string",
+      "minLength": 1
+    },
+    "contentVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "isFictionalPlaceholder": {
+      "type": "boolean"
+    },
+    "records": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/provenanceRecord"
+      }
+    }
+  },
+  "$defs": {
+    "provenanceRecord": {
+      "title": "ExerciseProvenanceRecord",
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "recordID",
+        "sourceIdentifier",
+        "authorOrOwner",
+        "licenseIdentifier",
+        "licenseText",
+        "redistributionAllowed",
+        "attributionRequirement",
+        "contentVersion",
+        "reviewDate",
+        "reviewerEvidence"
+      ],
+      "properties": {
+        "recordID": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceIdentifier": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authorOrOwner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "licenseIdentifier": {
+          "type": "string",
+          "minLength": 1
+        },
+        "licenseText": {
+          "type": "string",
+          "minLength": 1
+        },
+        "redistributionAllowed": {
+          "type": "boolean"
+        },
+        "attributionRequirement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contentVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewDate": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewerEvidence": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "placeholderCatalogExercise": {
+      "title": "PlaceholderCatalogExercise",
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "id",
+        "canonicalName",
+        "recordMode",
+        "provenanceRef"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "canonicalName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recordMode": {
+          "type": "string",
+          "enum": [
+            "weightReps",
+            "reps",
+            "duration"
+          ]
+        },
+        "provenanceRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "placeholderExerciseCatalog": {
+      "title": "PlaceholderExerciseCatalog",
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "metadataVersion",
+        "exercises",
+        "provenance"
+      ],
+      "properties": {
+        "metadataVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "exercises": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/placeholderCatalogExercise"
+          }
+        },
+        "provenance": {
+          "$ref": "#"
+        }
+      }
+    }
+  }
+}

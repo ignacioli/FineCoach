@@ -414,6 +414,7 @@
                 sessionUseCases: ActiveSessionUseCases(
                     sessionRepository: sessionRepository,
                     studentRepository: studentRepository,
+                    exerciseRepository: CoreDataExerciseRepository(writer: controller.writer),
                     recoveryStore: recoveryStore,
                     storeGenerationUUID: storeGenerationUUID,
                     clock: clock,

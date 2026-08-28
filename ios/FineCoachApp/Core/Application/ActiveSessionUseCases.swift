@@ -3,6 +3,7 @@ import Foundation
 public struct ActiveSessionUseCases: Sendable {
     private let sessionRepository: CoreDataSessionRepository
     private let studentRepository: CoreDataStudentRepository
+    private let exerciseRepository: CoreDataExerciseRepository
     private let coordinator: ActiveSessionCoordinator
     private let clock: any Clock
     private let ids: any IDGenerator
@@ -14,6 +15,7 @@ public struct ActiveSessionUseCases: Sendable {
     public init(
         sessionRepository: CoreDataSessionRepository,
         studentRepository: CoreDataStudentRepository,
+        exerciseRepository: CoreDataExerciseRepository,
         recoveryStore: ActiveSessionRecoveryStore,
         storeGenerationUUID: UUID,
         clock: any Clock,
@@ -21,6 +23,7 @@ public struct ActiveSessionUseCases: Sendable {
     ) {
         self.sessionRepository = sessionRepository
         self.studentRepository = studentRepository
+        self.exerciseRepository = exerciseRepository
         self.clock = clock
         self.ids = ids
         self.coordinator = ActiveSessionCoordinator(
@@ -64,11 +67,52 @@ public struct ActiveSessionUseCases: Sendable {
     }
 
     public func addSessionOnlyExercise(displayName: String, recordMode: RecordMode) async throws -> Session {
-        try await mutate { session in
-            try session.addingSessionOnlyExercise(
+        let exerciseID = StableUUID(ids.makeID())
+        let ownerID = try StableExerciseID(exerciseID.rawValue.uuidString)
+        let claim = try ExerciseNameClaim(
+            normalizedName: displayName,
+            ownerKind: .sessionOnly,
+            ownerID: ownerID,
+            scope: .currentSession
+        )
+        try await exerciseRepository.acquireUnifiedClaim(claim)
+        do {
+            return try await mutate { session in
+                try session.addingSessionOnlyExercise(
+                    id: exerciseID,
+                    displayName: displayName,
+                    recordMode: recordMode,
+                    now: clock.nowUTC()
+                )
+            }
+        } catch {
+            try? await exerciseRepository.releaseClaims(ownerID: ownerID)
+            throw error
+        }
+    }
+
+    public func addCatalogExercise(itemID: StableExerciseID) async throws -> Session {
+        let item = try await exerciseRepository.catalogItem(id: itemID)
+        return try await mutate { session in
+            try session.addingCatalogExercise(
                 id: StableUUID(ids.makeID()),
-                displayName: displayName,
-                recordMode: recordMode,
+                item: item,
+                now: clock.nowUTC()
+            )
+        }
+    }
+
+    public func addCustomToLibraryAndSession(name: String, recordMode: RecordMode) async throws -> Session {
+        let item = try await exerciseRepository.createCustom(
+            name: name,
+            recordMode: recordMode,
+            id: try StableExerciseID(ids.makeID().uuidString),
+            now: clock.nowUTC()
+        )
+        return try await mutate { session in
+            try session.addingCatalogExercise(
+                id: StableUUID(ids.makeID()),
+                item: item,
                 now: clock.nowUTC()
             )
         }
@@ -135,11 +179,15 @@ public struct ActiveSessionUseCases: Sendable {
 
     public func finish() async throws -> Session {
         try await coordinator.ensureProjectionReadyForCompletion()
-        return try await mutate { try $0.finished(now: clock.nowUTC()) }
+        let session = try await mutate { try $0.finished(now: clock.nowUTC()) }
+        try await exerciseRepository.releaseSessionScopeClaims()
+        return session
     }
 
     public func abandonEmpty() async throws -> Session {
-        try await mutate { try $0.abandoned(now: clock.nowUTC()) }
+        let session = try await mutate { try $0.abandoned(now: clock.nowUTC()) }
+        try await exerciseRepository.releaseSessionScopeClaims()
+        return session
     }
 
     private func mutate(_ transform: (Session) throws -> Session) async throws -> Session {

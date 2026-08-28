@@ -5,6 +5,7 @@ enum RootDestination: Hashable {
     case studentDetail(UUID)
     case editor(StudentEditorMode)
     case activeSession(UUID)
+    case exerciseLibrary
     case placeholder(PlaceholderKind)
 }
 
@@ -91,6 +92,8 @@ struct RootNavigation: View {
                                     useCases: environment.requireSessionUseCases(),
                                     path: $path
                                 )
+                            case .exerciseLibrary:
+                                ExerciseLibraryView(useCases: environment.requireExerciseUseCases())
                             case .placeholder(let kind):
                                 PlaceholderDestinationView(kind: kind)
                             }
@@ -113,6 +116,7 @@ struct RootNavigation: View {
         #if DEBUG
             await environment.applyUITestSeedingIfNeeded()
         #endif
+        await environment.prepareExerciseCatalog()
         guard let useCases = environment.studentUseCases else {
             didLoadOnboarding = true
             return

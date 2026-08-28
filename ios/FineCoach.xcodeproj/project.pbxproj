@@ -32,6 +32,17 @@
 		B133 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = A133 /* AppLogger.swift */; };
 		B134 /* PerformanceSignposts.swift in Sources */ = {isa = PBXBuildFile; fileRef = A134 /* PerformanceSignposts.swift */; };
 		B124 /* SessionTimingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A124 /* SessionTimingCoordinator.swift */; };
+		B125 /* ExerciseProvenanceValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A125 /* ExerciseProvenanceValidator.swift */; };
+		B126 /* ExerciseLibraryUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A126 /* ExerciseLibraryUseCases.swift */; };
+		B347 /* QuickCreateExerciseFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A347 /* QuickCreateExerciseFlow.swift */; };
+		B350 /* ExerciseLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A350 /* ExerciseLibraryView.swift */; };
+		B351 /* ExerciseLibraryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A351 /* ExerciseLibraryViewModel.swift */; };
+		B352 /* CustomExerciseEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A352 /* CustomExerciseEditorView.swift */; };
+		B225 /* ExerciseLibraryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A225 /* ExerciseLibraryUITests.swift */; };
+		B176 /* placeholder-catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = A176 /* placeholder-catalog.json */; };
+		B177 /* provenance.schema.json in Resources */ = {isa = PBXBuildFile; fileRef = A177 /* provenance.schema.json */; };
+		B237 /* ExerciseIdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A237 /* ExerciseIdentityTests.swift */; };
+		B238 /* ExerciseProvenanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A238 /* ExerciseProvenanceTests.swift */; };
 		B190 /* ActiveSessionRecoverySnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A190 /* ActiveSessionRecoverySnapshot.swift */; };
 		B191 /* ActiveSessionRecoveryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A191 /* ActiveSessionRecoveryStore.swift */; };
 		B192 /* ActiveSessionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A192 /* ActiveSessionCoordinator.swift */; };
@@ -74,12 +85,17 @@
 		B116 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = A116 /* Session.swift */; };
 		B117 /* SessionExercise.swift in Sources */ = {isa = PBXBuildFile; fileRef = A117 /* SessionExercise.swift */; };
 		B118 /* TrainingSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A118 /* TrainingSet.swift */; };
+		B119 /* Exercise.swift in Sources */ = {isa = PBXBuildFile; fileRef = A119 /* Exercise.swift */; };
+		B11B /* ExerciseProvenance.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B /* ExerciseProvenance.swift */; };
 		B122 /* StudentUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A122 /* StudentUseCases.swift */; };
 		B123 /* ActiveSessionUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A123 /* ActiveSessionUseCases.swift */; };
 		B144 /* StudentManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A144 /* StudentManagedObject+Mapping.swift */; };
 		B145 /* CoreDataStudentRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A145 /* CoreDataStudentRepository.swift */; };
 		B146 /* SessionManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A146 /* SessionManagedObject+Mapping.swift */; };
 		B147 /* CoreDataSessionRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A147 /* CoreDataSessionRepository.swift */; };
+		B148 /* ExerciseManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A148 /* ExerciseManagedObject+Mapping.swift */; };
+		B149 /* CoreDataExerciseRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A149 /* CoreDataExerciseRepository.swift */; };
+		B239 /* ExercisePersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A239 /* ExercisePersistenceTests.swift */; };
 		B180 /* FCAccessibilityID.swift in Sources */ = {isa = PBXBuildFile; fileRef = A180 /* FCAccessibilityID.swift */; };
 		B181 /* RootNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A181 /* RootNavigation.swift */; };
 		B310 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A310 /* OnboardingView.swift */; };
@@ -187,9 +203,22 @@
 		A116 /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 		A117 /* SessionExercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionExercise.swift; sourceTree = "<group>"; };
 		A118 /* TrainingSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingSet.swift; sourceTree = "<group>"; };
+		A119 /* Exercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exercise.swift; sourceTree = "<group>"; };
+		A11B /* ExerciseProvenance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseProvenance.swift; sourceTree = "<group>"; };
 		A122 /* StudentUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentUseCases.swift; sourceTree = "<group>"; };
 		A123 /* ActiveSessionUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionUseCases.swift; sourceTree = "<group>"; };
 		A124 /* SessionTimingCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionTimingCoordinator.swift; sourceTree = "<group>"; };
+		A125 /* ExerciseProvenanceValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseProvenanceValidator.swift; sourceTree = "<group>"; };
+		A126 /* ExerciseLibraryUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseLibraryUseCases.swift; sourceTree = "<group>"; };
+		A225 /* ExerciseLibraryUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseLibraryUITests.swift; sourceTree = "<group>"; };
+		A347 /* QuickCreateExerciseFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickCreateExerciseFlow.swift; sourceTree = "<group>"; };
+		A350 /* ExerciseLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseLibraryView.swift; sourceTree = "<group>"; };
+		A351 /* ExerciseLibraryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseLibraryViewModel.swift; sourceTree = "<group>"; };
+		A352 /* CustomExerciseEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomExerciseEditorView.swift; sourceTree = "<group>"; };
+		A176 /* placeholder-catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "placeholder-catalog.json"; sourceTree = "<group>"; };
+		A177 /* provenance.schema.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "provenance.schema.json"; sourceTree = "<group>"; };
+		A237 /* ExerciseIdentityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseIdentityTests.swift; sourceTree = "<group>"; };
+		A238 /* ExerciseProvenanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseProvenanceTests.swift; sourceTree = "<group>"; };
 		A190 /* ActiveSessionRecoverySnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionRecoverySnapshot.swift; sourceTree = "<group>"; };
 		A191 /* ActiveSessionRecoveryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionRecoveryStore.swift; sourceTree = "<group>"; };
 		A192 /* ActiveSessionCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionCoordinator.swift; sourceTree = "<group>"; };
@@ -198,6 +227,9 @@
 		A145 /* CoreDataStudentRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStudentRepository.swift; sourceTree = "<group>"; };
 		A146 /* SessionManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SessionManagedObject+Mapping.swift"; sourceTree = "<group>"; };
 		A147 /* CoreDataSessionRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataSessionRepository.swift; sourceTree = "<group>"; };
+		A148 /* ExerciseManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ExerciseManagedObject+Mapping.swift"; sourceTree = "<group>"; };
+		A149 /* CoreDataExerciseRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataExerciseRepository.swift; sourceTree = "<group>"; };
+		A239 /* ExercisePersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExercisePersistenceTests.swift; sourceTree = "<group>"; };
 		A180 /* FCAccessibilityID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCAccessibilityID.swift; sourceTree = "<group>"; };
 		A181 /* RootNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootNavigation.swift; sourceTree = "<group>"; };
 		A221 /* StudentLifecycleUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentLifecycleUITests.swift; sourceTree = "<group>"; };
@@ -375,8 +407,18 @@
 			children = (
 				A173 /* Assets.xcassets */,
 				A172 /* Localizable.xcstrings */,
+				A406 /* ExerciseCatalog */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		A406 /* ExerciseCatalog */ = {
+			isa = PBXGroup;
+			children = (
+				A176 /* placeholder-catalog.json */,
+				A177 /* provenance.schema.json */,
+			);
+			path = ExerciseCatalog;
 			sourceTree = "<group>";
 		};
 		A410 /* FineCoachTests */ = {
@@ -386,6 +428,7 @@
 				A473 /* Students */,
 				A476 /* ActiveSession */,
 				A479 /* Recovery */,
+				A482 /* ExerciseLibrary */,
 			);
 			path = FineCoachTests;
 			sourceTree = "<group>";
@@ -402,6 +445,8 @@
 				A116 /* Session.swift */,
 				A117 /* SessionExercise.swift */,
 				A118 /* TrainingSet.swift */,
+				A119 /* Exercise.swift */,
+				A11B /* ExerciseProvenance.swift */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -414,6 +459,8 @@
 				A122 /* StudentUseCases.swift */,
 				A123 /* ActiveSessionUseCases.swift */,
 				A124 /* SessionTimingCoordinator.swift */,
+				A125 /* ExerciseProvenanceValidator.swift */,
+				A126 /* ExerciseLibraryUseCases.swift */,
 			);
 			path = Application;
 			sourceTree = "<group>";
@@ -441,6 +488,8 @@
 				A145 /* CoreDataStudentRepository.swift */,
 				A146 /* SessionManagedObject+Mapping.swift */,
 				A147 /* CoreDataSessionRepository.swift */,
+				A148 /* ExerciseManagedObject+Mapping.swift */,
+				A149 /* CoreDataExerciseRepository.swift */,
 				A175 /* FineCoachModel.xcdatamodeld */,
 			);
 			path = Persistence;
@@ -478,6 +527,7 @@
 				A474 /* Students */,
 				A477 /* ActiveSession */,
 				A480 /* Recovery */,
+				A483 /* ExerciseLibrary */,
 			);
 			path = FineCoachIntegrationTests;
 			sourceTree = "<group>";
@@ -497,6 +547,7 @@
 				A475 /* Students */,
 				A478 /* ActiveSession */,
 				A481 /* Recovery */,
+				A484 /* ExerciseLibrary */,
 			);
 			path = FineCoachUITests;
 			sourceTree = "<group>";
@@ -525,6 +576,9 @@
 		A441 /* ExerciseLibrary */ = {
 			isa = PBXGroup;
 			children = (
+				A351 /* ExerciseLibraryViewModel.swift */,
+				A350 /* ExerciseLibraryView.swift */,
+				A352 /* CustomExerciseEditorView.swift */,
 			);
 			path = ExerciseLibrary;
 			sourceTree = "<group>";
@@ -539,6 +593,7 @@
 				A344 /* DeleteExerciseFlow.swift */,
 				A345 /* FinishSessionFlow.swift */,
 				A346 /* SaveStatusView.swift */,
+				A347 /* QuickCreateExerciseFlow.swift */,
 			);
 			path = ActiveSession;
 			sourceTree = "<group>";
@@ -657,12 +712,29 @@
 			path = Recovery;
 			sourceTree = "<group>";
 		};
+		A482 /* ExerciseLibrary */ = {
+			isa = PBXGroup;
+			children = (
+				A237 /* ExerciseIdentityTests.swift */,
+				A238 /* ExerciseProvenanceTests.swift */,
+			);
+			path = ExerciseLibrary;
+			sourceTree = "<group>";
+		};
 		A480 /* Recovery */ = {
 			isa = PBXGroup;
 			children = (
 				A236 /* RecoveryProjectionTests.swift */,
 			);
 			path = Recovery;
+			sourceTree = "<group>";
+		};
+		A483 /* ExerciseLibrary */ = {
+			isa = PBXGroup;
+			children = (
+				A239 /* ExercisePersistenceTests.swift */,
+			);
+			path = ExerciseLibrary;
 			sourceTree = "<group>";
 		};
 		A481 /* Recovery */ = {
@@ -672,6 +744,14 @@
 				A224 /* RecoveryMatrixTests.swift */,
 			);
 			path = Recovery;
+			sourceTree = "<group>";
+		};
+		A484 /* ExerciseLibrary */ = {
+			isa = PBXGroup;
+			children = (
+				A225 /* ExerciseLibraryUITests.swift */,
+			);
+			path = ExerciseLibrary;
 			sourceTree = "<group>";
 		};
 		A450 /* Doubles */ = {
@@ -831,6 +911,8 @@
 				B171 /* Assets.xcassets in Resources */,
 				B172 /* PrivacyInfo.xcprivacy in Resources */,
 				B173 /* FineCoachModel.xcdatamodeld in Resources */,
+				B176 /* placeholder-catalog.json in Resources */,
+				B177 /* provenance.schema.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -880,11 +962,15 @@
 				B116 /* Session.swift in Sources */,
 				B117 /* SessionExercise.swift in Sources */,
 				B118 /* TrainingSet.swift in Sources */,
+				B119 /* Exercise.swift in Sources */,
+				B11B /* ExerciseProvenance.swift in Sources */,
 				B120 /* Protocols.swift in Sources */,
 				B121 /* FaultInjectionBoundary.swift in Sources */,
 				B122 /* StudentUseCases.swift in Sources */,
 				B123 /* ActiveSessionUseCases.swift in Sources */,
 				B124 /* SessionTimingCoordinator.swift in Sources */,
+				B125 /* ExerciseProvenanceValidator.swift in Sources */,
+				B126 /* ExerciseLibraryUseCases.swift in Sources */,
 				B130 /* SystemClock.swift in Sources */,
 				B131 /* SecureRandomGenerator.swift in Sources */,
 				B132 /* ProtectedFileStore.swift in Sources */,
@@ -898,6 +984,8 @@
 				B145 /* CoreDataStudentRepository.swift in Sources */,
 				B146 /* SessionManagedObject+Mapping.swift in Sources */,
 				B147 /* CoreDataSessionRepository.swift in Sources */,
+				B148 /* ExerciseManagedObject+Mapping.swift in Sources */,
+				B149 /* CoreDataExerciseRepository.swift in Sources */,
 				B190 /* ActiveSessionRecoverySnapshot.swift in Sources */,
 				B191 /* ActiveSessionRecoveryStore.swift in Sources */,
 				B192 /* ActiveSessionCoordinator.swift in Sources */,
@@ -919,6 +1007,10 @@
 				B344 /* DeleteExerciseFlow.swift in Sources */,
 				B345 /* FinishSessionFlow.swift in Sources */,
 				B346 /* SaveStatusView.swift in Sources */,
+				B347 /* QuickCreateExerciseFlow.swift in Sources */,
+				B350 /* ExerciseLibraryView.swift in Sources */,
+				B351 /* ExerciseLibraryViewModel.swift in Sources */,
+				B352 /* CustomExerciseEditorView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -931,6 +1023,8 @@
 				B232 /* SessionSetDomainTests.swift in Sources */,
 				B234 /* ActiveSessionRecoveryCodecTests.swift in Sources */,
 				B235 /* SessionTimingTests.swift in Sources */,
+				B237 /* ExerciseIdentityTests.swift in Sources */,
+				B238 /* ExerciseProvenanceTests.swift in Sources */,
 				B201 /* FictitiousFixtures.swift in Sources */,
 				B202 /* TestClock.swift in Sources */,
 				B203 /* TestIDGenerator.swift in Sources */,
@@ -954,6 +1048,7 @@
 				B231 /* StudentPersistenceTests.swift in Sources */,
 				B233 /* ActiveSessionPersistenceTests.swift in Sources */,
 				B236 /* RecoveryProjectionTests.swift in Sources */,
+				B239 /* ExercisePersistenceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -966,6 +1061,7 @@
 				B222 /* CoreTrainingUITests.swift in Sources */,
 				B223 /* RecoveryProcessDriver.swift in Sources */,
 				B224 /* RecoveryMatrixTests.swift in Sources */,
+				B225 /* ExerciseLibraryUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

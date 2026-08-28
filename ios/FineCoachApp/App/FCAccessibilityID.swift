@@ -86,6 +86,26 @@ public enum FCAccessibilityID {
     public static let activeSessionDurationReview = "activeSession.durationReview"
     public static let activeSessionDurationValue = "activeSession.durationValue"
     public static let activeSessionDurationConfirm = "activeSession.durationConfirm"
+    public static let activeSessionSaveExerciseToLibrary = "activeSession.saveExerciseToLibrary"
+    public static let activeSessionExerciseNameConflict = "activeSession.exerciseNameConflict"
+
+    public static let exerciseLibraryEntry = "exerciseLibrary.entry"
+    public static let exerciseLibraryRoot = "exerciseLibrary.root"
+    public static let exerciseLibrarySearch = "exerciseLibrary.search"
+    public static let exerciseLibraryAddCustom = "exerciseLibrary.addCustom"
+    public static let exerciseLibraryShowHidden = "exerciseLibrary.showHidden"
+    public static let exerciseLibraryFavorite = "exerciseLibrary.favorite"
+    public static let exerciseLibraryHide = "exerciseLibrary.hide"
+    public static let exerciseLibraryConflict = "exerciseLibrary.conflict"
+
+    public static let customExerciseRoot = "customExercise.root"
+    public static let customExerciseName = "customExercise.name"
+    public static let customExerciseModeWeightReps = "customExercise.mode.weightReps"
+    public static let customExerciseModeReps = "customExercise.mode.reps"
+    public static let customExerciseModeDuration = "customExercise.mode.duration"
+    public static let customExerciseSave = "customExercise.save"
+    public static let customExerciseArchive = "customExercise.archive"
+    public static let customExerciseRestore = "customExercise.restore"
 
     public static func exerciseAt(_ index: Int) -> String {
         "activeSession.exercise.at.\(index)"
@@ -101,6 +121,10 @@ public enum FCAccessibilityID {
 
     public static func studentRow(_ id: StableUUID) -> String {
         "studentList.row.\(id.rawValue.uuidString)"
+    }
+
+    public static func exerciseLibraryRow(_ id: StableExerciseID) -> String {
+        "exerciseLibrary.row.\(id.rawValue)"
     }
 
     public static func sexIdentifier(_ sex: StudentSex) -> String {
