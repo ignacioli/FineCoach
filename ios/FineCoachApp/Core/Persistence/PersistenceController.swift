@@ -99,6 +99,27 @@ public final class PersistenceController: @unchecked Sendable {
             }
         }
 
+        if !inMemory, protectedFileStore.fileExists(at: storeURL) {
+            let metadata: [String: Any]
+            do {
+                metadata = try NSPersistentStoreCoordinator.metadataForPersistentStore(
+                    ofType: NSSQLiteStoreType,
+                    at: storeURL,
+                    options: nil
+                )
+            } catch {
+                throw PersistenceControllerError.storeLoadFailed
+            }
+            guard
+                resolvedModel.isConfiguration(
+                    withName: nil,
+                    compatibleWithStoreMetadata: metadata
+                )
+            else {
+                throw PersistenceControllerError.storeLoadFailed
+            }
+        }
+
         let container = NSPersistentContainer(name: "FineCoachModel", managedObjectModel: resolvedModel)
         let description: NSPersistentStoreDescription
         if inMemory {

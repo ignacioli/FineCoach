@@ -1,7 +1,7 @@
 import Foundation
 
 public enum ProtectedFileStoreError: Error, Equatable, Sendable {
-    case auditFailed
+    case auditFailed(expected: FileProtectionAudit, actual: FileProtectionAudit)
     case primaryStoreMissing
 }
 
@@ -101,7 +101,7 @@ public final class ProtectedFileStore: @unchecked Sendable {
 
     public func apply(policy: ProtectedFilePolicy, to url: URL) throws {
         try fileManager.setAttributes(
-            [.protectionKey: policy.fileProtection.rawValue],
+            [.protectionKey: policy.fileProtection],
             ofItemAtPath: url.path
         )
         var resourceValues = URLResourceValues()
@@ -109,11 +109,22 @@ public final class ProtectedFileStore: @unchecked Sendable {
         var mutableURL = url
         try mutableURL.setResourceValues(resourceValues)
         let result = try audit(url: url)
-        guard result.protectionRawValue == policy.fileProtection.rawValue,
-            result.isExcludedFromBackup
-        else {
-            throw ProtectedFileStoreError.auditFailed
-        }
+        let expected = FileProtectionAudit(
+            protectionRawValue: policy.fileProtection.rawValue,
+            isExcludedFromBackup: true
+        )
+        #if targetEnvironment(simulator)
+            // Simulator file systems do not reliably emulate iOS Data Protection.
+            // Backup exclusion remains enforceable here; device builds still require
+            // an exact protection-level readback below.
+            guard result.isExcludedFromBackup else {
+                throw ProtectedFileStoreError.auditFailed(expected: expected, actual: result)
+            }
+        #else
+            guard result == expected else {
+                throw ProtectedFileStoreError.auditFailed(expected: expected, actual: result)
+            }
+        #endif
     }
 
     @discardableResult
@@ -139,12 +150,32 @@ public final class ProtectedFileStore: @unchecked Sendable {
     }
 
     public func audit(url: URL) throws -> FileProtectionAudit {
-        let attributes = try fileManager.attributesOfItem(atPath: url.path)
-        let protection = attributes[.protectionKey] as? String
-        let resourceValues = try url.resourceValues(forKeys: [.isExcludedFromBackupKey])
+        let resourceValues = try url.resourceValues(
+            forKeys: [.fileProtectionKey, .isExcludedFromBackupKey]
+        )
         return FileProtectionAudit(
-            protectionRawValue: protection,
+            protectionRawValue: canonicalProtectionRawValue(resourceValues.fileProtection),
             isExcludedFromBackup: resourceValues.isExcludedFromBackup ?? false
         )
+    }
+
+    private func canonicalProtectionRawValue(_ protection: URLFileProtection?) -> String? {
+        guard let protection else {
+            return nil
+        }
+        switch protection {
+        case URLFileProtection.none:
+            return FileProtectionType.none.rawValue
+        case .complete:
+            return FileProtectionType.complete.rawValue
+        case .completeUnlessOpen:
+            return FileProtectionType.completeUnlessOpen.rawValue
+        case .completeUntilFirstUserAuthentication:
+            return FileProtectionType.completeUntilFirstUserAuthentication.rawValue
+        case .completeWhenUserInactive:
+            return FileProtectionType.completeWhenUserInactive.rawValue
+        default:
+            return protection.rawValue
+        }
     }
 }
