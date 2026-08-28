@@ -74,22 +74,6 @@ final class FoundationIntegrationTests: XCTestCase {
             let directory = try TemporaryProtectedDirectory()
             let storeURL = directory.url.appendingPathComponent("generation/FineCoach.sqlite")
             let controller = try PersistenceController(storeURL: storeURL)
-            let storeAudits = try controller.secureStoreArtifacts()
-            assertProtectionRawValue(
-                storeAudits[storeURL]?.protectionRawValue,
-                expected: .completeUnlessOpen
-            )
-            XCTAssertEqual(storeAudits[storeURL]?.isExcludedFromBackup, true)
-            for suffix in ["-wal", "-shm"] {
-                let artifactURL = URL(fileURLWithPath: storeURL.path + suffix)
-                if FileManager.default.fileExists(atPath: artifactURL.path) {
-                    assertProtectionRawValue(
-                        storeAudits[artifactURL]?.protectionRawValue,
-                        expected: .completeUnlessOpen
-                    )
-                    XCTAssertEqual(storeAudits[artifactURL]?.isExcludedFromBackup, true)
-                }
-            }
             let writer = controller.writer
             let probe = TransactionConcurrencyProbe()
 
@@ -121,6 +105,26 @@ final class FoundationIntegrationTests: XCTestCase {
                 return try context.fetch(request).compactMap { $0.value(forKey: "key") as? String }
             }
             XCTAssertEqual(Set(keys), Set((0..<32).map { "test.setting.\($0)" }))
+
+            let storeAudits = try controller.secureStoreArtifacts()
+            let expectedArtifacts = [
+                storeURL,
+                URL(fileURLWithPath: storeURL.path + "-wal"),
+                URL(fileURLWithPath: storeURL.path + "-shm"),
+            ]
+            for artifactURL in expectedArtifacts {
+                XCTAssertTrue(
+                    FileManager.default.fileExists(atPath: artifactURL.path),
+                    "Expected SQLite artifact \(artifactURL.lastPathComponent)"
+                )
+                let audit = try XCTUnwrap(storeAudits[artifactURL])
+                assertProtectionRawValue(
+                    audit.protectionRawValue,
+                    expected: .completeUnlessOpen
+                )
+                XCTAssertTrue(audit.isExcludedFromBackup)
+            }
+            try await controller.shutdownForTesting()
         }
 
         func testIncompatibleModelDoesNotEraseExistingStore() async throws {
@@ -138,6 +142,7 @@ final class FoundationIntegrationTests: XCTestCase {
                     setting.setValue("still-present", forKey: "typedValue")
                     setting.setValue(Int64(1), forKey: "schemaVersion")
                 }
+                try await controller.shutdownForTesting()
             }
 
             let incompatibleModel = NSManagedObjectModel()
@@ -164,6 +169,7 @@ final class FoundationIntegrationTests: XCTestCase {
             XCTAssertEqual(values.count, 1)
             XCTAssertEqual(values.first?.0, "preserved.marker")
             XCTAssertEqual(values.first?.1, "still-present")
+            try await reopened.shutdownForTesting()
         }
 
         func testProtectedDirectoryAndAtomicFileReadBackPolicy() throws {
@@ -186,6 +192,16 @@ final class FoundationIntegrationTests: XCTestCase {
             assertProtectionRawValue(reportAudit.protectionRawValue, expected: .complete)
             XCTAssertTrue(reportAudit.isExcludedFromBackup)
             XCTAssertEqual(try Data(contentsOf: reportURL), Data([0x01, 0x02, 0x03]))
+
+            let replacedReportData = Data([0x04, 0x05, 0x06])
+            let replacedReportAudit = try protectedStore.atomicReplace(
+                data: replacedReportData,
+                at: reportURL,
+                policy: .ephemeralReport
+            )
+            assertProtectionRawValue(replacedReportAudit.protectionRawValue, expected: .complete)
+            XCTAssertTrue(replacedReportAudit.isExcludedFromBackup)
+            XCTAssertEqual(try Data(contentsOf: reportURL), replacedReportData)
 
             let candidateURL = businessDirectory.appendingPathComponent("candidate.bin")
             let candidateData = Data([0x0A, 0x0B, 0x0C])
@@ -319,6 +335,7 @@ final class FoundationIntegrationTests: XCTestCase {
                 try context.count(for: NSFetchRequest(entityName: "AppSettingMO"))
             }
             XCTAssertEqual(savedCount, 0)
+            try await controller.shutdownForTesting()
 
             let generationDirectory = StoreGenerationDirectory(
                 rootURL: directory.url.appendingPathComponent("generation")

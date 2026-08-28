@@ -62,7 +62,6 @@ public final class ProtectedFileStore: @unchecked Sendable {
         } else {
             try fileManager.moveItem(at: replacementURL, to: url)
         }
-        try apply(policy: .business, to: url)
     }
 
     @discardableResult

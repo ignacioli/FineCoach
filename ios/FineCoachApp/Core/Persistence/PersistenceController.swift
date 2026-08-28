@@ -216,4 +216,17 @@ public final class PersistenceController: @unchecked Sendable {
         }
         return try protectedFileStore.secureSQLiteStoreArtifacts(at: storeURL)
     }
+
+    #if DEBUG
+        func shutdownForTesting() async throws {
+            await writer.resetForTesting()
+            container.viewContext.performAndWait {
+                container.viewContext.reset()
+            }
+            let coordinator = container.persistentStoreCoordinator
+            for store in coordinator.persistentStores {
+                try coordinator.remove(store)
+            }
+        }
+    #endif
 }

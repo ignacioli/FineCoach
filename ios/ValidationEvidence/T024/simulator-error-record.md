@@ -22,4 +22,5 @@
 
 ## 当前验证边界
 
-上一轮完整 Simulator Foundation 运行记录为 8/9 通过；失败项即上面的不兼容模型问题。该问题的针对性修复已通过，但本轮修复后的完整回归因执行权限配额暂未重新运行。实体 iPhone 验证必须在完整 Simulator 回归确认后进行。
+以上两个失败均已修复并纳入完整回归。最终结果与真机证据见
+[final-validation.md](./final-validation.md)。

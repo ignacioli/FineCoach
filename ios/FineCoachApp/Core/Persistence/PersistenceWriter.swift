@@ -58,4 +58,12 @@ public actor PersistenceWriter {
             try work(context)
         }
     }
+
+    #if DEBUG
+        func resetForTesting() {
+            context.performAndWait {
+                context.reset()
+            }
+        }
+    #endif
 }
