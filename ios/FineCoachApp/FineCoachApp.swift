@@ -13,7 +13,7 @@ struct FineCoachApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootView()
+            RootNavigation()
                 .environmentObject(environment)
                 .environmentObject(privacyCoordinator)
         }
@@ -25,33 +25,6 @@ struct FineCoachApp: App {
                 privacyCoordinator.sceneWillResignActive()
             @unknown default:
                 privacyCoordinator.sceneWillResignActive()
-            }
-        }
-    }
-}
-
-@MainActor
-private struct RootView: View {
-    @EnvironmentObject private var environment: AppEnvironment
-    @EnvironmentObject private var privacyCoordinator: ScenePrivacyCoordinator
-
-    var body: some View {
-        ZStack {
-            Group {
-                if environment.isStorageAvailable {
-                    Text("精练教练")
-                        .font(.title2.weight(.semibold))
-                } else {
-                    Text(environment.startupErrorDescription ?? "本地存储暂不可用。")
-                        .multilineTextAlignment(.center)
-                        .padding()
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(FCSemanticColors.background)
-
-            if privacyCoordinator.isCovered {
-                PrivacyCover()
             }
         }
     }

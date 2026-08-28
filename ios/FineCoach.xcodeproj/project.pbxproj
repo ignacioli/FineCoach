@@ -62,6 +62,20 @@
 		BF06 /* OSLog.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F006 /* OSLog.framework */; };
 		BF07 /* Combine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F007 /* Combine.framework */; };
 		BF08 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F008 /* XCTest.framework */; };
+		B115 /* Student.swift in Sources */ = {isa = PBXBuildFile; fileRef = A115 /* Student.swift */; };
+		B122 /* StudentUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A122 /* StudentUseCases.swift */; };
+		B144 /* StudentManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A144 /* StudentManagedObject+Mapping.swift */; };
+		B145 /* CoreDataStudentRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A145 /* CoreDataStudentRepository.swift */; };
+		B180 /* FCAccessibilityID.swift in Sources */ = {isa = PBXBuildFile; fileRef = A180 /* FCAccessibilityID.swift */; };
+		B181 /* RootNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A181 /* RootNavigation.swift */; };
+		B310 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A310 /* OnboardingView.swift */; };
+		B311 /* StudentEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A311 /* StudentEditorView.swift */; };
+		B320 /* StudentListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A320 /* StudentListView.swift */; };
+		B330 /* StudentDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A330 /* StudentDetailView.swift */; };
+		B331 /* DeleteStudentFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A331 /* DeleteStudentFlow.swift */; };
+		B230 /* StudentDomainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A230 /* StudentDomainTests.swift */; };
+		B231 /* StudentPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A231 /* StudentPersistenceTests.swift */; };
+		B221 /* StudentLifecycleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A221 /* StudentLifecycleUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -119,7 +133,7 @@
 		A163 /* FCSaveStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCSaveStatusView.swift; sourceTree = "<group>"; };
 		A170 /* FineCoach.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FineCoach.entitlements; sourceTree = "<group>"; };
 		A171 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		A172 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		A172 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		A173 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A175 /* FineCoachModel.xcdatamodeld */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = FineCoachModel.xcdatamodeld; sourceTree = "<group>"; };
 		A200 /* SetupSmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupSmokeTests.swift; sourceTree = "<group>"; };
@@ -139,6 +153,20 @@
 		F006 /* OSLog.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OSLog.framework; path = System/Library/Frameworks/OSLog.framework; sourceTree = SDKROOT; };
 		F007 /* Combine.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Combine.framework; path = System/Library/Frameworks/Combine.framework; sourceTree = SDKROOT; };
 		F008 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		A115 /* Student.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Student.swift; sourceTree = "<group>"; };
+		A122 /* StudentUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentUseCases.swift; sourceTree = "<group>"; };
+		A144 /* StudentManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "StudentManagedObject+Mapping.swift"; sourceTree = "<group>"; };
+		A145 /* CoreDataStudentRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStudentRepository.swift; sourceTree = "<group>"; };
+		A180 /* FCAccessibilityID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCAccessibilityID.swift; sourceTree = "<group>"; };
+		A181 /* RootNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootNavigation.swift; sourceTree = "<group>"; };
+		A221 /* StudentLifecycleUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentLifecycleUITests.swift; sourceTree = "<group>"; };
+		A230 /* StudentDomainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentDomainTests.swift; sourceTree = "<group>"; };
+		A231 /* StudentPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentPersistenceTests.swift; sourceTree = "<group>"; };
+		A310 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		A311 /* StudentEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentEditorView.swift; sourceTree = "<group>"; };
+		A320 /* StudentListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentListView.swift; sourceTree = "<group>"; };
+		A330 /* StudentDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentDetailView.swift; sourceTree = "<group>"; };
+		A331 /* DeleteStudentFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteStudentFlow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -241,6 +269,8 @@
 			isa = PBXGroup;
 			children = (
 				A100 /* AppEnvironment.swift */,
+				A180 /* FCAccessibilityID.swift */,
+				A181 /* RootNavigation.swift */,
 				A102 /* PrivacyCover.swift */,
 				A103 /* ScenePrivacyCoordinator.swift */,
 			);
@@ -296,6 +326,7 @@
 			isa = PBXGroup;
 			children = (
 				A200 /* SetupSmokeTests.swift */,
+				A473 /* Students */,
 			);
 			path = FineCoachTests;
 			sourceTree = "<group>";
@@ -308,6 +339,7 @@
 				A112 /* ValidatedText.swift */,
 				A113 /* NormalizedName.swift */,
 				A114 /* DecimalValue.swift */,
+				A115 /* Student.swift */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -317,6 +349,7 @@
 			children = (
 				A120 /* Protocols.swift */,
 				A121 /* FaultInjectionBoundary.swift */,
+				A122 /* StudentUseCases.swift */,
 			);
 			path = Application;
 			sourceTree = "<group>";
@@ -339,6 +372,8 @@
 				A141 /* PersistenceWriter.swift */,
 				A142 /* StoreGeneration.swift */,
 				A143 /* CurrentGenerationPointer.swift */,
+				A144 /* StudentManagedObject+Mapping.swift */,
+				A145 /* CoreDataStudentRepository.swift */,
 				A175 /* FineCoachModel.xcdatamodeld */,
 			);
 			path = Persistence;
@@ -369,6 +404,7 @@
 			isa = PBXGroup;
 			children = (
 				A421 /* Foundation */,
+				A474 /* Students */,
 			);
 			path = FineCoachIntegrationTests;
 			sourceTree = "<group>";
@@ -385,6 +421,7 @@
 			isa = PBXGroup;
 			children = (
 				A220 /* SetupSmokeUITests.swift */,
+				A475 /* Students */,
 			);
 			path = FineCoachUITests;
 			sourceTree = "<group>";
@@ -448,6 +485,59 @@
 		A446 /* Students */ = {
 			isa = PBXGroup;
 			children = (
+				A470 /* Onboarding */,
+				A471 /* StudentList */,
+				A472 /* StudentDetail */,
+			);
+			path = Students;
+			sourceTree = "<group>";
+		};
+		A470 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				A310 /* OnboardingView.swift */,
+				A311 /* StudentEditorView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		A471 /* StudentList */ = {
+			isa = PBXGroup;
+			children = (
+				A320 /* StudentListView.swift */,
+			);
+			path = StudentList;
+			sourceTree = "<group>";
+		};
+		A472 /* StudentDetail */ = {
+			isa = PBXGroup;
+			children = (
+				A330 /* StudentDetailView.swift */,
+				A331 /* DeleteStudentFlow.swift */,
+			);
+			path = StudentDetail;
+			sourceTree = "<group>";
+		};
+		A473 /* Students */ = {
+			isa = PBXGroup;
+			children = (
+				A230 /* StudentDomainTests.swift */,
+			);
+			path = Students;
+			sourceTree = "<group>";
+		};
+		A474 /* Students */ = {
+			isa = PBXGroup;
+			children = (
+				A231 /* StudentPersistenceTests.swift */,
+			);
+			path = Students;
+			sourceTree = "<group>";
+		};
+		A475 /* Students */ = {
+			isa = PBXGroup;
+			children = (
+				A221 /* StudentLifecycleUITests.swift */,
 			);
 			path = Students;
 			sourceTree = "<group>";
@@ -581,11 +671,11 @@
 			};
 			buildConfigurationList = A010 /* Build configuration list for PBXProject "FineCoach" */;
 			compatibilityVersion = "Xcode 16.0";
-			developmentRegion = en;
+			developmentRegion = "zh-Hans";
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en,
 				"zh-Hans",
+				en,
 			);
 			mainGroup = A001;
 			productRefGroup = A002 /* Products */;
@@ -644,6 +734,8 @@
 			files = (
 				B100 /* AppEnvironment.swift in Sources */,
 				B101 /* FineCoachApp.swift in Sources */,
+				B180 /* FCAccessibilityID.swift in Sources */,
+				B181 /* RootNavigation.swift in Sources */,
 				B102 /* PrivacyCover.swift in Sources */,
 				B103 /* ScenePrivacyCoordinator.swift in Sources */,
 				B110 /* DomainError.swift in Sources */,
@@ -651,8 +743,10 @@
 				B112 /* ValidatedText.swift in Sources */,
 				B113 /* NormalizedName.swift in Sources */,
 				B114 /* DecimalValue.swift in Sources */,
+				B115 /* Student.swift in Sources */,
 				B120 /* Protocols.swift in Sources */,
 				B121 /* FaultInjectionBoundary.swift in Sources */,
+				B122 /* StudentUseCases.swift in Sources */,
 				B130 /* SystemClock.swift in Sources */,
 				B131 /* SecureRandomGenerator.swift in Sources */,
 				B132 /* ProtectedFileStore.swift in Sources */,
@@ -661,11 +755,18 @@
 				B141 /* PersistenceWriter.swift in Sources */,
 				B142 /* StoreGeneration.swift in Sources */,
 				B143 /* CurrentGenerationPointer.swift in Sources */,
+				B144 /* StudentManagedObject+Mapping.swift in Sources */,
+				B145 /* CoreDataStudentRepository.swift in Sources */,
 				B150 /* Tokens.swift in Sources */,
 				B160 /* FCButton.swift in Sources */,
 				B161 /* FCTextField.swift in Sources */,
 				B162 /* FCSetRow.swift in Sources */,
 				B163 /* FCSaveStatusView.swift in Sources */,
+				B310 /* OnboardingView.swift in Sources */,
+				B311 /* StudentEditorView.swift in Sources */,
+				B320 /* StudentListView.swift in Sources */,
+				B330 /* StudentDetailView.swift in Sources */,
+				B331 /* DeleteStudentFlow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -674,6 +775,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B200 /* SetupSmokeTests.swift in Sources */,
+				B230 /* StudentDomainTests.swift in Sources */,
 				B201 /* FictitiousFixtures.swift in Sources */,
 				B202 /* TestClock.swift in Sources */,
 				B203 /* TestIDGenerator.swift in Sources */,
@@ -694,6 +796,7 @@
 				4C5E5DF930413B0D0088237A /* FakeRenderer.swift in Sources */,
 				4C5E5DFA30413B0D0088237A /* TestFaultInjector.swift in Sources */,
 				B210 /* FoundationIntegrationTests.swift in Sources */,
+				B231 /* StudentPersistenceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -702,6 +805,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B220 /* SetupSmokeUITests.swift in Sources */,
+				B221 /* StudentLifecycleUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -764,6 +868,7 @@
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 9Z7427RG9X;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDevelopmentRegion = "zh-Hans";
 				INFOPLIST_KEY_CFBundleDisplayName = "精练教练";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -782,6 +887,7 @@
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 9Z7427RG9X;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDevelopmentRegion = "zh-Hans";
 				INFOPLIST_KEY_CFBundleDisplayName = "精练教练";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -842,6 +948,8 @@
 		A03A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 9Z7427RG9X;
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.finecoach.app.ui-tests";
 				PRODUCT_NAME = FineCoachUITests;
@@ -853,6 +961,8 @@
 		A03B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 9Z7427RG9X;
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.finecoach.app.ui-tests";
 				PRODUCT_NAME = FineCoachUITests;

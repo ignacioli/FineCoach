@@ -6,21 +6,38 @@ import Foundation
 public final class AppEnvironment: ObservableObject {
     private let persistenceController: PersistenceController?
     public let persistenceWriter: PersistenceWriter?
+    public let studentUseCases: StudentUseCases?
     public let startupErrorDescription: String?
+    private let studentRepository: CoreDataStudentRepository?
 
     public var isStorageAvailable: Bool {
-        persistenceController != nil && persistenceWriter != nil
+        persistenceController != nil && persistenceWriter != nil && studentUseCases != nil
     }
 
     public static func bootstrap() -> AppEnvironment {
         do {
-            return try AppEnvironment()
+            #if DEBUG
+                return try AppEnvironment.makeForCurrentProcess()
+            #else
+                return try AppEnvironment()
+            #endif
         } catch {
             return AppEnvironment(failure: error)
         }
     }
 
-    public init(rootURL: URL? = nil) throws {
+    func requireUseCases() -> StudentUseCases {
+        guard let studentUseCases else {
+            preconditionFailure("Student use cases require available local storage.")
+        }
+        return studentUseCases
+    }
+
+    public init(
+        rootURL: URL? = nil,
+        clock: any Clock = SystemClock(),
+        idGenerator: any IDGenerator = SystemIDGenerator()
+    ) throws {
         let fileManager = FileManager.default
         let root: URL
         if let rootURL {
@@ -112,14 +129,79 @@ public final class AppEnvironment: ObservableObject {
         }
         self.persistenceController = controller
         self.persistenceWriter = controller.writer
+        let repository = CoreDataStudentRepository(writer: controller.writer)
+        self.studentRepository = repository
+        self.studentUseCases = StudentUseCases(
+            repository: repository,
+            clock: clock,
+            ids: idGenerator
+        )
         self.startupErrorDescription = nil
     }
 
     private init(failure: Error) {
         self.persistenceController = nil
         self.persistenceWriter = nil
+        self.studentRepository = nil
+        self.studentUseCases = nil
         self.startupErrorDescription = (failure as? LocalizedError)?.errorDescription ?? "本地存储暂不可用。"
     }
+
+    #if DEBUG
+        static func makeForCurrentProcess() throws -> AppEnvironment {
+            let arguments = ProcessInfo.processInfo.arguments
+            let fileManager = FileManager.default
+            guard
+                let applicationSupport = fileManager.urls(
+                    for: .applicationSupportDirectory,
+                    in: .userDomainMask
+                ).first
+            else {
+                throw PersistenceControllerError.storeLoadFailed
+            }
+            let folderName = arguments.contains("-FineCoachUITesting") ? "FineCoachUITesting" : "FineCoach"
+            let root = applicationSupport.appendingPathComponent(folderName, isDirectory: true)
+            if arguments.contains("-FineCoachResetStore") {
+                try? fileManager.removeItem(at: root)
+            }
+            return try AppEnvironment(rootURL: root)
+        }
+
+        func applyUITestSeedingIfNeeded() async {
+            let arguments = ProcessInfo.processInfo.arguments
+            guard arguments.contains("-FineCoachSeedInProgressSession"),
+                let useCases = studentUseCases,
+                let repository = studentRepository
+            else {
+                return
+            }
+            do {
+                let existing = try await useCases.searchActive(query: "")
+                if !existing.isEmpty {
+                    try await useCases.completeOnboarding()
+                    return
+                }
+                try await useCases.completeOnboarding()
+                let student = try await repository.create(
+                    try StudentDraft(
+                        displayName: "林青",
+                        sex: .female,
+                        injuryNotes: "合成测试备注：保持动作节奏。"
+                    ).makeStudent(
+                        id: StableUUID(UUID(uuidString: "11111111-1111-4111-8111-111111111111")!),
+                        now: Date()
+                    )
+                )
+                try await repository.insertInProgressSessionForTesting(
+                    studentID: student.id,
+                    sessionID: UUID(uuidString: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa")!,
+                    now: Date()
+                )
+            } catch {
+                return
+            }
+        }
+    #endif
 }
 
 extension AppEnvironment {
