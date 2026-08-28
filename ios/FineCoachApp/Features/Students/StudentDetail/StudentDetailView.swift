@@ -67,7 +67,7 @@ struct StudentDetailView: View {
                 VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
                     if viewModel.inProgress {
                         Button {
-                            path.append(.placeholder(.continueTraining))
+                            path.append(.activeSession(student.id.rawValue))
                         } label: {
                             banner(title: String(localized: "student.list.trainingBanner"))
                         }
@@ -85,7 +85,7 @@ struct StudentDetailView: View {
                         .accessibilityIdentifier(FCAccessibilityID.detailRestore)
                     } else if !viewModel.inProgress {
                         FCButton(title: String(localized: "student.detail.startTraining")) {
-                            path.append(.placeholder(.startTraining))
+                            path.append(.activeSession(student.id.rawValue))
                         }
                         .accessibilityIdentifier(FCAccessibilityID.detailStartTraining)
                     }
@@ -175,7 +175,7 @@ struct StudentDetailView: View {
                             case .backup:
                                 path.append(.placeholder(.backup))
                             case .continueTraining:
-                                path.append(.placeholder(.continueTraining))
+                                path.append(.activeSession(viewModel.studentID.rawValue))
                             }
                         }
                     )

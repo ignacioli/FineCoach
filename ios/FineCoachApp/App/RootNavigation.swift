@@ -4,6 +4,7 @@ enum RootDestination: Hashable {
     case archivedList
     case studentDetail(UUID)
     case editor(StudentEditorMode)
+    case activeSession(UUID)
     case placeholder(PlaceholderKind)
 }
 
@@ -83,6 +84,12 @@ struct RootNavigation: View {
                                             onboardingCompleted = true
                                         }
                                     }
+                                )
+                            case .activeSession(let studentID):
+                                ActiveSessionView(
+                                    studentID: StableUUID(studentID),
+                                    useCases: environment.requireSessionUseCases(),
+                                    path: $path
                                 )
                             case .placeholder(let kind):
                                 PlaceholderDestinationView(kind: kind)

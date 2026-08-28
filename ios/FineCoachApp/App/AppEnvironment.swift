@@ -7,11 +7,14 @@ public final class AppEnvironment: ObservableObject {
     private let persistenceController: PersistenceController?
     public let persistenceWriter: PersistenceWriter?
     public let studentUseCases: StudentUseCases?
+    public let sessionUseCases: ActiveSessionUseCases?
     public let startupErrorDescription: String?
     private let studentRepository: CoreDataStudentRepository?
+    private let sessionRepository: CoreDataSessionRepository?
 
     public var isStorageAvailable: Bool {
         persistenceController != nil && persistenceWriter != nil && studentUseCases != nil
+            && sessionUseCases != nil
     }
 
     public static func bootstrap() -> AppEnvironment {
@@ -31,6 +34,13 @@ public final class AppEnvironment: ObservableObject {
             preconditionFailure("Student use cases require available local storage.")
         }
         return studentUseCases
+    }
+
+    func requireSessionUseCases() -> ActiveSessionUseCases {
+        guard let sessionUseCases else {
+            preconditionFailure("Session use cases require available local storage.")
+        }
+        return sessionUseCases
     }
 
     public init(
@@ -130,9 +140,17 @@ public final class AppEnvironment: ObservableObject {
         self.persistenceController = controller
         self.persistenceWriter = controller.writer
         let repository = CoreDataStudentRepository(writer: controller.writer)
+        let sessions = CoreDataSessionRepository(writer: controller.writer)
         self.studentRepository = repository
+        self.sessionRepository = sessions
         self.studentUseCases = StudentUseCases(
             repository: repository,
+            clock: clock,
+            ids: idGenerator
+        )
+        self.sessionUseCases = ActiveSessionUseCases(
+            sessionRepository: sessions,
+            studentRepository: repository,
             clock: clock,
             ids: idGenerator
         )
@@ -143,7 +161,9 @@ public final class AppEnvironment: ObservableObject {
         self.persistenceController = nil
         self.persistenceWriter = nil
         self.studentRepository = nil
+        self.sessionRepository = nil
         self.studentUseCases = nil
+        self.sessionUseCases = nil
         self.startupErrorDescription = (failure as? LocalizedError)?.errorDescription ?? "本地存储暂不可用。"
     }
 

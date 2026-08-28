@@ -590,6 +590,252 @@
       "localizations" : {
         "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "设置" } }
       }
+    },
+    "session.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "训练中" } }
+      }
+    },
+    "session.empty.hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "先添加动作，再记录组数。" } }
+      }
+    },
+    "session.stats.completedLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已完成组数" } }
+      }
+    },
+    "session.status.completed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "训练已完成" } }
+      }
+    },
+    "session.status.abandoned" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已放弃空训练" } }
+      }
+    },
+    "session.field.exerciseName" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "动作名称" } }
+      }
+    },
+    "session.field.weight" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "重量" } }
+      }
+    },
+    "session.field.reps" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "次数" } }
+      }
+    },
+    "session.field.duration" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "时长（秒）" } }
+      }
+    },
+    "session.field.left" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "左侧" } }
+      }
+    },
+    "session.field.right" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "右侧" } }
+      }
+    },
+    "session.mode.weightReps" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "重量与次数" } }
+      }
+    },
+    "session.mode.reps" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "仅次数" } }
+      }
+    },
+    "session.mode.duration" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "时长" } }
+      }
+    },
+    "session.side.none" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "不区分左右" } }
+      }
+    },
+    "session.side.bilateral" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "左右侧" } }
+      }
+    },
+    "session.set.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "组" } }
+      }
+    },
+    "session.action.addExercise" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "添加动作" } }
+      }
+    },
+    "session.action.saveExercise" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "保存动作" } }
+      }
+    },
+    "session.action.addSet" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "添加组" } }
+      }
+    },
+    "session.action.confirmSet" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "确认" } }
+      }
+    },
+    "session.action.copyPrevious" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "复制上一组" } }
+      }
+    },
+    "session.action.copyLastSame" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "复制上次同动作" } }
+      }
+    },
+    "session.action.undo" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "撤销" } }
+      }
+    },
+    "session.action.moveUp" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "上移" } }
+      }
+    },
+    "session.action.moveDown" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "下移" } }
+      }
+    },
+    "session.action.deleteExercise" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "删除动作" } }
+      }
+    },
+    "session.action.finish" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "结束训练" } }
+      }
+    },
+    "session.deleteExercise.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "删除动作" } }
+      }
+    },
+    "session.deleteExercise.lead" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "该动作含已完成组，删除后这些组不再计入本课统计。" } }
+      }
+    },
+    "session.deleteExercise.hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "可在删除后用撤销组来恢复单组，但动作本身不会自动回来。" } }
+      }
+    },
+    "session.deleteExercise.confirm" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "确认删除动作" } }
+      }
+    },
+    "session.finish.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "结束训练" } }
+      }
+    },
+    "session.finish.completeLead" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "将保存为已完成记录。" } }
+      }
+    },
+    "session.finish.abandonTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "放弃空训练" } }
+      }
+    },
+    "session.finish.abandonLead" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "没有已完成组，结束将放弃本次训练，不会生成完成记录。" } }
+      }
+    },
+    "session.finish.abandonConfirm" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "放弃训练" } }
+      }
+    },
+    "session.finish.draftsTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "还有未完成内容" } }
+      }
+    },
+    "session.finish.draftsLead" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "请返回处理草稿和待完成组，或明确丢弃后再结束。" } }
+      }
+    },
+    "session.finish.discardDrafts" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "丢弃未完成" } }
+      }
+    },
+    "session.finish.returnToDrafts" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "返回处理" } }
+      }
     }
   },
   "version" : "1.0"

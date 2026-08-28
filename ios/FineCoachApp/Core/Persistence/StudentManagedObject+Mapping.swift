@@ -110,19 +110,14 @@ enum StudentManagedObjectMapping {
         now: Date,
         into context: NSManagedObjectContext
     ) throws {
-        let student = try requireStudent(id: studentID, in: context)
-        let session = NSEntityDescription.insertNewObject(forEntityName: sessionEntityName, into: context)
-        session.setValue(sessionID, forKey: "id")
-        session.setValue(studentID, forKey: "studentID")
-        session.setValue("inProgress", forKey: "state")
-        session.setValue(now, forKey: "startedAtUTC")
-        session.setValue(now, forKey: "lastCheckpointUTC")
-        session.setValue(Decimal(0), forKey: "elapsedSeconds")
-        session.setValue(false, forKey: "durationNeedsReview")
-        session.setValue(Int64(1), forKey: "revision")
-        session.setValue(now, forKey: "createdAtUTC")
-        session.setValue(now, forKey: "updatedAtUTC")
-        session.setValue(student, forKey: "student")
+        _ = try SessionManagedObjectMapping.upsertAggregate(
+            Session.start(
+                id: StableUUID(sessionID),
+                studentID: StableUUID(studentID),
+                now: now
+            ),
+            in: context
+        )
     }
 
     static func insertCompletedSession(
@@ -138,7 +133,7 @@ enum StudentManagedObjectMapping {
         session.setValue("completed", forKey: "state")
         session.setValue(now, forKey: "startedAtUTC")
         session.setValue(now, forKey: "lastCheckpointUTC")
-        session.setValue(Decimal(1800), forKey: "elapsedSeconds")
+        session.setValue(NSDecimalNumber(decimal: 1800), forKey: "elapsedSeconds")
         session.setValue(false, forKey: "durationNeedsReview")
         session.setValue(Int64(2), forKey: "revision")
         session.setValue(now, forKey: "createdAtUTC")

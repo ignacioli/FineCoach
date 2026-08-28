@@ -62,7 +62,9 @@ struct StudentListView: View {
                     }
                 if let inProgress = viewModel.inProgress, viewModel.query.isEmpty {
                     Button {
-                        path.append(.placeholder(.continueTraining))
+                        path.append(
+                            .activeSession(inProgress.studentID.rawValue)
+                        )
                     } label: {
                         HStack {
                             Image(systemName: "play.fill")

@@ -1,0 +1,345 @@
+import Foundation
+
+public enum SetRecordingState: String, Codable, Sendable {
+    case draft
+    case pending
+    case completed
+}
+
+public struct TrainingSetInput: Equatable, Sendable {
+    public var recordMode: RecordMode
+    public var weightValue: String?
+    public var repetitionCount: String?
+    public var durationSeconds: String?
+    public var unit: MeasurementUnit
+    public var side: SetSide
+    public var leftValue: String?
+    public var rightValue: String?
+
+    public init(
+        recordMode: RecordMode,
+        weightValue: String? = nil,
+        repetitionCount: String? = nil,
+        durationSeconds: String? = nil,
+        unit: MeasurementUnit,
+        side: SetSide = .none,
+        leftValue: String? = nil,
+        rightValue: String? = nil
+    ) {
+        self.recordMode = recordMode
+        self.weightValue = weightValue
+        self.repetitionCount = repetitionCount
+        self.durationSeconds = durationSeconds
+        self.unit = unit
+        self.side = side
+        self.leftValue = leftValue
+        self.rightValue = rightValue
+    }
+}
+
+public struct TrainingSet: Hashable, Codable, Sendable, Identifiable {
+    public let id: StableUUID
+    public let sessionExerciseID: StableUUID
+    public let orderIndex: UInt32
+    public let state: SetRecordingState
+    public let recordMode: RecordMode
+    public let weightValue: DecimalValue?
+    public let repetitionCount: DecimalValue?
+    public let durationSeconds: DecimalValue?
+    public let unit: MeasurementUnit
+    public let side: SetSide
+    public let leftValue: DecimalValue?
+    public let rightValue: DecimalValue?
+    public let createdAtUTC: Date
+    public let updatedAtUTC: Date
+    public let completedAtUTC: Date?
+
+    public var contributesToStatistics: Bool {
+        state == .completed
+    }
+
+    public init(
+        id: StableUUID,
+        sessionExerciseID: StableUUID,
+        orderIndex: UInt32,
+        state: SetRecordingState,
+        recordMode: RecordMode,
+        weightValue: DecimalValue?,
+        repetitionCount: DecimalValue?,
+        durationSeconds: DecimalValue?,
+        unit: MeasurementUnit,
+        side: SetSide,
+        leftValue: DecimalValue?,
+        rightValue: DecimalValue?,
+        createdAtUTC: Date,
+        updatedAtUTC: Date,
+        completedAtUTC: Date?
+    ) {
+        self.id = id
+        self.sessionExerciseID = sessionExerciseID
+        self.orderIndex = orderIndex
+        self.state = state
+        self.recordMode = recordMode
+        self.weightValue = weightValue
+        self.repetitionCount = repetitionCount
+        self.durationSeconds = durationSeconds
+        self.unit = unit
+        self.side = side
+        self.leftValue = leftValue
+        self.rightValue = rightValue
+        self.createdAtUTC = createdAtUTC
+        self.updatedAtUTC = updatedAtUTC
+        self.completedAtUTC = completedAtUTC
+    }
+
+    public static func makeDraft(
+        id: StableUUID,
+        sessionExerciseID: StableUUID,
+        orderIndex: UInt32,
+        input: TrainingSetInput,
+        now: Date
+    ) throws -> TrainingSet {
+        TrainingSet(
+            id: id,
+            sessionExerciseID: sessionExerciseID,
+            orderIndex: orderIndex,
+            state: .draft,
+            parsed: try ParsedFields(input),
+            createdAtUTC: now,
+            updatedAtUTC: now,
+            completedAtUTC: nil
+        )
+    }
+
+    public func updating(input: TrainingSetInput, now: Date) throws -> TrainingSet {
+        let parsed = try ParsedFields(input)
+        let nextState: SetRecordingState
+        switch state {
+        case .completed:
+            nextState = (try? parsed.validateForCompletion()) != nil ? .pending : .draft
+        case .pending, .draft:
+            nextState = .draft
+        }
+        return TrainingSet(
+            id: id,
+            sessionExerciseID: sessionExerciseID,
+            orderIndex: orderIndex,
+            state: nextState,
+            parsed: parsed,
+            createdAtUTC: createdAtUTC,
+            updatedAtUTC: now,
+            completedAtUTC: nil
+        )
+    }
+
+    public func confirmed(now: Date) throws -> TrainingSet {
+        try ParsedFields(self).validateForCompletion()
+        return replacing(state: .completed, orderIndex: orderIndex, updatedAtUTC: now, completedAtUTC: now)
+    }
+
+    public func copiedAsPending(id: StableUUID, orderIndex: UInt32, now: Date) throws -> TrainingSet {
+        try ParsedFields(self).validateForCompletion()
+        return TrainingSet(
+            id: id,
+            sessionExerciseID: sessionExerciseID,
+            orderIndex: orderIndex,
+            state: .pending,
+            recordMode: recordMode,
+            weightValue: weightValue,
+            repetitionCount: repetitionCount,
+            durationSeconds: durationSeconds,
+            unit: unit,
+            side: side,
+            leftValue: leftValue,
+            rightValue: rightValue,
+            createdAtUTC: now,
+            updatedAtUTC: now,
+            completedAtUTC: nil
+        )
+    }
+
+    public func undone(now: Date) throws -> TrainingSet {
+        guard state == .completed else {
+            throw DomainError.invalidState
+        }
+        return replacing(state: .pending, orderIndex: orderIndex, updatedAtUTC: now, completedAtUTC: nil)
+    }
+
+    func relocating(sessionExerciseID: StableUUID, orderIndex: UInt32) -> TrainingSet {
+        TrainingSet(
+            id: id,
+            sessionExerciseID: sessionExerciseID,
+            orderIndex: orderIndex,
+            state: state,
+            recordMode: recordMode,
+            weightValue: weightValue,
+            repetitionCount: repetitionCount,
+            durationSeconds: durationSeconds,
+            unit: unit,
+            side: side,
+            leftValue: leftValue,
+            rightValue: rightValue,
+            createdAtUTC: createdAtUTC,
+            updatedAtUTC: updatedAtUTC,
+            completedAtUTC: completedAtUTC
+        )
+    }
+
+    private init(
+        id: StableUUID,
+        sessionExerciseID: StableUUID,
+        orderIndex: UInt32,
+        state: SetRecordingState,
+        parsed: ParsedFields,
+        createdAtUTC: Date,
+        updatedAtUTC: Date,
+        completedAtUTC: Date?
+    ) {
+        self.id = id
+        self.sessionExerciseID = sessionExerciseID
+        self.orderIndex = orderIndex
+        self.state = state
+        self.recordMode = parsed.recordMode
+        self.weightValue = parsed.weightValue
+        self.repetitionCount = parsed.repetitionCount
+        self.durationSeconds = parsed.durationSeconds
+        self.unit = parsed.unit
+        self.side = parsed.side
+        self.leftValue = parsed.leftValue
+        self.rightValue = parsed.rightValue
+        self.createdAtUTC = createdAtUTC
+        self.updatedAtUTC = updatedAtUTC
+        self.completedAtUTC = completedAtUTC
+    }
+
+    private func replacing(
+        state: SetRecordingState,
+        orderIndex: UInt32,
+        updatedAtUTC: Date,
+        completedAtUTC: Date?
+    ) -> TrainingSet {
+        TrainingSet(
+            id: id,
+            sessionExerciseID: sessionExerciseID,
+            orderIndex: orderIndex,
+            state: state,
+            recordMode: recordMode,
+            weightValue: weightValue,
+            repetitionCount: repetitionCount,
+            durationSeconds: durationSeconds,
+            unit: unit,
+            side: side,
+            leftValue: leftValue,
+            rightValue: rightValue,
+            createdAtUTC: createdAtUTC,
+            updatedAtUTC: updatedAtUTC,
+            completedAtUTC: completedAtUTC
+        )
+    }
+}
+
+private struct ParsedFields {
+    let recordMode: RecordMode
+    let weightValue: DecimalValue?
+    let repetitionCount: DecimalValue?
+    let durationSeconds: DecimalValue?
+    let unit: MeasurementUnit
+    let side: SetSide
+    let leftValue: DecimalValue?
+    let rightValue: DecimalValue?
+
+    init(_ input: TrainingSetInput) throws {
+        self.recordMode = input.recordMode
+        self.weightValue = try Self.parseDecimal(input.weightValue)
+        self.repetitionCount = try Self.parseDecimal(input.repetitionCount)
+        self.durationSeconds = try Self.parseDecimal(input.durationSeconds)
+        self.unit = input.unit
+        self.side = input.side
+        self.leftValue = try Self.parseDecimal(input.leftValue)
+        self.rightValue = try Self.parseDecimal(input.rightValue)
+    }
+
+    init(_ set: TrainingSet) {
+        self.recordMode = set.recordMode
+        self.weightValue = set.weightValue
+        self.repetitionCount = set.repetitionCount
+        self.durationSeconds = set.durationSeconds
+        self.unit = set.unit
+        self.side = set.side
+        self.leftValue = set.leftValue
+        self.rightValue = set.rightValue
+    }
+
+    func validateForCompletion() throws {
+        switch recordMode {
+        case .weightReps:
+            guard weightValue != nil else {
+                throw DomainError.invalidNumber
+            }
+            try Self.requirePositiveInteger(repetitionCount)
+            guard durationSeconds == nil else {
+                throw DomainError.invalidMode
+            }
+            guard unit == .kilograms || unit == .pounds else {
+                throw DomainError.invalidUnit
+            }
+        case .reps:
+            guard weightValue == nil, durationSeconds == nil else {
+                throw DomainError.invalidMode
+            }
+            try Self.requirePositiveInteger(repetitionCount)
+            guard unit == .repetitions else {
+                throw DomainError.invalidUnit
+            }
+        case .duration:
+            guard weightValue == nil, repetitionCount == nil else {
+                throw DomainError.invalidMode
+            }
+            guard let durationSeconds, durationSeconds.isPositive else {
+                throw DomainError.invalidNumber
+            }
+            guard unit == .seconds else {
+                throw DomainError.invalidUnit
+            }
+        }
+        try validateSide()
+    }
+
+    private func validateSide() throws {
+        switch side {
+        case .none:
+            guard leftValue == nil, rightValue == nil else {
+                throw DomainError.invalidState
+            }
+        case .left:
+            guard leftValue != nil, rightValue == nil else {
+                throw DomainError.invalidNumber
+            }
+        case .right:
+            guard rightValue != nil, leftValue == nil else {
+                throw DomainError.invalidNumber
+            }
+        case .bilateral:
+            guard leftValue != nil, rightValue != nil else {
+                throw DomainError.invalidNumber
+            }
+        }
+    }
+
+    private static func requirePositiveInteger(_ value: DecimalValue?) throws {
+        guard let value, value.isPositive, value.isInteger else {
+            throw DomainError.invalidNumber
+        }
+    }
+
+    private static func parseDecimal(_ rawValue: String?) throws -> DecimalValue? {
+        guard let rawValue else {
+            return nil
+        }
+        let trimmed = rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            return nil
+        }
+        return try DecimalValue(trimmed)
+    }
+}

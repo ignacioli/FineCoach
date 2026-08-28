@@ -48,6 +48,49 @@ public enum FCAccessibilityID {
     public static let deleteBlocked = "deleteStudent.blocked"
     public static let deleteBackup = "deleteStudent.backup"
 
+    public static let activeSessionRoot = "activeSession.root"
+    public static let activeSessionAddExercise = "activeSession.addExercise"
+    public static let activeSessionExerciseName = "activeSession.exerciseName"
+    public static let activeSessionModeWeightReps = "activeSession.mode.weightReps"
+    public static let activeSessionModeReps = "activeSession.mode.reps"
+    public static let activeSessionModeDuration = "activeSession.mode.duration"
+    public static let activeSessionSaveExercise = "activeSession.saveExercise"
+    public static let activeSessionMoveUp = "activeSession.moveUp"
+    public static let activeSessionMoveDown = "activeSession.moveDown"
+    public static let activeSessionDeleteExercise = "activeSession.deleteExercise"
+    public static let activeSessionDeleteExerciseConfirm = "activeSession.deleteExerciseConfirm"
+    public static let activeSessionAddSet = "activeSession.addSet"
+    public static let activeSessionWeight = "activeSession.weight"
+    public static let activeSessionReps = "activeSession.reps"
+    public static let activeSessionDuration = "activeSession.duration"
+    public static let activeSessionSideNone = "activeSession.sideNone"
+    public static let activeSessionSideBilateral = "activeSession.sideBilateral"
+    public static let activeSessionLeft = "activeSession.left"
+    public static let activeSessionRight = "activeSession.right"
+    public static let activeSessionConfirmSet = "activeSession.confirmSet"
+    public static let activeSessionCopyPrevious = "activeSession.copyPrevious"
+    public static let activeSessionCopyLastSame = "activeSession.copyLastSame"
+    public static let activeSessionUndoSet = "activeSession.undoSet"
+    public static let activeSessionStats = "activeSession.stats"
+    public static let activeSessionFinish = "activeSession.finish"
+    public static let activeSessionAbandonConfirm = "activeSession.abandonConfirm"
+    public static let activeSessionDiscardDrafts = "activeSession.discardDrafts"
+    public static let activeSessionReturnToDrafts = "activeSession.returnToDrafts"
+    public static let activeSessionCompletedStatus = "activeSession.completedStatus"
+    public static let activeSessionEmptyHint = "activeSession.emptyHint"
+
+    public static func exerciseAt(_ index: Int) -> String {
+        "activeSession.exercise.at.\(index)"
+    }
+
+    public static func setAt(_ index: Int) -> String {
+        "activeSession.set.at.\(index)"
+    }
+
+    public static func setState(_ state: SetRecordingState) -> String {
+        "activeSession.setState.\(state.rawValue)"
+    }
+
     public static func studentRow(_ id: StableUUID) -> String {
         "studentList.row.\(id.rawValue.uuidString)"
     }

@@ -30,6 +30,7 @@
 		B131 /* SecureRandomGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A131 /* SecureRandomGenerator.swift */; };
 		B132 /* ProtectedFileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A132 /* ProtectedFileStore.swift */; };
 		B133 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = A133 /* AppLogger.swift */; };
+		B134 /* PerformanceSignposts.swift in Sources */ = {isa = PBXBuildFile; fileRef = A134 /* PerformanceSignposts.swift */; };
 		B140 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A140 /* PersistenceController.swift */; };
 		B141 /* PersistenceWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A141 /* PersistenceWriter.swift */; };
 		B142 /* StoreGeneration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A142 /* StoreGeneration.swift */; };
@@ -63,9 +64,15 @@
 		BF07 /* Combine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F007 /* Combine.framework */; };
 		BF08 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F008 /* XCTest.framework */; };
 		B115 /* Student.swift in Sources */ = {isa = PBXBuildFile; fileRef = A115 /* Student.swift */; };
+		B116 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = A116 /* Session.swift */; };
+		B117 /* SessionExercise.swift in Sources */ = {isa = PBXBuildFile; fileRef = A117 /* SessionExercise.swift */; };
+		B118 /* TrainingSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A118 /* TrainingSet.swift */; };
 		B122 /* StudentUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A122 /* StudentUseCases.swift */; };
+		B123 /* ActiveSessionUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A123 /* ActiveSessionUseCases.swift */; };
 		B144 /* StudentManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A144 /* StudentManagedObject+Mapping.swift */; };
 		B145 /* CoreDataStudentRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A145 /* CoreDataStudentRepository.swift */; };
+		B146 /* SessionManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A146 /* SessionManagedObject+Mapping.swift */; };
+		B147 /* CoreDataSessionRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A147 /* CoreDataSessionRepository.swift */; };
 		B180 /* FCAccessibilityID.swift in Sources */ = {isa = PBXBuildFile; fileRef = A180 /* FCAccessibilityID.swift */; };
 		B181 /* RootNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A181 /* RootNavigation.swift */; };
 		B310 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A310 /* OnboardingView.swift */; };
@@ -73,9 +80,18 @@
 		B320 /* StudentListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A320 /* StudentListView.swift */; };
 		B330 /* StudentDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A330 /* StudentDetailView.swift */; };
 		B331 /* DeleteStudentFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A331 /* DeleteStudentFlow.swift */; };
-		B230 /* StudentDomainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A230 /* StudentDomainTests.swift */; };
-		B231 /* StudentPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A231 /* StudentPersistenceTests.swift */; };
+		B340 /* ActiveSessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A340 /* ActiveSessionViewModel.swift */; };
+		B341 /* ActiveSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A341 /* ActiveSessionView.swift */; };
+		B342 /* SetEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A342 /* SetEditor.swift */; };
+		B343 /* CopySetFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A343 /* CopySetFlow.swift */; };
+		B344 /* DeleteExerciseFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A344 /* DeleteExerciseFlow.swift */; };
+		B345 /* FinishSessionFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A345 /* FinishSessionFlow.swift */; };
 		B221 /* StudentLifecycleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A221 /* StudentLifecycleUITests.swift */; };
+		B222 /* CoreTrainingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A222 /* CoreTrainingUITests.swift */; };
+		B230 /* StudentDomainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A230 /* StudentDomainTests.swift */; };
+		B232 /* SessionSetDomainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A232 /* SessionSetDomainTests.swift */; };
+		B231 /* StudentPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A231 /* StudentPersistenceTests.swift */; };
+		B233 /* ActiveSessionPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A233 /* ActiveSessionPersistenceTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -122,6 +138,7 @@
 		A131 /* SecureRandomGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureRandomGenerator.swift; sourceTree = "<group>"; };
 		A132 /* ProtectedFileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtectedFileStore.swift; sourceTree = "<group>"; };
 		A133 /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
+		A134 /* PerformanceSignposts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceSignposts.swift; sourceTree = "<group>"; };
 		A140 /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
 		A141 /* PersistenceWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceWriter.swift; sourceTree = "<group>"; };
 		A142 /* StoreGeneration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreGeneration.swift; sourceTree = "<group>"; };
@@ -154,19 +171,34 @@
 		F007 /* Combine.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Combine.framework; path = System/Library/Frameworks/Combine.framework; sourceTree = SDKROOT; };
 		F008 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		A115 /* Student.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Student.swift; sourceTree = "<group>"; };
+		A116 /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
+		A117 /* SessionExercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionExercise.swift; sourceTree = "<group>"; };
+		A118 /* TrainingSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingSet.swift; sourceTree = "<group>"; };
 		A122 /* StudentUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentUseCases.swift; sourceTree = "<group>"; };
+		A123 /* ActiveSessionUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionUseCases.swift; sourceTree = "<group>"; };
 		A144 /* StudentManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "StudentManagedObject+Mapping.swift"; sourceTree = "<group>"; };
 		A145 /* CoreDataStudentRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStudentRepository.swift; sourceTree = "<group>"; };
+		A146 /* SessionManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SessionManagedObject+Mapping.swift"; sourceTree = "<group>"; };
+		A147 /* CoreDataSessionRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataSessionRepository.swift; sourceTree = "<group>"; };
 		A180 /* FCAccessibilityID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCAccessibilityID.swift; sourceTree = "<group>"; };
 		A181 /* RootNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootNavigation.swift; sourceTree = "<group>"; };
 		A221 /* StudentLifecycleUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentLifecycleUITests.swift; sourceTree = "<group>"; };
+		A222 /* CoreTrainingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreTrainingUITests.swift; sourceTree = "<group>"; };
 		A230 /* StudentDomainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentDomainTests.swift; sourceTree = "<group>"; };
+		A232 /* SessionSetDomainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSetDomainTests.swift; sourceTree = "<group>"; };
 		A231 /* StudentPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentPersistenceTests.swift; sourceTree = "<group>"; };
+		A233 /* ActiveSessionPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionPersistenceTests.swift; sourceTree = "<group>"; };
 		A310 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		A311 /* StudentEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentEditorView.swift; sourceTree = "<group>"; };
 		A320 /* StudentListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentListView.swift; sourceTree = "<group>"; };
 		A330 /* StudentDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentDetailView.swift; sourceTree = "<group>"; };
 		A331 /* DeleteStudentFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteStudentFlow.swift; sourceTree = "<group>"; };
+		A340 /* ActiveSessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionViewModel.swift; sourceTree = "<group>"; };
+		A341 /* ActiveSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionView.swift; sourceTree = "<group>"; };
+		A342 /* SetEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetEditor.swift; sourceTree = "<group>"; };
+		A343 /* CopySetFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopySetFlow.swift; sourceTree = "<group>"; };
+		A344 /* DeleteExerciseFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteExerciseFlow.swift; sourceTree = "<group>"; };
+		A345 /* FinishSessionFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinishSessionFlow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -327,6 +359,7 @@
 			children = (
 				A200 /* SetupSmokeTests.swift */,
 				A473 /* Students */,
+				A476 /* ActiveSession */,
 			);
 			path = FineCoachTests;
 			sourceTree = "<group>";
@@ -340,6 +373,9 @@
 				A113 /* NormalizedName.swift */,
 				A114 /* DecimalValue.swift */,
 				A115 /* Student.swift */,
+				A116 /* Session.swift */,
+				A117 /* SessionExercise.swift */,
+				A118 /* TrainingSet.swift */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -350,6 +386,7 @@
 				A120 /* Protocols.swift */,
 				A121 /* FaultInjectionBoundary.swift */,
 				A122 /* StudentUseCases.swift */,
+				A123 /* ActiveSessionUseCases.swift */,
 			);
 			path = Application;
 			sourceTree = "<group>";
@@ -361,6 +398,7 @@
 				A131 /* SecureRandomGenerator.swift */,
 				A132 /* ProtectedFileStore.swift */,
 				A133 /* AppLogger.swift */,
+				A134 /* PerformanceSignposts.swift */,
 			);
 			path = Platform;
 			sourceTree = "<group>";
@@ -374,6 +412,8 @@
 				A143 /* CurrentGenerationPointer.swift */,
 				A144 /* StudentManagedObject+Mapping.swift */,
 				A145 /* CoreDataStudentRepository.swift */,
+				A146 /* SessionManagedObject+Mapping.swift */,
+				A147 /* CoreDataSessionRepository.swift */,
 				A175 /* FineCoachModel.xcdatamodeld */,
 			);
 			path = Persistence;
@@ -405,6 +445,7 @@
 			children = (
 				A421 /* Foundation */,
 				A474 /* Students */,
+				A477 /* ActiveSession */,
 			);
 			path = FineCoachIntegrationTests;
 			sourceTree = "<group>";
@@ -422,6 +463,7 @@
 			children = (
 				A220 /* SetupSmokeUITests.swift */,
 				A475 /* Students */,
+				A478 /* ActiveSession */,
 			);
 			path = FineCoachUITests;
 			sourceTree = "<group>";
@@ -457,6 +499,12 @@
 		A442 /* ActiveSession */ = {
 			isa = PBXGroup;
 			children = (
+				A340 /* ActiveSessionViewModel.swift */,
+				A341 /* ActiveSessionView.swift */,
+				A342 /* SetEditor.swift */,
+				A343 /* CopySetFlow.swift */,
+				A344 /* DeleteExerciseFlow.swift */,
+				A345 /* FinishSessionFlow.swift */,
 			);
 			path = ActiveSession;
 			sourceTree = "<group>";
@@ -540,6 +588,30 @@
 				A221 /* StudentLifecycleUITests.swift */,
 			);
 			path = Students;
+			sourceTree = "<group>";
+		};
+		A476 /* ActiveSession */ = {
+			isa = PBXGroup;
+			children = (
+				A232 /* SessionSetDomainTests.swift */,
+			);
+			path = ActiveSession;
+			sourceTree = "<group>";
+		};
+		A477 /* ActiveSession */ = {
+			isa = PBXGroup;
+			children = (
+				A233 /* ActiveSessionPersistenceTests.swift */,
+			);
+			path = ActiveSession;
+			sourceTree = "<group>";
+		};
+		A478 /* ActiveSession */ = {
+			isa = PBXGroup;
+			children = (
+				A222 /* CoreTrainingUITests.swift */,
+			);
+			path = ActiveSession;
 			sourceTree = "<group>";
 		};
 		A450 /* Doubles */ = {
@@ -744,19 +816,26 @@
 				B113 /* NormalizedName.swift in Sources */,
 				B114 /* DecimalValue.swift in Sources */,
 				B115 /* Student.swift in Sources */,
+				B116 /* Session.swift in Sources */,
+				B117 /* SessionExercise.swift in Sources */,
+				B118 /* TrainingSet.swift in Sources */,
 				B120 /* Protocols.swift in Sources */,
 				B121 /* FaultInjectionBoundary.swift in Sources */,
 				B122 /* StudentUseCases.swift in Sources */,
+				B123 /* ActiveSessionUseCases.swift in Sources */,
 				B130 /* SystemClock.swift in Sources */,
 				B131 /* SecureRandomGenerator.swift in Sources */,
 				B132 /* ProtectedFileStore.swift in Sources */,
 				B133 /* AppLogger.swift in Sources */,
+				B134 /* PerformanceSignposts.swift in Sources */,
 				B140 /* PersistenceController.swift in Sources */,
 				B141 /* PersistenceWriter.swift in Sources */,
 				B142 /* StoreGeneration.swift in Sources */,
 				B143 /* CurrentGenerationPointer.swift in Sources */,
 				B144 /* StudentManagedObject+Mapping.swift in Sources */,
 				B145 /* CoreDataStudentRepository.swift in Sources */,
+				B146 /* SessionManagedObject+Mapping.swift in Sources */,
+				B147 /* CoreDataSessionRepository.swift in Sources */,
 				B150 /* Tokens.swift in Sources */,
 				B160 /* FCButton.swift in Sources */,
 				B161 /* FCTextField.swift in Sources */,
@@ -767,6 +846,12 @@
 				B320 /* StudentListView.swift in Sources */,
 				B330 /* StudentDetailView.swift in Sources */,
 				B331 /* DeleteStudentFlow.swift in Sources */,
+				B340 /* ActiveSessionViewModel.swift in Sources */,
+				B341 /* ActiveSessionView.swift in Sources */,
+				B342 /* SetEditor.swift in Sources */,
+				B343 /* CopySetFlow.swift in Sources */,
+				B344 /* DeleteExerciseFlow.swift in Sources */,
+				B345 /* FinishSessionFlow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -776,6 +861,7 @@
 			files = (
 				B200 /* SetupSmokeTests.swift in Sources */,
 				B230 /* StudentDomainTests.swift in Sources */,
+				B232 /* SessionSetDomainTests.swift in Sources */,
 				B201 /* FictitiousFixtures.swift in Sources */,
 				B202 /* TestClock.swift in Sources */,
 				B203 /* TestIDGenerator.swift in Sources */,
@@ -797,6 +883,7 @@
 				4C5E5DFA30413B0D0088237A /* TestFaultInjector.swift in Sources */,
 				B210 /* FoundationIntegrationTests.swift in Sources */,
 				B231 /* StudentPersistenceTests.swift in Sources */,
+				B233 /* ActiveSessionPersistenceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -806,6 +893,7 @@
 			files = (
 				B220 /* SetupSmokeUITests.swift in Sources */,
 				B221 /* StudentLifecycleUITests.swift in Sources */,
+				B222 /* CoreTrainingUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

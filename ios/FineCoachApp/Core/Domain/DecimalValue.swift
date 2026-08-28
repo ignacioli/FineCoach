@@ -64,6 +64,12 @@ public struct DecimalValue: Hashable, Codable, Sendable, Comparable {
 
     public var isZero: Bool { self == .zero }
     public var isPositive: Bool { self > .zero }
+    public var isInteger: Bool {
+        var value = decimal
+        var rounded = Decimal()
+        NSDecimalRound(&rounded, &value, 0, .plain)
+        return rounded == decimal
+    }
 
     public static func < (lhs: DecimalValue, rhs: DecimalValue) -> Bool {
         NSDecimalNumber(decimal: lhs.decimal).compare(NSDecimalNumber(decimal: rhs.decimal)) == .orderedAscending
