@@ -15,6 +15,13 @@
         "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "本地存储暂不可用" } }
       }
     },
+    "exercise.catalog.unavailable" : {
+      "comment" : "Shown when the placeholder exercise catalog cannot be seeded",
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "动作库暂不可用" } }
+      }
+    },
     "onboarding.kicker" : {
       "extractionState" : "manual",
       "localizations" : {

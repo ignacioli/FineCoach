@@ -197,10 +197,19 @@ public struct CoreDataExerciseRepository: Sendable {
         }
     }
 
-    public func releaseSessionScopeClaims() async throws {
+    public func reapSessionScopeClaims(keepingOwnerIDs: Set<String>) async throws {
         try await writer.transaction { context in
-            try ExerciseManagedObjectMapping.deleteClaims(scope: .currentSession, in: context)
+            for object in try ExerciseManagedObjectMapping.fetchClaims(scope: .currentSession, in: context) {
+                let ownerID = object.value(forKey: "ownerID") as? String ?? ""
+                if !keepingOwnerIDs.contains(ownerID) {
+                    context.delete(object)
+                }
+            }
         }
+    }
+
+    public func releaseSessionScopeClaims() async throws {
+        try await reapSessionScopeClaims(keepingOwnerIDs: [])
     }
 
     public func hasCatalogRow(id: StableExerciseID) async throws -> Bool {

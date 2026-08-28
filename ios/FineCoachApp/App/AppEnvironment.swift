@@ -10,6 +10,7 @@ public final class AppEnvironment: ObservableObject {
     public let sessionUseCases: ActiveSessionUseCases?
     public let exerciseUseCases: ExerciseLibraryUseCases?
     public let startupErrorDescription: String?
+    @Published public private(set) var catalogUnavailableMessage: String?
     private let studentRepository: CoreDataStudentRepository?
     private let sessionRepository: CoreDataSessionRepository?
 
@@ -59,8 +60,10 @@ public final class AppEnvironment: ObservableObject {
         }
         do {
             try await exerciseUseCases.seedIfNeeded()
+            catalogUnavailableMessage = nil
         } catch {
-            return
+            catalogUnavailableMessage =
+                (error as? LocalizedError)?.errorDescription ?? String(localized: "exercise.catalog.unavailable")
         }
     }
 
@@ -191,6 +194,7 @@ public final class AppEnvironment: ObservableObject {
             ids: idGenerator
         )
         self.startupErrorDescription = nil
+        self.catalogUnavailableMessage = nil
     }
 
     private init(failure: Error) {
@@ -202,6 +206,7 @@ public final class AppEnvironment: ObservableObject {
         self.sessionUseCases = nil
         self.exerciseUseCases = nil
         self.startupErrorDescription = (failure as? LocalizedError)?.errorDescription ?? "本地存储暂不可用。"
+        self.catalogUnavailableMessage = nil
     }
 
     #if DEBUG

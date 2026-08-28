@@ -94,9 +94,19 @@ public enum FCAccessibilityID {
     public static let exerciseLibrarySearch = "exerciseLibrary.search"
     public static let exerciseLibraryAddCustom = "exerciseLibrary.addCustom"
     public static let exerciseLibraryShowHidden = "exerciseLibrary.showHidden"
-    public static let exerciseLibraryFavorite = "exerciseLibrary.favorite"
-    public static let exerciseLibraryHide = "exerciseLibrary.hide"
     public static let exerciseLibraryConflict = "exerciseLibrary.conflict"
+
+    public static func exerciseLibraryFavorite(_ id: StableExerciseID) -> String {
+        "exerciseLibrary.favorite.\(id.rawValue)"
+    }
+
+    public static func exerciseLibraryHide(_ id: StableExerciseID) -> String {
+        "exerciseLibrary.hide.\(id.rawValue)"
+    }
+
+    public static func exerciseLibraryRow(_ id: StableExerciseID) -> String {
+        "exerciseLibrary.row.\(id.rawValue)"
+    }
 
     public static let customExerciseRoot = "customExercise.root"
     public static let customExerciseName = "customExercise.name"
@@ -121,10 +131,6 @@ public enum FCAccessibilityID {
 
     public static func studentRow(_ id: StableUUID) -> String {
         "studentList.row.\(id.rawValue.uuidString)"
-    }
-
-    public static func exerciseLibraryRow(_ id: StableExerciseID) -> String {
-        "exerciseLibrary.row.\(id.rawValue)"
     }
 
     public static func sexIdentifier(_ sex: StudentSex) -> String {

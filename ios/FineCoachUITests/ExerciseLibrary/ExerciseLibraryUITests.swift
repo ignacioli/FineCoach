@@ -16,8 +16,8 @@ final class ExerciseLibraryUITests: XCTestCase {
             element(in: app, identifier: "exerciseLibrary.row.fc.placeholder.squat").waitForExistence(timeout: 8))
         XCTAssertTrue(app.staticTexts["内置"].waitForExistence(timeout: 8))
 
-        tapVisible(in: app, identifier: "exerciseLibrary.favorite")
-        tapVisible(in: app, identifier: "exerciseLibrary.hide")
+        tapVisible(in: app, identifier: "exerciseLibrary.favorite.fc.placeholder.squat")
+        tapVisible(in: app, identifier: "exerciseLibrary.hide.fc.placeholder.squat")
         XCTAssertTrue(element(in: app, identifier: "exerciseLibrary.root").waitForExistence(timeout: 8))
         XCTAssertFalse(
             element(in: app, identifier: "exerciseLibrary.row.fc.placeholder.squat").waitForExistence(timeout: 2),
@@ -27,7 +27,7 @@ final class ExerciseLibraryUITests: XCTestCase {
         tapVisible(in: app, identifier: "exerciseLibrary.showHidden")
         XCTAssertTrue(
             element(in: app, identifier: "exerciseLibrary.row.fc.placeholder.squat").waitForExistence(timeout: 8))
-        tapVisible(in: app, identifier: "exerciseLibrary.hide")
+        tapVisible(in: app, identifier: "exerciseLibrary.hide.fc.placeholder.squat")
         XCTAssertTrue(
             element(in: app, identifier: "exerciseLibrary.row.fc.placeholder.squat").waitForExistence(timeout: 8))
 

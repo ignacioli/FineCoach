@@ -31,11 +31,17 @@ struct QuickCreateExerciseFlow: View {
                     .foregroundStyle(FCSemanticColors.destructive)
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionExerciseNameConflict)
             }
-            FCButton(title: String(localized: "session.action.saveSessionOnly")) {
+            FCButton(
+                title: String(localized: "session.action.saveSessionOnly"),
+                isEnabled: !viewModel.isMutationInFlight
+            ) {
                 Task { await viewModel.saveExercise() }
             }
             .accessibilityIdentifier(FCAccessibilityID.activeSessionSaveExercise)
-            FCButton(title: String(localized: "session.action.saveToLibrary")) {
+            FCButton(
+                title: String(localized: "session.action.saveToLibrary"),
+                isEnabled: !viewModel.isMutationInFlight
+            ) {
                 Task { await viewModel.saveExerciseToLibrary() }
             }
             .accessibilityIdentifier(FCAccessibilityID.activeSessionSaveExerciseToLibrary)

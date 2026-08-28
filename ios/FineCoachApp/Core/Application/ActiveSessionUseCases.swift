@@ -35,7 +35,9 @@ public struct ActiveSessionUseCases: Sendable {
     }
 
     public func reconcileOnLaunch() async throws -> RecoveryLaunchDecision {
-        try await coordinator.reconcileOnLaunch()
+        let decision = try await coordinator.reconcileOnLaunch()
+        try await reapSessionScopeClaims(for: decision)
+        return decision
     }
 
     public func retry() async throws -> Session {
@@ -86,7 +88,9 @@ public struct ActiveSessionUseCases: Sendable {
                 )
             }
         } catch {
-            try? await exerciseRepository.releaseClaims(ownerID: ownerID)
+            if !(await workingCopyContainsExercise(id: exerciseID)) {
+                await releaseClaimBestEffort(ownerID: ownerID)
+            }
             throw error
         }
     }
@@ -109,12 +113,19 @@ public struct ActiveSessionUseCases: Sendable {
             id: try StableExerciseID(ids.makeID().uuidString),
             now: clock.nowUTC()
         )
-        return try await mutate { session in
-            try session.addingCatalogExercise(
-                id: StableUUID(ids.makeID()),
-                item: item,
-                now: clock.nowUTC()
-            )
+        do {
+            return try await mutate { session in
+                try session.addingCatalogExercise(
+                    id: StableUUID(ids.makeID()),
+                    item: item,
+                    now: clock.nowUTC()
+                )
+            }
+        } catch {
+            if !(await workingCopyContainsCatalogSource(id: item.id)) {
+                await archiveCustomBestEffort(id: item.id)
+            }
+            throw error
         }
     }
 
@@ -123,13 +134,19 @@ public struct ActiveSessionUseCases: Sendable {
     }
 
     public func removeExercise(exerciseID: StableUUID, confirmedIfCompleted: Bool) async throws -> Session {
-        try await mutate {
+        let session = try await mutate {
             try $0.removingExercise(
                 id: exerciseID,
                 confirmedIfCompleted: confirmedIfCompleted,
                 now: clock.nowUTC()
             )
         }
+        try await exerciseRepository.reapSessionScopeClaims(
+            keepingOwnerIDs: Set(
+                session.exercises.filter { $0.sourceKind == .sessionOnly }.map { $0.id.rawValue.uuidString }
+            )
+        )
+        return session
     }
 
     public func addSet(exerciseID: StableUUID, input: TrainingSetInput) async throws -> Session {
@@ -180,13 +197,13 @@ public struct ActiveSessionUseCases: Sendable {
     public func finish() async throws -> Session {
         try await coordinator.ensureProjectionReadyForCompletion()
         let session = try await mutate { try $0.finished(now: clock.nowUTC()) }
-        try await exerciseRepository.releaseSessionScopeClaims()
+        await releaseSessionScopeClaimsBestEffort()
         return session
     }
 
     public func abandonEmpty() async throws -> Session {
         let session = try await mutate { try $0.abandoned(now: clock.nowUTC()) }
-        try await exerciseRepository.releaseSessionScopeClaims()
+        await releaseSessionScopeClaimsBestEffort()
         return session
     }
 
@@ -195,5 +212,57 @@ public struct ActiveSessionUseCases: Sendable {
             throw DomainError.notFound
         }
         return try await coordinator.persist(transform(current))
+    }
+
+    private func reapSessionScopeClaims(for decision: RecoveryLaunchDecision) async throws {
+        let session: Session?
+        switch decision {
+        case .noActiveSession:
+            session = nil
+        case .failClosed:
+            session = try await sessionRepository.loadActive()
+        case .consistent(let recovered), .ignoreOlderSnapshot(let recovered):
+            session = recovered
+        case .replay(let snapshot):
+            session = snapshot.session
+        }
+        let keepIDs = Set(
+            (session?.exercises ?? [])
+                .filter { $0.sourceKind == .sessionOnly }
+                .map { $0.id.rawValue.uuidString }
+        )
+        try await exerciseRepository.reapSessionScopeClaims(keepingOwnerIDs: keepIDs)
+    }
+
+    private func workingCopyContainsExercise(id: StableUUID) async -> Bool {
+        (try? await coordinator.workingCopy())?.exercises.contains { $0.id == id } == true
+    }
+
+    private func workingCopyContainsCatalogSource(id: StableExerciseID) async -> Bool {
+        (try? await coordinator.workingCopy())?.exercises.contains { $0.sourceID == id } == true
+    }
+
+    private func releaseClaimBestEffort(ownerID: StableExerciseID) async {
+        do {
+            try await exerciseRepository.releaseClaims(ownerID: ownerID)
+        } catch {
+            return
+        }
+    }
+
+    private func archiveCustomBestEffort(id: StableExerciseID) async {
+        do {
+            _ = try await exerciseRepository.archiveCustom(id: id, now: clock.nowUTC())
+        } catch {
+            return
+        }
+    }
+
+    private func releaseSessionScopeClaimsBestEffort() async {
+        do {
+            try await exerciseRepository.releaseSessionScopeClaims()
+        } catch {
+            return
+        }
     }
 }

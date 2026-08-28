@@ -36,10 +36,13 @@
 
 ## 实体设备
 
-未在本轮对 US4 做实体设备回归。真实 100–150 条 Built-in 内容仍受来源/许可/专业评审阻塞。
+- 设备：iPhone XS Max（iPhone11,6），iOS 18.7.10，id `00008020-000C5D2C3ED3002E`。屏幕解锁、保持常亮。前两次 UI 因 `Timed out while enabling automation mode` 未能启动；解锁并允许自动化后第三次跑通。
+- FineCoachTests：38/38 通过（`/tmp/FineCoachDD-Device-Unit/Logs/Test/Test-FineCoachTests-2026.08.28_09-06-14--0700.xcresult`）。命令行覆盖 `DEVELOPMENT_TEAM=9Z7427RG9X`，未改 pbxproj。
+- FineCoachIntegrationTests：31/31 通过（`/tmp/FineCoachDD-Device-Int/Logs/Test/Test-FineCoachIntegrationTests-2026.08.28_09-06-37--0700.xcresult`）。
+- FineCoachUITests：18/18 通过（`/tmp/FineCoachDD-Device-UI3/Logs/Test/Test-FineCoachUITests-2026.08.28_09-17-23--0700.xcresult`），含 US1 4 + US2 CoreTraining 4 + US3 recovery 5 + US4 library 4 + smoke 1。
+- 这不是 Data Protection 专项证据。真实 100–150 条 Built-in 内容仍受来源/许可/专业评审阻塞。
 
 ## 未验证
 
 - 未做人工 VoiceOver 朗读走查。
-- 未把 4 个动作库 UI 修复后再跑一遍完整 FineCoachUITests 套件（US1–US3 回归证据来自修复前的全量，当时仅动作库 4 条失败）。
 - 未启动 T078 或任何 User Story 5 任务。

@@ -35,6 +35,7 @@ final class ActiveSessionViewModel: ObservableObject {
     @Published var right = ""
     @Published var selectedExerciseID: StableUUID?
     @Published var presentedSheet: ActiveSessionSheet?
+    @Published private(set) var isMutationInFlight = false
 
     let studentID: StableUUID
     let useCases: ActiveSessionUseCases
@@ -354,7 +355,12 @@ final class ActiveSessionViewModel: ObservableObject {
     }
 
     private func run(_ work: @escaping () async throws -> Void) async {
+        guard !isMutationInFlight else {
+            return
+        }
+        isMutationInFlight = true
         saveStatus = .saving
+        defer { isMutationInFlight = false }
         do {
             try await work()
             errorMessage = nil

@@ -55,6 +55,14 @@
             case .saving:
                 XCTFail("Snapshot replace failure must not remain in saving")
             }
+
+            injector.setFailure(at: .recoverySnapshotReplace, enabled: false)
+            let retried = try await environment.sessionUseCases.addSessionOnlyExercise(
+                displayName: "杠铃深蹲",
+                recordMode: .weightReps
+            )
+            XCTAssertEqual(retried.exercises.count, 1)
+            XCTAssertEqual(retried.exercises[0].displayNameSnapshot.value, "杠铃深蹲")
             try await environment.controller.shutdownForTesting()
         }
 
@@ -355,6 +363,107 @@
             XCTAssertEqual(setState(in: restored, id: completedSetID), .completed)
             XCTAssertFalse(restored.exercises.first?.sets.last?.contributesToStatistics ?? true)
             try await reopened.controller.shutdownForTesting()
+        }
+
+        func testRemovingSessionOnlyExerciseReleasesNameForReuse() async throws {
+            let removedExerciseID = StableUUID(UUID(uuidString: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb")!)
+            let reusedExerciseID = StableUUID(UUID(uuidString: "cccccccc-cccc-4ccc-8ccc-cccccccccccc")!)
+            let environment = try makeUseCases(
+                ids: [studentID.rawValue, sessionID.rawValue, removedExerciseID.rawValue, reusedExerciseID.rawValue]
+            )
+            _ = try await environment.studentUseCases.create(
+                draft: StudentDraft(displayName: "林青", sex: .female)
+            )
+            _ = try await environment.sessionUseCases.startOrOpen(studentID: studentID)
+            let added = try await environment.sessionUseCases.addSessionOnlyExercise(
+                displayName: "侧平举",
+                recordMode: .reps
+            )
+            XCTAssertEqual(added.exercises.count, 1)
+
+            let afterRemove = try await environment.sessionUseCases.removeExercise(
+                exerciseID: removedExerciseID,
+                confirmedIfCompleted: false
+            )
+            XCTAssertTrue(afterRemove.exercises.isEmpty)
+
+            let reused = try await environment.sessionUseCases.addSessionOnlyExercise(
+                displayName: "侧平举",
+                recordMode: .reps
+            )
+            XCTAssertEqual(reused.exercises.count, 1)
+            XCTAssertEqual(reused.exercises[0].id, reusedExerciseID)
+            XCTAssertEqual(reused.exercises[0].displayNameSnapshot.value, "侧平举")
+            try await environment.controller.shutdownForTesting()
+        }
+
+        func testSaveToLibrarySnapshotFailureArchivesCustomSoNameCanBeRetried() async throws {
+            let customID = UUID(uuidString: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb")!
+            let sessionExerciseID = UUID(uuidString: "cccccccc-cccc-4ccc-8ccc-cccccccccccc")!
+            let retryCustomID = UUID(uuidString: "dddddddd-dddd-4ddd-8ddd-dddddddddddd")!
+            let retrySessionExerciseID = UUID(uuidString: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee")!
+            let injector = TestFaultInjector()
+            let environment = try makeUseCases(
+                ids: [
+                    studentID.rawValue, sessionID.rawValue, customID, sessionExerciseID, retryCustomID,
+                    retrySessionExerciseID,
+                ],
+                injector: injector
+            )
+            _ = try await environment.studentUseCases.create(
+                draft: StudentDraft(displayName: "林青", sex: .female)
+            )
+            _ = try await environment.sessionUseCases.startOrOpen(studentID: studentID)
+
+            injector.setFailure(at: .recoverySnapshotReplace, enabled: true)
+            await assertBlocked(at: .recoverySnapshotReplace) {
+                _ = try await environment.sessionUseCases.addCustomToLibraryAndSession(
+                    name: "课中自定义A",
+                    recordMode: .weightReps
+                )
+            }
+
+            let catalog = CoreDataExerciseRepository(writer: environment.controller.writer)
+            let leftover = try await catalog.searchActive(query: "课中自定义A")
+            XCTAssertTrue(leftover.isEmpty, "failed save-to-library must archive the custom so the name is free")
+
+            injector.setFailure(at: .recoverySnapshotReplace, enabled: false)
+            let retried = try await environment.sessionUseCases.addCustomToLibraryAndSession(
+                name: "课中自定义A",
+                recordMode: .weightReps
+            )
+            XCTAssertEqual(retried.exercises.count, 1)
+            XCTAssertEqual(retried.exercises[0].displayNameSnapshot.value, "课中自定义A")
+            XCTAssertEqual(retried.exercises[0].sourceKind, .custom)
+            try await environment.controller.shutdownForTesting()
+        }
+
+        func testReconcileReapsOrphanSessionClaimsWhenNoActiveSession() async throws {
+            let environment = try makeUseCases(ids: [studentID.rawValue, sessionID.rawValue, firstExerciseID.rawValue])
+            let exercises = CoreDataExerciseRepository(writer: environment.controller.writer)
+            try await exercises.upsertClaimForTesting(
+                try ExerciseNameClaim(
+                    normalizedName: "侧平举",
+                    ownerKind: .sessionOnly,
+                    ownerID: try StableExerciseID(firstExerciseID.rawValue.uuidString),
+                    scope: .currentSession
+                )
+            )
+
+            let decision = try await environment.sessionUseCases.reconcileOnLaunch()
+            XCTAssertEqual(decision, .noActiveSession)
+
+            _ = try await environment.studentUseCases.create(
+                draft: StudentDraft(displayName: "林青", sex: .female)
+            )
+            _ = try await environment.sessionUseCases.startOrOpen(studentID: studentID)
+            let added = try await environment.sessionUseCases.addSessionOnlyExercise(
+                displayName: "侧平举",
+                recordMode: .reps
+            )
+            XCTAssertEqual(added.exercises.count, 1)
+            XCTAssertEqual(added.exercises[0].displayNameSnapshot.value, "侧平举")
+            try await environment.controller.shutdownForTesting()
         }
 
         private struct Environment {

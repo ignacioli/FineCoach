@@ -45,7 +45,6 @@
         <uniquenessConstraints>
             <constraint>
                 <constraint property="normalizedName"/>
-                <constraint property="scope"/>
             </constraint>
         </uniquenessConstraints>
     </entity>

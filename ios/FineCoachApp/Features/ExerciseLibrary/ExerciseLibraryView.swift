@@ -29,7 +29,7 @@ struct ExerciseLibraryView: View {
                 .padding(.vertical, FCPrimitives.spacingSmall)
                 .accessibilityIdentifier(FCAccessibilityID.exerciseLibrarySearch)
                 .onChange(of: viewModel.query) { _, _ in
-                    Task { await viewModel.reload() }
+                    viewModel.scheduleReload()
                 }
 
             Button(String(localized: "exercise.library.showHidden")) {
@@ -82,9 +82,6 @@ struct ExerciseLibraryView: View {
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.exerciseLibraryRoot)
         .task { await viewModel.reload() }
-        .onAppear {
-            Task { await viewModel.reload() }
-        }
         .onChange(of: editorRoute) { _, newValue in
             if newValue == nil {
                 Task { await viewModel.reload() }
@@ -131,8 +128,8 @@ struct ExerciseLibraryView: View {
                     .frame(minWidth: 44, minHeight: 44)
             }
             .buttonStyle(.borderless)
-            .accessibilityIdentifier(FCAccessibilityID.exerciseLibraryFavorite)
-            .accessibilityLabel(String(localized: "exercise.library.favorite"))
+            .accessibilityIdentifier(FCAccessibilityID.exerciseLibraryFavorite(entry.id))
+            .accessibilityLabel("\(String(localized: "exercise.library.favorite")), \(entry.displayedName)")
             .accessibilityAddTraits((entry.preference?.isFavorite ?? false) ? [.isSelected] : [])
 
             Button {
@@ -142,11 +139,11 @@ struct ExerciseLibraryView: View {
                     .frame(minWidth: 44, minHeight: 44)
             }
             .buttonStyle(.borderless)
-            .accessibilityIdentifier(FCAccessibilityID.exerciseLibraryHide)
+            .accessibilityIdentifier(FCAccessibilityID.exerciseLibraryHide(entry.id))
             .accessibilityLabel(
                 (entry.preference?.isHidden ?? false)
-                    ? String(localized: "exercise.library.unhide")
-                    : String(localized: "exercise.library.hide")
+                    ? "\(String(localized: "exercise.library.unhide")), \(entry.displayedName)"
+                    : "\(String(localized: "exercise.library.hide")), \(entry.displayedName)"
             )
         }
         .frame(minHeight: 44)

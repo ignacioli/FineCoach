@@ -10,17 +10,35 @@ final class ExerciseLibraryViewModel: ObservableObject {
     @Published var conflictMessage: String?
 
     let useCases: ExerciseLibraryUseCases
+    private var reloadGeneration = 0
+    private var reloadTask: Task<Void, Never>?
 
     init(useCases: ExerciseLibraryUseCases) {
         self.useCases = useCases
     }
 
+    func scheduleReload() {
+        reloadTask?.cancel()
+        reloadTask = Task { await reload() }
+    }
+
     func reload() async {
+        reloadGeneration += 1
+        let generation = reloadGeneration
         do {
-            entries = try await useCases.search(query: query, includeHidden: includeHidden)
+            let result = try await useCases.search(query: query, includeHidden: includeHidden)
+            guard generation == reloadGeneration, !Task.isCancelled else {
+                return
+            }
+            entries = result
             errorMessage = nil
             conflictMessage = nil
+        } catch is CancellationError {
+            return
         } catch {
+            guard generation == reloadGeneration else {
+                return
+            }
             present(error)
         }
     }

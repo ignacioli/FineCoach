@@ -42,6 +42,12 @@ struct RootNavigation: View {
                         .padding()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(FCSemanticColors.background)
+                } else if let catalogUnavailableMessage = environment.catalogUnavailableMessage {
+                    Text(catalogUnavailableMessage)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(FCSemanticColors.background)
                 } else if !didLoadOnboarding {
                     ProgressView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
