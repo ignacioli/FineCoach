@@ -7,6 +7,7 @@ public struct PrivacyCover: View {
         Color.black
             .ignoresSafeArea()
             .allowsHitTesting(true)
+            .accessibilityIdentifier(FCAccessibilityID.privacyCover)
             .accessibilityHidden(true)
     }
 }

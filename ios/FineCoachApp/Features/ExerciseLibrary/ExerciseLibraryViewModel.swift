@@ -26,7 +26,9 @@ final class ExerciseLibraryViewModel: ObservableObject {
         reloadGeneration += 1
         let generation = reloadGeneration
         do {
-            let result = try await useCases.search(query: query, includeHidden: includeHidden)
+            let result = try await PerformanceSignposts.shared.measureExerciseSearch {
+                try await useCases.search(query: query, includeHidden: includeHidden)
+            }
             guard generation == reloadGeneration, !Task.isCancelled else {
                 return
             }

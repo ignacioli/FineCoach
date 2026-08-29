@@ -192,9 +192,11 @@ final class CoreTrainingUITests: XCTestCase {
         }
 
         XCTAssertTrue(
-            element(in: app, identifier: "activeSession.completedStatus").waitForExistence(timeout: 8)
+            element(in: app, identifier: "sessionSummary.root").waitForExistence(timeout: 8)
+                || element(in: app, identifier: "activeSession.completedStatus").waitForExistence(timeout: 2)
                 || app.buttons["studentDetail.startTraining"].waitForExistence(timeout: 2)
-                || element(in: app, identifier: "studentDetail.root").waitForExistence(timeout: 2)
+                || element(in: app, identifier: "studentDetail.root").waitForExistence(timeout: 2),
+            "discard-and-finish must land on US5 session summary or another completed-session surface"
         )
         XCTAssertFalse(element(in: app, identifier: "studentList.inProgress").exists)
         XCTAssertFalse(element(in: app, identifier: "studentDetail.continueTraining").exists)

@@ -158,6 +158,9 @@
 		B245 /* RestoreCrashRecoveryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A245 /* RestoreCrashRecoveryTests.swift */; };
 		B250 /* BackupGoldenVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A250 /* BackupGoldenVectorTests.swift */; };
 		B251 /* BackupHostileInputTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A251 /* BackupHostileInputTests.swift */; };
+		B252 /* ScenePrivacyCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A252 /* ScenePrivacyCoordinatorTests.swift */; };
+		B253 /* PrivacyCoverUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A253 /* PrivacyCoverUITests.swift */; };
+		B254 /* PerformanceMeasurementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A254 /* PerformanceMeasurementTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -295,6 +298,9 @@
 		A246 /* RestoreFaultMatrixTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestoreFaultMatrixTests.swift; sourceTree = "<group>"; };
 		A250 /* BackupGoldenVectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupGoldenVectorTests.swift; sourceTree = "<group>"; };
 		A251 /* BackupHostileInputTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupHostileInputTests.swift; sourceTree = "<group>"; };
+		A252 /* ScenePrivacyCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenePrivacyCoordinatorTests.swift; sourceTree = "<group>"; };
+		A253 /* PrivacyCoverUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyCoverUITests.swift; sourceTree = "<group>"; };
+		A254 /* PerformanceMeasurementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceMeasurementTests.swift; sourceTree = "<group>"; };
 		A190 /* ActiveSessionRecoverySnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionRecoverySnapshot.swift; sourceTree = "<group>"; };
 		A191 /* ActiveSessionRecoveryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionRecoveryStore.swift; sourceTree = "<group>"; };
 		A192 /* ActiveSessionCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionCoordinator.swift; sourceTree = "<group>"; };
@@ -501,6 +507,7 @@
 			isa = PBXGroup;
 			children = (
 				A200 /* SetupSmokeTests.swift */,
+				A492 /* App */,
 				A473 /* Students */,
 				A476 /* ActiveSession */,
 				A479 /* Recovery */,
@@ -629,6 +636,7 @@
 				A483 /* ExerciseLibrary */,
 				A487 /* ShareReport */,
 				A490 /* Backup */,
+				A494 /* Performance */,
 			);
 			path = FineCoachIntegrationTests;
 			sourceTree = "<group>";
@@ -651,6 +659,7 @@
 				A484 /* ExerciseLibrary */,
 				A488 /* HistoryShare */,
 				A491 /* BackupRestore */,
+				A493 /* Privacy */,
 			);
 			path = FineCoachUITests;
 			sourceTree = "<group>";
@@ -922,6 +931,30 @@
 				A227 /* BackupRestoreUITests.swift */,
 			);
 			path = BackupRestore;
+			sourceTree = "<group>";
+		};
+		A492 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A252 /* ScenePrivacyCoordinatorTests.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		A493 /* Privacy */ = {
+			isa = PBXGroup;
+			children = (
+				A253 /* PrivacyCoverUITests.swift */,
+			);
+			path = Privacy;
+			sourceTree = "<group>";
+		};
+		A494 /* Performance */ = {
+			isa = PBXGroup;
+			children = (
+				A254 /* PerformanceMeasurementTests.swift */,
+			);
+			path = Performance;
 			sourceTree = "<group>";
 		};
 		A450 /* Doubles */ = {
@@ -1226,6 +1259,7 @@
 				B241 /* ShareReportPolicyTests.swift in Sources */,
 				B250 /* BackupGoldenVectorTests.swift in Sources */,
 				B251 /* BackupHostileInputTests.swift in Sources */,
+				B252 /* ScenePrivacyCoordinatorTests.swift in Sources */,
 				B201 /* FictitiousFixtures.swift in Sources */,
 				B202 /* TestClock.swift in Sources */,
 				B203 /* TestIDGenerator.swift in Sources */,
@@ -1255,6 +1289,7 @@
 				B244 /* BackupRoundTripTests.swift in Sources */,
 				B245 /* RestoreCrashRecoveryTests.swift in Sources */,
 				B246 /* RestoreFaultMatrixTests.swift in Sources */,
+				B254 /* PerformanceMeasurementTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1270,6 +1305,7 @@
 				B225 /* ExerciseLibraryUITests.swift in Sources */,
 				B226 /* HistoryShareUITests.swift in Sources */,
 				B227 /* BackupRestoreUITests.swift in Sources */,
+				B253 /* PrivacyCoverUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

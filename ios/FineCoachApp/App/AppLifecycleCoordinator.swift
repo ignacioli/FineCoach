@@ -9,7 +9,9 @@ public final class AppLifecycleCoordinator: ObservableObject {
         guard let useCases = environment.sessionUseCases else {
             return
         }
-        _ = try? await useCases.reconcileOnLaunch()
+        _ = try? await PerformanceSignposts.shared.measureRecovery {
+            try await useCases.reconcileOnLaunch()
+        }
     }
 
     public func sceneWillResignActive(environment: AppEnvironment) async {
