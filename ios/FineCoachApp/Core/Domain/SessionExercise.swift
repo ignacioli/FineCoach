@@ -59,6 +59,20 @@ public struct SessionExercise: Hashable, Codable, Sendable, Identifiable {
         )
     }
 
+    func replacingActionPrivateNote(_ note: ValidatedText?) -> SessionExercise {
+        SessionExercise(
+            id: id,
+            sessionID: sessionID,
+            orderIndex: orderIndex,
+            sourceKind: sourceKind,
+            sourceID: sourceID,
+            displayNameSnapshot: displayNameSnapshot,
+            recordModeSnapshot: recordModeSnapshot,
+            actionPrivateNote: note,
+            sets: sets
+        )
+    }
+
     func replacingSets(_ sets: [TrainingSet]) -> SessionExercise {
         SessionExercise(
             id: id,

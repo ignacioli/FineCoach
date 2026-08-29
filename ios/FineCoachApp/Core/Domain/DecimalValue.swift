@@ -76,6 +76,11 @@ public struct DecimalValue: Hashable, Codable, Sendable, Comparable {
         return try DecimalValue(sum.stringValue)
     }
 
+    public func multiplied(by other: DecimalValue) throws -> DecimalValue {
+        let product = NSDecimalNumber(decimal: decimal).multiplying(by: NSDecimalNumber(decimal: other.decimal))
+        return try DecimalValue(product.stringValue)
+    }
+
     public static func seconds(_ interval: TimeInterval) throws -> DecimalValue {
         let clamped = max(0, interval.rounded(.down))
         return try DecimalValue(String(Int(clamped)))

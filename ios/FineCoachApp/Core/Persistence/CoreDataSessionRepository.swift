@@ -36,4 +36,49 @@ public struct CoreDataSessionRepository: Sendable {
             return try SessionManagedObjectMapping.upsertAggregate(session, in: context)
         }
     }
+
+    public func listCompleted(studentID: StableUUID) async throws -> [CompletedSession] {
+        try await writer.read { context in
+            let ids = try HistoryReportManagedObjectMapping.completedSessionIDs(
+                studentID: studentID.rawValue,
+                in: context
+            )
+            return try ids.map { try HistoryReportManagedObjectMapping.loadCompletedSession(id: $0, in: context) }
+        }
+    }
+
+    public func completedSession(id: StableUUID) async throws -> CompletedSession {
+        try await writer.read { context in
+            try HistoryReportManagedObjectMapping.loadCompletedSession(id: id.rawValue, in: context)
+        }
+    }
+
+    public func saveCompletedEdit(_ session: Session) async throws -> CompletedSession {
+        guard session.state == .completed else {
+            throw DomainError.invalidState
+        }
+        return try await writer.transaction { context in
+            let saved = try SessionManagedObjectMapping.upsertAggregate(session, in: context)
+            try HistoryReportManagedObjectMapping.markCurrentReportsStale(
+                sessionID: saved.id.rawValue,
+                in: context
+            )
+            return try HistoryReportManagedObjectMapping.loadCompletedSession(id: saved.id.rawValue, in: context)
+        }
+    }
+
+    public func insertShareReport(
+        _ report: ShareReport,
+        modules: ShareReportModuleSelection
+    ) async throws -> ShareReport {
+        try await writer.transaction { context in
+            try HistoryReportManagedObjectMapping.upsertReport(report, modules: modules, in: context)
+        }
+    }
+
+    public func updateShareReport(_ report: ShareReport) async throws -> ShareReport {
+        try await writer.transaction { context in
+            try HistoryReportManagedObjectMapping.updateReport(report, in: context)
+        }
+    }
 }

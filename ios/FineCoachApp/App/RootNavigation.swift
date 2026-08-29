@@ -6,6 +6,11 @@ enum RootDestination: Hashable {
     case editor(StudentEditorMode)
     case activeSession(UUID)
     case exerciseLibrary
+    case sessionSummary(UUID)
+    case history(UUID)
+    case sessionDetail(UUID)
+    case sessionEdit(UUID)
+    case shareReport(UUID)
     case placeholder(PlaceholderKind)
 }
 
@@ -100,6 +105,39 @@ struct RootNavigation: View {
                                 )
                             case .exerciseLibrary:
                                 ExerciseLibraryView(useCases: environment.requireExerciseUseCases())
+                            case .sessionSummary(let sessionID):
+                                SessionSummaryView(
+                                    sessionID: StableUUID(sessionID),
+                                    useCases: environment.requireHistoryUseCases(),
+                                    path: $path
+                                )
+                            case .history(let studentID):
+                                HistoryListView(
+                                    studentID: StableUUID(studentID),
+                                    useCases: environment.requireHistoryUseCases(),
+                                    path: $path
+                                )
+                            case .sessionDetail(let sessionID):
+                                SessionDetailView(
+                                    sessionID: StableUUID(sessionID),
+                                    useCases: environment.requireHistoryUseCases(),
+                                    path: $path
+                                )
+                            case .sessionEdit(let sessionID):
+                                SessionEditView(
+                                    sessionID: StableUUID(sessionID),
+                                    useCases: environment.requireHistoryUseCases(),
+                                    path: $path
+                                )
+                            case .shareReport(let sessionID):
+                                ShareReportFlowView(
+                                    sessionID: StableUUID(sessionID),
+                                    useCases: environment.requireHistoryUseCases(),
+                                    reportsRootURL: environment.requireReportsRootURL(),
+                                    renderer: ShareReportRenderer(),
+                                    shareAdapter: environment.requireShareAdapter(),
+                                    path: $path
+                                )
                             case .placeholder(let kind):
                                 PlaceholderDestinationView(kind: kind)
                             }
@@ -165,5 +203,20 @@ struct PlaceholderDestinationView: View {
         case .settings:
             return String(localized: "placeholder.settings")
         }
+    }
+}
+
+extension Array where Element == RootDestination {
+    mutating func popToStudentDetail() {
+        if let index = lastIndex(where: {
+            if case .studentDetail = $0 {
+                return true
+            }
+            return false
+        }) {
+            removeSubrange((index + 1)..<count)
+            return
+        }
+        removeAll()
     }
 }

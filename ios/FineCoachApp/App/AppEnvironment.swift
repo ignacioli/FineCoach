@@ -9,14 +9,17 @@ public final class AppEnvironment: ObservableObject {
     public let studentUseCases: StudentUseCases?
     public let sessionUseCases: ActiveSessionUseCases?
     public let exerciseUseCases: ExerciseLibraryUseCases?
+    public let historyUseCases: HistoryUseCases?
     public let startupErrorDescription: String?
     @Published public private(set) var catalogUnavailableMessage: String?
     private let studentRepository: CoreDataStudentRepository?
     private let sessionRepository: CoreDataSessionRepository?
+    private let reportsRootURL: URL?
+    private let shareAdapter: SystemShareAdapter?
 
     public var isStorageAvailable: Bool {
         persistenceController != nil && persistenceWriter != nil && studentUseCases != nil
-            && sessionUseCases != nil && exerciseUseCases != nil
+            && sessionUseCases != nil && exerciseUseCases != nil && historyUseCases != nil
     }
 
     public static func bootstrap() -> AppEnvironment {
@@ -50,6 +53,27 @@ public final class AppEnvironment: ObservableObject {
             preconditionFailure("Exercise use cases require available local storage.")
         }
         return exerciseUseCases
+    }
+
+    func requireHistoryUseCases() -> HistoryUseCases {
+        guard let historyUseCases else {
+            preconditionFailure("History use cases require available local storage.")
+        }
+        return historyUseCases
+    }
+
+    func requireReportsRootURL() -> URL {
+        guard let reportsRootURL else {
+            preconditionFailure("Report file root requires available local storage.")
+        }
+        return reportsRootURL
+    }
+
+    func requireShareAdapter() -> SystemShareAdapter {
+        guard let shareAdapter else {
+            preconditionFailure("System share adapter requires available local storage.")
+        }
+        return shareAdapter
     }
 
     /// Seeds the placeholder built-in catalog once local storage is open.
@@ -193,6 +217,14 @@ public final class AppEnvironment: ObservableObject {
             clock: clock,
             ids: idGenerator
         )
+        self.historyUseCases = HistoryUseCases(
+            sessionRepository: sessions,
+            clock: clock,
+            ids: idGenerator
+        )
+        self.reportsRootURL = root
+        self.shareAdapter = SystemShareAdapter(presenter: LaunchArgumentSharePresenter())
+        try TempReportLease.cleanupOrphans(in: root, keepingFlowIDs: [])
         self.startupErrorDescription = nil
         self.catalogUnavailableMessage = nil
     }
@@ -205,6 +237,9 @@ public final class AppEnvironment: ObservableObject {
         self.studentUseCases = nil
         self.sessionUseCases = nil
         self.exerciseUseCases = nil
+        self.historyUseCases = nil
+        self.reportsRootURL = nil
+        self.shareAdapter = nil
         self.startupErrorDescription = (failure as? LocalizedError)?.errorDescription ?? "本地存储暂不可用。"
         self.catalogUnavailableMessage = nil
     }

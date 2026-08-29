@@ -58,6 +58,39 @@ public struct TrainingSet: Hashable, Codable, Sendable, Identifiable {
         state == .completed
     }
 
+    public func ordinaryVolumeContribution() throws -> DecimalValue? {
+        guard state == .completed, recordMode == .weightReps, let repetitionCount else {
+            return nil
+        }
+        let load: DecimalValue
+        switch side {
+        case .none:
+            guard let weightValue else {
+                return nil
+            }
+            load = weightValue
+        case .bilateral:
+            if let leftValue, let rightValue {
+                load = try leftValue.adding(rightValue)
+            } else if let weightValue, leftValue == nil, rightValue == nil {
+                load = try weightValue.multiplied(by: DecimalValue("2"))
+            } else {
+                return nil
+            }
+        case .left:
+            guard let value = leftValue ?? weightValue else {
+                return nil
+            }
+            load = value
+        case .right:
+            guard let value = rightValue ?? weightValue else {
+                return nil
+            }
+            load = value
+        }
+        return try load.multiplied(by: repetitionCount)
+    }
+
     public init(
         id: StableUUID,
         sessionExerciseID: StableUUID,

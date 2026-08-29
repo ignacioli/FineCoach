@@ -49,6 +49,33 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
         statisticsSets.count
     }
 
+    public var displayedDurationSeconds: DecimalValue {
+        coachAdjustedDurationSeconds ?? elapsedSeconds
+    }
+
+    public var sessionNotes: SessionNotes {
+        var actionPrivateNotes: [StableUUID: ValidatedText] = [:]
+        for exercise in exercises {
+            if let note = exercise.actionPrivateNote {
+                actionPrivateNotes[exercise.id] = note
+            }
+        }
+        return SessionNotes(
+            privateCoachNote: privateCoachNote,
+            studentFacingSummary: studentFacingSummary,
+            actionPrivateNotes: actionPrivateNotes
+        )
+    }
+
+    public var statistics: SessionStatistics {
+        (try? SessionStatistics.make(from: self))
+            ?? SessionStatistics(
+                completedSetCount: completedSetCount,
+                displayedDurationSeconds: displayedDurationSeconds,
+                ordinaryTrainingVolume: nil
+            )
+    }
+
     public var statisticsSets: [TrainingSet] {
         exercises.flatMap(\.sets).filter(\.contributesToStatistics)
     }
@@ -321,6 +348,12 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
         }
     }
 
+    private func ensureCompleted() throws {
+        guard state == .completed else {
+            throw DomainError.invalidState
+        }
+    }
+
     private func requireExercise(_ exerciseID: StableUUID) throws -> (Int, SessionExercise) {
         guard let index = exercises.firstIndex(where: { $0.id == exerciseID }) else {
             throw DomainError.notFound
@@ -363,6 +396,9 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
         interruptionStartedAtUTC: Date?? = nil,
         durationNeedsReview: Bool? = nil,
         coachAdjustedDurationSeconds: DecimalValue?? = nil,
+        trainingFocus: ValidatedText?? = nil,
+        studentFacingSummary: ValidatedText?? = nil,
+        privateCoachNote: ValidatedText?? = nil,
         revision: UInt64,
         updatedAtUTC: Date,
         completedAtUTC: Date? = nil
@@ -377,9 +413,9 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
             interruptionStartedAtUTC: interruptionStartedAtUTC ?? self.interruptionStartedAtUTC,
             durationNeedsReview: durationNeedsReview ?? self.durationNeedsReview,
             coachAdjustedDurationSeconds: coachAdjustedDurationSeconds ?? self.coachAdjustedDurationSeconds,
-            trainingFocus: trainingFocus,
-            studentFacingSummary: studentFacingSummary,
-            privateCoachNote: privateCoachNote,
+            trainingFocus: trainingFocus ?? self.trainingFocus,
+            studentFacingSummary: studentFacingSummary ?? self.studentFacingSummary,
+            privateCoachNote: privateCoachNote ?? self.privateCoachNote,
             revision: revision,
             createdAtUTC: createdAtUTC,
             updatedAtUTC: updatedAtUTC,
@@ -403,5 +439,51 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
             revision: nextRevision,
             updatedAtUTC: now
         )
+    }
+
+    public func updatingTrainingFocus(_ value: ValidatedText?, now: Date) throws -> Session {
+        try ensureCompleted()
+        return replacing(trainingFocus: .some(value), revision: nextRevision, updatedAtUTC: now)
+    }
+
+    public func updatingStudentFacingSummary(_ value: ValidatedText?, now: Date) throws -> Session {
+        try ensureCompleted()
+        return replacing(studentFacingSummary: .some(value), revision: nextRevision, updatedAtUTC: now)
+    }
+
+    public func updatingPrivateCoachNote(_ value: ValidatedText?, now: Date) throws -> Session {
+        try ensureCompleted()
+        return replacing(privateCoachNote: .some(value), revision: nextRevision, updatedAtUTC: now)
+    }
+
+    public func updatingActionPrivateNote(exerciseID: StableUUID, note: ValidatedText?, now: Date) throws -> Session {
+        try ensureCompleted()
+        let (index, exercise) = try requireExercise(exerciseID)
+        return replacingExercise(at: index, with: exercise.replacingActionPrivateNote(note), now: now)
+    }
+
+    public func updatingCompletedSummary(
+        trainingFocus: ValidatedText?,
+        privateCoachNote: ValidatedText?,
+        studentFacingSummary: ValidatedText?,
+        now: Date
+    ) throws -> Session {
+        try ensureCompleted()
+        return replacing(
+            trainingFocus: .some(trainingFocus),
+            studentFacingSummary: .some(studentFacingSummary),
+            privateCoachNote: .some(privateCoachNote),
+            revision: nextRevision,
+            updatedAtUTC: now
+        )
+    }
+
+    public func editingCompletedSet(setID: StableUUID, input: TrainingSetInput, now: Date) throws -> Session {
+        try ensureCompleted()
+        let (index, exercise, source) = try requireSet(setID)
+        let updated = try source.updating(input: input, now: now)
+        let confirmed = try updated.confirmed(now: now)
+        let sets = exercise.sets.map { $0.id == setID ? confirmed : $0 }
+        return replacingExercise(at: index, with: exercise.replacingSets(sets), now: now)
     }
 }

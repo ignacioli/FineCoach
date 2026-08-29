@@ -1,8 +1,10 @@
 import SwiftUI
+import UIKit
 
 struct ActiveSessionView: View {
     @StateObject private var viewModel: ActiveSessionViewModel
     @Binding var path: [RootDestination]
+    @State private var didPushSummary = false
 
     init(
         studentID: StableUUID,
@@ -59,24 +61,40 @@ struct ActiveSessionView: View {
                     }
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionAddExercise)
                 }
-
-                if viewModel.session?.state == .inProgress {
-                    FCButton(
-                        title: String(localized: "session.action.finish"),
-                        isEnabled: viewModel.canCompleteSession
-                    ) {
-                        viewModel.requestFinish()
-                    }
-                    .accessibilityIdentifier(FCAccessibilityID.activeSessionFinish)
-                }
             }
             .padding(FCPrimitives.spacingMedium)
+        }
+        .safeAreaInset(edge: .bottom) {
+            if viewModel.session?.state == .inProgress {
+                FCButton(
+                    title: String(localized: "session.action.finish"),
+                    isEnabled: viewModel.canCompleteSession
+                ) {
+                    UIApplication.shared.sendAction(
+                        #selector(UIResponder.resignFirstResponder),
+                        to: nil,
+                        from: nil,
+                        for: nil
+                    )
+                    viewModel.requestFinish()
+                }
+                .padding(.horizontal, FCPrimitives.spacingMedium)
+                .padding(.bottom, FCPrimitives.spacingSmall)
+                .accessibilityIdentifier(FCAccessibilityID.activeSessionFinish)
+            }
         }
         .scrollDismissesKeyboard(.interactively)
         .background(FCSemanticColors.background)
         .navigationTitle(String(localized: "session.title"))
         .navigationBarTitleDisplayMode(.inline)
         .task { await viewModel.load() }
+        .onChange(of: viewModel.session?.state) { _, state in
+            guard state == .completed, !didPushSummary, let sessionID = viewModel.session?.id else {
+                return
+            }
+            didPushSummary = true
+            path.append(.sessionSummary(sessionID.rawValue))
+        }
         .accessibilityIdentifier(FCAccessibilityID.activeSessionRoot)
         .fullScreenCover(item: $viewModel.presentedSheet) { sheet in
             NavigationStack {

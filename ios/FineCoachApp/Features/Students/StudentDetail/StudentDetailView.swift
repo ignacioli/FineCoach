@@ -107,7 +107,7 @@ struct StudentDetailView: View {
                     .accessibilityIdentifier(FCAccessibilityID.detailDelete)
 
                     Button {
-                        path.append(.placeholder(.recentTraining))
+                        path.append(.history(student.id.rawValue))
                     } label: {
                         summaryCard(
                             kicker: String(localized: "student.detail.recentKicker"),
@@ -121,7 +121,7 @@ struct StudentDetailView: View {
                     notesFold(student)
 
                     Button {
-                        path.append(.placeholder(.history))
+                        path.append(.history(student.id.rawValue))
                     } label: {
                         summaryCard(
                             kicker: String(localized: "student.detail.historyKicker"),

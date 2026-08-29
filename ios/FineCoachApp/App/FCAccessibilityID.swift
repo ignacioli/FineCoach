@@ -129,6 +129,40 @@ public enum FCAccessibilityID {
         "activeSession.setState.\(state.rawValue)"
     }
 
+    public static let sessionSummaryRoot = "sessionSummary.root"
+    public static let sessionSummaryFocus = "sessionSummary.focus"
+    public static let sessionSummaryPrivateNote = "sessionSummary.privateNote"
+    public static let sessionSummaryStudentSummary = "sessionSummary.studentSummary"
+    public static let sessionSummaryDuration = "sessionSummary.duration"
+    public static let sessionSummaryCompletedSets = "sessionSummary.completedSets"
+    public static let sessionSummarySkipShare = "sessionSummary.skipShare"
+    public static let sessionSummaryGenerateReport = "sessionSummary.generateReport"
+
+    public static let historyRoot = "history.root"
+    public static func historyRow(_ index: Int) -> String {
+        "history.row.\(index)"
+    }
+
+    public static let sessionDetailRoot = "sessionDetail.root"
+    public static let sessionDetailEdit = "sessionDetail.edit"
+    public static let sessionDetailGenerateReport = "sessionDetail.generateReport"
+    public static let sessionDetailReportStale = "sessionDetail.reportStale"
+    public static let sessionDetailHandedToSystem = "sessionDetail.handedToSystem"
+    public static let sessionDetailReadonly = "sessionDetail.readonly"
+
+    public static let sessionEditRoot = "sessionEdit.root"
+    public static let sessionEditFocus = "sessionEdit.focus"
+    public static let sessionEditSave = "sessionEdit.save"
+
+    public static let shareReportModules = "shareReport.modules"
+    public static let shareReportVolumeToggle = "shareReport.volumeToggle"
+    public static let shareReportPreview = "shareReport.preview"
+    public static let shareReportShare = "shareReport.share"
+    public static let shareReportRetry = "shareReport.retry"
+    public static let shareReportClose = "shareReport.close"
+    public static let shareReportNotSentStatus = "shareReport.notSentStatus"
+    public static let shareReportHandedOffStatus = "shareReport.handedOffStatus"
+
     public static func studentRow(_ id: StableUUID) -> String {
         "studentList.row.\(id.rawValue.uuidString)"
     }
