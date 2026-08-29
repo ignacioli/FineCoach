@@ -1,15 +1,9 @@
 <!--
 Sync Impact Report
-- Version change: template -> 1.0.0
+- Version change: 1.0.0 -> 1.0.1
 - Modified principles:
-  - Template placeholders -> I. Approved Scope Before Implementation
-  - Template placeholders -> II. Local-First Privacy by Default
-  - Template placeholders -> III. Recoverability and Data Integrity
-  - Template placeholders -> IV. iOS-First, Evidence-Driven Delivery
-  - Template placeholders -> V. Accessible, Testable, and Honest Outcomes
-- Added sections:
-  - Project Constraints
-  - Specification-Driven Workflow and Quality Gates
+  - V. Accessible, Testable, and Honest Outcomes: M1-A exception — VoiceOver is not a device-acceptance gate; dual physical OS/device matrix dropped
+- Added sections: none
 - Removed sections: none
 - Follow-up TODOs: none
 -->
@@ -93,9 +87,11 @@ speculative cross-platform costs.
   states MUST be testable. Relevant unit, integration, UI, accessibility, lifecycle, fault-injection,
   migration, and performance checks MUST be planned in proportion to risk.
 - User-visible state, error, selection, danger, and statistical meaning MUST NOT rely only on color,
-  motion, haptics, or a visual chart. iPhone interfaces MUST support VoiceOver, Dynamic Type, logical
-  focus order, and touch targets of at least 44 by 44 points unless an approved exception documents
-  equivalent accessibility.
+  motion, haptics, or a visual chart. iPhone interfaces MUST keep Dynamic Type, logical focus order,
+  and touch targets of at least 44 by 44 points. Existing SwiftUI accessibility identifiers and labels
+  MAY remain so VoiceOver can still parse the UI; M1-A MUST NOT add VoiceOver-only features and MUST
+  NOT require a manual VoiceOver device script, a second physical iOS 26 device, or iPhone SE as
+  acceptance. That exception is recorded in the M1-A spec/plan (2026-08-29).
 - Validation MUST NOT be gamed by weakening assertions, shrinking the approved scope, substituting
   diagnostics for acceptance, or hiding known failures. Unverified claims and residual risks MUST be
   stated explicitly.
@@ -156,4 +152,4 @@ milestone can truthfully be accepted.
 - Compliance MUST be rechecked at plan approval, task generation and analysis, implementation
   checkpoints, privacy/security review, and milestone acceptance.
 
-**Version**: 1.0.0 | **Ratified**: 2026-08-26 | **Last Amended**: 2026-08-26
+**Version**: 1.0.1 | **Ratified**: 2026-08-26 | **Last Amended**: 2026-08-29
