@@ -35,6 +35,50 @@ public struct LaunchArgumentSharePresenter: SystemSharePresenting {
     }
 }
 
+public struct UIKitDocumentExportPresenter: Sendable {
+    public init() {}
+
+    public func export(fileURL: URL) async -> SystemShareOutcome {
+        await UIKitDocumentExportSession.shared.export(fileURL: fileURL)
+    }
+}
+
+@MainActor
+final class UIKitDocumentExportSession: NSObject, UIDocumentPickerDelegate {
+    static let shared = UIKitDocumentExportSession()
+    private var continuation: CheckedContinuation<SystemShareOutcome, Never>?
+
+    func export(fileURL: URL) async -> SystemShareOutcome {
+        await withCheckedContinuation { continuation in
+            if let pending = self.continuation {
+                pending.resume(returning: .failed)
+            }
+            self.continuation = continuation
+            let picker = UIDocumentPickerViewController(forExporting: [fileURL], asCopy: true)
+            picker.delegate = self
+            guard let root = UIKitSystemSharePresenter.topViewController() else {
+                self.continuation = nil
+                continuation.resume(returning: .failed)
+                return
+            }
+            root.present(picker, animated: true)
+        }
+    }
+
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        finish(.completed)
+    }
+
+    func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
+        finish(.cancelled)
+    }
+
+    private func finish(_ outcome: SystemShareOutcome) {
+        continuation?.resume(returning: outcome)
+        continuation = nil
+    }
+}
+
 public struct UIKitSystemSharePresenter: SystemSharePresenting {
     public init() {}
 
@@ -60,7 +104,7 @@ public struct UIKitSystemSharePresenter: SystemSharePresenting {
         }
     }
 
-    private static func topViewController() -> UIViewController? {
+    fileprivate static func topViewController() -> UIViewController? {
         let scene = UIApplication.shared.connectedScenes
             .compactMap { $0 as? UIWindowScene }
             .first { $0.activationState == .foregroundActive }

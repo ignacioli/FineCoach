@@ -217,16 +217,35 @@ public final class PersistenceController: @unchecked Sendable {
         return try protectedFileStore.secureSQLiteStoreArtifacts(at: storeURL)
     }
 
+    func readInventoryBlocking() throws -> BackupInventory {
+        var captured: Result<BackupInventory, Error>?
+        container.viewContext.performAndWait {
+            do {
+                captured = .success(try BackupInventoryMapper.collect(in: container.viewContext))
+            } catch {
+                captured = .failure(error)
+            }
+        }
+        guard let captured else {
+            throw PersistenceControllerError.storeLoadFailed
+        }
+        return try captured.get()
+    }
+
+    func detachPersistentStores() throws {
+        container.viewContext.performAndWait {
+            container.viewContext.reset()
+        }
+        let coordinator = container.persistentStoreCoordinator
+        for store in coordinator.persistentStores {
+            try coordinator.remove(store)
+        }
+    }
+
     #if DEBUG
         func shutdownForTesting() async throws {
             await writer.resetForTesting()
-            container.viewContext.performAndWait {
-                container.viewContext.reset()
-            }
-            let coordinator = container.persistentStoreCoordinator
-            for store in coordinator.persistentStores {
-                try coordinator.remove(store)
-            }
+            try detachPersistentStores()
         }
     #endif
 }

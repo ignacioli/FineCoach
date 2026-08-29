@@ -4,18 +4,22 @@ import Foundation
 
 @MainActor
 public final class AppEnvironment: ObservableObject {
-    private let persistenceController: PersistenceController?
-    public let persistenceWriter: PersistenceWriter?
-    public let studentUseCases: StudentUseCases?
-    public let sessionUseCases: ActiveSessionUseCases?
-    public let exerciseUseCases: ExerciseLibraryUseCases?
-    public let historyUseCases: HistoryUseCases?
+    private var persistenceController: PersistenceController?
+    public private(set) var persistenceWriter: PersistenceWriter?
+    public private(set) var studentUseCases: StudentUseCases?
+    public private(set) var sessionUseCases: ActiveSessionUseCases?
+    public private(set) var exerciseUseCases: ExerciseLibraryUseCases?
+    public private(set) var historyUseCases: HistoryUseCases?
+    public private(set) var backupCoordinator: BackupCoordinator?
     public let startupErrorDescription: String?
     @Published public private(set) var catalogUnavailableMessage: String?
-    private let studentRepository: CoreDataStudentRepository?
-    private let sessionRepository: CoreDataSessionRepository?
-    private let reportsRootURL: URL?
-    private let shareAdapter: SystemShareAdapter?
+    private var studentRepository: CoreDataStudentRepository?
+    private var sessionRepository: CoreDataSessionRepository?
+    private var reportsRootURL: URL?
+    private var shareAdapter: SystemShareAdapter?
+    private let applicationRootURL: URL?
+    private let clock: any Clock
+    private let idGenerator: any IDGenerator
 
     public var isStorageAvailable: Bool {
         persistenceController != nil && persistenceWriter != nil && studentUseCases != nil
@@ -76,6 +80,13 @@ public final class AppEnvironment: ObservableObject {
         return shareAdapter
     }
 
+    func requireBackupCoordinator() -> BackupCoordinator {
+        guard let backupCoordinator else {
+            preconditionFailure("Backup coordinator requires available local storage.")
+        }
+        return backupCoordinator
+    }
+
     /// Seeds the placeholder built-in catalog once local storage is open.
     /// Call from `RootNavigation.loadInitialState` alongside onboarding load; do not call from `init`.
     func prepareExerciseCatalog() async {
@@ -132,6 +143,38 @@ public final class AppEnvironment: ObservableObject {
         if pointerExists {
             try protectedStore.apply(policy: .business, to: directory.currentPointerURL)
         }
+        let existingIntent = try RestoreGenerationSwitcher.readIntent(from: directory)
+        if let existing = try pointerStore.read() {
+            switch RestoreGenerationSwitcher.decision(
+                intent: existingIntent,
+                pointerUUID: existing.generationUUID
+            ) {
+            case .failClosed:
+                throw StoreGenerationError.pointerMismatch
+            case .verifyNewThenCommit:
+                try Self.verifyNewGenerationOrRollBack(
+                    pointer: existing,
+                    intent: existingIntent,
+                    directory: directory,
+                    metadataStore: metadataStore,
+                    pointerStore: pointerStore,
+                    protectedStore: protectedStore,
+                    fileManager: fileManager
+                )
+            case .keepOldDiscardCandidate:
+                try RestoreGenerationSwitcher.clearIntent(in: directory)
+            case .openCurrent:
+                break
+            }
+            let pointerAfter = try pointerStore.read() ?? existing
+            let intentAfter = try RestoreGenerationSwitcher.readIntent(from: directory)
+            try FileFlowJanitor.cleanupOrphans(
+                rootURL: root,
+                currentGenerationUUID: pointerAfter.generationUUID,
+                restoreIntent: intentAfter,
+                keepingFlowIDs: []
+            )
+        }
 
         let controller: PersistenceController
         let generationUUID: UUID
@@ -187,46 +230,32 @@ public final class AppEnvironment: ObservableObject {
             try metadataStore.write(metadata)
             try pointerStore.replace(with: newPointer)
         }
-        self.persistenceController = controller
-        self.persistenceWriter = controller.writer
-        let repository = CoreDataStudentRepository(writer: controller.writer)
-        let sessions = CoreDataSessionRepository(writer: controller.writer)
-        let exercises = CoreDataExerciseRepository(writer: controller.writer)
-        self.studentRepository = repository
-        self.sessionRepository = sessions
-        self.studentUseCases = StudentUseCases(
-            repository: repository,
-            clock: clock,
-            ids: idGenerator
-        )
-        self.exerciseUseCases = ExerciseLibraryUseCases(
-            repository: exercises,
-            clock: clock,
-            ids: idGenerator
-        )
-        let recoveryStore = ActiveSessionRecoveryStore(
-            url: directory.activeRecoveryURL,
-            protectedFileStore: protectedStore
-        )
-        self.sessionUseCases = ActiveSessionUseCases(
-            sessionRepository: sessions,
-            studentRepository: repository,
-            exerciseRepository: exercises,
-            recoveryStore: recoveryStore,
-            storeGenerationUUID: generationUUID,
-            clock: clock,
-            ids: idGenerator
-        )
-        self.historyUseCases = HistoryUseCases(
-            sessionRepository: sessions,
-            clock: clock,
-            ids: idGenerator
-        )
-        self.reportsRootURL = root
-        self.shareAdapter = SystemShareAdapter(presenter: LaunchArgumentSharePresenter())
-        try TempReportLease.cleanupOrphans(in: root, keepingFlowIDs: [])
+        self.persistenceController = nil
+        self.persistenceWriter = nil
+        self.studentRepository = nil
+        self.sessionRepository = nil
+        self.studentUseCases = nil
+        self.sessionUseCases = nil
+        self.exerciseUseCases = nil
+        self.historyUseCases = nil
+        self.backupCoordinator = nil
+        self.reportsRootURL = nil
+        self.shareAdapter = nil
+        self.applicationRootURL = root
+        self.clock = clock
+        self.idGenerator = idGenerator
         self.startupErrorDescription = nil
         self.catalogUnavailableMessage = nil
+        try bindLiveStack(
+            controller: controller,
+            generationUUID: generationUUID,
+            root: root,
+            directory: directory,
+            protectedStore: protectedStore,
+            clock: clock,
+            idGenerator: idGenerator
+        )
+        try TempReportLease.cleanupOrphans(in: root, keepingFlowIDs: [])
     }
 
     private init(failure: Error) {
@@ -238,10 +267,147 @@ public final class AppEnvironment: ObservableObject {
         self.sessionUseCases = nil
         self.exerciseUseCases = nil
         self.historyUseCases = nil
+        self.backupCoordinator = nil
         self.reportsRootURL = nil
         self.shareAdapter = nil
+        self.applicationRootURL = nil
+        self.clock = SystemClock()
+        self.idGenerator = SystemIDGenerator()
         self.startupErrorDescription = (failure as? LocalizedError)?.errorDescription ?? "本地存储暂不可用。"
         self.catalogUnavailableMessage = nil
+    }
+
+    func reloadAfterCommittedRestore() throws {
+        guard let root = applicationRootURL else {
+            throw BackupError.invalidState
+        }
+        try persistenceController?.detachPersistentStores()
+        let fileManager = FileManager.default
+        let directory = StoreGenerationDirectory(rootURL: root)
+        let protectedStore = ProtectedFileStore(fileManager: fileManager)
+        let pointerStore = CurrentGenerationPointerStore(
+            url: directory.currentPointerURL,
+            fileManager: fileManager,
+            protectedFileStore: protectedStore
+        )
+        guard let pointer = try pointerStore.read() else {
+            throw StoreGenerationError.pointerMismatch
+        }
+        let controller = try PersistenceController(
+            storeURL: directory.databaseURL(for: pointer.generationUUID),
+            protectedFileStore: protectedStore
+        )
+        try bindLiveStack(
+            controller: controller,
+            generationUUID: pointer.generationUUID,
+            root: root,
+            directory: directory,
+            protectedStore: protectedStore,
+            clock: clock,
+            idGenerator: idGenerator
+        )
+        objectWillChange.send()
+    }
+
+    private func bindLiveStack(
+        controller: PersistenceController,
+        generationUUID: UUID,
+        root: URL,
+        directory: StoreGenerationDirectory,
+        protectedStore: ProtectedFileStore,
+        clock: any Clock,
+        idGenerator: any IDGenerator
+    ) throws {
+        persistenceController = controller
+        persistenceWriter = controller.writer
+        let repository = CoreDataStudentRepository(writer: controller.writer)
+        let sessions = CoreDataSessionRepository(writer: controller.writer)
+        let exercises = CoreDataExerciseRepository(writer: controller.writer)
+        studentRepository = repository
+        sessionRepository = sessions
+        studentUseCases = StudentUseCases(
+            repository: repository,
+            clock: clock,
+            ids: idGenerator
+        )
+        exerciseUseCases = ExerciseLibraryUseCases(
+            repository: exercises,
+            clock: clock,
+            ids: idGenerator
+        )
+        let recoveryStore = ActiveSessionRecoveryStore(
+            url: directory.activeRecoveryURL,
+            protectedFileStore: protectedStore
+        )
+        sessionUseCases = ActiveSessionUseCases(
+            sessionRepository: sessions,
+            studentRepository: repository,
+            exerciseRepository: exercises,
+            recoveryStore: recoveryStore,
+            storeGenerationUUID: generationUUID,
+            clock: clock,
+            ids: idGenerator
+        )
+        historyUseCases = HistoryUseCases(
+            sessionRepository: sessions,
+            clock: clock,
+            ids: idGenerator
+        )
+        reportsRootURL = root
+        if shareAdapter == nil {
+            shareAdapter = SystemShareAdapter(presenter: LaunchArgumentSharePresenter())
+        }
+        backupCoordinator = BackupCoordinator(
+            rootURL: root,
+            writer: controller.writer,
+            clock: clock,
+            ids: idGenerator
+        )
+    }
+
+    private static func verifyNewGenerationOrRollBack(
+        pointer: CurrentGenerationPointer,
+        intent: RestoreIntent?,
+        directory: StoreGenerationDirectory,
+        metadataStore: StoreGenerationMetadataStore,
+        pointerStore: CurrentGenerationPointerStore,
+        protectedStore: ProtectedFileStore,
+        fileManager: FileManager
+    ) throws {
+        guard let intent else {
+            throw StoreGenerationError.pointerMismatch
+        }
+        let newUUID = pointer.generationUUID
+        let databaseURL = directory.databaseURL(for: newUUID)
+        func rollBackToOld() throws {
+            try pointerStore.replace(with: try CurrentGenerationPointer(generationUUID: intent.oldGenerationUUID))
+            try RestoreGenerationSwitcher.clearIntent(in: directory)
+        }
+        guard fileManager.fileExists(atPath: databaseURL.path) else {
+            try rollBackToOld()
+            return
+        }
+        do {
+            let candidate = try PersistenceController(
+                storeURL: databaseURL,
+                protectedFileStore: protectedStore
+            )
+            _ = try candidate.readInventoryBlocking()
+            try candidate.detachPersistentStores()
+            var metadata = try metadataStore.validate(generationUUID: newUUID)
+            metadata.validationState = .current
+            try metadataStore.write(metadata)
+            try RestoreGenerationSwitcher.writeIntent(
+                RestoreIntent(
+                    oldGenerationUUID: intent.oldGenerationUUID,
+                    newGenerationUUID: intent.newGenerationUUID,
+                    phase: .committed
+                ),
+                to: directory
+            )
+        } catch {
+            try rollBackToOld()
+        }
     }
 
     #if DEBUG

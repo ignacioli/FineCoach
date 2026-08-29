@@ -94,6 +94,20 @@
 		B165 /* ShareReportPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = A165 /* ShareReportPolicy.swift */; };
 		B166 /* ShareReportRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A166 /* ShareReportRenderer.swift */; };
 		B167 /* TempReportLease.swift in Sources */ = {isa = PBXBuildFile; fileRef = A167 /* TempReportLease.swift */; };
+		B168 /* FineCoachBackupV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = A168 /* FineCoachBackupV1.swift */; };
+		B169 /* BackupCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = A169 /* BackupCrypto.swift */; };
+		B16A /* BackupPassword.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16A /* BackupPassword.swift */; };
+		B16B /* BackupInventoryMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16B /* BackupInventoryMapper.swift */; };
+		B16C /* BackupExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16C /* BackupExporter.swift */; };
+		B16D /* FileFlowLease.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16D /* FileFlowLease.swift */; };
+		B16E /* FileFlowJanitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16E /* FileFlowJanitor.swift */; };
+		B16F /* BackupImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16F /* BackupImporter.swift */; };
+		B178 /* CandidateGenerationBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A178 /* CandidateGenerationBuilder.swift */; };
+		B179 /* RestoreGenerationSwitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = A179 /* RestoreGenerationSwitcher.swift */; };
+		B17A /* SecurityScopedFileAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17A /* SecurityScopedFileAdapter.swift */; };
+		B17B /* BackupExportFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17B /* BackupExportFlow.swift */; };
+		B17C /* BackupRestoreFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17C /* BackupRestoreFlow.swift */; };
+		B246 /* RestoreFaultMatrixTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A246 /* RestoreFaultMatrixTests.swift */; };
 		B122 /* StudentUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A122 /* StudentUseCases.swift */; };
 		B123 /* ActiveSessionUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A123 /* ActiveSessionUseCases.swift */; };
 		B144 /* StudentManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A144 /* StudentManagedObject+Mapping.swift */; };
@@ -135,10 +149,15 @@
 		B223 /* RecoveryProcessDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = A223 /* RecoveryProcessDriver.swift */; };
 		B224 /* RecoveryMatrixTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A224 /* RecoveryMatrixTests.swift */; };
 		B226 /* HistoryShareUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A226 /* HistoryShareUITests.swift */; };
+		B227 /* BackupRestoreUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A227 /* BackupRestoreUITests.swift */; };
 		B240 /* HistoryReportDomainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A240 /* HistoryReportDomainTests.swift */; };
 		B241 /* ShareReportPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A241 /* ShareReportPolicyTests.swift */; };
 		B242 /* ShareReportRendererTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A242 /* ShareReportRendererTests.swift */; };
 		B243 /* TempReportLifecycleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A243 /* TempReportLifecycleTests.swift */; };
+		B244 /* BackupRoundTripTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A244 /* BackupRoundTripTests.swift */; };
+		B245 /* RestoreCrashRecoveryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A245 /* RestoreCrashRecoveryTests.swift */; };
+		B250 /* BackupGoldenVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A250 /* BackupGoldenVectorTests.swift */; };
+		B251 /* BackupHostileInputTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A251 /* BackupHostileInputTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -231,6 +250,19 @@
 		A165 /* ShareReportPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareReportPolicy.swift; sourceTree = "<group>"; };
 		A166 /* ShareReportRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareReportRenderer.swift; sourceTree = "<group>"; };
 		A167 /* TempReportLease.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TempReportLease.swift; sourceTree = "<group>"; };
+		A168 /* FineCoachBackupV1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FineCoachBackupV1.swift; sourceTree = "<group>"; };
+		A169 /* BackupCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupCrypto.swift; sourceTree = "<group>"; };
+		A16A /* BackupPassword.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupPassword.swift; sourceTree = "<group>"; };
+		A16B /* BackupInventoryMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupInventoryMapper.swift; sourceTree = "<group>"; };
+		A16C /* BackupExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupExporter.swift; sourceTree = "<group>"; };
+		A16D /* FileFlowLease.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileFlowLease.swift; sourceTree = "<group>"; };
+		A16E /* FileFlowJanitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileFlowJanitor.swift; sourceTree = "<group>"; };
+		A16F /* BackupImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupImporter.swift; sourceTree = "<group>"; };
+		A178 /* CandidateGenerationBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CandidateGenerationBuilder.swift; sourceTree = "<group>"; };
+		A179 /* RestoreGenerationSwitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestoreGenerationSwitcher.swift; sourceTree = "<group>"; };
+		A17A /* SecurityScopedFileAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityScopedFileAdapter.swift; sourceTree = "<group>"; };
+		A17B /* BackupExportFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupExportFlow.swift; sourceTree = "<group>"; };
+		A17C /* BackupRestoreFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRestoreFlow.swift; sourceTree = "<group>"; };
 		A122 /* StudentUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentUseCases.swift; sourceTree = "<group>"; };
 		A123 /* ActiveSessionUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionUseCases.swift; sourceTree = "<group>"; };
 		A124 /* SessionTimingCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionTimingCoordinator.swift; sourceTree = "<group>"; };
@@ -253,10 +285,16 @@
 		A237 /* ExerciseIdentityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseIdentityTests.swift; sourceTree = "<group>"; };
 		A238 /* ExerciseProvenanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseProvenanceTests.swift; sourceTree = "<group>"; };
 		A226 /* HistoryShareUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryShareUITests.swift; sourceTree = "<group>"; };
+		A227 /* BackupRestoreUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRestoreUITests.swift; sourceTree = "<group>"; };
 		A240 /* HistoryReportDomainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryReportDomainTests.swift; sourceTree = "<group>"; };
 		A241 /* ShareReportPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareReportPolicyTests.swift; sourceTree = "<group>"; };
 		A242 /* ShareReportRendererTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareReportRendererTests.swift; sourceTree = "<group>"; };
 		A243 /* TempReportLifecycleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TempReportLifecycleTests.swift; sourceTree = "<group>"; };
+		A244 /* BackupRoundTripTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRoundTripTests.swift; sourceTree = "<group>"; };
+		A245 /* RestoreCrashRecoveryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestoreCrashRecoveryTests.swift; sourceTree = "<group>"; };
+		A246 /* RestoreFaultMatrixTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestoreFaultMatrixTests.swift; sourceTree = "<group>"; };
+		A250 /* BackupGoldenVectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupGoldenVectorTests.swift; sourceTree = "<group>"; };
+		A251 /* BackupHostileInputTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupHostileInputTests.swift; sourceTree = "<group>"; };
 		A190 /* ActiveSessionRecoverySnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionRecoverySnapshot.swift; sourceTree = "<group>"; };
 		A191 /* ActiveSessionRecoveryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionRecoveryStore.swift; sourceTree = "<group>"; };
 		A192 /* ActiveSessionCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionCoordinator.swift; sourceTree = "<group>"; };
@@ -469,6 +507,7 @@
 				A482 /* ExerciseLibrary */,
 				A485 /* History */,
 				A486 /* ShareReport */,
+				A489 /* Backup */,
 			);
 			path = FineCoachTests;
 			sourceTree = "<group>";
@@ -517,6 +556,7 @@
 				A133 /* AppLogger.swift */,
 				A134 /* PerformanceSignposts.swift */,
 				A135 /* SystemShareAdapter.swift */,
+				A17A /* SecurityScopedFileAdapter.swift */,
 			);
 			path = Platform;
 			sourceTree = "<group>";
@@ -565,6 +605,16 @@
 		A417 /* Backup */ = {
 			isa = PBXGroup;
 			children = (
+				A168 /* FineCoachBackupV1.swift */,
+				A169 /* BackupCrypto.swift */,
+				A16A /* BackupPassword.swift */,
+				A16B /* BackupInventoryMapper.swift */,
+				A16C /* BackupExporter.swift */,
+				A16D /* FileFlowLease.swift */,
+				A16E /* FileFlowJanitor.swift */,
+				A16F /* BackupImporter.swift */,
+				A178 /* CandidateGenerationBuilder.swift */,
+				A179 /* RestoreGenerationSwitcher.swift */,
 			);
 			path = Backup;
 			sourceTree = "<group>";
@@ -578,6 +628,7 @@
 				A480 /* Recovery */,
 				A483 /* ExerciseLibrary */,
 				A487 /* ShareReport */,
+				A490 /* Backup */,
 			);
 			path = FineCoachIntegrationTests;
 			sourceTree = "<group>";
@@ -599,6 +650,7 @@
 				A481 /* Recovery */,
 				A484 /* ExerciseLibrary */,
 				A488 /* HistoryShare */,
+				A491 /* BackupRestore */,
 			);
 			path = FineCoachUITests;
 			sourceTree = "<group>";
@@ -671,6 +723,8 @@
 		A445 /* BackupRestore */ = {
 			isa = PBXGroup;
 			children = (
+				A17B /* BackupExportFlow.swift */,
+				A17C /* BackupRestoreFlow.swift */,
 			);
 			path = BackupRestore;
 			sourceTree = "<group>";
@@ -826,6 +880,15 @@
 			path = ShareReport;
 			sourceTree = "<group>";
 		};
+		A489 /* Backup */ = {
+			isa = PBXGroup;
+			children = (
+				A250 /* BackupGoldenVectorTests.swift */,
+				A251 /* BackupHostileInputTests.swift */,
+			);
+			path = Backup;
+			sourceTree = "<group>";
+		};
 		A487 /* ShareReport */ = {
 			isa = PBXGroup;
 			children = (
@@ -835,12 +898,30 @@
 			path = ShareReport;
 			sourceTree = "<group>";
 		};
+		A490 /* Backup */ = {
+			isa = PBXGroup;
+			children = (
+				A244 /* BackupRoundTripTests.swift */,
+				A245 /* RestoreCrashRecoveryTests.swift */,
+				A246 /* RestoreFaultMatrixTests.swift */,
+			);
+			path = Backup;
+			sourceTree = "<group>";
+		};
 		A488 /* HistoryShare */ = {
 			isa = PBXGroup;
 			children = (
 				A226 /* HistoryShareUITests.swift */,
 			);
 			path = HistoryShare;
+			sourceTree = "<group>";
+		};
+		A491 /* BackupRestore */ = {
+			isa = PBXGroup;
+			children = (
+				A227 /* BackupRestoreUITests.swift */,
+			);
+			path = BackupRestore;
 			sourceTree = "<group>";
 		};
 		A450 /* Doubles */ = {
@@ -1073,6 +1154,19 @@
 				B165 /* ShareReportPolicy.swift in Sources */,
 				B166 /* ShareReportRenderer.swift in Sources */,
 				B167 /* TempReportLease.swift in Sources */,
+				B168 /* FineCoachBackupV1.swift in Sources */,
+				B169 /* BackupCrypto.swift in Sources */,
+				B16A /* BackupPassword.swift in Sources */,
+				B16B /* BackupInventoryMapper.swift in Sources */,
+				B16C /* BackupExporter.swift in Sources */,
+				B16D /* FileFlowLease.swift in Sources */,
+				B16E /* FileFlowJanitor.swift in Sources */,
+				B16F /* BackupImporter.swift in Sources */,
+				B178 /* CandidateGenerationBuilder.swift in Sources */,
+				B179 /* RestoreGenerationSwitcher.swift in Sources */,
+				B17A /* SecurityScopedFileAdapter.swift in Sources */,
+				B17B /* BackupExportFlow.swift in Sources */,
+				B17C /* BackupRestoreFlow.swift in Sources */,
 				B140 /* PersistenceController.swift in Sources */,
 				B141 /* PersistenceWriter.swift in Sources */,
 				B142 /* StoreGeneration.swift in Sources */,
@@ -1130,6 +1224,8 @@
 				B238 /* ExerciseProvenanceTests.swift in Sources */,
 				B240 /* HistoryReportDomainTests.swift in Sources */,
 				B241 /* ShareReportPolicyTests.swift in Sources */,
+				B250 /* BackupGoldenVectorTests.swift in Sources */,
+				B251 /* BackupHostileInputTests.swift in Sources */,
 				B201 /* FictitiousFixtures.swift in Sources */,
 				B202 /* TestClock.swift in Sources */,
 				B203 /* TestIDGenerator.swift in Sources */,
@@ -1156,6 +1252,9 @@
 				B239 /* ExercisePersistenceTests.swift in Sources */,
 				B242 /* ShareReportRendererTests.swift in Sources */,
 				B243 /* TempReportLifecycleTests.swift in Sources */,
+				B244 /* BackupRoundTripTests.swift in Sources */,
+				B245 /* RestoreCrashRecoveryTests.swift in Sources */,
+				B246 /* RestoreFaultMatrixTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1170,6 +1269,7 @@
 				B224 /* RecoveryMatrixTests.swift in Sources */,
 				B225 /* ExerciseLibraryUITests.swift in Sources */,
 				B226 /* HistoryShareUITests.swift in Sources */,
+				B227 /* BackupRestoreUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1232,6 +1332,7 @@
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 9Z7427RG9X;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FineCoachApp/FineCoach-Info.plist;
 				INFOPLIST_KEY_CFBundleDevelopmentRegion = "zh-Hans";
 				INFOPLIST_KEY_CFBundleDisplayName = "精练教练";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
@@ -1251,6 +1352,7 @@
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 9Z7427RG9X;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FineCoachApp/FineCoach-Info.plist;
 				INFOPLIST_KEY_CFBundleDevelopmentRegion = "zh-Hans";
 				INFOPLIST_KEY_CFBundleDisplayName = "精练教练";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";

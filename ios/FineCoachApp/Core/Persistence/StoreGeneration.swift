@@ -72,6 +72,13 @@ public struct StoreGenerationDirectory: Sendable {
         rootURL.appendingPathComponent("active-session-recovery-v1.json", isDirectory: false)
     }
 
+    public func recoveryURL(for generationUUID: UUID) -> URL {
+        generationURL(for: generationUUID).appendingPathComponent(
+            "active-session-recovery-v1.json",
+            isDirectory: false
+        )
+    }
+
     public var restoreIntentURL: URL {
         rootURL.appendingPathComponent("restore-intent-v1.json", isDirectory: false)
     }

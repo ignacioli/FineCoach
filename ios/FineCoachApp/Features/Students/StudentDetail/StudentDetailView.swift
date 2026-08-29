@@ -106,6 +106,11 @@ struct StudentDetailView: View {
                     }
                     .accessibilityIdentifier(FCAccessibilityID.detailDelete)
 
+                    FCButton(title: String(localized: "student.detail.backup")) {
+                        path.append(.backupRestore)
+                    }
+                    .accessibilityIdentifier(FCAccessibilityID.detailBackup)
+
                     Button {
                         path.append(.history(student.id.rawValue))
                     } label: {
@@ -173,7 +178,7 @@ struct StudentDetailView: View {
                             case .deleted:
                                 path.removeAll()
                             case .backup:
-                                path.append(.placeholder(.backup))
+                                path.append(.backupRestore)
                             case .continueTraining:
                                 path.append(.activeSession(viewModel.studentID.rawValue))
                             }

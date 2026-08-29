@@ -40,6 +40,7 @@ public enum FCAccessibilityID {
     public static let detailArchive = "studentDetail.archive"
     public static let detailRestore = "studentDetail.restore"
     public static let detailDelete = "studentDetail.delete"
+    public static let detailBackup = "studentDetail.backup"
     public static let detailArchivedStatus = "studentDetail.archivedStatus"
 
     public static let archiveConfirm = "archive.confirm"
@@ -162,6 +163,24 @@ public enum FCAccessibilityID {
     public static let shareReportClose = "shareReport.close"
     public static let shareReportNotSentStatus = "shareReport.notSentStatus"
     public static let shareReportHandedOffStatus = "shareReport.handedOffStatus"
+
+    public static let backupRoot = "backup.root"
+    public static let backupPassword = "backup.password"
+    public static let backupPasswordConfirm = "backup.passwordConfirm"
+    public static let backupPasswordHint = "backup.passwordHint"
+    public static let backupExport = "backup.export"
+    public static let backupExportStatus = "backup.exportStatus"
+    public static let backupCancel = "backup.cancel"
+    public static let backupRetry = "backup.retry"
+    public static let restoreRoot = "restore.root"
+    public static let restoreImporter = "restore.importer"
+    public static let restorePickFile = "restore.pickFile"
+    public static let restoreWarning = "restore.warning"
+    public static let restoreSuggestBackup = "restore.suggestBackup"
+    public static let restorePassword = "restore.password"
+    public static let restoreConfirm = "restore.confirm"
+    public static let restoreRetry = "restore.retry"
+    public static let restoreFailed = "restore.failed"
 
     public static func studentRow(_ id: StableUUID) -> String {
         "studentList.row.\(id.rawValue.uuidString)"

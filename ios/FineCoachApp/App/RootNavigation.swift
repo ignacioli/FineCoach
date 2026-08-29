@@ -11,6 +11,7 @@ enum RootDestination: Hashable {
     case sessionDetail(UUID)
     case sessionEdit(UUID)
     case shareReport(UUID)
+    case backupRestore
     case placeholder(PlaceholderKind)
 }
 
@@ -136,6 +137,11 @@ struct RootNavigation: View {
                                     reportsRootURL: environment.requireReportsRootURL(),
                                     renderer: ShareReportRenderer(),
                                     shareAdapter: environment.requireShareAdapter(),
+                                    path: $path
+                                )
+                            case .backupRestore:
+                                BackupExportFlowView(
+                                    coordinator: environment.requireBackupCoordinator(),
                                     path: $path
                                 )
                             case .placeholder(let kind):
