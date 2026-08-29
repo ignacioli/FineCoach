@@ -1,8 +1,8 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.0 -> 1.0.1
+- Version change: 1.0.1 -> 1.0.2
 - Modified principles:
-  - V. Accessible, Testable, and Honest Outcomes: M1-A exception — VoiceOver is not a device-acceptance gate; dual physical OS/device matrix dropped
+  - V. Accessible, Testable, and Honest Outcomes: M1-A exceptions — VoiceOver/SE/second iOS 26 device are not device-acceptance gates; Apple Developer Program, TestFlight, App Store Connect, and App Store listing are not G4 gates; Personal Team 7-day signing is accepted
 - Added sections: none
 - Removed sections: none
 - Follow-up TODOs: none
@@ -91,7 +91,12 @@ speculative cross-platform costs.
   and touch targets of at least 44 by 44 points. Existing SwiftUI accessibility identifiers and labels
   MAY remain so VoiceOver can still parse the UI; M1-A MUST NOT add VoiceOver-only features and MUST
   NOT require a manual VoiceOver device script, a second physical iOS 26 device, or iPhone SE as
-  acceptance. That exception is recorded in the M1-A spec/plan (2026-08-29).
+  acceptance. M1-A MUST NOT require Apple Developer Program enrollment, TestFlight, App Store Connect,
+  App Store listing, or an Account Holder encryption export-compliance questionnaire as acceptance.
+  Personal Team local signing with seven-day certificate renewal is an accepted M1-A install
+  channel. That does not authorize claiming an encryption exemption or writing
+  `ITSAppUsesNonExemptEncryption=NO`. Those exceptions are recorded in the M1-A spec/plan
+  (2026-08-29).
 - Validation MUST NOT be gamed by weakening assertions, shrinking the approved scope, substituting
   diagnostics for acceptance, or hiding known failures. Unverified claims and residual risks MUST be
   stated explicitly.
@@ -152,4 +157,4 @@ milestone can truthfully be accepted.
 - Compliance MUST be rechecked at plan approval, task generation and analysis, implementation
   checkpoints, privacy/security review, and milestone acceptance.
 
-**Version**: 1.0.1 | **Ratified**: 2026-08-26 | **Last Amended**: 2026-08-29
+**Version**: 1.0.2 | **Ratified**: 2026-08-26 | **Last Amended**: 2026-08-29
