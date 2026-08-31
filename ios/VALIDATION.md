@@ -129,11 +129,11 @@ xcodebuild test -project ios/FineCoach.xcodeproj -scheme FineCoachUITests \
 
 ## 仍未关闭
 
-无未勾选 `tasks.md` 项。当前 gate 为 G4（M1-A 实现验收与 R1 状态更新）；通过前不得创建 M1-B spec。T115 不以 VoiceOver 人工脚本为门。
+G4 已于 2026-08-30 通过。R1 已实现并验收。下一步唯一允许：创建 M1-B `spec.md`（尚未开始）。T115 不以 VoiceOver 人工脚本为门。
 
 ## T125 证据对照（2026-08-30）
 
-产品负责人确认可关闭 T125 并进入 G4。不以 Apple Developer Program / TestFlight / App Store 为条件。对照 `specs/001-m1-a-core-session/spec.md`：
+产品负责人确认可关闭 T125。同日宣布 **G4 通过**；R1 已实现并验收。不以 Apple Developer Program / TestFlight / App Store 为条件。对照 `specs/001-m1-a-core-session/spec.md`：
 
 | 项 | 证据 |
 | --- | --- |
