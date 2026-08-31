@@ -16,7 +16,7 @@ Outside approved M1-A behavior, do not infer whether Students directly use the A
 
 ## Current Phase
 
-M1-A Phase 1 Setup and Phase 2 Foundation are the currently authorized iOS implementation scope. Phase 3 and later tasks have not started and require a subsequent implementation round. The approved stack is native Swift/SwiftUI on iOS 18.0+, using Apple frameworks and local Core Data persistence. Android and requirements outside the approved M1-A artifacts remain in discovery.
+M1-A implementation (T001–T125) is complete. The current gate is G4: M1-A implementation acceptance and R1 status update. Do not create an M1-B `spec.md` until G4 passes. G4 does not require Apple Developer Program, TestFlight, App Store Connect, or App Store listing. The shipped stack is native Swift/SwiftUI on iOS 18.0+, using Apple frameworks and local Core Data persistence. Android and requirements outside the approved M1-A artifacts remain in discovery.
 
 Before implementing work outside approved M1-A scope:
 

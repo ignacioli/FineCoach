@@ -129,4 +129,25 @@ xcodebuild test -project ios/FineCoach.xcodeproj -scheme FineCoachUITests \
 
 ## 仍未关闭
 
-T125：全部 AC-001–013、NFR-001–008、SC-001–007 证据复核后更新 `specs/roadmap.md` 的 G4。未通过时保持 R1 阻塞。T115 不以 VoiceOver 人工脚本为门。FR-013A 真机动作库浏览见 `ValidationEvidence/us4-exercise-library.md`。
+无未勾选 `tasks.md` 项。当前 gate 为 G4（M1-A 实现验收与 R1 状态更新）；通过前不得创建 M1-B spec。T115 不以 VoiceOver 人工脚本为门。
+
+## T125 证据对照（2026-08-30）
+
+产品负责人确认可关闭 T125 并进入 G4。不以 Apple Developer Program / TestFlight / App Store 为条件。对照 `specs/001-m1-a-core-session/spec.md`：
+
+| 项 | 证据 |
+| --- | --- |
+| AC-001、AC-002 | `ValidationEvidence/us1-accessibility.md`；学员生命周期 UITests |
+| AC-003、FR-013A | `ValidationEvidence/us4-exercise-library.md`（含 XS Max 动作库浏览 5/5） |
+| AC-004、AC-005 | `ValidationEvidence/us2-accessibility.md`；CoreTraining UITests |
+| AC-006、AC-007、SC-003 | `ValidationEvidence/us3-recovery.md`、`recovery-matrix.md` |
+| AC-008–010 | `ValidationEvidence/us5-privacy.md` |
+| AC-011、AC-012 | `ValidationEvidence/us6-backup.md` |
+| AC-013、NFR-001、SC-005 | `ValidationEvidence/offline-core.md` |
+| NFR-002、NFR-007、SC-004 | `privacy-canary.md`、`privacy-entitlements.md`、`us5-privacy.md` |
+| NFR-003 | `app-switcher-privacy.md`（进程级遮罩；系统截图仍缺，T124 记为残留、不否决） |
+| NFR-004、NFR-005、NFR-006、SC-007 | `accessibility.md`、`compatibility-matrix.md` |
+| NFR-008 | `us5-privacy.md`、`us6-backup.md` |
+| SC-001、SC-002 | `product-owner-acceptance.md` |
+| SC-006 | `performance.md`、`t116-results.json` |
+| 独立隐私安全 gate | `privacy-security-gate.md`（PASS WITH RESIDUALS） |
