@@ -1,11 +1,11 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.1 -> 1.0.2
+- Version change: 1.0.2 -> 1.0.3
 - Modified principles:
-  - V. Accessible, Testable, and Honest Outcomes: M1-A exceptions — VoiceOver/SE/second iOS 26 device are not device-acceptance gates; Apple Developer Program, TestFlight, App Store Connect, and App Store listing are not G4 gates; Personal Team 7-day signing is accepted
+  - V. Accessible, Testable, and Honest Outcomes: clarify that test-first / red-green TDD is not a delivery gate. Each approved spec sets verification depth. Core-path unit and integration tests remain required in proportion to risk. Full UI, fault-injection, and performance matrices are not default unless the applicable spec requires them. M1-A already-shipped test-first tasks are not retroactively reopened.
 - Added sections: none
 - Removed sections: none
-- Follow-up TODOs: none
+- Follow-up TODOs: M1-B `plan.md` / `tasks.md` (when authorized) MUST follow `specs/002-m1-b-coach-operations/spec.md` §2.3 and MUST NOT reintroduce a TDD task-order gate.
 -->
 # FineCoach Constitution
 
@@ -85,7 +85,12 @@ speculative cross-platform costs.
   A task is complete only when its requirement-level acceptance evidence exists.
 - Critical paths and all empty, error, interruption, recovery, destructive, privacy, and permission
   states MUST be testable. Relevant unit, integration, UI, accessibility, lifecycle, fault-injection,
-  migration, and performance checks MUST be planned in proportion to risk.
+  migration, and performance checks MUST be planned in proportion to risk. Test-first / red-green TDD
+  is not a delivery gate. An approved feature spec defines the verification depth for its slice.
+  Core-path unit and integration tests remain required. Full UI-test matrices, fault-injection
+  matrices, and performance harnesses are not default gates unless that spec (or a later
+  product-owner review of a newly observed risk) requires them. M1-B follows
+  `specs/002-m1-b-coach-operations/spec.md` §2.3.
 - User-visible state, error, selection, danger, and statistical meaning MUST NOT rely only on color,
   motion, haptics, or a visual chart. iPhone interfaces MUST keep Dynamic Type, logical focus order,
   and touch targets of at least 44 by 44 points. Existing SwiftUI accessibility identifiers and labels
@@ -157,4 +162,4 @@ milestone can truthfully be accepted.
 - Compliance MUST be rechecked at plan approval, task generation and analysis, implementation
   checkpoints, privacy/security review, and milestone acceptance.
 
-**Version**: 1.0.2 | **Ratified**: 2026-08-26 | **Last Amended**: 2026-08-29
+**Version**: 1.0.3 | **Ratified**: 2026-08-26 | **Last Amended**: 2026-08-30

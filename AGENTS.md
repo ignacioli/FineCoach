@@ -11,12 +11,13 @@ Outside approved M1-A behavior, do not infer whether Students directly use the A
 - `specs/ideas.md` contains initial product ideas. It is not an approved specification or PRD and is not a source of binding requirements.
 - Treat requirement-style language, scope boundaries, acceptance scenarios, and technical questions in `specs/ideas.md` as discovery input that still requires confirmation.
 - `specs/CONTEXT.md` is the current working domain glossary. Use its terms consistently during discovery, but do not treat a term definition as proof that related product behavior has been approved.
-- `specs/001-m1-a-core-session/spec.md` is the approved M1-A product specification; its approved `plan.md`, detailed design artifacts, and `tasks.md` govern the current implementation scope.
+- `specs/001-m1-a-core-session/spec.md` is the approved M1-A product specification; its approved `plan.md`, detailed design artifacts, and `tasks.md` describe the shipped M1-A slice.
+- `specs/002-m1-b-coach-operations/spec.md` is the approved M1-B feature specification (`1.0-approved`, 2026-08-30), including §10 D-001–D-010. That is the specification half of G5 only. It authorizes the M1-B design carrier; it does not authorize `plan.md`, `tasks.md`, or implementation until G5 design review also passes. M1-B verification MUST follow that spec §2.3 (core-path unit and integration tests; no TDD/red-green gate).
 - The approved M1-A artifacts override discovery input only within their explicit scope. Do not promote remaining ideas into requirements.
 
 ## Current Phase
 
-M1-A (R1) is implemented and accepted. G4 passed on 2026-08-30. The only authorized next step is creating the M1-B feature `spec.md` when the product owner asks for it. Do not start M1-B implementation, design, or M2 feature spec until those later gates pass. The shipped M1-A stack is native Swift/SwiftUI on iOS 18.0+, using Apple frameworks and local Core Data persistence. Android and requirements outside approved specs remain in discovery.
+M1-A (R1) is implemented and accepted. G4 passed on 2026-08-30. The M1-B feature spec is `1.0-approved` (G5 specification half). The only authorized next step is the M1-B high-fidelity design carrier for G5 design review. Do not start M1-B `plan.md`, `tasks.md`, or implementation, and do not create an M2 feature spec, until full G5 passes. The shipped M1-A stack is native Swift/SwiftUI on iOS 18.0+, using Apple frameworks and local Core Data persistence. Android and requirements outside approved specs remain in discovery.
 
 Before implementing work outside approved M1-A scope:
 
