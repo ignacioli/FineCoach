@@ -114,8 +114,19 @@ xcodebuild test -project ios/FineCoach.xcodeproj -scheme FineCoachUITests \
 | FineCoachTests | `/tmp/FineCoach-Device-Unit.xcresult` | 70/70 通过 |
 | FineCoachUITests | `/tmp/FineCoach-Device-UI.xcresult` | 10 通过 / 17 失败 |
 
-UI 失败 17 条全部为 `Test crashed with signal kill`（XCTest runner 在 Backup/CoreTraining/Exercise/History 等套件启动时被杀，用例未完成断言）。通过的包括 `PrivacyCoverUITests`、`StudentLifecycleUITests`（4）、`RecoveryMatrixTests.testTerminateRelaunchKeepsCompletedAndDraft`、`RecoveryProcessDriverTests`、`testMatrixRecordsTwentyCombinations`、`SetupSmoke`。不是 Simulator 已覆盖的断言回归。
+滑动修复后全量 UI 复跑：`/tmp/FineCoach-Device-UI-retry.xcresult`，**25/27 通过**。失败 2 条为 CoreTraining 在添加「平板支撑」后等 `StaticText`（XS Max 折叠/合并 accessibility label），不是 runner kill。
 
-## 仍未关闭的物理门
+## 日常真机增量协议（宪法未要求每次全量）
 
-T113 飞行模式、T115 双物理通道 VoiceOver、T116 Release 无 debugger 样本、T117 重启矩阵、T119 系统任务切换器截图。T118 设备 DP 回读见 `ValidationEvidence/file-protection.md`。
+宪法只禁止「用模拟器冒充真机验收」，**没有**要求每次提交在真机跑完全部 UI。规格的物理证据是 Phase 9 门（T113–T119），不是每次开发循环。
+
+推荐：
+
+1. 模拟器跑变更相关的 unit / integration / UI。
+2. 真机只跑触及的 `-only-testing` 核心路径：学员 → 开训 → 加动作/组 → 结束 → 历史/分享或备份（约数分钟）。
+3. 全量真机 UI（27 条、30–40 分钟）仅在 US 完成或 Phase 9 关门时跑一次。
+4. XS Max 上避免 `app.swipeUp()`（会触发 Home）；用 `revealLowerContent()`。
+
+## 仍未关闭
+
+T125：全部 AC-001–013、NFR-001–008、SC-001–007 证据复核后更新 `specs/roadmap.md` 的 G4。未通过时保持 R1 阻塞。T115 不以 VoiceOver 人工脚本为门。FR-013A 真机动作库浏览见 `ValidationEvidence/us4-exercise-library.md`。

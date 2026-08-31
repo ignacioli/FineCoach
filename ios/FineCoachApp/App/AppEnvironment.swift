@@ -28,6 +28,12 @@ public final class AppEnvironment: ObservableObject {
 
     public static func bootstrap() -> AppEnvironment {
         do {
+            if T116PerformanceHarness.isRequested {
+                return try makeIsolatedStore(
+                    folderName: T116PerformanceHarness.storeFolderName,
+                    reset: true
+                )
+            }
             #if DEBUG
                 return try AppEnvironment.makeForCurrentProcess()
             #else
@@ -36,6 +42,23 @@ public final class AppEnvironment: ObservableObject {
         } catch {
             return AppEnvironment(failure: error)
         }
+    }
+
+    static func makeIsolatedStore(folderName: String, reset: Bool) throws -> AppEnvironment {
+        let fileManager = FileManager.default
+        guard
+            let applicationSupport = fileManager.urls(
+                for: .applicationSupportDirectory,
+                in: .userDomainMask
+            ).first
+        else {
+            throw PersistenceControllerError.storeLoadFailed
+        }
+        let root = applicationSupport.appendingPathComponent(folderName, isDirectory: true)
+        if reset {
+            try? fileManager.removeItem(at: root)
+        }
+        return try AppEnvironment(rootURL: root)
     }
 
     func requireUseCases() -> StudentUseCases {
@@ -87,7 +110,7 @@ public final class AppEnvironment: ObservableObject {
         return backupCoordinator
     }
 
-    /// Seeds the placeholder built-in catalog once local storage is open.
+    /// Seeds the built-in exercise catalog once local storage is open.
     /// Call from `RootNavigation.loadInitialState` alongside onboarding load; do not call from `init`.
     func prepareExerciseCatalog() async {
         guard let exerciseUseCases else {

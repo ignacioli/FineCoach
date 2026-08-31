@@ -4,22 +4,21 @@
 
 ## 架构
 
-`FineCoach.entitlements` 为空。App 源码无 `URLSession` / `Network` / 可达性探测。Student、Session、Exercise 搜索、历史、Share Report、备份 round-trip 均走本地 Core Data / 本地文件。系统 Files 与分享由 Coach 主动发起，不构成核心路径对网络的依赖。
+`FineCoach.entitlements` 为空。App 源码无 `URLSession` / `Network` / 可达性探测。Student、Session、Exercise 搜索、历史、Share Report、备份导出均走本地 Core Data / 本地文件。系统 Files 与分享由 Coach 主动发起。
+
+## 物理设备飞行模式（T113）
+
+设备：iPhone XS Max，iOS 18.7.10。USB 连接 Mac；**飞行模式开，Wi‑Fi 与蜂窝均关**。Coach 在设备上完成：
+
+1. 引导「开始使用」→ 创建虚构学员「林青」
+2. 开始训练 → 添加「杠铃深蹲」→ 确认一组 0×5
+3. 结束训练，跳过或取消系统分享发送
+4. 历史中打开该课 → 预览分享报告（未要求联网）
+5. 学员详情 → 备份与恢复 → 设置口令后导出；系统交接可取消/存本机，未使用 iCloud
+6. 动作库搜索「深蹲」，本地出结果，无联网提示
+
+未执行：用刚导出的文件做 **恢复 round-trip**（会替换当前库，本轮未做）。导出与核心读写均在无蜂窝/Wi‑Fi 下完成。
 
 ## Simulator 功能覆盖（诊断）
 
-iPhone 17 / iOS 26.5。T112 UI 套件已执行这些核心路径（Debug）：
-
-- Student：`StudentLifecycleUITests`
-- Session：`CoreTrainingUITests`
-- Exercise 搜索：`ExerciseLibraryUITests.testSearchFavoriteHideUnhidePlaceholderSquat`
-- 历史 / Share Report：`HistoryShareUITests`
-- 备份导出/恢复 UI：`BackupRestoreUITests`
-
-备份容器 round-trip：`BackupRoundTripTests`（集成）。
-
-这些运行未打开飞行模式；对无网络客户端的 App，失败模式与飞行模式等价，但**不能**写成已完成物理设备飞行模式验收。
-
-## 未完成
-
-未在 iPhone XS Max 上打开飞行模式后人工走完 Student → Session → Exercise 搜索 → 历史 → Share Report → 备份 round-trip。USB 连接设备仍可用于安装，但本轮未切换飞行模式。
+见 T112 UI 套件；未开飞行模式，不能单独当作 T113。

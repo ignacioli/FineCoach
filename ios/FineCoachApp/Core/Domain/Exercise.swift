@@ -243,6 +243,8 @@ public struct ExercisePreference: Hashable, Codable, Sendable {
 public struct ExerciseLibraryEntry: Hashable, Codable, Sendable, Identifiable {
     public let item: ExerciseCatalogItem
     public let preference: ExercisePreference?
+    public let primaryMuscleGroup: String?
+    public let equipmentClass: String?
 
     public var id: StableExerciseID { item.id }
 
@@ -253,8 +255,77 @@ public struct ExerciseLibraryEntry: Hashable, Codable, Sendable, Identifiable {
         return item.canonicalName.value
     }
 
-    public init(item: ExerciseCatalogItem, preference: ExercisePreference?) {
+    public init(
+        item: ExerciseCatalogItem,
+        preference: ExercisePreference?,
+        primaryMuscleGroup: String? = nil,
+        equipmentClass: String? = nil
+    ) {
         self.item = item
         self.preference = preference
+        self.primaryMuscleGroup = primaryMuscleGroup
+        self.equipmentClass = equipmentClass
+    }
+}
+
+public struct ExerciseCatalogBrowseFacet: Hashable, Sendable {
+    public let primaryMuscleGroup: String
+    public let equipmentClass: String
+
+    public init(primaryMuscleGroup: String, equipmentClass: String) {
+        self.primaryMuscleGroup = primaryMuscleGroup
+        self.equipmentClass = equipmentClass
+    }
+}
+
+public enum ExerciseCatalogBrowse: Sendable {
+    public static let muscleGroupOrder = ["胸", "肩", "背", "大腿", "小腿", "臂", "臀", "核心"]
+    public static let equipmentClassOrder = ["杠铃", "哑铃", "固定器械", "史密斯机", "龙门架", "壶铃", "徒手", "其他"]
+    public static let customSectionID = "custom"
+    public static let uncategorizedSectionID = "uncategorized"
+
+    public struct Section: Identifiable, Hashable, Sendable {
+        public let id: String
+        public let entries: [ExerciseLibraryEntry]
+    }
+
+    public static func sections(
+        from entries: [ExerciseLibraryEntry],
+        muscleFilter: String?,
+        equipmentFilter: String?
+    ) -> [Section] {
+        let filtersActive = muscleFilter != nil || equipmentFilter != nil
+        var result: [Section] = []
+        if !filtersActive {
+            let custom = entries.filter { $0.item.kind == .custom }
+            if !custom.isEmpty {
+                result.append(Section(id: customSectionID, entries: custom))
+            }
+        }
+
+        var grouped: [String: [ExerciseLibraryEntry]] = [:]
+        for entry in entries where entry.item.kind == .builtIn {
+            if let muscleFilter, entry.primaryMuscleGroup != muscleFilter {
+                continue
+            }
+            if let equipmentFilter, entry.equipmentClass != equipmentFilter {
+                continue
+            }
+            let key = entry.primaryMuscleGroup ?? uncategorizedSectionID
+            grouped[key, default: []].append(entry)
+        }
+
+        for muscle in muscleGroupOrder {
+            if let muscleFilter, muscle != muscleFilter {
+                continue
+            }
+            if let rows = grouped[muscle], !rows.isEmpty {
+                result.append(Section(id: muscle, entries: rows))
+            }
+        }
+        if muscleFilter == nil, let leftover = grouped[uncategorizedSectionID], !leftover.isEmpty {
+            result.append(Section(id: uncategorizedSectionID, entries: leftover))
+        }
+        return result
     }
 }

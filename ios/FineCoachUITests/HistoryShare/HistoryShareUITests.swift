@@ -287,7 +287,7 @@ final class HistoryShareUITests: XCTestCase {
         nameField.tap()
         nameField.typeText(name)
         app.buttons[sexIdentifier].tap()
-        app.swipeUp()
+        app.revealLowerContent()
         if let injuryNotes {
             typeInto(in: app, identifier: "studentEditor.injuryNotes", text: injuryNotes)
         }
@@ -370,6 +370,18 @@ final class HistoryShareUITests: XCTestCase {
     private func addExercise(in app: XCUIApplication, name: String, modeIdentifier: String) {
         tapControl(in: app, identifier: "activeSession.addExercise", label: "添加动作")
         typeInto(in: app, identifier: "activeSession.exerciseName", text: name)
+        let catalogMatch = app.descendants(matching: .any).matching(
+            NSPredicate(
+                format: "identifier BEGINSWITH %@ AND label == %@",
+                "activeSession.catalogRow.",
+                name
+            )
+        ).firstMatch
+        if catalogMatch.waitForExistence(timeout: 3) {
+            catalogMatch.tap()
+            XCTAssertTrue(app.staticTexts[name].waitForExistence(timeout: 8))
+            return
+        }
         tapVisible(in: app, identifier: modeIdentifier)
         tapControl(in: app, identifier: "activeSession.saveExercise", label: "保存动作")
         XCTAssertTrue(app.staticTexts[name].waitForExistence(timeout: 8))
@@ -475,7 +487,7 @@ final class HistoryShareUITests: XCTestCase {
             let button = app.buttons[label]
             XCTAssertTrue(button.waitForExistence(timeout: 8), "missing \(identifier) / \(label)")
             if !button.isHittable {
-                app.swipeUp()
+                app.revealLowerContent()
             }
             button.tap()
             return
@@ -496,7 +508,7 @@ final class HistoryShareUITests: XCTestCase {
         }
         XCTAssertTrue(target.waitForExistence(timeout: 8), "missing field \(identifier)")
         if !target.isHittable {
-            app.swipeUp()
+            app.revealLowerContent()
         }
         target.tap()
         target.typeText(text)
@@ -574,7 +586,7 @@ final class HistoryShareUITests: XCTestCase {
             XCTAssertTrue(target.waitForExistence(timeout: 8), "missing \(identifier) / \(label)")
         }
         if !target.isHittable {
-            app.swipeUp()
+            app.revealLowerContent()
         }
         let matches = app.descendants(matching: .any).matching(identifier: identifier)
         let hittable = matches.allElementsBoundByIndex.last(where: \.isHittable) ?? (target.isHittable ? target : nil)

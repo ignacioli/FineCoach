@@ -10,21 +10,15 @@ public struct CoreDataExerciseRepository: Sendable {
 
     public func seedPlaceholderCatalogIfNeeded(now: Date) async throws {
         try await writer.transaction { context in
-            if try ExerciseManagedObjectMapping.hasBuiltInCatalog(in: context) {
+            let existingCount = try ExerciseManagedObjectMapping.builtInCatalogCount(in: context)
+            if Self.builtInCatalogCountRange.contains(existingCount) {
                 return
             }
-            let catalog: PlaceholderExerciseCatalog
-            do {
-                catalog = try PlaceholderExerciseCatalogLoader.loadFromBundle(Bundle.main)
-            } catch {
-                #if DEBUG
-                    try Self.insertDebugPlaceholderCatalog(now: now, in: context)
-                    return
-                #else
-                    throw error
-                #endif
+            if existingCount > 0 {
+                try Self.removeBuiltInCatalog(in: context)
             }
-            try Self.insertLoadedPlaceholderCatalog(catalog, now: now, in: context)
+            let catalog = try PlaceholderExerciseCatalogLoader.loadFromBundle(Bundle.main)
+            try Self.insertLoadedBuiltInCatalog(catalog, now: now, in: context)
         }
     }
 
@@ -44,12 +38,25 @@ public struct CoreDataExerciseRepository: Sendable {
                 if !includeHidden, preference?.isHidden == true {
                     continue
                 }
+                let facet = PlaceholderExerciseCatalogLoader.facet(forExerciseID: item.id.rawValue)
                 if !normalizedQuery.isEmpty,
-                    !Self.matches(item: item, preference: preference, query: normalizedQuery)
+                    !Self.matches(
+                        item: item,
+                        preference: preference,
+                        facet: facet,
+                        query: normalizedQuery
+                    )
                 {
                     continue
                 }
-                entries.append(ExerciseLibraryEntry(item: item, preference: preference))
+                entries.append(
+                    ExerciseLibraryEntry(
+                        item: item,
+                        preference: preference,
+                        primaryMuscleGroup: item.kind == .builtIn ? facet?.primaryMuscleGroup : nil,
+                        equipmentClass: item.kind == .builtIn ? facet?.equipmentClass : nil
+                    )
+                )
             }
             return entries
         }
@@ -231,49 +238,43 @@ public struct CoreDataExerciseRepository: Sendable {
         }
     #endif
 
-    private static let forbiddenSeedNames: Set<String> = ["杠铃深蹲", "引体向上", "平板支撑"]
+    private static let builtInCatalogCountRange = 100...150
 
-    private static let expectedPlaceholderIDs = [
-        "fc.placeholder.squat",
-        "fc.placeholder.pullup",
-        "fc.placeholder.plank",
-    ]
-
-    private static let expectedPlaceholderNames: [String: String] = [
-        "fc.placeholder.squat": "占位深蹲",
-        "fc.placeholder.pullup": "占位引体",
-        "fc.placeholder.plank": "占位支撑",
-    ]
-
-    private static func insertLoadedPlaceholderCatalog(
+    private static func insertLoadedBuiltInCatalog(
         _ catalog: PlaceholderExerciseCatalog,
         now: Date,
         in context: NSManagedObjectContext
     ) throws {
-        let development = ExerciseProvenanceValidator.validate(
-            catalog.provenance,
-            gate: .developmentPlaceholder
-        )
-        guard development.isAccepted else {
-            throw DomainError.incompatibleInput
-        }
         let distributable = ExerciseProvenanceValidator.validate(
             catalog.provenance,
             gate: .distributable
         )
-        if distributable.isAccepted {
+        guard distributable.isAccepted else {
             throw DomainError.incompatibleInput
         }
-        for expectedID in expectedPlaceholderIDs {
-            guard let loaded = catalog.exercises.first(where: { $0.id == expectedID }) else {
+        let development = ExerciseProvenanceValidator.validate(
+            catalog.provenance,
+            gate: .developmentPlaceholder
+        )
+        if development.isAccepted {
+            throw DomainError.incompatibleInput
+        }
+        guard builtInCatalogCountRange.contains(catalog.exercises.count) else {
+            throw DomainError.incompatibleInput
+        }
+        let recordIDs = Set(catalog.provenance.records.map(\.recordID))
+        var seenIDs = Set<String>()
+        var seenNames = Set<String>()
+        for loaded in catalog.exercises {
+            guard recordIDs.contains(loaded.provenanceRef) else {
+                throw DomainError.incompatibleInput
+            }
+            guard seenIDs.insert(loaded.id).inserted else {
                 throw DomainError.incompatibleInput
             }
             let normalized = try ExerciseNameNormalizer.normalized(loaded.canonicalName)
-            guard normalized == expectedPlaceholderNames[expectedID] else {
-                throw DomainError.incompatibleInput
-            }
-            guard !forbiddenSeedNames.contains(normalized) else {
-                throw DomainError.incompatibleInput
+            guard seenNames.insert(normalized).inserted else {
+                throw DomainError.conflict
             }
             let item = try ExerciseCatalogItem.makeBuiltIn(
                 id: StableExerciseID(loaded.id),
@@ -287,42 +288,24 @@ public struct CoreDataExerciseRepository: Sendable {
         }
     }
 
-    #if DEBUG
-        private static func insertDebugPlaceholderCatalog(now: Date, in context: NSManagedObjectContext) throws {
-            let items = try [
-                ExerciseCatalogItem.makeBuiltIn(
-                    id: StableExerciseID("fc.placeholder.squat"),
-                    canonicalName: "占位深蹲",
-                    recordMode: .weightReps,
-                    metadataVersion: "placeholder.1",
-                    provenanceRef: "placeholder.squat",
-                    now: now
-                ),
-                ExerciseCatalogItem.makeBuiltIn(
-                    id: StableExerciseID("fc.placeholder.pullup"),
-                    canonicalName: "占位引体",
-                    recordMode: .reps,
-                    metadataVersion: "placeholder.1",
-                    provenanceRef: "placeholder.pullup",
-                    now: now
-                ),
-                ExerciseCatalogItem.makeBuiltIn(
-                    id: StableExerciseID("fc.placeholder.plank"),
-                    canonicalName: "占位支撑",
-                    recordMode: .duration,
-                    metadataVersion: "placeholder.1",
-                    provenanceRef: "placeholder.plank",
-                    now: now
-                ),
-            ]
-            for item in items {
-                guard !forbiddenSeedNames.contains(item.normalizedName) else {
-                    throw DomainError.incompatibleInput
-                }
-                try insertBuiltIn(item, in: context)
+    private static func removeBuiltInCatalog(in context: NSManagedObjectContext) throws {
+        for object in try ExerciseManagedObjectMapping.fetchBuiltInCatalogItems(in: context) {
+            let item = try ExerciseManagedObjectMapping.makeCatalogItem(from: object)
+            for claim in try ExerciseManagedObjectMapping.fetchClaims(
+                ownerID: item.id.rawValue,
+                in: context
+            ) {
+                context.delete(claim)
             }
+            if let preference = try ExerciseManagedObjectMapping.fetchPreference(
+                exerciseID: item.id.rawValue,
+                in: context
+            ) {
+                context.delete(preference)
+            }
+            context.delete(object)
         }
-    #endif
+    }
 
     private static func insertBuiltIn(_ item: ExerciseCatalogItem, in context: NSManagedObjectContext) throws {
         _ = try ExerciseManagedObjectMapping.upsertCatalogItem(item, in: context)
@@ -351,6 +334,7 @@ public struct CoreDataExerciseRepository: Sendable {
     private static func matches(
         item: ExerciseCatalogItem,
         preference: ExercisePreference?,
+        facet: ExerciseCatalogBrowseFacet?,
         query: String
     ) -> Bool {
         if contains(item.canonicalName.value, query: query) {
@@ -358,6 +342,13 @@ public struct CoreDataExerciseRepository: Sendable {
         }
         if let alias = preference?.alias?.value, contains(alias, query: query) {
             return true
+        }
+        if item.kind == .builtIn, let facet {
+            if contains(facet.primaryMuscleGroup, query: query)
+                || contains(facet.equipmentClass, query: query)
+            {
+                return true
+            }
         }
         return false
     }

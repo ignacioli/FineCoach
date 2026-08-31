@@ -25,6 +25,7 @@ final class ActiveSessionViewModel: ObservableObject {
     @Published var saveStatus: PersistenceProjectionStatus = .saved(revision: 0)
     @Published var exerciseName = ""
     @Published var exerciseNameConflict: String?
+    @Published var catalogMatches: [ExerciseLibraryEntry] = []
     @Published var recordMode: RecordMode = .weightReps
     @Published var isAddingExercise = false
     @Published var weight = ""
@@ -40,6 +41,8 @@ final class ActiveSessionViewModel: ObservableObject {
     let studentID: StableUUID
     let useCases: ActiveSessionUseCases
     private let signposts: PerformanceSignposts
+    private var catalogSearchGeneration = 0
+    private var catalogSearchTask: Task<Void, Never>?
 
     init(
         studentID: StableUUID,
@@ -113,6 +116,19 @@ final class ActiveSessionViewModel: ObservableObject {
                 name: name,
                 recordMode: mode
             )
+            self.applySavedExercise(updated, mode: mode)
+        }
+    }
+
+    func scheduleCatalogSearch() {
+        catalogSearchTask?.cancel()
+        catalogSearchTask = Task { await refreshCatalogMatches() }
+    }
+
+    func addCatalogMatch(_ id: StableExerciseID) async {
+        await run {
+            let updated = try await self.useCases.addCatalogExercise(itemID: id)
+            let mode = updated.exercises.last?.recordModeSnapshot ?? .weightReps
             self.applySavedExercise(updated, mode: mode)
         }
     }
@@ -340,6 +356,7 @@ final class ActiveSessionViewModel: ObservableObject {
         selectedExerciseID = updated.exercises.last?.id
         exerciseName = ""
         exerciseNameConflict = nil
+        catalogMatches = []
         isAddingExercise = false
         resetSetFields(for: mode)
     }
@@ -380,5 +397,29 @@ final class ActiveSessionViewModel: ObservableObject {
         }
         exerciseNameConflict = nil
         errorMessage = (error as? LocalizedError)?.errorDescription ?? String(localized: "student.error.generic")
+    }
+
+    private func refreshCatalogMatches() async {
+        catalogSearchGeneration += 1
+        let generation = catalogSearchGeneration
+        let query = exerciseName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else {
+            catalogMatches = []
+            return
+        }
+        do {
+            let matches = try await useCases.searchCatalog(query: query)
+            guard generation == catalogSearchGeneration, !Task.isCancelled else {
+                return
+            }
+            catalogMatches = Array(matches.prefix(8))
+        } catch is CancellationError {
+            return
+        } catch {
+            guard generation == catalogSearchGeneration else {
+                return
+            }
+            catalogMatches = []
+        }
     }
 }

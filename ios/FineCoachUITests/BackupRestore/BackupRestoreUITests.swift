@@ -174,7 +174,7 @@ final class BackupRestoreUITests: XCTestCase {
         nameField.tap()
         nameField.typeText(name)
         app.buttons[sexIdentifier].tap()
-        app.swipeUp()
+        app.revealLowerContent()
         let noteField = app.textFields["studentEditor.privateCoachNote"]
         if noteField.waitForExistence(timeout: 2) {
             noteField.tap()
@@ -224,7 +224,7 @@ final class BackupRestoreUITests: XCTestCase {
     private func openBackupFromStudentDetail(in app: XCUIApplication) {
         openStudentDetail(in: app)
         if !element(in: app, identifier: "studentDetail.backup").waitForExistence(timeout: 2) {
-            app.swipeUp()
+            app.revealLowerContent()
         }
         tapBackupEntry(in: app)
         XCTAssertTrue(
@@ -320,7 +320,7 @@ final class BackupRestoreUITests: XCTestCase {
             let button = app.buttons[label]
             XCTAssertTrue(button.waitForExistence(timeout: 8), "missing \(identifier) / \(label)")
             if !button.isHittable {
-                app.swipeUp()
+                app.revealLowerContent()
             }
             button.tap()
             return
@@ -344,7 +344,7 @@ final class BackupRestoreUITests: XCTestCase {
         }
         XCTAssertTrue(target.waitForExistence(timeout: 8), "missing field \(identifier)")
         if !target.isHittable {
-            app.swipeUp()
+            app.revealLowerContent()
         }
         target.tap()
         target.typeText(text)
@@ -390,7 +390,7 @@ final class BackupRestoreUITests: XCTestCase {
             XCTAssertTrue(target.waitForExistence(timeout: 8), "missing \(identifier) / \(label)")
         }
         if !target.isHittable {
-            app.swipeUp()
+            app.revealLowerContent()
         }
         let matches = app.descendants(matching: .any).matching(identifier: identifier)
         let hittable = matches.allElementsBoundByIndex.last(where: \.isHittable) ?? (target.isHittable ? target : nil)

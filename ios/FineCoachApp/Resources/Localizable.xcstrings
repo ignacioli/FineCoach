@@ -916,6 +916,30 @@
         "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "显示已隐藏" } }
       }
     },
+    "exercise.library.filter.muscle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "部位" } }
+      }
+    },
+    "exercise.library.filter.equipment" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "器械" } }
+      }
+    },
+    "exercise.library.filter.all" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "全部" } }
+      }
+    },
+    "exercise.library.section.uncategorized" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "未分类" } }
+      }
+    },
     "exercise.library.favorite" : {
       "extractionState" : "manual",
       "localizations" : {

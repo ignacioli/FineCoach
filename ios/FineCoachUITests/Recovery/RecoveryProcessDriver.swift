@@ -155,6 +155,18 @@ enum RecoveryProcessDriver {
     static func addExercise(in app: XCUIApplication, name: String, modeIdentifier: String) {
         tapControl(in: app, identifier: "activeSession.addExercise", label: "添加动作")
         typeInto(in: app, identifier: "activeSession.exerciseName", text: name)
+        let catalogMatch = app.descendants(matching: .any).matching(
+            NSPredicate(
+                format: "identifier BEGINSWITH %@ AND label == %@",
+                "activeSession.catalogRow.",
+                name
+            )
+        ).firstMatch
+        if catalogMatch.waitForExistence(timeout: 3) {
+            catalogMatch.tap()
+            XCTAssertTrue(app.staticTexts[name].waitForExistence(timeout: 8))
+            return
+        }
         tapVisible(in: app, identifier: modeIdentifier)
         tapControl(in: app, identifier: "activeSession.saveExercise", label: "保存动作")
         XCTAssertTrue(app.staticTexts[name].waitForExistence(timeout: 8))
@@ -171,7 +183,7 @@ enum RecoveryProcessDriver {
             let button = app.buttons[label]
             XCTAssertTrue(button.waitForExistence(timeout: 8), "missing \(identifier) / \(label)")
             if !button.isHittable {
-                app.swipeUp()
+                app.revealLowerContent()
             }
             button.tap()
             return
@@ -185,7 +197,7 @@ enum RecoveryProcessDriver {
         let target = field.waitForExistence(timeout: 2) ? field : element(in: app, identifier: identifier)
         XCTAssertTrue(target.waitForExistence(timeout: 8), "missing field \(identifier)")
         if !target.isHittable {
-            app.swipeUp()
+            app.revealLowerContent()
         }
         target.tap()
         target.typeText(text)
@@ -271,7 +283,7 @@ enum RecoveryProcessDriver {
         nameField.tap()
         nameField.typeText(name)
         app.buttons[sexIdentifier].tap()
-        app.swipeUp()
+        app.revealLowerContent()
         let noteField = app.textFields["studentEditor.privateCoachNote"]
         if noteField.waitForExistence(timeout: 2) {
             noteField.tap()
@@ -324,6 +336,16 @@ enum RecoveryProcessDriver {
         XCTAssertTrue(element(in: app, identifier: "activeSession.root").waitForExistence(timeout: 8))
         XCTAssertFalse(element(in: app, identifier: "placeholder.training").exists)
         XCTAssertFalse(app.staticTexts["此入口已保留，具体内容不在本里程碑展开。"].exists)
+    }
+}
+
+extension XCUIApplication {
+    /// Scrolls from mid-screen so the home indicator is not treated as a Home gesture.
+    /// `swipeUp()` on physical iPhone X-class devices can background the app and SIGKILL the UI runner.
+    func revealLowerContent() {
+        let start = coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.62))
+        let end = coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.28))
+        start.press(forDuration: 0.05, thenDragTo: end)
     }
 }
 

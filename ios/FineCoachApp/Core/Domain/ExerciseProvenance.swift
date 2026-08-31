@@ -88,12 +88,23 @@ public struct PlaceholderCatalogExercise: Hashable, Codable, Sendable {
     public var canonicalName: String
     public var recordMode: RecordMode
     public var provenanceRef: String
+    public var primaryMuscleGroup: String?
+    public var equipmentClass: String?
 
-    public init(id: String, canonicalName: String, recordMode: RecordMode, provenanceRef: String) {
+    public init(
+        id: String,
+        canonicalName: String,
+        recordMode: RecordMode,
+        provenanceRef: String,
+        primaryMuscleGroup: String? = nil,
+        equipmentClass: String? = nil
+    ) {
         self.id = id
         self.canonicalName = canonicalName
         self.recordMode = recordMode
         self.provenanceRef = provenanceRef
+        self.primaryMuscleGroup = primaryMuscleGroup
+        self.equipmentClass = equipmentClass
     }
 }
 

@@ -27,7 +27,7 @@ Release 构建：`/tmp/FineCoachDD-T114-AppRelease/Build/Products/Release-iphone
 
 ## 3. PrivacyInfo.xcprivacy
 
-`NSPrivacyTracking` = false；collected data types 与 tracking domains 为空。`NSPrivacyAccessedAPITypes` 目前为空。备份路径使用磁盘空间查询（`volumeAvailableCapacityForImportantUsage` / `.systemFreeSize`），required-reason 补全归 T121，不在本任务宣称 TestFlight 隐私报告已完成。
+`NSPrivacyTracking` = false；collected data types 与 tracking domains 为空。备份路径使用磁盘空间查询（`volumeAvailableCapacityForImportantUsage` / `.systemFreeSize`），`PrivacyInfo.xcprivacy` 已声明 DiskSpace `E174.1`。TestFlight / Archive 隐私报告不是 M1-A 门。
 
 ## 4. Info.plist
 
@@ -63,4 +63,4 @@ otool -L "$APP"
 
 ## 9. 结论
 
-T114 源码、工程与当前 Release 二进制扫描通过：无账号/服务器/CloudKit/遥测/远程日志/远程崩溃 SDK，Release 不含 fault-injection。磁盘空间 required-reason 留给 T121；加密出口合规归 T122。
+T114 源码、工程与当前 Release 二进制扫描通过：无账号/服务器/CloudKit/遥测/远程日志/远程崩溃 SDK，Release 不含 fault-injection。本地 PrivacyInfo / entitlements 已覆盖。Apple Developer Program、TestFlight、App Store 上架不是 M1-A 门；不得自行声称加密豁免。

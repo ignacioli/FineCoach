@@ -73,32 +73,71 @@ final class ExerciseProvenanceTests: XCTestCase {
         XCTAssertFalse(result.issues.contains { $0.field == "redistributionAllowed" })
     }
 
-    func testBundledPlaceholderCatalogPassesDevelopmentAndFailsDistributable() throws {
+    func testBundledCatalogPassesDistributableAndFailsDevelopmentPlaceholder() throws {
         let catalog = try PlaceholderExerciseCatalogLoader.loadFromBundle(
             Bundle(for: PersistenceController.self)
         )
-        XCTAssertEqual(catalog.metadataVersion, "placeholder.1")
-        XCTAssertEqual(
-            catalog.exercises.map(\.id),
-            ["fc.placeholder.squat", "fc.placeholder.pullup", "fc.placeholder.plank"]
+        XCTAssertEqual(catalog.metadataVersion, "m1a.wger.2026-08-30")
+        XCTAssertEqual(catalog.provenance.catalogID, "fc.m1a.wger")
+        XCTAssertEqual(catalog.exercises.count, 146)
+        XCTAssertEqual(catalog.provenance.records.count, 146)
+        XCTAssertFalse(catalog.provenance.isFictionalPlaceholder)
+        XCTAssertTrue(catalog.provenance.records.allSatisfy(\.redistributionAllowed))
+
+        let squat = try XCTUnwrap(
+            catalog.exercises.first { $0.id == "a2f5b6ef-b780-49c0-8d96-fdaff23e27ce" }
         )
-        XCTAssertEqual(catalog.exercises.map(\.canonicalName), ["占位深蹲", "占位引体", "占位支撑"])
-        XCTAssertEqual(catalog.exercises.map(\.recordMode), [.weightReps, .reps, .duration])
-        XCTAssertTrue(catalog.provenance.isFictionalPlaceholder)
-        XCTAssertTrue(catalog.provenance.records.allSatisfy { !$0.redistributionAllowed })
+        XCTAssertEqual(squat.canonicalName, "杠铃深蹲")
+        XCTAssertEqual(squat.recordMode, .weightReps)
+        XCTAssertEqual(squat.primaryMuscleGroup, "大腿")
+        XCTAssertEqual(squat.equipmentClass, "杠铃")
+        let pullUp = try XCTUnwrap(
+            catalog.exercises.first { $0.id == "8e420408-0682-4ab6-89f5-2681e54c7ce0" }
+        )
+        XCTAssertEqual(pullUp.canonicalName, "引体向上")
+        XCTAssertEqual(pullUp.recordMode, .reps)
+        let plank = try XCTUnwrap(
+            catalog.exercises.first { $0.id == "c9e57bbe-e839-44c6-861d-1c8dd2845e36" }
+        )
+        XCTAssertEqual(plank.canonicalName, "平板支撑")
+        XCTAssertEqual(plank.recordMode, .duration)
+
+        let vBar = try XCTUnwrap(
+            catalog.exercises.first { $0.id == "ea63d85c-8579-4dda-b99f-c4c8930f9af6" }
+        )
+        XCTAssertEqual(vBar.canonicalName, "V把下压")
+        let straightBar = try XCTUnwrap(
+            catalog.exercises.first { $0.id == "6ebb138e-bb0a-402e-84e5-68fe0896e897" }
+        )
+        XCTAssertEqual(straightBar.canonicalName, "直杆下压")
 
         let development = ExerciseProvenanceValidator.validate(
             catalog.provenance,
             gate: .developmentPlaceholder
         )
-        XCTAssertTrue(development.isAccepted)
+        XCTAssertFalse(development.isAccepted)
+        XCTAssertTrue(development.issues.contains { $0.field == "isFictionalPlaceholder" })
 
         let distributable = ExerciseProvenanceValidator.validate(
             catalog.provenance,
             gate: .distributable
         )
-        XCTAssertFalse(distributable.isAccepted)
-        XCTAssertTrue(distributable.issues.contains { $0.field == "isFictionalPlaceholder" })
+        XCTAssertTrue(distributable.isAccepted)
+        XCTAssertTrue(distributable.issues.isEmpty)
+
+        XCTAssertTrue(
+            catalog.exercises.allSatisfy {
+                $0.primaryMuscleGroup != nil && $0.equipmentClass != nil
+            }
+        )
+        XCTAssertEqual(
+            Set(catalog.exercises.compactMap(\.primaryMuscleGroup)),
+            Set(ExerciseCatalogBrowse.muscleGroupOrder)
+        )
+        XCTAssertEqual(
+            Set(catalog.exercises.compactMap(\.equipmentClass)),
+            Set(ExerciseCatalogBrowse.equipmentClassOrder)
+        )
     }
 
     func testInvalidJSONDataThrowsIncompatibleInput() {

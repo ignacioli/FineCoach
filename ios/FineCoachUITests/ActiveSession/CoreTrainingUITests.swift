@@ -48,9 +48,7 @@ final class CoreTrainingUITests: XCTestCase {
         XCTAssertTrue(element(in: app, identifier: "activeSession.setState.completed").waitForExistence(timeout: 8))
 
         addExercise(in: app, name: "平板支撑", modeIdentifier: "activeSession.mode.duration")
-        app.swipeUp()
-        XCTAssertTrue(app.staticTexts["平板支撑"].waitForExistence(timeout: 8))
-        app.staticTexts["平板支撑"].firstMatch.tap()
+        tapExerciseNamed(in: app, "平板支撑", fallbackIdentifier: "activeSession.exercise.at.2")
         tapControl(in: app, identifier: "activeSession.addSet", label: "添加组")
         typeInto(in: app, identifier: "activeSession.duration", text: "30")
         tapControl(in: app, identifier: "activeSession.confirmSet", label: "确认")
@@ -114,7 +112,7 @@ final class CoreTrainingUITests: XCTestCase {
         )
         XCTAssertTrue(app.staticTexts["杠铃深蹲"].exists)
         tapVisible(in: app, identifier: "activeSession.deleteExerciseConfirm")
-        XCTAssertTrue(app.staticTexts["平板支撑"].waitForExistence(timeout: 8))
+        assertExerciseListed(in: app, name: "平板支撑")
         XCTAssertFalse(app.staticTexts["杠铃深蹲"].exists)
 
         tapVisible(in: app, identifier: "activeSession.exercise.at.0")
@@ -271,7 +269,7 @@ final class CoreTrainingUITests: XCTestCase {
         nameField.tap()
         nameField.typeText(name)
         app.buttons[sexIdentifier].tap()
-        app.swipeUp()
+        app.revealLowerContent()
         let noteField = app.textFields["studentEditor.privateCoachNote"]
         if noteField.waitForExistence(timeout: 2) {
             noteField.tap()
@@ -367,9 +365,33 @@ final class CoreTrainingUITests: XCTestCase {
     private func addExercise(in app: XCUIApplication, name: String, modeIdentifier: String) {
         tapControl(in: app, identifier: "activeSession.addExercise", label: "添加动作")
         typeInto(in: app, identifier: "activeSession.exerciseName", text: name)
+        let catalogMatch = app.descendants(matching: .any).matching(
+            NSPredicate(
+                format: "identifier BEGINSWITH %@ AND label == %@",
+                "activeSession.catalogRow.",
+                name
+            )
+        ).firstMatch
+        if catalogMatch.waitForExistence(timeout: 3) {
+            catalogMatch.tap()
+            assertExerciseListed(in: app, name: name)
+            return
+        }
         tapVisible(in: app, identifier: modeIdentifier)
         tapControl(in: app, identifier: "activeSession.saveExercise", label: "保存动作")
-        XCTAssertTrue(app.staticTexts[name].waitForExistence(timeout: 8))
+        assertExerciseListed(in: app, name: name)
+    }
+
+    private func assertExerciseListed(in app: XCUIApplication, name: String) {
+        app.revealLowerContent()
+        let byText = app.staticTexts[name]
+        let byLabel = app.descendants(matching: .any).matching(
+            NSPredicate(format: "label CONTAINS %@", name)
+        ).firstMatch
+        XCTAssertTrue(
+            byText.waitForExistence(timeout: 8) || byLabel.waitForExistence(timeout: 8),
+            "exercise \(name) must appear in the session list"
+        )
     }
 
     private func addConfirmedWeightRepsSet(in app: XCUIApplication, weight: String, reps: String) {
@@ -380,9 +402,17 @@ final class CoreTrainingUITests: XCTestCase {
     }
 
     private func tapExerciseNamed(in app: XCUIApplication, _ name: String, fallbackIdentifier: String) {
+        app.revealLowerContent()
         let labeled = app.staticTexts[name]
         if labeled.waitForExistence(timeout: 2), labeled.firstMatch.isHittable {
             labeled.firstMatch.tap()
+            return
+        }
+        let byLabel = app.descendants(matching: .any).matching(
+            NSPredicate(format: "label CONTAINS %@", name)
+        ).firstMatch
+        if byLabel.waitForExistence(timeout: 2), byLabel.isHittable {
+            byLabel.tap()
             return
         }
         tapVisible(in: app, identifier: fallbackIdentifier)
@@ -398,7 +428,7 @@ final class CoreTrainingUITests: XCTestCase {
             let button = app.buttons[label]
             XCTAssertTrue(button.waitForExistence(timeout: 8), "missing \(identifier) / \(label)")
             if !button.isHittable {
-                app.swipeUp()
+                app.revealLowerContent()
             }
             button.tap()
             return
@@ -411,7 +441,7 @@ final class CoreTrainingUITests: XCTestCase {
         let target = field.waitForExistence(timeout: 2) ? field : element(in: app, identifier: identifier)
         XCTAssertTrue(target.waitForExistence(timeout: 8), "missing field \(identifier)")
         if !target.isHittable {
-            app.swipeUp()
+            app.revealLowerContent()
         }
         target.tap()
         target.typeText(text)
@@ -432,7 +462,7 @@ final class CoreTrainingUITests: XCTestCase {
             XCTAssertTrue(target.waitForExistence(timeout: 8), "missing \(identifier) / \(label)")
         }
         if !target.isHittable {
-            app.swipeUp()
+            app.revealLowerContent()
         }
         let matches = app.descendants(matching: .any).matching(identifier: identifier)
         let hittable = matches.allElementsBoundByIndex.last(where: \.isHittable) ?? (target.isHittable ? target : nil)

@@ -48,7 +48,7 @@ final class StudentLifecycleUITests: XCTestCase {
         XCTAssertTrue(app.buttons["studentDetail.injuryNotesFold"].exists)
         XCTAssertFalse(app.staticTexts["studentDetail.injuryNotesBody"].exists)
 
-        app.swipeUp()
+        app.revealLowerContent()
         tapVisible(in: app, identifier: "studentDetail.archive")
         XCTAssertTrue(app.buttons["archive.confirm"].waitForExistence(timeout: 5))
         tapVisible(in: app, identifier: "archive.confirm")
@@ -79,7 +79,7 @@ final class StudentLifecycleUITests: XCTestCase {
 
         app.staticTexts["林林"].firstMatch.tap()
         XCTAssertTrue(app.buttons["studentDetail.delete"].waitForExistence(timeout: 5))
-        app.swipeUp()
+        app.revealLowerContent()
         tapVisible(in: app, identifier: "studentDetail.delete")
         let nameField = app.textFields["deleteStudent.confirmName"]
         XCTAssertTrue(nameField.waitForExistence(timeout: 8))
@@ -100,7 +100,7 @@ final class StudentLifecycleUITests: XCTestCase {
         XCTAssertTrue(app.buttons["studentList.inProgress"].waitForExistence(timeout: 5))
         app.buttons["studentList.row.11111111-1111-4111-8111-111111111111"].tap()
         XCTAssertTrue(app.buttons["studentDetail.delete"].waitForExistence(timeout: 5))
-        app.swipeUp()
+        app.revealLowerContent()
         tapVisible(in: app, identifier: "studentDetail.delete")
         XCTAssertTrue(app.staticTexts["deleteStudent.blocked"].waitForExistence(timeout: 8))
         XCTAssertFalse(app.textFields["deleteStudent.confirmName"].exists)
@@ -194,7 +194,7 @@ final class StudentLifecycleUITests: XCTestCase {
         nameField.tap()
         nameField.typeText(name)
         app.buttons[sexIdentifier].tap()
-        app.swipeUp()
+        app.revealLowerContent()
         let noteField = app.textFields["studentEditor.privateCoachNote"]
         if noteField.waitForExistence(timeout: 2) {
             noteField.tap()

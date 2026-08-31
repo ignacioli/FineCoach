@@ -227,9 +227,16 @@ public enum ExerciseProvenanceValidator: Sendable {
 
 public enum PlaceholderExerciseCatalogLoader {
     public static func loadFromBundle(_ bundle: Bundle) throws -> PlaceholderExerciseCatalog {
-        guard let url = catalogURL(in: bundle) else {
-            throw DomainError.notFound
+        let candidates = [bundle, Bundle(for: PersistenceController.self)]
+        for candidate in candidates {
+            if let url = catalogURL(in: candidate) {
+                return try decodeCatalog(at: url)
+            }
         }
+        throw DomainError.notFound
+    }
+
+    private static func decodeCatalog(at url: URL) throws -> PlaceholderExerciseCatalog {
         let data: Data
         do {
             data = try Data(contentsOf: url)
@@ -244,13 +251,57 @@ public enum PlaceholderExerciseCatalogLoader {
     }
 
     private static func catalogURL(in bundle: Bundle) -> URL? {
-        if let url = bundle.url(forResource: "placeholder-catalog", withExtension: "json") {
+        if let url = bundle.url(forResource: "provenance", withExtension: "json") {
             return url
         }
         return bundle.url(
-            forResource: "placeholder-catalog",
+            forResource: "provenance",
             withExtension: "json",
             subdirectory: "ExerciseCatalog"
         )
+    }
+
+    public static func facet(forExerciseID id: String) -> ExerciseCatalogBrowseFacet? {
+        facetsByID()[id]
+    }
+
+    public static func facetsByID() -> [String: ExerciseCatalogBrowseFacet] {
+        facetCache.facets()
+    }
+
+    private static let facetCache = FacetCache()
+
+    private final class FacetCache: @unchecked Sendable {
+        private let lock = NSLock()
+        private var cached: [String: ExerciseCatalogBrowseFacet]?
+
+        func facets() -> [String: ExerciseCatalogBrowseFacet] {
+            lock.lock()
+            defer { lock.unlock() }
+            if let cached {
+                return cached
+            }
+            let catalog: PlaceholderExerciseCatalog
+            do {
+                catalog = try PlaceholderExerciseCatalogLoader.loadFromBundle(Bundle.main)
+            } catch {
+                cached = [:]
+                return [:]
+            }
+            var loaded: [String: ExerciseCatalogBrowseFacet] = [:]
+            loaded.reserveCapacity(catalog.exercises.count)
+            for exercise in catalog.exercises {
+                guard let muscle = exercise.primaryMuscleGroup, let equipment = exercise.equipmentClass
+                else {
+                    continue
+                }
+                loaded[exercise.id] = ExerciseCatalogBrowseFacet(
+                    primaryMuscleGroup: muscle,
+                    equipmentClass: equipment
+                )
+            }
+            cached = loaded
+            return loaded
+        }
     }
 }

@@ -9,8 +9,8 @@
         private let sessionID = StableUUID(UUID(uuidString: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa")!)
         private let sessionExerciseID = StableUUID(UUID(uuidString: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb")!)
         private let now = Date(timeIntervalSince1970: 1_700_000_000)
-        private let squatID = StableExerciseID(rawValue: "fc.placeholder.squat")!
-        private let pullupID = StableExerciseID(rawValue: "fc.placeholder.pullup")!
+        private let squatID = StableExerciseID(rawValue: "a2f5b6ef-b780-49c0-8d96-fdaff23e27ce")!
+        private let pullupID = StableExerciseID(rawValue: "8e420408-0682-4ab6-89f5-2681e54c7ce0")!
         private let customID = StableExerciseID(rawValue: "fc.custom.my-press")!
         private let archivedCustomID = StableExerciseID(rawValue: "fc.custom.ning-press")!
         private let reusedCustomID = StableExerciseID(rawValue: "fc.custom.ning-press-2")!
@@ -30,7 +30,7 @@
 
                 let squat = try await repository.catalogItem(id: squatID)
                 XCTAssertEqual(squat.kind, .builtIn)
-                XCTAssertEqual(squat.canonicalName.value, "占位深蹲")
+                XCTAssertEqual(squat.canonicalName.value, "杠铃深蹲")
                 squatCanonical = squat.canonicalName.value
 
                 let custom = try await repository.createCustom(
@@ -62,7 +62,7 @@
             let squat = try await repository.catalogItem(id: squatID)
             XCTAssertEqual(squat.id, squatID)
             XCTAssertEqual(squat.canonicalName.value, squatCanonical)
-            XCTAssertEqual(squat.canonicalName.value, "占位深蹲")
+            XCTAssertEqual(squat.canonicalName.value, "杠铃深蹲")
 
             let custom = try await repository.catalogItem(id: customID)
             XCTAssertEqual(custom.id, customID)
@@ -72,13 +72,15 @@
             XCTAssertEqual(byAlias.map(\.id), [squatID])
             let entry = try XCTUnwrap(byAlias.first)
             XCTAssertEqual(entry.item.id, squatID)
-            XCTAssertEqual(entry.item.canonicalName.value, "占位深蹲")
+            XCTAssertEqual(entry.item.canonicalName.value, "杠铃深蹲")
             XCTAssertEqual(entry.preference?.alias?.value, "深蹲别名")
             XCTAssertEqual(entry.preference?.isFavorite, true)
             XCTAssertEqual(entry.displayedName, "深蹲别名")
 
-            let forbidden = try await repository.searchActive(query: "杠铃深蹲")
-            XCTAssertTrue(forbidden.isEmpty)
+            let foundSquat = try await repository.searchActive(query: "杠铃深蹲")
+            XCTAssertEqual(foundSquat.map(\.id), [squatID])
+            XCTAssertEqual(foundSquat.first?.primaryMuscleGroup, "大腿")
+            XCTAssertEqual(foundSquat.first?.equipmentClass, "杠铃")
             try await reopened.shutdownForTesting()
         }
 
@@ -95,7 +97,7 @@
             let sessionRepository = CoreDataSessionRepository(writer: controller.writer)
             try await exerciseRepository.seedPlaceholderCatalogIfNeeded(now: clock.nowUTC())
             let catalogCountAfterSeed = try await catalogCount(writer: controller.writer)
-            XCTAssertEqual(catalogCountAfterSeed, 3)
+            XCTAssertEqual(catalogCountAfterSeed, 146)
 
             let student = try StudentDraft(displayName: "林青", sex: .female).makeStudent(
                 id: StableUUID(ids.makeID()),
@@ -158,7 +160,7 @@
 
             do {
                 _ = try await environment.repository.createCustom(
-                    name: "  占位深蹲  ",
+                    name: "  杠铃深蹲  ",
                     recordMode: .weightReps,
                     id: customID,
                     now: environment.clock.nowUTC()
@@ -214,14 +216,14 @@
             )
 
             let visible = try await environment.repository.searchActive(query: "", includeHidden: false)
-            XCTAssertEqual(visible.map(\.item.canonicalName.value), ["占位支撑", "占位深蹲"])
+            XCTAssertEqual(visible.count, 145)
             XCTAssertFalse(visible.contains { $0.id == pullupID })
 
             let includingHidden = try await environment.repository.searchActive(query: "", includeHidden: true)
-            XCTAssertEqual(includingHidden.map(\.item.canonicalName.value), ["占位引体", "占位支撑", "占位深蹲"])
+            XCTAssertEqual(includingHidden.count, 146)
             let hiddenEntry = try XCTUnwrap(includingHidden.first { $0.id == pullupID })
             XCTAssertEqual(hiddenEntry.preference?.isHidden, true)
-            XCTAssertEqual(hiddenEntry.item.canonicalName.value, "占位引体")
+            XCTAssertEqual(hiddenEntry.item.canonicalName.value, "引体向上")
             try await environment.controller.shutdownForTesting()
         }
 

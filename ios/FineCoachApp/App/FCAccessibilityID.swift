@@ -92,12 +92,30 @@ public enum FCAccessibilityID {
     public static let activeSessionSaveExerciseToLibrary = "activeSession.saveExerciseToLibrary"
     public static let activeSessionExerciseNameConflict = "activeSession.exerciseNameConflict"
 
+    public static func activeSessionCatalogRow(_ id: StableExerciseID) -> String {
+        "activeSession.catalogRow.\(id.rawValue)"
+    }
+
     public static let exerciseLibraryEntry = "exerciseLibrary.entry"
     public static let exerciseLibraryRoot = "exerciseLibrary.root"
     public static let exerciseLibrarySearch = "exerciseLibrary.search"
     public static let exerciseLibraryAddCustom = "exerciseLibrary.addCustom"
     public static let exerciseLibraryShowHidden = "exerciseLibrary.showHidden"
     public static let exerciseLibraryConflict = "exerciseLibrary.conflict"
+    public static let exerciseLibraryMuscleAll = "exerciseLibrary.muscle.all"
+    public static let exerciseLibraryEquipmentAll = "exerciseLibrary.equipment.all"
+
+    public static func exerciseLibraryMuscle(_ group: String) -> String {
+        "exerciseLibrary.muscle.\(group)"
+    }
+
+    public static func exerciseLibraryEquipment(_ group: String) -> String {
+        "exerciseLibrary.equipment.\(group)"
+    }
+
+    public static func exerciseLibrarySection(_ id: String) -> String {
+        "exerciseLibrary.section.\(id)"
+    }
 
     public static func exerciseLibraryFavorite(_ id: StableExerciseID) -> String {
         "exerciseLibrary.favorite.\(id.rawValue)"

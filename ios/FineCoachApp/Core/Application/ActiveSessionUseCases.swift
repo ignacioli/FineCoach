@@ -95,6 +95,10 @@ public struct ActiveSessionUseCases: Sendable {
         }
     }
 
+    public func searchCatalog(query: String) async throws -> [ExerciseLibraryEntry] {
+        try await exerciseRepository.searchActive(query: query)
+    }
+
     public func addCatalogExercise(itemID: StableExerciseID) async throws -> Session {
         let item = try await exerciseRepository.catalogItem(id: itemID)
         return try await mutate { session in

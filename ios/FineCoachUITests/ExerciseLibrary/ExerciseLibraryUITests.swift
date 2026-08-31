@@ -6,34 +6,38 @@ final class ExerciseLibraryUITests: XCTestCase {
         continueAfterFailure = false
     }
 
-    func testSearchFavoriteHideUnhidePlaceholderSquat() {
+    func testSearchFavoriteHideUnhideBarbellSquat() {
         let app = launchIsolatedApp()
         skipOnboarding(in: app)
         openExerciseLibrary(in: app)
 
-        typeInto(in: app, identifier: "exerciseLibrary.search", text: "占位深蹲")
+        typeInto(in: app, identifier: "exerciseLibrary.search", text: "杠铃深蹲")
         XCTAssertTrue(
-            element(in: app, identifier: "exerciseLibrary.row.fc.placeholder.squat").waitForExistence(timeout: 8))
-        XCTAssertTrue(app.staticTexts["内置"].waitForExistence(timeout: 8))
+            element(in: app, identifier: "exerciseLibrary.row.a2f5b6ef-b780-49c0-8d96-fdaff23e27ce")
+                .waitForExistence(timeout: 8))
 
-        tapVisible(in: app, identifier: "exerciseLibrary.favorite.fc.placeholder.squat")
-        tapVisible(in: app, identifier: "exerciseLibrary.hide.fc.placeholder.squat")
+        tapVisible(in: app, identifier: "exerciseLibrary.favorite.a2f5b6ef-b780-49c0-8d96-fdaff23e27ce")
+        tapVisible(in: app, identifier: "exerciseLibrary.hide.a2f5b6ef-b780-49c0-8d96-fdaff23e27ce")
         XCTAssertTrue(element(in: app, identifier: "exerciseLibrary.root").waitForExistence(timeout: 8))
         XCTAssertFalse(
-            element(in: app, identifier: "exerciseLibrary.row.fc.placeholder.squat").waitForExistence(timeout: 2),
-            "hidden placeholder must be omitted from the default list"
+            element(in: app, identifier: "exerciseLibrary.row.a2f5b6ef-b780-49c0-8d96-fdaff23e27ce")
+                .waitForExistence(timeout: 2),
+            "hidden built-in must be omitted from the default list"
         )
 
         tapVisible(in: app, identifier: "exerciseLibrary.showHidden")
         XCTAssertTrue(
-            element(in: app, identifier: "exerciseLibrary.row.fc.placeholder.squat").waitForExistence(timeout: 8))
-        tapVisible(in: app, identifier: "exerciseLibrary.hide.fc.placeholder.squat")
+            element(in: app, identifier: "exerciseLibrary.row.a2f5b6ef-b780-49c0-8d96-fdaff23e27ce")
+                .waitForExistence(timeout: 8))
+        tapVisible(in: app, identifier: "exerciseLibrary.hide.a2f5b6ef-b780-49c0-8d96-fdaff23e27ce")
         XCTAssertTrue(
-            element(in: app, identifier: "exerciseLibrary.row.fc.placeholder.squat").waitForExistence(timeout: 8))
+            element(in: app, identifier: "exerciseLibrary.row.a2f5b6ef-b780-49c0-8d96-fdaff23e27ce")
+                .waitForExistence(timeout: 8))
 
         tapVisible(in: app, identifier: "exerciseLibrary.showHidden")
         XCTAssertTrue(
-            element(in: app, identifier: "exerciseLibrary.row.fc.placeholder.squat").waitForExistence(timeout: 8))
+            element(in: app, identifier: "exerciseLibrary.row.a2f5b6ef-b780-49c0-8d96-fdaff23e27ce")
+                .waitForExistence(timeout: 8))
     }
 
     func testCreateArchiveAndRecreateCustomExerciseReleasesClaim() {
@@ -42,10 +46,12 @@ final class ExerciseLibraryUITests: XCTestCase {
         openExerciseLibrary(in: app)
 
         createCustomExercise(in: app, name: "我的推举")
+        searchLibrary(in: app, query: "我的推举")
         XCTAssertTrue(app.staticTexts["我的推举"].waitForExistence(timeout: 8))
 
         popToStudentList(in: app)
         openExerciseLibrary(in: app)
+        searchLibrary(in: app, query: "我的推举")
         XCTAssertTrue(app.staticTexts["我的推举"].waitForExistence(timeout: 8))
 
         app.staticTexts["我的推举"].firstMatch.tap()
@@ -56,6 +62,7 @@ final class ExerciseLibraryUITests: XCTestCase {
         XCTAssertTrue(element(in: app, identifier: "exerciseLibrary.root").waitForExistence(timeout: 8))
 
         createCustomExercise(in: app, name: "我的推举")
+        searchLibrary(in: app, query: "我的推举")
         XCTAssertTrue(app.staticTexts["我的推举"].waitForExistence(timeout: 8))
         XCTAssertFalse(element(in: app, identifier: "exerciseLibrary.conflict").exists)
     }
@@ -68,29 +75,30 @@ final class ExerciseLibraryUITests: XCTestCase {
         tapControl(in: app, identifier: "studentDetail.startTraining", label: "开始训练")
         assertActiveSession(in: app)
 
-        addSessionOnlyExercise(in: app, name: "杠铃深蹲", modeIdentifier: "activeSession.mode.weightReps")
-        XCTAssertTrue(app.staticTexts["杠铃深蹲"].waitForExistence(timeout: 8))
+        addSessionOnlyExercise(in: app, name: "课中深蹲", modeIdentifier: "activeSession.mode.weightReps")
+        XCTAssertTrue(app.staticTexts["课中深蹲"].waitForExistence(timeout: 8))
 
         addLibraryExercise(in: app, name: "课中自定义A", modeIdentifier: "activeSession.mode.weightReps")
         XCTAssertTrue(app.staticTexts["课中自定义A"].waitForExistence(timeout: 8))
 
         tapControl(in: app, identifier: "activeSession.addExercise", label: "添加动作")
-        typeInto(in: app, identifier: "activeSession.exerciseName", text: "占位深蹲")
+        typeInto(in: app, identifier: "activeSession.exerciseName", text: "杠铃深蹲")
         tapVisible(in: app, identifier: "activeSession.mode.weightReps")
         tapControl(in: app, identifier: "activeSession.saveExerciseToLibrary", label: "保存到动作库")
         XCTAssertTrue(
             element(in: app, identifier: "activeSession.exerciseNameConflict").waitForExistence(timeout: 8)
         )
         let nameField = app.textFields["activeSession.exerciseName"]
-        XCTAssertEqual(nameField.value as? String, "占位深蹲", "conflict must not silently rename")
+        XCTAssertEqual(nameField.value as? String, "杠铃深蹲", "conflict must not silently rename")
 
         popToStudentList(in: app)
         openExerciseLibrary(in: app)
+        searchLibrary(in: app, query: "课中自定义A")
         XCTAssertTrue(app.staticTexts["课中自定义A"].waitForExistence(timeout: 8))
-        typeInto(in: app, identifier: "exerciseLibrary.search", text: "占位深蹲")
-        XCTAssertTrue(app.staticTexts["占位深蹲"].waitForExistence(timeout: 8))
-        let squatMatches = app.staticTexts.matching(NSPredicate(format: "label == %@", "占位深蹲"))
-        XCTAssertEqual(squatMatches.count, 1, "library must keep a single 占位深蹲 after conflict")
+        searchLibrary(in: app, query: "杠铃深蹲")
+        XCTAssertTrue(app.staticTexts["杠铃深蹲"].waitForExistence(timeout: 8))
+        let squatMatches = app.staticTexts.matching(NSPredicate(format: "label == %@", "杠铃深蹲"))
+        XCTAssertEqual(squatMatches.count, 1, "library must keep a single 杠铃深蹲 after conflict")
     }
 
     func testSessionOnlyExerciseDoesNotAppearInLibrary() {
@@ -111,6 +119,56 @@ final class ExerciseLibraryUITests: XCTestCase {
             app.staticTexts["仅本次动作X"].waitForExistence(timeout: 2),
             "session-only exercises must not appear in the library"
         )
+    }
+
+    func testBrowseByMuscleEquipmentAndCustomSection() {
+        let app = launchIsolatedApp()
+        skipOnboarding(in: app)
+        openExerciseLibrary(in: app)
+
+        createCustomExercise(in: app, name: "我的分组动作")
+        XCTAssertTrue(
+            element(in: app, identifier: "exerciseLibrary.section.custom").waitForExistence(timeout: 8)
+        )
+        XCTAssertTrue(app.staticTexts["我的分组动作"].waitForExistence(timeout: 8))
+
+        tapVisible(in: app, identifier: "exerciseLibrary.muscle.大腿")
+        XCTAssertFalse(
+            app.staticTexts["我的分组动作"].waitForExistence(timeout: 2),
+            "custom exercises must not mix into a muscle filter"
+        )
+        searchLibrary(in: app, query: "杠铃深蹲")
+        XCTAssertTrue(
+            element(in: app, identifier: "exerciseLibrary.row.a2f5b6ef-b780-49c0-8d96-fdaff23e27ce")
+                .waitForExistence(timeout: 8)
+        )
+
+        tapVisible(in: app, identifier: "exerciseLibrary.equipment.杠铃")
+        XCTAssertTrue(
+            element(in: app, identifier: "exerciseLibrary.row.a2f5b6ef-b780-49c0-8d96-fdaff23e27ce")
+                .waitForExistence(timeout: 8)
+        )
+
+        tapVisible(in: app, identifier: "exerciseLibrary.muscle.胸")
+        XCTAssertFalse(
+            element(in: app, identifier: "exerciseLibrary.row.a2f5b6ef-b780-49c0-8d96-fdaff23e27ce")
+                .waitForExistence(timeout: 2),
+            "杠铃深蹲 is not a chest movement"
+        )
+
+        searchLibrary(in: app, query: "杠铃平板卧推")
+        XCTAssertTrue(
+            element(in: app, identifier: "exerciseLibrary.row.3717d144-7815-4a97-9a56-956fb889c996")
+                .waitForExistence(timeout: 8)
+        )
+
+        tapVisible(in: app, identifier: "exerciseLibrary.muscle.all")
+        tapVisible(in: app, identifier: "exerciseLibrary.equipment.all")
+        searchLibrary(in: app, query: "我的分组动作")
+        XCTAssertTrue(
+            element(in: app, identifier: "exerciseLibrary.section.custom").waitForExistence(timeout: 8)
+        )
+        XCTAssertTrue(app.staticTexts["我的分组动作"].waitForExistence(timeout: 8))
     }
 
     private func launchIsolatedApp(extraArguments: [String] = []) -> XCUIApplication {
@@ -165,7 +223,7 @@ final class ExerciseLibraryUITests: XCTestCase {
         nameField.tap()
         nameField.typeText(name)
         app.buttons[sexIdentifier].tap()
-        app.swipeUp()
+        app.revealLowerContent()
         let noteField = app.textFields["studentEditor.privateCoachNote"]
         if noteField.waitForExistence(timeout: 2) {
             noteField.tap()
@@ -277,7 +335,7 @@ final class ExerciseLibraryUITests: XCTestCase {
             let button = app.buttons[label]
             XCTAssertTrue(button.waitForExistence(timeout: 8), "missing \(identifier) / \(label)")
             if !button.isHittable {
-                app.swipeUp()
+                app.revealLowerContent()
             }
             button.tap()
             return
@@ -285,11 +343,27 @@ final class ExerciseLibraryUITests: XCTestCase {
         XCTFail("missing \(identifier)")
     }
 
+    private func searchLibrary(in app: XCUIApplication, query: String) {
+        let field = app.textFields["exerciseLibrary.search"]
+        XCTAssertTrue(field.waitForExistence(timeout: 8), "missing library search field")
+        if !field.isHittable {
+            app.revealLowerContent()
+        }
+        field.tap()
+        if let current = field.value as? String, !current.isEmpty {
+            let deleteString = String(repeating: XCUIKeyboardKey.delete.rawValue, count: current.count)
+            field.typeText(deleteString)
+        }
+        if !query.isEmpty {
+            field.typeText(query)
+        }
+    }
+
     private func typeInto(in app: XCUIApplication, identifier: String, text: String) {
         let byID = app.descendants(matching: .any).matching(identifier: identifier).firstMatch
         XCTAssertTrue(byID.waitForExistence(timeout: 8), "missing field \(identifier)")
         if !byID.isHittable {
-            app.swipeUp()
+            app.revealLowerContent()
         }
         byID.tap()
         let field = app.textFields[identifier].exists ? app.textFields[identifier] : app.textFields.firstMatch

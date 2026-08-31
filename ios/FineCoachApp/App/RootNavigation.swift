@@ -167,6 +167,7 @@ struct RootNavigation: View {
             await environment.applyUITestSeedingIfNeeded()
         #endif
         await environment.prepareExerciseCatalog()
+        await T116PerformanceHarness.runIfRequested(using: environment)
         guard let useCases = environment.studentUseCases else {
             didLoadOnboarding = true
             return

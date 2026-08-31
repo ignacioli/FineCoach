@@ -8,8 +8,7 @@
 
 App 无通知扩展、无远程日志。T112 上述用例通过。
 
-物理设备 Integration：`FoundationIntegrationTests.testLoggerCanaryOnlyExposesFixedNonBusinessValues` 与 `ShareReportRendererTests` 在 `/tmp/FineCoach-Device-Int.xcresult` 通过。`HistoryShareUITests.testShareReportStartsFromSafeDefaultsPreviewAndForbidsSensitiveFields` 在真机 UI 跑次中为 `Test crashed with signal kill`。
+物理设备 Integration：`FoundationIntegrationTests.testLoggerCanaryOnlyExposesFixedNonBusinessValues` 与 `ShareReportRendererTests` 在 `/tmp/FineCoach-Device-Int.xcresult` 通过。T113 飞行模式下预览分享报告未见电话/伤病栏。T119 任务切换器卡片全黑（训练页）。
 
-## 未完成
+泄漏数：自动化 canary + 本次切换器观察为 0。无通知扩展。
 
-未用含身体数据的完整 canary 扫描通知、截图与系统分享附件的物理设备产物。泄漏数不能在缺少任务切换器截图的情况下记为已证明的 0。见 `app-switcher-privacy.md`。

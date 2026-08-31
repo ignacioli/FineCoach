@@ -231,4 +231,67 @@ final class ExerciseIdentityTests: XCTestCase {
         XCTAssertEqual(table.claims[0].ownerID, builtInID)
         XCTAssertEqual(table.claims[0].scope, .activeCatalog)
     }
+
+    func testBrowseSectionsKeepCustomSeparateAndHonorFilters() throws {
+        let squat = try ExerciseCatalogItem.makeBuiltIn(
+            id: builtInID,
+            canonicalName: "杠铃深蹲",
+            recordMode: .weightReps,
+            metadataVersion: "placeholder.1",
+            provenanceRef: "placeholder.squat",
+            now: now
+        )
+        let bench = try ExerciseCatalogItem.makeBuiltIn(
+            id: StableExerciseID(rawValue: "fc.placeholder.bench")!,
+            canonicalName: "杠铃平板卧推",
+            recordMode: .weightReps,
+            metadataVersion: "placeholder.1",
+            provenanceRef: "placeholder.bench",
+            now: now
+        )
+        let custom = try ExerciseCatalogItem.makeCustom(
+            id: customID,
+            canonicalName: "我的分组动作",
+            recordMode: .weightReps,
+            now: now
+        )
+        let squatEntry = ExerciseLibraryEntry(
+            item: squat,
+            preference: nil,
+            primaryMuscleGroup: "大腿",
+            equipmentClass: "杠铃"
+        )
+        let benchEntry = ExerciseLibraryEntry(
+            item: bench,
+            preference: nil,
+            primaryMuscleGroup: "胸",
+            equipmentClass: "杠铃"
+        )
+        let customEntry = ExerciseLibraryEntry(item: custom, preference: nil)
+        let all = [benchEntry, squatEntry, customEntry]
+
+        let unfiltered = ExerciseCatalogBrowse.sections(
+            from: all,
+            muscleFilter: nil,
+            equipmentFilter: nil
+        )
+        XCTAssertEqual(unfiltered.map(\.id), ["custom", "胸", "大腿"])
+        XCTAssertEqual(unfiltered[0].entries.map(\.id), [customID])
+
+        let thigh = ExerciseCatalogBrowse.sections(
+            from: all,
+            muscleFilter: "大腿",
+            equipmentFilter: nil
+        )
+        XCTAssertEqual(thigh.map(\.id), ["大腿"])
+        XCTAssertEqual(thigh.first?.entries.map(\.displayedName), ["杠铃深蹲"])
+
+        let barbellChest = ExerciseCatalogBrowse.sections(
+            from: all,
+            muscleFilter: "胸",
+            equipmentFilter: "杠铃"
+        )
+        XCTAssertEqual(barbellChest.map(\.id), ["胸"])
+        XCTAssertEqual(barbellChest.first?.entries.map(\.displayedName), ["杠铃平板卧推"])
+    }
 }

@@ -17,7 +17,7 @@
             )
             _ = try await environment.sessionUseCases.startOrOpen(studentID: studentID)
             _ = try await environment.sessionUseCases.addSessionOnlyExercise(
-                displayName: "杠铃深蹲",
+                displayName: "课中深蹲",
                 recordMode: .weightReps
             )
             let seeded = try await environment.sessionUseCases.addSet(

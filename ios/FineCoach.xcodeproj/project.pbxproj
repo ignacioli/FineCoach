@@ -31,6 +31,7 @@
 		B132 /* ProtectedFileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A132 /* ProtectedFileStore.swift */; };
 		B133 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = A133 /* AppLogger.swift */; };
 		B134 /* PerformanceSignposts.swift in Sources */ = {isa = PBXBuildFile; fileRef = A134 /* PerformanceSignposts.swift */; };
+		B185 /* T116PerformanceHarness.swift in Sources */ = {isa = PBXBuildFile; fileRef = A185 /* T116PerformanceHarness.swift */; };
 		B124 /* SessionTimingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A124 /* SessionTimingCoordinator.swift */; };
 		B125 /* ExerciseProvenanceValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A125 /* ExerciseProvenanceValidator.swift */; };
 		B126 /* ExerciseLibraryUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A126 /* ExerciseLibraryUseCases.swift */; };
@@ -39,7 +40,7 @@
 		B351 /* ExerciseLibraryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A351 /* ExerciseLibraryViewModel.swift */; };
 		B352 /* CustomExerciseEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A352 /* CustomExerciseEditorView.swift */; };
 		B225 /* ExerciseLibraryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A225 /* ExerciseLibraryUITests.swift */; };
-		B176 /* placeholder-catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = A176 /* placeholder-catalog.json */; };
+		B176 /* provenance.json in Resources */ = {isa = PBXBuildFile; fileRef = A176 /* provenance.json */; };
 		B177 /* provenance.schema.json in Resources */ = {isa = PBXBuildFile; fileRef = A177 /* provenance.schema.json */; };
 		B237 /* ExerciseIdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A237 /* ExerciseIdentityTests.swift */; };
 		B238 /* ExerciseProvenanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A238 /* ExerciseProvenanceTests.swift */; };
@@ -209,6 +210,7 @@
 		A132 /* ProtectedFileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtectedFileStore.swift; sourceTree = "<group>"; };
 		A133 /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
 		A134 /* PerformanceSignposts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceSignposts.swift; sourceTree = "<group>"; };
+		A185 /* T116PerformanceHarness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = T116PerformanceHarness.swift; sourceTree = "<group>"; };
 		A140 /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
 		A141 /* PersistenceWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceWriter.swift; sourceTree = "<group>"; };
 		A142 /* StoreGeneration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreGeneration.swift; sourceTree = "<group>"; };
@@ -283,7 +285,7 @@
 		A350 /* ExerciseLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseLibraryView.swift; sourceTree = "<group>"; };
 		A351 /* ExerciseLibraryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseLibraryViewModel.swift; sourceTree = "<group>"; };
 		A352 /* CustomExerciseEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomExerciseEditorView.swift; sourceTree = "<group>"; };
-		A176 /* placeholder-catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "placeholder-catalog.json"; sourceTree = "<group>"; };
+		A176 /* provenance.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = provenance.json; sourceTree = "<group>"; };
 		A177 /* provenance.schema.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "provenance.schema.json"; sourceTree = "<group>"; };
 		A237 /* ExerciseIdentityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseIdentityTests.swift; sourceTree = "<group>"; };
 		A238 /* ExerciseProvenanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseProvenanceTests.swift; sourceTree = "<group>"; };
@@ -497,7 +499,7 @@
 		A406 /* ExerciseCatalog */ = {
 			isa = PBXGroup;
 			children = (
-				A176 /* placeholder-catalog.json */,
+				A176 /* provenance.json */,
 				A177 /* provenance.schema.json */,
 			);
 			path = ExerciseCatalog;
@@ -562,6 +564,7 @@
 				A132 /* ProtectedFileStore.swift */,
 				A133 /* AppLogger.swift */,
 				A134 /* PerformanceSignposts.swift */,
+				A185 /* T116PerformanceHarness.swift */,
 				A135 /* SystemShareAdapter.swift */,
 				A17A /* SecurityScopedFileAdapter.swift */,
 			);
@@ -1114,7 +1117,7 @@
 				B171 /* Assets.xcassets in Resources */,
 				B172 /* PrivacyInfo.xcprivacy in Resources */,
 				B173 /* FineCoachModel.xcdatamodeld in Resources */,
-				B176 /* placeholder-catalog.json in Resources */,
+				B176 /* provenance.json in Resources */,
 				B177 /* provenance.schema.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1182,6 +1185,7 @@
 				B132 /* ProtectedFileStore.swift in Sources */,
 				B133 /* AppLogger.swift in Sources */,
 				B134 /* PerformanceSignposts.swift in Sources */,
+				B185 /* T116PerformanceHarness.swift in Sources */,
 				B135 /* SystemShareAdapter.swift in Sources */,
 				B164 /* ShareReportDTO.swift in Sources */,
 				B165 /* ShareReportPolicy.swift in Sources */,
@@ -1403,6 +1407,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = 9Z7427RG9X;
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app.tests;
 				PRODUCT_NAME = FineCoachTests;
@@ -1415,6 +1420,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = 9Z7427RG9X;
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app.tests;
 				PRODUCT_NAME = FineCoachTests;

@@ -1,0 +1,58 @@
+{
+  "info" : {
+    "arguments" : [
+      "devicectl",
+      "device",
+      "process",
+      "launch",
+      "--terminate-existing",
+      "--device",
+      "00008020-000C5D2C3ED3002E",
+      "--json-output",
+      "/tmp/FineCoach-T116-launch.json",
+      "com.finecoach.app",
+      "-FineCoachT116Harness"
+    ],
+    "commandType" : "devicectl.device.process.launch",
+    "environment" : {
+      "TERM" : "dumb"
+    },
+    "jsonVersion" : 3,
+    "outcome" : "success",
+    "version" : "518.33"
+  },
+  "result" : {
+    "deviceIdentifier" : "CEDB2203-5F09-50A7-9FF3-4A9FB2FC69F4",
+    "launchOptions" : {
+      "activatedWhenStarted" : true,
+      "arguments" : [
+        "-FineCoachT116Harness"
+      ],
+      "environmentVariables" : {
+        "TERM" : "dumb"
+      },
+      "platformSpecificOptions" : {
+
+      },
+      "startStopped" : false,
+      "terminateExistingInstances" : true,
+      "user" : {
+        "active" : true
+      }
+    },
+    "process" : {
+      "auditToken" : [
+        4294967295,
+        501,
+        501,
+        501,
+        501,
+        1100,
+        0,
+        2873
+      ],
+      "executable" : "file:///private/var/containers/Bundle/Application/C13F26C5-2E3B-439C-923F-63CAC72E2913/FineCoach.app/FineCoach",
+      "processIdentifier" : 1100
+    }
+  }
+}

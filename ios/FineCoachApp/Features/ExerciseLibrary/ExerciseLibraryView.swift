@@ -32,6 +32,28 @@ struct ExerciseLibraryView: View {
                     viewModel.scheduleReload()
                 }
 
+            filterRow(
+                title: String(localized: "exercise.library.filter.muscle"),
+                allTitle: String(localized: "exercise.library.filter.all"),
+                allID: FCAccessibilityID.exerciseLibraryMuscleAll,
+                values: ExerciseCatalogBrowse.muscleGroupOrder,
+                selected: viewModel.muscleFilter,
+                chipID: FCAccessibilityID.exerciseLibraryMuscle,
+                onSelectAll: { viewModel.selectMuscle(nil) },
+                onSelect: { viewModel.selectMuscle($0) }
+            )
+
+            filterRow(
+                title: String(localized: "exercise.library.filter.equipment"),
+                allTitle: String(localized: "exercise.library.filter.all"),
+                allID: FCAccessibilityID.exerciseLibraryEquipmentAll,
+                values: ExerciseCatalogBrowse.equipmentClassOrder,
+                selected: viewModel.equipmentFilter,
+                chipID: FCAccessibilityID.exerciseLibraryEquipment,
+                onSelectAll: { viewModel.selectEquipment(nil) },
+                onSelect: { viewModel.selectEquipment($0) }
+            )
+
             Button(String(localized: "exercise.library.showHidden")) {
                 viewModel.includeHidden.toggle()
                 Task { await viewModel.reload() }
@@ -62,17 +84,28 @@ struct ExerciseLibraryView: View {
                     .padding(.horizontal, FCPrimitives.spacingMedium)
             }
 
-            List(viewModel.entries) { entry in
-                row(for: entry)
-                    .listRowBackground(FCSemanticColors.elevatedSurface)
-                    .listRowInsets(
-                        EdgeInsets(
-                            top: FCPrimitives.spacingSmall,
-                            leading: FCPrimitives.spacingMedium,
-                            bottom: FCPrimitives.spacingSmall,
-                            trailing: FCPrimitives.spacingMedium
-                        )
-                    )
+            List {
+                ForEach(viewModel.sections) { section in
+                    Section {
+                        ForEach(section.entries) { entry in
+                            row(for: entry)
+                                .listRowBackground(FCSemanticColors.elevatedSurface)
+                                .listRowInsets(
+                                    EdgeInsets(
+                                        top: FCPrimitives.spacingSmall,
+                                        leading: FCPrimitives.spacingMedium,
+                                        bottom: FCPrimitives.spacingSmall,
+                                        trailing: FCPrimitives.spacingMedium
+                                    )
+                                )
+                        }
+                    } header: {
+                        Text(sectionTitle(section.id))
+                            .font(.headline)
+                            .foregroundStyle(FCSemanticColors.primaryText)
+                            .accessibilityIdentifier(FCAccessibilityID.exerciseLibrarySection(section.id))
+                    }
+                }
             }
             .listStyle(.plain)
         }
@@ -101,6 +134,67 @@ struct ExerciseLibraryView: View {
                 }
             )
         }
+    }
+
+    private func filterRow(
+        title: String,
+        allTitle: String,
+        allID: String,
+        values: [String],
+        selected: String?,
+        chipID: @escaping (String) -> String,
+        onSelectAll: @escaping () -> Void,
+        onSelect: @escaping (String) -> Void
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.footnote)
+                .foregroundStyle(FCSemanticColors.secondaryText)
+                .padding(.horizontal, FCPrimitives.spacingMedium)
+                .accessibilityAddTraits(.isHeader)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: FCPrimitives.spacingSmall) {
+                    filterChip(
+                        title: allTitle,
+                        id: allID,
+                        isSelected: selected == nil,
+                        accessibilityLabel: "\(title), \(allTitle)",
+                        action: onSelectAll
+                    )
+                    ForEach(values, id: \.self) { value in
+                        filterChip(
+                            title: value,
+                            id: chipID(value),
+                            isSelected: selected == value,
+                            accessibilityLabel: "\(title), \(value)",
+                            action: { onSelect(value) }
+                        )
+                    }
+                }
+                .padding(.horizontal, FCPrimitives.spacingMedium)
+            }
+        }
+        .padding(.bottom, FCPrimitives.spacingSmall)
+    }
+
+    private func filterChip(
+        title: String,
+        id: String,
+        isSelected: Bool,
+        accessibilityLabel: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(title, action: action)
+            .frame(minHeight: 44)
+            .padding(.horizontal, FCPrimitives.spacingSmall)
+            .background(isSelected ? FCSemanticColors.primaryText : FCSemanticColors.separator)
+            .foregroundStyle(
+                isSelected ? FCSemanticColors.elevatedSurface : FCSemanticColors.primaryText
+            )
+            .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSmall))
+            .accessibilityIdentifier(id)
+            .accessibilityLabel(accessibilityLabel)
+            .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 
     private func row(for entry: ExerciseLibraryEntry) -> some View {
@@ -155,20 +249,32 @@ struct ExerciseLibraryView: View {
             Text(entry.displayedName)
                 .font(.headline)
                 .foregroundStyle(FCSemanticColors.primaryText)
-            Text(kindTitle(entry.item.kind))
+            Text(subtitle(for: entry))
                 .font(.footnote)
                 .foregroundStyle(FCSemanticColors.secondaryText)
-                .accessibilityLabel(kindTitle(entry.item.kind))
+                .accessibilityLabel(subtitle(for: entry))
         }
         .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
     }
 
-    private func kindTitle(_ kind: ExerciseKind) -> String {
-        switch kind {
-        case .builtIn:
-            return String(localized: "exercise.kind.builtIn")
-        case .custom:
+    private func subtitle(for entry: ExerciseLibraryEntry) -> String {
+        if entry.item.kind == .custom {
             return String(localized: "exercise.kind.custom")
+        }
+        if let equipment = entry.equipmentClass, !equipment.isEmpty {
+            return equipment
+        }
+        return String(localized: "exercise.kind.builtIn")
+    }
+
+    private func sectionTitle(_ id: String) -> String {
+        switch id {
+        case ExerciseCatalogBrowse.customSectionID:
+            return String(localized: "exercise.kind.custom")
+        case ExerciseCatalogBrowse.uncategorizedSectionID:
+            return String(localized: "exercise.library.section.uncategorized")
+        default:
+            return id
         }
     }
 }

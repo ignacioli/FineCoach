@@ -5,7 +5,10 @@ import Foundation
 final class ExerciseLibraryViewModel: ObservableObject {
     @Published var query = ""
     @Published var includeHidden = false
+    @Published var muscleFilter: String?
+    @Published var equipmentFilter: String?
     @Published var entries: [ExerciseLibraryEntry] = []
+    @Published var sections: [ExerciseCatalogBrowse.Section] = []
     @Published var errorMessage: String?
     @Published var conflictMessage: String?
 
@@ -33,6 +36,7 @@ final class ExerciseLibraryViewModel: ObservableObject {
                 return
             }
             entries = result
+            rebuildSections()
             errorMessage = nil
             conflictMessage = nil
         } catch is CancellationError {
@@ -43,6 +47,16 @@ final class ExerciseLibraryViewModel: ObservableObject {
             }
             present(error)
         }
+    }
+
+    func selectMuscle(_ value: String?) {
+        muscleFilter = value
+        rebuildSections()
+    }
+
+    func selectEquipment(_ value: String?) {
+        equipmentFilter = value
+        rebuildSections()
     }
 
     func toggleFavorite(_ entry: ExerciseLibraryEntry) async {
@@ -59,6 +73,14 @@ final class ExerciseLibraryViewModel: ObservableObject {
             try await self.useCases.setHidden(id: entry.id, isHidden: next)
             await self.reload()
         }
+    }
+
+    private func rebuildSections() {
+        sections = ExerciseCatalogBrowse.sections(
+            from: entries,
+            muscleFilter: muscleFilter,
+            equipmentFilter: equipmentFilter
+        )
     }
 
     private func run(_ work: @escaping () async throws -> Void) async {

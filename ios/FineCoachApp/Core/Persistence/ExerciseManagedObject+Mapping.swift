@@ -147,10 +147,19 @@ enum ExerciseManagedObjectMapping {
     }
 
     static func hasBuiltInCatalog(in context: NSManagedObjectContext) throws -> Bool {
+        try builtInCatalogCount(in: context) > 0
+    }
+
+    static func builtInCatalogCount(in context: NSManagedObjectContext) throws -> Int {
         let request = NSFetchRequest<NSManagedObject>(entityName: catalogEntityName)
         request.predicate = NSPredicate(format: "kind == %@", ExerciseKind.builtIn.rawValue)
-        request.fetchLimit = 1
-        return try context.count(for: request) > 0
+        return try context.count(for: request)
+    }
+
+    static func fetchBuiltInCatalogItems(in context: NSManagedObjectContext) throws -> [NSManagedObject] {
+        let request = NSFetchRequest<NSManagedObject>(entityName: catalogEntityName)
+        request.predicate = NSPredicate(format: "kind == %@", ExerciseKind.builtIn.rawValue)
+        return try context.fetch(request)
     }
 
     static func fetchClaim(normalizedName: String, in context: NSManagedObjectContext) throws -> NSManagedObject? {

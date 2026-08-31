@@ -7,6 +7,24 @@ struct QuickCreateExerciseFlow: View {
         VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
             FCTextField(String(localized: "session.field.exerciseName"), text: $viewModel.exerciseName)
                 .accessibilityIdentifier(FCAccessibilityID.activeSessionExerciseName)
+                .onChange(of: viewModel.exerciseName) { _, _ in
+                    viewModel.scheduleCatalogSearch()
+                }
+            if !viewModel.catalogMatches.isEmpty {
+                VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
+                    ForEach(viewModel.catalogMatches) { entry in
+                        Button {
+                            Task { await viewModel.addCatalogMatch(entry.id) }
+                        } label: {
+                            Text(entry.displayedName)
+                                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                        }
+                        .buttonStyle(.borderless)
+                        .accessibilityIdentifier(FCAccessibilityID.activeSessionCatalogRow(entry.id))
+                        .accessibilityLabel(entry.displayedName)
+                    }
+                }
+            }
             HStack(spacing: FCPrimitives.spacingSmall) {
                 modeChip(
                     .weightReps,
