@@ -83,6 +83,10 @@ When code is introduced, document the canonical setup, build, test, lint, and fo
 - Keep commits and pull requests scoped to one concern and reference the relevant approved requirement or decision.
 - Preserve unrelated and untracked work.
 
+**Protected primary branch.** Do not modify tracked files, stage, or commit on `main` or `master`. This repository currently has no remote: use the local `main` tip, then create a topic branch (prefer a dedicated git worktree) before changing tracked files. Direct commits to the primary branch are forbidden. Gitignored local state on the primary checkout is allowed.
+
+**Local toolchain bootstrap.** After `git worktree add`, and before using project skills, SpecKit, `.handoff`, Cursor subagents, or Codex project subagents in that worktree, run `scripts/bootstrap-local-worktree.sh` with the worktree as `cwd`. The script relative-symlinks ignored runtime subtrees from the primary checkout and skips missing sources. Do not symlink all of `.specify/`, `.cursor/`, or `.codex/`. Agents: run `ig-worktree-gate` before tracked-file edits. The private specs repository is a different git repo and is not wired by this script.
+
 ## M1-A Setup Validation (T001-T008)
 
 The approved iOS implementation stack is native Swift/SwiftUI on iOS 18.0+, using Apple frameworks only. Run these commands from the repository root. Device SDK builds use `CODE_SIGNING_ALLOWED=NO` so setup validation does not require a signing team; use a real signing configuration separately for device installation.

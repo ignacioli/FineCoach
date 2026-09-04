@@ -83,3 +83,6 @@ blob-report/
 
 # Specs (symlink to the private specs repo; not part of this public repo)
 /specs
+
+# local git worktrees
+.worktrees/
