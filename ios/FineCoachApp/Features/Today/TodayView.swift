@@ -170,6 +170,18 @@ struct TodayView: View {
         }
         .background(FCSemanticColors.background)
         .accessibilityIdentifier(FCAccessibilityID.todayRoot)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    path.append(.calendar)
+                } label: {
+                    Image(systemName: "calendar")
+                        .frame(minWidth: 44, minHeight: 44)
+                }
+                .accessibilityLabel(String(localized: "calendar.title"))
+                .accessibilityIdentifier(FCAccessibilityID.todayCalendarEntry)
+            }
+        }
         .task { await viewModel.reload() }
         .onChange(of: path) { _, _ in
             Task { await viewModel.reload() }

@@ -10,11 +10,27 @@ public enum FCAccessibilityID {
     public static let onboardingStart = "onboarding.start"
     public static let onboardingSkip = "onboarding.skip"
 
+    public static let calendarRoot = "calendar.root"
+    public static let appointmentEditorRoot = "appointmentEditor.root"
+    public static let appointmentEditorSave = "appointmentEditor.save"
+    public static let calendarPreviousMonth = "calendar.previousMonth"
+    public static let calendarNextMonth = "calendar.nextMonth"
+    public static let calendarAdd = "calendar.add"
+
+    public static func calendarDay(_ day: Int) -> String {
+        "calendar.day.\(day)"
+    }
+
+    public static func calendarAppointmentRow(_ id: StableUUID) -> String {
+        "calendar.appointmentRow.\(id.rawValue.uuidString)"
+    }
+
     public static let todayRoot = "today.root"
     public static let todaySegmentToday = "today.segment.today"
     public static let todaySegmentStudents = "today.segment.students"
     public static let todayInProgress = "today.inProgress"
     public static let todayResolvedFold = "today.resolvedFold"
+    public static let todayCalendarEntry = "today.calendarEntry"
 
     public static func todayRow(_ id: StableUUID) -> String {
         "today.row.\(id.rawValue.uuidString)"

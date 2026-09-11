@@ -453,6 +453,10 @@ public struct AppointmentUseCases: Sendable {
 
     // MARK: - Queries
 
+    public func appointment(id: StableUUID) async throws -> Appointment {
+        try await appointmentRepository.appointment(id: id)
+    }
+
     public func appointments(studentID: StableUUID) async throws -> [Appointment] {
         try await appointmentRepository.appointments(studentID: studentID)
     }

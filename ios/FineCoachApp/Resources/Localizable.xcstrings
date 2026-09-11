@@ -1389,6 +1389,114 @@
       "localizations" : {
         "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "分钟" } }
       }
+    },
+    "calendar.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "课程日历" } }
+      }
+    },
+    "calendar.empty" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "这一天暂无安排" } }
+      }
+    },
+    "calendar.addAppointment" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "+ 添加课程安排" } }
+      }
+    },
+    "appointmentEditor.createTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "新建课程安排" } }
+      }
+    },
+    "appointmentEditor.editTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "编辑课程安排" } }
+      }
+    },
+    "appointmentEditor.student" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "学员" } }
+      }
+    },
+    "appointmentEditor.date" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "日期" } }
+      }
+    },
+    "appointmentEditor.startTime" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "开始时间" } }
+      }
+    },
+    "appointmentEditor.duration" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "预计时长" } }
+      }
+    },
+    "appointmentEditor.reminder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "提醒" } }
+      }
+    },
+    "appointmentEditor.reminderLead" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "提前提醒" } }
+      }
+    },
+    "appointmentEditor.save" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "保存" } }
+      }
+    },
+    "appointmentEditor.studentRequired" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "请先选择学员。" } }
+      }
+    },
+    "appointmentEditor.durationInvalid" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "请输入有效的预计时长。" } }
+      }
+    },
+    "appointmentEditor.saveFailed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "保存失败，请重试。" } }
+      }
+    },
+    "appointmentEditor.conflictTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "与已有安排时间冲突" } }
+      }
+    },
+    "appointmentEditor.conflictOverride" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "仍然保存" } }
+      }
+    },
+    "appointmentEditor.conflictCancel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "取消" } }
+      }
     }
   },
   "version" : "1.0"

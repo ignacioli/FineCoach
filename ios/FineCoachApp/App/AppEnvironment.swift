@@ -97,6 +97,10 @@ public final class AppEnvironment: ObservableObject {
         return appointmentUseCases
     }
 
+    func requireCalendar() -> Calendar {
+        SystemLocalCalendarProvider().currentCalendar()
+    }
+
     func requireReportsRootURL() -> URL {
         guard let reportsRootURL else {
             preconditionFailure("Report file root requires available local storage.")

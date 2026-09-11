@@ -12,7 +12,14 @@ enum RootDestination: Hashable {
     case sessionEdit(UUID)
     case shareReport(UUID)
     case backupRestore
+    case calendar
+    case appointmentEditor(AppointmentEditorMode)
     case placeholder(PlaceholderKind)
+}
+
+enum AppointmentEditorMode: Hashable {
+    case create(studentID: UUID?, date: LocalDate)
+    case edit(UUID)
 }
 
 enum StudentEditorMode: Hashable {
@@ -150,6 +157,20 @@ struct RootNavigation: View {
                                 BackupExportFlowView(
                                     coordinator: environment.requireBackupCoordinator(),
                                     path: $path
+                                )
+                            case .calendar:
+                                CalendarView(
+                                    appointmentUseCases: environment.requireAppointmentUseCases(),
+                                    studentUseCases: environment.requireUseCases(),
+                                    calendar: environment.requireCalendar(),
+                                    path: $path
+                                )
+                            case .appointmentEditor(let editorMode):
+                                AppointmentEditorView(
+                                    mode: editorMode,
+                                    appointmentUseCases: environment.requireAppointmentUseCases(),
+                                    studentUseCases: environment.requireUseCases(),
+                                    calendar: environment.requireCalendar()
                                 )
                             case .placeholder(let kind):
                                 PlaceholderDestinationView(kind: kind)
