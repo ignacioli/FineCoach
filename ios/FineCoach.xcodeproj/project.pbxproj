@@ -12,6 +12,8 @@
 		4C5E5DF730413B0D0088237A /* TestIDGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A203 /* TestIDGenerator.swift */; };
 		4C5E5DF830413B0D0088237A /* TemporaryProtectedDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A204 /* TemporaryProtectedDirectory.swift */; };
 		4C5E5DF930413B0D0088237A /* FakeRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A205 /* FakeRenderer.swift */; };
+		B504 /* TestCalendarProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A502 /* TestCalendarProvider.swift */; };
+		B505 /* TestNotificationAuthorizationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A503 /* TestNotificationAuthorizationProvider.swift */; };
 		4C5E5DFA30413B0D0088237A /* TestFaultInjector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A206 /* TestFaultInjector.swift */; };
 		4C5E5DFB30413B0D0088237A /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F008 /* XCTest.framework */; };
 		4C5E5DFC30413B0D0088237A /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F008 /* XCTest.framework */; };
@@ -27,6 +29,7 @@
 		B120 /* Protocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = A120 /* Protocols.swift */; };
 		B121 /* FaultInjectionBoundary.swift in Sources */ = {isa = PBXBuildFile; fileRef = A121 /* FaultInjectionBoundary.swift */; };
 		B130 /* SystemClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A130 /* SystemClock.swift */; };
+		B506 /* SystemLocalCalendarProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A504 /* SystemLocalCalendarProvider.swift */; };
 		B131 /* SecureRandomGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A131 /* SecureRandomGenerator.swift */; };
 		B132 /* ProtectedFileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A132 /* ProtectedFileStore.swift */; };
 		B133 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = A133 /* AppLogger.swift */; };
@@ -71,6 +74,8 @@
 		B203 /* TestIDGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A203 /* TestIDGenerator.swift */; };
 		B204 /* TemporaryProtectedDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A204 /* TemporaryProtectedDirectory.swift */; };
 		B205 /* FakeRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A205 /* FakeRenderer.swift */; };
+		B502 /* TestCalendarProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A502 /* TestCalendarProvider.swift */; };
+		B503 /* TestNotificationAuthorizationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A503 /* TestNotificationAuthorizationProvider.swift */; };
 		B206 /* TestFaultInjector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A206 /* TestFaultInjector.swift */; };
 		B210 /* FoundationIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A210 /* FoundationIntegrationTests.swift */; };
 		B220 /* SetupSmokeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A220 /* SetupSmokeUITests.swift */; };
@@ -207,6 +212,7 @@
 		A120 /* Protocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Protocols.swift; sourceTree = "<group>"; };
 		A121 /* FaultInjectionBoundary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaultInjectionBoundary.swift; sourceTree = "<group>"; };
 		A130 /* SystemClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemClock.swift; sourceTree = "<group>"; };
+		A504 /* SystemLocalCalendarProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemLocalCalendarProvider.swift; sourceTree = "<group>"; };
 		A131 /* SecureRandomGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureRandomGenerator.swift; sourceTree = "<group>"; };
 		A132 /* ProtectedFileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtectedFileStore.swift; sourceTree = "<group>"; };
 		A133 /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
@@ -232,6 +238,8 @@
 		A203 /* TestIDGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestIDGenerator.swift; sourceTree = "<group>"; };
 		A204 /* TemporaryProtectedDirectory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryProtectedDirectory.swift; sourceTree = "<group>"; };
 		A205 /* FakeRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeRenderer.swift; sourceTree = "<group>"; };
+		A502 /* TestCalendarProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestCalendarProvider.swift; sourceTree = "<group>"; };
+		A503 /* TestNotificationAuthorizationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestNotificationAuthorizationProvider.swift; sourceTree = "<group>"; };
 		A206 /* TestFaultInjector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFaultInjector.swift; sourceTree = "<group>"; };
 		A210 /* FoundationIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationIntegrationTests.swift; sourceTree = "<group>"; };
 		A220 /* SetupSmokeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupSmokeUITests.swift; sourceTree = "<group>"; };
@@ -563,6 +571,7 @@
 			isa = PBXGroup;
 			children = (
 				A130 /* SystemClock.swift */,
+				A504 /* SystemLocalCalendarProvider.swift */,
 				A131 /* SecureRandomGenerator.swift */,
 				A132 /* ProtectedFileStore.swift */,
 				A133 /* AppLogger.swift */,
@@ -978,6 +987,8 @@
 				A203 /* TestIDGenerator.swift */,
 				A204 /* TemporaryProtectedDirectory.swift */,
 				A205 /* FakeRenderer.swift */,
+				A502 /* TestCalendarProvider.swift */,
+				A503 /* TestNotificationAuthorizationProvider.swift */,
 			);
 			path = Doubles;
 			sourceTree = "<group>";
@@ -1192,6 +1203,7 @@
 				B126 /* ExerciseLibraryUseCases.swift in Sources */,
 				B127 /* HistoryUseCases.swift in Sources */,
 				B130 /* SystemClock.swift in Sources */,
+				B506 /* SystemLocalCalendarProvider.swift in Sources */,
 				B131 /* SecureRandomGenerator.swift in Sources */,
 				B132 /* ProtectedFileStore.swift in Sources */,
 				B133 /* AppLogger.swift in Sources */,
@@ -1281,6 +1293,8 @@
 				B203 /* TestIDGenerator.swift in Sources */,
 				B204 /* TemporaryProtectedDirectory.swift in Sources */,
 				B205 /* FakeRenderer.swift in Sources */,
+				B502 /* TestCalendarProvider.swift in Sources */,
+				B503 /* TestNotificationAuthorizationProvider.swift in Sources */,
 				B206 /* TestFaultInjector.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1294,6 +1308,8 @@
 				4C5E5DF730413B0D0088237A /* TestIDGenerator.swift in Sources */,
 				4C5E5DF830413B0D0088237A /* TemporaryProtectedDirectory.swift in Sources */,
 				4C5E5DF930413B0D0088237A /* FakeRenderer.swift in Sources */,
+				B504 /* TestCalendarProvider.swift in Sources */,
+				B505 /* TestNotificationAuthorizationProvider.swift in Sources */,
 				4C5E5DFA30413B0D0088237A /* TestFaultInjector.swift in Sources */,
 				B210 /* FoundationIntegrationTests.swift in Sources */,
 				B231 /* StudentPersistenceTests.swift in Sources */,

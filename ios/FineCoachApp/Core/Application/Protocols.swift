@@ -67,3 +67,28 @@ public protocol Repository: Sendable {
 public protocol TransactionRepository: Sendable {
     func transaction<T: Sendable>(_ work: @escaping @Sendable () throws -> T) async throws -> T
 }
+
+/// Injectable local-day/time-zone port (M1-B T007a): overdue judgement and
+/// `localCalendarDay` derivation MUST go through this rather than
+/// `Calendar.current`/`TimeZone.current` directly, so tests are deterministic
+/// across time zones (adversarial A4).
+public protocol LocalCalendarProvider: Sendable {
+    func currentCalendar() -> Calendar
+}
+
+/// Mirrors `UNAuthorizationStatus` without importing UserNotifications outside
+/// the notification adapter (M1-B T012). Domain/Application code that only
+/// needs to branch on "is reminding currently possible" depends on this port
+/// instead of a real permission prompt, so save-still-succeeds-on-denial paths
+/// (D-004) are unit-testable without a device.
+public enum NotificationAuthorizationStatus: Sendable, Equatable {
+    case notDetermined
+    case denied
+    case authorized
+    case provisional
+    case ephemeral
+}
+
+public protocol NotificationAuthorizationProvider: Sendable {
+    func currentStatus() async -> NotificationAuthorizationStatus
+}
