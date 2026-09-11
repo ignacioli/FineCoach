@@ -17,6 +17,8 @@ public enum DomainError: Error, Equatable, LocalizedError, Sendable {
     case randomSourceFailed
     case invalidFileOperation
     case incompatibleInput
+    case recurrenceLimitExceeded
+    case overlapConflict
 
     public var errorDescription: String? {
         switch self {
@@ -50,6 +52,10 @@ public enum DomainError: Error, Equatable, LocalizedError, Sendable {
             return "本地文件操作失败。"
         case .incompatibleInput:
             return "输入内容不兼容。"
+        case .recurrenceLimitExceeded:
+            return "周期安排超过可物化上限（最多 366 次）。"
+        case .overlapConflict:
+            return "与已有安排时间冲突。"
         }
     }
 }
