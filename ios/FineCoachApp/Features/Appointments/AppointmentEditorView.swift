@@ -151,68 +151,75 @@ struct AppointmentEditorView: View {
     }
 
     var body: some View {
-        Form {
-            Section {
-                Picker(String(localized: "appointmentEditor.student"), selection: $viewModel.selectedStudentID) {
-                    ForEach(viewModel.students) { student in
-                        Text(student.displayName.value).tag(Optional(student.id))
-                    }
-                }
-
-                DatePicker(
-                    String(localized: "appointmentEditor.date"),
-                    selection: dateBinding,
-                    displayedComponents: .date
-                )
-
-                DatePicker(
-                    String(localized: "appointmentEditor.startTime"),
-                    selection: startTimeBinding,
-                    displayedComponents: .hourAndMinute
-                )
-
-                Stepper(
-                    "\(String(localized: "appointmentEditor.duration")): \(viewModel.durationMinutes) "
-                        + String(localized: "today.durationMinutes"),
-                    value: $viewModel.durationMinutes,
-                    in: 15...240,
-                    step: 15
-                )
-            }
-
-            Section {
-                Toggle(String(localized: "appointmentEditor.reminder"), isOn: $viewModel.reminderEnabled)
-                if viewModel.reminderEnabled {
-                    Picker(String(localized: "appointmentEditor.reminderLead"), selection: $viewModel.reminderLeadMinutes) {
-                        ForEach(ReminderLeadMinutes.allCases, id: \.self) { lead in
-                            Text("\(lead.rawValue) " + String(localized: "today.durationMinutes")).tag(lead)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                editorRow(String(localized: "appointmentEditor.student")) {
+                    Picker("", selection: $viewModel.selectedStudentID) {
+                        ForEach(viewModel.students) { student in
+                            Text(student.displayName.value).tag(Optional(student.id))
                         }
                     }
+                    .labelsHidden()
                 }
-            }
+                Divider()
 
-            if let errorMessage = viewModel.errorMessage {
-                Section {
-                    Text(errorMessage)
-                        .foregroundStyle(FCSemanticColors.destructive)
+                editorRow(String(localized: "appointmentEditor.date")) {
+                    DatePicker("", selection: dateBinding, displayedComponents: .date)
+                        .labelsHidden()
                 }
-            }
+                Divider()
 
-            Section {
-                Button {
-                    Task { await viewModel.save() }
-                } label: {
-                    if viewModel.isSaving {
-                        ProgressView()
-                    } else {
-                        Text(String(localized: "appointmentEditor.save"))
-                            .frame(maxWidth: .infinity)
+                editorRow(String(localized: "appointmentEditor.startTime")) {
+                    DatePicker("", selection: startTimeBinding, displayedComponents: .hourAndMinute)
+                        .labelsHidden()
+                }
+                Divider()
+
+                editorRow(String(localized: "appointmentEditor.duration")) {
+                    HStack(spacing: FCPrimitives.spacingSmall) {
+                        Text("\(viewModel.durationMinutes) " + String(localized: "today.durationMinutes"))
+                        Stepper("", value: $viewModel.durationMinutes, in: 15...240, step: 15)
+                            .labelsHidden()
                     }
                 }
-                .disabled(viewModel.isSaving)
+                Divider()
+
+                editorRow(String(localized: "appointmentEditor.reminder")) {
+                    Toggle("", isOn: $viewModel.reminderEnabled)
+                        .labelsHidden()
+                }
+                Divider()
+
+                if viewModel.reminderEnabled {
+                    editorRow(String(localized: "appointmentEditor.reminderLead")) {
+                        Picker("", selection: $viewModel.reminderLeadMinutes) {
+                            ForEach(ReminderLeadMinutes.allCases, id: \.self) { lead in
+                                Text("\(lead.rawValue) " + String(localized: "today.durationMinutes")).tag(lead)
+                            }
+                        }
+                        .labelsHidden()
+                    }
+                    Divider()
+                }
+
+                if let errorMessage = viewModel.errorMessage {
+                    Text(errorMessage)
+                        .foregroundStyle(FCSemanticColors.destructive)
+                        .padding(.vertical, FCPrimitives.spacingSmall)
+                }
+
+                FCButton(
+                    title: String(localized: "appointmentEditor.save"),
+                    isEnabled: !viewModel.isSaving
+                ) {
+                    Task { await viewModel.save() }
+                }
+                .padding(.top, FCPrimitives.spacingMedium)
                 .accessibilityIdentifier(FCAccessibilityID.appointmentEditorSave)
             }
+            .padding(FCPrimitives.spacingMedium)
         }
+        .background(FCSemanticColors.background)
         .navigationTitle(viewModel.title)
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier(FCAccessibilityID.appointmentEditorRoot)
@@ -236,6 +243,17 @@ struct AppointmentEditorView: View {
         } message: {
             Text(conflictMessage)
         }
+    }
+
+    private func editorRow<Control: View>(_ label: String, @ViewBuilder control: () -> Control) -> some View {
+        HStack {
+            Text(label)
+                .foregroundStyle(FCSemanticColors.primaryText)
+            Spacer()
+            control()
+                .foregroundStyle(FCSemanticColors.primaryText)
+        }
+        .frame(minHeight: 44)
     }
 
     private var dateBinding: Binding<Date> {
