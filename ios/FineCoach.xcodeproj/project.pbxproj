@@ -134,6 +134,7 @@
 		B513 /* AppointmentManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A512 /* AppointmentManagedObject+Mapping.swift */; };
 		B514 /* CoreDataAppointmentRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A513 /* CoreDataAppointmentRepository.swift */; };
 		B127 /* HistoryUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A127 /* HistoryUseCases.swift */; };
+		B521 /* TodayOrderingPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = A521 /* TodayOrderingPolicy.swift */; };
 		B518 /* NotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A518 /* NotificationScheduler.swift */; };
 		B515 /* AppointmentUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A514 /* AppointmentUseCases.swift */; };
 		B14A /* HistoryReportManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A14A /* HistoryReportManagedObject+Mapping.swift */; };
@@ -160,6 +161,7 @@
 		B222 /* CoreTrainingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A222 /* CoreTrainingUITests.swift */; };
 		B230 /* StudentDomainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A230 /* StudentDomainTests.swift */; };
 		B510 /* RecurrenceAppointmentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A509 /* RecurrenceAppointmentTests.swift */; };
+		B522 /* TodayOrderingPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A522 /* TodayOrderingPolicyTests.swift */; };
 		B232 /* SessionSetDomainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A232 /* SessionSetDomainTests.swift */; };
 		B231 /* StudentPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A231 /* StudentPersistenceTests.swift */; };
 		B233 /* ActiveSessionPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A233 /* ActiveSessionPersistenceTests.swift */; };
@@ -304,6 +306,7 @@
 		A125 /* ExerciseProvenanceValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseProvenanceValidator.swift; sourceTree = "<group>"; };
 		A126 /* ExerciseLibraryUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseLibraryUseCases.swift; sourceTree = "<group>"; };
 		A127 /* HistoryUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryUseCases.swift; sourceTree = "<group>"; };
+		A521 /* TodayOrderingPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayOrderingPolicy.swift; sourceTree = "<group>"; };
 		A518 /* NotificationScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationScheduler.swift; sourceTree = "<group>"; };
 		A514 /* AppointmentUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentUseCases.swift; sourceTree = "<group>"; };
 		A14A /* HistoryReportManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HistoryReportManagedObject+Mapping.swift"; sourceTree = "<group>"; };
@@ -358,6 +361,7 @@
 		A224 /* RecoveryMatrixTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryMatrixTests.swift; sourceTree = "<group>"; };
 		A230 /* StudentDomainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentDomainTests.swift; sourceTree = "<group>"; };
 		A509 /* RecurrenceAppointmentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrenceAppointmentTests.swift; sourceTree = "<group>"; };
+		A522 /* TodayOrderingPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayOrderingPolicyTests.swift; sourceTree = "<group>"; };
 		A232 /* SessionSetDomainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSetDomainTests.swift; sourceTree = "<group>"; };
 		A231 /* StudentPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentPersistenceTests.swift; sourceTree = "<group>"; };
 		A233 /* ActiveSessionPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionPersistenceTests.swift; sourceTree = "<group>"; };
@@ -594,6 +598,7 @@
 				A125 /* ExerciseProvenanceValidator.swift */,
 				A126 /* ExerciseLibraryUseCases.swift */,
 				A127 /* HistoryUseCases.swift */,
+				A521 /* TodayOrderingPolicy.swift */,
 				A518 /* NotificationScheduler.swift */,
 				A514 /* AppointmentUseCases.swift */,
 			);
@@ -848,6 +853,7 @@
 			isa = PBXGroup;
 			children = (
 				A509 /* RecurrenceAppointmentTests.swift */,
+				A522 /* TodayOrderingPolicyTests.swift */,
 			);
 			path = Appointments;
 			sourceTree = "<group>";
@@ -1261,6 +1267,7 @@
 				B125 /* ExerciseProvenanceValidator.swift in Sources */,
 				B126 /* ExerciseLibraryUseCases.swift in Sources */,
 				B127 /* HistoryUseCases.swift in Sources */,
+				B521 /* TodayOrderingPolicy.swift in Sources */,
 				B518 /* NotificationScheduler.swift in Sources */,
 				B515 /* AppointmentUseCases.swift in Sources */,
 				B130 /* SystemClock.swift in Sources */,
@@ -1343,6 +1350,7 @@
 				B200 /* SetupSmokeTests.swift in Sources */,
 				B230 /* StudentDomainTests.swift in Sources */,
 				B510 /* RecurrenceAppointmentTests.swift in Sources */,
+				B522 /* TodayOrderingPolicyTests.swift in Sources */,
 				B232 /* SessionSetDomainTests.swift in Sources */,
 				B234 /* ActiveSessionRecoveryCodecTests.swift in Sources */,
 				B235 /* SessionTimingTests.swift in Sources */,
