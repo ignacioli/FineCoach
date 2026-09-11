@@ -57,6 +57,33 @@ public enum FCAccessibilityID {
     public static let editorSave = "studentEditor.save"
     public static let editorSkip = "studentEditor.skip"
 
+    public static let coursePackageListRoot = "coursePackages.root"
+    public static let coursePackageListAdd = "coursePackages.add"
+    public static let coursePackageListEnd = "coursePackages.end"
+    public static let coursePackageListManualAdjust = "coursePackages.manualAdjust"
+    public static let coursePackageListViewTrail = "coursePackages.viewTrail"
+
+    public static func coursePackageRow(_ id: StableUUID) -> String {
+        "coursePackages.row.\(id.rawValue.uuidString)"
+    }
+
+    public static let coursePackageEditorRoot = "coursePackageEditor.root"
+    public static let coursePackageEditorName = "coursePackageEditor.name"
+    public static let coursePackageEditorTotalCredits = "coursePackageEditor.totalCredits"
+    public static let coursePackageEditorSave = "coursePackageEditor.save"
+
+    public static let manualAdjustmentRoot = "manualAdjustment.root"
+    public static let manualAdjustmentDirection = "manualAdjustment.direction"
+    public static let manualAdjustmentAmount = "manualAdjustment.amount"
+    public static let manualAdjustmentReason = "manualAdjustment.reason"
+    public static let manualAdjustmentSave = "manualAdjustment.save"
+
+    public static let creditTrailRoot = "creditTrail.root"
+
+    public static func creditTrailRow(_ id: StableUUID) -> String {
+        "creditTrail.row.\(id.rawValue.uuidString)"
+    }
+
     public static let detailRoot = "studentDetail.root"
     public static let detailStartTraining = "studentDetail.startTraining"
     public static let detailContinueTraining = "studentDetail.continueTraining"
@@ -70,6 +97,7 @@ public enum FCAccessibilityID {
     public static let detailDelete = "studentDetail.delete"
     public static let detailBackup = "studentDetail.backup"
     public static let detailArchivedStatus = "studentDetail.archivedStatus"
+    public static let detailCoursePackages = "studentDetail.coursePackages"
 
     public static let archiveConfirm = "archive.confirm"
     public static let deleteName = "deleteStudent.confirmName"

@@ -143,6 +143,10 @@
 		B532 /* CreditLedgerUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A532 /* CreditLedgerUseCases.swift */; };
 		B533 /* CoursePackageManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A533 /* CoursePackageManagedObject+Mapping.swift */; };
 		B534 /* CoreDataCoursePackageRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A534 /* CoreDataCoursePackageRepository.swift */; };
+		B535 /* CoursePackageListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A535 /* CoursePackageListView.swift */; };
+		B536 /* CoursePackageEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A536 /* CoursePackageEditorView.swift */; };
+		B537 /* ManualCreditAdjustmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A537 /* ManualCreditAdjustmentView.swift */; };
+		B538 /* CreditAdjustmentTrailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A538 /* CreditAdjustmentTrailView.swift */; };
 		B518 /* NotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A518 /* NotificationScheduler.swift */; };
 		B515 /* AppointmentUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A514 /* AppointmentUseCases.swift */; };
 		B14A /* HistoryReportManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A14A /* HistoryReportManagedObject+Mapping.swift */; };
@@ -324,6 +328,10 @@
 		A532 /* CreditLedgerUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CreditLedgerUseCases.swift"; sourceTree = "<group>"; };
 		A533 /* CoursePackageManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoursePackageManagedObject+Mapping.swift"; sourceTree = "<group>"; };
 		A534 /* CoreDataCoursePackageRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoreDataCoursePackageRepository.swift"; sourceTree = "<group>"; };
+		A535 /* CoursePackageListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoursePackageListView.swift"; sourceTree = "<group>"; };
+		A536 /* CoursePackageEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoursePackageEditorView.swift"; sourceTree = "<group>"; };
+		A537 /* ManualCreditAdjustmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualCreditAdjustmentView.swift"; sourceTree = "<group>"; };
+		A538 /* CreditAdjustmentTrailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CreditAdjustmentTrailView.swift"; sourceTree = "<group>"; };
 		A518 /* NotificationScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationScheduler.swift; sourceTree = "<group>"; };
 		A514 /* AppointmentUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentUseCases.swift; sourceTree = "<group>"; };
 		A14A /* HistoryReportManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HistoryReportManagedObject+Mapping.swift"; sourceTree = "<group>"; };
@@ -556,6 +564,17 @@
 			path = Appointments;
 			sourceTree = "<group>";
 		};
+		A539 /* CoursePackages */ = {
+			isa = PBXGroup;
+			children = (
+				A535 /* CoursePackageListView.swift */,
+				A536 /* CoursePackageEditorView.swift */,
+				A537 /* ManualCreditAdjustmentView.swift */,
+				A538 /* CreditAdjustmentTrailView.swift */,
+			);
+			path = CoursePackages;
+			sourceTree = "<group>";
+		};
 		A404 /* Features */ = {
 			isa = PBXGroup;
 			children = (
@@ -563,6 +582,7 @@
 				A524 /* Today */,
 				A526 /* Calendar */,
 				A528 /* Appointments */,
+				A539 /* CoursePackages */,
 				A441 /* ExerciseLibrary */,
 				A442 /* ActiveSession */,
 				A443 /* History */,
@@ -1368,6 +1388,10 @@
 				B514 /* CoreDataAppointmentRepository.swift in Sources */,
 				B533 /* CoursePackageManagedObject+Mapping.swift in Sources */,
 				B534 /* CoreDataCoursePackageRepository.swift in Sources */,
+				B535 /* CoursePackageListView.swift in Sources */,
+				B536 /* CoursePackageEditorView.swift in Sources */,
+				B537 /* ManualCreditAdjustmentView.swift in Sources */,
+				B538 /* CreditAdjustmentTrailView.swift in Sources */,
 				B14A /* HistoryReportManagedObject+Mapping.swift in Sources */,
 				B190 /* ActiveSessionRecoverySnapshot.swift in Sources */,
 				B191 /* ActiveSessionRecoveryStore.swift in Sources */,

@@ -1,1503 +1,3221 @@
 {
-  "sourceLanguage" : "zh-Hans",
-  "strings" : {
-    "app.title" : {
-      "comment" : "Application title",
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "精练教练" } }
-      }
-    },
-    "storage.unavailable" : {
-      "comment" : "Shown when protected local storage cannot be opened",
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "本地存储暂不可用" } }
-      }
-    },
-    "exercise.catalog.unavailable" : {
-      "comment" : "Shown when the placeholder exercise catalog cannot be seeded",
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "动作库暂不可用" } }
-      }
-    },
-    "onboarding.kicker" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "首次打开 · 无账号" } }
-      }
-    },
-    "onboarding.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "课堂记录留在这台手机" } }
-      }
-    },
-    "onboarding.lead" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "不注册、不登录。此刻也不会弹出通知、通讯录或其他系统权限。" } }
-      }
-    },
-    "onboarding.local" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "学员资料与训练记录默认只保存在本机。卸载或丢失设备会一起丢失，后续可在设置里手动备份。" } }
-      }
-    },
-    "onboarding.share" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "分享给学员时，由你主动挑选摘要内容。性别、伤病、电话、微信和教练私有备注不会进入分享。" } }
-      }
-    },
-    "onboarding.operator" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "学员本人不是使用者。他们不安装、不登录、也不在本模块里操作数据。" } }
-      }
-    },
-    "onboarding.start" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "开始使用" } }
-      }
-    },
-    "onboarding.skip" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "稍后添加学员" } }
-      }
-    },
-    "student.error.generic" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "操作失败，请重试。" } }
-      }
-    },
-    "student.sex.male" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "男" } }
-      }
-    },
-    "student.sex.female" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "女" } }
-      }
-    },
-    "student.sex.other" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "其他" } }
-      }
-    },
-    "student.sex.undisclosed" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "不透露" } }
-      }
-    },
-    "student.required" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "必填" } }
-      }
-    },
-    "student.optional" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选填" } }
-      }
-    },
-    "student.field.displayName" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "显示名称" } }
-      }
-    },
-    "student.field.sex" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "性别" } }
-      }
-    },
-    "student.field.trainingGoal" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "训练目标" } }
-      }
-    },
-    "student.field.injuryNotes" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "注意事项" } }
-      }
-    },
-    "student.field.phone" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "电话" } }
-      }
-    },
-    "student.field.wechat" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "微信" } }
-      }
-    },
-    "student.field.privateNote" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "教练备注" } }
-      }
-    },
-    "student.editor.firstTitle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "第一位学员" } }
-      }
-    },
-    "student.editor.addTitle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "添加学员" } }
-      }
-    },
-    "student.editor.editTitle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "编辑资料" } }
-      }
-    },
-    "student.editor.kicker" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "显示名称与性别必填，其余可跳过" } }
-      }
-    },
-    "student.editor.nameRequired" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "请填写显示名称" } }
-      }
-    },
-    "student.editor.sexRequired" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "请选择性别" } }
-      }
-    },
-    "student.editor.duplicateHint" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "允许重名。可用教练备注区分。" } }
-      }
-    },
-    "student.editor.contactHint" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "电话与微信由教练手输。不读取系统通讯录，不请求联系人权限。" } }
-      }
-    },
-    "student.editor.save" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "保存学员" } }
-      }
-    },
-    "student.editor.skip" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "稍后添加" } }
-      }
-    },
-    "student.list.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "学员" } }
-      }
-    },
-    "student.list.archivedTitle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已归档学员" } }
-      }
-    },
-    "student.list.add" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "添加学员" } }
-      }
-    },
-    "student.list.search" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "搜索学员" } }
-      }
-    },
-    "student.list.more" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "更多" } }
-      }
-    },
-    "student.list.trainingBanner" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "训练中" } }
-      }
-    },
-    "student.list.continue" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "继续训练" } }
-      }
-    },
-    "student.list.emptyTitle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "还没有学员" } }
-      }
-    },
-    "student.list.emptyBody" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "点上方「添加学员」创建第一位。学员不是账号，只由你在本机管理。" } }
-      }
-    },
-    "student.list.searchEmptyTitle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "没有找到匹配的学员" } }
-      }
-    },
-    "student.list.searchEmptyBody" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "试试显示名称中的其他字，或清空搜索。" } }
-      }
-    },
-    "student.list.archivedEmptyTitle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "没有已归档学员" } }
-      }
-    },
-    "student.list.archivedEmptyBody" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "归档后的学员会出现在这里，历史仍保留并可恢复。" } }
-      }
-    },
-    "student.list.noGoal" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "无训练目标" } }
-      }
-    },
-    "student.list.notePrefix" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "备注 " } }
-      }
-    },
-    "student.detail.startTraining" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "开始训练" } }
-      }
-    },
-    "student.detail.archived" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已归档" } }
-      }
-    },
-    "student.detail.archivedHint" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "不能开始新训练。仍可查看下方历史，或恢复为活跃学员。" } }
-      }
-    },
-    "student.detail.restore" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "恢复学员" } }
-      }
-    },
-    "student.detail.recentKicker" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "上次完成的训练" } }
-      }
-    },
-    "student.detail.recentPlaceholder" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "暂无已完成训练" } }
-      }
-    },
-    "student.detail.historyKicker" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "训练历史 · 新的在上" } }
-      }
-    },
-    "student.detail.historyPlaceholder" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "历史入口将在后续提供" } }
-      }
-    },
-    "student.detail.notesEmpty" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "未填写" } }
-      }
-    },
-    "student.detail.notesHidden" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "默认折叠" } }
-      }
-    },
-    "student.detail.notesExpanded" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已展开" } }
-      }
-    },
-    "student.detail.notesCollapsed" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已折叠" } }
-      }
-    },
-    "student.detail.notesDisclaimer" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "此内容不是医疗诊断或医疗建议。仅教练可见，不进入分享报告。" } }
-      }
-    },
-    "student.detail.unfilled" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "未填写" } }
-      }
-    },
-    "student.detail.edit" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "编辑资料" } }
-      }
-    },
-    "student.detail.archive" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "归档学员" } }
-      }
-    },
-    "student.detail.delete" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "永久删除" } }
-      }
-    },
-    "student.detail.more" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "更多" } }
-      }
-    },
-    "student.archive.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "归档学员" } }
-      }
-    },
-    "student.archive.lead" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "归档之后：" } }
-      }
-    },
-    "student.archive.effect.hidden" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "从活跃学员列表中隐藏" } }
-      }
-    },
-    "student.archive.effect.noSession" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "不能开始新训练" } }
-      }
-    },
-    "student.archive.effect.history" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "仍可查看训练历史" } }
-      }
-    },
-    "student.archive.effect.restore" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "之后可以恢复为活跃" } }
-      }
-    },
-    "student.archive.hint" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "归档不是删除。永久删除在「更多」的二级入口。" } }
-      }
-    },
-    "student.delete.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "永久删除" } }
-      }
-    },
-    "student.delete.lead" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "将永久删除「%@」及其在本机的关联数据。" } }
-      }
-    },
-    "student.delete.affect" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "将一并删除" } }
-      }
-    },
-    "student.delete.affect.profile" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "显示名称、性别、训练目标" } }
-      }
-    },
-    "student.delete.affect.notes" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "伤病 / 注意事项、教练备注、电话与微信" } }
-      }
-    },
-    "student.delete.affect.historyCount" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "%lld 条已完成训练记录" } }
-      }
-    },
-    "student.delete.backup" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "先备份（建议）" } }
-      }
-    },
-    "student.delete.namePrompt" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "输入显示名称以确认" } }
-      }
-    },
-    "student.delete.boundary" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "删除后无法从本页恢复。已分享的旧图片和你保存的备份不会被远程改写或删除。" } }
-      }
-    },
-    "student.delete.confirm" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "永久删除" } }
-      }
-    },
-    "student.delete.mismatch" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "显示名称不匹配" } }
-      }
-    },
-    "student.delete.blocked" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "%@ 有进行中的训练，不能永久删除。" } }
-      }
-    },
-    "student.delete.blockedHint" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "状态不只靠颜色：当前为「训练中」，须先结束或继续完成该训练。" } }
-      }
-    },
-    "student.delete.backToDetail" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "回到详情" } }
-      }
-    },
-    "student.delete.done" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "学员已永久删除" } }
-      }
-    },
-    "student.delete.backToList" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "返回学员列表" } }
-      }
-    },
-    "student.flow.cancel" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "取消" } }
-      }
-    },
-    "placeholder.boundary" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "此入口已保留，具体内容不在本里程碑展开。" } }
-      }
-    },
-    "placeholder.training" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "训练中" } }
-      }
-    },
-    "placeholder.recent" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "最近训练" } }
-      }
-    },
-    "placeholder.history" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "训练历史" } }
-      }
-    },
-    "placeholder.backup" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "备份与恢复" } }
-      }
-    },
-    "placeholder.library" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "动作库" } }
-      }
-    },
-    "placeholder.settings" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "设置" } }
-      }
-    },
-    "session.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "训练中" } }
-      }
-    },
-    "session.empty.hint" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "先添加动作，再记录组数。" } }
-      }
-    },
-    "session.stats.completedLabel" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已完成组数" } }
-      }
-    },
-    "session.status.completed" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "训练已完成" } }
-      }
-    },
-    "session.status.abandoned" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已放弃空训练" } }
-      }
-    },
-    "session.field.exerciseName" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "动作名称" } }
-      }
-    },
-    "session.field.weight" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "重量" } }
-      }
-    },
-    "session.field.reps" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "次数" } }
-      }
-    },
-    "session.field.duration" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "时长（秒）" } }
-      }
-    },
-    "session.field.left" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "左侧" } }
-      }
-    },
-    "session.field.right" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "右侧" } }
-      }
-    },
-    "session.mode.weightReps" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "重量与次数" } }
-      }
-    },
-    "session.mode.reps" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "仅次数" } }
-      }
-    },
-    "session.mode.duration" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "时长" } }
-      }
-    },
-    "session.side.none" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "不区分左右" } }
-      }
-    },
-    "session.side.bilateral" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "左右侧" } }
-      }
-    },
-    "session.set.label" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "组" } }
-      }
-    },
-    "session.action.addExercise" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "添加动作" } }
-      }
-    },
-    "session.action.saveExercise" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "保存动作" } }
-      }
-    },
-    "session.action.saveSessionOnly" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "仅本次" } }
-      }
-    },
-    "session.action.saveToLibrary" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "保存到动作库" } }
-      }
-    },
-    "session.action.addSet" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "添加组" } }
-      }
-    },
-    "session.action.confirmSet" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "确认" } }
-      }
-    },
-    "session.action.copyPrevious" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "复制上一组" } }
-      }
-    },
-    "session.action.copyLastSame" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "复制上次同动作" } }
-      }
-    },
-    "session.action.undo" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "撤销" } }
-      }
-    },
-    "session.action.moveUp" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "上移" } }
-      }
-    },
-    "session.action.moveDown" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "下移" } }
-      }
-    },
-    "session.action.deleteExercise" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "删除动作" } }
-      }
-    },
-    "session.action.finish" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "结束训练" } }
-      }
-    },
-    "session.deleteExercise.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "删除动作" } }
-      }
-    },
-    "session.deleteExercise.lead" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "该动作含已完成组，删除后这些组不再计入本课统计。" } }
-      }
-    },
-    "session.deleteExercise.hint" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "可在删除后用撤销组来恢复单组，但动作本身不会自动回来。" } }
-      }
-    },
-    "session.deleteExercise.confirm" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "确认删除动作" } }
-      }
-    },
-    "session.finish.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "结束训练" } }
-      }
-    },
-    "session.finish.completeLead" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "将保存为已完成记录。" } }
-      }
-    },
-    "session.finish.abandonTitle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "放弃空训练" } }
-      }
-    },
-    "session.finish.abandonLead" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "没有已完成组，结束将放弃本次训练，不会生成完成记录。" } }
-      }
-    },
-    "session.finish.abandonConfirm" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "放弃训练" } }
-      }
-    },
-    "session.finish.draftsTitle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "还有未完成内容" } }
-      }
-    },
-    "session.finish.draftsLead" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "请返回处理草稿和待完成组，或明确丢弃后再结束。" } }
-      }
-    },
-    "session.finish.discardDrafts" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "丢弃未完成" } }
-      }
-    },
-    "session.finish.returnToDrafts" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "返回处理" } }
-      }
-    },
-    "session.save.retry" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "重试保存" } }
-      }
-    },
-    "session.save.finishBlocked" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "保存尚未成功，无法完成训练。" } }
-      }
-    },
-    "session.duration.reviewTitle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "复核训练时长" } }
-      }
-    },
-    "session.duration.reviewLead" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "本次中断较长或时钟异常，请确认或修正训练时长后再结束。" } }
-      }
-    },
-    "session.duration.confirm" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "确认时长" } }
-      }
-    },
-    "exercise.library.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "动作库" } }
-      }
-    },
-    "exercise.library.entry" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "动作库" } }
-      }
-    },
-    "exercise.library.search" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "搜索动作" } }
-      }
-    },
-    "exercise.library.addCustom" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "新建自定义动作" } }
-      }
-    },
-    "exercise.library.showHidden" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "显示已隐藏" } }
-      }
-    },
-    "exercise.library.filter.muscle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "部位" } }
-      }
-    },
-    "exercise.library.filter.equipment" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "器械" } }
-      }
-    },
-    "exercise.library.filter.all" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "全部" } }
-      }
-    },
-    "exercise.library.section.uncategorized" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "未分类" } }
-      }
-    },
-    "exercise.library.favorite" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "收藏" } }
-      }
-    },
-    "exercise.library.hide" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "隐藏" } }
-      }
-    },
-    "exercise.library.unhide" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "取消隐藏" } }
-      }
-    },
-    "exercise.kind.builtIn" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "内置" } }
-      }
-    },
-    "exercise.kind.custom" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "自定义" } }
-      }
-    },
-    "exercise.editor.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "自定义动作" } }
-      }
-    },
-    "exercise.editor.name" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "动作名称" } }
-      }
-    },
-    "exercise.editor.save" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "保存" } }
-      }
-    },
-    "exercise.editor.archive" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "归档" } }
-      }
-    },
-    "exercise.editor.restore" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "恢复" } }
-      }
-    },
-    "exercise.conflict" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "名称与已有动作冲突，未改名。" } }
-      }
-    },
-    "summary.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "训练总结" } }
-      }
-    },
-    "summary.focus" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "训练重点" } }
-      }
-    },
-    "summary.privateNote" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "教练私有备注" } }
-      }
-    },
-    "summary.studentSummary" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "课后可见总结" } }
-      }
-    },
-    "summary.duration.format" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "时长 %@ 秒" } }
-      }
-    },
-    "summary.sets.format" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已完成 %lld 组" } }
-      }
-    },
-    "summary.skipShare" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "跳过分享" } }
-      }
-    },
-    "summary.generateReport" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "生成训练报告" } }
-      }
-    },
-    "history.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "训练历史" } }
-      }
-    },
-    "history.row.sets.format" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "%lld 组已完成" } }
-      }
-    },
-    "detail.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "训练记录" } }
-      }
-    },
-    "detail.readonly" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "只读" } }
-      }
-    },
-    "detail.edit" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "编辑训练记录" } }
-      }
-    },
-    "detail.reportStale" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "报告已过期" } }
-      }
-    },
-    "share.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "训练报告" } }
-      }
-    },
-    "share.modules" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "报告模块" } }
-      }
-    },
-    "share.module.volume" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "训练容量" } }
-      }
-    },
-    "share.handToSystem" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "交给系统分享" } }
-      }
-    },
-    "share.retry" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "重试" } }
-      }
-    },
-    "share.close" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "关闭" } }
-      }
-    },
-    "share.notSent" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "未发送" } }
-      }
-    },
-    "share.handedToSystem" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已交给系统分享" } }
-      }
-    },
-    "student.detail.backup" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "备份与恢复" } }
-      }
-    },
-    "backup.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "备份与恢复" } }
-      }
-    },
-    "backup.password.placeholder" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "设置口令" } }
-      }
-    },
-    "backup.passwordConfirm.placeholder" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "再次输入口令" } }
-      }
-    },
-    "backup.password.hint" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "口令不可恢复，也无法找回。请自行妥善保存，应用不会记住口令。" } }
-      }
-    },
-    "backup.password.mismatch" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "两次口令不一致。" } }
-      }
-    },
-    "backup.export" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "导出备份" } }
-      }
-    },
-    "backup.export.handedOff" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已交给系统文件" } }
-      }
-    },
-    "backup.export.working" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "正在导出…" } }
-      }
-    },
-    "backup.cancel" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "取消" } }
-      }
-    },
-    "backup.retry" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "重试" } }
-      }
-    },
-    "backup.restore.entry" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "从备份恢复" } }
-      }
-    },
-    "backup.restore.warning" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "恢复将完整替换本机数据。" } }
-      }
-    },
-    "backup.restore.suggestBackup" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "建议先备份当前数据。" } }
-      }
-    },
-    "backup.restore.password" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "输入备份口令" } }
-      }
-    },
-    "backup.restore.confirm" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "确认恢复" } }
-      }
-    },
-    "backup.restore.failed" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "恢复失败，本机数据未改动。" } }
-      }
-    },
-    "backup.restore.needFile" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "请先选择备份文件。" } }
-      }
-    },
-    "backup.restore.pickFile" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选择备份文件" } }
-      }
-    },
-    "backup.restore.working" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "正在恢复…" } }
-      }
-    },
-    "today.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "今日" } }
-      }
-    },
-    "today.segment.today" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "今日" } }
-      }
-    },
-    "today.segment.students" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "学员" } }
-      }
-    },
-    "today.inProgress.badge" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "进行中" } }
-      }
-    },
-    "today.inProgress.continue" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "继续训练" } }
-      }
-    },
-    "today.section.nextUp" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "下一节课" } }
-      }
-    },
-    "today.section.remaining" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "其余今日课程" } }
-      }
-    },
-    "today.section.resolved" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已处理" } }
-      }
-    },
-    "today.status.pending" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "待上课" } }
-      }
-    },
-    "today.status.overdue" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已逾期" } }
-      }
-    },
-    "today.status.completed" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已完成" } }
-      }
-    },
-    "today.status.cancelled" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已取消" } }
-      }
-    },
-    "today.status.absent" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "缺席" } }
-      }
-    },
-    "today.action.start" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "开始训练" } }
-      }
-    },
-    "today.action.cancel" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "取消安排" } }
-      }
-    },
-    "today.action.markAbsent" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "标记缺席" } }
-      }
-    },
-    "today.action.markAbsentCharged" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "缺席并扣课" } }
-      }
-    },
-    "today.action.markAbsentNotCharged" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "缺席不扣课" } }
-      }
-    },
-    "today.empty.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "今日暂无安排" } }
-      }
-    },
-    "today.empty.body" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "今天还没有课程安排。" } }
-      }
-    },
-    "today.error.generic" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "加载今日安排失败，请重试。" } }
-      }
-    },
-    "today.durationMinutes" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "分钟" } }
-      }
-    },
-    "calendar.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "课程日历" } }
-      }
-    },
-    "calendar.empty" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "这一天暂无安排" } }
-      }
-    },
-    "calendar.addAppointment" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "+ 添加课程安排" } }
-      }
-    },
-    "appointmentEditor.createTitle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "新建课程安排" } }
-      }
-    },
-    "appointmentEditor.editTitle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "编辑课程安排" } }
-      }
-    },
-    "appointmentEditor.student" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "学员" } }
-      }
-    },
-    "appointmentEditor.date" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "日期" } }
-      }
-    },
-    "appointmentEditor.startTime" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "开始时间" } }
-      }
-    },
-    "appointmentEditor.duration" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "预计时长" } }
-      }
-    },
-    "appointmentEditor.reminder" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "提醒" } }
-      }
-    },
-    "appointmentEditor.reminderLead" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "提前提醒" } }
-      }
-    },
-    "appointmentEditor.save" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "保存" } }
-      }
-    },
-    "appointmentEditor.studentRequired" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "请先选择学员。" } }
-      }
-    },
-    "appointmentEditor.durationInvalid" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "请输入有效的预计时长。" } }
-      }
-    },
-    "appointmentEditor.saveFailed" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "保存失败，请重试。" } }
-      }
-    },
-    "appointmentEditor.conflictTitle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "与已有安排时间冲突" } }
-      }
-    },
-    "appointmentEditor.conflictOverride" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "仍然保存" } }
-      }
-    },
-    "appointmentEditor.conflictCancel" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "取消" } }
+  "sourceLanguage": "zh-Hans",
+  "strings": {
+    "app.title": {
+      "comment": "Application title",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "精练教练"
+          }
+        }
+      }
+    },
+    "storage.unavailable": {
+      "comment": "Shown when protected local storage cannot be opened",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本地存储暂不可用"
+          }
+        }
+      }
+    },
+    "exercise.catalog.unavailable": {
+      "comment": "Shown when the placeholder exercise catalog cannot be seeded",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动作库暂不可用"
+          }
+        }
+      }
+    },
+    "onboarding.kicker": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "首次打开 · 无账号"
+          }
+        }
+      }
+    },
+    "onboarding.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课堂记录留在这台手机"
+          }
+        }
+      }
+    },
+    "onboarding.lead": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不注册、不登录。此刻也不会弹出通知、通讯录或其他系统权限。"
+          }
+        }
+      }
+    },
+    "onboarding.local": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学员资料与训练记录默认只保存在本机。卸载或丢失设备会一起丢失，后续可在设置里手动备份。"
+          }
+        }
+      }
+    },
+    "onboarding.share": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分享给学员时，由你主动挑选摘要内容。性别、伤病、电话、微信和教练私有备注不会进入分享。"
+          }
+        }
+      }
+    },
+    "onboarding.operator": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学员本人不是使用者。他们不安装、不登录、也不在本模块里操作数据。"
+          }
+        }
+      }
+    },
+    "onboarding.start": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始使用"
+          }
+        }
+      }
+    },
+    "onboarding.skip": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "稍后添加学员"
+          }
+        }
+      }
+    },
+    "student.error.generic": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "操作失败，请重试。"
+          }
+        }
+      }
+    },
+    "student.sex.male": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "男"
+          }
+        }
+      }
+    },
+    "student.sex.female": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "女"
+          }
+        }
+      }
+    },
+    "student.sex.other": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "其他"
+          }
+        }
+      }
+    },
+    "student.sex.undisclosed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不透露"
+          }
+        }
+      }
+    },
+    "student.required": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "必填"
+          }
+        }
+      }
+    },
+    "student.optional": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选填"
+          }
+        }
+      }
+    },
+    "student.field.displayName": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示名称"
+          }
+        }
+      }
+    },
+    "student.field.sex": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "性别"
+          }
+        }
+      }
+    },
+    "student.field.trainingGoal": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练目标"
+          }
+        }
+      }
+    },
+    "student.field.injuryNotes": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "注意事项"
+          }
+        }
+      }
+    },
+    "student.field.phone": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "电话"
+          }
+        }
+      }
+    },
+    "student.field.wechat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "微信"
+          }
+        }
+      }
+    },
+    "student.field.privateNote": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "教练备注"
+          }
+        }
+      }
+    },
+    "student.editor.firstTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第一位学员"
+          }
+        }
+      }
+    },
+    "student.editor.addTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加学员"
+          }
+        }
+      }
+    },
+    "student.editor.editTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编辑资料"
+          }
+        }
+      }
+    },
+    "student.editor.kicker": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示名称与性别必填，其余可跳过"
+          }
+        }
+      }
+    },
+    "student.editor.nameRequired": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请填写显示名称"
+          }
+        }
+      }
+    },
+    "student.editor.sexRequired": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请选择性别"
+          }
+        }
+      }
+    },
+    "student.editor.duplicateHint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "允许重名。可用教练备注区分。"
+          }
+        }
+      }
+    },
+    "student.editor.contactHint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "电话与微信由教练手输。不读取系统通讯录，不请求联系人权限。"
+          }
+        }
+      }
+    },
+    "student.editor.save": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存学员"
+          }
+        }
+      }
+    },
+    "student.editor.skip": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "稍后添加"
+          }
+        }
+      }
+    },
+    "student.list.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学员"
+          }
+        }
+      }
+    },
+    "student.list.archivedTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已归档学员"
+          }
+        }
+      }
+    },
+    "student.list.add": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加学员"
+          }
+        }
+      }
+    },
+    "student.list.search": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜索学员"
+          }
+        }
+      }
+    },
+    "student.list.more": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更多"
+          }
+        }
+      }
+    },
+    "student.list.trainingBanner": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练中"
+          }
+        }
+      }
+    },
+    "student.list.continue": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "继续训练"
+          }
+        }
+      }
+    },
+    "student.list.emptyTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "还没有学员"
+          }
+        }
+      }
+    },
+    "student.list.emptyBody": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "点上方「添加学员」创建第一位。学员不是账号，只由你在本机管理。"
+          }
+        }
+      }
+    },
+    "student.list.searchEmptyTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有找到匹配的学员"
+          }
+        }
+      }
+    },
+    "student.list.searchEmptyBody": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "试试显示名称中的其他字，或清空搜索。"
+          }
+        }
+      }
+    },
+    "student.list.archivedEmptyTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有已归档学员"
+          }
+        }
+      }
+    },
+    "student.list.archivedEmptyBody": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档后的学员会出现在这里，历史仍保留并可恢复。"
+          }
+        }
+      }
+    },
+    "student.list.noGoal": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无训练目标"
+          }
+        }
+      }
+    },
+    "student.list.notePrefix": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "备注 "
+          }
+        }
+      }
+    },
+    "student.detail.startTraining": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始训练"
+          }
+        }
+      }
+    },
+    "student.detail.archived": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已归档"
+          }
+        }
+      }
+    },
+    "student.detail.archivedHint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不能开始新训练。仍可查看下方历史，或恢复为活跃学员。"
+          }
+        }
+      }
+    },
+    "student.detail.restore": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复学员"
+          }
+        }
+      }
+    },
+    "student.detail.recentKicker": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上次完成的训练"
+          }
+        }
+      }
+    },
+    "student.detail.recentPlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂无已完成训练"
+          }
+        }
+      }
+    },
+    "student.detail.historyKicker": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练历史 · 新的在上"
+          }
+        }
+      }
+    },
+    "student.detail.historyPlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "历史入口将在后续提供"
+          }
+        }
+      }
+    },
+    "student.detail.notesEmpty": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未填写"
+          }
+        }
+      }
+    },
+    "student.detail.notesHidden": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "默认折叠"
+          }
+        }
+      }
+    },
+    "student.detail.notesExpanded": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已展开"
+          }
+        }
+      }
+    },
+    "student.detail.notesCollapsed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已折叠"
+          }
+        }
+      }
+    },
+    "student.detail.notesDisclaimer": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此内容不是医疗诊断或医疗建议。仅教练可见，不进入分享报告。"
+          }
+        }
+      }
+    },
+    "student.detail.unfilled": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未填写"
+          }
+        }
+      }
+    },
+    "student.detail.edit": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编辑资料"
+          }
+        }
+      }
+    },
+    "student.detail.archive": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档学员"
+          }
+        }
+      }
+    },
+    "student.detail.delete": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久删除"
+          }
+        }
+      }
+    },
+    "student.detail.more": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更多"
+          }
+        }
+      }
+    },
+    "student.archive.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档学员"
+          }
+        }
+      }
+    },
+    "student.archive.lead": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档之后："
+          }
+        }
+      }
+    },
+    "student.archive.effect.hidden": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从活跃学员列表中隐藏"
+          }
+        }
+      }
+    },
+    "student.archive.effect.noSession": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不能开始新训练"
+          }
+        }
+      }
+    },
+    "student.archive.effect.history": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仍可查看训练历史"
+          }
+        }
+      }
+    },
+    "student.archive.effect.restore": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "之后可以恢复为活跃"
+          }
+        }
+      }
+    },
+    "student.archive.hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档不是删除。永久删除在「更多」的二级入口。"
+          }
+        }
+      }
+    },
+    "student.delete.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久删除"
+          }
+        }
+      }
+    },
+    "student.delete.lead": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将永久删除「%@」及其在本机的关联数据。"
+          }
+        }
+      }
+    },
+    "student.delete.affect": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将一并删除"
+          }
+        }
+      }
+    },
+    "student.delete.affect.profile": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示名称、性别、训练目标"
+          }
+        }
+      }
+    },
+    "student.delete.affect.notes": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "伤病 / 注意事项、教练备注、电话与微信"
+          }
+        }
+      }
+    },
+    "student.delete.affect.historyCount": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 条已完成训练记录"
+          }
+        }
+      }
+    },
+    "student.delete.backup": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "先备份（建议）"
+          }
+        }
+      }
+    },
+    "student.delete.namePrompt": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输入显示名称以确认"
+          }
+        }
+      }
+    },
+    "student.delete.boundary": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除后无法从本页恢复。已分享的旧图片和你保存的备份不会被远程改写或删除。"
+          }
+        }
+      }
+    },
+    "student.delete.confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久删除"
+          }
+        }
+      }
+    },
+    "student.delete.mismatch": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示名称不匹配"
+          }
+        }
+      }
+    },
+    "student.delete.blocked": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 有进行中的训练，不能永久删除。"
+          }
+        }
+      }
+    },
+    "student.delete.blockedHint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "状态不只靠颜色：当前为「训练中」，须先结束或继续完成该训练。"
+          }
+        }
+      }
+    },
+    "student.delete.backToDetail": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "回到详情"
+          }
+        }
+      }
+    },
+    "student.delete.done": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学员已永久删除"
+          }
+        }
+      }
+    },
+    "student.delete.backToList": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "返回学员列表"
+          }
+        }
+      }
+    },
+    "student.flow.cancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        }
+      }
+    },
+    "placeholder.boundary": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此入口已保留，具体内容不在本里程碑展开。"
+          }
+        }
+      }
+    },
+    "placeholder.training": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练中"
+          }
+        }
+      }
+    },
+    "placeholder.recent": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近训练"
+          }
+        }
+      }
+    },
+    "placeholder.history": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练历史"
+          }
+        }
+      }
+    },
+    "placeholder.backup": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "备份与恢复"
+          }
+        }
+      }
+    },
+    "placeholder.library": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动作库"
+          }
+        }
+      }
+    },
+    "placeholder.settings": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置"
+          }
+        }
+      }
+    },
+    "session.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练中"
+          }
+        }
+      }
+    },
+    "session.empty.hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "先添加动作，再记录组数。"
+          }
+        }
+      }
+    },
+    "session.stats.completedLabel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已完成组数"
+          }
+        }
+      }
+    },
+    "session.status.completed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练已完成"
+          }
+        }
+      }
+    },
+    "session.status.abandoned": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已放弃空训练"
+          }
+        }
+      }
+    },
+    "session.field.exerciseName": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动作名称"
+          }
+        }
+      }
+    },
+    "session.field.weight": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重量"
+          }
+        }
+      }
+    },
+    "session.field.reps": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "次数"
+          }
+        }
+      }
+    },
+    "session.field.duration": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "时长（秒）"
+          }
+        }
+      }
+    },
+    "session.field.left": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "左侧"
+          }
+        }
+      }
+    },
+    "session.field.right": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "右侧"
+          }
+        }
+      }
+    },
+    "session.mode.weightReps": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重量与次数"
+          }
+        }
+      }
+    },
+    "session.mode.reps": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仅次数"
+          }
+        }
+      }
+    },
+    "session.mode.duration": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "时长"
+          }
+        }
+      }
+    },
+    "session.side.none": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不区分左右"
+          }
+        }
+      }
+    },
+    "session.side.bilateral": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "左右侧"
+          }
+        }
+      }
+    },
+    "session.set.label": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "组"
+          }
+        }
+      }
+    },
+    "session.action.addExercise": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加动作"
+          }
+        }
+      }
+    },
+    "session.action.saveExercise": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存动作"
+          }
+        }
+      }
+    },
+    "session.action.saveSessionOnly": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仅本次"
+          }
+        }
+      }
+    },
+    "session.action.saveToLibrary": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存到动作库"
+          }
+        }
+      }
+    },
+    "session.action.addSet": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加组"
+          }
+        }
+      }
+    },
+    "session.action.confirmSet": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "确认"
+          }
+        }
+      }
+    },
+    "session.action.copyPrevious": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制上一组"
+          }
+        }
+      }
+    },
+    "session.action.copyLastSame": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制上次同动作"
+          }
+        }
+      }
+    },
+    "session.action.undo": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "撤销"
+          }
+        }
+      }
+    },
+    "session.action.moveUp": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上移"
+          }
+        }
+      }
+    },
+    "session.action.moveDown": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下移"
+          }
+        }
+      }
+    },
+    "session.action.deleteExercise": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除动作"
+          }
+        }
+      }
+    },
+    "session.action.finish": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束训练"
+          }
+        }
+      }
+    },
+    "session.deleteExercise.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除动作"
+          }
+        }
+      }
+    },
+    "session.deleteExercise.lead": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "该动作含已完成组，删除后这些组不再计入本课统计。"
+          }
+        }
+      }
+    },
+    "session.deleteExercise.hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "可在删除后用撤销组来恢复单组，但动作本身不会自动回来。"
+          }
+        }
+      }
+    },
+    "session.deleteExercise.confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "确认删除动作"
+          }
+        }
+      }
+    },
+    "session.finish.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束训练"
+          }
+        }
+      }
+    },
+    "session.finish.completeLead": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将保存为已完成记录。"
+          }
+        }
+      }
+    },
+    "session.finish.abandonTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "放弃空训练"
+          }
+        }
+      }
+    },
+    "session.finish.abandonLead": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有已完成组，结束将放弃本次训练，不会生成完成记录。"
+          }
+        }
+      }
+    },
+    "session.finish.abandonConfirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "放弃训练"
+          }
+        }
+      }
+    },
+    "session.finish.draftsTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "还有未完成内容"
+          }
+        }
+      }
+    },
+    "session.finish.draftsLead": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请返回处理草稿和待完成组，或明确丢弃后再结束。"
+          }
+        }
+      }
+    },
+    "session.finish.discardDrafts": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "丢弃未完成"
+          }
+        }
+      }
+    },
+    "session.finish.returnToDrafts": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "返回处理"
+          }
+        }
+      }
+    },
+    "session.save.retry": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重试保存"
+          }
+        }
+      }
+    },
+    "session.save.finishBlocked": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存尚未成功，无法完成训练。"
+          }
+        }
+      }
+    },
+    "session.duration.reviewTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复核训练时长"
+          }
+        }
+      }
+    },
+    "session.duration.reviewLead": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本次中断较长或时钟异常，请确认或修正训练时长后再结束。"
+          }
+        }
+      }
+    },
+    "session.duration.confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "确认时长"
+          }
+        }
+      }
+    },
+    "exercise.library.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动作库"
+          }
+        }
+      }
+    },
+    "exercise.library.entry": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动作库"
+          }
+        }
+      }
+    },
+    "exercise.library.search": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜索动作"
+          }
+        }
+      }
+    },
+    "exercise.library.addCustom": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新建自定义动作"
+          }
+        }
+      }
+    },
+    "exercise.library.showHidden": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示已隐藏"
+          }
+        }
+      }
+    },
+    "exercise.library.filter.muscle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "部位"
+          }
+        }
+      }
+    },
+    "exercise.library.filter.equipment": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "器械"
+          }
+        }
+      }
+    },
+    "exercise.library.filter.all": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全部"
+          }
+        }
+      }
+    },
+    "exercise.library.section.uncategorized": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未分类"
+          }
+        }
+      }
+    },
+    "exercise.library.favorite": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "收藏"
+          }
+        }
+      }
+    },
+    "exercise.library.hide": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隐藏"
+          }
+        }
+      }
+    },
+    "exercise.library.unhide": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消隐藏"
+          }
+        }
+      }
+    },
+    "exercise.kind.builtIn": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "内置"
+          }
+        }
+      }
+    },
+    "exercise.kind.custom": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自定义"
+          }
+        }
+      }
+    },
+    "exercise.editor.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自定义动作"
+          }
+        }
+      }
+    },
+    "exercise.editor.name": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动作名称"
+          }
+        }
+      }
+    },
+    "exercise.editor.save": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存"
+          }
+        }
+      }
+    },
+    "exercise.editor.archive": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档"
+          }
+        }
+      }
+    },
+    "exercise.editor.restore": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复"
+          }
+        }
+      }
+    },
+    "exercise.conflict": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "名称与已有动作冲突，未改名。"
+          }
+        }
+      }
+    },
+    "summary.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练总结"
+          }
+        }
+      }
+    },
+    "summary.focus": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练重点"
+          }
+        }
+      }
+    },
+    "summary.privateNote": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "教练私有备注"
+          }
+        }
+      }
+    },
+    "summary.studentSummary": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课后可见总结"
+          }
+        }
+      }
+    },
+    "summary.duration.format": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "时长 %@ 秒"
+          }
+        }
+      }
+    },
+    "summary.sets.format": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已完成 %lld 组"
+          }
+        }
+      }
+    },
+    "summary.skipShare": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跳过分享"
+          }
+        }
+      }
+    },
+    "summary.generateReport": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "生成训练报告"
+          }
+        }
+      }
+    },
+    "history.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练历史"
+          }
+        }
+      }
+    },
+    "history.row.sets.format": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 组已完成"
+          }
+        }
+      }
+    },
+    "detail.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练记录"
+          }
+        }
+      }
+    },
+    "detail.readonly": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "只读"
+          }
+        }
+      }
+    },
+    "detail.edit": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编辑训练记录"
+          }
+        }
+      }
+    },
+    "detail.reportStale": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "报告已过期"
+          }
+        }
+      }
+    },
+    "share.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练报告"
+          }
+        }
+      }
+    },
+    "share.modules": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "报告模块"
+          }
+        }
+      }
+    },
+    "share.module.volume": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练容量"
+          }
+        }
+      }
+    },
+    "share.handToSystem": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "交给系统分享"
+          }
+        }
+      }
+    },
+    "share.retry": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重试"
+          }
+        }
+      }
+    },
+    "share.close": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭"
+          }
+        }
+      }
+    },
+    "share.notSent": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未发送"
+          }
+        }
+      }
+    },
+    "share.handedToSystem": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已交给系统分享"
+          }
+        }
+      }
+    },
+    "student.detail.backup": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "备份与恢复"
+          }
+        }
+      }
+    },
+    "backup.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "备份与恢复"
+          }
+        }
+      }
+    },
+    "backup.password.placeholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置口令"
+          }
+        }
+      }
+    },
+    "backup.passwordConfirm.placeholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "再次输入口令"
+          }
+        }
+      }
+    },
+    "backup.password.hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "口令不可恢复，也无法找回。请自行妥善保存，应用不会记住口令。"
+          }
+        }
+      }
+    },
+    "backup.password.mismatch": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "两次口令不一致。"
+          }
+        }
+      }
+    },
+    "backup.export": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导出备份"
+          }
+        }
+      }
+    },
+    "backup.export.handedOff": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已交给系统文件"
+          }
+        }
+      }
+    },
+    "backup.export.working": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在导出…"
+          }
+        }
+      }
+    },
+    "backup.cancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        }
+      }
+    },
+    "backup.retry": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重试"
+          }
+        }
+      }
+    },
+    "backup.restore.entry": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从备份恢复"
+          }
+        }
+      }
+    },
+    "backup.restore.warning": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复将完整替换本机数据。"
+          }
+        }
+      }
+    },
+    "backup.restore.suggestBackup": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "建议先备份当前数据。"
+          }
+        }
+      }
+    },
+    "backup.restore.password": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输入备份口令"
+          }
+        }
+      }
+    },
+    "backup.restore.confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "确认恢复"
+          }
+        }
+      }
+    },
+    "backup.restore.failed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复失败，本机数据未改动。"
+          }
+        }
+      }
+    },
+    "backup.restore.needFile": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请先选择备份文件。"
+          }
+        }
+      }
+    },
+    "backup.restore.pickFile": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择备份文件"
+          }
+        }
+      }
+    },
+    "backup.restore.working": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在恢复…"
+          }
+        }
+      }
+    },
+    "today.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日"
+          }
+        }
+      }
+    },
+    "today.segment.today": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日"
+          }
+        }
+      }
+    },
+    "today.segment.students": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学员"
+          }
+        }
+      }
+    },
+    "today.inProgress.badge": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "进行中"
+          }
+        }
+      }
+    },
+    "today.inProgress.continue": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "继续训练"
+          }
+        }
+      }
+    },
+    "today.section.nextUp": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下一节课"
+          }
+        }
+      }
+    },
+    "today.section.remaining": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "其余今日课程"
+          }
+        }
+      }
+    },
+    "today.section.resolved": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已处理"
+          }
+        }
+      }
+    },
+    "today.status.pending": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "待上课"
+          }
+        }
+      }
+    },
+    "today.status.overdue": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已逾期"
+          }
+        }
+      }
+    },
+    "today.status.completed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已完成"
+          }
+        }
+      }
+    },
+    "today.status.cancelled": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已取消"
+          }
+        }
+      }
+    },
+    "today.status.absent": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "缺席"
+          }
+        }
+      }
+    },
+    "today.action.start": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始训练"
+          }
+        }
+      }
+    },
+    "today.action.cancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消安排"
+          }
+        }
+      }
+    },
+    "today.action.markAbsent": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "标记缺席"
+          }
+        }
+      }
+    },
+    "today.action.markAbsentCharged": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "缺席并扣课"
+          }
+        }
+      }
+    },
+    "today.action.markAbsentNotCharged": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "缺席不扣课"
+          }
+        }
+      }
+    },
+    "today.empty.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日暂无安排"
+          }
+        }
+      }
+    },
+    "today.empty.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天还没有课程安排。"
+          }
+        }
+      }
+    },
+    "today.error.generic": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加载今日安排失败，请重试。"
+          }
+        }
+      }
+    },
+    "today.durationMinutes": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分钟"
+          }
+        }
+      }
+    },
+    "calendar.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课程日历"
+          }
+        }
+      }
+    },
+    "calendar.empty": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这一天暂无安排"
+          }
+        }
+      }
+    },
+    "calendar.addAppointment": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+ 添加课程安排"
+          }
+        }
+      }
+    },
+    "appointmentEditor.createTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新建课程安排"
+          }
+        }
+      }
+    },
+    "appointmentEditor.editTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编辑课程安排"
+          }
+        }
+      }
+    },
+    "appointmentEditor.student": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学员"
+          }
+        }
+      }
+    },
+    "appointmentEditor.date": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日期"
+          }
+        }
+      }
+    },
+    "appointmentEditor.startTime": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始时间"
+          }
+        }
+      }
+    },
+    "appointmentEditor.duration": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "预计时长"
+          }
+        }
+      }
+    },
+    "appointmentEditor.reminder": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "提醒"
+          }
+        }
+      }
+    },
+    "appointmentEditor.reminderLead": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "提前提醒"
+          }
+        }
+      }
+    },
+    "appointmentEditor.save": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存"
+          }
+        }
+      }
+    },
+    "appointmentEditor.studentRequired": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请先选择学员。"
+          }
+        }
+      }
+    },
+    "appointmentEditor.durationInvalid": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请输入有效的预计时长。"
+          }
+        }
+      }
+    },
+    "appointmentEditor.saveFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存失败，请重试。"
+          }
+        }
+      }
+    },
+    "appointmentEditor.conflictTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "与已有安排时间冲突"
+          }
+        }
+      }
+    },
+    "appointmentEditor.conflictOverride": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仍然保存"
+          }
+        }
+      }
+    },
+    "appointmentEditor.conflictCancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        }
+      }
+    },
+    "student.detail.coursePackages": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课包与课时"
+          }
+        }
+      }
+    },
+    "coursePackages.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课包管理"
+          }
+        }
+      }
+    },
+    "coursePackages.error.generic": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课包信息暂不可用，请重试。"
+          }
+        }
+      }
+    },
+    "coursePackages.activeSectionTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前课包"
+          }
+        }
+      }
+    },
+    "coursePackages.historySectionTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "历史课包"
+          }
+        }
+      }
+    },
+    "coursePackages.noActive": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂无有效课包。"
+          }
+        }
+      }
+    },
+    "coursePackages.newPackage": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新建课包"
+          }
+        }
+      }
+    },
+    "coursePackages.endActive": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束当前课包"
+          }
+        }
+      }
+    },
+    "coursePackages.manualAdjust": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "人工调整课时"
+          }
+        }
+      }
+    },
+    "coursePackages.statusActive": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有效"
+          }
+        }
+      }
+    },
+    "coursePackages.statusEnded": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已结束"
+          }
+        }
+      }
+    },
+    "coursePackages.balanceFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "剩余 %d / 共 %d 课时"
+          }
+        }
+      }
+    },
+    "coursePackages.viewTrailHint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "查看课时调整记录 ›"
+          }
+        }
+      }
+    },
+    "coursePackageEditor.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新建课包"
+          }
+        }
+      }
+    },
+    "coursePackageEditor.name": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课包名称"
+          }
+        }
+      }
+    },
+    "coursePackageEditor.totalCredits": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "总课时数"
+          }
+        }
+      }
+    },
+    "coursePackageEditor.hasStartDate": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置开始日期"
+          }
+        }
+      }
+    },
+    "coursePackageEditor.startDate": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始日期"
+          }
+        }
+      }
+    },
+    "coursePackageEditor.hasEndDate": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置结束日期"
+          }
+        }
+      }
+    },
+    "coursePackageEditor.endDate": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束日期"
+          }
+        }
+      }
+    },
+    "coursePackageEditor.save": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存"
+          }
+        }
+      }
+    },
+    "coursePackageEditor.creditsInvalid": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "总课时数需大于 0。"
+          }
+        }
+      }
+    },
+    "coursePackageEditor.saveFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存失败，请重试。"
+          }
+        }
+      }
+    },
+    "manualAdjustment.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "人工调整课时"
+          }
+        }
+      }
+    },
+    "manualAdjustment.direction": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "调整方向"
+          }
+        }
+      }
+    },
+    "manualAdjustment.direction.debit": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "扣减"
+          }
+        }
+      }
+    },
+    "manualAdjustment.direction.credit": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "返还"
+          }
+        }
+      }
+    },
+    "manualAdjustment.amount": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课时数"
+          }
+        }
+      }
+    },
+    "manualAdjustment.reasonLabel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "调整原因（必填）"
+          }
+        }
+      }
+    },
+    "manualAdjustment.reasonPlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请说明本次调整的原因"
+          }
+        }
+      }
+    },
+    "manualAdjustment.save": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存调整"
+          }
+        }
+      }
+    },
+    "manualAdjustment.reasonRequired": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请填写调整原因。"
+          }
+        }
+      }
+    },
+    "manualAdjustment.wouldGoNegative": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "扣减后余额将为负，请检查课时数。"
+          }
+        }
+      }
+    },
+    "manualAdjustment.saveFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存失败，请重试。"
+          }
+        }
+      }
+    },
+    "creditTrail.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课时调整记录"
+          }
+        }
+      }
+    },
+    "creditTrail.error.generic": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "记录暂不可用，请重试。"
+          }
+        }
+      }
+    },
+    "creditTrail.balanceFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前余额：%d"
+          }
+        }
+      }
+    },
+    "creditTrail.empty": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂无课时调整记录。"
+          }
+        }
+      }
+    },
+    "creditTrail.reason.sessionComplete": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练完成扣课"
+          }
+        }
+      }
+    },
+    "creditTrail.reason.appointmentAbsent": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "缺席扣课"
+          }
+        }
+      }
+    },
+    "creditTrail.reason.adhocSession": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "临时课扣课"
+          }
+        }
+      }
+    },
+    "creditTrail.reason.manualCorrection": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "人工调整"
+          }
+        }
+      }
+    },
+    "creditTrail.reason.sessionReopen": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重开训练返还"
+          }
+        }
       }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }

@@ -14,6 +14,10 @@ enum RootDestination: Hashable {
     case backupRestore
     case calendar
     case appointmentEditor(AppointmentEditorMode)
+    case coursePackages(UUID)
+    case coursePackageEditor(UUID)
+    case creditAdjustmentTrail(UUID)
+    case manualCreditAdjustment(UUID)
     case placeholder(PlaceholderKind)
 }
 
@@ -172,6 +176,29 @@ struct RootNavigation: View {
                                     studentUseCases: environment.requireUseCases(),
                                     calendar: environment.requireCalendar()
                                 )
+                            case .coursePackages(let studentID):
+                                CoursePackageListView(
+                                    studentID: StableUUID(studentID),
+                                    useCases: environment.requireCreditLedgerUseCases(),
+                                    path: $path
+                                )
+                            case .coursePackageEditor(let studentID):
+                                CoursePackageEditorView(
+                                    studentID: StableUUID(studentID),
+                                    useCases: environment.requireCreditLedgerUseCases(),
+                                    path: $path
+                                )
+                            case .creditAdjustmentTrail(let packageID):
+                                CreditAdjustmentTrailView(
+                                    packageID: StableUUID(packageID),
+                                    useCases: environment.requireCreditLedgerUseCases()
+                                )
+                            case .manualCreditAdjustment(let packageID):
+                                ManualCreditAdjustmentView(
+                                    packageID: StableUUID(packageID),
+                                    useCases: environment.requireCreditLedgerUseCases(),
+                                    path: $path
+                                )
                             case .placeholder(let kind):
                                 PlaceholderDestinationView(kind: kind)
                             }
@@ -219,6 +246,7 @@ struct RootTabContainer: View {
                 TodayView(
                     appointmentUseCases: environment.requireAppointmentUseCases(),
                     studentUseCases: environment.requireUseCases(),
+                    creditLedgerUseCases: environment.creditLedgerUseCases,
                     path: $path
                 )
             case .students:

@@ -9,10 +9,16 @@ final class TodayViewModel: ObservableObject {
 
     private let appointmentUseCases: AppointmentUseCases
     private let studentUseCases: StudentUseCases
+    private let creditLedgerUseCases: CreditLedgerUseCases?
 
-    init(appointmentUseCases: AppointmentUseCases, studentUseCases: StudentUseCases) {
+    init(
+        appointmentUseCases: AppointmentUseCases,
+        studentUseCases: StudentUseCases,
+        creditLedgerUseCases: CreditLedgerUseCases? = nil
+    ) {
         self.appointmentUseCases = appointmentUseCases
         self.studentUseCases = studentUseCases
+        self.creditLedgerUseCases = creditLedgerUseCases
         self.todayDate = appointmentUseCases.todayLocalDate()
     }
 
@@ -81,7 +87,23 @@ final class TodayViewModel: ObservableObject {
 
     func markAbsent(appointmentID: StableUUID, creditChoice: AbsentCreditChoice) async {
         do {
-            _ = try await appointmentUseCases.markAbsent(appointmentID: appointmentID, creditChoice: creditChoice)
+            let updated = try await appointmentUseCases.markAbsent(
+                appointmentID: appointmentID,
+                creditChoice: creditChoice
+            )
+            // M1B-FR-014: absence handling is never blocked by the credit ledger --
+            // if there is no active package (or the ledger write itself fails), the
+            // absence status change above still stands; this is a best-effort
+            // side effect, not a precondition of markAbsent succeeding.
+            if creditChoice == .charged, let creditLedgerUseCases {
+                if let activePackage = try? await creditLedgerUseCases.activePackage(studentID: updated.studentID) {
+                    _ = try? await creditLedgerUseCases.applyAbsence(
+                        packageID: activePackage.id,
+                        appointmentID: appointmentID,
+                        creditChoice: creditChoice
+                    )
+                }
+            }
             await reload()
         } catch {
             errorMessage = String(localized: "today.error.generic")
@@ -115,12 +137,14 @@ struct TodayView: View {
     init(
         appointmentUseCases: AppointmentUseCases,
         studentUseCases: StudentUseCases,
+        creditLedgerUseCases: CreditLedgerUseCases? = nil,
         path: Binding<[RootDestination]>
     ) {
         _viewModel = StateObject(
             wrappedValue: TodayViewModel(
                 appointmentUseCases: appointmentUseCases,
-                studentUseCases: studentUseCases
+                studentUseCases: studentUseCases,
+                creditLedgerUseCases: creditLedgerUseCases
             )
         )
         _path = path
