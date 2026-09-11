@@ -12,6 +12,7 @@
 		4C5E5DF730413B0D0088237A /* TestIDGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A203 /* TestIDGenerator.swift */; };
 		4C5E5DF830413B0D0088237A /* TemporaryProtectedDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A204 /* TemporaryProtectedDirectory.swift */; };
 		4C5E5DF930413B0D0088237A /* FakeRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A205 /* FakeRenderer.swift */; };
+		B520 /* FakeNotificationScheduling.swift in Sources */ = {isa = PBXBuildFile; fileRef = A519 /* FakeNotificationScheduling.swift */; };
 		B504 /* TestCalendarProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A502 /* TestCalendarProvider.swift */; };
 		B505 /* TestNotificationAuthorizationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A503 /* TestNotificationAuthorizationProvider.swift */; };
 		4C5E5DFA30413B0D0088237A /* TestFaultInjector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A206 /* TestFaultInjector.swift */; };
@@ -29,6 +30,7 @@
 		B120 /* Protocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = A120 /* Protocols.swift */; };
 		B121 /* FaultInjectionBoundary.swift in Sources */ = {isa = PBXBuildFile; fileRef = A121 /* FaultInjectionBoundary.swift */; };
 		B130 /* SystemClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A130 /* SystemClock.swift */; };
+		B517 /* NotificationAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A517 /* NotificationAdapter.swift */; };
 		B506 /* SystemLocalCalendarProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A504 /* SystemLocalCalendarProvider.swift */; };
 		B131 /* SecureRandomGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A131 /* SecureRandomGenerator.swift */; };
 		B132 /* ProtectedFileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A132 /* ProtectedFileStore.swift */; };
@@ -74,6 +76,7 @@
 		B203 /* TestIDGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A203 /* TestIDGenerator.swift */; };
 		B204 /* TemporaryProtectedDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A204 /* TemporaryProtectedDirectory.swift */; };
 		B205 /* FakeRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A205 /* FakeRenderer.swift */; };
+		B519 /* FakeNotificationScheduling.swift in Sources */ = {isa = PBXBuildFile; fileRef = A519 /* FakeNotificationScheduling.swift */; };
 		B502 /* TestCalendarProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A502 /* TestCalendarProvider.swift */; };
 		B503 /* TestNotificationAuthorizationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A503 /* TestNotificationAuthorizationProvider.swift */; };
 		B206 /* TestFaultInjector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A206 /* TestFaultInjector.swift */; };
@@ -131,6 +134,7 @@
 		B513 /* AppointmentManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A512 /* AppointmentManagedObject+Mapping.swift */; };
 		B514 /* CoreDataAppointmentRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A513 /* CoreDataAppointmentRepository.swift */; };
 		B127 /* HistoryUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A127 /* HistoryUseCases.swift */; };
+		B518 /* NotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A518 /* NotificationScheduler.swift */; };
 		B515 /* AppointmentUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A514 /* AppointmentUseCases.swift */; };
 		B14A /* HistoryReportManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A14A /* HistoryReportManagedObject+Mapping.swift */; };
 		B360 /* SessionSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A360 /* SessionSummaryView.swift */; };
@@ -223,6 +227,7 @@
 		A121 /* FaultInjectionBoundary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaultInjectionBoundary.swift; sourceTree = "<group>"; };
 		A130 /* SystemClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemClock.swift; sourceTree = "<group>"; };
 		A504 /* SystemLocalCalendarProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemLocalCalendarProvider.swift; sourceTree = "<group>"; };
+		A517 /* NotificationAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationAdapter.swift; sourceTree = "<group>"; };
 		A131 /* SecureRandomGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureRandomGenerator.swift; sourceTree = "<group>"; };
 		A132 /* ProtectedFileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtectedFileStore.swift; sourceTree = "<group>"; };
 		A133 /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
@@ -248,6 +253,7 @@
 		A203 /* TestIDGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestIDGenerator.swift; sourceTree = "<group>"; };
 		A204 /* TemporaryProtectedDirectory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryProtectedDirectory.swift; sourceTree = "<group>"; };
 		A205 /* FakeRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeRenderer.swift; sourceTree = "<group>"; };
+		A519 /* FakeNotificationScheduling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeNotificationScheduling.swift; sourceTree = "<group>"; };
 		A502 /* TestCalendarProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestCalendarProvider.swift; sourceTree = "<group>"; };
 		A503 /* TestNotificationAuthorizationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestNotificationAuthorizationProvider.swift; sourceTree = "<group>"; };
 		A206 /* TestFaultInjector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFaultInjector.swift; sourceTree = "<group>"; };
@@ -298,6 +304,7 @@
 		A125 /* ExerciseProvenanceValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseProvenanceValidator.swift; sourceTree = "<group>"; };
 		A126 /* ExerciseLibraryUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseLibraryUseCases.swift; sourceTree = "<group>"; };
 		A127 /* HistoryUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryUseCases.swift; sourceTree = "<group>"; };
+		A518 /* NotificationScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationScheduler.swift; sourceTree = "<group>"; };
 		A514 /* AppointmentUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentUseCases.swift; sourceTree = "<group>"; };
 		A14A /* HistoryReportManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HistoryReportManagedObject+Mapping.swift"; sourceTree = "<group>"; };
 		A360 /* SessionSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSummaryView.swift; sourceTree = "<group>"; };
@@ -587,6 +594,7 @@
 				A125 /* ExerciseProvenanceValidator.swift */,
 				A126 /* ExerciseLibraryUseCases.swift */,
 				A127 /* HistoryUseCases.swift */,
+				A518 /* NotificationScheduler.swift */,
 				A514 /* AppointmentUseCases.swift */,
 			);
 			path = Application;
@@ -597,6 +605,7 @@
 			children = (
 				A130 /* SystemClock.swift */,
 				A504 /* SystemLocalCalendarProvider.swift */,
+				A517 /* NotificationAdapter.swift */,
 				A131 /* SecureRandomGenerator.swift */,
 				A132 /* ProtectedFileStore.swift */,
 				A133 /* AppLogger.swift */,
@@ -1035,6 +1044,7 @@
 				A205 /* FakeRenderer.swift */,
 				A502 /* TestCalendarProvider.swift */,
 				A503 /* TestNotificationAuthorizationProvider.swift */,
+				A519 /* FakeNotificationScheduling.swift */,
 			);
 			path = Doubles;
 			sourceTree = "<group>";
@@ -1251,8 +1261,10 @@
 				B125 /* ExerciseProvenanceValidator.swift in Sources */,
 				B126 /* ExerciseLibraryUseCases.swift in Sources */,
 				B127 /* HistoryUseCases.swift in Sources */,
+				B518 /* NotificationScheduler.swift in Sources */,
 				B515 /* AppointmentUseCases.swift in Sources */,
 				B130 /* SystemClock.swift in Sources */,
+				B517 /* NotificationAdapter.swift in Sources */,
 				B506 /* SystemLocalCalendarProvider.swift in Sources */,
 				B131 /* SecureRandomGenerator.swift in Sources */,
 				B132 /* ProtectedFileStore.swift in Sources */,
@@ -1347,6 +1359,7 @@
 				B203 /* TestIDGenerator.swift in Sources */,
 				B204 /* TemporaryProtectedDirectory.swift in Sources */,
 				B205 /* FakeRenderer.swift in Sources */,
+				B519 /* FakeNotificationScheduling.swift in Sources */,
 				B502 /* TestCalendarProvider.swift in Sources */,
 				B503 /* TestNotificationAuthorizationProvider.swift in Sources */,
 				B206 /* TestFaultInjector.swift in Sources */,
@@ -1362,6 +1375,7 @@
 				4C5E5DF730413B0D0088237A /* TestIDGenerator.swift in Sources */,
 				4C5E5DF830413B0D0088237A /* TemporaryProtectedDirectory.swift in Sources */,
 				4C5E5DF930413B0D0088237A /* FakeRenderer.swift in Sources */,
+				B520 /* FakeNotificationScheduling.swift in Sources */,
 				B504 /* TestCalendarProvider.swift in Sources */,
 				B505 /* TestNotificationAuthorizationProvider.swift in Sources */,
 				4C5E5DFA30413B0D0088237A /* TestFaultInjector.swift in Sources */,

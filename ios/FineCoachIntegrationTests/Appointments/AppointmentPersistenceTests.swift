@@ -55,6 +55,10 @@
                 appointmentRepository: CoreDataAppointmentRepository(writer: controller.writer),
                 studentRepository: studentRepository,
                 activeSession: sessionUseCases,
+                notifications: NotificationScheduler(
+                    notificationCenter: FakeNotificationScheduling(),
+                    calendarProvider: calendarProvider
+                ),
                 clock: clock,
                 calendarProvider: calendarProvider,
                 ids: idGenerator

@@ -51,6 +51,7 @@ public struct AppointmentUseCases: Sendable {
     private let appointmentRepository: CoreDataAppointmentRepository
     private let studentRepository: CoreDataStudentRepository
     private let activeSession: ActiveSessionUseCases
+    private let notifications: NotificationScheduler
     private let clock: any Clock
     private let calendarProvider: any LocalCalendarProvider
     private let ids: any IDGenerator
@@ -59,6 +60,7 @@ public struct AppointmentUseCases: Sendable {
         appointmentRepository: CoreDataAppointmentRepository,
         studentRepository: CoreDataStudentRepository,
         activeSession: ActiveSessionUseCases,
+        notifications: NotificationScheduler,
         clock: any Clock,
         calendarProvider: any LocalCalendarProvider,
         ids: any IDGenerator
@@ -66,6 +68,7 @@ public struct AppointmentUseCases: Sendable {
         self.appointmentRepository = appointmentRepository
         self.studentRepository = studentRepository
         self.activeSession = activeSession
+        self.notifications = notifications
         self.clock = clock
         self.calendarProvider = calendarProvider
         self.ids = ids
@@ -147,7 +150,9 @@ public struct AppointmentUseCases: Sendable {
             updatedAtUTC: now
         )
         try await ensureNoConflict(draft, overrideConflict: overrideConflict, excludingAppointmentID: nil)
-        return try await appointmentRepository.create(draft)
+        let created = try await appointmentRepository.create(draft)
+        await notifications.sync(appointment: created)
+        return created
     }
 
     public func createRecurring(
@@ -202,6 +207,9 @@ public struct AppointmentUseCases: Sendable {
             }
         }
         try await appointmentRepository.createSeries(series: series, appointments: appointments)
+        for appointment in appointments {
+            await notifications.sync(appointment: appointment)
+        }
         return appointments
     }
 
@@ -282,7 +290,9 @@ public struct AppointmentUseCases: Sendable {
             now: now
         )
         try await ensureNoConflict(updated, overrideConflict: overrideConflict, excludingAppointmentID: appointmentID)
-        return try await appointmentRepository.update(updated)
+        let saved = try await appointmentRepository.update(updated)
+        await notifications.sync(appointment: saved)
+        return saved
     }
 
     /// "本次及以后" (D-011): ends the current series as of `boundaryDate`,
@@ -369,6 +379,10 @@ public struct AppointmentUseCases: Sendable {
             newSeries: newSeries,
             newAppointments: newAppointments
         )
+        await notifications.remove(appointmentIDs: superseded.map(\.id))
+        for appointment in newAppointments {
+            await notifications.sync(appointment: appointment)
+        }
         return newAppointments
     }
 
@@ -378,13 +392,17 @@ public struct AppointmentUseCases: Sendable {
         let current = try await appointmentRepository.appointment(id: appointmentID)
         let reasonText = try reason.map { try ValidatedText($0, allowEmpty: true) }
         let updated = try current.cancelling(reason: reasonText, now: clock.nowUTC())
-        return try await appointmentRepository.update(updated)
+        let saved = try await appointmentRepository.update(updated)
+        await notifications.remove(appointmentID: appointmentID)
+        return saved
     }
 
     public func markAbsent(appointmentID: StableUUID, creditChoice: AbsentCreditChoice) async throws -> Appointment {
         let current = try await appointmentRepository.appointment(id: appointmentID)
         let updated = try current.markingAbsent(creditChoice: creditChoice, now: clock.nowUTC())
-        return try await appointmentRepository.update(updated)
+        let saved = try await appointmentRepository.update(updated)
+        await notifications.remove(appointmentID: appointmentID)
+        return saved
     }
 
     /// "开始训练" (M1B-FR-007): reuses the M1-A single-active-session pointer
@@ -405,19 +423,24 @@ public struct AppointmentUseCases: Sendable {
         }
         let updated = try appointment.startingTraining(sessionID: session.id, now: clock.nowUTC())
         _ = try await appointmentRepository.update(updated)
+        await notifications.remove(appointmentID: appointmentID)
         return session
     }
 
     public func abandonEmptySession(appointmentID: StableUUID) async throws -> Appointment {
         let current = try await appointmentRepository.appointment(id: appointmentID)
         let updated = try current.abandoningEmptySession(now: clock.nowUTC())
-        return try await appointmentRepository.update(updated)
+        let saved = try await appointmentRepository.update(updated)
+        await notifications.sync(appointment: saved)
+        return saved
     }
 
     public func completeSession(appointmentID: StableUUID) async throws -> Appointment {
         let current = try await appointmentRepository.appointment(id: appointmentID)
         let updated = try current.completingSession(now: clock.nowUTC())
-        return try await appointmentRepository.update(updated)
+        let saved = try await appointmentRepository.update(updated)
+        await notifications.remove(appointmentID: appointmentID)
+        return saved
     }
 
     // MARK: - Delete (M1B-FR-008: never-started future misclick only)
@@ -425,6 +448,7 @@ public struct AppointmentUseCases: Sendable {
     public func deleteNeverStartedFutureAppointment(appointmentID: StableUUID) async throws {
         let calendar = calendarProvider.currentCalendar()
         try await appointmentRepository.delete(id: appointmentID, now: clock.nowUTC(), calendar: calendar)
+        await notifications.remove(appointmentID: appointmentID)
     }
 
     // MARK: - Queries
