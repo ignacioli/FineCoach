@@ -10,6 +10,7 @@ public final class AppEnvironment: ObservableObject {
     public private(set) var sessionUseCases: ActiveSessionUseCases?
     public private(set) var exerciseUseCases: ExerciseLibraryUseCases?
     public private(set) var historyUseCases: HistoryUseCases?
+    public private(set) var appointmentUseCases: AppointmentUseCases?
     public private(set) var backupCoordinator: BackupCoordinator?
     public let startupErrorDescription: String?
     @Published public private(set) var catalogUnavailableMessage: String?
@@ -87,6 +88,13 @@ public final class AppEnvironment: ObservableObject {
             preconditionFailure("History use cases require available local storage.")
         }
         return historyUseCases
+    }
+
+    func requireAppointmentUseCases() -> AppointmentUseCases {
+        guard let appointmentUseCases else {
+            preconditionFailure("Appointment use cases require available local storage.")
+        }
+        return appointmentUseCases
     }
 
     func requireReportsRootURL() -> URL {
@@ -374,6 +382,18 @@ public final class AppEnvironment: ObservableObject {
         historyUseCases = HistoryUseCases(
             sessionRepository: sessions,
             clock: clock,
+            ids: idGenerator
+        )
+        appointmentUseCases = AppointmentUseCases(
+            appointmentRepository: CoreDataAppointmentRepository(writer: controller.writer),
+            studentRepository: repository,
+            activeSession: sessionUseCases!,
+            notifications: NotificationScheduler(
+                notificationCenter: SystemNotificationAdapter(),
+                calendarProvider: SystemLocalCalendarProvider()
+            ),
+            clock: clock,
+            calendarProvider: SystemLocalCalendarProvider(),
             ids: idGenerator
         )
         reportsRootURL = root

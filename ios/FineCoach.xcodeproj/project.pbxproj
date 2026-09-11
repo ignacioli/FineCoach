@@ -135,6 +135,7 @@
 		B514 /* CoreDataAppointmentRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A513 /* CoreDataAppointmentRepository.swift */; };
 		B127 /* HistoryUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A127 /* HistoryUseCases.swift */; };
 		B521 /* TodayOrderingPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = A521 /* TodayOrderingPolicy.swift */; };
+		B523 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A523 /* TodayView.swift */; };
 		B518 /* NotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A518 /* NotificationScheduler.swift */; };
 		B515 /* AppointmentUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A514 /* AppointmentUseCases.swift */; };
 		B14A /* HistoryReportManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A14A /* HistoryReportManagedObject+Mapping.swift */; };
@@ -307,6 +308,7 @@
 		A126 /* ExerciseLibraryUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseLibraryUseCases.swift; sourceTree = "<group>"; };
 		A127 /* HistoryUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryUseCases.swift; sourceTree = "<group>"; };
 		A521 /* TodayOrderingPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayOrderingPolicy.swift; sourceTree = "<group>"; };
+		A523 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		A518 /* NotificationScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationScheduler.swift; sourceTree = "<group>"; };
 		A514 /* AppointmentUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentUseCases.swift; sourceTree = "<group>"; };
 		A14A /* HistoryReportManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HistoryReportManagedObject+Mapping.swift"; sourceTree = "<group>"; };
@@ -514,10 +516,19 @@
 			path = DesignSystem;
 			sourceTree = "<group>";
 		};
+		A524 /* Today */ = {
+			isa = PBXGroup;
+			children = (
+				A523 /* TodayView.swift */,
+			);
+			path = Today;
+			sourceTree = "<group>";
+		};
 		A404 /* Features */ = {
 			isa = PBXGroup;
 			children = (
 				A446 /* Students */,
+				A524 /* Today */,
 				A441 /* ExerciseLibrary */,
 				A442 /* ActiveSession */,
 				A443 /* History */,
@@ -1268,6 +1279,7 @@
 				B126 /* ExerciseLibraryUseCases.swift in Sources */,
 				B127 /* HistoryUseCases.swift in Sources */,
 				B521 /* TodayOrderingPolicy.swift in Sources */,
+				B523 /* TodayView.swift in Sources */,
 				B518 /* NotificationScheduler.swift in Sources */,
 				B515 /* AppointmentUseCases.swift in Sources */,
 				B130 /* SystemClock.swift in Sources */,

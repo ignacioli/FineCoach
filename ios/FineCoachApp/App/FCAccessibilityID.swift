@@ -10,6 +10,16 @@ public enum FCAccessibilityID {
     public static let onboardingStart = "onboarding.start"
     public static let onboardingSkip = "onboarding.skip"
 
+    public static let todayRoot = "today.root"
+    public static let todaySegmentToday = "today.segment.today"
+    public static let todaySegmentStudents = "today.segment.students"
+    public static let todayInProgress = "today.inProgress"
+    public static let todayResolvedFold = "today.resolvedFold"
+
+    public static func todayRow(_ id: StableUUID) -> String {
+        "today.row.\(id.rawValue.uuidString)"
+    }
+
     public static let studentList = "studentList.root"
     public static let studentListAdd = "studentList.add"
     public static let studentListSearch = "studentList.search"

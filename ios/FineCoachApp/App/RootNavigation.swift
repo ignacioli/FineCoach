@@ -31,6 +31,11 @@ enum PlaceholderKind: Hashable {
     case settings
 }
 
+enum RootTab: Hashable {
+    case today
+    case students
+}
+
 @MainActor
 struct RootNavigation: View {
     @EnvironmentObject private var environment: AppEnvironment
@@ -38,6 +43,7 @@ struct RootNavigation: View {
     @State private var path: [RootDestination] = []
     @State private var onboardingCompleted = false
     @State private var didLoadOnboarding = false
+    @State private var rootTab: RootTab = .today
 
     var body: some View {
         ZStack {
@@ -67,9 +73,10 @@ struct RootNavigation: View {
                     )
                 } else {
                     NavigationStack(path: $path) {
-                        StudentListView(
-                            useCases: environment.requireUseCases(),
-                            path: $path
+                        RootTabContainer(
+                            rootTab: $rootTab,
+                            path: $path,
+                            environment: environment
                         )
                         .navigationDestination(for: RootDestination.self) { destination in
                             switch destination {
@@ -174,6 +181,61 @@ struct RootNavigation: View {
         }
         onboardingCompleted = (try? await useCases.isOnboardingCompleted()) ?? false
         didLoadOnboarding = true
+    }
+}
+
+@MainActor
+struct RootTabContainer: View {
+    @Binding var rootTab: RootTab
+    @Binding var path: [RootDestination]
+    let environment: AppEnvironment
+
+    var body: some View {
+        VStack(spacing: 0) {
+            segmentedControl
+            switch rootTab {
+            case .today:
+                TodayView(
+                    appointmentUseCases: environment.requireAppointmentUseCases(),
+                    studentUseCases: environment.requireUseCases(),
+                    path: $path
+                )
+            case .students:
+                StudentListView(
+                    useCases: environment.requireUseCases(),
+                    path: $path
+                )
+            }
+        }
+        .background(FCSemanticColors.background)
+        .accessibilityIdentifier(FCAccessibilityID.studentList)
+    }
+
+    private var segmentedControl: some View {
+        HStack(spacing: FCPrimitives.spacingSmall) {
+            segmentButton(String(localized: "today.segment.today"), tab: .today)
+                .accessibilityIdentifier(FCAccessibilityID.todaySegmentToday)
+            segmentButton(String(localized: "today.segment.students"), tab: .students)
+                .accessibilityIdentifier(FCAccessibilityID.todaySegmentStudents)
+            Spacer()
+        }
+        .padding(.horizontal, FCPrimitives.spacingMedium)
+        .padding(.top, FCPrimitives.spacingSmall)
+    }
+
+    private func segmentButton(_ title: String, tab: RootTab) -> some View {
+        Button {
+            rootTab = tab
+        } label: {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .padding(.horizontal, FCPrimitives.spacingMedium)
+                .frame(minHeight: 44)
+                .background(
+                    Capsule().fill(rootTab == tab ? FCSemanticColors.primaryText : FCSemanticColors.tint)
+                )
+                .foregroundStyle(rootTab == tab ? FCSemanticColors.background : FCSemanticColors.primaryText)
+        }
     }
 }
 

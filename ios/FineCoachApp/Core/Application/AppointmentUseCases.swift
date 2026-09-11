@@ -460,4 +460,19 @@ public struct AppointmentUseCases: Sendable {
     public func appointments(onLocalDates dates: [LocalDate]) async throws -> [Appointment] {
         try await appointmentRepository.appointments(localDates: dates)
     }
+
+    /// Today's ordered rows (T014 TodayOrderingPolicy), computed from this use
+    /// case's own injected clock/calendar -- so the Today Feature UI never needs
+    /// its own copy of "what time is it" / "what day is today" (T014a).
+    public func todayOrdering() async throws -> [TodayOrderedAppointment] {
+        let calendar = calendarProvider.currentCalendar()
+        let now = clock.nowUTC()
+        let today = LocalDate(date: now, calendar: calendar)
+        let appointments = try await appointments(onLocalDates: [today])
+        return TodayOrderingPolicy.order(appointments: appointments, today: today, now: now, calendar: calendar)
+    }
+
+    public func todayLocalDate() -> LocalDate {
+        LocalDate(date: clock.nowUTC(), calendar: calendarProvider.currentCalendar())
+    }
 }
