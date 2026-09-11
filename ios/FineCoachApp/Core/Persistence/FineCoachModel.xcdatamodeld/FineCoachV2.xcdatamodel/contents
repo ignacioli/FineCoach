@@ -254,6 +254,15 @@
             </constraint>
         </uniquenessConstraints>
     </entity>
+    <entity name="ActiveCoursePackageClaimMO" representedClassName="NSManagedObject" syncable="NO">
+        <attribute name="studentID" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="packageID" optional="NO" attributeType="UUID" syncable="NO"/>
+        <uniquenessConstraints>
+            <constraint>
+                <constraint property="studentID"/>
+            </constraint>
+        </uniquenessConstraints>
+    </entity>
     <entity name="TrainingTemplateMO" representedClassName="NSManagedObject" syncable="NO">
         <attribute name="id" optional="NO" attributeType="UUID" syncable="NO"/>
         <attribute name="name" optional="NO" attributeType="String" syncable="NO"/>
@@ -349,6 +358,7 @@
         <element name="AppointmentMO" positionX="-980" positionY="-270" width="200" height="300"/>
         <element name="CoursePackageMO" positionX="-720" positionY="180" width="200" height="240"/>
         <element name="CreditAdjustmentMO" positionX="-980" positionY="180" width="200" height="240"/>
+        <element name="ActiveCoursePackageClaimMO" positionX="-720" positionY="420" width="200" height="120"/>
         <element name="TrainingTemplateMO" positionX="-1240" positionY="-270" width="200" height="150"/>
         <element name="TemplateExerciseMO" positionX="-1240" positionY="180" width="200" height="240"/>
         <element name="SessionSectionMO" positionX="-1240" positionY="570" width="200" height="150"/>

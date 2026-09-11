@@ -11,6 +11,7 @@ public final class AppEnvironment: ObservableObject {
     public private(set) var exerciseUseCases: ExerciseLibraryUseCases?
     public private(set) var historyUseCases: HistoryUseCases?
     public private(set) var appointmentUseCases: AppointmentUseCases?
+    public private(set) var creditLedgerUseCases: CreditLedgerUseCases?
     public private(set) var backupCoordinator: BackupCoordinator?
     public let startupErrorDescription: String?
     @Published public private(set) var catalogUnavailableMessage: String?
@@ -25,6 +26,7 @@ public final class AppEnvironment: ObservableObject {
     public var isStorageAvailable: Bool {
         persistenceController != nil && persistenceWriter != nil && studentUseCases != nil
             && sessionUseCases != nil && exerciseUseCases != nil && historyUseCases != nil
+            && creditLedgerUseCases != nil
     }
 
     public static func bootstrap() -> AppEnvironment {
@@ -95,6 +97,13 @@ public final class AppEnvironment: ObservableObject {
             preconditionFailure("Appointment use cases require available local storage.")
         }
         return appointmentUseCases
+    }
+
+    func requireCreditLedgerUseCases() -> CreditLedgerUseCases {
+        guard let creditLedgerUseCases else {
+            preconditionFailure("Credit ledger use cases require available local storage.")
+        }
+        return creditLedgerUseCases
     }
 
     func requireCalendar() -> Calendar {
@@ -273,6 +282,8 @@ public final class AppEnvironment: ObservableObject {
         self.sessionUseCases = nil
         self.exerciseUseCases = nil
         self.historyUseCases = nil
+        self.appointmentUseCases = nil
+        self.creditLedgerUseCases = nil
         self.backupCoordinator = nil
         self.reportsRootURL = nil
         self.shareAdapter = nil
@@ -302,6 +313,8 @@ public final class AppEnvironment: ObservableObject {
         self.sessionUseCases = nil
         self.exerciseUseCases = nil
         self.historyUseCases = nil
+        self.appointmentUseCases = nil
+        self.creditLedgerUseCases = nil
         self.backupCoordinator = nil
         self.reportsRootURL = nil
         self.shareAdapter = nil
@@ -398,6 +411,11 @@ public final class AppEnvironment: ObservableObject {
             ),
             clock: clock,
             calendarProvider: SystemLocalCalendarProvider(),
+            ids: idGenerator
+        )
+        creditLedgerUseCases = CreditLedgerUseCases(
+            repository: CoreDataCoursePackageRepository(writer: controller.writer),
+            clock: clock,
             ids: idGenerator
         )
         reportsRootURL = root

@@ -138,6 +138,11 @@
 		B523 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A523 /* TodayView.swift */; };
 		B524 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A525 /* CalendarView.swift */; };
 		B525 /* AppointmentEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A527 /* AppointmentEditorView.swift */; };
+		B530 /* CreditLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = A530 /* CreditLedger.swift */; };
+		B531 /* CoursePackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A531 /* CoursePackage.swift */; };
+		B532 /* CreditLedgerUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A532 /* CreditLedgerUseCases.swift */; };
+		B533 /* CoursePackageManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A533 /* CoursePackageManagedObject+Mapping.swift */; };
+		B534 /* CoreDataCoursePackageRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A534 /* CoreDataCoursePackageRepository.swift */; };
 		B518 /* NotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A518 /* NotificationScheduler.swift */; };
 		B515 /* AppointmentUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A514 /* AppointmentUseCases.swift */; };
 		B14A /* HistoryReportManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A14A /* HistoryReportManagedObject+Mapping.swift */; };
@@ -314,6 +319,11 @@
 		A523 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		A525 /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
 		A527 /* AppointmentEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentEditorView.swift; sourceTree = "<group>"; };
+		A530 /* CreditLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CreditLedger.swift"; sourceTree = "<group>"; };
+		A531 /* CoursePackage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoursePackage.swift"; sourceTree = "<group>"; };
+		A532 /* CreditLedgerUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CreditLedgerUseCases.swift"; sourceTree = "<group>"; };
+		A533 /* CoursePackageManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoursePackageManagedObject+Mapping.swift"; sourceTree = "<group>"; };
+		A534 /* CoreDataCoursePackageRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoreDataCoursePackageRepository.swift"; sourceTree = "<group>"; };
 		A518 /* NotificationScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationScheduler.swift; sourceTree = "<group>"; };
 		A514 /* AppointmentUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentUseCases.swift; sourceTree = "<group>"; };
 		A14A /* HistoryReportManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HistoryReportManagedObject+Mapping.swift"; sourceTree = "<group>"; };
@@ -618,6 +628,8 @@
 				A506 /* LocalCalendar.swift */,
 				A507 /* Recurrence.swift */,
 				A508 /* Appointment.swift */,
+				A530 /* CreditLedger.swift */,
+				A531 /* CoursePackage.swift */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -636,6 +648,7 @@
 				A521 /* TodayOrderingPolicy.swift */,
 				A518 /* NotificationScheduler.swift */,
 				A514 /* AppointmentUseCases.swift */,
+				A532 /* CreditLedgerUseCases.swift */,
 			);
 			path = Application;
 			sourceTree = "<group>";
@@ -673,6 +686,8 @@
 				A511 /* RecurrenceSeriesManagedObject+Mapping.swift */,
 				A512 /* AppointmentManagedObject+Mapping.swift */,
 				A513 /* CoreDataAppointmentRepository.swift */,
+				A533 /* CoursePackageManagedObject+Mapping.swift */,
+				A534 /* CoreDataCoursePackageRepository.swift */,
 				A14A /* HistoryReportManagedObject+Mapping.swift */,
 				A175 /* FineCoachModel.xcdatamodeld */,
 			);
@@ -1295,6 +1310,8 @@
 				B511 /* LocalCalendar.swift in Sources */,
 				B508 /* Recurrence.swift in Sources */,
 				B509 /* Appointment.swift in Sources */,
+				B530 /* CreditLedger.swift in Sources */,
+				B531 /* CoursePackage.swift in Sources */,
 				B120 /* Protocols.swift in Sources */,
 				B121 /* FaultInjectionBoundary.swift in Sources */,
 				B122 /* StudentUseCases.swift in Sources */,
@@ -1309,6 +1326,7 @@
 				B525 /* AppointmentEditorView.swift in Sources */,
 				B518 /* NotificationScheduler.swift in Sources */,
 				B515 /* AppointmentUseCases.swift in Sources */,
+				B532 /* CreditLedgerUseCases.swift in Sources */,
 				B130 /* SystemClock.swift in Sources */,
 				B517 /* NotificationAdapter.swift in Sources */,
 				B506 /* SystemLocalCalendarProvider.swift in Sources */,
@@ -1348,6 +1366,8 @@
 				B512 /* RecurrenceSeriesManagedObject+Mapping.swift in Sources */,
 				B513 /* AppointmentManagedObject+Mapping.swift in Sources */,
 				B514 /* CoreDataAppointmentRepository.swift in Sources */,
+				B533 /* CoursePackageManagedObject+Mapping.swift in Sources */,
+				B534 /* CoreDataCoursePackageRepository.swift in Sources */,
 				B14A /* HistoryReportManagedObject+Mapping.swift in Sources */,
 				B190 /* ActiveSessionRecoverySnapshot.swift in Sources */,
 				B191 /* ActiveSessionRecoveryStore.swift in Sources */,
