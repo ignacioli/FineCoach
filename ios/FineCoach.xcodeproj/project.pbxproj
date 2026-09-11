@@ -164,6 +164,7 @@
 		B222 /* CoreTrainingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A222 /* CoreTrainingUITests.swift */; };
 		B230 /* StudentDomainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A230 /* StudentDomainTests.swift */; };
 		B510 /* RecurrenceAppointmentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A509 /* RecurrenceAppointmentTests.swift */; };
+		B526 /* NotificationRedactionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A529 /* NotificationRedactionTests.swift */; };
 		B522 /* TodayOrderingPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A522 /* TodayOrderingPolicyTests.swift */; };
 		B232 /* SessionSetDomainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A232 /* SessionSetDomainTests.swift */; };
 		B231 /* StudentPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A231 /* StudentPersistenceTests.swift */; };
@@ -367,6 +368,7 @@
 		A224 /* RecoveryMatrixTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryMatrixTests.swift; sourceTree = "<group>"; };
 		A230 /* StudentDomainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentDomainTests.swift; sourceTree = "<group>"; };
 		A509 /* RecurrenceAppointmentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrenceAppointmentTests.swift; sourceTree = "<group>"; };
+		A529 /* NotificationRedactionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationRedactionTests.swift; sourceTree = "<group>"; };
 		A522 /* TodayOrderingPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayOrderingPolicyTests.swift; sourceTree = "<group>"; };
 		A232 /* SessionSetDomainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSetDomainTests.swift; sourceTree = "<group>"; };
 		A231 /* StudentPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentPersistenceTests.swift; sourceTree = "<group>"; };
@@ -886,6 +888,7 @@
 			isa = PBXGroup;
 			children = (
 				A509 /* RecurrenceAppointmentTests.swift */,
+				A529 /* NotificationRedactionTests.swift */,
 				A522 /* TodayOrderingPolicyTests.swift */,
 			);
 			path = Appointments;
@@ -1386,6 +1389,7 @@
 				B200 /* SetupSmokeTests.swift in Sources */,
 				B230 /* StudentDomainTests.swift in Sources */,
 				B510 /* RecurrenceAppointmentTests.swift in Sources */,
+				B526 /* NotificationRedactionTests.swift in Sources */,
 				B522 /* TodayOrderingPolicyTests.swift in Sources */,
 				B232 /* SessionSetDomainTests.swift in Sources */,
 				B234 /* ActiveSessionRecoveryCodecTests.swift in Sources */,
