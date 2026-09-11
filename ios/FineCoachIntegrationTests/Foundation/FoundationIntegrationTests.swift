@@ -48,10 +48,13 @@ final class FoundationIntegrationTests: XCTestCase {
             #endif
         }
 
-        func testV1ModelLoadsWithApprovedEntitySurface() throws {
+        func testV2ModelLoadsWithApprovedEntitySurface() throws {
+            // M1-B T004/T005: FineCoachV2 is the bundled current model. It is a
+            // purely additive superset of FineCoachV1 (plan D-M1B-006) -- the
+            // 11 M1-A entities below are unchanged, plus the 9 new M1-B entities.
             let model = try PersistenceController.loadBundledModel()
             let entities = Set(model.entities.compactMap(\.name))
-            let expected: Set<String> = [
+            let expectedM1A: Set<String> = [
                 "StudentMO",
                 "ExerciseCatalogMO",
                 "ExerciseNameClaimMO",
@@ -64,7 +67,18 @@ final class FoundationIntegrationTests: XCTestCase {
                 "ActiveSessionPointerMO",
                 "StoreGenerationMetadataMO",
             ]
-            XCTAssertEqual(entities, expected)
+            let expectedM1B: Set<String> = [
+                "RecurrenceSeriesMO",
+                "AppointmentMO",
+                "CoursePackageMO",
+                "CreditAdjustmentMO",
+                "TrainingTemplateMO",
+                "TemplateExerciseMO",
+                "SessionSectionMO",
+                "BodyMetricDefinitionMO",
+                "BodyMeasurementMO",
+            ]
+            XCTAssertEqual(entities, expectedM1A.union(expectedM1B))
             XCTAssertEqual(
                 model.entities.first(where: { $0.name == "StudentMO" })?.attributesByName["id"]?.attributeType,
                 .UUIDAttributeType)
