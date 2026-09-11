@@ -147,6 +147,7 @@ link_one "$primary/.agents/skills" "$current/.agents/skills" || failures=$((fail
 link_one "$primary/.cursor/skills" "$current/.cursor/skills" || failures=$((failures + 1))
 link_one "$primary/.cursor/agents" "$current/.cursor/agents" || failures=$((failures + 1))
 link_one "$primary/.claude/skills" "$current/.claude/skills" || failures=$((failures + 1))
+link_one "$primary/.claude/agents" "$current/.claude/agents" || failures=$((failures + 1))
 link_one "$primary/.codex/agents" "$current/.codex/agents" || failures=$((failures + 1))
 link_one "$primary/specs" "$current/specs" || failures=$((failures + 1))
 link_one "$primary/.specify/scripts" "$current/.specify/scripts" || failures=$((failures + 1))
