@@ -147,6 +147,7 @@
 		B536 /* CoursePackageEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A536 /* CoursePackageEditorView.swift */; };
 		B537 /* ManualCreditAdjustmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A537 /* ManualCreditAdjustmentView.swift */; };
 		B538 /* CreditAdjustmentTrailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A538 /* CreditAdjustmentTrailView.swift */; };
+		B540 /* CreditLedgerIdempotencyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A540 /* CreditLedgerIdempotencyTests.swift */; };
 		B518 /* NotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A518 /* NotificationScheduler.swift */; };
 		B515 /* AppointmentUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A514 /* AppointmentUseCases.swift */; };
 		B14A /* HistoryReportManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A14A /* HistoryReportManagedObject+Mapping.swift */; };
@@ -332,6 +333,7 @@
 		A536 /* CoursePackageEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoursePackageEditorView.swift"; sourceTree = "<group>"; };
 		A537 /* ManualCreditAdjustmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualCreditAdjustmentView.swift"; sourceTree = "<group>"; };
 		A538 /* CreditAdjustmentTrailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CreditAdjustmentTrailView.swift"; sourceTree = "<group>"; };
+		A540 /* CreditLedgerIdempotencyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CreditLedgerIdempotencyTests.swift"; sourceTree = "<group>"; };
 		A518 /* NotificationScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationScheduler.swift; sourceTree = "<group>"; };
 		A514 /* AppointmentUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentUseCases.swift; sourceTree = "<group>"; };
 		A14A /* HistoryReportManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HistoryReportManagedObject+Mapping.swift"; sourceTree = "<group>"; };
@@ -618,6 +620,7 @@
 				A492 /* App */,
 				A473 /* Students */,
 				A510 /* Appointments */,
+				A541 /* CoursePackages */,
 				A476 /* ActiveSession */,
 				A479 /* Recovery */,
 				A482 /* ExerciseLibrary */,
@@ -927,6 +930,14 @@
 				A522 /* TodayOrderingPolicyTests.swift */,
 			);
 			path = Appointments;
+			sourceTree = "<group>";
+		};
+		A541 /* CoursePackages */ = {
+			isa = PBXGroup;
+			children = (
+				A540 /* CreditLedgerIdempotencyTests.swift */,
+			);
+			path = CoursePackages;
 			sourceTree = "<group>";
 		};
 		A474 /* Students */ = {
@@ -1435,6 +1446,7 @@
 				B510 /* RecurrenceAppointmentTests.swift in Sources */,
 				B526 /* NotificationRedactionTests.swift in Sources */,
 				B522 /* TodayOrderingPolicyTests.swift in Sources */,
+				B540 /* CreditLedgerIdempotencyTests.swift in Sources */,
 				B232 /* SessionSetDomainTests.swift in Sources */,
 				B234 /* ActiveSessionRecoveryCodecTests.swift in Sources */,
 				B235 /* SessionTimingTests.swift in Sources */,
