@@ -78,6 +78,7 @@
 		B503 /* TestNotificationAuthorizationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A503 /* TestNotificationAuthorizationProvider.swift */; };
 		B206 /* TestFaultInjector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A206 /* TestFaultInjector.swift */; };
 		B210 /* FoundationIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A210 /* FoundationIntegrationTests.swift */; };
+		B507 /* V1ToV2MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A505 /* V1ToV2MigrationTests.swift */; };
 		B220 /* SetupSmokeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A220 /* SetupSmokeUITests.swift */; };
 		BF01 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F001 /* Foundation.framework */; };
 		BF02 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F002 /* SwiftUI.framework */; };
@@ -242,6 +243,7 @@
 		A503 /* TestNotificationAuthorizationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestNotificationAuthorizationProvider.swift; sourceTree = "<group>"; };
 		A206 /* TestFaultInjector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFaultInjector.swift; sourceTree = "<group>"; };
 		A210 /* FoundationIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationIntegrationTests.swift; sourceTree = "<group>"; };
+		A505 /* V1ToV2MigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V1ToV2MigrationTests.swift; sourceTree = "<group>"; };
 		A220 /* SetupSmokeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupSmokeUITests.swift; sourceTree = "<group>"; };
 		F001 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		F002 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -660,6 +662,7 @@
 			isa = PBXGroup;
 			children = (
 				A210 /* FoundationIntegrationTests.swift */,
+				A505 /* V1ToV2MigrationTests.swift */,
 			);
 			path = Foundation;
 			sourceTree = "<group>";
@@ -1312,6 +1315,7 @@
 				B505 /* TestNotificationAuthorizationProvider.swift in Sources */,
 				4C5E5DFA30413B0D0088237A /* TestFaultInjector.swift in Sources */,
 				B210 /* FoundationIntegrationTests.swift in Sources */,
+				B507 /* V1ToV2MigrationTests.swift in Sources */,
 				B231 /* StudentPersistenceTests.swift in Sources */,
 				B233 /* ActiveSessionPersistenceTests.swift in Sources */,
 				B236 /* RecoveryProjectionTests.swift in Sources */,

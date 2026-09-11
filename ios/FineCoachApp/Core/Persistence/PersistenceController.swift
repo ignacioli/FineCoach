@@ -83,6 +83,7 @@ public final class PersistenceController: @unchecked Sendable {
         protectedFileStore: ProtectedFileStore,
         writerPreSaveCheck: @escaping @Sendable () throws -> Void
     ) throws {
+        let usedBundledModel = model == nil
         let resolvedModel = try model ?? Self.loadBundledModel()
         self.storeURL = storeURL
         self.protectedFileStore = protectedFileStore
@@ -110,12 +111,28 @@ public final class PersistenceController: @unchecked Sendable {
             } catch {
                 throw PersistenceControllerError.storeLoadFailed
             }
-            guard
-                resolvedModel.isConfiguration(
-                    withName: nil,
-                    compatibleWithStoreMetadata: metadata
-                )
-            else {
+            // Accept the store if it matches the current model exactly (fast path,
+            // no migration needed) OR if it matches ANY known prior model version
+            // bundled in FineCoachModel.momd (mergedModel finds a compatible version
+            // by scanning all compiled .mom files) -- that is the signal a lightweight
+            // migration below can actually succeed. A store matching neither is
+            // genuinely foreign/corrupted data and MUST fail closed here, before the
+            // container is even constructed, so the existing valid generation is never
+            // touched (data-model SS7).
+            let matchesCurrentModel = resolvedModel.isConfiguration(
+                withName: nil,
+                compatibleWithStoreMetadata: metadata
+            )
+            // Only the real bundled-model path may fall back to "any known prior
+            // version" -- a caller that explicitly injects a model (tests, isolated
+            // stores) wants that exact model checked, not the app's own momd.
+            let matchesKnownPriorVersion =
+                usedBundledModel
+                && NSManagedObjectModel.mergedModel(
+                    from: [Bundle(for: PersistenceBundleMarker.self), Bundle.main],
+                    forStoreMetadata: metadata
+                ) != nil
+            guard matchesCurrentModel || matchesKnownPriorVersion else {
                 throw PersistenceControllerError.storeLoadFailed
             }
         }
@@ -208,6 +225,40 @@ public final class PersistenceController: @unchecked Sendable {
         }
         throw PersistenceControllerError.modelUnavailable
     }
+
+    #if DEBUG
+        /// Loads a single named model version (e.g. "FineCoachV1") straight out of the
+        /// compiled FineCoachModel.momd bundle, bypassing the "current version" that
+        /// loadBundledModel() resolves to. Test-only: lets a migration test build a
+        /// fixture store under an older schema before opening it with the current model.
+        public static func loadModelVersionForMigrationTesting(
+            named versionName: String,
+            bundle: Bundle? = nil
+        ) throws -> NSManagedObjectModel {
+            var bundles: [Bundle] = []
+            if let bundle {
+                bundles.append(bundle)
+            }
+            bundles.append(Bundle(for: PersistenceBundleMarker.self))
+            bundles.append(Bundle.main)
+
+            var seenIdentifiers = Set<String>()
+            for candidate in bundles {
+                let identifier = candidate.bundleURL.path
+                guard seenIdentifiers.insert(identifier).inserted else {
+                    continue
+                }
+                guard let momdURL = candidate.url(forResource: "FineCoachModel", withExtension: "momd") else {
+                    continue
+                }
+                let versionURL = momdURL.appendingPathComponent("\(versionName).mom")
+                if let model = NSManagedObjectModel(contentsOf: versionURL) {
+                    return model
+                }
+            }
+            throw PersistenceControllerError.modelUnavailable
+        }
+    #endif
 
     @discardableResult
     func secureStoreArtifacts() throws -> [URL: FileProtectionAudit] {
