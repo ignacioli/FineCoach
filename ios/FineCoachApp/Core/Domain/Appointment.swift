@@ -151,6 +151,7 @@ public struct Appointment: Hashable, Codable, Sendable, Identifiable {
     /// reminder lead time. Changing weekdays is modeled as a new series by the
     /// Application layer, never as a mutation here.
     public func reschedulingDetached(
+        date: LocalDate? = nil,
         startTime: LocalTime? = nil,
         durationMinutes: Int? = nil,
         reminderEnabled: Bool? = nil,
@@ -172,6 +173,7 @@ public struct Appointment: Hashable, Codable, Sendable, Identifiable {
             }
         }
         return replacing(
+            date: date,
             startTime: startTime,
             durationMinutes: resolvedDuration,
             isDetachedException: true,

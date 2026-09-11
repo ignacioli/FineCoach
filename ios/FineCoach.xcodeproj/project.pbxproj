@@ -78,6 +78,7 @@
 		B503 /* TestNotificationAuthorizationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A503 /* TestNotificationAuthorizationProvider.swift */; };
 		B206 /* TestFaultInjector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A206 /* TestFaultInjector.swift */; };
 		B210 /* FoundationIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A210 /* FoundationIntegrationTests.swift */; };
+		B516 /* AppointmentPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A515 /* AppointmentPersistenceTests.swift */; };
 		B507 /* V1ToV2MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A505 /* V1ToV2MigrationTests.swift */; };
 		B220 /* SetupSmokeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A220 /* SetupSmokeUITests.swift */; };
 		BF01 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F001 /* Foundation.framework */; };
@@ -126,7 +127,11 @@
 		B147 /* CoreDataSessionRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A147 /* CoreDataSessionRepository.swift */; };
 		B148 /* ExerciseManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A148 /* ExerciseManagedObject+Mapping.swift */; };
 		B149 /* CoreDataExerciseRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A149 /* CoreDataExerciseRepository.swift */; };
+		B512 /* RecurrenceSeriesManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A511 /* RecurrenceSeriesManagedObject+Mapping.swift */; };
+		B513 /* AppointmentManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A512 /* AppointmentManagedObject+Mapping.swift */; };
+		B514 /* CoreDataAppointmentRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A513 /* CoreDataAppointmentRepository.swift */; };
 		B127 /* HistoryUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A127 /* HistoryUseCases.swift */; };
+		B515 /* AppointmentUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A514 /* AppointmentUseCases.swift */; };
 		B14A /* HistoryReportManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A14A /* HistoryReportManagedObject+Mapping.swift */; };
 		B360 /* SessionSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A360 /* SessionSummaryView.swift */; };
 		B361 /* HistoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A361 /* HistoryListView.swift */; };
@@ -247,6 +252,7 @@
 		A503 /* TestNotificationAuthorizationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestNotificationAuthorizationProvider.swift; sourceTree = "<group>"; };
 		A206 /* TestFaultInjector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFaultInjector.swift; sourceTree = "<group>"; };
 		A210 /* FoundationIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationIntegrationTests.swift; sourceTree = "<group>"; };
+		A515 /* AppointmentPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentPersistenceTests.swift; sourceTree = "<group>"; };
 		A505 /* V1ToV2MigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V1ToV2MigrationTests.swift; sourceTree = "<group>"; };
 		A220 /* SetupSmokeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupSmokeUITests.swift; sourceTree = "<group>"; };
 		F001 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -292,6 +298,7 @@
 		A125 /* ExerciseProvenanceValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseProvenanceValidator.swift; sourceTree = "<group>"; };
 		A126 /* ExerciseLibraryUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseLibraryUseCases.swift; sourceTree = "<group>"; };
 		A127 /* HistoryUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryUseCases.swift; sourceTree = "<group>"; };
+		A514 /* AppointmentUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentUseCases.swift; sourceTree = "<group>"; };
 		A14A /* HistoryReportManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HistoryReportManagedObject+Mapping.swift"; sourceTree = "<group>"; };
 		A360 /* SessionSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSummaryView.swift; sourceTree = "<group>"; };
 		A361 /* HistoryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryListView.swift; sourceTree = "<group>"; };
@@ -332,6 +339,9 @@
 		A147 /* CoreDataSessionRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataSessionRepository.swift; sourceTree = "<group>"; };
 		A148 /* ExerciseManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ExerciseManagedObject+Mapping.swift"; sourceTree = "<group>"; };
 		A149 /* CoreDataExerciseRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataExerciseRepository.swift; sourceTree = "<group>"; };
+		A511 /* RecurrenceSeriesManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecurrenceSeriesManagedObject+Mapping.swift"; sourceTree = "<group>"; };
+		A512 /* AppointmentManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppointmentManagedObject+Mapping.swift"; sourceTree = "<group>"; };
+		A513 /* CoreDataAppointmentRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataAppointmentRepository.swift; sourceTree = "<group>"; };
 		A239 /* ExercisePersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExercisePersistenceTests.swift; sourceTree = "<group>"; };
 		A180 /* FCAccessibilityID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCAccessibilityID.swift; sourceTree = "<group>"; };
 		A181 /* RootNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootNavigation.swift; sourceTree = "<group>"; };
@@ -577,6 +587,7 @@
 				A125 /* ExerciseProvenanceValidator.swift */,
 				A126 /* ExerciseLibraryUseCases.swift */,
 				A127 /* HistoryUseCases.swift */,
+				A514 /* AppointmentUseCases.swift */,
 			);
 			path = Application;
 			sourceTree = "<group>";
@@ -610,6 +621,9 @@
 				A147 /* CoreDataSessionRepository.swift */,
 				A148 /* ExerciseManagedObject+Mapping.swift */,
 				A149 /* CoreDataExerciseRepository.swift */,
+				A511 /* RecurrenceSeriesManagedObject+Mapping.swift */,
+				A512 /* AppointmentManagedObject+Mapping.swift */,
+				A513 /* CoreDataAppointmentRepository.swift */,
 				A14A /* HistoryReportManagedObject+Mapping.swift */,
 				A175 /* FineCoachModel.xcdatamodeld */,
 			);
@@ -659,6 +673,7 @@
 			isa = PBXGroup;
 			children = (
 				A421 /* Foundation */,
+				A516 /* Appointments */,
 				A474 /* Students */,
 				A477 /* ActiveSession */,
 				A480 /* Recovery */,
@@ -677,6 +692,14 @@
 				A505 /* V1ToV2MigrationTests.swift */,
 			);
 			path = Foundation;
+			sourceTree = "<group>";
+		};
+		A516 /* Appointments */ = {
+			isa = PBXGroup;
+			children = (
+				A515 /* AppointmentPersistenceTests.swift */,
+			);
+			path = Appointments;
 			sourceTree = "<group>";
 		};
 		A430 /* FineCoachUITests */ = {
@@ -1228,6 +1251,7 @@
 				B125 /* ExerciseProvenanceValidator.swift in Sources */,
 				B126 /* ExerciseLibraryUseCases.swift in Sources */,
 				B127 /* HistoryUseCases.swift in Sources */,
+				B515 /* AppointmentUseCases.swift in Sources */,
 				B130 /* SystemClock.swift in Sources */,
 				B506 /* SystemLocalCalendarProvider.swift in Sources */,
 				B131 /* SecureRandomGenerator.swift in Sources */,
@@ -1263,6 +1287,9 @@
 				B147 /* CoreDataSessionRepository.swift in Sources */,
 				B148 /* ExerciseManagedObject+Mapping.swift in Sources */,
 				B149 /* CoreDataExerciseRepository.swift in Sources */,
+				B512 /* RecurrenceSeriesManagedObject+Mapping.swift in Sources */,
+				B513 /* AppointmentManagedObject+Mapping.swift in Sources */,
+				B514 /* CoreDataAppointmentRepository.swift in Sources */,
 				B14A /* HistoryReportManagedObject+Mapping.swift in Sources */,
 				B190 /* ActiveSessionRecoverySnapshot.swift in Sources */,
 				B191 /* ActiveSessionRecoveryStore.swift in Sources */,
@@ -1339,6 +1366,7 @@
 				B505 /* TestNotificationAuthorizationProvider.swift in Sources */,
 				4C5E5DFA30413B0D0088237A /* TestFaultInjector.swift in Sources */,
 				B210 /* FoundationIntegrationTests.swift in Sources */,
+				B516 /* AppointmentPersistenceTests.swift in Sources */,
 				B507 /* V1ToV2MigrationTests.swift in Sources */,
 				B231 /* StudentPersistenceTests.swift in Sources */,
 				B233 /* ActiveSessionPersistenceTests.swift in Sources */,
