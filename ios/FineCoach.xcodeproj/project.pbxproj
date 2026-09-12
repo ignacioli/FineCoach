@@ -153,6 +153,8 @@
 		B607 /* BodyDataListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A607 /* BodyDataListView.swift */; };
 		B608 /* BodyMeasurementEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A608 /* BodyMeasurementEntryView.swift */; };
 		B609 /* TrendsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A609 /* TrendsView.swift */; };
+		B612 /* BodyMeasurementComparisonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A612 /* BodyMeasurementComparisonTests.swift */; };
+		B613 /* BodyDataReportExclusionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A613 /* BodyDataReportExclusionTests.swift */; };
 		B544 /* SessionSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A544 /* SessionSection.swift */; };
 		B545 /* TrainingTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A545 /* TrainingTemplate.swift */; };
 		B546 /* TemplateUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A546 /* TemplateUseCases.swift */; };
@@ -362,6 +364,8 @@
 		A607 /* BodyDataListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BodyDataListView.swift"; sourceTree = "<group>"; };
 		A608 /* BodyMeasurementEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BodyMeasurementEntryView.swift"; sourceTree = "<group>"; };
 		A609 /* TrendsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TrendsView.swift"; sourceTree = "<group>"; };
+		A612 /* BodyMeasurementComparisonTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BodyMeasurementComparisonTests.swift"; sourceTree = "<group>"; };
+		A613 /* BodyDataReportExclusionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BodyDataReportExclusionTests.swift"; sourceTree = "<group>"; };
 		A547 /* TemplateManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TemplateManagedObject+Mapping.swift"; sourceTree = "<group>"; };
 		A548 /* CoreDataTemplateRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoreDataTemplateRepository.swift"; sourceTree = "<group>"; };
 		A549 /* SessionSectionManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SessionSectionManagedObject+Mapping.swift"; sourceTree = "<group>"; };
@@ -692,6 +696,7 @@
 				A510 /* Appointments */,
 				A541 /* CoursePackages */,
 				A555 /* Templates */,
+				A614 /* BodyData */,
 				A476 /* ActiveSession */,
 				A479 /* Recovery */,
 				A482 /* ExerciseLibrary */,
@@ -1038,6 +1043,15 @@
 				A554 /* TemplateSnapshotSectionTests.swift */,
 			);
 			path = Templates;
+			sourceTree = "<group>";
+		};
+		A614 /* BodyData */ = {
+			isa = PBXGroup;
+			children = (
+				A612 /* BodyMeasurementComparisonTests.swift */,
+				A613 /* BodyDataReportExclusionTests.swift */,
+			);
+			path = BodyData;
 			sourceTree = "<group>";
 		};
 		A474 /* Students */ = {
@@ -1566,6 +1580,8 @@
 				B522 /* TodayOrderingPolicyTests.swift in Sources */,
 				B540 /* CreditLedgerIdempotencyTests.swift in Sources */,
 				B554 /* TemplateSnapshotSectionTests.swift in Sources */,
+				B612 /* BodyMeasurementComparisonTests.swift in Sources */,
+				B613 /* BodyDataReportExclusionTests.swift in Sources */,
 				B232 /* SessionSetDomainTests.swift in Sources */,
 				B234 /* ActiveSessionRecoveryCodecTests.swift in Sources */,
 				B235 /* SessionTimingTests.swift in Sources */,
