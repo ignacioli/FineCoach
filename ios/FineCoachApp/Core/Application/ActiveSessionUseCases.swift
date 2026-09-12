@@ -4,6 +4,7 @@ public struct ActiveSessionUseCases: Sendable {
     private let sessionRepository: CoreDataSessionRepository
     private let studentRepository: CoreDataStudentRepository
     private let exerciseRepository: CoreDataExerciseRepository
+    private let sectionRepository: CoreDataSessionSectionRepository
     private let coordinator: ActiveSessionCoordinator
     private let clock: any Clock
     private let ids: any IDGenerator
@@ -16,6 +17,7 @@ public struct ActiveSessionUseCases: Sendable {
         sessionRepository: CoreDataSessionRepository,
         studentRepository: CoreDataStudentRepository,
         exerciseRepository: CoreDataExerciseRepository,
+        sectionRepository: CoreDataSessionSectionRepository,
         recoveryStore: ActiveSessionRecoveryStore,
         storeGenerationUUID: UUID,
         clock: any Clock,
@@ -24,6 +26,7 @@ public struct ActiveSessionUseCases: Sendable {
         self.sessionRepository = sessionRepository
         self.studentRepository = studentRepository
         self.exerciseRepository = exerciseRepository
+        self.sectionRepository = sectionRepository
         self.clock = clock
         self.ids = ids
         self.coordinator = ActiveSessionCoordinator(
@@ -192,6 +195,125 @@ public struct ActiveSessionUseCases: Sendable {
 
     public func discardUnresolved() async throws -> Session {
         try await mutate { try $0.discardingUnresolvedSets(now: clock.nowUTC()) }
+    }
+
+    // MARK: - Template application (M1B-FR-019, D-009) and Sections (M1B-FR-020/021)
+
+    /// Deep-copies a template's Exercise/Section snapshot onto the CURRENT
+    /// working-copy Session as new, independent `.pending` Exercises/Sets
+    /// (M1B-FR-019). `templateExercises`/`templateSections` are the
+    /// read-only snapshot `TemplateUseCases.loadApplicationSnapshot` already
+    /// fetched; `existingSessionSections` is this Session's current Section
+    /// rows (from `TemplateUseCases.sessionSections`). The returned
+    /// `newSections` MUST be persisted by the caller via
+    /// `TemplateUseCases.persistAppliedSections` -- this call only persists
+    /// the Session side (through the same crash-recovery-safe
+    /// `ActiveSessionCoordinator` every other Session mutation here uses).
+    public func applyTemplate(
+        templateExercises: [TemplateExercise],
+        templateSections: [SessionSection],
+        existingSessionSections: [SessionSection]
+    ) async throws -> TemplateApplicationResult {
+        guard let current = try await coordinator.workingCopy() else {
+            throw DomainError.notFound
+        }
+        let now = clock.nowUTC()
+        let result = try TrainingTemplate.applying(
+            exercises: templateExercises,
+            sections: templateSections,
+            to: current,
+            existingSessionSections: existingSessionSections,
+            newExerciseIDGenerator: { self.ids.makeID() },
+            newSetIDGenerator: { self.ids.makeID() },
+            newSectionIDGenerator: { self.ids.makeID() },
+            now: now
+        )
+        let savedSession = try await coordinator.persist(result.session)
+        return TemplateApplicationResult(session: savedSession, newSections: result.newSections)
+    }
+
+    /// Creates a new, empty Section at the end of the CURRENT Session's
+    /// unified order axis (M1B-FR-020). Does not touch any Exercise.
+    public func createSection(name: String) async throws -> SessionSection {
+        guard let current = try await coordinator.workingCopy() else {
+            throw DomainError.notFound
+        }
+        let existingSections = try await sectionRepository.sections(ownerKind: .session, ownerID: current.id)
+        let nextOrder =
+            (current.exercises.map(\.orderIndex) + existingSections.map(\.orderIndex)).max().map { $0 + 1 } ?? 0
+        let section = SessionSection(
+            id: StableUUID(ids.makeID()),
+            ownerKind: .session,
+            ownerID: current.id,
+            name: try NormalizedName(name),
+            orderIndex: nextOrder
+        )
+        return try await sectionRepository.upsert(section)
+    }
+
+    @discardableResult
+    public func renameSection(sectionID: StableUUID, name: String) async throws -> SessionSection {
+        guard let current = try await coordinator.workingCopy() else {
+            throw DomainError.notFound
+        }
+        let existingSections = try await sectionRepository.sections(ownerKind: .session, ownerID: current.id)
+        guard let section = existingSections.first(where: { $0.id == sectionID }) else {
+            throw DomainError.notFound
+        }
+        return try await sectionRepository.upsert(section.renamed(try NormalizedName(name)))
+    }
+
+    /// Moves one Exercise into `targetSectionID` (`nil` = unsectioned)
+    /// without changing its position in the unified order axis
+    /// (M1B-FR-020/021).
+    public func moveExerciseToSection(exerciseID: StableUUID, toSectionID targetSectionID: StableUUID?)
+        async throws -> Session
+    {
+        try await mutate { session in
+            try session.updatingExerciseSection(
+                exerciseID: exerciseID,
+                sectionID: targetSectionID,
+                now: self.clock.nowUTC()
+            )
+        }
+    }
+
+    /// Deletes a Section from the CURRENT Session, requiring an explicit
+    /// disposition for its member Exercises (M1B-FR-020/021) -- there is no
+    /// overload that omits `disposition`.
+    public func deleteSection(
+        sectionID: StableUUID,
+        disposition: SessionSectionDeletionDisposition
+    ) async throws -> Session {
+        guard let current = try await coordinator.workingCopy() else {
+            throw DomainError.notFound
+        }
+        let existingSections = try await sectionRepository.sections(ownerKind: .session, ownerID: current.id)
+        let memberIDs = Set(current.exercises.filter { $0.sectionID == sectionID }.map(\.id))
+        let resolution = try SessionSectionOrdering.resolveSectionDeletion(
+            sectionID: sectionID,
+            exerciseIDsInSection: memberIDs,
+            disposition: disposition,
+            existingSections: existingSections
+        )
+        let now = clock.nowUTC()
+        var updated = current
+        if !resolution.exerciseIDsToDelete.isEmpty {
+            for exerciseID in resolution.exerciseIDsToDelete {
+                updated = try updated.removingExercise(id: exerciseID, confirmedIfCompleted: true, now: now)
+            }
+        } else {
+            for exerciseID in memberIDs {
+                updated = try updated.updatingExerciseSection(
+                    exerciseID: exerciseID,
+                    sectionID: resolution.relocatedSectionID,
+                    now: now
+                )
+            }
+        }
+        let saved = try await coordinator.persist(updated)
+        try await sectionRepository.delete(id: sectionID)
+        return saved
     }
 
     public func applyCoachAdjustedDuration(_ seconds: DecimalValue) async throws -> Session {

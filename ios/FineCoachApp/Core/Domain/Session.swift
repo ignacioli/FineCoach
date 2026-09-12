@@ -228,6 +228,15 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
         )
     }
 
+    /// Moves one Exercise into `sectionID` (`nil` = unsectioned) without
+    /// changing its position in the unified order axis (M1B-FR-020/021).
+    public func updatingExerciseSection(exerciseID: StableUUID, sectionID: StableUUID?, now: Date) throws -> Session {
+        try ensureInProgress()
+        let (index, exercise) = try requireExercise(exerciseID)
+        let relocated = exercise.relocating(orderIndex: exercise.orderIndex, sectionID: sectionID)
+        return replacingExercise(at: index, with: relocated, now: now)
+    }
+
     public func removingExercise(id: StableUUID, confirmedIfCompleted: Bool, now: Date) throws -> Session {
         try ensureInProgress()
         guard let exercise = exercises.first(where: { $0.id == id }) else {

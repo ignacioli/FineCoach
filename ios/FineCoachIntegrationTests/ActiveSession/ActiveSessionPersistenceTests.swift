@@ -369,6 +369,7 @@
                     sessionRepository: sessionRepository,
                     studentRepository: studentRepository,
                     exerciseRepository: CoreDataExerciseRepository(writer: controller.writer),
+                    sectionRepository: CoreDataSessionSectionRepository(writer: controller.writer),
                     recoveryStore: ActiveSessionRecoveryStore(
                         url: directory.url.appendingPathComponent("active-session-recovery-v1.json"),
                         protectedFileStore: ProtectedFileStore()

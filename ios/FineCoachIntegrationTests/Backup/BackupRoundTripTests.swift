@@ -289,6 +289,7 @@
                     sessionRepository: sessionRepository,
                     studentRepository: studentRepository,
                     exerciseRepository: CoreDataExerciseRepository(writer: controller.writer),
+                    sectionRepository: CoreDataSessionSectionRepository(writer: controller.writer),
                     recoveryStore: ActiveSessionRecoveryStore(
                         url: directory.activeRecoveryURL,
                         protectedFileStore: ProtectedFileStore()

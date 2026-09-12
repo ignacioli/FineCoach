@@ -524,6 +524,7 @@
                     sessionRepository: sessionRepository,
                     studentRepository: studentRepository,
                     exerciseRepository: CoreDataExerciseRepository(writer: controller.writer),
+                    sectionRepository: CoreDataSessionSectionRepository(writer: controller.writer),
                     recoveryStore: recoveryStore,
                     storeGenerationUUID: storeGenerationUUID,
                     clock: clock,
