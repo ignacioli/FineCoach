@@ -191,6 +191,20 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
         return replacing(exercises: exercises + [exercise], revision: nextRevision, updatedAtUTC: now)
     }
 
+    /// Appends externally-constructed `SessionExercise` values as-is, without
+    /// recomputing their `orderIndex`/`sectionID` (used by template
+    /// application, M1B-FR-019 -- `TrainingTemplate.applying` computes the
+    /// correct unified-axis `orderIndex` for each new Exercise/Section before
+    /// calling this). Callers MUST have already validated `sessionID` on each
+    /// exercise; this only re-checks it defensively.
+    public func appendingTemplateExercises(_ newExercises: [SessionExercise], now: Date) throws -> Session {
+        try ensureInProgress()
+        guard newExercises.allSatisfy({ $0.sessionID == id }) else {
+            throw DomainError.invalidState
+        }
+        return replacing(exercises: exercises + newExercises, revision: nextRevision, updatedAtUTC: now)
+    }
+
     public func reorderingExercises(ids: [StableUUID], now: Date) throws -> Session {
         try ensureInProgress()
         guard ids.count == exercises.count, Set(ids).count == ids.count else {
