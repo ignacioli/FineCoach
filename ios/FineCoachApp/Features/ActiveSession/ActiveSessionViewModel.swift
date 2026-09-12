@@ -34,6 +34,9 @@ final class ActiveSessionViewModel: ObservableObject {
     @Published var side: SetSide = .none
     @Published var left = ""
     @Published var right = ""
+    @Published var distance = ""
+    @Published var speed = ""
+    @Published var resistance = ""
     @Published var selectedExerciseID: StableUUID?
     @Published var presentedSheet: ActiveSessionSheet?
     @Published private(set) var isMutationInFlight = false
@@ -339,7 +342,10 @@ final class ActiveSessionViewModel: ObservableObject {
             unit: unit(for: exercise.recordModeSnapshot),
             side: side,
             leftValue: left,
-            rightValue: right
+            rightValue: right,
+            distanceValue: distance,
+            speedValue: speed,
+            resistanceValue: resistance
         )
     }
 
@@ -348,6 +354,7 @@ final class ActiveSessionViewModel: ObservableObject {
         case .weightReps: return .kilograms
         case .reps: return .repetitions
         case .duration: return .seconds
+        case .cardio: return .seconds
         }
     }
 
@@ -368,6 +375,9 @@ final class ActiveSessionViewModel: ObservableObject {
         side = .none
         left = ""
         right = ""
+        distance = ""
+        speed = ""
+        resistance = ""
         recordMode = mode
     }
 

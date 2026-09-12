@@ -103,6 +103,10 @@ public enum RecordMode: String, Codable, CaseIterable, Sendable {
     case weightReps
     case reps
     case duration
+    /// Cardio recording (M1B-FR-022, D-008): duration + distance, with
+    /// optional speed/resistance. Completion threshold is duration>0 AND
+    /// distance>0; speed/resistance are never required.
+    case cardio
 }
 
 public enum SetSide: String, Codable, CaseIterable, Sendable {

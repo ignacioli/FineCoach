@@ -15,6 +15,9 @@ public struct TrainingSetInput: Equatable, Sendable {
     public var side: SetSide
     public var leftValue: String?
     public var rightValue: String?
+    public var distanceValue: String?
+    public var speedValue: String?
+    public var resistanceValue: String?
 
     public init(
         recordMode: RecordMode,
@@ -24,7 +27,10 @@ public struct TrainingSetInput: Equatable, Sendable {
         unit: MeasurementUnit,
         side: SetSide = .none,
         leftValue: String? = nil,
-        rightValue: String? = nil
+        rightValue: String? = nil,
+        distanceValue: String? = nil,
+        speedValue: String? = nil,
+        resistanceValue: String? = nil
     ) {
         self.recordMode = recordMode
         self.weightValue = weightValue
@@ -34,6 +40,9 @@ public struct TrainingSetInput: Equatable, Sendable {
         self.side = side
         self.leftValue = leftValue
         self.rightValue = rightValue
+        self.distanceValue = distanceValue
+        self.speedValue = speedValue
+        self.resistanceValue = resistanceValue
     }
 }
 
@@ -50,6 +59,13 @@ public struct TrainingSet: Hashable, Codable, Sendable, Identifiable {
     public let side: SetSide
     public let leftValue: DecimalValue?
     public let rightValue: DecimalValue?
+    /// Cardio-only planned/recorded fields (M1B-FR-022, D-008). `distanceValue`
+    /// is required (alongside `durationSeconds`) for a cardio set to reach
+    /// `.completed`; `speedValue`/`resistanceValue` are always optional and
+    /// never gate completion.
+    public let distanceValue: DecimalValue?
+    public let speedValue: DecimalValue?
+    public let resistanceValue: DecimalValue?
     public let createdAtUTC: Date
     public let updatedAtUTC: Date
     public let completedAtUTC: Date?
@@ -104,6 +120,9 @@ public struct TrainingSet: Hashable, Codable, Sendable, Identifiable {
         side: SetSide,
         leftValue: DecimalValue?,
         rightValue: DecimalValue?,
+        distanceValue: DecimalValue? = nil,
+        speedValue: DecimalValue? = nil,
+        resistanceValue: DecimalValue? = nil,
         createdAtUTC: Date,
         updatedAtUTC: Date,
         completedAtUTC: Date?
@@ -120,6 +139,9 @@ public struct TrainingSet: Hashable, Codable, Sendable, Identifiable {
         self.side = side
         self.leftValue = leftValue
         self.rightValue = rightValue
+        self.distanceValue = distanceValue
+        self.speedValue = speedValue
+        self.resistanceValue = resistanceValue
         self.createdAtUTC = createdAtUTC
         self.updatedAtUTC = updatedAtUTC
         self.completedAtUTC = completedAtUTC
@@ -185,6 +207,40 @@ public struct TrainingSet: Hashable, Codable, Sendable, Identifiable {
             side: side,
             leftValue: leftValue,
             rightValue: rightValue,
+            distanceValue: distanceValue,
+            speedValue: speedValue,
+            resistanceValue: resistanceValue,
+            createdAtUTC: now,
+            updatedAtUTC: now,
+            completedAtUTC: nil
+        )
+    }
+
+    /// Deep-value copy as a fresh `.pending` set with a brand-new identity and
+    /// no timestamps inherited from the source (M1B-FR-019/D-009: template
+    /// application snapshots). Unlike `copiedAsPending`, the source is NOT
+    /// required to already satisfy the completion threshold -- planned
+    /// template data is copied as-is, whatever its current fields, so it can
+    /// still be edited before completion.
+    public func copiedAsPendingSnapshot(id: StableUUID, sessionExerciseID: StableUUID, orderIndex: UInt32, now: Date)
+        -> TrainingSet
+    {
+        TrainingSet(
+            id: id,
+            sessionExerciseID: sessionExerciseID,
+            orderIndex: orderIndex,
+            state: .pending,
+            recordMode: recordMode,
+            weightValue: weightValue,
+            repetitionCount: repetitionCount,
+            durationSeconds: durationSeconds,
+            unit: unit,
+            side: side,
+            leftValue: leftValue,
+            rightValue: rightValue,
+            distanceValue: distanceValue,
+            speedValue: speedValue,
+            resistanceValue: resistanceValue,
             createdAtUTC: now,
             updatedAtUTC: now,
             completedAtUTC: nil
@@ -212,6 +268,9 @@ public struct TrainingSet: Hashable, Codable, Sendable, Identifiable {
             side: side,
             leftValue: leftValue,
             rightValue: rightValue,
+            distanceValue: distanceValue,
+            speedValue: speedValue,
+            resistanceValue: resistanceValue,
             createdAtUTC: createdAtUTC,
             updatedAtUTC: updatedAtUTC,
             completedAtUTC: completedAtUTC
@@ -240,6 +299,9 @@ public struct TrainingSet: Hashable, Codable, Sendable, Identifiable {
         self.side = parsed.side
         self.leftValue = parsed.leftValue
         self.rightValue = parsed.rightValue
+        self.distanceValue = parsed.distanceValue
+        self.speedValue = parsed.speedValue
+        self.resistanceValue = parsed.resistanceValue
         self.createdAtUTC = createdAtUTC
         self.updatedAtUTC = updatedAtUTC
         self.completedAtUTC = completedAtUTC
@@ -264,6 +326,9 @@ public struct TrainingSet: Hashable, Codable, Sendable, Identifiable {
             side: side,
             leftValue: leftValue,
             rightValue: rightValue,
+            distanceValue: distanceValue,
+            speedValue: speedValue,
+            resistanceValue: resistanceValue,
             createdAtUTC: createdAtUTC,
             updatedAtUTC: updatedAtUTC,
             completedAtUTC: completedAtUTC
@@ -280,6 +345,9 @@ private struct ParsedFields {
     let side: SetSide
     let leftValue: DecimalValue?
     let rightValue: DecimalValue?
+    let distanceValue: DecimalValue?
+    let speedValue: DecimalValue?
+    let resistanceValue: DecimalValue?
 
     init(_ input: TrainingSetInput) throws {
         self.recordMode = input.recordMode
@@ -290,6 +358,9 @@ private struct ParsedFields {
         self.side = input.side
         self.leftValue = try Self.parseDecimal(input.leftValue)
         self.rightValue = try Self.parseDecimal(input.rightValue)
+        self.distanceValue = try Self.parseDecimal(input.distanceValue)
+        self.speedValue = try Self.parseDecimal(input.speedValue)
+        self.resistanceValue = try Self.parseDecimal(input.resistanceValue)
     }
 
     init(_ set: TrainingSet) {
@@ -301,6 +372,9 @@ private struct ParsedFields {
         self.side = set.side
         self.leftValue = set.leftValue
         self.rightValue = set.rightValue
+        self.distanceValue = set.distanceValue
+        self.speedValue = set.speedValue
+        self.resistanceValue = set.resistanceValue
     }
 
     func validateForCompletion() throws {
@@ -316,6 +390,7 @@ private struct ParsedFields {
             guard unit == .kilograms || unit == .pounds else {
                 throw DomainError.invalidUnit
             }
+            try Self.requireNoCardioFields(distanceValue, speedValue, resistanceValue)
         case .reps:
             guard weightValue == nil, durationSeconds == nil else {
                 throw DomainError.invalidMode
@@ -324,11 +399,29 @@ private struct ParsedFields {
             guard unit == .repetitions else {
                 throw DomainError.invalidUnit
             }
+            try Self.requireNoCardioFields(distanceValue, speedValue, resistanceValue)
         case .duration:
             guard weightValue == nil, repetitionCount == nil else {
                 throw DomainError.invalidMode
             }
             guard let durationSeconds, durationSeconds.isPositive else {
+                throw DomainError.invalidNumber
+            }
+            guard unit == .seconds else {
+                throw DomainError.invalidUnit
+            }
+            try Self.requireNoCardioFields(distanceValue, speedValue, resistanceValue)
+        case .cardio:
+            // M1B-FR-022 / D-008: duration>0 AND distance>0 are both
+            // required for a cardio set to complete; speed/resistance are
+            // always optional and never gate completion.
+            guard weightValue == nil, repetitionCount == nil else {
+                throw DomainError.invalidMode
+            }
+            guard let durationSeconds, durationSeconds.isPositive else {
+                throw DomainError.invalidNumber
+            }
+            guard let distanceValue, distanceValue.isPositive else {
                 throw DomainError.invalidNumber
             }
             guard unit == .seconds else {
@@ -362,6 +455,16 @@ private struct ParsedFields {
     private static func requirePositiveInteger(_ value: DecimalValue?) throws {
         guard let value, value.isPositive, value.isInteger else {
             throw DomainError.invalidNumber
+        }
+    }
+
+    private static func requireNoCardioFields(
+        _ distanceValue: DecimalValue?,
+        _ speedValue: DecimalValue?,
+        _ resistanceValue: DecimalValue?
+    ) throws {
+        guard distanceValue == nil, speedValue == nil, resistanceValue == nil else {
+            throw DomainError.invalidMode
         }
     }
 

@@ -53,6 +53,9 @@ enum SessionManagedObjectMapping {
         object.setValue(trainingSet.side.rawValue, forKey: "side")
         object.setValue(storeDecimal(trainingSet.leftValue), forKey: "leftValue")
         object.setValue(storeDecimal(trainingSet.rightValue), forKey: "rightValue")
+        object.setValue(storeDecimal(trainingSet.distanceValue), forKey: "distanceValue")
+        object.setValue(storeDecimal(trainingSet.speedValue), forKey: "speedValue")
+        object.setValue(storeDecimal(trainingSet.resistanceValue), forKey: "resistanceValue")
         object.setValue(trainingSet.createdAtUTC, forKey: "createdAtUTC")
         object.setValue(trainingSet.updatedAtUTC, forKey: "updatedAtUTC")
         object.setValue(trainingSet.completedAtUTC, forKey: "completedAtUTC")
@@ -186,6 +189,9 @@ enum SessionManagedObjectMapping {
             side: side,
             leftValue: try optionalDecimal(object.value(forKey: "leftValue")),
             rightValue: try optionalDecimal(object.value(forKey: "rightValue")),
+            distanceValue: try optionalDecimal(object.value(forKey: "distanceValue")),
+            speedValue: try optionalDecimal(object.value(forKey: "speedValue")),
+            resistanceValue: try optionalDecimal(object.value(forKey: "resistanceValue")),
             createdAtUTC: createdAtUTC,
             updatedAtUTC: updatedAtUTC,
             completedAtUTC: object.value(forKey: "completedAtUTC") as? Date

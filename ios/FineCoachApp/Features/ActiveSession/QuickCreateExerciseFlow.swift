@@ -43,6 +43,11 @@ struct QuickCreateExerciseFlow: View {
                     title: String(localized: "session.mode.duration"),
                     id: FCAccessibilityID.activeSessionModeDuration
                 )
+                modeChip(
+                    .cardio,
+                    title: String(localized: "session.mode.cardio"),
+                    id: FCAccessibilityID.activeSessionModeCardio
+                )
             }
             if let exerciseNameConflict = viewModel.exerciseNameConflict {
                 Text(exerciseNameConflict)

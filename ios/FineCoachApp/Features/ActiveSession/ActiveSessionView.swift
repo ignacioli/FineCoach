@@ -212,6 +212,7 @@ struct ActiveSessionView: View {
         case .weightReps: return String(localized: "session.mode.weightReps")
         case .reps: return String(localized: "session.mode.reps")
         case .duration: return String(localized: "session.mode.duration")
+        case .cardio: return String(localized: "session.mode.cardio")
         }
     }
 
@@ -235,6 +236,8 @@ struct ActiveSessionView: View {
             return set.repetitionCount?.canonicalString ?? "-"
         case .duration:
             return set.durationSeconds?.canonicalString ?? "-"
+        case .cardio:
+            return "\(set.durationSeconds?.canonicalString ?? "-")s / \(set.distanceValue?.canonicalString ?? "-")"
         }
     }
 

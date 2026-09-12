@@ -3215,6 +3215,50 @@
           }
         }
       }
+    },
+    "session.mode.cardio": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有氧"
+          }
+        }
+      }
+    },
+    "session.field.distance": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "距离"
+          }
+        }
+      }
+    },
+    "session.field.speed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "速度（选填）"
+          }
+        }
+      }
+    },
+    "session.field.resistance": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "阻力（选填）"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
