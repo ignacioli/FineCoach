@@ -38,6 +38,7 @@ enum SessionManagedObjectMapping {
         object.setValue(exercise.displayNameSnapshot.value, forKey: "displayNameSnapshot")
         object.setValue(exercise.recordModeSnapshot.rawValue, forKey: "recordModeSnapshot")
         object.setValue(exercise.actionPrivateNote?.value, forKey: "actionPrivateNote")
+        object.setValue(exercise.sectionID?.rawValue, forKey: "sectionID")
     }
 
     static func apply(_ trainingSet: TrainingSet, to object: NSManagedObject) {
@@ -131,6 +132,7 @@ enum SessionManagedObjectMapping {
         } else {
             sourceID = nil
         }
+        let sectionID = (object.value(forKey: "sectionID") as? UUID).map { StableUUID($0) }
         return try SessionExercise(
             id: StableUUID(rawID),
             sessionID: StableUUID(sessionID),
@@ -140,6 +142,7 @@ enum SessionManagedObjectMapping {
             displayNameSnapshot: NormalizedName(displayName),
             recordModeSnapshot: recordMode,
             actionPrivateNote: try optionalText(object.value(forKey: "actionPrivateNote") as? String),
+            sectionID: sectionID,
             sets: sets
         )
     }
