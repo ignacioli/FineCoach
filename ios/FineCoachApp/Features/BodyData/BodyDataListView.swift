@@ -1,0 +1,216 @@
+import SwiftUI
+
+/// Every metric visible to a Student -- the 8 fixed built-ins plus any
+/// custom metrics they've created (T039, M1B-FR-023). Body data may be
+/// entirely absent; that renders a real empty state, never fabricated
+/// placeholder numbers (M1B-FR-023).
+@MainActor
+final class BodyDataListViewModel: ObservableObject {
+    @Published var metrics: [BodyMetricDefinition] = []
+    @Published var errorMessage: String?
+    @Published var showingNewCustomMetric = false
+    @Published var newMetricName = ""
+    @Published var newMetricUnit = ""
+
+    let studentID: StableUUID
+    private let useCases: BodyDataUseCases
+
+    init(studentID: StableUUID, useCases: BodyDataUseCases) {
+        self.studentID = studentID
+        self.useCases = useCases
+    }
+
+    var builtInMetrics: [BodyMetricDefinition] {
+        metrics.filter { $0.kind == .builtIn }
+    }
+
+    /// Active custom metrics first, then archived (archived still shown so
+    /// their history stays reachable, per M1B-FR-023).
+    var customMetrics: [BodyMetricDefinition] {
+        metrics.filter { $0.kind == .custom }
+            .sorted { ($0.lifecycle == .active ? 0 : 1) < ($1.lifecycle == .active ? 0 : 1) }
+    }
+
+    func reload() async {
+        do {
+            metrics = try await useCases.metrics(studentID: studentID)
+            errorMessage = nil
+        } catch {
+            errorMessage =
+                (error as? LocalizedError)?.errorDescription
+                ?? String(localized: "bodyData.error.generic")
+        }
+    }
+
+    func createCustomMetric() async {
+        do {
+            _ = try await useCases.createCustomMetric(
+                studentID: studentID,
+                name: newMetricName,
+                unit: newMetricUnit
+            )
+            newMetricName = ""
+            newMetricUnit = ""
+            showingNewCustomMetric = false
+            await reload()
+        } catch {
+            errorMessage =
+                (error as? LocalizedError)?.errorDescription
+                ?? String(localized: "bodyData.error.generic")
+        }
+    }
+
+    func toggleArchive(_ metric: BodyMetricDefinition) async {
+        do {
+            if metric.lifecycle == .active {
+                _ = try await useCases.archiveCustomMetric(id: metric.id)
+            } else {
+                _ = try await useCases.restoreCustomMetric(id: metric.id)
+            }
+            await reload()
+        } catch {
+            errorMessage =
+                (error as? LocalizedError)?.errorDescription
+                ?? String(localized: "bodyData.error.generic")
+        }
+    }
+
+    /// Deletion is only possible with zero recorded measurements
+    /// (M1B-FR-023/D-009) -- `deleteCustomMetricIfUnused` counts live and
+    /// refuses otherwise; this surfaces that refusal as a real message
+    /// rather than a silent no-op.
+    func deleteIfUnused(_ metric: BodyMetricDefinition) async {
+        do {
+            try await useCases.deleteCustomMetricIfUnused(id: metric.id)
+            await reload()
+        } catch DomainError.conflict {
+            errorMessage = String(localized: "bodyData.deleteBlocked")
+        } catch {
+            errorMessage =
+                (error as? LocalizedError)?.errorDescription
+                ?? String(localized: "bodyData.error.generic")
+        }
+    }
+}
+
+struct BodyDataListView: View {
+    @StateObject private var viewModel: BodyDataListViewModel
+    @Binding var path: [RootDestination]
+
+    init(studentID: StableUUID, useCases: BodyDataUseCases, path: Binding<[RootDestination]>) {
+        _viewModel = StateObject(wrappedValue: BodyDataListViewModel(studentID: studentID, useCases: useCases))
+        _path = path
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+                if let errorMessage = viewModel.errorMessage {
+                    Text(errorMessage).foregroundStyle(FCSemanticColors.destructive)
+                }
+
+                if viewModel.metrics.isEmpty {
+                    Text(String(localized: "bodyData.empty"))
+                        .foregroundStyle(FCSemanticColors.secondaryText)
+                        .accessibilityIdentifier(FCAccessibilityID.bodyDataEmptyState)
+                }
+
+                sectionTitle(String(localized: "bodyData.builtInSection"))
+                ForEach(viewModel.builtInMetrics) { metric in
+                    metricRow(metric)
+                }
+
+                if !viewModel.customMetrics.isEmpty {
+                    Divider()
+                    sectionTitle(String(localized: "bodyData.customSection"))
+                    ForEach(viewModel.customMetrics) { metric in
+                        metricRow(metric)
+                    }
+                }
+
+                FCButton(title: String(localized: "bodyData.addCustomMetric")) {
+                    viewModel.showingNewCustomMetric = true
+                }
+                .accessibilityIdentifier(FCAccessibilityID.bodyDataAddCustomMetric)
+            }
+            .padding(FCPrimitives.spacingMedium)
+        }
+        .background(FCSemanticColors.background)
+        .navigationTitle(String(localized: "bodyData.title"))
+        .navigationBarTitleDisplayMode(.inline)
+        .accessibilityIdentifier(FCAccessibilityID.bodyDataListRoot)
+        .task { await viewModel.reload() }
+        .sheet(isPresented: $viewModel.showingNewCustomMetric) {
+            newCustomMetricSheet
+        }
+    }
+
+    private var newCustomMetricSheet: some View {
+        VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+            Text(String(localized: "bodyData.newCustomMetric.title"))
+                .font(.title3.weight(.semibold))
+            FCTextField(String(localized: "bodyData.newCustomMetric.namePlaceholder"), text: $viewModel.newMetricName)
+            FCTextField(String(localized: "bodyData.newCustomMetric.unitPlaceholder"), text: $viewModel.newMetricUnit)
+            FCButton(title: String(localized: "bodyData.newCustomMetric.save")) {
+                Task { await viewModel.createCustomMetric() }
+            }
+            Button(String(localized: "bodyData.newCustomMetric.cancel")) {
+                viewModel.showingNewCustomMetric = false
+            }
+            .frame(minHeight: 44)
+        }
+        .padding(FCPrimitives.spacingMedium)
+        .background(FCSemanticColors.background)
+    }
+
+    private func sectionTitle(_ text: String) -> some View {
+        Text(text)
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(FCSemanticColors.secondaryText)
+    }
+
+    private func metricRow(_ metric: BodyMetricDefinition) -> some View {
+        HStack {
+            Button {
+                path.append(
+                    .bodyMeasurementEntry(studentID: viewModel.studentID.rawValue, metricID: metric.id.rawValue))
+            } label: {
+                VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
+                    HStack {
+                        Text(metric.name.value)
+                            .font(.headline)
+                            .foregroundStyle(FCSemanticColors.primaryText)
+                        if metric.lifecycle == .archived {
+                            Text(String(localized: "bodyData.archived"))
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(FCSemanticColors.secondaryText)
+                        }
+                    }
+                    Text(metric.currentUnit)
+                        .font(.caption)
+                        .foregroundStyle(FCSemanticColors.secondaryText)
+                }
+                .padding(FCPrimitives.spacingMedium)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(FCSemanticColors.elevatedSurface)
+                .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusMedium))
+            }
+            .buttonStyle(.plain)
+        }
+        .accessibilityIdentifier(FCAccessibilityID.bodyDataMetricRow(metric.id))
+        .contextMenu {
+            if metric.kind == .custom {
+                Button(
+                    metric.lifecycle == .active
+                        ? String(localized: "bodyData.archive")
+                        : String(localized: "bodyData.restore")
+                ) {
+                    Task { await viewModel.toggleArchive(metric) }
+                }
+                Button(String(localized: "bodyData.delete"), role: .destructive) {
+                    Task { await viewModel.deleteIfUnused(metric) }
+                }
+            }
+        }
+    }
+}

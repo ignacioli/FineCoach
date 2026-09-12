@@ -116,6 +116,16 @@ struct StudentDetailView: View {
                     }
                     .accessibilityIdentifier(FCAccessibilityID.detailCoursePackages)
 
+                    FCButton(title: String(localized: "student.detail.bodyData")) {
+                        path.append(.bodyData(student.id.rawValue))
+                    }
+                    .accessibilityIdentifier(FCAccessibilityID.detailBodyData)
+
+                    FCButton(title: String(localized: "student.detail.trends")) {
+                        path.append(.trends(student.id.rawValue))
+                    }
+                    .accessibilityIdentifier(FCAccessibilityID.detailTrends)
+
                     Button {
                         path.append(.history(student.id.rawValue))
                     } label: {

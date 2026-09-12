@@ -150,6 +150,9 @@
 		B604 /* BodyDataUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A604 /* BodyDataUseCases.swift */; };
 		B605 /* BodyMetricManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A605 /* BodyMetricManagedObject+Mapping.swift */; };
 		B606 /* CoreDataBodyDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A606 /* CoreDataBodyDataRepository.swift */; };
+		B607 /* BodyDataListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A607 /* BodyDataListView.swift */; };
+		B608 /* BodyMeasurementEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A608 /* BodyMeasurementEntryView.swift */; };
+		B609 /* TrendsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A609 /* TrendsView.swift */; };
 		B544 /* SessionSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A544 /* SessionSection.swift */; };
 		B545 /* TrainingTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A545 /* TrainingTemplate.swift */; };
 		B546 /* TemplateUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A546 /* TemplateUseCases.swift */; };
@@ -356,6 +359,9 @@
 		A604 /* BodyDataUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BodyDataUseCases.swift"; sourceTree = "<group>"; };
 		A605 /* BodyMetricManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BodyMetricManagedObject+Mapping.swift"; sourceTree = "<group>"; };
 		A606 /* CoreDataBodyDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoreDataBodyDataRepository.swift"; sourceTree = "<group>"; };
+		A607 /* BodyDataListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BodyDataListView.swift"; sourceTree = "<group>"; };
+		A608 /* BodyMeasurementEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BodyMeasurementEntryView.swift"; sourceTree = "<group>"; };
+		A609 /* TrendsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TrendsView.swift"; sourceTree = "<group>"; };
 		A547 /* TemplateManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TemplateManagedObject+Mapping.swift"; sourceTree = "<group>"; };
 		A548 /* CoreDataTemplateRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoreDataTemplateRepository.swift"; sourceTree = "<group>"; };
 		A549 /* SessionSectionManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SessionSectionManagedObject+Mapping.swift"; sourceTree = "<group>"; };
@@ -621,6 +627,23 @@
 			path = Templates;
 			sourceTree = "<group>";
 		};
+		A610 /* BodyData */ = {
+			isa = PBXGroup;
+			children = (
+				A607 /* BodyDataListView.swift */,
+				A608 /* BodyMeasurementEntryView.swift */,
+			);
+			path = BodyData;
+			sourceTree = "<group>";
+		};
+		A611 /* Trends */ = {
+			isa = PBXGroup;
+			children = (
+				A609 /* TrendsView.swift */,
+			);
+			path = Trends;
+			sourceTree = "<group>";
+		};
 		A404 /* Features */ = {
 			isa = PBXGroup;
 			children = (
@@ -630,6 +653,8 @@
 				A528 /* Appointments */,
 				A539 /* CoursePackages */,
 				A553 /* Templates */,
+				A610 /* BodyData */,
+				A611 /* Trends */,
 				A441 /* ExerciseLibrary */,
 				A442 /* ActiveSession */,
 				A443 /* History */,
@@ -1489,6 +1514,9 @@
 				B604 /* BodyDataUseCases.swift in Sources */,
 				B605 /* BodyMetricManagedObject+Mapping.swift in Sources */,
 				B606 /* CoreDataBodyDataRepository.swift in Sources */,
+				B607 /* BodyDataListView.swift in Sources */,
+				B608 /* BodyMeasurementEntryView.swift in Sources */,
+				B609 /* TrendsView.swift in Sources */,
 				B535 /* CoursePackageListView.swift in Sources */,
 				B536 /* CoursePackageEditorView.swift in Sources */,
 				B537 /* ManualCreditAdjustmentView.swift in Sources */,

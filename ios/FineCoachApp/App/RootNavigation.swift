@@ -21,6 +21,9 @@ enum RootDestination: Hashable {
     case templates
     case templateEditor(UUID)
     case applyTemplate
+    case bodyData(UUID)
+    case bodyMeasurementEntry(studentID: UUID, metricID: UUID)
+    case trends(UUID)
     case placeholder(PlaceholderKind)
 }
 
@@ -218,6 +221,24 @@ struct RootNavigation: View {
                                     templateUseCases: environment.requireTemplateUseCases(),
                                     sessionUseCases: environment.requireSessionUseCases(),
                                     path: $path
+                                )
+                            case .bodyData(let studentID):
+                                BodyDataListView(
+                                    studentID: StableUUID(studentID),
+                                    useCases: environment.requireBodyDataUseCases(),
+                                    path: $path
+                                )
+                            case .bodyMeasurementEntry(let studentID, let metricID):
+                                BodyMeasurementEntryView(
+                                    studentID: StableUUID(studentID),
+                                    metricID: StableUUID(metricID),
+                                    useCases: environment.requireBodyDataUseCases()
+                                )
+                            case .trends(let studentID):
+                                TrendsView(
+                                    studentID: StableUUID(studentID),
+                                    historyUseCases: environment.requireHistoryUseCases(),
+                                    calendarProvider: SystemLocalCalendarProvider()
                                 )
                             case .placeholder(let kind):
                                 PlaceholderDestinationView(kind: kind)

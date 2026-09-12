@@ -105,6 +105,33 @@ public enum FCAccessibilityID {
         "coursePackages.row.\(id.rawValue.uuidString)"
     }
 
+    public static let bodyDataListRoot = "bodyData.root"
+    public static let bodyDataAddCustomMetric = "bodyData.addCustomMetric"
+    public static let bodyDataEmptyState = "bodyData.emptyState"
+
+    public static func bodyDataMetricRow(_ id: StableUUID) -> String {
+        "bodyData.metricRow.\(id.rawValue.uuidString)"
+    }
+
+    public static let bodyMeasurementEntryRoot = "bodyMeasurementEntry.root"
+    public static let bodyMeasurementEntryValueField = "bodyMeasurementEntry.valueField"
+    public static let bodyMeasurementEntrySave = "bodyMeasurementEntry.save"
+
+    public static func bodyMeasurementRow(_ id: StableUUID) -> String {
+        "bodyMeasurementEntry.row.\(id.rawValue.uuidString)"
+    }
+
+    public static let bodyMeasurementDeleteConfirm = "bodyMeasurementEntry.deleteConfirm"
+
+    public static let trendsRoot = "trends.root"
+    public static let trendsFilterDateRange = "trends.filterDateRange"
+    public static let trendsFilterFocus = "trends.filterFocus"
+    public static let trendsFilterExercise = "trends.filterExercise"
+    public static let trendsNoMatches = "trends.noMatches"
+    public static let trendsComparisonSection = "trends.comparisonSection"
+    public static let trendsExerciseTrendSection = "trends.exerciseTrendSection"
+    public static let trendsPersonalRecordSection = "trends.personalRecordSection"
+
     public static let coursePackageEditorRoot = "coursePackageEditor.root"
     public static let coursePackageEditorName = "coursePackageEditor.name"
     public static let coursePackageEditorTotalCredits = "coursePackageEditor.totalCredits"
@@ -136,6 +163,8 @@ public enum FCAccessibilityID {
     public static let detailBackup = "studentDetail.backup"
     public static let detailArchivedStatus = "studentDetail.archivedStatus"
     public static let detailCoursePackages = "studentDetail.coursePackages"
+    public static let detailBodyData = "studentDetail.bodyData"
+    public static let detailTrends = "studentDetail.trends"
 
     public static let archiveConfirm = "archive.confirm"
     public static let deleteName = "deleteStudent.confirmName"
