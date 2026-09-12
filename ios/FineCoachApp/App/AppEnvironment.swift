@@ -13,6 +13,7 @@ public final class AppEnvironment: ObservableObject {
     public private(set) var appointmentUseCases: AppointmentUseCases?
     public private(set) var creditLedgerUseCases: CreditLedgerUseCases?
     public private(set) var templateUseCases: TemplateUseCases?
+    public private(set) var bodyDataUseCases: BodyDataUseCases?
     public private(set) var backupCoordinator: BackupCoordinator?
     public let startupErrorDescription: String?
     @Published public private(set) var catalogUnavailableMessage: String?
@@ -27,7 +28,7 @@ public final class AppEnvironment: ObservableObject {
     public var isStorageAvailable: Bool {
         persistenceController != nil && persistenceWriter != nil && studentUseCases != nil
             && sessionUseCases != nil && exerciseUseCases != nil && historyUseCases != nil
-            && creditLedgerUseCases != nil && templateUseCases != nil
+            && creditLedgerUseCases != nil && templateUseCases != nil && bodyDataUseCases != nil
     }
 
     public static func bootstrap() -> AppEnvironment {
@@ -112,6 +113,13 @@ public final class AppEnvironment: ObservableObject {
             preconditionFailure("Template use cases require available local storage.")
         }
         return templateUseCases
+    }
+
+    func requireBodyDataUseCases() -> BodyDataUseCases {
+        guard let bodyDataUseCases else {
+            preconditionFailure("Body data use cases require available local storage.")
+        }
+        return bodyDataUseCases
     }
 
     func requireCalendar() -> Calendar {
@@ -293,6 +301,7 @@ public final class AppEnvironment: ObservableObject {
         self.appointmentUseCases = nil
         self.creditLedgerUseCases = nil
         self.templateUseCases = nil
+        self.bodyDataUseCases = nil
         self.backupCoordinator = nil
         self.reportsRootURL = nil
         self.shareAdapter = nil
@@ -325,6 +334,7 @@ public final class AppEnvironment: ObservableObject {
         self.appointmentUseCases = nil
         self.creditLedgerUseCases = nil
         self.templateUseCases = nil
+        self.bodyDataUseCases = nil
         self.backupCoordinator = nil
         self.reportsRootURL = nil
         self.shareAdapter = nil
@@ -433,6 +443,12 @@ public final class AppEnvironment: ObservableObject {
             templateRepository: CoreDataTemplateRepository(writer: controller.writer),
             sectionRepository: CoreDataSessionSectionRepository(writer: controller.writer),
             clock: clock,
+            ids: idGenerator
+        )
+        bodyDataUseCases = BodyDataUseCases(
+            repository: CoreDataBodyDataRepository(writer: controller.writer),
+            clock: clock,
+            calendarProvider: SystemLocalCalendarProvider(),
             ids: idGenerator
         )
         reportsRootURL = root

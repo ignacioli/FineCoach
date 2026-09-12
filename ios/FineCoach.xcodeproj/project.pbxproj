@@ -144,6 +144,12 @@
 		B532 /* CreditLedgerUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A532 /* CreditLedgerUseCases.swift */; };
 		B533 /* CoursePackageManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A533 /* CoursePackageManagedObject+Mapping.swift */; };
 		B534 /* CoreDataCoursePackageRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A534 /* CoreDataCoursePackageRepository.swift */; };
+		B601 /* BodyMetric.swift in Sources */ = {isa = PBXBuildFile; fileRef = A601 /* BodyMetric.swift */; };
+		B602 /* BodyMeasurement.swift in Sources */ = {isa = PBXBuildFile; fileRef = A602 /* BodyMeasurement.swift */; };
+		B603 /* Comparison.swift in Sources */ = {isa = PBXBuildFile; fileRef = A603 /* Comparison.swift */; };
+		B604 /* BodyDataUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A604 /* BodyDataUseCases.swift */; };
+		B605 /* BodyMetricManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A605 /* BodyMetricManagedObject+Mapping.swift */; };
+		B606 /* CoreDataBodyDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A606 /* CoreDataBodyDataRepository.swift */; };
 		B544 /* SessionSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A544 /* SessionSection.swift */; };
 		B545 /* TrainingTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A545 /* TrainingTemplate.swift */; };
 		B546 /* TemplateUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A546 /* TemplateUseCases.swift */; };
@@ -344,6 +350,12 @@
 		A546 /* TemplateUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TemplateUseCases.swift"; sourceTree = "<group>"; };
 		A533 /* CoursePackageManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoursePackageManagedObject+Mapping.swift"; sourceTree = "<group>"; };
 		A534 /* CoreDataCoursePackageRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoreDataCoursePackageRepository.swift"; sourceTree = "<group>"; };
+		A601 /* BodyMetric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BodyMetric.swift"; sourceTree = "<group>"; };
+		A602 /* BodyMeasurement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BodyMeasurement.swift"; sourceTree = "<group>"; };
+		A603 /* Comparison.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Comparison.swift"; sourceTree = "<group>"; };
+		A604 /* BodyDataUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BodyDataUseCases.swift"; sourceTree = "<group>"; };
+		A605 /* BodyMetricManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BodyMetricManagedObject+Mapping.swift"; sourceTree = "<group>"; };
+		A606 /* CoreDataBodyDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoreDataBodyDataRepository.swift"; sourceTree = "<group>"; };
 		A547 /* TemplateManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TemplateManagedObject+Mapping.swift"; sourceTree = "<group>"; };
 		A548 /* CoreDataTemplateRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoreDataTemplateRepository.swift"; sourceTree = "<group>"; };
 		A549 /* SessionSectionManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SessionSectionManagedObject+Mapping.swift"; sourceTree = "<group>"; };
@@ -689,6 +701,9 @@
 				A531 /* CoursePackage.swift */,
 				A544 /* SessionSection.swift */,
 				A545 /* TrainingTemplate.swift */,
+				A601 /* BodyMetric.swift */,
+				A602 /* BodyMeasurement.swift */,
+				A603 /* Comparison.swift */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -709,6 +724,7 @@
 				A514 /* AppointmentUseCases.swift */,
 				A532 /* CreditLedgerUseCases.swift */,
 				A546 /* TemplateUseCases.swift */,
+				A604 /* BodyDataUseCases.swift */,
 			);
 			path = Application;
 			sourceTree = "<group>";
@@ -751,6 +767,8 @@
 				A547 /* TemplateManagedObject+Mapping.swift */,
 				A548 /* CoreDataTemplateRepository.swift */,
 				A549 /* SessionSectionManagedObject+Mapping.swift */,
+				A605 /* BodyMetricManagedObject+Mapping.swift */,
+				A606 /* CoreDataBodyDataRepository.swift */,
 				A14A /* HistoryReportManagedObject+Mapping.swift */,
 				A175 /* FineCoachModel.xcdatamodeld */,
 			);
@@ -1465,6 +1483,12 @@
 				B550 /* TemplateListView.swift in Sources */,
 				B551 /* TemplateEditorView.swift in Sources */,
 				B552 /* ApplyTemplateView.swift in Sources */,
+				B601 /* BodyMetric.swift in Sources */,
+				B602 /* BodyMeasurement.swift in Sources */,
+				B603 /* Comparison.swift in Sources */,
+				B604 /* BodyDataUseCases.swift in Sources */,
+				B605 /* BodyMetricManagedObject+Mapping.swift in Sources */,
+				B606 /* CoreDataBodyDataRepository.swift in Sources */,
 				B535 /* CoursePackageListView.swift in Sources */,
 				B536 /* CoursePackageEditorView.swift in Sources */,
 				B537 /* ManualCreditAdjustmentView.swift in Sources */,
