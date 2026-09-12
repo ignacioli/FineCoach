@@ -1,5 +1,36 @@
 import Foundation
 
+/// Multi-criterion filter for `HistoryUseCases.filteredHistory` (M1B-FR-026).
+/// All three criteria are optional and independently combinable; `nil` means
+/// "don't filter on this criterion".
+public struct HistoryFilterCriteria: Equatable, Sendable {
+    public var dateRange: ClosedRange<LocalDate>?
+    public var trainingFocus: String?
+    public var exerciseID: StableExerciseID?
+
+    public init(
+        dateRange: ClosedRange<LocalDate>? = nil,
+        trainingFocus: String? = nil,
+        exerciseID: StableExerciseID? = nil
+    ) {
+        self.dateRange = dateRange
+        self.trainingFocus = trainingFocus
+        self.exerciseID = exerciseID
+    }
+
+    public var isEmpty: Bool {
+        dateRange == nil && trainingFocus == nil && exerciseID == nil
+    }
+}
+
+/// Explicit empty-state contract (M1B-FR-026): a real "no matches" result the
+/// UI renders as a real empty state, never an ambiguous nil/empty array the
+/// caller has to interpret.
+public enum HistoryFilterResult: Sendable {
+    case matches([CompletedSession])
+    case noMatches
+}
+
 public struct HistoryUseCases: Sendable {
     private let sessionRepository: CoreDataSessionRepository
     private let clock: any Clock
@@ -89,6 +120,35 @@ public struct HistoryUseCases: Sendable {
             return report
         }
         return try await sessionRepository.updateShareReport(updated)
+    }
+
+    /// Applies `criteria` to this Student's completed-session history,
+    /// deriving `localCalendarDay` comparisons through the injected
+    /// `LocalCalendarProvider` (T007a) rather than `Calendar.current`.
+    public func filteredHistory(
+        studentID: StableUUID,
+        criteria: HistoryFilterCriteria,
+        calendarProvider: any LocalCalendarProvider
+    ) async throws -> HistoryFilterResult {
+        let all = try await listHistory(studentID: studentID)
+        guard !criteria.isEmpty else {
+            return all.isEmpty ? .noMatches : .matches(all)
+        }
+        let calendar = calendarProvider.currentCalendar()
+        let filtered = all.filter { session in
+            if let dateRange = criteria.dateRange {
+                let day = LocalDate(date: session.completedAtUTC, calendar: calendar)
+                guard dateRange.contains(day) else { return false }
+            }
+            if let trainingFocus = criteria.trainingFocus {
+                guard session.trainingFocus?.value == trainingFocus else { return false }
+            }
+            if let exerciseID = criteria.exerciseID {
+                guard session.exercises.contains(where: { $0.sourceID == exerciseID }) else { return false }
+            }
+            return true
+        }
+        return filtered.isEmpty ? .noMatches : .matches(filtered)
     }
 
     private func optionalText(_ rawValue: String) throws -> ValidatedText? {
