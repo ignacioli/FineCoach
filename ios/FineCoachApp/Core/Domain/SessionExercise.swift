@@ -15,6 +15,12 @@ public struct SessionExercise: Hashable, Codable, Sendable, Identifiable {
     public let displayNameSnapshot: NormalizedName
     public let recordModeSnapshot: RecordMode
     public let actionPrivateNote: ValidatedText?
+    /// Optional `SessionSection` this Exercise belongs to (M1B-FR-020/021).
+    /// `nil` means "unsectioned" -- it lives directly in the Session's flat,
+    /// unified `orderIndex` axis alongside any Section headers. A blank
+    /// Session defaults to entirely unsectioned Exercises; Sections are
+    /// opt-in and never forced (data-model §2.7).
+    public let sectionID: StableUUID?
     public let sets: [TrainingSet]
 
     public var hasCompletedSet: Bool {
@@ -30,6 +36,7 @@ public struct SessionExercise: Hashable, Codable, Sendable, Identifiable {
         displayNameSnapshot: NormalizedName,
         recordModeSnapshot: RecordMode,
         actionPrivateNote: ValidatedText?,
+        sectionID: StableUUID? = nil,
         sets: [TrainingSet]
     ) {
         self.id = id
@@ -40,6 +47,7 @@ public struct SessionExercise: Hashable, Codable, Sendable, Identifiable {
         self.displayNameSnapshot = displayNameSnapshot
         self.recordModeSnapshot = recordModeSnapshot
         self.actionPrivateNote = actionPrivateNote
+        self.sectionID = sectionID
         self.sets = sets
     }
 
@@ -53,6 +61,24 @@ public struct SessionExercise: Hashable, Codable, Sendable, Identifiable {
             displayNameSnapshot: displayNameSnapshot,
             recordModeSnapshot: recordModeSnapshot,
             actionPrivateNote: actionPrivateNote,
+            sectionID: sectionID,
+            sets: sets.enumerated().map { offset, trainingSet in
+                trainingSet.relocating(sessionExerciseID: id, orderIndex: UInt32(offset))
+            }
+        )
+    }
+
+    func relocating(orderIndex: UInt32, sectionID: StableUUID?) -> SessionExercise {
+        SessionExercise(
+            id: id,
+            sessionID: sessionID,
+            orderIndex: orderIndex,
+            sourceKind: sourceKind,
+            sourceID: sourceID,
+            displayNameSnapshot: displayNameSnapshot,
+            recordModeSnapshot: recordModeSnapshot,
+            actionPrivateNote: actionPrivateNote,
+            sectionID: sectionID,
             sets: sets.enumerated().map { offset, trainingSet in
                 trainingSet.relocating(sessionExerciseID: id, orderIndex: UInt32(offset))
             }
@@ -69,6 +95,7 @@ public struct SessionExercise: Hashable, Codable, Sendable, Identifiable {
             displayNameSnapshot: displayNameSnapshot,
             recordModeSnapshot: recordModeSnapshot,
             actionPrivateNote: note,
+            sectionID: sectionID,
             sets: sets
         )
     }
@@ -83,6 +110,7 @@ public struct SessionExercise: Hashable, Codable, Sendable, Identifiable {
             displayNameSnapshot: displayNameSnapshot,
             recordModeSnapshot: recordModeSnapshot,
             actionPrivateNote: actionPrivateNote,
+            sectionID: sectionID,
             sets: sets.enumerated().map { offset, trainingSet in
                 trainingSet.relocating(sessionExerciseID: id, orderIndex: UInt32(offset))
             }
