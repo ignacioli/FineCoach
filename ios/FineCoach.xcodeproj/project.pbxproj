@@ -150,6 +150,9 @@
 		B547 /* TemplateManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A547 /* TemplateManagedObject+Mapping.swift */; };
 		B548 /* CoreDataTemplateRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A548 /* CoreDataTemplateRepository.swift */; };
 		B549 /* SessionSectionManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A549 /* SessionSectionManagedObject+Mapping.swift */; };
+		B550 /* TemplateListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A550 /* TemplateListView.swift */; };
+		B551 /* TemplateEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A551 /* TemplateEditorView.swift */; };
+		B552 /* ApplyTemplateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A552 /* ApplyTemplateView.swift */; };
 		B535 /* CoursePackageListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A535 /* CoursePackageListView.swift */; };
 		B536 /* CoursePackageEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A536 /* CoursePackageEditorView.swift */; };
 		B537 /* ManualCreditAdjustmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A537 /* ManualCreditAdjustmentView.swift */; };
@@ -343,6 +346,9 @@
 		A547 /* TemplateManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TemplateManagedObject+Mapping.swift"; sourceTree = "<group>"; };
 		A548 /* CoreDataTemplateRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoreDataTemplateRepository.swift"; sourceTree = "<group>"; };
 		A549 /* SessionSectionManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SessionSectionManagedObject+Mapping.swift"; sourceTree = "<group>"; };
+		A550 /* TemplateListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TemplateListView.swift"; sourceTree = "<group>"; };
+		A551 /* TemplateEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TemplateEditorView.swift"; sourceTree = "<group>"; };
+		A552 /* ApplyTemplateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ApplyTemplateView.swift"; sourceTree = "<group>"; };
 		A535 /* CoursePackageListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoursePackageListView.swift"; sourceTree = "<group>"; };
 		A536 /* CoursePackageEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoursePackageEditorView.swift"; sourceTree = "<group>"; };
 		A537 /* ManualCreditAdjustmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualCreditAdjustmentView.swift"; sourceTree = "<group>"; };
@@ -591,6 +597,16 @@
 			path = CoursePackages;
 			sourceTree = "<group>";
 		};
+		A553 /* Templates */ = {
+			isa = PBXGroup;
+			children = (
+				A550 /* TemplateListView.swift */,
+				A551 /* TemplateEditorView.swift */,
+				A552 /* ApplyTemplateView.swift */,
+			);
+			path = Templates;
+			sourceTree = "<group>";
+		};
 		A404 /* Features */ = {
 			isa = PBXGroup;
 			children = (
@@ -599,6 +615,7 @@
 				A526 /* Calendar */,
 				A528 /* Appointments */,
 				A539 /* CoursePackages */,
+				A553 /* Templates */,
 				A441 /* ExerciseLibrary */,
 				A442 /* ActiveSession */,
 				A443 /* History */,
@@ -1434,6 +1451,9 @@
 				B547 /* TemplateManagedObject+Mapping.swift in Sources */,
 				B548 /* CoreDataTemplateRepository.swift in Sources */,
 				B549 /* SessionSectionManagedObject+Mapping.swift in Sources */,
+				B550 /* TemplateListView.swift in Sources */,
+				B551 /* TemplateEditorView.swift in Sources */,
+				B552 /* ApplyTemplateView.swift in Sources */,
 				B535 /* CoursePackageListView.swift in Sources */,
 				B536 /* CoursePackageEditorView.swift in Sources */,
 				B537 /* ManualCreditAdjustmentView.swift in Sources */,

@@ -9,12 +9,14 @@ struct ActiveSessionView: View {
     init(
         studentID: StableUUID,
         useCases: ActiveSessionUseCases,
+        templateUseCases: TemplateUseCases? = nil,
         path: Binding<[RootDestination]>
     ) {
         _viewModel = StateObject(
             wrappedValue: ActiveSessionViewModel(
                 studentID: studentID,
-                useCases: useCases
+                useCases: useCases,
+                templateUseCases: templateUseCases
             )
         )
         _path = path
@@ -49,6 +51,7 @@ struct ActiveSessionView: View {
 
                 if let session = viewModel.session {
                     ForEach(Array(session.exercises.enumerated()), id: \.element.id) { index, exercise in
+                        sectionHeaderIfNeeded(before: exercise, in: session, at: index)
                         exerciseCard(exercise, index: index)
                     }
                 }
@@ -60,6 +63,11 @@ struct ActiveSessionView: View {
                         viewModel.isAddingExercise = true
                     }
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionAddExercise)
+                }
+
+                if viewModel.session?.state == .inProgress {
+                    Divider()
+                    templateAndSectionControls
                 }
             }
             .padding(FCPrimitives.spacingMedium)
@@ -88,6 +96,21 @@ struct ActiveSessionView: View {
         .navigationTitle(String(localized: "session.title"))
         .navigationBarTitleDisplayMode(.inline)
         .task { await viewModel.load() }
+        .confirmationDialog(
+            String(localized: "activeSession.deleteSection"),
+            isPresented: Binding(
+                get: { viewModel.pendingSectionDeletion != nil },
+                set: { if !$0 { viewModel.pendingSectionDeletion = nil } }
+            ),
+            presenting: viewModel.pendingSectionDeletion
+        ) { section in
+            Button(String(localized: "templateEditor.deleteSection.moveOut")) {
+                Task { await viewModel.deleteSection(section, disposition: .moveExercisesTo(sectionID: nil)) }
+            }
+            Button(String(localized: "templateEditor.deleteSection.deleteExercises"), role: .destructive) {
+                Task { await viewModel.deleteSection(section, disposition: .deleteWithExercises) }
+            }
+        }
         .onChange(of: viewModel.session?.state) { _, state in
             guard state == .completed, !didPushSummary, let sessionID = viewModel.session?.id else {
                 return
@@ -198,6 +221,18 @@ struct ActiveSessionView: View {
                     .frame(minHeight: 44)
                     .foregroundStyle(FCSemanticColors.destructive)
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionDeleteExercise)
+
+                    Menu(String(localized: "activeSession.moveToSection")) {
+                        Button(String(localized: "activeSession.unsectioned")) {
+                            Task { await viewModel.moveExercise(exercise.id, toSectionID: nil) }
+                        }
+                        ForEach(viewModel.orderedSections) { section in
+                            Button(section.name.value) {
+                                Task { await viewModel.moveExercise(exercise.id, toSectionID: section.id) }
+                            }
+                        }
+                    }
+                    .frame(minHeight: 44)
                 }
                 SetEditor(viewModel: viewModel, exercise: exercise)
             }
@@ -205,6 +240,69 @@ struct ActiveSessionView: View {
         .padding(FCPrimitives.spacingSmall)
         .background(FCSemanticColors.elevatedSurface)
         .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSmall))
+    }
+
+    /// Shows a Section header immediately before the first Exercise that
+    /// belongs to it (M1B-FR-020/021: unsectioned Exercises and Sections
+    /// coexist with an unambiguous combined order -- `session.exercises` is
+    /// already sorted by the unified `orderIndex` axis, so this only needs
+    /// to detect the boundary where `sectionID` changes).
+    @ViewBuilder
+    private func sectionHeaderIfNeeded(before exercise: SessionExercise, in session: Session, at index: Int) -> some View {
+        let previousSectionID = index > 0 ? session.exercises[index - 1].sectionID : nil
+        if let sectionID = exercise.sectionID, sectionID != previousSectionID,
+            let section = viewModel.sections.first(where: { $0.id == sectionID })
+        {
+            HStack {
+                Text(section.name.value)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(FCSemanticColors.secondaryText)
+                Spacer()
+                if viewModel.session?.state == .inProgress {
+                    Button(String(localized: "activeSession.deleteSection")) {
+                        viewModel.requestDeleteSection(section)
+                    }
+                    .frame(minHeight: 44)
+                    .foregroundStyle(FCSemanticColors.destructive)
+                }
+            }
+            .accessibilityIdentifier(FCAccessibilityID.activeSessionSectionHeader(section.id))
+        }
+    }
+
+    private var templateAndSectionControls: some View {
+        VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
+            FCTextField(String(localized: "activeSession.sectionNamePrompt"), text: $viewModel.newSectionName)
+                .accessibilityIdentifier(FCAccessibilityID.activeSessionSectionName)
+            FCButton(title: String(localized: "activeSession.action.createSection")) {
+                Task { await viewModel.createSection() }
+            }
+            .accessibilityIdentifier(FCAccessibilityID.activeSessionCreateSection)
+
+            if viewModel.isSavingAsTemplate {
+                FCTextField(
+                    String(localized: "activeSession.saveAsTemplateNamePrompt"),
+                    text: $viewModel.saveAsTemplateName
+                )
+                .accessibilityIdentifier(FCAccessibilityID.activeSessionSaveAsTemplateName)
+                FCButton(title: String(localized: "activeSession.saveAsTemplateConfirm")) {
+                    Task { await viewModel.saveAsTemplate() }
+                }
+                .accessibilityIdentifier(FCAccessibilityID.activeSessionSaveAsTemplateConfirm)
+            } else {
+                Button(String(localized: "activeSession.action.saveAsTemplate")) {
+                    viewModel.isSavingAsTemplate = true
+                }
+                .frame(minHeight: 44)
+                .accessibilityIdentifier(FCAccessibilityID.activeSessionSaveAsTemplate)
+            }
+
+            Button(String(localized: "activeSession.action.applyTemplate")) {
+                path.append(.applyTemplate)
+            }
+            .frame(minHeight: 44)
+            .accessibilityIdentifier(FCAccessibilityID.activeSessionApplyTemplate)
+        }
     }
 
     private func modeTitle(_ mode: RecordMode) -> String {

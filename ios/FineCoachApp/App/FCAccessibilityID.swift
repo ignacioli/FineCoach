@@ -57,6 +57,44 @@ public enum FCAccessibilityID {
     public static let editorSave = "studentEditor.save"
     public static let editorSkip = "studentEditor.skip"
 
+    public static let templatesEntry = "templates.entry"
+    public static let templateListRoot = "templates.root"
+    public static let templateListAdd = "templates.add"
+    public static let templateListDelete = "templates.delete"
+    public static let templateEditorRoot = "templateEditor.root"
+    public static let templateEditorName = "templateEditor.name"
+    public static let templateEditorAddExercise = "templateEditor.addExercise"
+    public static let templateEditorExerciseName = "templateEditor.exerciseName"
+    public static let templateEditorCreateSection = "templateEditor.createSection"
+    public static let templateEditorSectionName = "templateEditor.sectionName"
+    public static let activeSessionSaveAsTemplate = "activeSession.saveAsTemplate"
+    public static let activeSessionSaveAsTemplateName = "activeSession.saveAsTemplateName"
+    public static let activeSessionSaveAsTemplateConfirm = "activeSession.saveAsTemplateConfirm"
+    public static let activeSessionApplyTemplate = "activeSession.applyTemplate"
+    public static let activeSessionCreateSection = "activeSession.createSection"
+    public static let activeSessionSectionName = "activeSession.sectionName"
+    public static let applyTemplateRoot = "applyTemplate.root"
+
+    public static func templateRow(_ id: StableUUID) -> String {
+        "templates.row.\(id.rawValue.uuidString)"
+    }
+
+    public static func templateExerciseRow(_ id: StableUUID) -> String {
+        "templateEditor.exerciseRow.\(id.rawValue.uuidString)"
+    }
+
+    public static func templateSectionRow(_ id: StableUUID) -> String {
+        "templateEditor.sectionRow.\(id.rawValue.uuidString)"
+    }
+
+    public static func applyTemplateRow(_ id: StableUUID) -> String {
+        "applyTemplate.row.\(id.rawValue.uuidString)"
+    }
+
+    public static func activeSessionSectionHeader(_ id: StableUUID) -> String {
+        "activeSession.sectionHeader.\(id.rawValue.uuidString)"
+    }
+
     public static let coursePackageListRoot = "coursePackages.root"
     public static let coursePackageListAdd = "coursePackages.add"
     public static let coursePackageListEnd = "coursePackages.end"

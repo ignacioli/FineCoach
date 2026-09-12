@@ -71,6 +71,15 @@ public struct ActiveSessionUseCases: Sendable {
         try await sessionRepository.loadActive()
     }
 
+    /// The CURRENT Session's own `SessionSection` rows (T032 UI: grouping
+    /// display + the exclusion set `TemplateUseCases.saveAsTemplate` needs).
+    public func sessionSections() async throws -> [SessionSection] {
+        guard let current = try await coordinator.workingCopy() else {
+            return []
+        }
+        return try await sectionRepository.sections(ownerKind: .session, ownerID: current.id)
+    }
+
     public func addSessionOnlyExercise(displayName: String, recordMode: RecordMode) async throws -> Session {
         let exerciseID = StableUUID(ids.makeID())
         let ownerID = try StableExerciseID(exerciseID.rawValue.uuidString)

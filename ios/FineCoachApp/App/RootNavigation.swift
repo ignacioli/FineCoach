@@ -18,6 +18,9 @@ enum RootDestination: Hashable {
     case coursePackageEditor(UUID)
     case creditAdjustmentTrail(UUID)
     case manualCreditAdjustment(UUID)
+    case templates
+    case templateEditor(UUID)
+    case applyTemplate
     case placeholder(PlaceholderKind)
 }
 
@@ -120,6 +123,7 @@ struct RootNavigation: View {
                                 ActiveSessionView(
                                     studentID: StableUUID(studentID),
                                     useCases: environment.requireSessionUseCases(),
+                                    templateUseCases: environment.templateUseCases,
                                     path: $path
                                 )
                             case .exerciseLibrary:
@@ -197,6 +201,22 @@ struct RootNavigation: View {
                                 ManualCreditAdjustmentView(
                                     packageID: StableUUID(packageID),
                                     useCases: environment.requireCreditLedgerUseCases(),
+                                    path: $path
+                                )
+                            case .templates:
+                                TemplateListView(
+                                    useCases: environment.requireTemplateUseCases(),
+                                    path: $path
+                                )
+                            case .templateEditor(let templateID):
+                                TemplateEditorView(
+                                    templateID: StableUUID(templateID),
+                                    useCases: environment.requireTemplateUseCases()
+                                )
+                            case .applyTemplate:
+                                ApplyTemplateView(
+                                    templateUseCases: environment.requireTemplateUseCases(),
+                                    sessionUseCases: environment.requireSessionUseCases(),
                                     path: $path
                                 )
                             case .placeholder(let kind):

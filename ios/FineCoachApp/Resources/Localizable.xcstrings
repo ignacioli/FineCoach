@@ -3259,6 +3259,369 @@
           }
         }
       }
+    },
+    "templates.entry": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "模板"
+          }
+        }
+      }
+    },
+    "templates.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练模板"
+          }
+        }
+      }
+    },
+    "templates.empty": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂无模板"
+          }
+        }
+      }
+    },
+    "templates.newTemplate": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新建模板"
+          }
+        }
+      }
+    },
+    "templates.newTemplateNamePrompt": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "模板名称"
+          }
+        }
+      }
+    },
+    "templates.delete": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除"
+          }
+        }
+      }
+    },
+    "templates.error.generic": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "操作失败，请重试。"
+          }
+        }
+      }
+    },
+    "templates.exerciseCount": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 个动作"
+          }
+        }
+      }
+    },
+    "templateEditor.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编辑模板"
+          }
+        }
+      }
+    },
+    "templateEditor.name": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "模板名称"
+          }
+        }
+      }
+    },
+    "templateEditor.trainingFocus": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练重点（选填）"
+          }
+        }
+      }
+    },
+    "templateEditor.addExercise": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加动作"
+          }
+        }
+      }
+    },
+    "templateEditor.exerciseNamePrompt": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动作名称"
+          }
+        }
+      }
+    },
+    "templateEditor.removeExercise": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除"
+          }
+        }
+      }
+    },
+    "templateEditor.createSection": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新建分区"
+          }
+        }
+      }
+    },
+    "templateEditor.sectionNamePrompt": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分区名称"
+          }
+        }
+      }
+    },
+    "templateEditor.unsectioned": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未分区"
+          }
+        }
+      }
+    },
+    "templateEditor.deleteSection": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除分区"
+          }
+        }
+      }
+    },
+    "templateEditor.deleteSection.moveOut": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移出到未分区后删除"
+          }
+        }
+      }
+    },
+    "templateEditor.deleteSection.deleteExercises": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连同动作一起删除"
+          }
+        }
+      }
+    },
+    "templateEditor.moveToUnsectioned": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移出分区"
+          }
+        }
+      }
+    },
+    "activeSession.action.saveAsTemplate": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "另存为模板"
+          }
+        }
+      }
+    },
+    "activeSession.action.applyTemplate": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "应用模板"
+          }
+        }
+      }
+    },
+    "activeSession.action.createSection": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新建分区"
+          }
+        }
+      }
+    },
+    "activeSession.saveAsTemplateNamePrompt": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "模板名称"
+          }
+        }
+      }
+    },
+    "activeSession.sectionNamePrompt": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分区名称"
+          }
+        }
+      }
+    },
+    "activeSession.unsectioned": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未分区动作"
+          }
+        }
+      }
+    },
+    "activeSession.moveToSection": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移入分区"
+          }
+        }
+      }
+    },
+    "activeSession.deleteSection": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除分区"
+          }
+        }
+      }
+    },
+    "applyTemplate.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "应用模板"
+          }
+        }
+      }
+    },
+    "applyTemplate.empty": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂无可用模板"
+          }
+        }
+      }
+    },
+    "applyTemplate.confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "应用到当前训练"
+          }
+        }
+      }
+    },
+    "activeSession.saveAsTemplateConfirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存模板"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

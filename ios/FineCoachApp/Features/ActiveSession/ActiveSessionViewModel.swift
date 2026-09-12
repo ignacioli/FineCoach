@@ -40,9 +40,15 @@ final class ActiveSessionViewModel: ObservableObject {
     @Published var selectedExerciseID: StableUUID?
     @Published var presentedSheet: ActiveSessionSheet?
     @Published private(set) var isMutationInFlight = false
+    @Published var sections: [SessionSection] = []
+    @Published var isSavingAsTemplate = false
+    @Published var saveAsTemplateName = ""
+    @Published var newSectionName = ""
+    @Published var pendingSectionDeletion: SessionSection?
 
     let studentID: StableUUID
     let useCases: ActiveSessionUseCases
+    let templateUseCases: TemplateUseCases?
     private let signposts: PerformanceSignposts
     private var catalogSearchGeneration = 0
     private var catalogSearchTask: Task<Void, Never>?
@@ -50,10 +56,12 @@ final class ActiveSessionViewModel: ObservableObject {
     init(
         studentID: StableUUID,
         useCases: ActiveSessionUseCases,
+        templateUseCases: TemplateUseCases? = nil,
         signposts: PerformanceSignposts = .shared
     ) {
         self.studentID = studentID
         self.useCases = useCases
+        self.templateUseCases = templateUseCases
         self.signposts = signposts
     }
 
@@ -86,9 +94,93 @@ final class ActiveSessionViewModel: ObservableObject {
             selectedExerciseID = session?.exercises.last?.id
             errorMessage = nil
             saveStatus = useCases.saveStatus
+            await loadSections()
         } catch {
             present(error)
         }
+    }
+
+    // MARK: - Template save/section management (M1B-FR-018/019/020/021)
+
+    func loadSections() async {
+        sections = (try? await useCases.sessionSections()) ?? []
+    }
+
+    func saveAsTemplate() async {
+        guard let session, let templateUseCases else {
+            return
+        }
+        let name = saveAsTemplateName
+        guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return
+        }
+        do {
+            _ = try await templateUseCases.saveAsTemplate(
+                from: session,
+                existingSessionSections: sections,
+                name: name
+            )
+            saveAsTemplateName = ""
+            isSavingAsTemplate = false
+            errorMessage = nil
+        } catch {
+            present(error)
+        }
+    }
+
+    func createSection() async {
+        let name = newSectionName
+        guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return
+        }
+        do {
+            _ = try await useCases.createSection(name: name)
+            newSectionName = ""
+            await loadSections()
+        } catch {
+            present(error)
+        }
+    }
+
+    func moveExercise(_ exerciseID: StableUUID, toSectionID sectionID: StableUUID?) async {
+        await run {
+            self.session = try await self.useCases.moveExerciseToSection(
+                exerciseID: exerciseID,
+                toSectionID: sectionID
+            )
+        }
+    }
+
+    /// Non-empty Sections MUST require an explicit disposition
+    /// (M1B-FR-020/021) -- routes through `pendingSectionDeletion` so there
+    /// is no direct action that skips the choice.
+    func requestDeleteSection(_ section: SessionSection) {
+        let hasMembers = session?.exercises.contains { $0.sectionID == section.id } ?? false
+        guard hasMembers else {
+            Task { await deleteSection(section, disposition: .deleteWithExercises) }
+            return
+        }
+        pendingSectionDeletion = section
+    }
+
+    func deleteSection(_ section: SessionSection, disposition: SessionSectionDeletionDisposition) async {
+        await run {
+            self.session = try await self.useCases.deleteSection(sectionID: section.id, disposition: disposition)
+        }
+        pendingSectionDeletion = nil
+        await loadSections()
+    }
+
+    func unsectionedExercises(in session: Session) -> [SessionExercise] {
+        session.exercises.filter { $0.sectionID == nil }
+    }
+
+    func exercises(in section: SessionSection, of session: Session) -> [SessionExercise] {
+        session.exercises.filter { $0.sectionID == section.id }
+    }
+
+    var orderedSections: [SessionSection] {
+        sections.sorted { $0.orderIndex < $1.orderIndex }
     }
 
     func retrySave() async {

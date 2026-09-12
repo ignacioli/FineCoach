@@ -159,6 +159,14 @@ struct StudentListView: View {
                     .accessibilityLabel(String(localized: "student.list.archivedTitle"))
                     .accessibilityIdentifier(FCAccessibilityID.studentListArchived)
                 }
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(String(localized: "templates.entry")) {
+                        path.append(.templates)
+                    }
+                    .frame(minWidth: 44, minHeight: 44)
+                    .accessibilityIdentifier(FCAccessibilityID.templatesEntry)
+                    .accessibilityLabel(String(localized: "templates.entry"))
+                }
             }
         }
         .task { await viewModel.reload() }
