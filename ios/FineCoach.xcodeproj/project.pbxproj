@@ -153,6 +153,7 @@
 		B550 /* TemplateListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A550 /* TemplateListView.swift */; };
 		B551 /* TemplateEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A551 /* TemplateEditorView.swift */; };
 		B552 /* ApplyTemplateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A552 /* ApplyTemplateView.swift */; };
+		B554 /* TemplateSnapshotSectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A554 /* TemplateSnapshotSectionTests.swift */; };
 		B535 /* CoursePackageListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A535 /* CoursePackageListView.swift */; };
 		B536 /* CoursePackageEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A536 /* CoursePackageEditorView.swift */; };
 		B537 /* ManualCreditAdjustmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A537 /* ManualCreditAdjustmentView.swift */; };
@@ -349,6 +350,7 @@
 		A550 /* TemplateListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TemplateListView.swift"; sourceTree = "<group>"; };
 		A551 /* TemplateEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TemplateEditorView.swift"; sourceTree = "<group>"; };
 		A552 /* ApplyTemplateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ApplyTemplateView.swift"; sourceTree = "<group>"; };
+		A554 /* TemplateSnapshotSectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TemplateSnapshotSectionTests.swift"; sourceTree = "<group>"; };
 		A535 /* CoursePackageListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoursePackageListView.swift"; sourceTree = "<group>"; };
 		A536 /* CoursePackageEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoursePackageEditorView.swift"; sourceTree = "<group>"; };
 		A537 /* ManualCreditAdjustmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualCreditAdjustmentView.swift"; sourceTree = "<group>"; };
@@ -652,6 +654,7 @@
 				A473 /* Students */,
 				A510 /* Appointments */,
 				A541 /* CoursePackages */,
+				A555 /* Templates */,
 				A476 /* ActiveSession */,
 				A479 /* Recovery */,
 				A482 /* ExerciseLibrary */,
@@ -984,6 +987,14 @@
 				A540 /* CreditLedgerIdempotencyTests.swift */,
 			);
 			path = CoursePackages;
+			sourceTree = "<group>";
+		};
+		A555 /* Templates */ = {
+			isa = PBXGroup;
+			children = (
+				A554 /* TemplateSnapshotSectionTests.swift */,
+			);
+			path = Templates;
 			sourceTree = "<group>";
 		};
 		A474 /* Students */ = {
@@ -1502,6 +1513,7 @@
 				B526 /* NotificationRedactionTests.swift in Sources */,
 				B522 /* TodayOrderingPolicyTests.swift in Sources */,
 				B540 /* CreditLedgerIdempotencyTests.swift in Sources */,
+				B554 /* TemplateSnapshotSectionTests.swift in Sources */,
 				B232 /* SessionSetDomainTests.swift in Sources */,
 				B234 /* ActiveSessionRecoveryCodecTests.swift in Sources */,
 				B235 /* SessionTimingTests.swift in Sources */,
