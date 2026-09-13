@@ -123,6 +123,7 @@
 		B17B /* BackupExportFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17B /* BackupExportFlow.swift */; };
 		B17C /* BackupRestoreFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17C /* BackupRestoreFlow.swift */; };
 		B246 /* RestoreFaultMatrixTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A246 /* RestoreFaultMatrixTests.swift */; };
+		B247 /* M1BBackupRoundTripTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A247 /* M1BBackupRoundTripTests.swift */; };
 		B122 /* StudentUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A122 /* StudentUseCases.swift */; };
 		B123 /* ActiveSessionUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A123 /* ActiveSessionUseCases.swift */; };
 		B144 /* StudentManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A144 /* StudentManagedObject+Mapping.swift */; };
@@ -405,6 +406,7 @@
 		A244 /* BackupRoundTripTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRoundTripTests.swift; sourceTree = "<group>"; };
 		A245 /* RestoreCrashRecoveryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestoreCrashRecoveryTests.swift; sourceTree = "<group>"; };
 		A246 /* RestoreFaultMatrixTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestoreFaultMatrixTests.swift; sourceTree = "<group>"; };
+		A247 /* M1BBackupRoundTripTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M1BBackupRoundTripTests.swift; sourceTree = "<group>"; };
 		A250 /* BackupGoldenVectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupGoldenVectorTests.swift; sourceTree = "<group>"; };
 		A251 /* BackupHostileInputTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupHostileInputTests.swift; sourceTree = "<group>"; };
 		A252 /* ScenePrivacyCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenePrivacyCoordinatorTests.swift; sourceTree = "<group>"; };
@@ -1193,6 +1195,7 @@
 				A244 /* BackupRoundTripTests.swift */,
 				A245 /* RestoreCrashRecoveryTests.swift */,
 				A246 /* RestoreFaultMatrixTests.swift */,
+				A247 /* M1BBackupRoundTripTests.swift */,
 			);
 			path = Backup;
 			sourceTree = "<group>";
@@ -1631,6 +1634,7 @@
 				B244 /* BackupRoundTripTests.swift in Sources */,
 				B245 /* RestoreCrashRecoveryTests.swift in Sources */,
 				B246 /* RestoreFaultMatrixTests.swift in Sources */,
+				B247 /* M1BBackupRoundTripTests.swift in Sources */,
 				B254 /* PerformanceMeasurementTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -18,8 +18,11 @@ final class BackupGoldenVectorTests: XCTestCase {
         XCTAssertEqual(FineCoachBackupV1.magic.count, 4)
         XCTAssertEqual(FineCoachBackupV1.headerLength, 82)
         XCTAssertEqual(FineCoachBackupV1.containerVersion, 1)
-        XCTAssertEqual(FineCoachBackupV1.payloadSchemaVersion, 1)
-        XCTAssertEqual(FineCoachBackupV1.minimumReaderVersion, 1)
+        // M1-B (T042/T043): payloadSchemaVersion/minimumReaderVersion moved 1->2 to
+        // add the §6.7 sections; everything else on this line stays frozen.
+        XCTAssertEqual(FineCoachBackupV1.payloadSchemaVersion, 2)
+        XCTAssertEqual(FineCoachBackupV1.minimumSupportedPayloadSchemaVersion, 1)
+        XCTAssertEqual(FineCoachBackupV1.minimumReaderVersion, 2)
         XCTAssertEqual(FineCoachBackupV1.kdfID, 1)
         XCTAssertEqual(FineCoachBackupV1.aeadID, 1)
         XCTAssertEqual(FineCoachBackupV1.iterations, 600_000)
@@ -79,13 +82,29 @@ final class BackupGoldenVectorTests: XCTestCase {
         ) { error in
             XCTAssertEqual(error as? BackupError, .unsupportedVersion)
         }
+        // T043 forward/backward compatibility: this reader still accepts an
+        // M1-A-era payloadSchemaVersion=1 / minimumReaderVersion=1 header (its
+        // §6.7 sections are simply absent, not malformed)...
+        XCTAssertNoThrow(
+            try FineCoachBackupHeader.parse(headerReplacing(header, payloadSchemaVersion: 1).encode())
+        )
+        XCTAssertNoThrow(
+            try FineCoachBackupHeader.parse(headerReplacing(header, minimumReaderVersion: 1).encode())
+        )
+        // ...but fails closed on anything outside the [1, current] range it
+        // actually knows how to read, in both directions.
         XCTAssertThrowsError(
-            try FineCoachBackupHeader.parse(headerReplacing(header, payloadSchemaVersion: 2).encode())
+            try FineCoachBackupHeader.parse(headerReplacing(header, payloadSchemaVersion: 0).encode())
         ) { error in
             XCTAssertEqual(error as? BackupError, .unsupportedVersion)
         }
         XCTAssertThrowsError(
-            try FineCoachBackupHeader.parse(headerReplacing(header, minimumReaderVersion: 2).encode())
+            try FineCoachBackupHeader.parse(headerReplacing(header, payloadSchemaVersion: 3).encode())
+        ) { error in
+            XCTAssertEqual(error as? BackupError, .unsupportedVersion)
+        }
+        XCTAssertThrowsError(
+            try FineCoachBackupHeader.parse(headerReplacing(header, minimumReaderVersion: 3).encode())
         ) { error in
             XCTAssertEqual(error as? BackupError, .unsupportedVersion)
         }
