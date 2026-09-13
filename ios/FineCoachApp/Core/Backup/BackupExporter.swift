@@ -73,11 +73,24 @@ public struct BackupCoordinator: Sendable {
         let plaintext = try await Task.detached {
             try BackupInventoryMapper.encodeFrames(inventory)
         }.value
-        let recordCount = UInt64(
-            1 + inventory.students.count + inventory.catalog.count + inventory.preferences.count
-                + inventory.claims.count + inventory.sessions.count + inventory.reports.count
-                + inventory.settings.count
-        )
+        let sectionCounts: [Int] = [
+            inventory.students.count,
+            inventory.catalog.count,
+            inventory.preferences.count,
+            inventory.claims.count,
+            inventory.sessions.count,
+            inventory.reports.count,
+            inventory.settings.count,
+            inventory.appointments.count,
+            inventory.recurrenceSeries.count,
+            inventory.coursePackages.count,
+            inventory.creditAdjustments.count,
+            inventory.templates.count,
+            inventory.sessionSections.count,
+            inventory.bodyMetrics.count,
+            inventory.bodyMeasurements.count,
+        ]
+        let recordCount = UInt64(1 + sectionCounts.reduce(0, +))
         let container: Data
         do {
             container = try await Task.detached {

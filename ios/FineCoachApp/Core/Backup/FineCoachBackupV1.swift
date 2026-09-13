@@ -28,8 +28,22 @@ public enum FineCoachBackupV1 {
     public static let magic = Data("FCBK".utf8)
     public static let headerLength: UInt16 = 82
     public static let containerVersion: UInt16 = 1
-    public static let payloadSchemaVersion: UInt16 = 1
-    public static let minimumReaderVersion: UInt16 = 1
+    /// The payload schema version THIS BUILD WRITES into new backups. M1-B
+    /// raises this from 1 to 2 to add the section 6.7 sections (M1B-FR-031/032,
+    /// D-M1B-006) -- the 82-byte header shape and the KDF/AEAD contract
+    /// below are UNCHANGED and MUST NEVER change here.
+    public static let payloadSchemaVersion: UInt16 = 2
+    /// The oldest payload schema THIS BUILD CAN STILL READ. An M1-A backup
+    /// (schema 1) has none of the M1-B sections; that is "absent", not
+    /// malformed, and MUST decode with those sections empty.
+    public static let minimumSupportedPayloadSchemaVersion: UInt16 = 1
+    /// The reader version THIS BUILD WRITES into new backups' header, i.e.
+    /// what a reader needs to safely parse them. Also doubles as the
+    /// upper bound this build itself supports when READING an incoming
+    /// header: a file declaring a newer `minimumReaderVersion` than this
+    /// MUST fail closed (`unsupportedVersion`) rather than silently ignore
+    /// sections it does not understand (T043).
+    public static let minimumReaderVersion: UInt16 = 2
     public static let kdfID: UInt8 = 1
     public static let aeadID: UInt8 = 1
     public static let iterations: UInt32 = 600_000
@@ -149,10 +163,20 @@ public struct FineCoachBackupHeader: Equatable, Sendable {
         return header
     }
 
+    /// Forward/backward compatible on purpose (T043): a file whose
+    /// `payloadSchemaVersion` is between the oldest we still read (1, the
+    /// frozen M1-A schema) and the newest we write (2) is accepted -- an
+    /// M1-A-era file simply has none of the M1-B sections, which is treated
+    /// as "absent" rather than malformed. A file whose `minimumReaderVersion`
+    /// exceeds what THIS reader implements is rejected outright: that is
+    /// exactly the fail-closed guard that makes a hypothetical M1-A-only
+    /// reader (hardcoded to `minimumReaderVersion == 1`) refuse an M1-B
+    /// backup instead of silently restoring a partial dataset.
     fileprivate func validateVersionFields() throws {
         guard containerVersion == FineCoachBackupV1.containerVersion,
-            payloadSchemaVersion == FineCoachBackupV1.payloadSchemaVersion,
-            minimumReaderVersion == FineCoachBackupV1.minimumReaderVersion,
+            payloadSchemaVersion >= FineCoachBackupV1.minimumSupportedPayloadSchemaVersion,
+            payloadSchemaVersion <= FineCoachBackupV1.payloadSchemaVersion,
+            minimumReaderVersion <= FineCoachBackupV1.minimumReaderVersion,
             kdfID == FineCoachBackupV1.kdfID,
             aeadID == FineCoachBackupV1.aeadID,
             iterations == FineCoachBackupV1.iterations
@@ -174,6 +198,15 @@ public enum BackupSecurityCeiling {
     public static let maxSets = 1_000_000
     public static let maxRelationshipEdges = 3_000_000
     public static let maxSettings = 10_000
+    public static let maxAppointments = 200_000
+    public static let maxRecurrenceSeries = 50_000
+    public static let maxCoursePackages = 100_000
+    public static let maxCreditAdjustments = 500_000
+    public static let maxTrainingTemplates = 20_000
+    public static let maxTemplateExercises = 200_000
+    public static let maxSessionSections = 200_000
+    public static let maxBodyMetrics = 50_000
+    public static let maxBodyMeasurements = 1_000_000
     public static let maxStringUTF8Bytes = 64 * 1024
     public static let maxJSONDepth = 16
     public static let maxAppManagedTempBytes: UInt64 = 2 * 1024 * 1024 * 1024
