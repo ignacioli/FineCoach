@@ -2996,6 +2996,61 @@
         }
       }
     },
+    "coursePackageEditor.activeWarningFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "该学员已有有效课包「%@」，剩余 %d 课时。新建将结束当前课包。"
+          }
+        }
+      }
+    },
+    "coursePackageEditor.confirmEndActive.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束当前课包？"
+          }
+        }
+      }
+    },
+    "coursePackageEditor.confirmEndActive.messageFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "该学员已有有效课包「%@」，剩余 %d 课时。新建将结束当前课包，历史记录会保留。确认继续？"
+          }
+        }
+      }
+    },
+    "coursePackageEditor.confirmEndActive.confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "确认结束并新建"
+          }
+        }
+      }
+    },
+    "coursePackageEditor.confirmEndActive.cancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        }
+      }
+    },
     "manualAdjustment.title": {
       "extractionState": "manual",
       "localizations": {

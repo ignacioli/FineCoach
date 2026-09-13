@@ -83,6 +83,7 @@
 		B210 /* FoundationIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A210 /* FoundationIntegrationTests.swift */; };
 		B516 /* AppointmentPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A515 /* AppointmentPersistenceTests.swift */; };
 		B543 /* CreditLedgerRestartTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A543 /* CreditLedgerRestartTests.swift */; };
+		B700 /* CoursePackageEditorViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A700 /* CoursePackageEditorViewModelTests.swift */; };
 		B507 /* V1ToV2MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A505 /* V1ToV2MigrationTests.swift */; };
 		B220 /* SetupSmokeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A220 /* SetupSmokeUITests.swift */; };
 		BF01 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F001 /* Foundation.framework */; };
@@ -299,6 +300,7 @@
 		A210 /* FoundationIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationIntegrationTests.swift; sourceTree = "<group>"; };
 		A515 /* AppointmentPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentPersistenceTests.swift; sourceTree = "<group>"; };
 		A543 /* CreditLedgerRestartTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CreditLedgerRestartTests.swift"; sourceTree = "<group>"; };
+		A700 /* CoursePackageEditorViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoursePackageEditorViewModelTests.swift"; sourceTree = "<group>"; };
 		A505 /* V1ToV2MigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V1ToV2MigrationTests.swift; sourceTree = "<group>"; };
 		A220 /* SetupSmokeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupSmokeUITests.swift; sourceTree = "<group>"; };
 		F001 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -884,6 +886,7 @@
 			isa = PBXGroup;
 			children = (
 				A543 /* CreditLedgerRestartTests.swift */,
+				A700 /* CoursePackageEditorViewModelTests.swift */,
 			);
 			path = CoursePackages;
 			sourceTree = "<group>";
@@ -1624,6 +1627,7 @@
 				B210 /* FoundationIntegrationTests.swift in Sources */,
 				B516 /* AppointmentPersistenceTests.swift in Sources */,
 				B543 /* CreditLedgerRestartTests.swift in Sources */,
+				B700 /* CoursePackageEditorViewModelTests.swift in Sources */,
 				B507 /* V1ToV2MigrationTests.swift in Sources */,
 				B231 /* StudentPersistenceTests.swift in Sources */,
 				B233 /* ActiveSessionPersistenceTests.swift in Sources */,
