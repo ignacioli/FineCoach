@@ -68,6 +68,7 @@ struct CreditAdjustmentTrailView: View {
                     row(for: adjustment)
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(FCPrimitives.spacingMedium)
         }
         .background(FCSemanticColors.background)
