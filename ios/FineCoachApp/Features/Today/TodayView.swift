@@ -286,6 +286,9 @@ struct TodayView: View {
                     .foregroundStyle(
                         row.section == .overdue ? FCSemanticColors.warning : FCSemanticColors.secondaryText
                     )
+                if appointment.status == .scheduled {
+                    rowActionsMenu(for: appointment)
+                }
             }
         }
         .frame(minHeight: 44, alignment: .leading)
@@ -293,23 +296,43 @@ struct TodayView: View {
         .accessibilityIdentifier(FCAccessibilityID.todayRow(appointment.id))
         .contextMenu {
             if appointment.status == .scheduled {
-                Button(String(localized: "today.action.start")) {
-                    Task {
-                        if let studentID = await viewModel.startTraining(appointmentID: appointment.id) {
-                            path.append(.activeSession(studentID.rawValue))
-                        }
-                    }
-                }
-                Button(String(localized: "today.action.markAbsentCharged")) {
-                    Task { await viewModel.markAbsent(appointmentID: appointment.id, creditChoice: .charged) }
-                }
-                Button(String(localized: "today.action.markAbsentNotCharged")) {
-                    Task { await viewModel.markAbsent(appointmentID: appointment.id, creditChoice: .notCharged) }
-                }
-                Button(String(localized: "today.action.cancel"), role: .destructive) {
-                    Task { await viewModel.cancel(appointmentID: appointment.id) }
+                rowActionButtons(for: appointment)
+            }
+        }
+    }
+
+    /// Visible tap target for "开始训练"/"标记缺席(扣课)"/"标记缺席(不扣课)"/"取消" -- the
+    /// `contextMenu` above requires a long-press and is not a discoverable
+    /// affordance for a primary, frequently-needed action. This `Menu` gives
+    /// the same 4 actions a standard iOS "more actions" tap target; the
+    /// contextMenu stays as a harmless power-user shortcut.
+    private func rowActionsMenu(for appointment: Appointment) -> some View {
+        Menu {
+            rowActionButtons(for: appointment)
+        } label: {
+            Image(systemName: "ellipsis.circle")
+                .frame(minWidth: 44, minHeight: 44)
+        }
+        .accessibilityIdentifier(FCAccessibilityID.todayRowActions(appointment.id))
+    }
+
+    @ViewBuilder
+    private func rowActionButtons(for appointment: Appointment) -> some View {
+        Button(String(localized: "today.action.start")) {
+            Task {
+                if let studentID = await viewModel.startTraining(appointmentID: appointment.id) {
+                    path.append(.activeSession(studentID.rawValue))
                 }
             }
+        }
+        Button(String(localized: "today.action.markAbsentCharged")) {
+            Task { await viewModel.markAbsent(appointmentID: appointment.id, creditChoice: .charged) }
+        }
+        Button(String(localized: "today.action.markAbsentNotCharged")) {
+            Task { await viewModel.markAbsent(appointmentID: appointment.id, creditChoice: .notCharged) }
+        }
+        Button(String(localized: "today.action.cancel"), role: .destructive) {
+            Task { await viewModel.cancel(appointmentID: appointment.id) }
         }
     }
 

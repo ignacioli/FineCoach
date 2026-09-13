@@ -36,6 +36,10 @@ public enum FCAccessibilityID {
         "today.row.\(id.rawValue.uuidString)"
     }
 
+    public static func todayRowActions(_ id: StableUUID) -> String {
+        "today.rowActions.\(id.rawValue.uuidString)"
+    }
+
     public static let studentList = "studentList.root"
     public static let studentListAdd = "studentList.add"
     public static let studentListSearch = "studentList.search"
