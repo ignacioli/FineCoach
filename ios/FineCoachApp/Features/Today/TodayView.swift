@@ -133,6 +133,11 @@ enum TodayRowStatusPresentation {
 struct TodayView: View {
     @StateObject private var viewModel: TodayViewModel
     @Binding var path: [RootDestination]
+    /// Drives the row-actions `confirmationDialog` (bottom action sheet) --
+    /// replaces the earlier `Menu` popover, which floated an oversized card
+    /// near the tap point instead of a full-width sheet consistent with
+    /// this app's other confirmation flows (e.g. CoursePackageEditorView).
+    @State private var actionsAppointment: Appointment?
 
     init(
         appointmentUseCases: AppointmentUseCases,
@@ -210,6 +215,20 @@ struct TodayView: View {
         .onChange(of: path) { _, _ in
             Task { await viewModel.reload() }
         }
+        .confirmationDialog(
+            String(localized: "today.action.dialogTitle"),
+            isPresented: Binding(
+                get: { actionsAppointment != nil },
+                set: { isPresented in
+                    if !isPresented { actionsAppointment = nil }
+                }
+            ),
+            titleVisibility: .visible,
+            presenting: actionsAppointment
+        ) { appointment in
+            rowActionButtons(for: appointment)
+            Button(String(localized: "today.action.dismiss"), role: .cancel) {}
+        }
     }
 
     private var header: some View {
@@ -268,7 +287,7 @@ struct TodayView: View {
     private func appointmentRow(_ row: TodayOrderedAppointment, emphasized: Bool = false) -> some View {
         let appointment = row.appointment
         return VStack(alignment: .leading, spacing: 4) {
-            HStack(alignment: .top) {
+            HStack(alignment: .center) {
                 Text(appointment.startTime.canonicalString)
                     .font(emphasized ? .title2.weight(.bold) : .headline)
                 VStack(alignment: .leading, spacing: 2) {
@@ -303,12 +322,15 @@ struct TodayView: View {
 
     /// Visible tap target for "开始训练"/"标记缺席(扣课)"/"标记缺席(不扣课)"/"取消" -- the
     /// `contextMenu` above requires a long-press and is not a discoverable
-    /// affordance for a primary, frequently-needed action. This `Menu` gives
-    /// the same 4 actions a standard iOS "more actions" tap target; the
-    /// contextMenu stays as a harmless power-user shortcut.
+    /// affordance for a primary, frequently-needed action. Tapping this
+    /// button presents a bottom `confirmationDialog` (see `body`) with the
+    /// same 4 actions, consistent with this app's other confirmation
+    /// flows -- a `Menu` popover here floated an oversized card near the
+    /// tap point instead. The contextMenu stays as a harmless power-user
+    /// shortcut.
     private func rowActionsMenu(for appointment: Appointment) -> some View {
-        Menu {
-            rowActionButtons(for: appointment)
+        Button {
+            actionsAppointment = appointment
         } label: {
             Image(systemName: "ellipsis.circle")
                 .frame(minWidth: 44, minHeight: 44)
