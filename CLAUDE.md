@@ -57,6 +57,56 @@ there.
 - No ViewInspector-level structural assertions on Feature screens unless
   explicitly requested.
 
+## Checkpoint completion — manual walkthrough is not optional
+
+A story/phase Checkpoint is not "done" when tests are green. It requires
+BOTH:
+
+1. `xcodebuild build` + `FineCoachTests` + `FineCoachIntegrationTests`
+   green (the automated gate — proves domain logic and persistence are
+   correct).
+2. A human has actually opened the built app on a simulator (or real
+   device) and operated every new user-facing interaction at least
+   once, checking two things automated tests structurally cannot see:
+   whether it renders at a sane layout/width, and whether a first-time
+   user would ever find it without being told.
+
+Unit/integration tests in this repo do not render SwiftUI views and
+cannot detect a missing `.frame(maxWidth: .infinity)`, a control hidden
+behind an undiscoverable gesture, or "this logic is fully tested but has
+no UI entry point at all." These are real defect classes, not
+hypothetical — three shipped in Phase 4 despite 100% green tests, found
+only by a manual walkthrough. Do not report a phase/Checkpoint as
+complete, or describe Feature UI as "done," until step 2 has actually
+happened; say explicitly when it hasn't (see the existing rule below on
+not claiming "visually verified" without a human having looked).
+
+## Discoverable affordances — no contextMenu-only actions
+
+Any action that mutates data (marks something absent/cancelled/deleted,
+applies a charge, ends/starts a lifecycle state, etc.) MUST be reachable
+from a visible, obviously-tappable control — a button, a swipe action,
+or a visible menu/"…" icon — not **only** a `.contextMenu` triggered by
+long-press. A long-press-only trigger is invisible to a first-time user
+and does not count as "the feature has a UI path," even though the code
+technically exists and is technically reachable.
+
+## Ambiguous, consequential spec wording — ask, don't silently pick one reading
+
+When a spec/task sentence describing a MUST behavior is ambiguous
+between "the system does X automatically as a side effect" and "the
+coach must explicitly do X first, as a precondition, with its own
+confirmation," and X has a real, not-easily-reversed consequence (ends
+a course package's credits, deletes something, changes billing-adjacent
+state) — treat that ambiguity as a question for the project owner, not
+an implementation detail to resolve silently. This applies whether the
+choice is made by a subagent or by the orchestrating session itself
+quoting the sentence into a task brief without flagging the ambiguity.
+A real instance of this: M1B-FR-012's "已有有效课包时新建 MUST 先结束当前课包"
+was silently implemented as an automatic, unconfirmed side effect of
+creating a new package, silently ending the old one with no coach
+confirmation — the reading that should have been confirmed, not assumed.
+
 ## UX/UI acceptance — no screenshot-loop automation
 
 **Never use a "screenshot → compare → fix" loop as the acceptance
