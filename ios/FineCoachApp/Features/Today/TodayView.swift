@@ -133,11 +133,6 @@ enum TodayRowStatusPresentation {
 struct TodayView: View {
     @StateObject private var viewModel: TodayViewModel
     @Binding var path: [RootDestination]
-    /// Drives the row-actions `confirmationDialog` (bottom action sheet) --
-    /// replaces the earlier `Menu` popover, which floated an oversized card
-    /// near the tap point instead of a full-width sheet consistent with
-    /// this app's other confirmation flows (e.g. CoursePackageEditorView).
-    @State private var actionsAppointment: Appointment?
 
     init(
         appointmentUseCases: AppointmentUseCases,
@@ -214,20 +209,6 @@ struct TodayView: View {
         .task { await viewModel.reload() }
         .onChange(of: path) { _, _ in
             Task { await viewModel.reload() }
-        }
-        .confirmationDialog(
-            String(localized: "today.action.dialogTitle"),
-            isPresented: Binding(
-                get: { actionsAppointment != nil },
-                set: { isPresented in
-                    if !isPresented { actionsAppointment = nil }
-                }
-            ),
-            titleVisibility: .visible,
-            presenting: actionsAppointment
-        ) { appointment in
-            rowActionButtons(for: appointment)
-            Button(String(localized: "today.action.dismiss"), role: .cancel) {}
         }
     }
 
@@ -320,17 +301,16 @@ struct TodayView: View {
         }
     }
 
-    /// Visible tap target for "开始训练"/"标记缺席(扣课)"/"标记缺席(不扣课)"/"取消" -- the
-    /// `contextMenu` above requires a long-press and is not a discoverable
-    /// affordance for a primary, frequently-needed action. Tapping this
-    /// button presents a bottom `confirmationDialog` (see `body`) with the
-    /// same 4 actions, consistent with this app's other confirmation
-    /// flows -- a `Menu` popover here floated an oversized card near the
-    /// tap point instead. The contextMenu stays as a harmless power-user
-    /// shortcut.
+    /// Visible tap target for "开始训练"/"标记缺席"/"取消安排" -- the `contextMenu`
+    /// below requires a long-press and is not a discoverable affordance for
+    /// a primary, frequently-needed action. A native `Menu` here (not a
+    /// hand-rolled dialog) gets the iOS system anchor arrow, automatic
+    /// top/bottom boundary flip, and native blur/shadow for free -- exactly
+    /// what a custom bubble would otherwise have to reimplement. contextMenu
+    /// stays as a harmless power-user long-press shortcut.
     private func rowActionsMenu(for appointment: Appointment) -> some View {
-        Button {
-            actionsAppointment = appointment
+        Menu {
+            rowActionButtons(for: appointment)
         } label: {
             Image(systemName: "ellipsis.circle")
                 .frame(minWidth: 44, minHeight: 44)
@@ -347,11 +327,18 @@ struct TodayView: View {
                 }
             }
         }
-        Button(String(localized: "today.action.markAbsentCharged")) {
-            Task { await viewModel.markAbsent(appointmentID: appointment.id, creditChoice: .charged) }
-        }
-        Button(String(localized: "today.action.markAbsentNotCharged")) {
-            Task { await viewModel.markAbsent(appointmentID: appointment.id, creditChoice: .notCharged) }
+        // Collapsed from 2 top-level buttons into one submenu (native
+        // nested Menu, still anchor/boundary-flip for free) so the
+        // top-level list stays at 3 items. "不扣课" is listed first --
+        // the safe, no-credit-consequence default -- "扣课" is the more
+        // consequential, deliberate second choice.
+        Menu(String(localized: "today.action.markAbsent")) {
+            Button(String(localized: "today.action.markAbsentNotCharged")) {
+                Task { await viewModel.markAbsent(appointmentID: appointment.id, creditChoice: .notCharged) }
+            }
+            Button(String(localized: "today.action.markAbsentCharged")) {
+                Task { await viewModel.markAbsent(appointmentID: appointment.id, creditChoice: .charged) }
+            }
         }
         Button(String(localized: "today.action.cancel"), role: .destructive) {
             Task { await viewModel.cancel(appointmentID: appointment.id) }
