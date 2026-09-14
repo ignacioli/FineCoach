@@ -620,6 +620,28 @@
         }
       }
     },
+    "student.detail.recentSummaryFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ · %@"
+          }
+        }
+      }
+    },
+    "student.detail.recentSummarySetsFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ · 完成 %lld 组"
+          }
+        }
+      }
+    },
     "student.detail.historyKicker": {
       "extractionState": "manual",
       "localizations": {

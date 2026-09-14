@@ -107,6 +107,7 @@ struct RootNavigation: View {
                                 StudentDetailView(
                                     studentID: StableUUID(id),
                                     useCases: environment.requireUseCases(),
+                                    historyUseCases: environment.requireHistoryUseCases(),
                                     path: $path
                                 )
                             case .editor(let mode):

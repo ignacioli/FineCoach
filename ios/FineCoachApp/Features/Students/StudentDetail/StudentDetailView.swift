@@ -6,13 +6,20 @@ final class StudentDetailViewModel: ObservableObject {
     @Published var inProgress = false
     @Published var notesExpanded = false
     @Published var errorMessage: String?
+    /// The Student's most recently COMPLETED session, newest-by-`completedAtUTC`
+    /// (not array/fetch order -- deliberately re-sorted below). `nil` means
+    /// there is genuinely no completed session yet, which keeps
+    /// `student.detail.recentPlaceholder` as the correct empty-state copy.
+    @Published var mostRecentCompletedSession: CompletedSession?
 
     let studentID: StableUUID
     let useCases: StudentUseCases
+    private let historyUseCases: HistoryUseCases
 
-    init(studentID: StableUUID, useCases: StudentUseCases) {
+    init(studentID: StableUUID, useCases: StudentUseCases, historyUseCases: HistoryUseCases) {
         self.studentID = studentID
         self.useCases = useCases
+        self.historyUseCases = historyUseCases
     }
 
     func reload() async {
@@ -20,6 +27,8 @@ final class StudentDetailViewModel: ObservableObject {
             student = try await useCases.student(id: studentID)
             let summary = try await useCases.inProgressTraining()
             inProgress = summary?.studentID == studentID
+            let history = try await historyUseCases.listHistory(studentID: studentID)
+            mostRecentCompletedSession = history.max { $0.completedAtUTC < $1.completedAtUTC }
             errorMessage = nil
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? String(localized: "student.error.generic")
@@ -49,9 +58,18 @@ struct StudentDetailView: View {
     @Binding var path: [RootDestination]
     @State private var cover: StudentDetailCover?
 
-    init(studentID: StableUUID, useCases: StudentUseCases, path: Binding<[RootDestination]>) {
+    init(
+        studentID: StableUUID,
+        useCases: StudentUseCases,
+        historyUseCases: HistoryUseCases,
+        path: Binding<[RootDestination]>
+    ) {
         _viewModel = StateObject(
-            wrappedValue: StudentDetailViewModel(studentID: studentID, useCases: useCases)
+            wrappedValue: StudentDetailViewModel(
+                studentID: studentID,
+                useCases: useCases,
+                historyUseCases: historyUseCases
+            )
         )
         _path = path
     }
@@ -131,7 +149,7 @@ struct StudentDetailView: View {
                     } label: {
                         summaryCard(
                             kicker: String(localized: "student.detail.recentKicker"),
-                            title: String(localized: "student.detail.recentPlaceholder")
+                            title: recentTrainingTitle
                         )
                     }
                     .accessibilityIdentifier(FCAccessibilityID.detailRecentTraining)
@@ -203,6 +221,33 @@ struct StudentDetailView: View {
             }
         }
         .accessibilityIdentifier(FCAccessibilityID.detailRoot)
+    }
+
+    /// Real most-recent-completed-session summary (M1B data-model §2.4-adjacent
+    /// traceability expectation) when one exists; the genuine "no completed
+    /// sessions yet" case still falls back to the static placeholder copy.
+    private var recentTrainingTitle: String {
+        guard let session = viewModel.mostRecentCompletedSession else {
+            return String(localized: "student.detail.recentPlaceholder")
+        }
+        let dateText = Self.dateText(session.completedAtUTC)
+        if let focus = session.trainingFocus?.value, !focus.isEmpty {
+            return String(format: String(localized: "student.detail.recentSummaryFormat"), dateText, focus)
+        }
+        return String(
+            format: String(localized: "student.detail.recentSummarySetsFormat"),
+            dateText,
+            Int64(session.statistics.completedSetCount)
+        )
+    }
+
+    private static func dateText(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        return formatter.string(from: date)
     }
 
     private func profile(_ student: Student) -> some View {
