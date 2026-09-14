@@ -95,6 +95,9 @@ struct CreditAdjustmentTrailView: View {
                 Text(reasonText.value)
                     .foregroundStyle(FCSemanticColors.secondaryText)
             }
+            Text(Self.dateTimeText(adjustment.createdAtUTC))
+                .font(.caption)
+                .foregroundStyle(FCSemanticColors.secondaryText)
         }
         .padding(FCPrimitives.spacingMedium)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -106,6 +109,15 @@ struct CreditAdjustmentTrailView: View {
     private func signedAmount(_ adjustment: CreditAdjustment) -> String {
         let sign = adjustment.direction == .debit ? "-" : "+"
         return "\(sign)\(adjustment.amount)"
+    }
+
+    private static func dateTimeText(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
     }
 
     private func reasonTitle(_ adjustment: CreditAdjustment) -> String {
