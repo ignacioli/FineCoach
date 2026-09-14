@@ -140,6 +140,107 @@
 
             try await env.controller.shutdownForTesting()
         }
+
+        /// M1B-FR-012 (updated): an existing active package that has already
+        /// EXPIRED as of today MUST end silently -- no confirmation dialog --
+        /// because it is no longer "in effect" for the coach to lose.
+        func testSaveWithExpiredExistingActivePackageCreatesImmediatelyWithoutConfirmation() async throws {
+            let firstPackageID = UUID(uuidString: "44444444-4444-4444-8444-444444444445")!
+            let secondPackageID = UUID(uuidString: "55555555-5555-4555-8555-555555555556")!
+            let env = try await makeEnvironment(ids: [firstPackageID, secondPackageID])
+
+            // `now` is 2023-11-14T22:13:20Z; an endDate of 2023-01-01 is
+            // unambiguously in the past regardless of time zone.
+            let expiredEndDate = try LocalDate(canonicalString: "2023-01-01")
+            let firstPackage = try await env.useCases.createActivePackage(
+                studentID: env.studentID,
+                name: "过期旧课包",
+                totalCredits: 5,
+                startDate: nil,
+                endDate: expiredEndDate
+            )
+            XCTAssertEqual(firstPackage.status, .active)
+
+            let viewModel = await CoursePackageEditorViewModel(
+                studentID: env.studentID,
+                useCases: env.useCases,
+                today: LocalDate(date: now, calendar: Calendar(identifier: .gregorian))
+            )
+            await MainActor.run { viewModel.totalCredits = 12 }
+
+            await viewModel.loadExistingActivePackage()
+            let loadedBalance = await viewModel.existingActivePackageBalance
+            XCTAssertEqual(loadedBalance, 5, "the expired package still has credits left -- expiry, not balance, is why no dialog is needed")
+
+            await viewModel.save()
+
+            let isConfirming = await viewModel.isConfirmingEndActive
+            let didSave = await viewModel.didSave
+            XCTAssertFalse(isConfirming, "an expired active package must not require confirmation")
+            XCTAssertTrue(didSave, "save() must create immediately when the existing active package is expired")
+
+            let packages = try await env.useCases.packages(studentID: env.studentID)
+            XCTAssertEqual(packages.count, 2, "the old package must be retained, never deleted")
+            let ended = packages.first { $0.id == firstPackage.id }
+            XCTAssertEqual(ended?.status, .ended)
+            let created = packages.first { $0.id != firstPackage.id }
+            XCTAssertEqual(created?.status, .active)
+            XCTAssertEqual(created?.totalCredits, 12)
+
+            try await env.controller.shutdownForTesting()
+        }
+
+        /// M1B-FR-012 (updated): an existing active package with zero
+        /// remaining credits MUST end silently -- no confirmation dialog --
+        /// even though it has not expired by date.
+        func testSaveWithZeroBalanceExistingActivePackageCreatesImmediatelyWithoutConfirmation() async throws {
+            let firstPackageID = UUID(uuidString: "66666666-6666-4666-8666-666666666667")!
+            let adjustmentID = UUID(uuidString: "77777777-7777-4777-8777-777777777778")!
+            let secondPackageID = UUID(uuidString: "88888888-8888-4888-8888-888888888889")!
+            let env = try await makeEnvironment(ids: [firstPackageID, adjustmentID, secondPackageID])
+
+            let firstPackage = try await env.useCases.createActivePackage(
+                studentID: env.studentID,
+                name: "已刷完旧课包",
+                totalCredits: 3,
+                startDate: nil,
+                endDate: nil
+            )
+            _ = try await env.useCases.recordManualCorrection(
+                packageID: firstPackage.id,
+                direction: .debit,
+                amount: 3,
+                reasonText: "test setup: exhaust balance"
+            )
+
+            let viewModel = await CoursePackageEditorViewModel(
+                studentID: env.studentID,
+                useCases: env.useCases,
+                today: LocalDate(date: now, calendar: Calendar(identifier: .gregorian))
+            )
+            await MainActor.run { viewModel.totalCredits = 12 }
+
+            await viewModel.loadExistingActivePackage()
+            let loadedBalance = await viewModel.existingActivePackageBalance
+            XCTAssertEqual(loadedBalance, 0, "balance must be fully exhausted for this scenario")
+
+            await viewModel.save()
+
+            let isConfirming = await viewModel.isConfirmingEndActive
+            let didSave = await viewModel.didSave
+            XCTAssertFalse(isConfirming, "a zero-balance active package must not require confirmation")
+            XCTAssertTrue(didSave, "save() must create immediately when the existing active package has zero balance")
+
+            let packages = try await env.useCases.packages(studentID: env.studentID)
+            XCTAssertEqual(packages.count, 2, "the old package must be retained, never deleted")
+            let ended = packages.first { $0.id == firstPackage.id }
+            XCTAssertEqual(ended?.status, .ended)
+            let created = packages.first { $0.id != firstPackage.id }
+            XCTAssertEqual(created?.status, .active)
+            XCTAssertEqual(created?.totalCredits, 12)
+
+            try await env.controller.shutdownForTesting()
+        }
     }
 #else
     import XCTest

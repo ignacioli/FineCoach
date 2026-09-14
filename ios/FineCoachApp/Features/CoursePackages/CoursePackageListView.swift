@@ -161,6 +161,8 @@ struct CoursePackageListView: View {
                     )
                 )
                 .foregroundStyle(FCSemanticColors.secondaryText)
+                Text(validityPeriodText(package))
+                    .foregroundStyle(FCSemanticColors.secondaryText)
                 Text(String(localized: "coursePackages.viewTrailHint"))
                     .font(.caption)
                     .foregroundStyle(FCSemanticColors.secondaryText)
@@ -172,5 +174,14 @@ struct CoursePackageListView: View {
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier(FCAccessibilityID.coursePackageRow(package.id))
+    }
+
+    /// "有效期：<start> ~ <end>" -- `LocalDate.canonicalString` is already
+    /// yyyy-MM-dd (the same format `CoursePackage.displayName`'s fallback
+    /// uses), so no separate date formatter is needed here.
+    private func validityPeriodText(_ package: CoursePackage) -> String {
+        let start = package.startDate?.canonicalString ?? String(localized: "coursePackages.noStartDate")
+        let end = package.endDate?.canonicalString ?? String(localized: "coursePackages.noEndDate")
+        return String(format: String(localized: "coursePackages.validityPeriodFormat"), start, end)
     }
 }

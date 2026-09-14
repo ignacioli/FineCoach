@@ -4238,6 +4238,39 @@
           }
         }
       }
+    },
+    "coursePackages.validityPeriodFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有效期：%@ ~ %@"
+          }
+        }
+      }
+    },
+    "coursePackages.noStartDate": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无开始日期"
+          }
+        }
+      }
+    },
+    "coursePackages.noEndDate": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无结束日期"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

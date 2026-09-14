@@ -26,10 +26,16 @@ final class CoursePackageEditorViewModel: ObservableObject {
 
     let studentID: StableUUID
     private let useCases: CreditLedgerUseCases
+    /// Retained (not just used to seed `startDate`/`endDate`) so `save()` can
+    /// judge whether an existing active package is still "in effect" as of
+    /// today (M1B-FR-012) using the same date this editor was opened with,
+    /// consistent with how `startDate`/`endDate` are already derived.
+    private let today: LocalDate
 
     init(studentID: StableUUID, useCases: CreditLedgerUseCases, today: LocalDate) {
         self.studentID = studentID
         self.useCases = useCases
+        self.today = today
         self.startDate = today
         self.endDate = today
     }
@@ -45,18 +51,24 @@ final class CoursePackageEditorViewModel: ObservableObject {
         existingActivePackageBalance = (try? await useCases.balance(packageID: active.id)) ?? active.remainingCreditsCache
     }
 
-    /// When the Student already has an active package, Save must not end it
+    /// When the Student already has an active package that is STILL in
+    /// effect (not expired and has remaining credits), Save must not end it
     /// silently -- route through `isConfirmingEndActive` and wait for the
     /// coach's explicit confirmation instead of calling through immediately.
-    /// When there is no active package (the common case), this behaves
-    /// exactly as before: no extra step.
+    /// When there is no active package, or the existing one has already
+    /// expired (`isExpired(asOf:)`) or has zero remaining credits, ending it
+    /// is not a real, reversible-feeling loss -- MUST NOT require an extra
+    /// confirmation step (M1B-FR-012).
     func save() async {
         errorMessage = nil
         guard totalCredits > 0 else {
             errorMessage = String(localized: "coursePackageEditor.creditsInvalid")
             return
         }
-        guard existingActivePackage == nil else {
+        if let existingActivePackage,
+            !existingActivePackage.isExpired(asOf: today),
+            existingActivePackageBalance != 0
+        {
             isConfirmingEndActive = true
             return
         }
