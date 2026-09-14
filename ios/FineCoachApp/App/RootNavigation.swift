@@ -148,6 +148,7 @@ struct RootNavigation: View {
                                 SessionDetailView(
                                     sessionID: StableUUID(sessionID),
                                     useCases: environment.requireHistoryUseCases(),
+                                    templateUseCases: environment.templateUseCases,
                                     path: $path
                                 )
                             case .sessionEdit(let sessionID):

@@ -54,6 +54,15 @@ public struct HistoryUseCases: Sendable {
         try await sessionRepository.completedSession(id: sessionID)
     }
 
+    /// Loads the full `Session` domain aggregate for `id` (any state, not
+    /// just in-progress) -- needed by callers such as save-completed-
+    /// session-as-template (M1B-FR-017/018) that require the raw Exercise/
+    /// Set shape `TemplateUseCases.saveAsTemplate` operates on, which
+    /// `CompletedSession` (a read-only display DTO) does not carry.
+    public func fullSession(id: StableUUID) async throws -> Session {
+        try await sessionRepository.session(id: id)
+    }
+
     public func saveSummaryNotes(
         sessionID: StableUUID,
         trainingFocus: String,

@@ -4,18 +4,55 @@ import SwiftUI
 final class SessionDetailViewModel: ObservableObject {
     @Published var completed: CompletedSession?
     @Published var errorMessage: String?
+    @Published var isSavingAsTemplate = false
+    @Published var saveAsTemplateName = ""
+    @Published var didSaveAsTemplate = false
 
     let sessionID: StableUUID
     private let useCases: HistoryUseCases
+    private let templateUseCases: TemplateUseCases?
 
-    init(sessionID: StableUUID, useCases: HistoryUseCases) {
+    var canSaveAsTemplate: Bool { templateUseCases != nil }
+
+    init(sessionID: StableUUID, useCases: HistoryUseCases, templateUseCases: TemplateUseCases? = nil) {
         self.sessionID = sessionID
         self.useCases = useCases
+        self.templateUseCases = templateUseCases
     }
 
     func load() async {
         do {
             completed = try await useCases.detail(sessionID: sessionID)
+            errorMessage = nil
+        } catch {
+            errorMessage = (error as? LocalizedError)?.errorDescription ?? String(localized: "student.error.generic")
+        }
+    }
+
+    /// Saves THIS already-completed Session as a new template (M1B-FR-017:
+    /// save-as-template MUST work both from scratch and from a completed
+    /// Session, not only a still-live one). Loads the full `Session`
+    /// aggregate + its owned Sections on demand -- `CompletedSession` alone
+    /// does not carry the raw shape `TemplateUseCases.saveAsTemplate` needs.
+    func saveAsTemplate() async {
+        guard let templateUseCases else {
+            return
+        }
+        let name = saveAsTemplateName
+        guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return
+        }
+        do {
+            let session = try await useCases.fullSession(id: sessionID)
+            let sections = try await templateUseCases.sessionSections(sessionID: sessionID)
+            _ = try await templateUseCases.saveAsTemplate(
+                from: session,
+                existingSessionSections: sections,
+                name: name
+            )
+            saveAsTemplateName = ""
+            isSavingAsTemplate = false
+            didSaveAsTemplate = true
             errorMessage = nil
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? String(localized: "student.error.generic")
@@ -27,9 +64,18 @@ struct SessionDetailView: View {
     @StateObject private var viewModel: SessionDetailViewModel
     @Binding var path: [RootDestination]
 
-    init(sessionID: StableUUID, useCases: HistoryUseCases, path: Binding<[RootDestination]>) {
+    init(
+        sessionID: StableUUID,
+        useCases: HistoryUseCases,
+        templateUseCases: TemplateUseCases? = nil,
+        path: Binding<[RootDestination]>
+    ) {
         _viewModel = StateObject(
-            wrappedValue: SessionDetailViewModel(sessionID: sessionID, useCases: useCases)
+            wrappedValue: SessionDetailViewModel(
+                sessionID: sessionID,
+                useCases: useCases,
+                templateUseCases: templateUseCases
+            )
         )
         _path = path
     }
@@ -100,6 +146,8 @@ struct SessionDetailView: View {
                     path.append(.shareReport(viewModel.sessionID.rawValue))
                 }
                 .accessibilityIdentifier(FCAccessibilityID.sessionDetailGenerateReport)
+
+                saveAsTemplateControls
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(FCPrimitives.spacingMedium)
@@ -112,6 +160,33 @@ struct SessionDetailView: View {
             Task { await viewModel.load() }
         }
         .accessibilityIdentifier(FCAccessibilityID.sessionDetailRoot)
+    }
+
+    /// Mirrors `ActiveSessionView.templateAndSectionControls`'s
+    /// toggle-between-button-and-inline-name-field pattern, reusing that
+    /// flow's existing localization keys verbatim (M1B-FR-017 requires this
+    /// second entry point, not new wording).
+    @ViewBuilder
+    private var saveAsTemplateControls: some View {
+        if viewModel.canSaveAsTemplate {
+            if viewModel.isSavingAsTemplate {
+                FCTextField(
+                    String(localized: "activeSession.saveAsTemplateNamePrompt"),
+                    text: $viewModel.saveAsTemplateName
+                )
+                .accessibilityIdentifier(FCAccessibilityID.sessionDetailSaveAsTemplateName)
+                FCButton(title: String(localized: "activeSession.saveAsTemplateConfirm")) {
+                    Task { await viewModel.saveAsTemplate() }
+                }
+                .accessibilityIdentifier(FCAccessibilityID.sessionDetailSaveAsTemplateConfirm)
+            } else {
+                Button(String(localized: "activeSession.action.saveAsTemplate")) {
+                    viewModel.isSavingAsTemplate = true
+                }
+                .frame(minHeight: 44)
+                .accessibilityIdentifier(FCAccessibilityID.sessionDetailSaveAsTemplate)
+            }
+        }
     }
 
     private func labeled(_ title: String, _ value: String) -> some View {

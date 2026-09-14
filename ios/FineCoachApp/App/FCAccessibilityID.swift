@@ -299,6 +299,9 @@ public enum FCAccessibilityID {
     public static let sessionDetailReportStale = "sessionDetail.reportStale"
     public static let sessionDetailHandedToSystem = "sessionDetail.handedToSystem"
     public static let sessionDetailReadonly = "sessionDetail.readonly"
+    public static let sessionDetailSaveAsTemplate = "sessionDetail.saveAsTemplate"
+    public static let sessionDetailSaveAsTemplateName = "sessionDetail.saveAsTemplateName"
+    public static let sessionDetailSaveAsTemplateConfirm = "sessionDetail.saveAsTemplateConfirm"
 
     public static let sessionEditRoot = "sessionEdit.root"
     public static let sessionEditFocus = "sessionEdit.focus"
