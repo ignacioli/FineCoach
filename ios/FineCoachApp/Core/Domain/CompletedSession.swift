@@ -105,6 +105,15 @@ public struct CompletedSession: Hashable, Codable, Sendable, Identifiable {
         )
     }
 
+    /// Newest-by-`completedAtUTC` session in `sessions`, independent of the
+    /// array's fetch/insertion order. Shared by any UI (e.g.
+    /// `StudentDetailView`'s "most recently completed training" preview)
+    /// that needs "the latest one" rather than "whatever the repository
+    /// happened to return first".
+    public static func mostRecent(in sessions: [CompletedSession]) -> CompletedSession? {
+        sessions.max { $0.completedAtUTC < $1.completedAtUTC }
+    }
+
     public func attaching(latestReport: ShareReport?) -> CompletedSession {
         CompletedSession(
             id: id,

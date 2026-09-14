@@ -28,7 +28,7 @@ final class StudentDetailViewModel: ObservableObject {
             let summary = try await useCases.inProgressTraining()
             inProgress = summary?.studentID == studentID
             let history = try await historyUseCases.listHistory(studentID: studentID)
-            mostRecentCompletedSession = history.max { $0.completedAtUTC < $1.completedAtUTC }
+            mostRecentCompletedSession = CompletedSession.mostRecent(in: history)
             errorMessage = nil
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? String(localized: "student.error.generic")

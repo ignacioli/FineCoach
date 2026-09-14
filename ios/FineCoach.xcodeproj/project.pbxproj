@@ -211,6 +211,7 @@
 		B226 /* HistoryShareUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A226 /* HistoryShareUITests.swift */; };
 		B227 /* BackupRestoreUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A227 /* BackupRestoreUITests.swift */; };
 		B240 /* HistoryReportDomainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A240 /* HistoryReportDomainTests.swift */; };
+		B701 /* CompletedSessionMostRecentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A701 /* CompletedSessionMostRecentTests.swift */; };
 		B241 /* ShareReportPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A241 /* ShareReportPolicyTests.swift */; };
 		B500 /* VisionHarnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A501 /* VisionHarnessTests.swift */; };
 		B242 /* ShareReportRendererTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A242 /* ShareReportRendererTests.swift */; };
@@ -401,6 +402,7 @@
 		A226 /* HistoryShareUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryShareUITests.swift; sourceTree = "<group>"; };
 		A227 /* BackupRestoreUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRestoreUITests.swift; sourceTree = "<group>"; };
 		A240 /* HistoryReportDomainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryReportDomainTests.swift; sourceTree = "<group>"; };
+		A701 /* CompletedSessionMostRecentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedSessionMostRecentTests.swift; sourceTree = "<group>"; };
 		A241 /* ShareReportPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareReportPolicyTests.swift; sourceTree = "<group>"; };
 		A501 /* VisionHarnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionHarnessTests.swift; sourceTree = "<group>"; };
 		A242 /* ShareReportRendererTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareReportRendererTests.swift; sourceTree = "<group>"; };
@@ -1154,6 +1156,7 @@
 			isa = PBXGroup;
 			children = (
 				A240 /* HistoryReportDomainTests.swift */,
+				A701 /* CompletedSessionMostRecentTests.swift */,
 			);
 			path = History;
 			sourceTree = "<group>";
@@ -1594,6 +1597,7 @@
 				B237 /* ExerciseIdentityTests.swift in Sources */,
 				B238 /* ExerciseProvenanceTests.swift in Sources */,
 				B240 /* HistoryReportDomainTests.swift in Sources */,
+				B701 /* CompletedSessionMostRecentTests.swift in Sources */,
 				B241 /* ShareReportPolicyTests.swift in Sources */,
 				B500 /* VisionHarnessTests.swift in Sources */,
 				B250 /* BackupGoldenVectorTests.swift in Sources */,
