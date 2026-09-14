@@ -63,6 +63,7 @@ struct OnboardingView: View {
                     .contentShape(Rectangle())
                     .accessibilityIdentifier(FCAccessibilityID.onboardingSkip)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(FCPrimitives.spacingMedium)
             }
             .background(FCSemanticColors.background)

@@ -90,6 +90,7 @@ struct ApplyTemplateView: View {
                     }
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(FCPrimitives.spacingMedium)
         }
         .background(FCSemanticColors.background)

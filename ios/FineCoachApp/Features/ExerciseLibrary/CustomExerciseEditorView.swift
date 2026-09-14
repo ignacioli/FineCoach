@@ -191,6 +191,7 @@ struct CustomExerciseEditorView: View {
                     .accessibilityIdentifier(FCAccessibilityID.customExerciseRestore)
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(FCPrimitives.spacingMedium)
         }
         .background(FCSemanticColors.background)

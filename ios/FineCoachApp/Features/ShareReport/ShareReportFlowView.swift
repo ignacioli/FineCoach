@@ -207,6 +207,7 @@ struct ShareReportFlowView: View {
                 }
                 .accessibilityIdentifier(FCAccessibilityID.shareReportClose)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(FCPrimitives.spacingMedium)
         }
         .background(FCSemanticColors.background)

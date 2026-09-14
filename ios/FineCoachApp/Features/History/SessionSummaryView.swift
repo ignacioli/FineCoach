@@ -113,6 +113,7 @@ struct SessionSummaryView: View {
                 }
                 .accessibilityIdentifier(FCAccessibilityID.sessionSummarySkipShare)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(FCPrimitives.spacingMedium)
         }
         .scrollDismissesKeyboard(.interactively)
