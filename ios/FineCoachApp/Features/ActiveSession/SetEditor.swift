@@ -3,6 +3,13 @@ import SwiftUI
 struct SetEditor: View {
     @ObservedObject var viewModel: ActiveSessionViewModel
     let exercise: SessionExercise
+    /// When set, this editor is editing that specific existing set inline
+    /// (pre-filled via `viewModel.beginEditingSet(_:)`) instead of the
+    /// bottom "add a new set" form. M1-A fix: editing is addressed by this
+    /// explicit id, never by `exercise.sets.last`.
+    var targetSetID: StableUUID?
+
+    private var isEditMode: Bool { targetSetID != nil }
 
     var body: some View {
         VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
@@ -58,34 +65,49 @@ struct SetEditor: View {
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionRight)
             }
 
-            FCButton(title: String(localized: "session.action.addSet")) {
-                Task { await viewModel.addDraftSet() }
-            }
-            .accessibilityIdentifier(FCAccessibilityID.activeSessionAddSet)
+            if isEditMode {
+                HStack(spacing: FCPrimitives.spacingSmall) {
+                    FCButton(title: String(localized: "session.action.saveSetEdit")) {
+                        Task { await viewModel.saveEditingSet() }
+                    }
+                    .accessibilityIdentifier(FCAccessibilityID.activeSessionSaveSetEdit)
 
-            FCButton(title: String(localized: "session.action.confirmSet")) {
-                Task { await viewModel.confirmSet() }
-            }
-            .accessibilityIdentifier(FCAccessibilityID.activeSessionConfirmSet)
-
-            HStack(spacing: FCPrimitives.spacingSmall) {
-                Button(String(localized: "session.action.copyPrevious")) {
-                    Task { await viewModel.copyPrevious() }
+                    Button(String(localized: "session.action.cancelSetEdit")) {
+                        viewModel.cancelEditingSet()
+                    }
+                    .frame(minHeight: 44)
+                    .accessibilityIdentifier(FCAccessibilityID.activeSessionCancelSetEdit)
                 }
-                .frame(minHeight: 44)
-                .accessibilityIdentifier(FCAccessibilityID.activeSessionCopyPrevious)
-
-                Button(String(localized: "session.action.copyLastSame")) {
-                    Task { await viewModel.copyLastSame() }
+            } else {
+                FCButton(title: String(localized: "session.action.addSet")) {
+                    Task { await viewModel.addDraftSet() }
                 }
-                .frame(minHeight: 44)
-                .accessibilityIdentifier(FCAccessibilityID.activeSessionCopyLastSame)
+                .accessibilityIdentifier(FCAccessibilityID.activeSessionAddSet)
 
-                Button(String(localized: "session.action.undo")) {
-                    Task { await viewModel.undoLastSet() }
+                FCButton(title: String(localized: "session.action.confirmSet")) {
+                    Task { await viewModel.confirmActiveDraftSet() }
                 }
-                .frame(minHeight: 44)
-                .accessibilityIdentifier(FCAccessibilityID.activeSessionUndoSet)
+                .accessibilityIdentifier(FCAccessibilityID.activeSessionConfirmSet)
+
+                HStack(spacing: FCPrimitives.spacingSmall) {
+                    Button(String(localized: "session.action.copyPrevious")) {
+                        Task { await viewModel.copyPrevious() }
+                    }
+                    .frame(minHeight: 44)
+                    .accessibilityIdentifier(FCAccessibilityID.activeSessionCopyPrevious)
+
+                    Button(String(localized: "session.action.copyLastSame")) {
+                        Task { await viewModel.copyLastSame() }
+                    }
+                    .frame(minHeight: 44)
+                    .accessibilityIdentifier(FCAccessibilityID.activeSessionCopyLastSame)
+
+                    Button(String(localized: "session.action.undo")) {
+                        Task { await viewModel.undoLastSet() }
+                    }
+                    .frame(minHeight: 44)
+                    .accessibilityIdentifier(FCAccessibilityID.activeSessionUndoSet)
+                }
             }
         }
     }

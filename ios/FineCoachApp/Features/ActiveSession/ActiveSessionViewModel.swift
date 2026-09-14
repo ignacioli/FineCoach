@@ -45,6 +45,10 @@ final class ActiveSessionViewModel: ObservableObject {
     @Published var saveAsTemplateName = ""
     @Published var newSectionName = ""
     @Published var pendingSectionDeletion: SessionSection?
+    /// The set currently expanded for inline row editing (M1-A fix:
+    /// explicit id addressing -- at most one row may be expanded at a
+    /// time; setting this to a different id auto-collapses the other).
+    @Published var editingSetID: StableUUID?
 
     let studentID: StableUUID
     let useCases: ActiveSessionUseCases
@@ -52,6 +56,10 @@ final class ActiveSessionViewModel: ObservableObject {
     private let signposts: PerformanceSignposts
     private var catalogSearchGeneration = 0
     private var catalogSearchTask: Task<Void, Never>?
+    /// The set most recently created via the bottom "add set" form, so
+    /// the form's own "confirm" button (`confirmActiveDraftSet()`) can
+    /// target it explicitly instead of falling back to `exercise.sets.last`.
+    private var activeDraftSetID: StableUUID?
 
     init(
         studentID: StableUUID,
@@ -294,38 +302,119 @@ final class ActiveSessionViewModel: ObservableObject {
             return
         }
         await run {
-            self.session = try await self.useCases.addSet(
+            let updated = try await self.useCases.addSet(
                 exerciseID: exercise.id,
                 input: self.currentInput(for: exercise)
             )
+            self.session = updated
+            // Newly appended by `addingSet`, so `.sets.last` here captures
+            // the id of the set this call just created -- not a positional
+            // guess about which set to mutate later.
+            self.activeDraftSetID = updated.exercises.first(where: { $0.id == exercise.id })?.sets.last?.id
         }
     }
 
-    func confirmSet() async {
-        guard let exerciseID = currentExercise?.id,
-            let session,
-            let exercise = session.exercises.first(where: { $0.id == exerciseID })
-        else {
+    /// Confirms the set most recently created by the bottom "add set" form
+    /// (`activeDraftSetID`), or -- if the coach typed values and tapped
+    /// confirm without an explicit "add" first -- creates and confirms a new
+    /// set from the current form fields. Preserves the existing single
+    /// "确认" button UX; does not address by `exercise.sets.last`.
+    func confirmActiveDraftSet() async {
+        if let setID = activeDraftSetID {
+            await confirmSet(setID: setID)
+            return
+        }
+        guard let exercise = currentExercise else {
             return
         }
         await run {
             let input = self.currentInput(for: exercise)
-            let targetID: StableUUID
-            if let last = exercise.sets.last, last.state != .completed {
-                self.session = try await self.useCases.editSet(setID: last.id, input: input)
-                targetID = last.id
-            } else {
-                let added = try await self.useCases.addSet(exerciseID: exercise.id, input: input)
-                self.session = added
-                guard let setID = added.exercises.first(where: { $0.id == exercise.id })?.sets.last?.id else {
-                    throw DomainError.notFound
-                }
-                targetID = setID
+            let added = try await self.useCases.addSet(exerciseID: exercise.id, input: input)
+            guard let newSetID = added.exercises.first(where: { $0.id == exercise.id })?.sets.last?.id else {
+                throw DomainError.notFound
             }
             self.session = try await self.signposts.measureSetConfirm {
-                try await self.useCases.confirmSet(setID: targetID)
+                try await self.useCases.confirmSet(setID: newSetID)
             }
         }
+    }
+
+    /// Confirms an explicitly identified set (M1-A fix). MUST NOT fall back
+    /// to `exercise.sets.last` -- confirming one draft/pending set out of
+    /// order MUST NOT affect any other set's state.
+    func confirmSet(setID: StableUUID) async {
+        await run {
+            self.session = try await self.signposts.measureSetConfirm {
+                try await self.useCases.confirmSet(setID: setID)
+            }
+        }
+        if errorMessage == nil, activeDraftSetID == setID {
+            activeDraftSetID = nil
+        }
+    }
+
+    /// Begins inline editing of an explicitly identified set's row. Only one
+    /// row may be expanded at a time -- setting `editingSetID` to a new
+    /// value automatically collapses whichever row was previously open.
+    func beginEditingSet(_ set: TrainingSet) {
+        editingSetID = set.id
+        recordMode = set.recordMode
+        weight = set.weightValue?.canonicalString ?? ""
+        reps = set.repetitionCount?.canonicalString ?? ""
+        duration = set.durationSeconds?.canonicalString ?? ""
+        side = set.side
+        left = set.leftValue?.canonicalString ?? ""
+        right = set.rightValue?.canonicalString ?? ""
+        distance = set.distanceValue?.canonicalString ?? ""
+        speed = set.speedValue?.canonicalString ?? ""
+        resistance = set.resistanceValue?.canonicalString ?? ""
+    }
+
+    func cancelEditingSet() {
+        editingSetID = nil
+        resetSetFields(for: recordMode)
+    }
+
+    /// Saves the inline-editing form's fields onto the explicitly addressed
+    /// `editingSetID`. Looks up the owning Exercise by scanning for the set
+    /// id (the row being edited need not belong to the currently *selected*
+    /// Exercise) instead of assuming `currentExercise`.
+    func saveEditingSet() async {
+        guard let setID = editingSetID,
+            let exercise = exercise(containingSetID: setID)
+        else {
+            return
+        }
+        let input = currentInput(for: exercise)
+        await run {
+            self.session = try await self.useCases.editSet(setID: setID, input: input)
+        }
+        if errorMessage == nil {
+            editingSetID = nil
+            resetSetFields(for: recordMode)
+        }
+    }
+
+    /// Removes an explicitly identified set (M1-A fix). Used by the per-row
+    /// swipe-to-delete action; MUST NOT rely on array order.
+    func removeSet(setID: StableUUID) async {
+        await run {
+            self.session = try await self.useCases.deleteSet(setID: setID)
+        }
+        guard errorMessage == nil else {
+            return
+        }
+        if editingSetID == setID {
+            editingSetID = nil
+            resetSetFields(for: recordMode)
+        }
+        if activeDraftSetID == setID {
+            activeDraftSetID = nil
+        }
+    }
+
+    private func exercise(containingSetID setID: StableUUID) -> SessionExercise? {
+        session?.exercises.first { $0.sets.contains { $0.id == setID } }
     }
 
     func copyPrevious() async {

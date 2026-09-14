@@ -5,6 +5,16 @@ struct ActiveSessionView: View {
     @StateObject private var viewModel: ActiveSessionViewModel
     @Binding var path: [RootDestination]
     @State private var didPushSummary = false
+    /// Estimated per-row height for the non-scrolling `List` embedded under
+    /// each Exercise (needed so native `.swipeActions` works -- that
+    /// modifier only has an effect inside a `List`, and a `List` nested in
+    /// a `ScrollView` must be given an explicit height). Scales with
+    /// Dynamic Type; deliberately generous so growing content is never
+    /// clipped -- worst case is a little extra blank space, verified by a
+    /// human on-device per this repo's UI acceptance rules, not by an
+    /// automated screenshot loop.
+    @ScaledMetric private var setRowHeight: CGFloat = 76
+    @ScaledMetric private var setEditorExtraHeight: CGFloat = 460
 
     init(
         studentID: StableUUID,
@@ -185,20 +195,31 @@ struct ActiveSessionView: View {
                 viewModel.selectedExerciseID == exercise.id ? [.isSelected] : []
             )
 
-            ForEach(Array(exercise.sets.enumerated()), id: \.element.id) { setIndex, trainingSet in
-                FCSetRow(
-                    title: setTitle(trainingSet, index: setIndex),
-                    value: setValue(trainingSet),
-                    state: rowState(trainingSet.state)
-                )
-                .accessibilityIdentifier(FCAccessibilityID.setAt(setIndex))
-                .accessibilityAddTraits(.updatesFrequently)
-                .background {
-                    Text(trainingSet.state.rawValue)
-                        .font(.caption2)
-                        .foregroundStyle(.clear)
-                        .accessibilityIdentifier(FCAccessibilityID.setState(trainingSet.state))
+            if !exercise.sets.isEmpty {
+                List {
+                    ForEach(Array(exercise.sets.enumerated()), id: \.element.id) { setIndex, trainingSet in
+                        setRow(trainingSet, index: setIndex, in: exercise)
+                            .listRowInsets(EdgeInsets())
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(FCSemanticColors.elevatedSurface)
+                            .swipeActions(
+                                edge: .trailing,
+                                allowsFullSwipe: trainingSet.state != .completed
+                            ) {
+                                Button(role: .destructive) {
+                                    Task { await viewModel.removeSet(setID: trainingSet.id) }
+                                } label: {
+                                    Label(String(localized: "session.action.deleteSet"), systemImage: "trash")
+                                }
+                                .accessibilityIdentifier(FCAccessibilityID.setDeleteAt(setIndex))
+                            }
+                    }
                 }
+                .listStyle(.plain)
+                .scrollDisabled(true)
+                .scrollContentBackground(.hidden)
+                .environment(\.defaultMinListRowHeight, 44)
+                .frame(height: setsListHeight(for: exercise))
             }
 
             if viewModel.selectedExerciseID == exercise.id, viewModel.session?.state == .inProgress {
@@ -312,6 +333,43 @@ struct ActiveSessionView: View {
         case .duration: return String(localized: "session.mode.duration")
         case .cardio: return String(localized: "session.mode.cardio")
         }
+    }
+
+    @ViewBuilder
+    private func setRow(_ trainingSet: TrainingSet, index: Int, in exercise: SessionExercise) -> some View {
+        VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
+            FCSetRow(
+                title: setTitle(trainingSet, index: index),
+                value: setValue(trainingSet),
+                state: rowState(trainingSet.state),
+                onConfirm: trainingSet.state == .completed
+                    ? nil
+                    : { Task { await viewModel.confirmSet(setID: trainingSet.id) } },
+                onEdit: { viewModel.beginEditingSet(trainingSet) }
+            )
+            .accessibilityIdentifier(FCAccessibilityID.setAt(index))
+            .accessibilityAddTraits(.updatesFrequently)
+            .background {
+                Text(trainingSet.state.rawValue)
+                    .font(.caption2)
+                    .foregroundStyle(.clear)
+                    .accessibilityIdentifier(FCAccessibilityID.setState(trainingSet.state))
+            }
+
+            if viewModel.editingSetID == trainingSet.id {
+                SetEditor(viewModel: viewModel, exercise: exercise, targetSetID: trainingSet.id)
+                    .padding(.bottom, FCPrimitives.spacingSmall)
+            }
+        }
+    }
+
+    /// See the `setRowHeight`/`setEditorExtraHeight` doc comment -- a
+    /// deliberately generous, Dynamic-Type-scaled estimate for the
+    /// non-scrolling per-Exercise sets `List`.
+    private func setsListHeight(for exercise: SessionExercise) -> CGFloat {
+        let base = CGFloat(exercise.sets.count) * setRowHeight
+        let isEditingHere = exercise.sets.contains { $0.id == viewModel.editingSetID }
+        return base + (isEditingHere ? setEditorExtraHeight : 0)
     }
 
     private func rowState(_ state: SetRecordingState) -> FCSetRow.State {

@@ -200,6 +200,8 @@ public enum FCAccessibilityID {
     public static let activeSessionLeft = "activeSession.left"
     public static let activeSessionRight = "activeSession.right"
     public static let activeSessionConfirmSet = "activeSession.confirmSet"
+    public static let activeSessionSaveSetEdit = "activeSession.saveSetEdit"
+    public static let activeSessionCancelSetEdit = "activeSession.cancelSetEdit"
     public static let activeSessionCopyPrevious = "activeSession.copyPrevious"
     public static let activeSessionCopyLastSame = "activeSession.copyLastSame"
     public static let activeSessionUndoSet = "activeSession.undoSet"
@@ -277,6 +279,18 @@ public enum FCAccessibilityID {
 
     public static func setState(_ state: SetRecordingState) -> String {
         "activeSession.setState.\(state.rawValue)"
+    }
+
+    public static func setConfirmAt(_ index: Int) -> String {
+        "activeSession.set.confirm.at.\(index)"
+    }
+
+    public static func setEditAt(_ index: Int) -> String {
+        "activeSession.set.edit.at.\(index)"
+    }
+
+    public static func setDeleteAt(_ index: Int) -> String {
+        "activeSession.set.delete.at.\(index)"
     }
 
     public static let sessionSummaryRoot = "sessionSummary.root"
