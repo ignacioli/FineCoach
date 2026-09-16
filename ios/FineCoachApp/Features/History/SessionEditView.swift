@@ -55,7 +55,7 @@ struct SessionEditView: View {
                 Text(String(localized: "summary.focus"))
                     .font(.footnote)
                     .foregroundStyle(FCSemanticColors.secondaryText)
-                TextField(String(localized: "summary.focus"), text: $viewModel.focus, axis: .vertical)
+                TextField(String(localized: "sessionEdit.focusPlaceholder"), text: $viewModel.focus, axis: .vertical)
                     .textFieldStyle(.roundedBorder)
                     .frame(minHeight: 44)
                     .accessibilityLabel(Text(String(localized: "summary.focus")))

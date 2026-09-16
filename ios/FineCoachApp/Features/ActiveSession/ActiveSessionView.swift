@@ -80,6 +80,7 @@ struct ActiveSessionView: View {
                     templateAndSectionControls
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(FCPrimitives.spacingMedium)
         }
         .safeAreaInset(edge: .bottom) {

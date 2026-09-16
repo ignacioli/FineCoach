@@ -2001,7 +2001,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "编辑训练记录"
+            "value": "编辑训练重点"
           }
         }
       }
@@ -4268,6 +4268,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "无结束日期"
+          }
+        }
+      }
+    },
+    "sessionEdit.focusPlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一句话备注，例如\"腿部训练，重点纠正膝内扣角度\""
           }
         }
       }
