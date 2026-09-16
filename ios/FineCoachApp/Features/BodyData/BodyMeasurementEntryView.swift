@@ -12,15 +12,30 @@ final class BodyMeasurementEntryViewModel: ObservableObject {
     @Published var unitText = ""
     @Published var errorMessage: String?
     @Published var pendingDeleteID: StableUUID?
+    /// Coach's current display-unit choice for THIS metric's unit family
+    /// (M1B-FR-025) -- only meaningful when `metric.kind == .builtIn` and
+    /// `unitRuleKind` is `.weight`/`.length`; irrelevant otherwise. Seeded
+    /// from -- and persisted back to -- `unitPreferences` on change.
+    @Published var weightDisplayUnit: BuiltInUnitConversion.WeightDisplayUnit
+    @Published var lengthDisplayUnit: BuiltInUnitConversion.LengthDisplayUnit
 
     let studentID: StableUUID
     let metricID: StableUUID
     private let useCases: BodyDataUseCases
+    private let unitPreferences: BodyDataUnitPreferences
 
-    init(studentID: StableUUID, metricID: StableUUID, useCases: BodyDataUseCases) {
+    init(
+        studentID: StableUUID,
+        metricID: StableUUID,
+        useCases: BodyDataUseCases,
+        unitPreferences: BodyDataUnitPreferences = .shared
+    ) {
         self.studentID = studentID
         self.metricID = metricID
         self.useCases = useCases
+        self.unitPreferences = unitPreferences
+        self.weightDisplayUnit = unitPreferences.weightUnit
+        self.lengthDisplayUnit = unitPreferences.lengthUnit
     }
 
     /// Whether today already has a recorded value -- if so, saving EDITS it
@@ -28,6 +43,66 @@ final class BodyMeasurementEntryViewModel: ObservableObject {
     var todaysMeasurement: BodyMeasurement? {
         guard let today = history.map(\.localCalendarDay).max() else { return nil }
         return history.first { $0.localCalendarDay == today }
+    }
+
+    var isBuiltInWeight: Bool { metric?.kind == .builtIn && metric?.unitRuleKind == .weight }
+    var isBuiltInLength: Bool { metric?.kind == .builtIn && metric?.unitRuleKind == .length }
+
+    func setWeightDisplayUnit(_ unit: BuiltInUnitConversion.WeightDisplayUnit) {
+        weightDisplayUnit = unit
+        unitPreferences.weightUnit = unit
+    }
+
+    func setLengthDisplayUnit(_ unit: BuiltInUnitConversion.LengthDisplayUnit) {
+        lengthDisplayUnit = unit
+        unitPreferences.lengthUnit = unit
+    }
+
+    /// Converts a canonical `BodyMeasurement.value` into the currently
+    /// selected display unit for history rows -- built-in weight/length only;
+    /// percent and custom metrics show their stored value/unit unchanged
+    /// (M1B-FR-025).
+    func displayValue(for measurement: BodyMeasurement) -> String {
+        guard let metric, metric.kind == .builtIn else {
+            return "\(measurement.value.canonicalString) \(measurement.enteredUnit)"
+        }
+        switch metric.unitRuleKind {
+        case .weight:
+            let converted =
+                (try? BuiltInUnitConversion.weight(canonicalKilograms: measurement.value, displayedAs: weightDisplayUnit))
+                ?? measurement.value
+            return "\(converted.canonicalString) \(weightDisplayUnit.rawValue)"
+        case .length:
+            let converted =
+                (try? BuiltInUnitConversion.length(canonicalCentimeters: measurement.value, displayedAs: lengthDisplayUnit))
+                ?? measurement.value
+            return "\(converted.canonicalString) \(lengthDisplayUnit.rawValue)"
+        case .percent, .customUnit:
+            return "\(measurement.value.canonicalString) \(measurement.enteredUnit)"
+        }
+    }
+
+    /// Turns what the coach typed in `valueText` -- entered WHILE the UI was
+    /// displaying in the current `weightDisplayUnit`/`lengthDisplayUnit` --
+    /// into the canonical value+unit pair to actually store (M1B-FR-025):
+    /// built-ins always persist in their fixed canonical unit; percent and
+    /// custom metrics pass `valueText`/`unitText` through unchanged.
+    private func canonicalInputForSave() throws -> (value: String, enteredUnit: String) {
+        guard let metric, metric.kind == .builtIn else {
+            return (valueText, unitText)
+        }
+        switch metric.unitRuleKind {
+        case .weight:
+            let entered = try DecimalValue(valueText)
+            let canonical = try BuiltInUnitConversion.canonicalKilograms(fromDisplayed: entered, unit: weightDisplayUnit)
+            return (canonical.canonicalString, metric.currentUnit)
+        case .length:
+            let entered = try DecimalValue(valueText)
+            let canonical = try BuiltInUnitConversion.canonicalCentimeters(fromDisplayed: entered, unit: lengthDisplayUnit)
+            return (canonical.canonicalString, metric.currentUnit)
+        case .percent, .customUnit:
+            return (valueText, unitText)
+        }
     }
 
     func reload() async {
@@ -50,11 +125,12 @@ final class BodyMeasurementEntryViewModel: ObservableObject {
 
     func save() async {
         do {
+            let (value, enteredUnit) = try canonicalInputForSave()
             _ = try await useCases.recordMeasurement(
                 studentID: studentID,
                 metricID: metricID,
-                value: valueText,
-                enteredUnit: unitText
+                value: value,
+                enteredUnit: enteredUnit
             )
             valueText = ""
             await reload()
@@ -103,7 +179,38 @@ struct BodyMeasurementEntryView: View {
                 FCTextField(String(localized: "bodyMeasurementEntry.valuePlaceholder"), text: $viewModel.valueText)
                     .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementEntryValueField)
                     .keyboardType(.decimalPad)
-                FCTextField(String(localized: "bodyMeasurementEntry.unitPlaceholder"), text: $viewModel.unitText)
+
+                if viewModel.isBuiltInWeight {
+                    Picker(
+                        String(localized: "bodyMeasurementEntry.displayUnit"),
+                        selection: Binding(
+                            get: { viewModel.weightDisplayUnit },
+                            set: { viewModel.setWeightDisplayUnit($0) }
+                        )
+                    ) {
+                        ForEach(BuiltInUnitConversion.WeightDisplayUnit.allCases, id: \.self) { unit in
+                            Text(unit.rawValue).tag(unit)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementEntryUnitToggle)
+                } else if viewModel.isBuiltInLength {
+                    Picker(
+                        String(localized: "bodyMeasurementEntry.displayUnit"),
+                        selection: Binding(
+                            get: { viewModel.lengthDisplayUnit },
+                            set: { viewModel.setLengthDisplayUnit($0) }
+                        )
+                    ) {
+                        ForEach(BuiltInUnitConversion.LengthDisplayUnit.allCases, id: \.self) { unit in
+                            Text(unit.rawValue).tag(unit)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementEntryUnitToggle)
+                } else {
+                    FCTextField(String(localized: "bodyMeasurementEntry.unitPlaceholder"), text: $viewModel.unitText)
+                }
 
                 FCButton(title: String(localized: "bodyMeasurementEntry.save")) {
                     Task { await viewModel.save() }
@@ -158,7 +265,7 @@ struct BodyMeasurementEntryView: View {
             VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
                 Text(measurement.localCalendarDay.canonicalString)
                     .font(.body.weight(.medium))
-                Text("\(measurement.value.canonicalString) \(measurement.enteredUnit)")
+                Text(viewModel.displayValue(for: measurement))
                     .foregroundStyle(FCSemanticColors.secondaryText)
             }
             Spacer()

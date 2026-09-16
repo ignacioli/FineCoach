@@ -4304,6 +4304,17 @@
           }
         }
       }
+    },
+    "bodyMeasurementEntry.displayUnit": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示单位"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

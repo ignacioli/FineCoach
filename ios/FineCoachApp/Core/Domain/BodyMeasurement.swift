@@ -220,4 +220,40 @@ public enum BuiltInUnitConversion {
                 .stringValue
         )
     }
+
+    /// Inverse of `weight(canonicalKilograms:displayedAs:)`: the coach TYPED
+    /// `value` while the UI was displaying in `unit` -- this converts that
+    /// entry back into the canonical kg value to store (M1B-FR-025). Pure
+    /// math, no side effects; the caller still owns writing the result.
+    public static func canonicalKilograms(fromDisplayed value: DecimalValue, unit: WeightDisplayUnit) throws
+        -> DecimalValue
+    {
+        switch unit {
+        case .kilograms:
+            return value
+        case .pounds:
+            return try DecimalValue(
+                NSDecimalNumber(decimal: value.decimal)
+                    .dividing(by: NSDecimalNumber(decimal: DecimalValue("2.2046226218").decimal))
+                    .stringValue
+            )
+        }
+    }
+
+    /// Inverse of `length(canonicalCentimeters:displayedAs:)` -- see
+    /// `canonicalKilograms(fromDisplayed:unit:)` above.
+    public static func canonicalCentimeters(fromDisplayed value: DecimalValue, unit: LengthDisplayUnit) throws
+        -> DecimalValue
+    {
+        switch unit {
+        case .centimeters:
+            return value
+        case .inches:
+            return try DecimalValue(
+                NSDecimalNumber(decimal: value.decimal)
+                    .dividing(by: NSDecimalNumber(decimal: DecimalValue("0.3937007874").decimal))
+                    .stringValue
+            )
+        }
+    }
 }

@@ -112,6 +112,7 @@ public enum FCAccessibilityID {
     public static let bodyDataListRoot = "bodyData.root"
     public static let bodyDataAddCustomMetric = "bodyData.addCustomMetric"
     public static let bodyDataEmptyState = "bodyData.emptyState"
+    public static let bodyDataNewCustomMetricError = "bodyData.newCustomMetric.error"
 
     public static func bodyDataMetricRow(_ id: StableUUID) -> String {
         "bodyData.metricRow.\(id.rawValue.uuidString)"
@@ -120,6 +121,7 @@ public enum FCAccessibilityID {
     public static let bodyMeasurementEntryRoot = "bodyMeasurementEntry.root"
     public static let bodyMeasurementEntryValueField = "bodyMeasurementEntry.valueField"
     public static let bodyMeasurementEntrySave = "bodyMeasurementEntry.save"
+    public static let bodyMeasurementEntryUnitToggle = "bodyMeasurementEntry.unitToggle"
 
     public static func bodyMeasurementRow(_ id: StableUUID) -> String {
         "bodyMeasurementEntry.row.\(id.rawValue.uuidString)"

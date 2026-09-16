@@ -110,6 +110,73 @@ final class BodyMeasurementComparisonTests: XCTestCase {
         XCTAssertEqual(canonicalKg.canonicalString, "70")
     }
 
+    /// Covers the fix for M1B-FR-025's display-unit switch: given the SAME
+    /// saved canonical value, switching the display unit MUST recompute the
+    /// shown number from it -- never a second stored value.
+    func testCanonicalWeightConvertsToDisplayedPoundsAndBackWithoutMutation() throws {
+        let canonicalKg = try DecimalValue("70")
+
+        let displayedInPounds = try BuiltInUnitConversion.weight(canonicalKilograms: canonicalKg, displayedAs: .pounds)
+        // 70 kg ~= 154.32 lb.
+        XCTAssertEqual(
+            NSDecimalNumber(decimal: displayedInPounds.decimal)
+                .rounding(accordingToBehavior: NSDecimalNumberHandler(
+                    roundingMode: .plain, scale: 1, raiseOnExactness: false, raiseOnOverflow: false,
+                    raiseOnUnderflow: false, raiseOnDivideByZero: false))
+                .stringValue,
+            "154.3"
+        )
+
+        // The inverse of a display-unit entry converts back to the same
+        // canonical value the display started from (within decimal rounding).
+        let reenteredCanonical = try BuiltInUnitConversion.canonicalKilograms(
+            fromDisplayed: displayedInPounds, unit: .pounds)
+        XCTAssertEqual(
+            NSDecimalNumber(decimal: reenteredCanonical.decimal).rounding(accordingToBehavior: nil).stringValue,
+            NSDecimalNumber(decimal: canonicalKg.decimal).rounding(accordingToBehavior: nil).stringValue
+        )
+        // Still untouched.
+        XCTAssertEqual(canonicalKg.canonicalString, "70")
+    }
+
+    func testCanonicalLengthConvertsToDisplayedInchesAndBackWithoutMutation() throws {
+        let canonicalCm = try DecimalValue("180")
+
+        let displayedInInches = try BuiltInUnitConversion.length(canonicalCentimeters: canonicalCm, displayedAs: .inches)
+        // 180 cm ~= 70.87 in.
+        XCTAssertEqual(
+            NSDecimalNumber(decimal: displayedInInches.decimal)
+                .rounding(accordingToBehavior: NSDecimalNumberHandler(
+                    roundingMode: .plain, scale: 1, raiseOnExactness: false, raiseOnOverflow: false,
+                    raiseOnUnderflow: false, raiseOnDivideByZero: false))
+                .stringValue,
+            "70.9"
+        )
+
+        let reenteredCanonical = try BuiltInUnitConversion.canonicalCentimeters(
+            fromDisplayed: displayedInInches, unit: .inches)
+        XCTAssertEqual(
+            NSDecimalNumber(decimal: reenteredCanonical.decimal).rounding(accordingToBehavior: nil).stringValue,
+            NSDecimalNumber(decimal: canonicalCm.decimal).rounding(accordingToBehavior: nil).stringValue
+        )
+        XCTAssertEqual(canonicalCm.canonicalString, "180")
+    }
+
+    /// The kg/cm identity case (no conversion) MUST pass the value through
+    /// unchanged in both directions.
+    func testCanonicalConversionIsIdentityForTheCanonicalUnitItself() throws {
+        let kg = try DecimalValue("62.5")
+        XCTAssertEqual(
+            try BuiltInUnitConversion.canonicalKilograms(fromDisplayed: kg, unit: .kilograms).canonicalString,
+            "62.5"
+        )
+        let cm = try DecimalValue("165")
+        XCTAssertEqual(
+            try BuiltInUnitConversion.canonicalCentimeters(fromDisplayed: cm, unit: .centimeters).canonicalString,
+            "165"
+        )
+    }
+
     func testCustomMetricCurrentUnitChangeNeverAltersExistingMeasurements() throws {
         let metric = try BodyMetricDefinition.makeCustom(
             id: metricID, studentID: studentID, name: "握力", unit: "kg", now: now

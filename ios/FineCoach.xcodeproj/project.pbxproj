@@ -154,9 +154,11 @@
 		B606 /* CoreDataBodyDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A606 /* CoreDataBodyDataRepository.swift */; };
 		B607 /* BodyDataListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A607 /* BodyDataListView.swift */; };
 		B608 /* BodyMeasurementEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A608 /* BodyMeasurementEntryView.swift */; };
+		B620 /* BodyDataUnitPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = A620 /* BodyDataUnitPreferences.swift */; };
 		B609 /* TrendsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A609 /* TrendsView.swift */; };
 		B612 /* BodyMeasurementComparisonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A612 /* BodyMeasurementComparisonTests.swift */; };
 		B613 /* BodyDataReportExclusionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A613 /* BodyDataReportExclusionTests.swift */; };
+		B621 /* BodyDataUnitPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A621 /* BodyDataUnitPreferencesTests.swift */; };
 		B544 /* SessionSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A544 /* SessionSection.swift */; };
 		B545 /* TrainingTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A545 /* TrainingTemplate.swift */; };
 		B546 /* TemplateUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A546 /* TemplateUseCases.swift */; };
@@ -369,9 +371,11 @@
 		A606 /* CoreDataBodyDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoreDataBodyDataRepository.swift"; sourceTree = "<group>"; };
 		A607 /* BodyDataListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BodyDataListView.swift"; sourceTree = "<group>"; };
 		A608 /* BodyMeasurementEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BodyMeasurementEntryView.swift"; sourceTree = "<group>"; };
+		A620 /* BodyDataUnitPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BodyDataUnitPreferences.swift"; sourceTree = "<group>"; };
 		A609 /* TrendsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TrendsView.swift"; sourceTree = "<group>"; };
 		A612 /* BodyMeasurementComparisonTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BodyMeasurementComparisonTests.swift"; sourceTree = "<group>"; };
 		A613 /* BodyDataReportExclusionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BodyDataReportExclusionTests.swift"; sourceTree = "<group>"; };
+		A621 /* BodyDataUnitPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BodyDataUnitPreferencesTests.swift"; sourceTree = "<group>"; };
 		A547 /* TemplateManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TemplateManagedObject+Mapping.swift"; sourceTree = "<group>"; };
 		A548 /* CoreDataTemplateRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoreDataTemplateRepository.swift"; sourceTree = "<group>"; };
 		A549 /* SessionSectionManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SessionSectionManagedObject+Mapping.swift"; sourceTree = "<group>"; };
@@ -646,6 +650,7 @@
 			children = (
 				A607 /* BodyDataListView.swift */,
 				A608 /* BodyMeasurementEntryView.swift */,
+				A620 /* BodyDataUnitPreferences.swift */,
 			);
 			path = BodyData;
 			sourceTree = "<group>";
@@ -1061,6 +1066,7 @@
 			children = (
 				A612 /* BodyMeasurementComparisonTests.swift */,
 				A613 /* BodyDataReportExclusionTests.swift */,
+				A621 /* BodyDataUnitPreferencesTests.swift */,
 			);
 			path = BodyData;
 			sourceTree = "<group>";
@@ -1545,6 +1551,7 @@
 				B606 /* CoreDataBodyDataRepository.swift in Sources */,
 				B607 /* BodyDataListView.swift in Sources */,
 				B608 /* BodyMeasurementEntryView.swift in Sources */,
+				B620 /* BodyDataUnitPreferences.swift in Sources */,
 				B609 /* TrendsView.swift in Sources */,
 				B535 /* CoursePackageListView.swift in Sources */,
 				B536 /* CoursePackageEditorView.swift in Sources */,
@@ -1597,6 +1604,7 @@
 				B554 /* TemplateSnapshotSectionTests.swift in Sources */,
 				B612 /* BodyMeasurementComparisonTests.swift in Sources */,
 				B613 /* BodyDataReportExclusionTests.swift in Sources */,
+				B621 /* BodyDataUnitPreferencesTests.swift in Sources */,
 				B232 /* SessionSetDomainTests.swift in Sources */,
 				B234 /* ActiveSessionRecoveryCodecTests.swift in Sources */,
 				B235 /* SessionTimingTests.swift in Sources */,

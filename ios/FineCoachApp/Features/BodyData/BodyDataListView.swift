@@ -11,6 +11,11 @@ final class BodyDataListViewModel: ObservableObject {
     @Published var showingNewCustomMetric = false
     @Published var newMetricName = ""
     @Published var newMetricUnit = ""
+    /// Error from `createCustomMetric()` (most commonly a same-name conflict,
+    /// M1B-FR-023), shown INSIDE the new-custom-metric sheet -- `errorMessage`
+    /// above renders behind the sheet's modal layer and is invisible while
+    /// the sheet is open, so this failure needs its own surfaced state.
+    @Published var newMetricErrorMessage: String?
 
     let studentID: StableUUID
     private let useCases: BodyDataUseCases
@@ -51,13 +56,29 @@ final class BodyDataListViewModel: ObservableObject {
             )
             newMetricName = ""
             newMetricUnit = ""
+            newMetricErrorMessage = nil
             showingNewCustomMetric = false
             await reload()
         } catch {
-            errorMessage =
+            // Deliberately NOT dismissing the sheet and NOT touching the
+            // list-level `errorMessage` -- the coach is still inside the
+            // sheet and needs to see why the save failed right there.
+            newMetricErrorMessage =
                 (error as? LocalizedError)?.errorDescription
                 ?? String(localized: "bodyData.error.generic")
         }
+    }
+
+    /// Clears any stale error from a previous failed attempt when the coach
+    /// (re)opens the new-custom-metric sheet.
+    func presentNewCustomMetricSheet() {
+        newMetricErrorMessage = nil
+        showingNewCustomMetric = true
+    }
+
+    func cancelNewCustomMetric() {
+        newMetricErrorMessage = nil
+        showingNewCustomMetric = false
     }
 
     func toggleArchive(_ metric: BodyMetricDefinition) async {
@@ -129,7 +150,7 @@ struct BodyDataListView: View {
                 }
 
                 FCButton(title: String(localized: "bodyData.addCustomMetric")) {
-                    viewModel.showingNewCustomMetric = true
+                    viewModel.presentNewCustomMetricSheet()
                 }
                 .accessibilityIdentifier(FCAccessibilityID.bodyDataAddCustomMetric)
             }
@@ -149,13 +170,18 @@ struct BodyDataListView: View {
         VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
             Text(String(localized: "bodyData.newCustomMetric.title"))
                 .font(.title3.weight(.semibold))
+            if let newMetricErrorMessage = viewModel.newMetricErrorMessage {
+                Text(newMetricErrorMessage)
+                    .foregroundStyle(FCSemanticColors.destructive)
+                    .accessibilityIdentifier(FCAccessibilityID.bodyDataNewCustomMetricError)
+            }
             FCTextField(String(localized: "bodyData.newCustomMetric.namePlaceholder"), text: $viewModel.newMetricName)
             FCTextField(String(localized: "bodyData.newCustomMetric.unitPlaceholder"), text: $viewModel.newMetricUnit)
             FCButton(title: String(localized: "bodyData.newCustomMetric.save")) {
                 Task { await viewModel.createCustomMetric() }
             }
             Button(String(localized: "bodyData.newCustomMetric.cancel")) {
-                viewModel.showingNewCustomMetric = false
+                viewModel.cancelNewCustomMetric()
             }
             .frame(minHeight: 44)
         }
