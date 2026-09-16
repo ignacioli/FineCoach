@@ -61,7 +61,7 @@ struct SessionEditView: View {
                     .accessibilityLabel(Text(String(localized: "summary.focus")))
                     .accessibilityIdentifier(FCAccessibilityID.sessionEditFocus)
 
-                FCButton(title: String(localized: "student.editor.save")) {
+                FCButton(title: String(localized: "sessionEdit.save")) {
                     Task {
                         guard await viewModel.save() else { return }
                         if !path.isEmpty {

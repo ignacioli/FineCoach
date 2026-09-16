@@ -46,6 +46,7 @@ struct HistoryListView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(Self.dayText(row.completedAtUTC))
                             .font(.headline)
+                            .foregroundStyle(FCSemanticColors.primaryText)
                         Text(
                             String(
                                 format: String(localized: "history.row.sets.format"),

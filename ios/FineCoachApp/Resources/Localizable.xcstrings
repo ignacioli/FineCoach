@@ -4271,6 +4271,17 @@
           }
         }
       }
+    },
+    "sessionEdit.save": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
