@@ -37,11 +37,21 @@ public struct FCSetRow: View {
     public var body: some View {
         HStack(spacing: FCPrimitives.spacingSmall) {
             confirmControl
+            // Long-press-to-edit is scoped to JUST this title+value block,
+            // not the whole row -- a `.onLongPressGesture` on the full
+            // HStack would sit on top of `confirmControl`/`editControl` and
+            // steal their tap gestures (classic SwiftUI parent-gesture-wins
+            // conflict), which is exactly what made both buttons dead on a
+            // real device despite compiling and unit-testing fine.
             VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
                 Text(title)
                     .font(.body)
                     .foregroundStyle(state == .completed ? FCSemanticColors.primaryText : FCSemanticColors.secondaryText)
                 Text(value).font(.subheadline).foregroundStyle(FCSemanticColors.secondaryText)
+            }
+            .contentShape(Rectangle())
+            .onLongPressGesture(minimumDuration: 0.5) {
+                onEdit?()
             }
             Spacer(minLength: FCPrimitives.spacingSmall)
             Text(state.rawValue)
@@ -51,10 +61,6 @@ public struct FCSetRow: View {
         }
         .padding(.vertical, FCPrimitives.spacingSmall)
         .frame(minHeight: 44)
-        .contentShape(Rectangle())
-        .onLongPressGesture(minimumDuration: 0.5) {
-            onEdit?()
-        }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("\(title)，\(value)，\(state.rawValue)"))
         .accessibilityHint(state.isConfirmable ? Text(String(localized: "session.set.confirmHint")) : Text(""))
