@@ -204,6 +204,7 @@
 		B231 /* StudentPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A231 /* StudentPersistenceTests.swift */; };
 		B233 /* ActiveSessionPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A233 /* ActiveSessionPersistenceTests.swift */; };
 		B710 /* ActiveSessionSetRowInteractionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A710 /* ActiveSessionSetRowInteractionTests.swift */; };
+		B711 /* ActiveSessionCardioDurationConversionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A711 /* ActiveSessionCardioDurationConversionTests.swift */; };
 		B234 /* ActiveSessionRecoveryCodecTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A234 /* ActiveSessionRecoveryCodecTests.swift */; };
 		B235 /* SessionTimingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A235 /* SessionTimingTests.swift */; };
 		B236 /* RecoveryProjectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A236 /* RecoveryProjectionTests.swift */; };
@@ -445,6 +446,7 @@
 		A231 /* StudentPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentPersistenceTests.swift; sourceTree = "<group>"; };
 		A233 /* ActiveSessionPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionPersistenceTests.swift; sourceTree = "<group>"; };
 		A710 /* ActiveSessionSetRowInteractionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionSetRowInteractionTests.swift; sourceTree = "<group>"; };
+		A711 /* ActiveSessionCardioDurationConversionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionCardioDurationConversionTests.swift; sourceTree = "<group>"; };
 		A234 /* ActiveSessionRecoveryCodecTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionRecoveryCodecTests.swift; sourceTree = "<group>"; };
 		A235 /* SessionTimingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionTimingTests.swift; sourceTree = "<group>"; };
 		A236 /* RecoveryProjectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryProjectionTests.swift; sourceTree = "<group>"; };
@@ -1092,6 +1094,7 @@
 			children = (
 				A233 /* ActiveSessionPersistenceTests.swift */,
 				A710 /* ActiveSessionSetRowInteractionTests.swift */,
+				A711 /* ActiveSessionCardioDurationConversionTests.swift */,
 			);
 			path = ActiveSession;
 			sourceTree = "<group>";
@@ -1639,6 +1642,7 @@
 				B231 /* StudentPersistenceTests.swift in Sources */,
 				B233 /* ActiveSessionPersistenceTests.swift in Sources */,
 				B710 /* ActiveSessionSetRowInteractionTests.swift in Sources */,
+				B711 /* ActiveSessionCardioDurationConversionTests.swift in Sources */,
 				B236 /* RecoveryProjectionTests.swift in Sources */,
 				B239 /* ExercisePersistenceTests.swift in Sources */,
 				B242 /* ShareReportRendererTests.swift in Sources */,

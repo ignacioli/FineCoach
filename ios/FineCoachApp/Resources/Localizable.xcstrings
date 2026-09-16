@@ -1214,6 +1214,17 @@
         }
       }
     },
+    "session.field.cardioDuration": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "时长（分钟）"
+          }
+        }
+      }
+    },
     "session.field.left": {
       "extractionState": "manual",
       "localizations": {
@@ -3310,7 +3321,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "距离"
+            "value": "距离（km）"
           }
         }
       }

@@ -25,7 +25,7 @@ struct SetEditor: View {
                     .keyboardType(.numberPad)
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionReps)
             } else if exercise.recordModeSnapshot == .cardio {
-                FCTextField(String(localized: "session.field.duration"), text: $viewModel.duration)
+                FCTextField(String(localized: "session.field.cardioDuration"), text: $viewModel.duration)
                     .keyboardType(.decimalPad)
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionDuration)
                 FCTextField(String(localized: "session.field.distance"), text: $viewModel.distance)
