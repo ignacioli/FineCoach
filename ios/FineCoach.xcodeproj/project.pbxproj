@@ -207,6 +207,7 @@
 		B233 /* ActiveSessionPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A233 /* ActiveSessionPersistenceTests.swift */; };
 		B710 /* ActiveSessionSetRowInteractionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A710 /* ActiveSessionSetRowInteractionTests.swift */; };
 		B711 /* ActiveSessionCardioDurationConversionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A711 /* ActiveSessionCardioDurationConversionTests.swift */; };
+		B720 /* BodyDataPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A720 /* BodyDataPersistenceTests.swift */; };
 		B234 /* ActiveSessionRecoveryCodecTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A234 /* ActiveSessionRecoveryCodecTests.swift */; };
 		B235 /* SessionTimingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A235 /* SessionTimingTests.swift */; };
 		B236 /* RecoveryProjectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A236 /* RecoveryProjectionTests.swift */; };
@@ -451,6 +452,7 @@
 		A233 /* ActiveSessionPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionPersistenceTests.swift; sourceTree = "<group>"; };
 		A710 /* ActiveSessionSetRowInteractionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionSetRowInteractionTests.swift; sourceTree = "<group>"; };
 		A711 /* ActiveSessionCardioDurationConversionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionCardioDurationConversionTests.swift; sourceTree = "<group>"; };
+		A720 /* BodyDataPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyDataPersistenceTests.swift; sourceTree = "<group>"; };
 		A234 /* ActiveSessionRecoveryCodecTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionRecoveryCodecTests.swift; sourceTree = "<group>"; };
 		A235 /* SessionTimingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionTimingTests.swift; sourceTree = "<group>"; };
 		A236 /* RecoveryProjectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryProjectionTests.swift; sourceTree = "<group>"; };
@@ -872,6 +874,7 @@
 				A487 /* ShareReport */,
 				A490 /* Backup */,
 				A494 /* Performance */,
+				A721 /* BodyData */,
 			);
 			path = FineCoachIntegrationTests;
 			sourceTree = "<group>";
@@ -891,6 +894,14 @@
 				A515 /* AppointmentPersistenceTests.swift */,
 			);
 			path = Appointments;
+			sourceTree = "<group>";
+		};
+		A721 /* BodyData */ = {
+			isa = PBXGroup;
+			children = (
+				A720 /* BodyDataPersistenceTests.swift */,
+			);
+			path = BodyData;
 			sourceTree = "<group>";
 		};
 		A542 /* CoursePackages */ = {
@@ -1651,6 +1662,7 @@
 				B233 /* ActiveSessionPersistenceTests.swift in Sources */,
 				B710 /* ActiveSessionSetRowInteractionTests.swift in Sources */,
 				B711 /* ActiveSessionCardioDurationConversionTests.swift in Sources */,
+				B720 /* BodyDataPersistenceTests.swift in Sources */,
 				B236 /* RecoveryProjectionTests.swift in Sources */,
 				B239 /* ExercisePersistenceTests.swift in Sources */,
 				B242 /* ShareReportRendererTests.swift in Sources */,

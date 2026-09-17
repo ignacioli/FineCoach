@@ -186,6 +186,8 @@ public enum BuiltInUnitConversion {
     }
 
     /// `canonicalKilograms` MUST be the metric's canonical stored value (kg).
+    /// The returned value is rounded to 2 decimal places -- this is a
+    /// DISPLAY-only rounding; the canonical stored value is never touched.
     public static func weight(canonicalKilograms: DecimalValue, displayedAs unit: WeightDisplayUnit) throws
         -> DecimalValue
     {
@@ -193,11 +195,14 @@ public enum BuiltInUnitConversion {
         case .kilograms:
             return canonicalKilograms
         case .pounds:
-            return try canonicalKilograms.multiplied(by: DecimalValue("2.2046226218"))
+            let converted = try canonicalKilograms.multiplied(by: DecimalValue("2.2046226218"))
+            return try roundedForDisplay(converted)
         }
     }
 
     /// `canonicalCentimeters` MUST be the metric's canonical stored value (cm).
+    /// The returned value is rounded to 2 decimal places -- this is a
+    /// DISPLAY-only rounding; the canonical stored value is never touched.
     public static func length(canonicalCentimeters: DecimalValue, displayedAs unit: LengthDisplayUnit) throws
         -> DecimalValue
     {
@@ -205,8 +210,20 @@ public enum BuiltInUnitConversion {
         case .centimeters:
             return canonicalCentimeters
         case .inches:
-            return try canonicalCentimeters.multiplied(by: DecimalValue("0.3937007874"))
+            let converted = try canonicalCentimeters.multiplied(by: DecimalValue("0.3937007874"))
+            return try roundedForDisplay(converted)
         }
+    }
+
+    /// Rounds a display value to 2 decimal places (via `.plain` rounding
+    /// mode), matching the idiom used elsewhere in the codebase (see
+    /// `ActiveSessionViewModel.minutesDisplay`). Display-only -- never
+    /// applied to canonical stored values.
+    private static func roundedForDisplay(_ value: DecimalValue) throws -> DecimalValue {
+        var rounded = Decimal()
+        var input = value.decimal
+        NSDecimalRound(&rounded, &input, 2, .plain)
+        return try DecimalValue(NSDecimalNumber(decimal: rounded).stringValue)
     }
 
     /// Round-trip helper used by tests to prove the conversion is lossless

@@ -7,6 +7,10 @@ import SwiftUI
 @MainActor
 final class BodyDataListViewModel: ObservableObject {
     @Published var metrics: [BodyMetricDefinition] = []
+    /// Most-recent recorded value per metric, keyed by `metricID` -- loaded
+    /// via a single batch call alongside `metrics` in `reload()`. Metrics
+    /// with no recorded measurement are simply absent (no placeholder row).
+    @Published var latestByMetric: [StableUUID: BodyMeasurement] = [:]
     @Published var errorMessage: String?
     @Published var showingNewCustomMetric = false
     @Published var newMetricName = ""
@@ -19,10 +23,12 @@ final class BodyDataListViewModel: ObservableObject {
 
     let studentID: StableUUID
     private let useCases: BodyDataUseCases
+    private let unitPreferences: BodyDataUnitPreferences
 
-    init(studentID: StableUUID, useCases: BodyDataUseCases) {
+    init(studentID: StableUUID, useCases: BodyDataUseCases, unitPreferences: BodyDataUnitPreferences = .shared) {
         self.studentID = studentID
         self.useCases = useCases
+        self.unitPreferences = unitPreferences
     }
 
     var builtInMetrics: [BodyMetricDefinition] {
@@ -36,14 +42,56 @@ final class BodyDataListViewModel: ObservableObject {
             .sorted { ($0.lifecycle == .active ? 0 : 1) < ($1.lifecycle == .active ? 0 : 1) }
     }
 
+    /// Split out of `customMetrics` into their own visual groups so an
+    /// archived ("停用") metric never reads as visually indistinct from one
+    /// that is still active (coaches were mixing up "archived" with
+    /// "can't be deleted").
+    var activeCustomMetrics: [BodyMetricDefinition] {
+        customMetrics.filter { $0.lifecycle == .active }
+    }
+
+    var archivedCustomMetrics: [BodyMetricDefinition] {
+        customMetrics.filter { $0.lifecycle == .archived }
+    }
+
     func reload() async {
         do {
             metrics = try await useCases.metrics(studentID: studentID)
+            latestByMetric = try await useCases.latestMeasurements(studentID: studentID)
             errorMessage = nil
         } catch {
             errorMessage =
                 (error as? LocalizedError)?.errorDescription
                 ?? String(localized: "bodyData.error.generic")
+        }
+    }
+
+    /// Converts a metric's latest recorded value into its currently
+    /// preferred display form -- built-in weight/length metrics are
+    /// converted through `BuiltInUnitConversion` using the coach's saved
+    /// display-unit preference (mirrors
+    /// `BodyMeasurementEntryViewModel.displayValue(for:)`); percent and
+    /// custom metrics show their stored value/unit unchanged.
+    func latestDisplayValue(for metric: BodyMetricDefinition) -> String? {
+        guard let measurement = latestByMetric[metric.id] else { return nil }
+        guard metric.kind == .builtIn else {
+            return "\(measurement.value.canonicalString) \(measurement.enteredUnit)"
+        }
+        switch metric.unitRuleKind {
+        case .weight:
+            let unit = unitPreferences.weightUnit
+            let converted =
+                (try? BuiltInUnitConversion.weight(canonicalKilograms: measurement.value, displayedAs: unit))
+                ?? measurement.value
+            return "\(converted.canonicalString) \(unit.rawValue)"
+        case .length:
+            let unit = unitPreferences.lengthUnit
+            let converted =
+                (try? BuiltInUnitConversion.length(canonicalCentimeters: measurement.value, displayedAs: unit))
+                ?? measurement.value
+            return "\(converted.canonicalString) \(unit.rawValue)"
+        case .percent, .customUnit:
+            return "\(measurement.value.canonicalString) \(measurement.enteredUnit)"
         }
     }
 
@@ -141,10 +189,18 @@ struct BodyDataListView: View {
                     metricRow(metric)
                 }
 
-                if !viewModel.customMetrics.isEmpty {
+                if !viewModel.activeCustomMetrics.isEmpty {
                     Divider()
                     sectionTitle(String(localized: "bodyData.customSection"))
-                    ForEach(viewModel.customMetrics) { metric in
+                    ForEach(viewModel.activeCustomMetrics) { metric in
+                        metricRow(metric)
+                    }
+                }
+
+                if !viewModel.archivedCustomMetrics.isEmpty {
+                    Divider()
+                    sectionTitle(String(localized: "bodyData.customSection.archived"))
+                    ForEach(viewModel.archivedCustomMetrics) { metric in
                         metricRow(metric)
                     }
                 }
@@ -215,6 +271,11 @@ struct BodyDataListView: View {
                     Text(metric.currentUnit)
                         .font(.caption)
                         .foregroundStyle(FCSemanticColors.secondaryText)
+                    if let latestValue = viewModel.latestDisplayValue(for: metric) {
+                        Text(latestValue)
+                            .font(.subheadline.weight(.medium))
+                            .foregroundStyle(FCSemanticColors.primaryText)
+                    }
                 }
                 .padding(FCPrimitives.spacingMedium)
                 .frame(maxWidth: .infinity, alignment: .leading)

@@ -128,6 +128,8 @@ public enum FCAccessibilityID {
     }
 
     public static let bodyMeasurementDeleteConfirm = "bodyMeasurementEntry.deleteConfirm"
+    public static let bodyMeasurementDeleteAll = "bodyMeasurementEntry.deleteAll"
+    public static let bodyMeasurementDeleteAllConfirm = "bodyMeasurementEntry.deleteAllConfirm"
 
     public static let trendsRoot = "trends.root"
     public static let trendsFilterDateRange = "trends.filterDateRange"

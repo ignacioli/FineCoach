@@ -124,7 +124,24 @@ public struct BodyDataUseCases: Sendable {
         try await repository.deleteMeasurement(id: id)
     }
 
+    /// Clears every recorded measurement for this metric in one call -- the
+    /// "clear all records" entry point that lets a coach then successfully
+    /// delete a custom metric definition that used to have history
+    /// (`deleteCustomMetricIfUnused` still re-validates the count itself).
+    /// Callers (UI) MUST already have explicit confirmation before calling
+    /// this, mirroring `deleteMeasurement`'s own contract.
+    public func deleteAllMeasurements(studentID: StableUUID, metricID: StableUUID) async throws {
+        try await repository.deleteAllMeasurements(studentID: studentID, metricID: metricID)
+    }
+
     public func history(studentID: StableUUID, metricID: StableUUID) async throws -> [BodyMeasurement] {
         try await repository.history(studentID: studentID, metricID: metricID)
+    }
+
+    /// One most-recent-day measurement per metric for this Student, keyed by
+    /// `metricID` -- backs the metric-list row's "latest value" summary. A
+    /// single batch call, never one `history` fetch per metric.
+    public func latestMeasurements(studentID: StableUUID) async throws -> [StableUUID: BodyMeasurement] {
+        try await repository.latestMeasurements(studentID: studentID)
     }
 }

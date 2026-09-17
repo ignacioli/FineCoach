@@ -3777,6 +3777,17 @@
         }
       }
     },
+    "bodyData.customSection.archived": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已停用"
+          }
+        }
+      }
+    },
     "bodyData.empty": {
       "extractionState": "manual",
       "localizations": {
@@ -4015,6 +4026,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "删除后将从趋势中移除该数据点，且无法恢复。"
+          }
+        }
+      }
+    },
+    "bodyMeasurementEntry.deleteAll": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清空全部记录"
+          }
+        }
+      }
+    },
+    "bodyMeasurementEntry.deleteAllConfirmTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清空这个指标的全部记录？"
+          }
+        }
+      }
+    },
+    "bodyMeasurementEntry.deleteAllConfirmMessage": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清空后这个指标的全部历史数据点都会消失，且无法恢复。"
           }
         }
       }

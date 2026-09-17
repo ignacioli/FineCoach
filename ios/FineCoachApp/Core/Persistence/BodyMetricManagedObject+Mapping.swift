@@ -174,4 +174,14 @@ enum BodyMetricManagedObjectMapping {
         request.predicate = NSPredicate(format: "metricID == %@", metricID as CVarArg)
         return try context.count(for: request)
     }
+
+    /// Every measurement for this Student across ALL metrics, most-recent
+    /// day first -- the fetch backing `latestMeasurements(studentID:)`'s
+    /// single batch query (avoids one fetch per metric / N+1).
+    static func fetchMeasurements(studentID: UUID, in context: NSManagedObjectContext) throws -> [NSManagedObject] {
+        let request = NSFetchRequest<NSManagedObject>(entityName: measurementEntityName)
+        request.predicate = NSPredicate(format: "studentID == %@", studentID as CVarArg)
+        request.sortDescriptors = [NSSortDescriptor(key: "localCalendarDay", ascending: false)]
+        return try context.fetch(request)
+    }
 }

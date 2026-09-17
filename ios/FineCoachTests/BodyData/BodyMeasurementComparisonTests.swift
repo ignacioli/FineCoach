@@ -162,6 +162,31 @@ final class BodyMeasurementComparisonTests: XCTestCase {
         XCTAssertEqual(canonicalCm.canonicalString, "180")
     }
 
+    /// Fix: display conversions were showing unbounded decimal tails (e.g.
+    /// 70kg -> 154.32357982... lb). The DISPLAY value returned by
+    /// `weight`/`length` MUST be rounded to 2 decimal places; the canonical
+    /// stored value passed in must remain completely untouched.
+    func testWeightDisplayConversionIsRoundedToTwoDecimalPlaces() throws {
+        let canonicalKg = try DecimalValue("70")
+        let pounds = try BuiltInUnitConversion.weight(canonicalKilograms: canonicalKg, displayedAs: .pounds)
+        // 70 * 2.2046226218 = 154.323583526 -- rounded to 2dp is 154.32.
+        XCTAssertEqual(pounds.canonicalString, "154.32")
+        XCTAssertEqual(canonicalKg.canonicalString, "70", "the canonical value itself must never be rounded/mutated")
+
+        // The identity case (no conversion) must still pass through exactly,
+        // not get spuriously rounded.
+        let identity = try BuiltInUnitConversion.weight(canonicalKilograms: canonicalKg, displayedAs: .kilograms)
+        XCTAssertEqual(identity.canonicalString, "70")
+    }
+
+    func testLengthDisplayConversionIsRoundedToTwoDecimalPlaces() throws {
+        let canonicalCm = try DecimalValue("180")
+        let inches = try BuiltInUnitConversion.length(canonicalCentimeters: canonicalCm, displayedAs: .inches)
+        // 180 * 0.3937007874 = 70.866141732 -- rounded to 2dp is 70.87.
+        XCTAssertEqual(inches.canonicalString, "70.87")
+        XCTAssertEqual(canonicalCm.canonicalString, "180", "the canonical value itself must never be rounded/mutated")
+    }
+
     /// The kg/cm identity case (no conversion) MUST pass the value through
     /// unchanged in both directions.
     func testCanonicalConversionIsIdentityForTheCanonicalUnitItself() throws {

@@ -171,6 +171,26 @@ public struct CoreDataBodyDataRepository: Sendable {
         }
     }
 
+    /// Deletes every measurement recorded for this Student+Metric in ONE
+    /// transaction (the "clear all records" entry point for a custom metric
+    /// the coach wants to delete but which still has history) -- never one
+    /// transaction per row. Deliberately does NOT touch the metric
+    /// definition itself; `deleteCustomMetricIfUnused` re-validates the
+    /// (now-zero) count as its own backstop before permanently deleting the
+    /// definition (M1B-FR-023/D-009).
+    public func deleteAllMeasurements(studentID: StableUUID, metricID: StableUUID) async throws {
+        try await writer.transaction { context in
+            let objects = try BodyMetricManagedObjectMapping.fetchMeasurements(
+                studentID: studentID.rawValue,
+                metricID: metricID.rawValue,
+                in: context
+            )
+            for object in objects {
+                context.delete(object)
+            }
+        }
+    }
+
     public func history(studentID: StableUUID, metricID: StableUUID) async throws -> [BodyMeasurement] {
         try await writer.read { context in
             try BodyMetricManagedObjectMapping.fetchMeasurements(
@@ -178,6 +198,32 @@ public struct CoreDataBodyDataRepository: Sendable {
                 metricID: metricID.rawValue,
                 in: context
             ).map { try BodyMetricManagedObjectMapping.makeMeasurement(from: $0) }
+        }
+    }
+
+    /// One most-recent-day measurement PER metric for this Student, keyed by
+    /// `metricID` -- a single batch fetch (all of this Student's
+    /// measurements, sorted newest-day-first) grouped in memory, rather than
+    /// one query per metric (avoids N+1; measurement volume per Student is
+    /// small enough that this in-memory grouping is the simplest reliable
+    /// approach). Metrics with zero recorded measurements are simply absent
+    /// from the result -- never synthesized.
+    public func latestMeasurements(studentID: StableUUID) async throws -> [StableUUID: BodyMeasurement] {
+        try await writer.read { context in
+            let objects = try BodyMetricManagedObjectMapping.fetchMeasurements(
+                studentID: studentID.rawValue,
+                in: context
+            )
+            var result: [StableUUID: BodyMeasurement] = [:]
+            for object in objects {
+                let measurement = try BodyMetricManagedObjectMapping.makeMeasurement(from: object)
+                // `objects` is sorted newest-day-first, so the first
+                // occurrence seen per metricID is already its latest.
+                if result[measurement.metricID] == nil {
+                    result[measurement.metricID] = measurement
+                }
+            }
+            return result
         }
     }
 }

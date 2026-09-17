@@ -12,6 +12,10 @@ final class BodyMeasurementEntryViewModel: ObservableObject {
     @Published var unitText = ""
     @Published var errorMessage: String?
     @Published var pendingDeleteID: StableUUID?
+    /// Confirmation gate for "clear all records" (a full-history delete for
+    /// this metric) -- mirrors `pendingDeleteID`'s single-row confirmation
+    /// pattern, just at metric scope.
+    @Published var showingDeleteAllConfirm = false
     /// Coach's current display-unit choice for THIS metric's unit family
     /// (M1B-FR-025) -- only meaningful when `metric.kind == .builtIn` and
     /// `unitRuleKind` is `.weight`/`.length`; irrelevant otherwise. Seeded
@@ -152,6 +156,24 @@ final class BodyMeasurementEntryViewModel: ObservableObject {
                 ?? String(localized: "bodyMeasurementEntry.error.generic")
         }
     }
+
+    /// Clears every recorded measurement for this metric (with the coach
+    /// having already confirmed via `showingDeleteAllConfirm`). Never
+    /// touches the metric definition itself -- if this metric has zero
+    /// other references, the coach can now successfully delete it from the
+    /// list screen (`deleteCustomMetricIfUnused` re-validates the count).
+    func confirmDeleteAll() async {
+        do {
+            try await useCases.deleteAllMeasurements(studentID: studentID, metricID: metricID)
+            showingDeleteAllConfirm = false
+            await reload()
+        } catch {
+            showingDeleteAllConfirm = false
+            errorMessage =
+                (error as? LocalizedError)?.errorDescription
+                ?? String(localized: "bodyMeasurementEntry.error.generic")
+        }
+    }
 }
 
 struct BodyMeasurementEntryView: View {
@@ -218,9 +240,20 @@ struct BodyMeasurementEntryView: View {
                 .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementEntrySave)
 
                 Divider()
-                Text(String(localized: "bodyMeasurementEntry.historySection"))
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(FCSemanticColors.secondaryText)
+                HStack {
+                    Text(String(localized: "bodyMeasurementEntry.historySection"))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(FCSemanticColors.secondaryText)
+                    Spacer()
+                    if !viewModel.history.isEmpty {
+                        Button(String(localized: "bodyMeasurementEntry.deleteAll"), role: .destructive) {
+                            viewModel.showingDeleteAllConfirm = true
+                        }
+                        .font(.footnote)
+                        .frame(minHeight: 44)
+                        .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementDeleteAll)
+                    }
+                }
 
                 if viewModel.history.isEmpty {
                     Text(String(localized: "bodyMeasurementEntry.empty"))
@@ -257,6 +290,21 @@ struct BodyMeasurementEntryView: View {
             }
         } message: {
             Text(String(localized: "bodyMeasurementEntry.deleteConfirmMessage"))
+        }
+        .confirmationDialog(
+            String(localized: "bodyMeasurementEntry.deleteAllConfirmTitle"),
+            isPresented: $viewModel.showingDeleteAllConfirm,
+            titleVisibility: .visible
+        ) {
+            Button(String(localized: "bodyMeasurementEntry.deleteAll"), role: .destructive) {
+                Task { await viewModel.confirmDeleteAll() }
+            }
+            .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementDeleteAllConfirm)
+            Button(String(localized: "bodyMeasurementEntry.cancel"), role: .cancel) {
+                viewModel.showingDeleteAllConfirm = false
+            }
+        } message: {
+            Text(String(localized: "bodyMeasurementEntry.deleteAllConfirmMessage"))
         }
     }
 
