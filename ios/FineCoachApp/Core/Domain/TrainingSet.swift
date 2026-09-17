@@ -107,6 +107,53 @@ public struct TrainingSet: Hashable, Codable, Sendable, Identifiable {
         return try load.multiplied(by: repetitionCount)
     }
 
+    /// Single source of truth for rendering one Set's recorded values as a
+    /// human-readable string, shared by ActiveSessionView (in-progress sets)
+    /// and SessionDetailView (read-only History). Before this existed each
+    /// View had its own copy; SessionDetailView's copy only ever handled
+    /// weightReps, so .reps/.duration/.cardio sets rendered blank there.
+    /// Cardio's durationSeconds is shown in minutes (see
+    /// `DecimalValue.minutes(fromSeconds:)`) -- storage itself stays in
+    /// seconds.
+    public var displaySummary: String {
+        switch recordMode {
+        case .weightReps:
+            let repsText = repetitionCount?.canonicalString ?? "-"
+            switch side {
+            case .none:
+                return "\(weightValue?.canonicalString ?? "-")kg × \(repsText)次"
+            case .left:
+                return "左 \((leftValue ?? weightValue)?.canonicalString ?? "-")kg × \(repsText)次"
+            case .right:
+                return "右 \((rightValue ?? weightValue)?.canonicalString ?? "-")kg × \(repsText)次"
+            case .bilateral:
+                if let leftValue, let rightValue {
+                    return "左 \(leftValue.canonicalString)kg / 右 \(rightValue.canonicalString)kg × \(repsText)次"
+                }
+                return "\(weightValue?.canonicalString ?? "-")kg（双侧） × \(repsText)次"
+            }
+        case .reps:
+            return "\(repetitionCount?.canonicalString ?? "-")次"
+        case .duration:
+            return "\(durationSeconds?.canonicalString ?? "-")秒"
+        case .cardio:
+            var parts: [String] = []
+            if let durationSeconds {
+                parts.append("\(DecimalValue.minutes(fromSeconds: durationSeconds).canonicalString)分钟")
+            } else {
+                parts.append("-分钟")
+            }
+            parts.append("\(distanceValue?.canonicalString ?? "-")km")
+            if let speedValue {
+                parts.append("速度 \(speedValue.canonicalString)")
+            }
+            if let resistanceValue {
+                parts.append("阻力 \(resistanceValue.canonicalString)")
+            }
+            return parts.joined(separator: " · ")
+        }
+    }
+
     public init(
         id: StableUUID,
         sessionExerciseID: StableUUID,

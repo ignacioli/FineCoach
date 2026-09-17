@@ -199,13 +199,6 @@ struct SessionDetailView: View {
     }
 
     private func setLine(_ trainingSet: TrainingSet) -> String {
-        var parts = ["组\(trainingSet.orderIndex + 1)"]
-        if let weight = trainingSet.weightValue {
-            parts.append(weight.canonicalString)
-        }
-        if let reps = trainingSet.repetitionCount {
-            parts.append("×\(reps.canonicalString)")
-        }
-        return parts.joined(separator: " ")
+        "组\(trainingSet.orderIndex + 1) \(trainingSet.displaySummary)"
     }
 }

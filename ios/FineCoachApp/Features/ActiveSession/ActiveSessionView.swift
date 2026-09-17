@@ -386,16 +386,7 @@ struct ActiveSessionView: View {
     }
 
     private func setValue(_ set: TrainingSet) -> String {
-        switch set.recordMode {
-        case .weightReps:
-            return "\(set.weightValue?.canonicalString ?? "-") × \(set.repetitionCount?.canonicalString ?? "-")"
-        case .reps:
-            return set.repetitionCount?.canonicalString ?? "-"
-        case .duration:
-            return set.durationSeconds?.canonicalString ?? "-"
-        case .cardio:
-            return "\(set.durationSeconds?.canonicalString ?? "-")s / \(set.distanceValue?.canonicalString ?? "-")"
-        }
+        set.displaySummary
     }
 
 }

@@ -86,6 +86,19 @@ public struct DecimalValue: Hashable, Codable, Sendable, Comparable {
         return try DecimalValue(String(Int(clamped)))
     }
 
+    /// Converts a canonical seconds value to minutes for display, rounded to
+    /// 2 decimal places. Storage always stays in seconds (see
+    /// `TrainingSet.durationSeconds`, Core Data, Comparison/ShareReport
+    /// statistics) -- this exists purely so cardio durations can be shown
+    /// the way coaches enter them, never for re-saving.
+    public static func minutes(fromSeconds seconds: DecimalValue) -> DecimalValue {
+        let minutesValue = seconds.decimal / 60
+        var rounded = Decimal()
+        var value = minutesValue
+        NSDecimalRound(&rounded, &value, 2, .plain)
+        return (try? DecimalValue(NSDecimalNumber(decimal: rounded).stringValue)) ?? seconds
+    }
+
     public static func < (lhs: DecimalValue, rhs: DecimalValue) -> Bool {
         NSDecimalNumber(decimal: lhs.decimal).compare(NSDecimalNumber(decimal: rhs.decimal)) == .orderedAscending
     }

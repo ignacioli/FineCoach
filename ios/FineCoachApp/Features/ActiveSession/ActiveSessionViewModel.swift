@@ -547,11 +547,7 @@ final class ActiveSessionViewModel: ObservableObject {
 
     private static func minutesDisplay(fromSeconds seconds: DecimalValue?) -> String {
         guard let seconds else { return "" }
-        let minutes = seconds.decimal / 60
-        var rounded = Decimal()
-        var value = minutes
-        NSDecimalRound(&rounded, &value, 2, .plain)
-        return NSDecimalNumber(decimal: rounded).stringValue
+        return DecimalValue.minutes(fromSeconds: seconds).canonicalString
     }
 
     private func unit(for mode: RecordMode) -> MeasurementUnit {
