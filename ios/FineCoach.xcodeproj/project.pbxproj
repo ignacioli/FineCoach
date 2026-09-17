@@ -27,6 +27,7 @@
 		B112 /* ValidatedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = A112 /* ValidatedText.swift */; };
 		B113 /* NormalizedName.swift in Sources */ = {isa = PBXBuildFile; fileRef = A113 /* NormalizedName.swift */; };
 		B114 /* DecimalValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = A114 /* DecimalValue.swift */; };
+		B713 /* DurationTextParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A713 /* DurationTextParser.swift */; };
 		B120 /* Protocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = A120 /* Protocols.swift */; };
 		B121 /* FaultInjectionBoundary.swift in Sources */ = {isa = PBXBuildFile; fileRef = A121 /* FaultInjectionBoundary.swift */; };
 		B130 /* SystemClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A130 /* SystemClock.swift */; };
@@ -203,6 +204,7 @@
 		B526 /* NotificationRedactionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A529 /* NotificationRedactionTests.swift */; };
 		B522 /* TodayOrderingPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A522 /* TodayOrderingPolicyTests.swift */; };
 		B232 /* SessionSetDomainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A232 /* SessionSetDomainTests.swift */; };
+		B714 /* DurationTextParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A714 /* DurationTextParserTests.swift */; };
 		B712 /* TrainingSetDisplaySummaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A712 /* TrainingSetDisplaySummaryTests.swift */; };
 		B231 /* StudentPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A231 /* StudentPersistenceTests.swift */; };
 		B233 /* ActiveSessionPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A233 /* ActiveSessionPersistenceTests.swift */; };
@@ -270,6 +272,7 @@
 		A112 /* ValidatedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidatedText.swift; sourceTree = "<group>"; };
 		A113 /* NormalizedName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NormalizedName.swift; sourceTree = "<group>"; };
 		A114 /* DecimalValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecimalValue.swift; sourceTree = "<group>"; };
+		A713 /* DurationTextParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationTextParser.swift; sourceTree = "<group>"; };
 		A120 /* Protocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Protocols.swift; sourceTree = "<group>"; };
 		A121 /* FaultInjectionBoundary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaultInjectionBoundary.swift; sourceTree = "<group>"; };
 		A130 /* SystemClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemClock.swift; sourceTree = "<group>"; };
@@ -449,6 +452,7 @@
 		A529 /* NotificationRedactionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationRedactionTests.swift; sourceTree = "<group>"; };
 		A522 /* TodayOrderingPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayOrderingPolicyTests.swift; sourceTree = "<group>"; };
 		A232 /* SessionSetDomainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSetDomainTests.swift; sourceTree = "<group>"; };
+		A714 /* DurationTextParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationTextParserTests.swift; sourceTree = "<group>"; };
 		A712 /* TrainingSetDisplaySummaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingSetDisplaySummaryTests.swift; sourceTree = "<group>"; };
 		A231 /* StudentPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentPersistenceTests.swift; sourceTree = "<group>"; };
 		A233 /* ActiveSessionPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionPersistenceTests.swift; sourceTree = "<group>"; };
@@ -735,6 +739,7 @@
 				A112 /* ValidatedText.swift */,
 				A113 /* NormalizedName.swift */,
 				A114 /* DecimalValue.swift */,
+				A713 /* DurationTextParser.swift */,
 				A115 /* Student.swift */,
 				A116 /* Session.swift */,
 				A117 /* SessionExercise.swift */,
@@ -1104,6 +1109,7 @@
 			isa = PBXGroup;
 			children = (
 				A232 /* SessionSetDomainTests.swift */,
+				A714 /* DurationTextParserTests.swift */,
 				A712 /* TrainingSetDisplaySummaryTests.swift */,
 			);
 			path = ActiveSession;
@@ -1479,6 +1485,7 @@
 				B112 /* ValidatedText.swift in Sources */,
 				B113 /* NormalizedName.swift in Sources */,
 				B114 /* DecimalValue.swift in Sources */,
+				B713 /* DurationTextParser.swift in Sources */,
 				B115 /* Student.swift in Sources */,
 				B116 /* Session.swift in Sources */,
 				B117 /* SessionExercise.swift in Sources */,
@@ -1620,6 +1627,7 @@
 				B613 /* BodyDataReportExclusionTests.swift in Sources */,
 				B621 /* BodyDataUnitPreferencesTests.swift in Sources */,
 				B232 /* SessionSetDomainTests.swift in Sources */,
+				B714 /* DurationTextParserTests.swift in Sources */,
 				B712 /* TrainingSetDisplaySummaryTests.swift in Sources */,
 				B234 /* ActiveSessionRecoveryCodecTests.swift in Sources */,
 				B235 /* SessionTimingTests.swift in Sources */,

@@ -361,9 +361,14 @@ final class ActiveSessionViewModel: ObservableObject {
         recordMode = set.recordMode
         weight = set.weightValue?.canonicalString ?? ""
         reps = set.repetitionCount?.canonicalString ?? ""
-        duration = set.recordMode == .cardio
-            ? Self.minutesDisplay(fromSeconds: set.durationSeconds)
-            : (set.durationSeconds?.canonicalString ?? "")
+        switch set.recordMode {
+        case .cardio:
+            duration = Self.minutesDisplay(fromSeconds: set.durationSeconds)
+        case .duration:
+            duration = DurationTextParser.formatForEditing(secondsText: set.durationSeconds?.canonicalString)
+        case .weightReps, .reps:
+            duration = set.durationSeconds?.canonicalString ?? ""
+        }
         side = set.side
         left = set.leftValue?.canonicalString ?? ""
         right = set.rightValue?.canonicalString ?? ""
@@ -517,9 +522,15 @@ final class ActiveSessionViewModel: ObservableObject {
     }
 
     private func currentInput(for exercise: SessionExercise) -> TrainingSetInput {
-        let durationSecondsText = exercise.recordModeSnapshot == .cardio
-            ? Self.secondsInput(fromMinutesText: duration)
-            : duration
+        let durationSecondsText: String
+        switch exercise.recordModeSnapshot {
+        case .cardio:
+            durationSecondsText = Self.secondsInput(fromMinutesText: duration)
+        case .duration:
+            durationSecondsText = DurationTextParser.parseSeconds(duration) ?? duration
+        case .weightReps, .reps:
+            durationSecondsText = duration
+        }
         return TrainingSetInput(
             recordMode: exercise.recordModeSnapshot,
             weightValue: weight,

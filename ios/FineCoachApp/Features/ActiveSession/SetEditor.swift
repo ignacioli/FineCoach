@@ -38,8 +38,8 @@ struct SetEditor: View {
                     .keyboardType(.decimalPad)
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionResistance)
             } else {
-                FCTextField(String(localized: "session.field.duration"), text: $viewModel.duration)
-                    .keyboardType(.decimalPad)
+                FCTextField(String(localized: "session.field.durationFlexible"), text: $viewModel.duration)
+                    .keyboardType(.default)
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionDuration)
             }
 

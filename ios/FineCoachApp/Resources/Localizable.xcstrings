@@ -1214,6 +1214,17 @@
         }
       }
     },
+    "session.field.durationFlexible": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "时长，如 5分30秒 / 5m30s"
+          }
+        }
+      }
+    },
     "session.field.cardioDuration": {
       "extractionState": "manual",
       "localizations": {
