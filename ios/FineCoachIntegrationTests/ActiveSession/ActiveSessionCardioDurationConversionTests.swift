@@ -4,14 +4,16 @@
 
     @testable import FineCoach
 
-    /// Cardio's duration field is entered/displayed in minutes while
+    /// Cardio's duration field accepts the same `DurationTextParser` text
+    /// (e.g. "5分30秒" / "5m30s") as the `.duration` RecordMode, while
     /// `TrainingSet.durationSeconds` storage (Core Data, `Comparison`,
-    /// `ShareReportDTO`) remains in seconds. These tests pin the conversion
-    /// at the ViewModel boundary: `addDraftSet()`/`currentInput(for:)` must
-    /// convert minutes -> seconds on write, and `beginEditingSet(_:)` must
-    /// convert seconds -> minutes on read, without touching any other
-    /// record mode's duration field (`.duration`, e.g. isometric holds,
-    /// stays in seconds both ways).
+    /// `ShareReportDTO`) remains in whole seconds. These tests pin the
+    /// conversion at the ViewModel boundary: `addDraftSet()`/
+    /// `currentInput(for:)` must parse mm:ss text -> seconds on write, and
+    /// `beginEditingSet(_:)` must format seconds -> mm:ss text on read.
+    /// Superseded a prior decimal-minutes-only scheme (a bare "5" meant "5
+    /// minutes"); a bare number is now always seconds, matching
+    /// `DurationTextParser`'s single, mode-independent convention.
     @MainActor
     final class ActiveSessionCardioDurationConversionTests: XCTestCase {
         private let studentID = StableUUID(UUID(uuidString: "22222222-2222-4222-8222-222222222222")!)
@@ -19,11 +21,11 @@
         private let exerciseID = StableUUID(UUID(uuidString: "dddddddd-dddd-4ddd-8ddd-dddddddddddd")!)
         private let now = Date(timeIntervalSince1970: 1_700_000_000)
 
-        func testAddingACardioSetConvertsMinutesInputToSecondsStorage() async throws {
+        func testAddingACardioSetParsesMinutesAndSecondsTextToSecondsStorage() async throws {
             let environment = try makeEnvironment()
             let viewModel = try await makeLoadedCardioViewModel(environment: environment)
 
-            viewModel.duration = "5"
+            viewModel.duration = "5分"
             viewModel.distance = "3"
             await viewModel.addDraftSet()
 
@@ -31,17 +33,17 @@
             let set = try XCTUnwrap(exercise.sets.first)
             XCTAssertEqual(
                 set.durationSeconds?.canonicalString, try DecimalValue("300").canonicalString,
-                "5 minutes entered must be stored as 300 seconds, not 5 seconds"
+                "\"5分\" entered must be stored as 300 seconds"
             )
 
             try await environment.controller.shutdownForTesting()
         }
 
-        func testAddingACardioSetHandlesFractionalMinutes() async throws {
+        func testAddingACardioSetHandlesFullMinutesAndSecondsFormat() async throws {
             let environment = try makeEnvironment()
             let viewModel = try await makeLoadedCardioViewModel(environment: environment)
 
-            viewModel.duration = "1.5"
+            viewModel.duration = "1分30秒"
             viewModel.distance = "1"
             await viewModel.addDraftSet()
 
@@ -49,17 +51,32 @@
             let set = try XCTUnwrap(exercise.sets.first)
             XCTAssertEqual(
                 set.durationSeconds?.canonicalString, try DecimalValue("90").canonicalString,
-                "1.5 minutes must round-trip to 90 seconds without truncation"
+                "\"1分30秒\" must store as 90 seconds"
             )
 
             try await environment.controller.shutdownForTesting()
         }
 
-        func testEditingAnExistingCardioSetDisplaysStoredSecondsAsMinutes() async throws {
+        func testAddingACardioSetAcceptsLatinMinutesSecondsFormat() async throws {
             let environment = try makeEnvironment()
             let viewModel = try await makeLoadedCardioViewModel(environment: environment)
 
-            viewModel.duration = "10"
+            viewModel.duration = "1m30s"
+            viewModel.distance = "1"
+            await viewModel.addDraftSet()
+
+            let exercise = try XCTUnwrap(viewModel.session?.exercises.first(where: { $0.id == exerciseID }))
+            let set = try XCTUnwrap(exercise.sets.first)
+            XCTAssertEqual(set.durationSeconds?.canonicalString, try DecimalValue("90").canonicalString)
+
+            try await environment.controller.shutdownForTesting()
+        }
+
+        func testEditingAnExistingCardioSetDisplaysStoredSecondsAsMinutesAndSeconds() async throws {
+            let environment = try makeEnvironment()
+            let viewModel = try await makeLoadedCardioViewModel(environment: environment)
+
+            viewModel.duration = "10分"
             viewModel.distance = "5"
             await viewModel.addDraftSet()
             let exercise = try XCTUnwrap(viewModel.session?.exercises.first(where: { $0.id == exerciseID }))
@@ -69,8 +86,8 @@
             viewModel.beginEditingSet(set)
 
             XCTAssertEqual(
-                viewModel.duration, "10",
-                "editing a set stored as 600 seconds must pre-fill the minutes field as 10, not 600"
+                viewModel.duration, "10分",
+                "editing a set stored as 600 seconds must pre-fill the field as \"10分\", not raw 600"
             )
 
             try await environment.controller.shutdownForTesting()

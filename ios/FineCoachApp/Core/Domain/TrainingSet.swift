@@ -112,9 +112,11 @@ public struct TrainingSet: Hashable, Codable, Sendable, Identifiable {
     /// and SessionDetailView (read-only History). Before this existed each
     /// View had its own copy; SessionDetailView's copy only ever handled
     /// weightReps, so .reps/.duration/.cardio sets rendered blank there.
-    /// Cardio's durationSeconds is shown in minutes (see
-    /// `DecimalValue.minutes(fromSeconds:)`) -- storage itself stays in
-    /// seconds.
+    /// .duration and .cardio both show durationSeconds via
+    /// `DurationTextParser.formatForEditing` (e.g. "5分30秒") -- gym cardio
+    /// never runs past an hour, so minutes+seconds is precise enough and
+    /// matches the same text format the coach types in. Storage itself
+    /// always stays in seconds.
     public var displaySummary: String {
         switch recordMode {
         case .weightReps:
@@ -135,14 +137,13 @@ public struct TrainingSet: Hashable, Codable, Sendable, Identifiable {
         case .reps:
             return "\(repetitionCount?.canonicalString ?? "-")次"
         case .duration:
-            return "\(durationSeconds?.canonicalString ?? "-")秒"
+            guard let durationSeconds else { return "-" }
+            return DurationTextParser.formatForEditing(secondsText: durationSeconds.canonicalString)
         case .cardio:
             var parts: [String] = []
-            if let durationSeconds {
-                parts.append("\(DecimalValue.minutes(fromSeconds: durationSeconds).canonicalString)分钟")
-            } else {
-                parts.append("-分钟")
-            }
+            parts.append(
+                durationSeconds.map { DurationTextParser.formatForEditing(secondsText: $0.canonicalString) } ?? "-"
+            )
             parts.append("\(distanceValue?.canonicalString ?? "-")km")
             if let speedValue {
                 parts.append("速度 \(speedValue.canonicalString)")

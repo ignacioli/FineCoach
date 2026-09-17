@@ -362,9 +362,7 @@ final class ActiveSessionViewModel: ObservableObject {
         weight = set.weightValue?.canonicalString ?? ""
         reps = set.repetitionCount?.canonicalString ?? ""
         switch set.recordMode {
-        case .cardio:
-            duration = Self.minutesDisplay(fromSeconds: set.durationSeconds)
-        case .duration:
+        case .cardio, .duration:
             duration = DurationTextParser.formatForEditing(secondsText: set.durationSeconds?.canonicalString)
         case .weightReps, .reps:
             duration = set.durationSeconds?.canonicalString ?? ""
@@ -524,9 +522,7 @@ final class ActiveSessionViewModel: ObservableObject {
     private func currentInput(for exercise: SessionExercise) -> TrainingSetInput {
         let durationSecondsText: String
         switch exercise.recordModeSnapshot {
-        case .cardio:
-            durationSecondsText = Self.secondsInput(fromMinutesText: duration)
-        case .duration:
+        case .cardio, .duration:
             durationSecondsText = DurationTextParser.parseSeconds(duration) ?? duration
         case .weightReps, .reps:
             durationSecondsText = duration
@@ -544,21 +540,6 @@ final class ActiveSessionViewModel: ObservableObject {
             speedValue: speed,
             resistanceValue: resistance
         )
-    }
-
-    /// Cardio's duration field is entered/displayed in minutes; storage
-    /// (`TrainingSet.durationSeconds`, Core Data, Comparison/ShareReport
-    /// statistics) remains in seconds unchanged. These two helpers are the
-    /// only place that conversion happens -- never change the storage unit.
-    private static func secondsInput(fromMinutesText minutesText: String) -> String {
-        guard let minutes = try? DecimalValue(minutesText) else { return minutesText }
-        let seconds = minutes.decimal * 60
-        return NSDecimalNumber(decimal: seconds).stringValue
-    }
-
-    private static func minutesDisplay(fromSeconds seconds: DecimalValue?) -> String {
-        guard let seconds else { return "" }
-        return DecimalValue.minutes(fromSeconds: seconds).canonicalString
     }
 
     private func unit(for mode: RecordMode) -> MeasurementUnit {

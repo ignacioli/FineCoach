@@ -30,14 +30,27 @@ final class TrainingSetDisplaySummaryTests: XCTestCase {
         XCTAssertEqual(set.displaySummary, "20次")
     }
 
-    func testDurationDisplaySummaryStaysInSeconds() throws {
-        let set = try makeSet(
+    func testDurationDisplaySummaryFormatsAsMinutesAndSeconds() throws {
+        let wholeMinute = try makeSet(
             TrainingSetInput(recordMode: .duration, durationSeconds: "60", unit: .seconds)
         )
-        XCTAssertEqual(set.displaySummary, "60秒")
+        XCTAssertEqual(wholeMinute.displaySummary, "1分")
+
+        let underAMinute = try makeSet(
+            TrainingSetInput(recordMode: .duration, durationSeconds: "45", unit: .seconds)
+        )
+        XCTAssertEqual(underAMinute.displaySummary, "45秒")
+
+        // The exact scenario reported after the mm:ss input change: a
+        // History detail row for a 50-minute duration-mode set must not
+        // show the raw seconds count.
+        let fiftyMinutes = try makeSet(
+            TrainingSetInput(recordMode: .duration, durationSeconds: "3000", unit: .seconds)
+        )
+        XCTAssertEqual(fiftyMinutes.displaySummary, "50分")
     }
 
-    func testCardioDisplaySummaryConvertsDurationToMinutes() throws {
+    func testCardioDisplaySummaryFormatsDurationAsMinutesAndSeconds() throws {
         let set = try makeSet(
             TrainingSetInput(
                 recordMode: .cardio,
@@ -48,14 +61,14 @@ final class TrainingSetDisplaySummaryTests: XCTestCase {
                 resistanceValue: "3"
             )
         )
-        XCTAssertEqual(set.displaySummary, "5分钟 · 5km · 速度 10 · 阻力 3")
+        XCTAssertEqual(set.displaySummary, "5分 · 5km · 速度 10 · 阻力 3")
     }
 
     func testCardioDisplaySummaryOmitsOptionalFieldsWhenAbsent() throws {
         let set = try makeSet(
             TrainingSetInput(recordMode: .cardio, durationSeconds: "90", unit: .seconds, distanceValue: "1")
         )
-        XCTAssertEqual(set.displaySummary, "1.5分钟 · 1km")
+        XCTAssertEqual(set.displaySummary, "1分30秒 · 1km")
     }
 
     func testBilateralWeightRepsDisplaySummaryShowsBothSides() throws {
