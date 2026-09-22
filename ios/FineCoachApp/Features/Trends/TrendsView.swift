@@ -169,6 +169,7 @@ enum TrendsTab: String, CaseIterable, Identifiable {
 
 struct TrendsView: View {
     @StateObject private var viewModel: TrendsViewModel
+    @State private var selectedTrendMetric: TrendMetric = .weight
 
     init(
         studentID: StableUUID,
@@ -361,9 +362,54 @@ struct TrendsView: View {
                 }
             }
             let points = viewModel.exerciseTrend()
+            if points.first?.recordMode == .weightReps {
+                Picker(String(localized: "trends.metricPickerLabel"), selection: $selectedTrendMetric) {
+                    ForEach(TrendMetric.allCases) { metric in
+                        Text(metric.label).tag(metric)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .accessibilityIdentifier(FCAccessibilityID.trendsMetricPicker)
+                if selectedTrendMetric == .volume {
+                    Text(String(localized: "trends.volumeCaption"))
+                        .font(.footnote)
+                        .foregroundStyle(FCSemanticColors.secondaryText)
+                }
+            }
             trendContent(for: Comparison.TrendSampleDensity.classify(points))
         }
         .accessibilityIdentifier(FCAccessibilityID.trendsExerciseTrendSection)
+    }
+
+    private enum TrendMetric: String, CaseIterable, Identifiable {
+        case weight
+        case reps
+        case volume
+
+        var id: String { rawValue }
+
+        var label: String {
+            switch self {
+            case .weight: return String(localized: "trends.metric.weight")
+            case .reps: return String(localized: "trends.metric.reps")
+            case .volume: return String(localized: "trends.metric.volume")
+            }
+        }
+
+        var unit: String {
+            switch self {
+            case .weight, .volume: return "kg"
+            case .reps: return "次"
+            }
+        }
+
+        func value(for point: Comparison.SetTrendPoint) -> DecimalValue? {
+            switch self {
+            case .weight: return point.maxWeight
+            case .reps: return point.bestReps
+            case .volume: return point.volume
+            }
+        }
     }
 
     @ViewBuilder
@@ -388,8 +434,10 @@ struct TrendsView: View {
     @ViewBuilder
     private func trendBody(_ points: [Comparison.SetTrendPoint], dashed: Bool) -> some View {
         if points.first?.recordMode == .weightReps {
-            weightTrendChart(points, dashed: dashed)
-            if viewModel.isAssistedForSelectedExercise, let summary = trendDeltaSummary(points) {
+            metricTrendChart(points, dashed: dashed)
+            if selectedTrendMetric == .weight, viewModel.isAssistedForSelectedExercise,
+                let summary = trendDeltaSummary(points)
+            {
                 Text(summary)
                     .font(.footnote)
                     .foregroundStyle(FCSemanticColors.secondaryText)
@@ -399,18 +447,19 @@ struct TrendsView: View {
         }
     }
 
-    private func weightTrendChart(_ points: [Comparison.SetTrendPoint], dashed: Bool) -> some View {
-        Chart(points, id: \.sessionID) { point in
-            if let weight = point.maxWeight, let value = Double(weight.canonicalString) {
+    private func metricTrendChart(_ points: [Comparison.SetTrendPoint], dashed: Bool) -> some View {
+        let metric = selectedTrendMetric
+        return Chart(points, id: \.sessionID) { point in
+            if let raw = metric.value(for: point), let value = Double(raw.canonicalString) {
                 LineMark(
                     x: .value("date", point.completedAtUTC),
-                    y: .value("weight", value)
+                    y: .value(metric.label, value)
                 )
                 .foregroundStyle(FCPrimitives.brand)
                 .lineStyle(dashed ? StrokeStyle(lineWidth: 2, dash: [4, 4]) : StrokeStyle(lineWidth: 2))
                 PointMark(
                     x: .value("date", point.completedAtUTC),
-                    y: .value("weight", value)
+                    y: .value(metric.label, value)
                 )
                 .foregroundStyle(FCPrimitives.brand)
             }
@@ -424,15 +473,25 @@ struct TrendsView: View {
                 HStack {
                     Text(point.completedAtUTC, style: .date)
                     Spacer()
-                    Text(trendValueText(point))
+                    Text(point.recordMode == .weightReps ? metricSingleValueText(point) : trendValueText(point))
                 }
             }
         }
     }
 
+    /// The metric-switcher's own value text for `.weightReps` points
+    /// (weight/reps/volume, driven by `selectedTrendMetric`) -- kept
+    /// separate from `trendValueText` below, which is the pre-existing
+    /// fixed-field text for the other RecordModes the switcher doesn't
+    /// apply to.
+    private func metricSingleValueText(_ point: Comparison.SetTrendPoint) -> String {
+        let metric = selectedTrendMetric
+        return metric.value(for: point).map { "\($0.canonicalString)\(metric.unit)" } ?? "-"
+    }
+
     private func singlePointTrendView(_ point: Comparison.SetTrendPoint) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(trendValueText(point))
+            Text(point.recordMode == .weightReps ? metricSingleValueText(point) : trendValueText(point))
                 .font(.system(size: 34, weight: .bold))
                 .foregroundStyle(FCSemanticColors.primaryText)
             Text(point.completedAtUTC, style: .date)

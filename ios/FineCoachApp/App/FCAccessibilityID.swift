@@ -138,6 +138,7 @@ public enum FCAccessibilityID {
     public static let trendsNoMatches = "trends.noMatches"
     public static let trendsComparisonSection = "trends.comparisonSection"
     public static let trendsExerciseTrendSection = "trends.exerciseTrendSection"
+    public static let trendsMetricPicker = "trends.metricPicker"
     public static let trendsPersonalRecordSection = "trends.personalRecordSection"
     public static let trendsTabPicker = "trends.tabPicker"
     public static let trendsAssistedBadge = "trends.assistedBadge"
