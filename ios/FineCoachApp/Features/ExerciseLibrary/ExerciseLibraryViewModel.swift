@@ -75,6 +75,14 @@ final class ExerciseLibraryViewModel: ObservableObject {
         }
     }
 
+    func toggleAssisted(_ entry: ExerciseLibraryEntry) async {
+        let next = !(entry.preference?.isAssisted ?? false)
+        await run {
+            try await self.useCases.setAssisted(id: entry.id, isAssisted: next)
+            await self.reload()
+        }
+    }
+
     private func rebuildSections() {
         sections = ExerciseCatalogBrowse.sections(
             from: entries,

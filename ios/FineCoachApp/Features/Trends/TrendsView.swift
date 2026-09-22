@@ -1,3 +1,4 @@
+import Charts
 import SwiftUI
 
 /// History filtering (M1B-FR-026) + session comparison (M1B-FR-027) +
@@ -14,15 +15,28 @@ final class TrendsViewModel: ObservableObject {
     @Published var focusFilterText = ""
     @Published var selectedForComparison: Set<StableUUID> = []
     @Published var selectedExerciseKey: String?
+    @Published var selectedTab: TrendsTab = .comparison
     @Published var errorMessage: String?
+    /// Whether the currently-selected trend/PR exercise is marked as
+    /// assisted-load (M1B-FR-028). Looked up from `ExerciseLibraryUseCases`
+    /// whenever `selectedExerciseKey` changes, since `CompletedSession`
+    /// history carries no preference data of its own.
+    @Published private(set) var isAssistedForSelectedExercise = false
 
     let studentID: StableUUID
     private let historyUseCases: HistoryUseCases
+    private let exerciseUseCases: ExerciseLibraryUseCases
     private let calendarProvider: any LocalCalendarProvider
 
-    init(studentID: StableUUID, historyUseCases: HistoryUseCases, calendarProvider: any LocalCalendarProvider) {
+    init(
+        studentID: StableUUID,
+        historyUseCases: HistoryUseCases,
+        exerciseUseCases: ExerciseLibraryUseCases,
+        calendarProvider: any LocalCalendarProvider
+    ) {
         self.studentID = studentID
         self.historyUseCases = historyUseCases
+        self.exerciseUseCases = exerciseUseCases
         self.calendarProvider = calendarProvider
     }
 
@@ -65,14 +79,40 @@ final class TrendsViewModel: ObservableObject {
         return (option.id, option.mode)
     }
 
+    private var loadDirection: Comparison.LoadDirection {
+        isAssistedForSelectedExercise ? .decreaseIsImprovement : .increaseIsImprovement
+    }
+
     func exerciseTrend() -> [Comparison.SetTrendPoint] {
         guard let (id, mode) = selectedTrendOption() else { return [] }
-        return Comparison.exerciseTrend(exerciseID: id, recordMode: mode, across: allSessions)
+        return Comparison.exerciseTrend(exerciseID: id, recordMode: mode, across: allSessions, loadDirection: loadDirection)
     }
 
     func personalRecords() -> Comparison.PersonalRecordSet? {
         guard let (id, mode) = selectedTrendOption() else { return nil }
-        return Comparison.personalRecords(exerciseID: id, recordMode: mode, across: allSessions)
+        return Comparison.personalRecords(exerciseID: id, recordMode: mode, across: allSessions, loadDirection: loadDirection)
+    }
+
+    /// Sets the trend/PR exercise selection (shared by both the "动作趋势"
+    /// and "个人最佳" Tabs, so switching Tabs never loses the pick) and
+    /// refreshes whether it's assisted-load, since that flips how "best" is
+    /// interpreted for both derived views above.
+    func selectExercise(key: String) {
+        selectedExerciseKey = key
+        Task { await loadAssistedFlag() }
+    }
+
+    private func loadAssistedFlag() async {
+        guard let (id, _) = selectedTrendOption() else {
+            isAssistedForSelectedExercise = false
+            return
+        }
+        do {
+            let entries = try await exerciseUseCases.search(query: "", includeHidden: true)
+            isAssistedForSelectedExercise = entries.first(where: { $0.id == id })?.preference?.isAssisted ?? false
+        } catch {
+            isAssistedForSelectedExercise = false
+        }
     }
 
     func reload() async {
@@ -111,43 +151,88 @@ final class TrendsViewModel: ObservableObject {
     }
 }
 
+enum TrendsTab: String, CaseIterable, Identifiable {
+    case comparison
+    case exerciseTrend
+    case personalRecord
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .comparison: return String(localized: "trends.tab.comparison")
+        case .exerciseTrend: return String(localized: "trends.tab.exerciseTrend")
+        case .personalRecord: return String(localized: "trends.tab.personalRecord")
+        }
+    }
+}
+
 struct TrendsView: View {
     @StateObject private var viewModel: TrendsViewModel
 
-    init(studentID: StableUUID, historyUseCases: HistoryUseCases, calendarProvider: any LocalCalendarProvider) {
+    init(
+        studentID: StableUUID,
+        historyUseCases: HistoryUseCases,
+        exerciseUseCases: ExerciseLibraryUseCases,
+        calendarProvider: any LocalCalendarProvider
+    ) {
         _viewModel = StateObject(
             wrappedValue: TrendsViewModel(
                 studentID: studentID,
                 historyUseCases: historyUseCases,
+                exerciseUseCases: exerciseUseCases,
                 calendarProvider: calendarProvider
             )
         )
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
-                if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage).foregroundStyle(FCSemanticColors.destructive)
+        VStack(spacing: 0) {
+            Picker("", selection: $viewModel.selectedTab) {
+                ForEach(TrendsTab.allCases) { tab in
+                    Text(tab.title).tag(tab)
                 }
-
-                filterSection
-                Divider()
-                historySection
-                Divider()
-                comparisonSection
-                Divider()
-                exerciseTrendSection
-                Divider()
-                personalRecordSection
             }
-            .padding(FCPrimitives.spacingMedium)
+            .pickerStyle(.segmented)
+            .padding(.horizontal, FCPrimitives.spacingMedium)
+            .padding(.top, FCPrimitives.spacingSmall)
+            .accessibilityIdentifier(FCAccessibilityID.trendsTabPicker)
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+                    if let errorMessage = viewModel.errorMessage {
+                        Text(errorMessage).foregroundStyle(FCSemanticColors.destructive)
+                    }
+
+                    switch viewModel.selectedTab {
+                    case .comparison:
+                        comparisonTab
+                    case .exerciseTrend:
+                        exerciseTrendTab
+                    case .personalRecord:
+                        personalRecordTab
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(FCPrimitives.spacingMedium)
+            }
         }
         .background(FCSemanticColors.background)
         .navigationTitle(String(localized: "trends.title"))
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier(FCAccessibilityID.trendsRoot)
         .task { await viewModel.reload() }
+    }
+
+    // MARK: - 训练对比 Tab
+
+    private var comparisonTab: some View {
+        VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+            tabHint(String(localized: "trends.comparisonTabHint"))
+            filterSection
+            historySection
+            comparisonSection
+        }
     }
 
     private var filterSection: some View {
@@ -196,6 +281,7 @@ struct TrendsView: View {
             if let result = viewModel.selectedComparisonResult {
                 switch result {
                 case .compatible(let detail):
+                    comparisonChart(detail)
                     Text("\(detail.totalSetCountA) vs \(detail.totalSetCountB) 组")
                     if let volumeA = detail.trainingVolumeA, let volumeB = detail.trainingVolumeB {
                         Text(
@@ -215,42 +301,223 @@ struct TrendsView: View {
         .accessibilityIdentifier(FCAccessibilityID.trendsComparisonSection)
     }
 
+    private struct ComparisonBarDatum: Identifiable {
+        let id = UUID()
+        let metric: String
+        let session: String
+        let value: Double
+    }
+
+    private func comparisonChart(_ detail: Comparison.SessionComparisonDetail) -> some View {
+        var data: [ComparisonBarDatum] = [
+            ComparisonBarDatum(
+                metric: String(localized: "trends.comparisonMetricSets"),
+                session: "A",
+                value: Double(detail.totalSetCountA)
+            ),
+            ComparisonBarDatum(
+                metric: String(localized: "trends.comparisonMetricSets"),
+                session: "B",
+                value: Double(detail.totalSetCountB)
+            ),
+        ]
+        if let volumeA = detail.trainingVolumeA, let volumeB = detail.trainingVolumeB,
+            let a = Double(volumeA.canonicalString), let b = Double(volumeB.canonicalString)
+        {
+            data.append(
+                ComparisonBarDatum(metric: String(localized: "trends.comparisonMetricVolume"), session: "A", value: a)
+            )
+            data.append(
+                ComparisonBarDatum(metric: String(localized: "trends.comparisonMetricVolume"), session: "B", value: b)
+            )
+        }
+        return Chart(data) { datum in
+            BarMark(
+                x: .value("metric", datum.metric),
+                y: .value("value", datum.value)
+            )
+            .position(by: .value("session", datum.session))
+            .foregroundStyle(datum.session == "A" ? FCPrimitives.brand : FCPrimitives.brand.opacity(0.5))
+        }
+        .frame(height: 200)
+    }
+
+    // MARK: - 动作趋势 Tab
+
+    private var exerciseTrendTab: some View {
+        VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+            tabHint(String(localized: "trends.exerciseTrendTabHint"))
+            exercisePicker
+            exerciseTrendSection
+        }
+    }
+
     private var exerciseTrendSection: some View {
         VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
-            sectionTitle(String(localized: "trends.exerciseTrendTitle"))
-            exercisePicker
-            let points = viewModel.exerciseTrend()
-            if points.isEmpty {
-                Text(String(localized: "trends.exerciseTrendEmpty"))
-                    .foregroundStyle(FCSemanticColors.secondaryText)
-            } else {
-                ForEach(Array(points.enumerated()), id: \.offset) { _, point in
-                    HStack {
-                        Text(point.completedAtUTC, style: .date)
-                        Spacer()
-                        if let maxWeight = point.maxWeight {
-                            Text(maxWeight.canonicalString)
-                        }
-                    }
+            HStack(spacing: FCPrimitives.spacingSmall) {
+                sectionTitle(String(localized: "trends.exerciseTrendTitle"))
+                if viewModel.isAssistedForSelectedExercise {
+                    assistedBadge
                 }
             }
+            let points = viewModel.exerciseTrend()
+            trendContent(for: Comparison.TrendSampleDensity.classify(points))
         }
         .accessibilityIdentifier(FCAccessibilityID.trendsExerciseTrendSection)
     }
 
+    @ViewBuilder
+    private func trendContent(for density: Comparison.TrendSampleDensity) -> some View {
+        switch density {
+        case .empty:
+            Text(String(localized: "trends.exerciseTrendEmpty"))
+                .foregroundStyle(FCSemanticColors.secondaryText)
+        case .single(let point):
+            singlePointTrendView(point)
+        case .sparse(let points):
+            trendBody(points, dashed: true)
+        case .sufficient(let points):
+            trendBody(points, dashed: false)
+        }
+    }
+
+    /// Renders as a `Charts` line for `.weightReps` (the only mode where
+    /// `maxWeight` carries the plotted value); other record modes fall back
+    /// to the unit-annotated row list, since a weight-axis chart wouldn't
+    /// have anything to plot for a duration/cardio-only exercise.
+    @ViewBuilder
+    private func trendBody(_ points: [Comparison.SetTrendPoint], dashed: Bool) -> some View {
+        if points.first?.recordMode == .weightReps {
+            weightTrendChart(points, dashed: dashed)
+            if viewModel.isAssistedForSelectedExercise, let summary = trendDeltaSummary(points) {
+                Text(summary)
+                    .font(.footnote)
+                    .foregroundStyle(FCSemanticColors.secondaryText)
+            }
+        } else {
+            trendRows(points)
+        }
+    }
+
+    private func weightTrendChart(_ points: [Comparison.SetTrendPoint], dashed: Bool) -> some View {
+        Chart(points, id: \.sessionID) { point in
+            if let weight = point.maxWeight, let value = Double(weight.canonicalString) {
+                LineMark(
+                    x: .value("date", point.completedAtUTC),
+                    y: .value("weight", value)
+                )
+                .foregroundStyle(FCPrimitives.brand)
+                .lineStyle(dashed ? StrokeStyle(lineWidth: 2, dash: [4, 4]) : StrokeStyle(lineWidth: 2))
+                PointMark(
+                    x: .value("date", point.completedAtUTC),
+                    y: .value("weight", value)
+                )
+                .foregroundStyle(FCPrimitives.brand)
+            }
+        }
+        .frame(height: 200)
+    }
+
+    private func trendRows(_ points: [Comparison.SetTrendPoint]) -> some View {
+        VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
+            ForEach(Array(points.enumerated()), id: \.offset) { _, point in
+                HStack {
+                    Text(point.completedAtUTC, style: .date)
+                    Spacer()
+                    Text(trendValueText(point))
+                }
+            }
+        }
+    }
+
+    private func singlePointTrendView(_ point: Comparison.SetTrendPoint) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(trendValueText(point))
+                .font(.system(size: 34, weight: .bold))
+                .foregroundStyle(FCSemanticColors.primaryText)
+            Text(point.completedAtUTC, style: .date)
+                .font(.footnote)
+                .foregroundStyle(FCSemanticColors.secondaryText)
+            Text(String(localized: "trends.exerciseTrendSingleHint"))
+                .font(.footnote)
+                .foregroundStyle(FCSemanticColors.secondaryText)
+        }
+    }
+
+    /// M1B-FR-028 units fix -- weight always shows "kg", `.duration`/`.cardio`
+    /// go through `DurationTextParser` (never raw seconds), cardio distance
+    /// shows "km". Single source used by both the row fallback and the
+    /// single-point large-number view so they can never drift apart.
+    private func trendValueText(_ point: Comparison.SetTrendPoint) -> String {
+        switch point.recordMode {
+        case .weightReps:
+            return point.maxWeight.map { "\($0.canonicalString)kg" } ?? "-"
+        case .reps:
+            return point.bestReps.map { "\($0.canonicalString)次" } ?? "-"
+        case .duration:
+            guard let duration = point.bestDurationSeconds else { return "-" }
+            return DurationTextParser.formatForEditing(secondsText: duration.canonicalString)
+        case .cardio:
+            var parts: [String] = []
+            if let duration = point.bestDurationSeconds {
+                parts.append(DurationTextParser.formatForEditing(secondsText: duration.canonicalString))
+            }
+            if let distance = point.bestDistance {
+                parts.append("\(distance.canonicalString)km")
+            }
+            return parts.isEmpty ? "-" : parts.joined(separator: " · ")
+        }
+    }
+
+    private func trendDeltaSummary(_ points: [Comparison.SetTrendPoint]) -> String? {
+        guard let last = points.last, let delta = last.weightDelta, !delta.isZero else { return nil }
+        let magnitude = NSDecimalNumber(decimal: delta.decimal).doubleValue
+        let signedText = magnitude >= 0 ? "+\(delta.canonicalString)" : delta.canonicalString
+        let isImprovement = viewModel.isAssistedForSelectedExercise ? magnitude < 0 : magnitude > 0
+        let label =
+            isImprovement
+            ? String(localized: "trends.deltaImprovement")
+            : String(localized: "trends.deltaRegression")
+        return String(format: String(localized: "trends.deltaSummaryFormat"), signedText, label)
+    }
+
+    // MARK: - 个人最佳 Tab
+
+    private var personalRecordTab: some View {
+        VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+            tabHint(String(localized: "trends.personalRecordTabHint"))
+            exercisePicker
+            personalRecordSection
+        }
+    }
+
     private var personalRecordSection: some View {
         VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
-            sectionTitle(String(localized: "trends.personalRecordTitle"))
+            HStack(spacing: FCPrimitives.spacingSmall) {
+                sectionTitle(String(localized: "trends.personalRecordTitle"))
+                if viewModel.isAssistedForSelectedExercise {
+                    assistedBadge
+                }
+            }
             if let records = viewModel.personalRecords() {
-                if let highest = records.highestWeight {
-                    Text("PR: \(highest.weight.canonicalString)")
-                }
-                if let longest = records.longestDuration {
-                    Text("PR: \(longest.seconds.canonicalString)s")
-                }
-                if records.highestWeight == nil && records.longestDuration == nil && records.longestDistance == nil {
-                    Text(String(localized: "trends.personalRecordEmpty"))
-                        .foregroundStyle(FCSemanticColors.secondaryText)
+                VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
+                    if let highest = records.highestWeight {
+                        personalRecordCard("PR: \(highest.weight.canonicalString)kg")
+                    }
+                    if let longest = records.longestDuration {
+                        personalRecordCard(
+                            "PR: \(DurationTextParser.formatForEditing(secondsText: longest.seconds.canonicalString))"
+                        )
+                    }
+                    if let distance = records.longestDistance {
+                        personalRecordCard("PR: \(distance.distance.canonicalString)km")
+                    }
+                    if records.highestWeight == nil && records.longestDuration == nil
+                        && records.longestDistance == nil
+                    {
+                        Text(String(localized: "trends.personalRecordEmpty"))
+                            .foregroundStyle(FCSemanticColors.secondaryText)
+                    }
                 }
             } else {
                 Text(String(localized: "trends.personalRecordEmpty"))
@@ -260,12 +527,22 @@ struct TrendsView: View {
         .accessibilityIdentifier(FCAccessibilityID.trendsPersonalRecordSection)
     }
 
+    private func personalRecordCard(_ text: String) -> some View {
+        Text(text)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(FCPrimitives.spacingSmall)
+            .background(FCSemanticColors.elevatedSurface)
+            .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSmall))
+    }
+
+    // MARK: - Shared
+
     private var exercisePicker: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
                 ForEach(viewModel.exerciseOptions, id: \.key) { option in
                     Button(option.name) {
-                        viewModel.selectedExerciseKey = option.key
+                        viewModel.selectExercise(key: option.key)
                     }
                     .padding(.horizontal, FCPrimitives.spacingSmall)
                     .frame(minHeight: 44)
@@ -277,6 +554,23 @@ struct TrendsView: View {
                 }
             }
         }
+    }
+
+    private var assistedBadge: some View {
+        Text(String(localized: "trends.assistedBadge"))
+            .font(.caption.weight(.semibold))
+            .padding(.horizontal, FCPrimitives.spacingSmall)
+            .padding(.vertical, 4)
+            .background(FCSemanticColors.warning.opacity(0.15))
+            .foregroundStyle(FCSemanticColors.warning)
+            .clipShape(Capsule())
+            .accessibilityIdentifier(FCAccessibilityID.trendsAssistedBadge)
+    }
+
+    private func tabHint(_ text: String) -> some View {
+        Text(text)
+            .font(.footnote)
+            .foregroundStyle(FCSemanticColors.secondaryText)
     }
 
     private func sectionTitle(_ text: String) -> some View {

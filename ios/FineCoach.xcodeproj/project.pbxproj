@@ -50,6 +50,7 @@
 		B177 /* provenance.schema.json in Resources */ = {isa = PBXBuildFile; fileRef = A177 /* provenance.schema.json */; };
 		B237 /* ExerciseIdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A237 /* ExerciseIdentityTests.swift */; };
 		B238 /* ExerciseProvenanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A238 /* ExerciseProvenanceTests.swift */; };
+		B723 /* ExercisePreferenceAssistedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A723 /* ExercisePreferenceAssistedTests.swift */; };
 		B190 /* ActiveSessionRecoverySnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A190 /* ActiveSessionRecoverySnapshot.swift */; };
 		B191 /* ActiveSessionRecoveryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A191 /* ActiveSessionRecoveryStore.swift */; };
 		B192 /* ActiveSessionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A192 /* ActiveSessionCoordinator.swift */; };
@@ -221,6 +222,7 @@
 		B227 /* BackupRestoreUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A227 /* BackupRestoreUITests.swift */; };
 		B240 /* HistoryReportDomainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A240 /* HistoryReportDomainTests.swift */; };
 		B701 /* CompletedSessionMostRecentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A701 /* CompletedSessionMostRecentTests.swift */; };
+		B722 /* ComparisonLoadDirectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A722 /* ComparisonLoadDirectionTests.swift */; };
 		B241 /* ShareReportPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A241 /* ShareReportPolicyTests.swift */; };
 		B500 /* VisionHarnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A501 /* VisionHarnessTests.swift */; };
 		B242 /* ShareReportRendererTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A242 /* ShareReportRendererTests.swift */; };
@@ -412,10 +414,12 @@
 		A177 /* provenance.schema.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "provenance.schema.json"; sourceTree = "<group>"; };
 		A237 /* ExerciseIdentityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseIdentityTests.swift; sourceTree = "<group>"; };
 		A238 /* ExerciseProvenanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseProvenanceTests.swift; sourceTree = "<group>"; };
+		A723 /* ExercisePreferenceAssistedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExercisePreferenceAssistedTests.swift; sourceTree = "<group>"; };
 		A226 /* HistoryShareUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryShareUITests.swift; sourceTree = "<group>"; };
 		A227 /* BackupRestoreUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRestoreUITests.swift; sourceTree = "<group>"; };
 		A240 /* HistoryReportDomainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryReportDomainTests.swift; sourceTree = "<group>"; };
 		A701 /* CompletedSessionMostRecentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedSessionMostRecentTests.swift; sourceTree = "<group>"; };
+		A722 /* ComparisonLoadDirectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComparisonLoadDirectionTests.swift; sourceTree = "<group>"; };
 		A241 /* ShareReportPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareReportPolicyTests.swift; sourceTree = "<group>"; };
 		A501 /* VisionHarnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionHarnessTests.swift; sourceTree = "<group>"; };
 		A242 /* ShareReportRendererTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareReportRendererTests.swift; sourceTree = "<group>"; };
@@ -1150,6 +1154,7 @@
 			children = (
 				A237 /* ExerciseIdentityTests.swift */,
 				A238 /* ExerciseProvenanceTests.swift */,
+				A723 /* ExercisePreferenceAssistedTests.swift */,
 			);
 			path = ExerciseLibrary;
 			sourceTree = "<group>";
@@ -1192,6 +1197,7 @@
 			children = (
 				A240 /* HistoryReportDomainTests.swift */,
 				A701 /* CompletedSessionMostRecentTests.swift */,
+				A722 /* ComparisonLoadDirectionTests.swift */,
 			);
 			path = History;
 			sourceTree = "<group>";
@@ -1637,8 +1643,10 @@
 				B235 /* SessionTimingTests.swift in Sources */,
 				B237 /* ExerciseIdentityTests.swift in Sources */,
 				B238 /* ExerciseProvenanceTests.swift in Sources */,
+				B723 /* ExercisePreferenceAssistedTests.swift in Sources */,
 				B240 /* HistoryReportDomainTests.swift in Sources */,
 				B701 /* CompletedSessionMostRecentTests.swift in Sources */,
+				B722 /* ComparisonLoadDirectionTests.swift in Sources */,
 				B241 /* ShareReportPolicyTests.swift in Sources */,
 				B500 /* VisionHarnessTests.swift in Sources */,
 				B250 /* BackupGoldenVectorTests.swift in Sources */,

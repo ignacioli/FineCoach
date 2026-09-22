@@ -139,6 +139,8 @@ public enum FCAccessibilityID {
     public static let trendsComparisonSection = "trends.comparisonSection"
     public static let trendsExerciseTrendSection = "trends.exerciseTrendSection"
     public static let trendsPersonalRecordSection = "trends.personalRecordSection"
+    public static let trendsTabPicker = "trends.tabPicker"
+    public static let trendsAssistedBadge = "trends.assistedBadge"
 
     public static let coursePackageEditorRoot = "coursePackageEditor.root"
     public static let coursePackageEditorName = "coursePackageEditor.name"
@@ -258,6 +260,10 @@ public enum FCAccessibilityID {
 
     public static func exerciseLibraryHide(_ id: StableExerciseID) -> String {
         "exerciseLibrary.hide.\(id.rawValue)"
+    }
+
+    public static func exerciseLibraryAssisted(_ id: StableExerciseID) -> String {
+        "exerciseLibrary.assisted.\(id.rawValue)"
     }
 
     public static func exerciseLibraryRow(_ id: StableExerciseID) -> String {

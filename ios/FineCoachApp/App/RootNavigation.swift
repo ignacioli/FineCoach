@@ -240,6 +240,7 @@ struct RootNavigation: View {
                                 TrendsView(
                                     studentID: StableUUID(studentID),
                                     historyUseCases: environment.requireHistoryUseCases(),
+                                    exerciseUseCases: environment.requireExerciseUseCases(),
                                     calendarProvider: SystemLocalCalendarProvider()
                                 )
                             case .placeholder(let kind):

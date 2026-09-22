@@ -64,4 +64,14 @@ public struct ExerciseLibraryUseCases: Sendable {
             isHidden: isHidden
         )
     }
+
+    public func setAssisted(id: StableExerciseID, isAssisted: Bool) async throws {
+        _ = try await repository.setPreference(
+            exerciseID: id,
+            alias: nil,
+            isFavorite: nil,
+            isHidden: nil,
+            isAssisted: isAssisted
+        )
+    }
 }

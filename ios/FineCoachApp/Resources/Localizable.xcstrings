@@ -1786,6 +1786,17 @@
         }
       }
     },
+    "exercise.library.assisted": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "辅助器械"
+          }
+        }
+      }
+    },
     "exercise.kind.builtIn": {
       "extractionState": "manual",
       "localizations": {
@@ -4235,6 +4246,149 @@
           "stringUnit": {
             "state": "translated",
             "value": "加载失败，请重试。"
+          }
+        }
+      }
+    },
+    "trends.tab.comparison": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练对比"
+          }
+        }
+      }
+    },
+    "trends.tab.exerciseTrend": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动作趋势"
+          }
+        }
+      }
+    },
+    "trends.tab.personalRecord": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "个人最佳"
+          }
+        }
+      }
+    },
+    "trends.comparisonTabHint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从下方历史记录中选 2 条已完成训练进行比较"
+          }
+        }
+      }
+    },
+    "trends.exerciseTrendTabHint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示该学员全部历史中此动作的每次记录，与「训练对比」筛选无关"
+          }
+        }
+      }
+    },
+    "trends.personalRecordTabHint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "该动作在全部历史中的最佳成绩"
+          }
+        }
+      }
+    },
+    "trends.exerciseTrendSingleHint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仅 1 次记录，暂无法看出趋势"
+          }
+        }
+      }
+    },
+    "trends.assistedBadge": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "辅助器械 · 配重下降 = 进步"
+          }
+        }
+      }
+    },
+    "trends.deltaSummaryFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "相比上次：%@kg（%@）"
+          }
+        }
+      }
+    },
+    "trends.deltaImprovement": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "进步"
+          }
+        }
+      }
+    },
+    "trends.deltaRegression": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "退步"
+          }
+        }
+      }
+    },
+    "trends.comparisonMetricSets": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "总组数"
+          }
+        }
+      }
+    },
+    "trends.comparisonMetricVolume": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练容量"
           }
         }
       }

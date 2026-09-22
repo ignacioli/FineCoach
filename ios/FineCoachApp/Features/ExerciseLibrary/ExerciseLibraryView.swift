@@ -239,6 +239,21 @@ struct ExerciseLibraryView: View {
                     ? "\(String(localized: "exercise.library.unhide")), \(entry.displayedName)"
                     : "\(String(localized: "exercise.library.hide")), \(entry.displayedName)"
             )
+
+            Toggle(
+                isOn: Binding(
+                    get: { entry.preference?.isAssisted ?? false },
+                    set: { _ in Task { await viewModel.toggleAssisted(entry) } }
+                )
+            ) {
+                Image(systemName: (entry.preference?.isAssisted ?? false) ? "arrow.down.circle.fill" : "arrow.down.circle")
+                    .frame(minWidth: 44, minHeight: 44)
+            }
+            .toggleStyle(.button)
+            .buttonStyle(.borderless)
+            .accessibilityIdentifier(FCAccessibilityID.exerciseLibraryAssisted(entry.id))
+            .accessibilityLabel("\(String(localized: "exercise.library.assisted")), \(entry.displayedName)")
+            .accessibilityAddTraits((entry.preference?.isAssisted ?? false) ? [.isSelected] : [])
         }
         .frame(minHeight: 44)
         .accessibilityElement(children: .contain)

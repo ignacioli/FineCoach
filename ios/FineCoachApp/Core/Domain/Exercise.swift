@@ -213,29 +213,38 @@ public struct ExercisePreference: Hashable, Codable, Sendable {
     public let alias: NormalizedName?
     public let isFavorite: Bool
     public let isHidden: Bool
+    /// M1B-FR-028: whether this exercise's load is assisted (e.g. an
+    /// assisted pull-up machine's counterweight), meaning a LOWER
+    /// `weightValue` represents progress rather than a higher one. Purely a
+    /// display/interpretation flag -- never changes how a value is stored.
+    public let isAssisted: Bool
 
     public init(
         exerciseID: StableExerciseID,
         alias: NormalizedName? = nil,
         isFavorite: Bool = false,
-        isHidden: Bool = false
+        isHidden: Bool = false,
+        isAssisted: Bool = false
     ) {
         self.exerciseID = exerciseID
         self.alias = alias
         self.isFavorite = isFavorite
         self.isHidden = isHidden
+        self.isAssisted = isAssisted
     }
 
     public func updating(
         alias: NormalizedName?? = nil,
         isFavorite: Bool? = nil,
-        isHidden: Bool? = nil
+        isHidden: Bool? = nil,
+        isAssisted: Bool? = nil
     ) -> ExercisePreference {
         ExercisePreference(
             exerciseID: exerciseID,
             alias: alias ?? self.alias,
             isFavorite: isFavorite ?? self.isFavorite,
-            isHidden: isHidden ?? self.isHidden
+            isHidden: isHidden ?? self.isHidden,
+            isAssisted: isAssisted ?? self.isAssisted
         )
     }
 }

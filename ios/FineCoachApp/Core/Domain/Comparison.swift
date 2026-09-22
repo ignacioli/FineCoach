@@ -139,7 +139,8 @@ public enum Comparison {
     public static func exerciseTrend(
         exerciseID: StableExerciseID,
         recordMode: RecordMode,
-        across sessions: [CompletedSession]
+        across sessions: [CompletedSession],
+        loadDirection: LoadDirection = .increaseIsImprovement
     ) -> [SetTrendPoint] {
         let ordered = sessions.sorted { $0.completedAtUTC < $1.completedAtUTC }
         var points: [SetTrendPoint] = []
@@ -151,7 +152,14 @@ public enum Comparison {
             let completedSets = matching.flatMap(\.sets).filter(\.contributesToStatistics)
             guard !completedSets.isEmpty else { continue }
 
-            let maxWeight = completedSets.compactMap(\.weightValue).max()
+            let weights = completedSets.compactMap(\.weightValue)
+            let maxWeight: DecimalValue?
+            switch loadDirection {
+            case .increaseIsImprovement:
+                maxWeight = weights.max()
+            case .decreaseIsImprovement:
+                maxWeight = weights.min()
+            }
             let bestReps = completedSets.compactMap(\.repetitionCount).max()
             let bestDuration = completedSets.compactMap(\.durationSeconds).max()
             let bestDistance = completedSets.compactMap(\.distanceValue).max()
@@ -197,6 +205,27 @@ public enum Comparison {
         return points
     }
 
+    /// Sample-size tiering for the "动作趋势" chart (Trends Tab UX plan).
+    /// Deliberately a pure, unit-testable classification separate from any
+    /// SwiftUI view body: 0 points has no chart at all, 1 point can't draw a
+    /// line, 2 points draw a dashed line (small-sample signal), and 3+ draw
+    /// a normal solid line.
+    public enum TrendSampleDensity: Sendable {
+        case empty
+        case single(SetTrendPoint)
+        case sparse([SetTrendPoint])
+        case sufficient([SetTrendPoint])
+
+        public static func classify(_ points: [SetTrendPoint]) -> TrendSampleDensity {
+            switch points.count {
+            case 0: return .empty
+            case 1: return .single(points[0])
+            case 2: return .sparse(points)
+            default: return .sufficient(points)
+            }
+        }
+    }
+
     // MARK: - Personal Record (M1B-FR-029)
 
     /// ONLY these three explicit rules. There is INTENTIONALLY no estimated
@@ -218,23 +247,33 @@ public enum Comparison {
     public static func personalRecords(
         exerciseID: StableExerciseID,
         recordMode: RecordMode,
-        across sessions: [CompletedSession]
+        across sessions: [CompletedSession],
+        loadDirection: LoadDirection = .increaseIsImprovement
     ) -> PersonalRecordSet {
         var highestWeight: (StableUUID, DecimalValue)?
         var mostRepsAtWeight: (StableUUID, DecimalValue, DecimalValue)?
         var longestDuration: (StableUUID, DecimalValue)?
         var longestDistance: (StableUUID, DecimalValue)?
 
+        func isBetterWeight(_ candidate: DecimalValue, than current: DecimalValue) -> Bool {
+            switch loadDirection {
+            case .increaseIsImprovement:
+                return candidate > current
+            case .decreaseIsImprovement:
+                return candidate < current
+            }
+        }
+
         for session in sessions {
             let matching = session.exercises.filter { $0.sourceID == exerciseID && $0.recordModeSnapshot == recordMode }
             for exercise in matching {
                 for set in exercise.sets where set.contributesToStatistics {
                     if let weight = set.weightValue {
-                        if highestWeight == nil || weight > highestWeight!.1 {
+                        if highestWeight == nil || isBetterWeight(weight, than: highestWeight!.1) {
                             highestWeight = (session.id, weight)
                         }
                         if let reps = set.repetitionCount {
-                            if mostRepsAtWeight == nil || weight > mostRepsAtWeight!.1
+                            if mostRepsAtWeight == nil || isBetterWeight(weight, than: mostRepsAtWeight!.1)
                                 || (weight == mostRepsAtWeight!.1 && reps > mostRepsAtWeight!.2)
                             {
                                 mostRepsAtWeight = (session.id, weight, reps)

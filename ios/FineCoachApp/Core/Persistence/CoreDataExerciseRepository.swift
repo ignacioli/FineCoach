@@ -164,7 +164,8 @@ public struct CoreDataExerciseRepository: Sendable {
         exerciseID: StableExerciseID,
         alias: String?,
         isFavorite: Bool?,
-        isHidden: Bool?
+        isHidden: Bool?,
+        isAssisted: Bool? = nil
     ) async throws -> ExercisePreference {
         try await writer.transaction { context in
             _ = try ExerciseManagedObjectMapping.requireCatalogItem(id: exerciseID.rawValue, in: context)
@@ -186,7 +187,12 @@ public struct CoreDataExerciseRepository: Sendable {
             } else {
                 aliasUpdate = nil
             }
-            let updated = current.updating(alias: aliasUpdate, isFavorite: isFavorite, isHidden: isHidden)
+            let updated = current.updating(
+                alias: aliasUpdate,
+                isFavorite: isFavorite,
+                isHidden: isHidden,
+                isAssisted: isAssisted
+            )
             let object = try ExerciseManagedObjectMapping.upsertPreference(updated, in: context)
             return try ExerciseManagedObjectMapping.makePreference(from: object)
         }

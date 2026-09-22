@@ -53,6 +53,7 @@
         <attribute name="alias" optional="YES" attributeType="String" syncable="NO"/>
         <attribute name="isFavorite" optional="NO" attributeType="Boolean" usesScalarValueType="YES" syncable="NO"/>
         <attribute name="isHidden" optional="NO" attributeType="Boolean" usesScalarValueType="YES" syncable="NO"/>
+        <attribute name="isAssisted" optional="NO" attributeType="Boolean" usesScalarValueType="YES" defaultValueString="NO" syncable="NO"/>
         <relationship name="exercise" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ExerciseCatalogMO" inverseName="preferences" inverseEntity="ExerciseCatalogMO"/>
     </entity>
     <entity name="SessionMO" representedClassName="NSManagedObject" syncable="NO">
