@@ -462,9 +462,26 @@ struct TrendsView: View {
                     y: .value(metric.label, value)
                 )
                 .foregroundStyle(FCPrimitives.brand)
+                .annotation(position: .top) {
+                    Text(Self.pointLabel(value, unit: metric.unit))
+                        .font(.caption2)
+                        .foregroundStyle(FCSemanticColors.secondaryText)
+                }
             }
         }
         .frame(height: 200)
+    }
+
+    /// Point-label text for chart annotations: at most 1 decimal place,
+    /// with a whole number never showing a trailing ".0" (e.g. "40kg", not
+    /// "40.0kg", but "40.5kg" stays as-is).
+    static func pointLabel(_ value: Double, unit: String) -> String {
+        let rounded = (value * 10).rounded() / 10
+        var text = String(format: "%.1f", rounded)
+        if text.hasSuffix(".0") {
+            text.removeLast(2)
+        }
+        return "\(text)\(unit)"
     }
 
     private func trendRows(_ points: [Comparison.SetTrendPoint]) -> some View {

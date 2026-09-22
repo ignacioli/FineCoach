@@ -51,6 +51,7 @@
 		B237 /* ExerciseIdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A237 /* ExerciseIdentityTests.swift */; };
 		B238 /* ExerciseProvenanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A238 /* ExerciseProvenanceTests.swift */; };
 		B723 /* ExercisePreferenceAssistedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A723 /* ExercisePreferenceAssistedTests.swift */; };
+		B730 /* TrendsViewPointLabelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A730 /* TrendsViewPointLabelTests.swift */; };
 		B190 /* ActiveSessionRecoverySnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A190 /* ActiveSessionRecoverySnapshot.swift */; };
 		B191 /* ActiveSessionRecoveryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A191 /* ActiveSessionRecoveryStore.swift */; };
 		B192 /* ActiveSessionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A192 /* ActiveSessionCoordinator.swift */; };
@@ -415,6 +416,7 @@
 		A237 /* ExerciseIdentityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseIdentityTests.swift; sourceTree = "<group>"; };
 		A238 /* ExerciseProvenanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseProvenanceTests.swift; sourceTree = "<group>"; };
 		A723 /* ExercisePreferenceAssistedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExercisePreferenceAssistedTests.swift; sourceTree = "<group>"; };
+		A730 /* TrendsViewPointLabelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendsViewPointLabelTests.swift; sourceTree = "<group>"; };
 		A226 /* HistoryShareUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryShareUITests.swift; sourceTree = "<group>"; };
 		A227 /* BackupRestoreUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRestoreUITests.swift; sourceTree = "<group>"; };
 		A240 /* HistoryReportDomainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryReportDomainTests.swift; sourceTree = "<group>"; };
@@ -733,6 +735,7 @@
 				A486 /* ShareReport */,
 				A489 /* Backup */,
 				A500 /* DesignSystem */,
+				A731 /* Trends */,
 			);
 			path = FineCoachTests;
 			sourceTree = "<group>";
@@ -1210,6 +1213,14 @@
 			path = DesignSystem;
 			sourceTree = "<group>";
 		};
+		A731 /* Trends */ = {
+			isa = PBXGroup;
+			children = (
+				A730 /* TrendsViewPointLabelTests.swift */,
+			);
+			path = Trends;
+			sourceTree = "<group>";
+		};
 		A486 /* ShareReport */ = {
 			isa = PBXGroup;
 			children = (
@@ -1644,6 +1655,7 @@
 				B237 /* ExerciseIdentityTests.swift in Sources */,
 				B238 /* ExerciseProvenanceTests.swift in Sources */,
 				B723 /* ExercisePreferenceAssistedTests.swift in Sources */,
+				B730 /* TrendsViewPointLabelTests.swift in Sources */,
 				B240 /* HistoryReportDomainTests.swift in Sources */,
 				B701 /* CompletedSessionMostRecentTests.swift in Sources */,
 				B722 /* ComparisonLoadDirectionTests.swift in Sources */,
