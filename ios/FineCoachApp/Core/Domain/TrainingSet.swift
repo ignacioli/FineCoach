@@ -107,52 +107,13 @@ public struct TrainingSet: Hashable, Codable, Sendable, Identifiable {
         return try load.multiplied(by: repetitionCount)
     }
 
-    /// Single source of truth for rendering one Set's recorded values as a
-    /// human-readable string, shared by ActiveSessionView (in-progress sets)
-    /// and SessionDetailView (read-only History). Before this existed each
-    /// View had its own copy; SessionDetailView's copy only ever handled
-    /// weightReps, so .reps/.duration/.cardio sets rendered blank there.
-    /// .duration and .cardio both show durationSeconds via
-    /// `DurationTextParser.formatForEditing` (e.g. "5分30秒") -- gym cardio
-    /// never runs past an hour, so minutes+seconds is precise enough and
-    /// matches the same text format the coach types in. Storage itself
-    /// always stays in seconds.
+    /// Human-readable rendering of this Set's recorded values, shared by
+    /// ActiveSessionView (in-progress sets), SessionDetailView (read-only
+    /// History), and `ShareReportPolicy.setLine` (Share Report) via
+    /// `TrainingSetDisplayFormatting`, so all three stay in the exact same
+    /// format instead of drifting into independent copies.
     public var displaySummary: String {
-        switch recordMode {
-        case .weightReps:
-            let repsText = repetitionCount?.canonicalString ?? "-"
-            switch side {
-            case .none:
-                return "\(weightValue?.canonicalString ?? "-")kg × \(repsText)次"
-            case .left:
-                return "左 \((leftValue ?? weightValue)?.canonicalString ?? "-")kg × \(repsText)次"
-            case .right:
-                return "右 \((rightValue ?? weightValue)?.canonicalString ?? "-")kg × \(repsText)次"
-            case .bilateral:
-                if let leftValue, let rightValue {
-                    return "左 \(leftValue.canonicalString)kg / 右 \(rightValue.canonicalString)kg × \(repsText)次"
-                }
-                return "\(weightValue?.canonicalString ?? "-")kg（双侧） × \(repsText)次"
-            }
-        case .reps:
-            return "\(repetitionCount?.canonicalString ?? "-")次"
-        case .duration:
-            guard let durationSeconds else { return "-" }
-            return DurationTextParser.formatForEditing(secondsText: durationSeconds.canonicalString)
-        case .cardio:
-            var parts: [String] = []
-            parts.append(
-                durationSeconds.map { DurationTextParser.formatForEditing(secondsText: $0.canonicalString) } ?? "-"
-            )
-            parts.append("\(distanceValue?.canonicalString ?? "-")km")
-            if let speedValue {
-                parts.append("速度 \(speedValue.canonicalString)")
-            }
-            if let resistanceValue {
-                parts.append("阻力 \(resistanceValue.canonicalString)")
-            }
-            return parts.joined(separator: " · ")
-        }
+        TrainingSetDisplayFormatting.summary(for: self)
     }
 
     public init(

@@ -51,6 +51,13 @@ public struct ShareReportSetDTO: Hashable, Sendable {
     public let side: SetSide
     public let leftValue: DecimalValue?
     public let rightValue: DecimalValue?
+    /// Cardio-only fields (M1B-FR-022, D-008), mirroring `TrainingSet`'s
+    /// `distanceValue`/`speedValue`/`resistanceValue`. Training performance
+    /// data, not privacy-sensitive body/identity data -- not subject to
+    /// `ShareReportPolicy.forbiddenIdentifierTokens`.
+    public let distanceValue: DecimalValue?
+    public let speedValue: DecimalValue?
+    public let resistanceValue: DecimalValue?
 
     public init(
         orderIndex: UInt32,
@@ -61,7 +68,10 @@ public struct ShareReportSetDTO: Hashable, Sendable {
         unit: MeasurementUnit,
         side: SetSide,
         leftValue: DecimalValue?,
-        rightValue: DecimalValue?
+        rightValue: DecimalValue?,
+        distanceValue: DecimalValue? = nil,
+        speedValue: DecimalValue? = nil,
+        resistanceValue: DecimalValue? = nil
     ) {
         self.orderIndex = orderIndex
         self.recordMode = recordMode
@@ -72,5 +82,10 @@ public struct ShareReportSetDTO: Hashable, Sendable {
         self.side = side
         self.leftValue = leftValue
         self.rightValue = rightValue
+        self.distanceValue = distanceValue
+        self.speedValue = speedValue
+        self.resistanceValue = resistanceValue
     }
 }
+
+extension ShareReportSetDTO: TrainingSetDisplayValues {}

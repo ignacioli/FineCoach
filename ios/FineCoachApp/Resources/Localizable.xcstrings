@@ -4359,6 +4359,17 @@
           }
         }
       }
+    },
+    "trends.comparisonVolumeFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练容量：%@kg vs %@kg"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

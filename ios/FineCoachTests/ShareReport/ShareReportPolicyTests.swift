@@ -50,6 +50,9 @@ final class ShareReportPolicyTests: XCTestCase {
         "side",
         "leftValue",
         "rightValue",
+        "distanceValue",
+        "speedValue",
+        "resistanceValue",
     ]
 
     private static let requiredForbiddenIdentifierTokens: [String] = [
@@ -251,6 +254,84 @@ final class ShareReportPolicyTests: XCTestCase {
         XCTAssertEqual(Set(volumeDTO.exercises.map(\.displayName)), ["杠铃深蹲", "平板支撑", "引体向上"])
         XCTAssertEqual(volumeDTO.exercises.first { $0.displayName == "平板支撑" }?.confirmedSets.count, 1)
         XCTAssertEqual(volumeDTO.exercises.first { $0.displayName == "引体向上" }?.confirmedSets.count, 1)
+    }
+
+    func testSetLineFormatMatchesTrainingSetDisplaySummaryAcrossRecordModes() throws {
+        let completed = try makeCompleted(includingNotes: false, includingUnresolvedSets: false)
+        let dto = try ShareReportPolicy.makeDTO(from: completed)
+        let lines = ShareReportPolicy.previewLines(for: dto)
+
+        var assertedAtLeastOne = false
+        for exercise in completed.exercises {
+            for trainingSet in exercise.sets.filter(\.contributesToStatistics) {
+                let expected = "组\(trainingSet.orderIndex + 1) " + trainingSet.displaySummary
+                XCTAssertTrue(
+                    lines.contains(expected),
+                    "share report line must match TrainingSet.displaySummary format: \(expected)"
+                )
+                assertedAtLeastOne = true
+            }
+        }
+        XCTAssertTrue(assertedAtLeastOne)
+    }
+
+    func testCardioSetCarriesDistanceSpeedResistanceIntoDTOAndSetLine() throws {
+        let cardioExerciseID = StableUUID(UUID(uuidString: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb")!)
+        let cardioSetID = StableUUID(UUID(uuidString: "cccccccc-cccc-4ccc-8ccc-cccccccccccc")!)
+
+        var session = Session.start(id: sessionID, studentID: studentID, now: now)
+        session = try session.addingSessionOnlyExercise(
+            id: cardioExerciseID,
+            displayName: "动感单车",
+            recordMode: .cardio,
+            now: now
+        )
+        session = try session.addingSet(
+            exerciseID: cardioExerciseID,
+            setID: cardioSetID,
+            input: TrainingSetInput(
+                recordMode: .cardio,
+                durationSeconds: "630",
+                unit: .seconds,
+                distanceValue: "5.2",
+                speedValue: "18.5",
+                resistanceValue: "6"
+            ),
+            now: now
+        )
+        session = try session.confirmingSet(setID: cardioSetID, now: now)
+        session = try session.finished(now: finishNow)
+        let completed = try CompletedSession.make(
+            from: session,
+            studentDisplayName: NormalizedName(studentDisplayName)
+        )
+
+        let dto = try ShareReportPolicy.makeDTO(from: completed)
+        let exercise = try XCTUnwrap(dto.exercises.first { $0.displayName == "动感单车" })
+        let setDTO = try XCTUnwrap(exercise.confirmedSets.first)
+        XCTAssertEqual(setDTO.distanceValue?.canonicalString, try DecimalValue("5.2").canonicalString)
+        XCTAssertEqual(setDTO.speedValue?.canonicalString, try DecimalValue("18.5").canonicalString)
+        XCTAssertEqual(setDTO.resistanceValue?.canonicalString, try DecimalValue("6").canonicalString)
+
+        let trainingSet = try XCTUnwrap(
+            completed.exercises.first { $0.displayNameSnapshot.value == "动感单车" }?.sets.first
+        )
+        let lines = ShareReportPolicy.previewLines(for: dto)
+        let expectedLine = "组1 " + trainingSet.displaySummary
+        XCTAssertTrue(lines.contains(expectedLine))
+        // mm:ss formatting (matches DurationTextParser.formatForEditing), not raw "630s".
+        XCTAssertTrue(expectedLine.contains("分"))
+        XCTAssertFalse(lines.contains { $0.contains("630s") })
+    }
+
+    func testTrainingVolumePreviewLineIncludesKilogramUnit() throws {
+        let completed = try makeCompleted(includingNotes: false, includingUnresolvedSets: false)
+        var modules = ShareReportModuleSelection.privacySafeDefaults
+        modules.includeTrainingVolume = true
+        let dto = try ShareReportPolicy.makeDTO(from: completed, modules: modules)
+        let volume = try XCTUnwrap(dto.trainingVolume)
+        let lines = ShareReportPolicy.previewLines(for: dto)
+        XCTAssertTrue(lines.contains("训练容量 \(volume.canonicalString)kg"))
     }
 
     private var finishNow: Date {

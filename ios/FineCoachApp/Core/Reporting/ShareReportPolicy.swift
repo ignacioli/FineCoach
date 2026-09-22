@@ -76,7 +76,10 @@ public enum ShareReportPolicy {
                             unit: trainingSet.unit,
                             side: trainingSet.side,
                             leftValue: trainingSet.leftValue,
-                            rightValue: trainingSet.rightValue
+                            rightValue: trainingSet.rightValue,
+                            distanceValue: trainingSet.distanceValue,
+                            speedValue: trainingSet.speedValue,
+                            resistanceValue: trainingSet.resistanceValue
                         )
                     }
                 )
@@ -115,7 +118,7 @@ public enum ShareReportPolicy {
             lines.append("课后总结 \(summary)")
         }
         if let volume = dto.trainingVolume {
-            lines.append("训练容量 \(volume.canonicalString)")
+            lines.append("训练容量 \(volume.canonicalString)kg")
         }
         for exercise in dto.exercises {
             lines.append(exercise.displayName)
@@ -130,23 +133,7 @@ public enum ShareReportPolicy {
     }
 
     private static func setLine(_ trainingSet: ShareReportSetDTO) -> String {
-        var parts = ["组\(trainingSet.orderIndex + 1)"]
-        if let weight = trainingSet.weightValue {
-            parts.append(weight.canonicalString)
-        }
-        if let reps = trainingSet.repetitionCount {
-            parts.append("×\(reps.canonicalString)")
-        }
-        if let duration = trainingSet.durationSeconds {
-            parts.append("\(duration.canonicalString)s")
-        }
-        if let left = trainingSet.leftValue {
-            parts.append("L\(left.canonicalString)")
-        }
-        if let right = trainingSet.rightValue {
-            parts.append("R\(right.canonicalString)")
-        }
-        return parts.joined(separator: " ")
+        "组\(trainingSet.orderIndex + 1) " + TrainingSetDisplayFormatting.summary(for: trainingSet)
     }
 
     private static func formattedDay(_ date: Date) -> String {

@@ -99,6 +99,7 @@
 		B116 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = A116 /* Session.swift */; };
 		B117 /* SessionExercise.swift in Sources */ = {isa = PBXBuildFile; fileRef = A117 /* SessionExercise.swift */; };
 		B118 /* TrainingSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A118 /* TrainingSet.swift */; };
+		B11E /* TrainingSetDisplayFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E /* TrainingSetDisplayFormatting.swift */; };
 		B119 /* Exercise.swift in Sources */ = {isa = PBXBuildFile; fileRef = A119 /* Exercise.swift */; };
 		B11B /* ExerciseProvenance.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B /* ExerciseProvenance.swift */; };
 		B11C /* CompletedSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11C /* CompletedSession.swift */; };
@@ -325,6 +326,7 @@
 		A116 /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 		A117 /* SessionExercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionExercise.swift; sourceTree = "<group>"; };
 		A118 /* TrainingSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingSet.swift; sourceTree = "<group>"; };
+		A11E /* TrainingSetDisplayFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingSetDisplayFormatting.swift; sourceTree = "<group>"; };
 		A119 /* Exercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exercise.swift; sourceTree = "<group>"; };
 		A11B /* ExerciseProvenance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseProvenance.swift; sourceTree = "<group>"; };
 		A11C /* CompletedSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedSession.swift; sourceTree = "<group>"; };
@@ -744,6 +746,7 @@
 				A116 /* Session.swift */,
 				A117 /* SessionExercise.swift */,
 				A118 /* TrainingSet.swift */,
+				A11E /* TrainingSetDisplayFormatting.swift */,
 				A119 /* Exercise.swift */,
 				A11B /* ExerciseProvenance.swift */,
 				A11C /* CompletedSession.swift */,
@@ -1490,6 +1493,7 @@
 				B116 /* Session.swift in Sources */,
 				B117 /* SessionExercise.swift in Sources */,
 				B118 /* TrainingSet.swift in Sources */,
+				B11E /* TrainingSetDisplayFormatting.swift in Sources */,
 				B119 /* Exercise.swift in Sources */,
 				B11B /* ExerciseProvenance.swift in Sources */,
 				B11C /* CompletedSession.swift in Sources */,

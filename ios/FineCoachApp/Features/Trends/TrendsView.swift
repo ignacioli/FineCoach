@@ -198,7 +198,13 @@ struct TrendsView: View {
                 case .compatible(let detail):
                     Text("\(detail.totalSetCountA) vs \(detail.totalSetCountB) 组")
                     if let volumeA = detail.trainingVolumeA, let volumeB = detail.trainingVolumeB {
-                        Text("\(volumeA.canonicalString) vs \(volumeB.canonicalString)")
+                        Text(
+                            String(
+                                format: String(localized: "trends.comparisonVolumeFormat"),
+                                volumeA.canonicalString,
+                                volumeB.canonicalString
+                            )
+                        )
                     }
                 case .incompatibleTrainingFocus, .differentStudent:
                     Text(String(localized: "trends.comparisonIncompatible"))
