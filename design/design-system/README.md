@@ -62,7 +62,7 @@
 | `color.surface.canvas` | neutral.50 | `#F7F4EE` | **仅小面积填充**：搜索框底（10）、输入框底（08，O3）、深色 hero 上的徽标底（01） |
 | `color.surface.subtle` | neutral.100 | `#F0EEE9` | 画稿未使用，保留 |
 | `color.surface.divider` | neutral.200 | `#ECE9E2` | 1pt 分割线、关闭态开关底（仅作装饰，不作为唯一可辨识的控件边界） |
-| `color.border.control` | neutral.500 | `#8E897F` | 可交互控件的描边，例如待完成组圆圈；对白底 3.48:1。画稿原用 `#ECE9E2` |
+| `color.border.control` | neutral.500 | `#8E897F` | 可交互控件的描边：待完成组圆圈（O2）、关闭态开关轨道外圈（O7）；对白底 3.48:1。画稿原用 `#ECE9E2` |
 | `color.surface.selected` | brand.subtle | `#EDE9E2` | 未选中的二选一/胶囊底、头像底、提示条底、弹窗次按钮底 |
 | `color.text.primary` | neutral.900 | `#211F1B` | 正文、列表主文字、数值 |
 | `color.text.secondary` | neutral.600 | `#5C5A52` | 辅助文字、字段标签、区段标签、箭头 |
@@ -225,7 +225,7 @@
 | 顶部分段切换（今日 / 学员） | 选中项 50×32 胶囊，`action.primary` 底 + `headline` 白字；未选中项为纯文字 `body` `text.secondary` |
 | 筛选胶囊（07） | 高 30 胶囊；未选中 `surface.selected` 底 + `chipLabel` `text.primary`；选中 `action.primary` 底 + 白字 |
 | 星期多选（02） | 64×28 胶囊，选中/未选中配色同筛选胶囊 |
-| 开关 | 44×26 胶囊，开启 `action.primary`、关闭 `surface.divider`；滑块 18×18 白色圆 |
+| 开关 | 44×26 胶囊，滑块 18×18 白色圆，**左关右开**（iOS 惯例，与画稿 02/12 一致）。开启：轨道 `action.primary`。关闭：轨道 `surface.divider` 底 + 1.5pt `border.control` 内描边（O7）。实现为系统原生 `Toggle` + 自定义外观样式，保留系统开关的无障碍语义；可点击区域不小于 44×44 |
 | 深色 hero 卡（01） | 358×100，`radius.lg`，`action.primary` 底；内含徽标（56×24 胶囊，`surface.canvas` 底，`sectionLabel` `action.primary` 字）、`headline` 白字标题、`text.onActionSecondary` 副文字、`callout` 600 白字操作。每屏最多一个 |
 | 列表行 | 左 16；主文字 `headline` 或 `body`，元信息 `caption` `text.secondary`，右侧 `›`；行间用 1pt 分割线 |
 | 区段标签 | `sectionLabel`，`text.secondary` |
@@ -269,6 +269,7 @@
 | O4 | 11 屏器材图标溢出画板左边缘（x<0） | 画稿绘制瑕疵：图标改为 24×24 放在 16pt 边距内，动作名右移到 x=48 | 已定，已回填 |
 | I1 | Penpot 17 屏、11 屏里的器材图标是旧画法（描边 3pt/2pt 混用），与 `icons/` 目录的重绘版不一致 | 以 `icons/` 为准，已替换 | 已定，已回填 |
 | O5 | 画稿只覆盖了空态和训练三种状态，缺少加载、错误、离线状态（评分卡维度 9 扣分项） | 不另出设计稿，用本文的组件与颜色组合实现，并在逐屏走查时人工确认 | 已定（产品负责人） |
+| O7 | 关闭态开关轨道 `#ECE9E2` 对白底 1.21:1，开关状态只靠轨道体现，低于非文本元素 3:1（spec NFR-010；2026-09-23 对抗性审查 #1） | 保留画稿外观，轨道加 1.5pt `border.control` 内描边（3.48:1），与 O2 同一处理方式；已回填 Penpot 12 屏（快照 `before-switch-off-outline 2026-09-23` → `switch-off-outline 2026-09-23 (…)`）并重新导出 `12-share-report.png` | 已定（产品负责人 2026-09-23），已回填 |
 | O6 | 吉祥物造型与知名动画角色是否存在版权关联 | 产品负责人确认：吉祥物为其自行生成的原创形象，与该角色无关，不涉及版权问题 | 已定（产品负责人） |
 
 ## 11. 对比度核验（WCAG 2.x）
@@ -287,7 +288,9 @@
 | `#5C5A52` | `#EDE9E2` | 5.71 | 通过 |
 | `#FFFFFF` | `#B45309` warning | 5.02 | 通过 |
 | `#D4442A` destructive | `#FFFFFF` | 4.51 | 通过（O1 修复后；原值 `#D9563E` 为 3.92） |
-| `#8E897F` border.control（非文本） | `#FFFFFF` | 3.48 | 通过（O2 修复后；原值 `#ECE9E2` 为 1.21） |
+| `#8E897F` border.control：待完成组圆圈描边（非文本，状态边界） | `#FFFFFF` 页面 | 3.48 | 通过（O2 修复后；原值 `#ECE9E2` 为 1.21） |
+| `#8E897F` border.control：关闭态开关轨道外圈（非文本，状态边界） | `#FFFFFF` 页面 | 3.48 | 通过（O7 修复后；原轨道 `#ECE9E2` 为 1.21） |
+| `#2A2822` action.primary：开启态开关轨道（非文本，状态边界） | `#FFFFFF` 页面 | 14.74 | 通过 |
 | `#ECE9E2` divider（装饰，非控件边界） | `#FFFFFF` | 1.21 | 纯装饰分割线，不适用 3:1 要求 |
 | `#A8A39A` text.disabled | `#FFFFFF` | 2.51 | 禁用态，WCAG 豁免 |
 
