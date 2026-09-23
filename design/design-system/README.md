@@ -26,7 +26,7 @@
   - 画稿：O1（08）、O2（11、13）、O3（08）、O4（11）、C10（01、15）。
   - 图标：17 屏 15 个图标和 11 屏 2 个图标换成 `icons/` 目录的重绘版。
   - Foundations 样张：C1、C2、C5、C6、C7，并在色板中新增 `border.control`。
-- 导出：本仓库 `design/m1-b-hifi/screens/`，文件名沿用旧版（`01-today.png` … `17-icons.png`）。2 倍图，01–16 为 780×1688，17 为 1120×1040。04、06、07、08、12 这 5 块画板上的展示投影在导出时临时去掉、导出后立即恢复，所以导出图不含投影边距。
+- 导出：本仓库 `design/m1-b-hifi/screens/`，文件名沿用旧版（`01-today.png` … `17-icons.png`）。2 倍图，01–16 为 780×1688，17 为 1120×1200（2026-09-23 新增一行 3 个图标后重新导出，原为 1120×1040）。04、06、07、08、12 这 5 块画板上的展示投影在导出时临时去掉、导出后立即恢复，所以导出图不含投影边距。
 
 ## 2. 颜色
 
@@ -173,9 +173,30 @@
 
 ### 7.1 器材图标（权威：`design/m1-b-hifi/icons/`）
 
-- 共 15 个：barbell、bike、bodyweight、cable-crossover、cable-machine、dumbbell、hack-squat、jump-rope、kettlebell、pec-deck、resistance-band、rowing-machine、shoulder-press、smith-machine、treadmill。
+- 共 18 个：barbell、bike、bodyweight、cable-crossover、cable-machine、dumbbell、hack-squat、jump-rope、kettlebell、pec-deck、resistance-band、rowing-machine、shoulder-press、smith-machine、treadmill，以及 2026-09-23 为 T065 新增的 leg-extension（腿屈伸）、hip-adduction（髋内收/外展一体机）、tbar-row（胸托 T 杠划船）。新增 3 个已回填 Penpot「17 器材 icon 库」画板（快照 `before-T065-icons 2026-09-23` → `T065-icons 2026-09-23 (…)`）。
 - 规格：viewBox 24、描边 2、圆角端点与圆角转角、无填充、描边色 `#2A2822`。
-- 已导入 `ios/FineCoachApp/Resources/Assets.xcassets/equipment-*.imageset`（2026-09-22 核对，与原件逐字节一致），并设置为 template 渲染，着色用 `action.primary`。
+- 前 15 个已导入 `ios/FineCoachApp/Resources/Assets.xcassets/equipment-*.imageset`（2026-09-22 核对，与原件逐字节一致），并设置为 template 渲染，着色用 `action.primary`；新增 3 个在 T065 实现时导入。
+- **动作 → 图标对应（产品负责人 2026-09-23，T065）**：按动作库的 `equipmentClass` 对应；`固定器械` 再按 `primaryMuscleGroup` 细分。**没有对应图标的动作不显示图标（留空），不用默认图标补位。**
+
+  | 器材类别 | 主练部位 | 图标 |
+  |---|---|---|
+  | 杠铃 | 任意 | barbell |
+  | 哑铃 | 任意 | dumbbell |
+  | 徒手 | 任意 | bodyweight |
+  | 龙门架 | 任意 | cable-crossover |
+  | 史密斯机 | 任意 | smith-machine |
+  | 壶铃 | 任意 | kettlebell |
+  | 固定器械 | 胸 | pec-deck |
+  | 固定器械 | 肩 | shoulder-press |
+  | 固定器械 | 大腿 | leg-extension |
+  | 固定器械 | 臀 | hip-adduction |
+  | 固定器械 | 小腿 | hack-squat |
+  | 固定器械 | 背 | tbar-row |
+  | 固定器械 | 臂、核心 | 留空 |
+  | 其他 | 任意 | 留空 |
+  | 自定义动作 | — | 留空 |
+
+  bike、treadmill、rowing-machine、jump-rope、cable-machine、resistance-band 目前没有对应的器材类别，暂不使用。
 - 用途：动作库、训练中动作行。11 屏的动作行图标为 24×24，位于左边距 16 处，动作名右移到 x=48（O4）。
 - 展示尺寸：24 画布下描边 2；放大显示时描边按比例放大（17 屏 36×36 的描边为 3）。
 
@@ -284,6 +305,6 @@
 | 排版 | 没有排版 token；系统字体 + `.footnote` / `.headline` 等约 20 种写法 | Noto Sans SC；§3 的 7 级阶梯 + 7 个具名例外 |
 | 间距 | 8 / 16 | 4 / 8 / 12 / 16 / 24 / 32 |
 | 圆角 | 8 / 14（14 不在刻度内） | 8 / 12 / 16 / 20 + 胶囊 + 弹窗按钮 10 |
-| 器材图标 | 已导入 15 个，代码中 0 处引用 | 接入动作相关界面（§7.1） |
+| 器材图标 | 已导入 15 个，代码中 0 处引用；新增 3 个未导入 | 导入新增 3 个，按 §7.1 对应表接入动作相关界面 |
 | 吉祥物 | 不存在 | 空态使用（§9） |
 | 自动化校验 | `VisionHarnessTests` 只锁定 9 个颜色和 2 个间距 | 扩展到 §2–§5 的全部 token 值和 §11 的对比度 |

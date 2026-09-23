@@ -33,7 +33,7 @@ Penpot 文件「M1-B G5 Design」→「Foundations」页：
 ## 目录
 
 - `screens/`：17 张高保真截图（01-17），2026-09-22 设计系统修复回填 Penpot 后重新导出的 2 倍图（导出规格见设计系统 §1.1）
-- `icons/`：15 个器材 icon SVG（stroke `#2A2822`，viewBox 24）
+- `icons/`：18 个器材 icon SVG（stroke `#2A2822`，viewBox 24）。2026-09-23 为 T065 新增 leg-extension、hip-adduction、tbar-row；动作 → 图标对应表见设计系统 §7.1
 
 ## 视觉评分
 
