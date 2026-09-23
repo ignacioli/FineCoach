@@ -128,6 +128,19 @@ Simulator control tool and any other screenshot-capable tool.
   that). Treat it as a tool for a human-guided walkthrough, not a
   default verification step for routine changes.
 
+## Visual design authority
+
+`design/` is the single authoritative visual source (`AGENTS.md`
+§Current Artifacts and Authority). `design/design-system/README.md`
+defines every color, type style, spacing, radius, icon, and component
+value; Feature views consume those tokens and never introduce their own
+values. Compare a screen against its `design/m1-b-hifi/screens/*.png`
+target during the human walkthrough — this is checking against a fixed
+approved image, not the forbidden screenshot loop above. A design
+change goes into the design-system doc and is backfilled into Penpot
+「M1-B G5 Design」 in the same round; never let code, doc, and Penpot
+drift apart.
+
 ## Privacy and safety
 
 - Treat Coach/Student identity, body data, injuries, notes, schedules,

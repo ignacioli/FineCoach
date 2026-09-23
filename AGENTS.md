@@ -14,6 +14,7 @@ Outside approved M1-A behavior, do not infer whether Students directly use the A
 - `specs/001-m1-a-core-session/spec.md` is the approved M1-A product specification; its approved `plan.md`, detailed design artifacts, and `tasks.md` describe the shipped M1-A slice.
 - `specs/002-m1-b-coach-operations/spec.md` is the approved M1-B feature specification (`1.0-approved`, 2026-08-30), including §10 D-001–D-010. That is the specification half of G5 only. It authorizes the M1-B design carrier; it does not authorize `plan.md`, `tasks.md`, or implementation until G5 design review also passes. M1-B verification MUST follow that spec §2.3 (core-path unit and integration tests; no TDD/red-green gate).
 - The approved M1-A artifacts override discovery input only within their explicit scope. Do not promote remaining ideas into requirements.
+- `design/` in this repository is the single authoritative visual design baseline and source (product-owner decision, 2026-09-22): `design/design-system/README.md` defines color, typography, spacing, radius, icon, and component rules; `design/m1-b-hifi/` holds the approved hi-fi screens, equipment icons, and design notes; `design/12d-visual-scorecard.md` is the visual quality bar. They are backed by the Penpot file「M1-B G5 Design」, which must be kept in sync with any design-system change. The private specs repository keeps only design-discovery evidence and must not be used as a visual source.
 
 ## Current Phase
 
