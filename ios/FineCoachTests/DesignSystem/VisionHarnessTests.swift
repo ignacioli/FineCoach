@@ -35,53 +35,58 @@ enum WCAGContrast {
     }
 }
 
+/// T060: exact-value assertions for every color/spacing/radius token introduced by
+/// T054–T057, pinned against `design/design-system/README.md` §2/§4/§5 so any drift in
+/// `Tokens.swift` fails a test instead of silently reaching a feature screen.
 final class VisionHarnessTests: XCTestCase {
-    // MARK: Token value assertions (pin exact G5 "暖炭黑素雅" palette hex values, §2/§4/§5)
+    // MARK: §2.1 FC Primitives — color
 
-    func testSurfacePageTokenValue() {
+    func testPrimitiveColorHexValues() {
+        XCTAssertEqual(FCPrimitives.brandPrimaryHex, "#2A2822")
+        XCTAssertEqual(FCPrimitives.brandPressedHex, "#1F1E1B")
+        XCTAssertEqual(FCPrimitives.brandSubtleHex, "#EDE9E2")
+        XCTAssertEqual(FCPrimitives.brandOnHex, "#FFFFFF")
+
+        XCTAssertEqual(FCPrimitives.neutral0Hex, "#FFFFFF")
+        XCTAssertEqual(FCPrimitives.neutral50Hex, "#F7F4EE")
+        XCTAssertEqual(FCPrimitives.neutral100Hex, "#F0EEE9")
+        XCTAssertEqual(FCPrimitives.neutral200Hex, "#ECE9E2")
+        XCTAssertEqual(FCPrimitives.neutral400Hex, "#A8A39A")
+        XCTAssertEqual(FCPrimitives.neutral500Hex, "#8E897F")
+        XCTAssertEqual(FCPrimitives.neutral600Hex, "#5C5A52")
+        XCTAssertEqual(FCPrimitives.neutral900Hex, "#211F1B")
+
+        XCTAssertEqual(FCPrimitives.green600Hex, "#2A2822")
+        XCTAssertEqual(FCPrimitives.amber700Hex, "#B45309")
+        // §10 O1: dimmed from the original #D9563E (3.92:1) to #D4442A (4.51:1).
+        XCTAssertEqual(FCPrimitives.red700Hex, "#D4442A")
+    }
+
+    // MARK: §2.2 FC Semantic Color — each MUST resolve to its documented §2.2 value
+
+    func testSemanticColorHexValues() {
+        XCTAssertEqual(FCSemanticColors.actionPrimaryHex, "#2A2822")
+        XCTAssertEqual(FCSemanticColors.actionPressedHex, "#1F1E1B")
+        XCTAssertEqual(FCSemanticColors.actionOnHex, "#FFFFFF")
         XCTAssertEqual(FCSemanticColors.surfacePageHex, "#FFFFFF")
-    }
-
-    func testSurfaceCanvasTokenValue() {
+        XCTAssertEqual(FCSemanticColors.surfaceElevatedHex, "#FFFFFF")
         XCTAssertEqual(FCSemanticColors.surfaceCanvasHex, "#F7F4EE")
-    }
-
-    func testTextPrimaryTokenValue() {
-        XCTAssertEqual(FCSemanticColors.textPrimaryHex, "#211F1B")
-    }
-
-    func testTextSecondaryTokenValue() {
-        XCTAssertEqual(FCSemanticColors.textSecondaryHex, "#5C5A52")
-    }
-
-    func testSurfaceDividerTokenValue() {
+        XCTAssertEqual(FCSemanticColors.surfaceSubtleHex, "#F0EEE9")
         XCTAssertEqual(FCSemanticColors.surfaceDividerHex, "#ECE9E2")
-    }
-
-    func testStatusDestructiveTokenValue() {
-        // §10 O1: dimmed from #D9563E to #D4442A to clear 4.5:1 text contrast.
+        XCTAssertEqual(FCSemanticColors.surfaceSelectedHex, "#EDE9E2")
+        XCTAssertEqual(FCSemanticColors.borderControlHex, "#8E897F")
+        XCTAssertEqual(FCSemanticColors.textPrimaryHex, "#211F1B")
+        XCTAssertEqual(FCSemanticColors.textSecondaryHex, "#5C5A52")
+        XCTAssertEqual(FCSemanticColors.textDisabledHex, "#A8A39A")
+        // §10 C9: backfilled from the artwork, no primitive of its own.
+        XCTAssertEqual(FCSemanticColors.textOnActionSecondaryHex, "#B0ABA2")
+        XCTAssertEqual(FCSemanticColors.statusSuccessHex, "#2A2822")
+        XCTAssertEqual(FCSemanticColors.statusWarningHex, "#B45309")
+        // §10 O1: dimmed from the original #D9563E (3.92:1) to #D4442A (4.51:1).
         XCTAssertEqual(FCSemanticColors.statusDestructiveHex, "#D4442A")
     }
 
-    func testSurfaceSelectedTokenValue() {
-        XCTAssertEqual(FCSemanticColors.surfaceSelectedHex, "#EDE9E2")
-    }
-
-    func testStatusWarningTokenValue() {
-        XCTAssertEqual(FCSemanticColors.statusWarningHex, "#B45309")
-    }
-
-    func testActionPrimaryTokenValue() {
-        XCTAssertEqual(FCSemanticColors.actionPrimaryHex, "#2A2822")
-    }
-
-    func testBorderControlTokenValue() {
-        XCTAssertEqual(FCSemanticColors.borderControlHex, "#8E897F")
-    }
-
-    func testTextOnActionSecondaryTokenValue() {
-        XCTAssertEqual(FCSemanticColors.textOnActionSecondaryHex, "#B0ABA2")
-    }
+    // MARK: §4 spacing (only these six values are permitted)
 
     func testSpacingTokenValues() {
         XCTAssertEqual(FCPrimitives.space1, 4)
@@ -92,15 +97,40 @@ final class VisionHarnessTests: XCTestCase {
         XCTAssertEqual(FCPrimitives.space8, 32)
     }
 
+    // MARK: §5 radii
+
     func testRadiusTokenValues() {
         XCTAssertEqual(FCPrimitives.radiusSm, 8)
         XCTAssertEqual(FCPrimitives.radiusMd, 12)
         XCTAssertEqual(FCPrimitives.radiusLg, 16)
         XCTAssertEqual(FCPrimitives.radiusXl, 20)
+        // §10 C8: off the 8/12/16/20 scale but consistently used in the
+        // approved artwork for the 36pt confirmation-dialog action buttons.
         XCTAssertEqual(FCPrimitives.radiusDialogAction, 10)
     }
 
-    // MARK: Contrast utility self-checks (full palette contrast assertions land in T045)
+    // MARK: Transitional aliases (T057) — pin their CURRENT values so they can't
+    // silently drift before T068 removes them. Per T054/T057, these intentionally
+    // still hold their pre-design-system values, not the new token values.
+
+    func testTransitionalSpacingAndRadiusAliasValues() {
+        XCTAssertEqual(FCPrimitives.spacingSmall, 8)
+        XCTAssertEqual(FCPrimitives.spacingMedium, 16)
+        XCTAssertEqual(FCPrimitives.radiusSmall, 8)
+        XCTAssertEqual(FCPrimitives.radiusMedium, 14)
+    }
+
+    func testTransitionalColorAliasesTrackTheirSemanticTarget() {
+        XCTAssertEqual(FCSemanticColors.elevatedSurface, FCSemanticColors.surfaceElevated)
+        XCTAssertEqual(FCSemanticColors.primaryText, FCSemanticColors.textPrimary)
+        XCTAssertEqual(FCSemanticColors.secondaryText, FCSemanticColors.textSecondary)
+        XCTAssertEqual(FCSemanticColors.separator, FCSemanticColors.surfaceDivider)
+        XCTAssertEqual(FCSemanticColors.destructive, FCSemanticColors.statusDestructive)
+        XCTAssertEqual(FCSemanticColors.tint, FCSemanticColors.surfaceSelected)
+        XCTAssertEqual(FCSemanticColors.warning, FCSemanticColors.statusWarning)
+    }
+
+    // MARK: Contrast utility self-checks (full §11 palette contrast assertions: T045)
 
     func testContrastRatioOfIdenticalColorsIsOne() {
         XCTAssertEqual(WCAGContrast.contrastRatio("#FFFFFF", "#FFFFFF"), 1.0, accuracy: 0.0001)
