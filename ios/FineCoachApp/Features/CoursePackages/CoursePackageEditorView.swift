@@ -194,7 +194,7 @@ struct CoursePackageEditorView: View {
             }
             .padding(FCPrimitives.spacingMedium)
         }
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "coursePackageEditor.title"))
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier(FCAccessibilityID.coursePackageEditorRoot)

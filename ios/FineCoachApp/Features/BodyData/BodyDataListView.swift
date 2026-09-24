@@ -212,7 +212,7 @@ struct BodyDataListView: View {
             }
             .padding(FCPrimitives.spacingMedium)
         }
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "bodyData.title"))
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier(FCAccessibilityID.bodyDataListRoot)
@@ -242,7 +242,7 @@ struct BodyDataListView: View {
             .frame(minHeight: 44)
         }
         .padding(FCPrimitives.spacingMedium)
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
     }
 
     private func sectionTitle(_ text: String) -> some View {

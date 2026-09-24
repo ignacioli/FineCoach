@@ -194,7 +194,7 @@ struct CustomExerciseEditorView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(FCPrimitives.spacingMedium)
         }
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "exercise.editor.title"))
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityElement(children: .contain)

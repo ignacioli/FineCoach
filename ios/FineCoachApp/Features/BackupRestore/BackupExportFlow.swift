@@ -186,7 +186,7 @@ struct BackupExportFlowView: View {
             .padding(.bottom, FCPrimitives.spacingSmall)
             .accessibilityIdentifier(FCAccessibilityID.backupCancel)
         }
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "backup.title"))
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)

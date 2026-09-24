@@ -171,7 +171,7 @@ struct StudentDetailView: View {
                 .padding(FCPrimitives.spacingMedium)
             }
         }
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .navigationTitle(viewModel.student?.displayName.value ?? String(localized: "student.list.title"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

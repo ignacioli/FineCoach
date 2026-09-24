@@ -129,7 +129,7 @@ struct StudentListView: View {
                 .listStyle(.plain)
             }
         }
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .navigationTitle(viewModel.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

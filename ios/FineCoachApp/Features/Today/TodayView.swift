@@ -192,7 +192,7 @@ struct TodayView: View {
             }
             .padding(FCPrimitives.spacingMedium)
         }
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .accessibilityIdentifier(FCAccessibilityID.todayRoot)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -260,7 +260,7 @@ struct TodayView: View {
             .padding(FCPrimitives.spacingMedium)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(RoundedRectangle(cornerRadius: FCPrimitives.radiusMedium).fill(FCSemanticColors.primaryText))
-            .foregroundStyle(FCSemanticColors.background)
+            .foregroundStyle(FCSemanticColors.surfacePage)
         }
         .accessibilityIdentifier(FCAccessibilityID.todayInProgress)
     }

@@ -70,17 +70,17 @@ struct RootNavigation: View {
                         .multilineTextAlignment(.center)
                         .padding()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(FCSemanticColors.background)
+                        .background(FCSemanticColors.surfacePage)
                 } else if let catalogUnavailableMessage = environment.catalogUnavailableMessage {
                     Text(catalogUnavailableMessage)
                         .multilineTextAlignment(.center)
                         .padding()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(FCSemanticColors.background)
+                        .background(FCSemanticColors.surfacePage)
                 } else if !didLoadOnboarding {
                     ProgressView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(FCSemanticColors.background)
+                        .background(FCSemanticColors.surfacePage)
                 } else if !onboardingCompleted {
                     OnboardingView(
                         viewModel: OnboardingViewModel(useCases: environment.requireUseCases()),
@@ -300,7 +300,7 @@ struct RootTabContainer: View {
                 )
             }
         }
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .accessibilityIdentifier(FCAccessibilityID.studentList)
     }
 
@@ -327,7 +327,7 @@ struct RootTabContainer: View {
                 .background(
                     Capsule().fill(rootTab == tab ? FCSemanticColors.primaryText : FCSemanticColors.tint)
                 )
-                .foregroundStyle(rootTab == tab ? FCSemanticColors.background : FCSemanticColors.primaryText)
+                .foregroundStyle(rootTab == tab ? FCSemanticColors.surfacePage : FCSemanticColors.primaryText)
         }
     }
 }
@@ -345,7 +345,7 @@ struct PlaceholderDestinationView: View {
         }
         .padding(FCPrimitives.spacingMedium)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
     }

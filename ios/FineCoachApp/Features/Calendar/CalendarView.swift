@@ -136,7 +136,7 @@ struct CalendarView: View {
             }
             addButton
         }
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .accessibilityIdentifier(FCAccessibilityID.calendarRoot)
         .task { await viewModel.reload() }
         .onChange(of: viewModel.displayedMonthStart) { _, _ in
@@ -208,9 +208,9 @@ struct CalendarView: View {
                     .font(.subheadline.weight(isSelected ? .bold : .regular))
                     .frame(width: 32, height: 32)
                     .background(Circle().fill(isSelected ? FCSemanticColors.primaryText : Color.clear))
-                    .foregroundStyle(isSelected ? FCSemanticColors.background : FCSemanticColors.primaryText)
+                    .foregroundStyle(isSelected ? FCSemanticColors.surfacePage : FCSemanticColors.primaryText)
                 Circle()
-                    .fill(hasAppointments ? FCSemanticColors.brand : Color.clear)
+                    .fill(hasAppointments ? FCSemanticColors.actionPrimary : Color.clear)
                     .frame(width: 4, height: 4)
             }
             .frame(maxWidth: .infinity, minHeight: 44)
@@ -266,7 +266,7 @@ struct CalendarView: View {
         }
         .padding(FCPrimitives.spacingMedium)
         .background(FCSemanticColors.primaryText)
-        .foregroundStyle(FCSemanticColors.background)
+        .foregroundStyle(FCSemanticColors.surfacePage)
         .accessibilityIdentifier(FCAccessibilityID.calendarAdd)
     }
 }

@@ -109,7 +109,7 @@ struct ExerciseLibraryView: View {
             }
             .listStyle(.plain)
         }
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "exercise.library.title"))
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityElement(children: .contain)

@@ -152,7 +152,7 @@ struct SessionDetailView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(FCPrimitives.spacingMedium)
         }
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "detail.title"))
         .navigationBarTitleDisplayMode(.inline)
         .task { await viewModel.load() }

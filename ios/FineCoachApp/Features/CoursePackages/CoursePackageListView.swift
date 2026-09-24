@@ -115,7 +115,7 @@ struct CoursePackageListView: View {
             }
             .padding(FCPrimitives.spacingMedium)
         }
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "coursePackages.title"))
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier(FCAccessibilityID.coursePackageListRoot)
@@ -150,7 +150,7 @@ struct CoursePackageListView: View {
                     )
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(
-                        package.status == .active ? FCSemanticColors.brand : FCSemanticColors.secondaryText
+                        package.status == .active ? FCSemanticColors.actionPrimary : FCSemanticColors.secondaryText
                     )
                 }
                 Text(

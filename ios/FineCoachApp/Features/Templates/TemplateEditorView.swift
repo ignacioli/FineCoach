@@ -196,7 +196,7 @@ struct TemplateEditorView: View {
             }
             .padding(FCPrimitives.spacingMedium)
         }
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "templateEditor.title"))
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier(FCAccessibilityID.templateEditorRoot)

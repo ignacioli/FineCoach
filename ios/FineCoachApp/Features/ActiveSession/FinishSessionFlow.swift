@@ -39,7 +39,7 @@ struct FinishSessionFlow: View {
         }
         .padding(FCPrimitives.spacingMedium)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -96,7 +96,7 @@ struct DurationReviewFlow: View {
         }
         .padding(FCPrimitives.spacingMedium)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "session.duration.reviewTitle"))
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier(FCAccessibilityID.activeSessionDurationReview)

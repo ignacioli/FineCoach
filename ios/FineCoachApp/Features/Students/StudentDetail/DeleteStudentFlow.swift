@@ -45,7 +45,7 @@ struct ArchiveStudentView: View {
             Spacer()
         }
         .padding(FCPrimitives.spacingMedium)
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "student.archive.title"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -83,7 +83,7 @@ struct DeleteStudentFlow: View {
         .task { await load() }
         .padding(FCPrimitives.spacingMedium)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "student.delete.title"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

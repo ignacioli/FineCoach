@@ -66,7 +66,7 @@ struct OnboardingView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(FCPrimitives.spacingMedium)
             }
-            .background(FCSemanticColors.background)
+            .background(FCSemanticColors.surfacePage)
             .navigationTitle(String(localized: "app.title"))
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: RootDestination.self) { destination in

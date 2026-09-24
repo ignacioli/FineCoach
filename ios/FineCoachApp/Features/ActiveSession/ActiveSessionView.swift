@@ -103,7 +103,7 @@ struct ActiveSessionView: View {
             }
         }
         .scrollDismissesKeyboard(.interactively)
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "session.title"))
         .navigationBarTitleDisplayMode(.inline)
         .task { await viewModel.load() }

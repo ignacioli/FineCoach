@@ -61,7 +61,7 @@ struct HistoryListView: View {
                 .accessibilityIdentifier(FCAccessibilityID.historyRow(index))
             }
         }
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "history.title"))
         .navigationBarTitleDisplayMode(.inline)
         .task { await viewModel.load() }

@@ -25,7 +25,7 @@ struct DeleteExerciseFlow: View {
         }
         .padding(FCPrimitives.spacingMedium)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "session.deleteExercise.title"))
         .navigationBarTitleDisplayMode(.inline)
     }

@@ -36,52 +36,68 @@ enum WCAGContrast {
 }
 
 final class VisionHarnessTests: XCTestCase {
-    // MARK: Token value assertions (pin exact G5 "暖炭黑素雅" palette hex values)
+    // MARK: Token value assertions (pin exact G5 "暖炭黑素雅" palette hex values, §2/§4/§5)
 
-    func testCanvasTokenValue() {
-        XCTAssertEqual(FCPrimitives.canvasHex, "#F7F4EE")
+    func testSurfacePageTokenValue() {
+        XCTAssertEqual(FCSemanticColors.surfacePageHex, "#FFFFFF")
     }
 
-    func testSurfaceTokenValue() {
-        XCTAssertEqual(FCPrimitives.surfaceHex, "#FFFFFF")
+    func testSurfaceCanvasTokenValue() {
+        XCTAssertEqual(FCSemanticColors.surfaceCanvasHex, "#F7F4EE")
     }
 
-    func testPrimaryTextTokenValue() {
-        XCTAssertEqual(FCPrimitives.inkHex, "#211F1B")
+    func testTextPrimaryTokenValue() {
+        XCTAssertEqual(FCSemanticColors.textPrimaryHex, "#211F1B")
     }
 
-    func testSecondaryTextTokenValue() {
-        XCTAssertEqual(FCPrimitives.mutedInkHex, "#5C5A52")
+    func testTextSecondaryTokenValue() {
+        XCTAssertEqual(FCSemanticColors.textSecondaryHex, "#5C5A52")
     }
 
-    func testSeparatorTokenValue() {
-        XCTAssertEqual(FCPrimitives.dividerHex, "#ECE9E2")
+    func testSurfaceDividerTokenValue() {
+        XCTAssertEqual(FCSemanticColors.surfaceDividerHex, "#ECE9E2")
     }
 
-    func testDestructiveTokenValue() {
-        XCTAssertEqual(FCPrimitives.destructiveHex, "#D9563E")
+    func testStatusDestructiveTokenValue() {
+        // §10 O1: dimmed from #D9563E to #D4442A to clear 4.5:1 text contrast.
+        XCTAssertEqual(FCSemanticColors.statusDestructiveHex, "#D4442A")
     }
 
-    func testTintTokenValue() {
-        XCTAssertEqual(FCPrimitives.tintHex, "#EDE9E2")
+    func testSurfaceSelectedTokenValue() {
+        XCTAssertEqual(FCSemanticColors.surfaceSelectedHex, "#EDE9E2")
     }
 
-    func testWarningTokenValue() {
-        XCTAssertEqual(FCPrimitives.warningHex, "#B45309")
+    func testStatusWarningTokenValue() {
+        XCTAssertEqual(FCSemanticColors.statusWarningHex, "#B45309")
     }
 
-    func testBrandTokenValue() {
-        XCTAssertEqual(FCPrimitives.brandHex, "#E08A5C")
+    func testActionPrimaryTokenValue() {
+        XCTAssertEqual(FCSemanticColors.actionPrimaryHex, "#2A2822")
+    }
+
+    func testBorderControlTokenValue() {
+        XCTAssertEqual(FCSemanticColors.borderControlHex, "#8E897F")
+    }
+
+    func testTextOnActionSecondaryTokenValue() {
+        XCTAssertEqual(FCSemanticColors.textOnActionSecondaryHex, "#B0ABA2")
     }
 
     func testSpacingTokenValues() {
-        XCTAssertEqual(FCPrimitives.spacingSmall, 8)
-        XCTAssertEqual(FCPrimitives.spacingMedium, 16)
+        XCTAssertEqual(FCPrimitives.space1, 4)
+        XCTAssertEqual(FCPrimitives.space2, 8)
+        XCTAssertEqual(FCPrimitives.space3, 12)
+        XCTAssertEqual(FCPrimitives.space4, 16)
+        XCTAssertEqual(FCPrimitives.space6, 24)
+        XCTAssertEqual(FCPrimitives.space8, 32)
     }
 
     func testRadiusTokenValues() {
-        XCTAssertEqual(FCPrimitives.radiusSmall, 8)
-        XCTAssertEqual(FCPrimitives.radiusMedium, 14)
+        XCTAssertEqual(FCPrimitives.radiusSm, 8)
+        XCTAssertEqual(FCPrimitives.radiusMd, 12)
+        XCTAssertEqual(FCPrimitives.radiusLg, 16)
+        XCTAssertEqual(FCPrimitives.radiusXl, 20)
+        XCTAssertEqual(FCPrimitives.radiusDialogAction, 10)
     }
 
     // MARK: Contrast utility self-checks (full palette contrast assertions land in T045)
@@ -95,8 +111,8 @@ final class VisionHarnessTests: XCTestCase {
     }
 
     func testContrastRatioIsSymmetric() {
-        let a = WCAGContrast.contrastRatio(FCPrimitives.inkHex, FCPrimitives.canvasHex)
-        let b = WCAGContrast.contrastRatio(FCPrimitives.canvasHex, FCPrimitives.inkHex)
+        let a = WCAGContrast.contrastRatio(FCSemanticColors.textPrimaryHex, FCSemanticColors.surfaceCanvasHex)
+        let b = WCAGContrast.contrastRatio(FCSemanticColors.surfaceCanvasHex, FCSemanticColors.textPrimaryHex)
         XCTAssertEqual(a, b, accuracy: 0.0001)
     }
 }

@@ -218,7 +218,7 @@ struct TrendsView: View {
                 .padding(FCPrimitives.spacingMedium)
             }
         }
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "trends.title"))
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier(FCAccessibilityID.trendsRoot)
@@ -338,7 +338,7 @@ struct TrendsView: View {
                 y: .value("value", datum.value)
             )
             .position(by: .value("session", datum.session))
-            .foregroundStyle(datum.session == "A" ? FCPrimitives.brand : FCPrimitives.brand.opacity(0.5))
+            .foregroundStyle(datum.session == "A" ? FCSemanticColors.actionPrimary : FCSemanticColors.actionPrimary.opacity(0.5))
         }
         .frame(height: 200)
     }
@@ -455,13 +455,13 @@ struct TrendsView: View {
                     x: .value("date", point.completedAtUTC),
                     y: .value(metric.label, value)
                 )
-                .foregroundStyle(FCPrimitives.brand)
+                .foregroundStyle(FCSemanticColors.actionPrimary)
                 .lineStyle(dashed ? StrokeStyle(lineWidth: 2, dash: [4, 4]) : StrokeStyle(lineWidth: 2))
                 PointMark(
                     x: .value("date", point.completedAtUTC),
                     y: .value(metric.label, value)
                 )
-                .foregroundStyle(FCPrimitives.brand)
+                .foregroundStyle(FCSemanticColors.actionPrimary)
                 .annotation(position: .top) {
                     Text(Self.pointLabel(value, unit: metric.unit))
                         .font(.caption2)
@@ -624,7 +624,7 @@ struct TrendsView: View {
                     .frame(minHeight: 44)
                     .background(
                         viewModel.selectedExerciseKey == option.key
-                            ? FCSemanticColors.brand.opacity(0.2) : Color.clear
+                            ? FCSemanticColors.actionPrimary.opacity(0.2) : Color.clear
                     )
                     .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSmall))
                 }

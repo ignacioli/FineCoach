@@ -117,7 +117,7 @@ struct SessionSummaryView: View {
             .padding(FCPrimitives.spacingMedium)
         }
         .scrollDismissesKeyboard(.interactively)
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "summary.title"))
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)

@@ -71,7 +71,7 @@ struct CreditAdjustmentTrailView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(FCPrimitives.spacingMedium)
         }
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "creditTrail.title"))
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier(FCAccessibilityID.creditTrailRoot)
@@ -88,7 +88,7 @@ struct CreditAdjustmentTrailView: View {
                 Text(signedAmount(adjustment))
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(
-                        adjustment.direction == .debit ? FCSemanticColors.destructive : FCSemanticColors.brand
+                        adjustment.direction == .debit ? FCSemanticColors.destructive : FCSemanticColors.actionPrimary
                     )
             }
             if let reasonText = adjustment.reasonText, !reasonText.isEmpty {

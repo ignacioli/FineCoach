@@ -74,7 +74,7 @@ struct SessionEditView: View {
             .padding(FCPrimitives.spacingMedium)
         }
         .scrollDismissesKeyboard(.interactively)
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "detail.edit"))
         .navigationBarTitleDisplayMode(.inline)
         .task { await viewModel.load() }

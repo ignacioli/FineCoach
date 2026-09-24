@@ -181,7 +181,7 @@ struct StudentEditorView: View {
             }
             .padding(FCPrimitives.spacingMedium)
         }
-        .background(FCSemanticColors.background)
+        .background(FCSemanticColors.surfacePage)
         .navigationTitle(viewModel.title)
         .navigationBarTitleDisplayMode(.inline)
         .task { await viewModel.loadIfNeeded() }
