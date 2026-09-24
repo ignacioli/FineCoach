@@ -48,6 +48,8 @@
 		B225 /* ExerciseLibraryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A225 /* ExerciseLibraryUITests.swift */; };
 		B176 /* provenance.json in Resources */ = {isa = PBXBuildFile; fileRef = A176 /* provenance.json */; };
 		B177 /* provenance.schema.json in Resources */ = {isa = PBXBuildFile; fileRef = A177 /* provenance.schema.json */; };
+		B901 /* NotoSansSC-VF.otf in Resources */ = {isa = PBXBuildFile; fileRef = A901 /* NotoSansSC-VF.otf */; };
+		B902 /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = A902 /* OFL.txt */; };
 		B237 /* ExerciseIdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A237 /* ExerciseIdentityTests.swift */; };
 		B238 /* ExerciseProvenanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A238 /* ExerciseProvenanceTests.swift */; };
 		B723 /* ExercisePreferenceAssistedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A723 /* ExercisePreferenceAssistedTests.swift */; };
@@ -413,6 +415,8 @@
 		A352 /* CustomExerciseEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomExerciseEditorView.swift; sourceTree = "<group>"; };
 		A176 /* provenance.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = provenance.json; sourceTree = "<group>"; };
 		A177 /* provenance.schema.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "provenance.schema.json"; sourceTree = "<group>"; };
+		A901 /* NotoSansSC-VF.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSansSC-VF.otf"; sourceTree = "<group>"; };
+		A902 /* OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = OFL.txt; sourceTree = "<group>"; };
 		A237 /* ExerciseIdentityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseIdentityTests.swift; sourceTree = "<group>"; };
 		A238 /* ExerciseProvenanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseProvenanceTests.swift; sourceTree = "<group>"; };
 		A723 /* ExercisePreferenceAssistedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExercisePreferenceAssistedTests.swift; sourceTree = "<group>"; };
@@ -705,6 +709,7 @@
 				A173 /* Assets.xcassets */,
 				A172 /* Localizable.xcstrings */,
 				A406 /* ExerciseCatalog */,
+				A900 /* Fonts */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -716,6 +721,15 @@
 				A177 /* provenance.schema.json */,
 			);
 			path = ExerciseCatalog;
+			sourceTree = "<group>";
+		};
+		A900 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				A901 /* NotoSansSC-VF.otf */,
+				A902 /* OFL.txt */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 		A410 /* FineCoachTests */ = {
@@ -1460,6 +1474,8 @@
 				B173 /* FineCoachModel.xcdatamodeld in Resources */,
 				B176 /* provenance.json in Resources */,
 				B177 /* provenance.schema.json in Resources */,
+				B901 /* NotoSansSC-VF.otf in Resources */,
+				B902 /* OFL.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
