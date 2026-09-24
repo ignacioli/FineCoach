@@ -242,6 +242,7 @@
 		B500 /* VisionHarnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A501 /* VisionHarnessTests.swift */; };
 		B930 /* FCStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A930 /* FCStatusTests.swift */; };
 		B931 /* TypographyHarnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A931 /* TypographyHarnessTests.swift */; };
+		B932 /* DesignValueScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A932 /* DesignValueScanTests.swift */; };
 		B242 /* ShareReportRendererTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A242 /* ShareReportRendererTests.swift */; };
 		B243 /* TempReportLifecycleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A243 /* TempReportLifecycleTests.swift */; };
 		B244 /* BackupRoundTripTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A244 /* BackupRoundTripTests.swift */; };
@@ -456,6 +457,7 @@
 		A501 /* VisionHarnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionHarnessTests.swift; sourceTree = "<group>"; };
 		A930 /* FCStatusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCStatusTests.swift; sourceTree = "<group>"; };
 		A931 /* TypographyHarnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypographyHarnessTests.swift; sourceTree = "<group>"; };
+		A932 /* DesignValueScanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignValueScanTests.swift; sourceTree = "<group>"; };
 		A242 /* ShareReportRendererTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareReportRendererTests.swift; sourceTree = "<group>"; };
 		A243 /* TempReportLifecycleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TempReportLifecycleTests.swift; sourceTree = "<group>"; };
 		A244 /* BackupRoundTripTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRoundTripTests.swift; sourceTree = "<group>"; };
@@ -1265,6 +1267,7 @@
 				A501 /* VisionHarnessTests.swift */,
 				A930 /* FCStatusTests.swift */,
 				A931 /* TypographyHarnessTests.swift */,
+				A932 /* DesignValueScanTests.swift */,
 			);
 			path = DesignSystem;
 			sourceTree = "<group>";
@@ -1733,6 +1736,7 @@
 				B500 /* VisionHarnessTests.swift in Sources */,
 				B930 /* FCStatusTests.swift in Sources */,
 				B931 /* TypographyHarnessTests.swift in Sources */,
+				B932 /* DesignValueScanTests.swift in Sources */,
 				B250 /* BackupGoldenVectorTests.swift in Sources */,
 				B251 /* BackupHostileInputTests.swift in Sources */,
 				B252 /* ScenePrivacyCoordinatorTests.swift in Sources */,
