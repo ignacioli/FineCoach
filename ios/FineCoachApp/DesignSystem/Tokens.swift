@@ -76,6 +76,11 @@ public enum FCPrimitives {
 
     // MARK: §5 — radii
 
+    /// `radius.capsule` (§5): fully rounded ends, i.e. corner radius = height / 2.
+    /// There is no fixed constant for this — use SwiftUI's `Capsule()` shape
+    /// (pills, chips, segmented controls, badges, switches), which already computes
+    /// height/2 for any frame size.
+
     public static let radiusSm: CGFloat = 8
     public static let radiusMd: CGFloat = 12
     public static let radiusLg: CGFloat = 16
