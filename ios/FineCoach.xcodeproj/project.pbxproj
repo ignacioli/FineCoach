@@ -65,6 +65,7 @@
 		B142 /* StoreGeneration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A142 /* StoreGeneration.swift */; };
 		B143 /* CurrentGenerationPointer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A143 /* CurrentGenerationPointer.swift */; };
 		B150 /* Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = A150 /* Tokens.swift */; };
+		B903 /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = A903 /* Typography.swift */; };
 		B160 /* FCButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A160 /* FCButton.swift */; };
 		B161 /* FCTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = A161 /* FCTextField.swift */; };
 		B162 /* FCSetRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A162 /* FCSetRow.swift */; };
@@ -294,6 +295,7 @@
 		A142 /* StoreGeneration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreGeneration.swift; sourceTree = "<group>"; };
 		A143 /* CurrentGenerationPointer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentGenerationPointer.swift; sourceTree = "<group>"; };
 		A150 /* Tokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tokens.swift; sourceTree = "<group>"; };
+		A903 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
 		A160 /* FCButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCButton.swift; sourceTree = "<group>"; };
 		A161 /* FCTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCTextField.swift; sourceTree = "<group>"; };
 		A162 /* FCSetRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCSetRow.swift; sourceTree = "<group>"; };
@@ -615,6 +617,7 @@
 			isa = PBXGroup;
 			children = (
 				A150 /* Tokens.swift */,
+				A903 /* Typography.swift */,
 				A431 /* Components */,
 			);
 			path = DesignSystem;
@@ -1621,6 +1624,7 @@
 				B192 /* ActiveSessionCoordinator.swift in Sources */,
 				B193 /* RecoveryReconciler.swift in Sources */,
 				B150 /* Tokens.swift in Sources */,
+				B903 /* Typography.swift in Sources */,
 				B160 /* FCButton.swift in Sources */,
 				B161 /* FCTextField.swift in Sources */,
 				B162 /* FCSetRow.swift in Sources */,
