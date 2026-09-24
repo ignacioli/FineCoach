@@ -4579,6 +4579,61 @@
           }
         }
       }
+    },
+    "status.overdue": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "逾期"
+          }
+        }
+      }
+    },
+    "status.conflict": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "冲突"
+          }
+        }
+      }
+    },
+    "status.coursePackageInvalid": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课包异常"
+          }
+        }
+      }
+    },
+    "status.notComparable": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不可比较"
+          }
+        }
+      }
+    },
+    "status.permissionDenied": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "权限拒绝"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

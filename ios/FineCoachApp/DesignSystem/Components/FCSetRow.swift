@@ -74,20 +74,30 @@ public struct FCSetRow: View {
 
     @ViewBuilder
     private var confirmControl: some View {
+        // Visual only: swapped the plain SF Symbol circle for the design
+        // system's FCSetStateCircle (§6), which distinguishes draft (dashed)
+        // from pending (solid stroke) — the confirm button wiring,
+        // accessibility hiding, and hit-area frame are unchanged.
         if state.isConfirmable {
             Button {
                 onConfirm?()
             } label: {
-                Image(systemName: "circle")
-                    .foregroundStyle(FCSemanticColors.secondaryText)
+                FCSetStateCircle(circleState)
                     .frame(minWidth: 44, minHeight: 44)
             }
             .accessibilityHidden(true)
         } else {
-            Image(systemName: "checkmark.circle.fill")
-                .foregroundStyle(FCSemanticColors.primaryText)
+            FCSetStateCircle(circleState)
                 .frame(minWidth: 44, minHeight: 44)
                 .accessibilityHidden(true)
+        }
+    }
+
+    private var circleState: FCSetStateCircle.State {
+        switch state {
+        case .draft: return .draft
+        case .pending: return .pending
+        case .completed: return .completed
         }
     }
 
