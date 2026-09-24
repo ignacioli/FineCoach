@@ -240,3 +240,20 @@ public extension View {
         modifier(FCFontModifier(style: style, variant: weight))
     }
 }
+
+public extension Text {
+    /// A `Text`-scoped variant of `View.fcFont(_:weight:)`, needed only where a SwiftUI
+    /// API requires a `Text` value directly rather than an arbitrary `View` (e.g.
+    /// `TextField`'s `prompt:` parameter). Because a `Text` is built outside a view's
+    /// `body`, this cannot read the `dynamicTypeSize` environment value the way
+    /// `View.fcFont` does — it scales against the system-wide preferred content size
+    /// category instead of honoring a local `.dynamicTypeSize()` override — and it does
+    /// not apply the style's line spacing (`Text` alone has no line-wrapping geometry to
+    /// space). Prefer `View.fcFont` wherever the call site is not constrained to `Text`.
+    func fcFont(_ style: FCTextStyle, weight: FCFontWeightVariant? = nil) -> Text {
+        let resolvedWeight = style.effectiveWeight(variant: weight)
+        let baseFont = FCFont.uiFont(size: style.size, weight: resolvedWeight)
+        let scaledFont = UIFontMetrics(forTextStyle: style.scalingBase).scaledFont(for: baseFont)
+        return self.font(Font(scaledFont))
+    }
+}
