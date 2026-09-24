@@ -33,11 +33,10 @@ public struct FCTextField: View {
 }
 
 /// The search field (§8 "搜索框": 358×40, `radius.sm`, `surface.canvas` bg,
-/// placeholder `callout` 400 `text.secondary`). The magnifying-glass glyph is
-/// not itself called out with a size/color in §7.2's character table, but is
-/// the standard iOS affordance that makes this row legible as search rather
-/// than a plain input row at a glance; colored with `text.secondary` like the
-/// placeholder it sits beside, not an invented token.
+/// placeholder `callout` 400 `text.secondary`). No magnifying-glass icon —
+/// `design/m1-b-hifi/screens/10-student-list.png` (the authoritative artwork,
+/// §1) shows only the placeholder text ("搜索学员") left-aligned at the
+/// standard inner inset on the `surface.canvas` fill, no icon.
 public struct FCSearchField: View {
     private let title: String
     @Binding private var text: String
@@ -48,20 +47,15 @@ public struct FCSearchField: View {
     }
 
     public var body: some View {
-        HStack(spacing: FCPrimitives.space2) {
-            Image(systemName: "magnifyingglass")
+        TextField(
+            "",
+            text: $text,
+            prompt: Text(title)
+                .fcFont(.callout)
                 .foregroundStyle(FCSemanticColors.textSecondary)
-                .accessibilityHidden(true)
-            TextField(
-                "",
-                text: $text,
-                prompt: Text(title)
-                    .fcFont(.callout)
-                    .foregroundStyle(FCSemanticColors.textSecondary)
-            )
-            .fcFont(.callout)
-            .foregroundStyle(FCSemanticColors.textPrimary)
-        }
+        )
+        .fcFont(.callout)
+        .foregroundStyle(FCSemanticColors.textPrimary)
         .padding(.horizontal, FCPrimitives.space4)
         .frame(maxWidth: .infinity, minHeight: 40, maxHeight: 40)
         .background(FCSemanticColors.surfaceCanvas)

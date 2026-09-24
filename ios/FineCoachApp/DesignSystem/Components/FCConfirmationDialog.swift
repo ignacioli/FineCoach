@@ -9,9 +9,13 @@ import SwiftUI
 /// bg + white text).
 ///
 /// This is a content view, not a presentation API — callers own how/where it
-/// is shown (e.g. as a custom overlay). §5 registers the 36pt button height
-/// as a deliberate, approved exception to the general 44×44 touch-target
-/// rule (§10 C8); it is intentionally not padded up to 44 here.
+/// is shown (e.g. as a custom overlay). §10 C8 only registers the 36pt
+/// *visual* height and its off-scale radius (`radius.dialogAction`) — it
+/// does NOT exempt these buttons from the general >=44x44 touch-target rule
+/// (§7.2 last line, §11 last line). The visible button stays 36pt tall; the
+/// tappable hit area is padded out to >=44pt via an outer frame + expanded
+/// hit-testing shape (same pattern as `FCChip`), not by resizing the
+/// button's own visual background.
 public struct FCConfirmationDialog: View {
     public struct Action {
         public let title: String
@@ -74,5 +78,7 @@ public struct FCConfirmationDialog: View {
                 .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusDialogAction))
         }
         .buttonStyle(.plain)
+        .frame(minHeight: 44)
+        .contentShape(Rectangle())
     }
 }
