@@ -386,9 +386,15 @@ enum BackupInventoryMapper {
             throw BackupError.invalidState
         }
         let manifest = try BackupJSONCodec.decode(BackupManifest.self, from: first.json)
-        guard manifest.payloadSchemaVersion >= FineCoachBackupV1.minimumSupportedPayloadSchemaVersion,
-            manifest.payloadSchemaVersion <= FineCoachBackupV1.payloadSchemaVersion
-        else {
+        // Defense-in-depth mirror of FineCoachBackupHeader.validateVersionFields:
+        // the header-level check (before decryption even starts) is the real
+        // gate for D-M1B-009's "reject any pre-Revision-1.2 backup", but this
+        // payload-level manifest check exists too in case header and payload
+        // ever disagree (corruption).
+        guard manifest.payloadSchemaVersion >= FineCoachBackupV1.minimumSupportedPayloadSchemaVersion else {
+            throw BackupError.incompatiblePayloadVersion
+        }
+        guard manifest.payloadSchemaVersion <= FineCoachBackupV1.payloadSchemaVersion else {
             throw BackupError.unsupportedVersion
         }
         guard UInt64(frames.count) == manifest.recordCount else {

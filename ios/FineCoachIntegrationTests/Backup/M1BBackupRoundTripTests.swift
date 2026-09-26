@@ -119,6 +119,45 @@
             try await source.controller.shutdownForTesting()
         }
 
+        // MARK: - Old-format backup restore is rejected (M1B-FR-034/D-015, T076)
+
+        /// A backup whose header declares the pre-Revision-1.2 payload schema
+        /// version (2) MUST be rejected outright -- not parsed, not converted,
+        /// not partially imported -- and current data MUST be untouched. The
+        /// header's payloadSchemaVersion field is checked (and this throws)
+        /// BEFORE any AEAD decryption is attempted, so mutating only that
+        /// plaintext header field (without touching the encrypted chunks that
+        /// follow) is sufficient to simulate an old-format file without
+        /// needing to actually export one under a retired version constant.
+        func testOldFormatBackupRestoreIsRejectedAndLeavesM1BInventoryUnchanged() async throws {
+            let source = try makeHarness(generationUUID: sourceGenerationID, sessionIDs: sessionUseCaseIDs())
+            try await seedM1BInventory(on: source)
+            let exported = try await exportInventory(from: source)
+
+            var oldFormat = try Data(contentsOf: exported.fileURL)
+            // payloadSchemaVersion is the big-endian UInt16 at header byte offset 8
+            // (FineCoachBackupHeader.decodeFields: `data.u16BE(at: 8)`).
+            let oldPayloadSchemaVersion: UInt16 = 2
+            oldFormat[8] = UInt8(oldPayloadSchemaVersion >> 8)
+            oldFormat[9] = UInt8(oldPayloadSchemaVersion & 0xFF)
+            try oldFormat.write(to: exported.fileURL, options: .atomic)
+
+            do {
+                try await makeCoordinator(harness: source, ids: [restoredGenerationID]).restoreReplacingCurrent(
+                    BackupRestoreRequest(
+                        password: try BackupPassword(creating: exportPasswordText),
+                        sourceFileURL: exported.fileURL
+                    )
+                )
+                XCTFail("Expected incompatiblePayloadVersion for a pre-Revision-1.2 backup")
+            } catch BackupError.incompatiblePayloadVersion {
+                // expected -- the clear, non-crashing, specific rejection M1B-FR-034 requires.
+            }
+
+            try await assertRestoredM1BInventory(on: source)
+            try await source.controller.shutdownForTesting()
+        }
+
         // MARK: - Harness (mirrors BackupRoundTripTests.Harness)
 
         private struct Harness {

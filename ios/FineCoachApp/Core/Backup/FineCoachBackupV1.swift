@@ -3,6 +3,13 @@ import Foundation
 public enum BackupError: Error, Equatable, LocalizedError, Sendable {
     case invalidHeader
     case unsupportedVersion
+    /// M1B-FR-034/D-015: the file's payload schema version is older than this
+    /// build's `minimumSupportedPayloadSchemaVersion` -- i.e. it predates
+    /// Revision 1.2's training-focus/recurrence field changes. Distinct from
+    /// `.unsupportedVersion` (structurally incompatible/corrupt) so the coach
+    /// gets the specific, honest "this is an old backup" message rather than
+    /// a generic read failure.
+    case incompatiblePayloadVersion
     case authenticationFailed
     case limitExceeded
     case invalidPassword
@@ -12,6 +19,8 @@ public enum BackupError: Error, Equatable, LocalizedError, Sendable {
         switch self {
         case .invalidHeader, .unsupportedVersion:
             return "备份文件无法读取。"
+        case .incompatiblePayloadVersion:
+            return "该备份来自旧版本，无法恢复。"
         case .authenticationFailed:
             return "口令不正确，或备份文件已损坏。"
         case .limitExceeded:
@@ -28,22 +37,30 @@ public enum FineCoachBackupV1 {
     public static let magic = Data("FCBK".utf8)
     public static let headerLength: UInt16 = 82
     public static let containerVersion: UInt16 = 1
-    /// The payload schema version THIS BUILD WRITES into new backups. M1-B
-    /// raises this from 1 to 2 to add the section 6.7 sections (M1B-FR-031/032,
-    /// D-M1B-006) -- the 82-byte header shape and the KDF/AEAD contract
-    /// below are UNCHANGED and MUST NEVER change here.
-    public static let payloadSchemaVersion: UInt16 = 2
-    /// The oldest payload schema THIS BUILD CAN STILL READ. An M1-A backup
-    /// (schema 1) has none of the M1-B sections; that is "absent", not
-    /// malformed, and MUST decode with those sections empty.
-    public static let minimumSupportedPayloadSchemaVersion: UInt16 = 1
+    /// The payload schema version THIS BUILD WRITES into new backups.
+    /// Revision 1.2 (D-M1B-009) raises this from 2 to 3: the training-focus
+    /// (free text -> Set<BodyPart>) and recurrence (weekdays -> intervalDays)
+    /// field changes are backup-incompatible breaking changes, not additive
+    /// ones -- the 82-byte header shape and the KDF/AEAD contract below are
+    /// UNCHANGED and MUST NEVER change here.
+    public static let payloadSchemaVersion: UInt16 = 3
+    /// The oldest payload schema THIS BUILD CAN STILL READ. Revision 1.2/
+    /// D-M1B-009 tightens this to equal `payloadSchemaVersion` itself: MUST
+    /// NOT read forward from ANY older schema (neither M1-A's 1 nor the
+    /// pre-Revision-1.2 M1-B's 2) -- both would require silently
+    /// parsing/discarding/guessing at fields this build no longer
+    /// understands the old shape of, which spec/D-015 explicitly forbids.
+    /// A file below this version MUST be rejected with `.incompatiblePayloadVersion`
+    /// (M1B-FR-034), never parsed.
+    public static let minimumSupportedPayloadSchemaVersion: UInt16 = 3
     /// The reader version THIS BUILD WRITES into new backups' header, i.e.
     /// what a reader needs to safely parse them. Also doubles as the
     /// upper bound this build itself supports when READING an incoming
     /// header: a file declaring a newer `minimumReaderVersion` than this
     /// MUST fail closed (`unsupportedVersion`) rather than silently ignore
-    /// sections it does not understand (T043).
-    public static let minimumReaderVersion: UInt16 = 2
+    /// sections it does not understand. Kept equal to `payloadSchemaVersion`
+    /// per D-M1B-009's tightened "only exact version, no forward-read" rule.
+    public static let minimumReaderVersion: UInt16 = 3
     public static let kdfID: UInt8 = 1
     public static let aeadID: UInt8 = 1
     public static let iterations: UInt32 = 600_000
@@ -163,18 +180,21 @@ public struct FineCoachBackupHeader: Equatable, Sendable {
         return header
     }
 
-    /// Forward/backward compatible on purpose (T043): a file whose
-    /// `payloadSchemaVersion` is between the oldest we still read (1, the
-    /// frozen M1-A schema) and the newest we write (2) is accepted -- an
-    /// M1-A-era file simply has none of the M1-B sections, which is treated
-    /// as "absent" rather than malformed. A file whose `minimumReaderVersion`
-    /// exceeds what THIS reader implements is rejected outright: that is
-    /// exactly the fail-closed guard that makes a hypothetical M1-A-only
-    /// reader (hardcoded to `minimumReaderVersion == 1`) refuse an M1-B
-    /// backup instead of silently restoring a partial dataset.
+    /// D-M1B-009 (supersedes T043's forward-compat promise): a file whose
+    /// `payloadSchemaVersion` is older than `minimumSupportedPayloadSchemaVersion`
+    /// (which now equals `payloadSchemaVersion` itself -- no forward-read range
+    /// at all) is a pre-Revision-1.2 backup and MUST be rejected with the
+    /// specific `.incompatiblePayloadVersion` (M1B-FR-034), checked and thrown
+    /// BEFORE any other structural check -- this reader never even attempts to
+    /// parse such a file's contents. Every other structural mismatch
+    /// (container version, an unexpectedly NEWER payload/reader version than
+    /// this build knows about, KDF/AEAD/iteration mismatch) remains the
+    /// generic `.unsupportedVersion` fail-closed guard.
     fileprivate func validateVersionFields() throws {
+        guard payloadSchemaVersion >= FineCoachBackupV1.minimumSupportedPayloadSchemaVersion else {
+            throw BackupError.incompatiblePayloadVersion
+        }
         guard containerVersion == FineCoachBackupV1.containerVersion,
-            payloadSchemaVersion >= FineCoachBackupV1.minimumSupportedPayloadSchemaVersion,
             payloadSchemaVersion <= FineCoachBackupV1.payloadSchemaVersion,
             minimumReaderVersion <= FineCoachBackupV1.minimumReaderVersion,
             kdfID == FineCoachBackupV1.kdfID,
