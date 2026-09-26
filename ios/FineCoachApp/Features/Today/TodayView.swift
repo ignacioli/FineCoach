@@ -340,6 +340,9 @@ struct TodayView: View {
                 Task { await viewModel.markAbsent(appointmentID: appointment.id, creditChoice: .charged) }
             }
         }
+        Button(String(localized: "today.action.edit")) {
+            path.append(.appointmentEditor(.edit(appointment.id.rawValue)))
+        }
         Button(String(localized: "today.action.cancel"), role: .destructive) {
             Task { await viewModel.cancel(appointmentID: appointment.id) }
         }

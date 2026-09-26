@@ -20,6 +20,8 @@ public struct RecurringAppointmentDraft: Sendable {
     public var durationMinutes: Int
     public var reminderEnabled: Bool
     public var reminderLeadMinutes: ReminderLeadMinutes?
+    /// M1B-FR-033: copied onto every materialized instance.
+    public var trainingFocus: Set<BodyPart>
 
     public init(
         intervalDays: RecurrenceInterval,
@@ -28,8 +30,10 @@ public struct RecurringAppointmentDraft: Sendable {
         startTime: LocalTime,
         durationMinutes: Int = 60,
         reminderEnabled: Bool = true,
-        reminderLeadMinutes: ReminderLeadMinutes? = .sixty
+        reminderLeadMinutes: ReminderLeadMinutes? = .sixty,
+        trainingFocus: Set<BodyPart> = []
     ) {
+        self.trainingFocus = trainingFocus
         self.intervalDays = intervalDays
         self.termination = termination
         self.firstOccurrenceDate = firstOccurrenceDate
@@ -194,6 +198,7 @@ public struct AppointmentUseCases: Sendable {
             durationMinutes: draft.durationMinutes,
             reminderEnabled: draft.reminderEnabled,
             reminderLeadMinutes: draft.reminderLeadMinutes,
+            trainingFocus: { _ in draft.trainingFocus },
             studentID: studentID,
             calendar: calendar,
             now: now
@@ -224,6 +229,7 @@ public struct AppointmentUseCases: Sendable {
         durationMinutes: Int,
         reminderEnabled: Bool,
         reminderLeadMinutes: ReminderLeadMinutes?,
+        trainingFocus: (LocalDate) -> Set<BodyPart>,
         studentID: StableUUID,
         calendar: Calendar,
         now: Date
@@ -244,6 +250,7 @@ public struct AppointmentUseCases: Sendable {
                 durationMinutes: durationMinutes,
                 reminderEnabled: reminderEnabled,
                 reminderLeadMinutes: reminderLeadMinutes,
+                trainingFocus: trainingFocus(date),
                 createdAtUTC: now,
                 updatedAtUTC: now
             )
@@ -279,11 +286,12 @@ public struct AppointmentUseCases: Sendable {
         durationMinutes: Int? = nil,
         reminderEnabled: Bool? = nil,
         reminderLeadMinutes: ReminderLeadMinutes? = nil,
+        trainingFocus: Set<BodyPart>? = nil,
         overrideConflict: Bool
     ) async throws -> Appointment {
         let current = try await appointmentRepository.appointment(id: appointmentID)
         let now = clock.nowUTC()
-        let updated = try current.reschedulingDetached(
+        var updated = try current.reschedulingDetached(
             date: date,
             startTime: startTime,
             durationMinutes: durationMinutes,
@@ -291,6 +299,9 @@ public struct AppointmentUseCases: Sendable {
             reminderLeadMinutes: reminderLeadMinutes,
             now: now
         )
+        if let trainingFocus {
+            updated = try updated.updatingTrainingFocus(trainingFocus, now: now)
+        }
         try await ensureNoConflict(updated, overrideConflict: overrideConflict, excludingAppointmentID: appointmentID)
         let saved = try await appointmentRepository.update(updated)
         await notifications.sync(appointment: saved)
@@ -311,6 +322,7 @@ public struct AppointmentUseCases: Sendable {
         durationMinutes: Int? = nil,
         reminderEnabled: Bool? = nil,
         reminderLeadMinutes: ReminderLeadMinutes? = nil,
+        boundaryTrainingFocus: Set<BodyPart>? = nil,
         overrideConflict: Bool
     ) async throws -> [Appointment] {
         let calendar = calendarProvider.currentCalendar()
@@ -320,6 +332,17 @@ public struct AppointmentUseCases: Sendable {
 
         let superseded = existing.filter { appointment in
             appointment.date >= boundaryDate && appointment.status == .scheduled && !appointment.isDetachedException
+        }
+
+        // Training focus is per instance and outside D-011's this-and-future
+        // fields: each re-materialized date keeps the focus of the instance
+        // it supersedes; only the boundary instance may take an edited focus.
+        var focusByDate: [LocalDate: Set<BodyPart>] = [:]
+        for appointment in superseded {
+            focusByDate[appointment.date] = appointment.trainingFocus
+        }
+        if let boundaryTrainingFocus {
+            focusByDate[boundaryDate] = boundaryTrainingFocus
         }
 
         let resolvedIntervalDays = intervalDays ?? currentSeries.intervalDays
@@ -354,6 +377,7 @@ public struct AppointmentUseCases: Sendable {
             durationMinutes: resolvedDuration,
             reminderEnabled: resolvedReminderEnabled,
             reminderLeadMinutes: resolvedReminderLeadMinutes,
+            trainingFocus: { focusByDate[$0] ?? [] },
             studentID: currentSeries.studentID,
             calendar: calendar,
             now: now
@@ -473,6 +497,20 @@ public struct AppointmentUseCases: Sendable {
 
     public func appointments(studentID: StableUUID) async throws -> [Appointment] {
         try await appointmentRepository.appointments(studentID: studentID)
+    }
+
+    public func series(id: StableUUID) async throws -> RecurrenceSeries {
+        try await appointmentRepository.series(id: id)
+    }
+
+    /// The instances "本次及以后" from `boundaryDate` would re-materialize:
+    /// same selection rule as `applyThisAndFuture` (scheduled, not a
+    /// detached exception, on or after the boundary). For the scope-sheet
+    /// count shown before the coach commits.
+    public func thisAndFutureAffectedCount(seriesID: StableUUID, boundaryDate: LocalDate) async throws -> Int {
+        try await appointmentRepository.appointments(seriesID: seriesID).filter { appointment in
+            appointment.date >= boundaryDate && appointment.status == .scheduled && !appointment.isDetachedException
+        }.count
     }
 
     public func appointments(onLocalDates dates: [LocalDate]) async throws -> [Appointment] {

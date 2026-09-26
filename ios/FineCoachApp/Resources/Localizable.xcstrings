@@ -4821,6 +4821,314 @@
           }
         }
       }
+    },
+    "appointmentEditor.trainingFocus": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练重点"
+          }
+        }
+      }
+    },
+    "appointmentEditor.optionalMultiSelect": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选填，可多选"
+          }
+        }
+      }
+    },
+    "appointmentEditor.repeat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重复"
+          }
+        }
+      }
+    },
+    "appointmentEditor.repeat.none": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不重复"
+          }
+        }
+      }
+    },
+    "appointmentEditor.repeat.everyOtherDay": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每隔一天"
+          }
+        }
+      }
+    },
+    "appointmentEditor.repeat.everyTwoDays": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每隔两天"
+          }
+        }
+      }
+    },
+    "appointmentEditor.repeat.everyWeek": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每隔一周"
+          }
+        }
+      }
+    },
+    "appointmentEditor.endMode": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束方式"
+          }
+        }
+      }
+    },
+    "appointmentEditor.endMode.date": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按结束日期"
+          }
+        }
+      }
+    },
+    "appointmentEditor.endMode.count": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按重复次数"
+          }
+        }
+      }
+    },
+    "appointmentEditor.endDate": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束日期"
+          }
+        }
+      }
+    },
+    "appointmentEditor.repeatCount": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重复次数"
+          }
+        }
+      }
+    },
+    "appointmentEditor.repeatCountValueFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d 次"
+          }
+        }
+      }
+    },
+    "appointmentEditor.durationValueFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d 分钟"
+          }
+        }
+      }
+    },
+    "appointmentEditor.reminderLeadValueFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "提前 %d 分钟"
+          }
+        }
+      }
+    },
+    "appointmentEditor.previewFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将创建 %1$d 节课（%2$@ – %3$@，每 %4$d 天一次）"
+          }
+        }
+      }
+    },
+    "appointmentEditor.seriesEndDateFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "到 %@ 结束"
+          }
+        }
+      }
+    },
+    "appointmentEditor.seriesCountFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "共 %d 次"
+          }
+        }
+      }
+    },
+    "appointmentEditor.recurringConflictFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有 %d 节课与已有安排时间冲突"
+          }
+        }
+      }
+    },
+    "appointmentEditor.scope.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这节课属于重复安排"
+          }
+        }
+      }
+    },
+    "appointmentEditor.scope.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "改动只影响开始时间、预计时长和提醒。"
+          }
+        }
+      }
+    },
+    "appointmentEditor.scope.thisOnly": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仅本次"
+          }
+        }
+      }
+    },
+    "appointmentEditor.scope.thisOnlyDetailFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "只改 %@ 这一节"
+          }
+        }
+      }
+    },
+    "appointmentEditor.scope.thisAndFuture": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本次及以后"
+          }
+        }
+      }
+    },
+    "appointmentEditor.scope.thisAndFutureDetailFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@起的 %2$d 节一起改"
+          }
+        }
+      }
+    },
+    "appointmentEditor.scope.dateChangedDetail": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "改了日期只能选「仅本次」"
+          }
+        }
+      }
+    },
+    "appointmentEditor.scope.cancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        }
+      }
+    },
+    "today.action.edit": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编辑安排"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

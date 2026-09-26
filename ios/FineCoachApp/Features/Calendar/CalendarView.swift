@@ -240,7 +240,23 @@ struct CalendarView: View {
         }
     }
 
+    @ViewBuilder
     private func appointmentRow(_ appointment: Appointment) -> some View {
+        if appointment.status == .scheduled {
+            // T077: the edit entry (仅本次 / 本次及以后 for series members).
+            // T069e replaces this target with the D1 course action sheet.
+            Button {
+                path.append(.appointmentEditor(.edit(appointment.id.rawValue)))
+            } label: {
+                appointmentRowContent(appointment, showsDisclosure: true)
+            }
+            .buttonStyle(.plain)
+        } else {
+            appointmentRowContent(appointment, showsDisclosure: false)
+        }
+    }
+
+    private func appointmentRowContent(_ appointment: Appointment, showsDisclosure: Bool) -> some View {
         HStack(alignment: .top) {
             Text(appointment.startTime.canonicalString)
                 .font(.headline)
@@ -252,8 +268,14 @@ struct CalendarView: View {
             Text(TodayRowStatusPresentation.title(for: TodayOrderedAppointment(appointment: appointment, section: .remainingToday)))
                 .font(.footnote)
                 .foregroundStyle(FCSemanticColors.secondaryText)
+            if showsDisclosure {
+                Image(systemName: "chevron.right")
+                    .foregroundStyle(FCSemanticColors.textSecondary)
+                    .accessibilityHidden(true)
+            }
         }
         .frame(minHeight: 44)
+        .contentShape(Rectangle())
         .accessibilityIdentifier(FCAccessibilityID.calendarAppointmentRow(appointment.id))
     }
 

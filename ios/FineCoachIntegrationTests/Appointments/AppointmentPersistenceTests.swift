@@ -250,6 +250,94 @@
             XCTAssertEqual(newInstances.count, replaced.count)
             try await reopened.shutdownForTesting()
         }
+
+        // T077 / M1B-FR-033: a recurring draft's training focus lands on every
+        // materialized instance and survives restart.
+        func testRecurringDraftTrainingFocusIsCopiedToEveryInstance() async throws {
+            let env = try await makeEnvironment(ids: (0..<4).map { _ in UUID() })
+            let created = try await env.appointmentUseCases.createRecurring(
+                studentID: env.studentID,
+                draft: RecurringAppointmentDraft(
+                    intervalDays: .everyOtherDay,
+                    termination: .repeatCount(3),
+                    firstOccurrenceDate: try LocalDate(year: 2026, month: 1, day: 5),
+                    startTime: try LocalTime(hour: 9, minute: 0),
+                    trainingFocus: [.thighs, .glutes]
+                ),
+                overrideConflict: false
+            )
+            XCTAssertTrue(created.allSatisfy { $0.trainingFocus == [.thighs, .glutes] })
+
+            let seriesID = try XCTUnwrap(created.first?.seriesID)
+            try await env.controller.shutdownForTesting()
+            let reopened = try PersistenceController(storeURL: env.directory.url.appendingPathComponent("generation/FineCoach.sqlite"))
+            let persisted = try await CoreDataAppointmentRepository(writer: reopened.writer).appointments(seriesID: seriesID)
+            XCTAssertEqual(persisted.count, 3)
+            XCTAssertTrue(persisted.allSatisfy { $0.trainingFocus == [.thighs, .glutes] })
+            try await reopened.shutdownForTesting()
+        }
+
+        // T077 / D-011: "本次及以后" changes only start time / duration / reminder
+        // for later instances; each re-materialized instance keeps its own
+        // focus, and only the edited (boundary) instance takes the new focus.
+        func testThisAndFutureKeepsPerInstanceFocusAndAppliesEditedFocusOnlyToBoundary() async throws {
+            let env = try await makeEnvironment(ids: (0..<10).map { _ in UUID() })
+            let created = try await env.appointmentUseCases.createRecurring(
+                studentID: env.studentID,
+                draft: RecurringAppointmentDraft(
+                    intervalDays: .everyWeek,
+                    termination: .repeatCount(3),
+                    firstOccurrenceDate: try LocalDate(year: 2026, month: 1, day: 5),
+                    startTime: try LocalTime(hour: 9, minute: 0),
+                    trainingFocus: [.chest]
+                ),
+                overrideConflict: false
+            )
+            _ = try await env.appointmentUseCases.updateTrainingFocus(appointmentID: created[2].id, trainingFocus: [.back])
+
+            let newStartTime = try LocalTime(hour: 10, minute: 0)
+            let replaced = try await env.appointmentUseCases.applyThisAndFuture(
+                seriesID: try XCTUnwrap(created[1].seriesID),
+                boundaryDate: created[1].date,
+                startTime: newStartTime,
+                boundaryTrainingFocus: [.thighs],
+                overrideConflict: false
+            )
+
+            let byDate = Dictionary(uniqueKeysWithValues: replaced.map { ($0.date, $0) })
+            XCTAssertEqual(byDate[created[1].date]?.trainingFocus, [.thighs])
+            XCTAssertEqual(byDate[created[2].date]?.trainingFocus, [.back])
+            XCTAssertTrue(replaced.allSatisfy { $0.startTime == newStartTime })
+            let untouched = try await env.appointmentUseCases.appointment(id: created[0].id)
+            XCTAssertEqual(untouched.trainingFocus, [.chest])
+        }
+
+        // T077: "仅本次" can change schedule and focus in one write; the
+        // instance becomes a detached exception.
+        func testRescheduleSingleAlsoUpdatesTrainingFocus() async throws {
+            let env = try await makeEnvironment(ids: (0..<4).map { _ in UUID() })
+            let created = try await env.appointmentUseCases.createRecurring(
+                studentID: env.studentID,
+                draft: RecurringAppointmentDraft(
+                    intervalDays: .everyWeek,
+                    termination: .repeatCount(2),
+                    firstOccurrenceDate: try LocalDate(year: 2026, month: 1, day: 5),
+                    startTime: try LocalTime(hour: 9, minute: 0),
+                    trainingFocus: [.chest]
+                ),
+                overrideConflict: false
+            )
+            let updated = try await env.appointmentUseCases.rescheduleSingle(
+                appointmentID: created[0].id,
+                startTime: try LocalTime(hour: 11, minute: 0),
+                trainingFocus: [.core],
+                overrideConflict: false
+            )
+            XCTAssertTrue(updated.isDetachedException)
+            XCTAssertEqual(updated.trainingFocus, [.core])
+            let sibling = try await env.appointmentUseCases.appointment(id: created[1].id)
+            XCTAssertEqual(sibling.trainingFocus, [.chest])
+        }
     }
 #else
     import XCTest

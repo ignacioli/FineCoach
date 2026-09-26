@@ -150,6 +150,10 @@ public extension View {
 /// actions use `status.destructive` text and no `›`). A destructive row does
 /// not confirm by itself — the caller MUST show an `FCConfirmationDialog`
 /// from `action` (§8.1). Rows are separated by `FCListRowDivider`.
+///
+/// With a `subtitle` (the two-line rows of `24-edit-occurrence-scope`), the
+/// title is `headline` and the subtitle `caption` `text.secondary` below it.
+/// A disabled row renders its text in `text.disabled` and ignores taps.
 public struct FCActionRow: View {
     public enum Role {
         case normal
@@ -157,23 +161,41 @@ public struct FCActionRow: View {
     }
 
     private let title: String
+    private let subtitle: String?
     private let note: String?
     private let role: Role
+    private let isEnabled: Bool
     private let action: () -> Void
 
-    public init(title: String, note: String? = nil, role: Role = .normal, action: @escaping () -> Void) {
+    public init(
+        title: String,
+        subtitle: String? = nil,
+        note: String? = nil,
+        role: Role = .normal,
+        isEnabled: Bool = true,
+        action: @escaping () -> Void
+    ) {
         self.title = title
+        self.subtitle = subtitle
         self.note = note
         self.role = role
+        self.isEnabled = isEnabled
         self.action = action
     }
 
     public var body: some View {
         Button(action: action) {
             HStack(spacing: FCPrimitives.space2) {
-                Text(title)
-                    .fcFont(.body)
-                    .foregroundStyle(role == .destructive ? FCSemanticColors.statusDestructive : FCSemanticColors.textPrimary)
+                VStack(alignment: .leading, spacing: FCPrimitives.space1) {
+                    Text(title)
+                        .fcFont(subtitle == nil ? .body : .headline)
+                        .foregroundStyle(titleColor)
+                    if let subtitle {
+                        Text(subtitle)
+                            .fcFont(.caption)
+                            .foregroundStyle(isEnabled ? FCSemanticColors.textSecondary : FCSemanticColors.textDisabled)
+                    }
+                }
                 Spacer(minLength: FCPrimitives.space2)
                 if let note {
                     Text(note)
@@ -182,13 +204,20 @@ public struct FCActionRow: View {
                 }
                 if role == .normal {
                     Image(systemName: "chevron.right")
-                        .foregroundStyle(FCSemanticColors.textSecondary)
+                        .foregroundStyle(isEnabled ? FCSemanticColors.textSecondary : FCSemanticColors.textDisabled)
                         .accessibilityHidden(true)
                 }
             }
+            .padding(.vertical, subtitle == nil ? 0 : FCPrimitives.space3)
             .frame(maxWidth: .infinity, minHeight: 52)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .disabled(!isEnabled)
+    }
+
+    private var titleColor: Color {
+        guard isEnabled else { return FCSemanticColors.textDisabled }
+        return role == .destructive ? FCSemanticColors.statusDestructive : FCSemanticColors.textPrimary
     }
 }

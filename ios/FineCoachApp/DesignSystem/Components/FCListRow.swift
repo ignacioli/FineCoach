@@ -133,27 +133,52 @@ public struct FCGroupEntryRow: View {
 ///
 /// `value` is any view: plain `body` text, a control such as a `Toggle`
 /// with `FCToggleStyle`, or text plus a trailing element. Pass `action` to
-/// make the whole row tappable with a trailing `›`.
+/// make the whole row tappable with a trailing `›`; pass
+/// `showsDisclosure: true` without an action when the row is the label of
+/// an enclosing `Menu`. Rows with a view-builder value keep their children
+/// separately accessible (controls stay operable); plain-text rows read as
+/// one element.
 public struct FCLabelValueRow<Value: View>: View {
     private let label: String
     private let value: Value
     private let action: (() -> Void)?
+    private let showsDisclosure: Bool
+    private let combinesAccessibility: Bool
 
     private static var labelColumnWidth: CGFloat { 112 - FCPrimitives.space4 }
 
-    public init(label: String, action: (() -> Void)? = nil, @ViewBuilder value: () -> Value) {
+    public init(
+        label: String,
+        showsDisclosure: Bool? = nil,
+        action: (() -> Void)? = nil,
+        @ViewBuilder value: () -> Value
+    ) {
+        self.init(label: label, showsDisclosure: showsDisclosure, action: action, combinesAccessibility: false, value: value())
+    }
+
+    fileprivate init(
+        label: String,
+        showsDisclosure: Bool?,
+        action: (() -> Void)?,
+        combinesAccessibility: Bool,
+        value: Value
+    ) {
         self.label = label
         self.action = action
-        self.value = value()
+        self.showsDisclosure = showsDisclosure ?? (action != nil)
+        self.combinesAccessibility = combinesAccessibility
+        self.value = value
     }
 
     public var body: some View {
         if let action {
             Button(action: action) { content }
                 .buttonStyle(.plain)
-        } else {
+        } else if combinesAccessibility {
             content
                 .accessibilityElement(children: .combine)
+        } else {
+            content
         }
     }
 
@@ -165,7 +190,7 @@ public struct FCLabelValueRow<Value: View>: View {
                 .frame(width: Self.labelColumnWidth, alignment: .leading)
             value
                 .frame(maxWidth: .infinity, alignment: .leading)
-            if action != nil {
+            if showsDisclosure {
                 Image(systemName: "chevron.right")
                     .foregroundStyle(FCSemanticColors.textSecondary)
                     .accessibilityHidden(true)
@@ -178,8 +203,14 @@ public struct FCLabelValueRow<Value: View>: View {
 
 public extension FCLabelValueRow where Value == FCLabelValueText {
     /// A row whose value is plain `body` `text.primary` text.
-    init(label: String, value: String, action: (() -> Void)? = nil) {
-        self.init(label: label, action: action) { FCLabelValueText(value) }
+    init(label: String, value: String, showsDisclosure: Bool? = nil, action: (() -> Void)? = nil) {
+        self.init(
+            label: label,
+            showsDisclosure: showsDisclosure,
+            action: action,
+            combinesAccessibility: true,
+            value: FCLabelValueText(value)
+        )
     }
 }
 
