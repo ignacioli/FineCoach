@@ -81,6 +81,9 @@
 		B918 /* FCSetStateCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A918 /* FCSetStateCircle.swift */; };
 		B919 /* FCStatusLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A919 /* FCStatusLabel.swift */; };
 		B920 /* FCConfirmationDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A920 /* FCConfirmationDialog.swift */; };
+		B940 /* BodyPart.swift in Sources */ = {isa = PBXBuildFile; fileRef = A940 /* BodyPart.swift */; };
+		B941 /* BodyPartCoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = A941 /* BodyPartCoding.swift */; };
+		B942 /* BodyPartMultiSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A942 /* BodyPartMultiSelectView.swift */; };
 		B170 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A172 /* Localizable.xcstrings */; };
 		B171 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A173 /* Assets.xcassets */; };
 		B172 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A171 /* PrivacyInfo.xcprivacy */; };
@@ -236,6 +239,7 @@
 		B226 /* HistoryShareUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A226 /* HistoryShareUITests.swift */; };
 		B227 /* BackupRestoreUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A227 /* BackupRestoreUITests.swift */; };
 		B240 /* HistoryReportDomainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A240 /* HistoryReportDomainTests.swift */; };
+		B944 /* HistoryFilterCriteriaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A944 /* HistoryFilterCriteriaTests.swift */; };
 		B701 /* CompletedSessionMostRecentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A701 /* CompletedSessionMostRecentTests.swift */; };
 		B722 /* ComparisonLoadDirectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A722 /* ComparisonLoadDirectionTests.swift */; };
 		B241 /* ShareReportPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A241 /* ShareReportPolicyTests.swift */; };
@@ -326,6 +330,9 @@
 		A918 /* FCSetStateCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCSetStateCircle.swift; sourceTree = "<group>"; };
 		A919 /* FCStatusLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCStatusLabel.swift; sourceTree = "<group>"; };
 		A920 /* FCConfirmationDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCConfirmationDialog.swift; sourceTree = "<group>"; };
+		A940 /* BodyPart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyPart.swift; sourceTree = "<group>"; };
+		A941 /* BodyPartCoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyPartCoding.swift; sourceTree = "<group>"; };
+		A942 /* BodyPartMultiSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyPartMultiSelectView.swift; sourceTree = "<group>"; };
 		A170 /* FineCoach.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FineCoach.entitlements; sourceTree = "<group>"; };
 		A171 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		A172 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
@@ -452,6 +459,7 @@
 		A226 /* HistoryShareUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryShareUITests.swift; sourceTree = "<group>"; };
 		A227 /* BackupRestoreUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRestoreUITests.swift; sourceTree = "<group>"; };
 		A240 /* HistoryReportDomainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryReportDomainTests.swift; sourceTree = "<group>"; };
+		A944 /* HistoryFilterCriteriaTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryFilterCriteriaTests.swift; sourceTree = "<group>"; };
 		A701 /* CompletedSessionMostRecentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedSessionMostRecentTests.swift; sourceTree = "<group>"; };
 		A722 /* ComparisonLoadDirectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComparisonLoadDirectionTests.swift; sourceTree = "<group>"; };
 		A241 /* ShareReportPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareReportPolicyTests.swift; sourceTree = "<group>"; };
@@ -732,8 +740,17 @@
 				A443 /* History */,
 				A444 /* ShareReport */,
 				A445 /* BackupRestore */,
+				A943 /* Shared */,
 			);
 			path = Features;
+			sourceTree = "<group>";
+		};
+		A943 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				A942 /* BodyPartMultiSelectView.swift */,
+			);
+			path = Shared;
 			sourceTree = "<group>";
 		};
 		A405 /* Resources */ = {
@@ -815,6 +832,7 @@
 				A601 /* BodyMetric.swift */,
 				A602 /* BodyMeasurement.swift */,
 				A603 /* Comparison.swift */,
+				A940 /* BodyPart.swift */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -881,6 +899,7 @@
 				A605 /* BodyMetricManagedObject+Mapping.swift */,
 				A606 /* CoreDataBodyDataRepository.swift */,
 				A14A /* HistoryReportManagedObject+Mapping.swift */,
+				A941 /* BodyPartCoding.swift */,
 				A175 /* FineCoachModel.xcdatamodeld */,
 			);
 			path = Persistence;
@@ -1257,6 +1276,7 @@
 			isa = PBXGroup;
 			children = (
 				A240 /* HistoryReportDomainTests.swift */,
+				A944 /* HistoryFilterCriteriaTests.swift */,
 				A701 /* CompletedSessionMostRecentTests.swift */,
 				A722 /* ComparisonLoadDirectionTests.swift */,
 			);
@@ -1681,6 +1701,9 @@
 				B918 /* FCSetStateCircle.swift in Sources */,
 				B919 /* FCStatusLabel.swift in Sources */,
 				B920 /* FCConfirmationDialog.swift in Sources */,
+				B940 /* BodyPart.swift in Sources */,
+				B941 /* BodyPartCoding.swift in Sources */,
+				B942 /* BodyPartMultiSelectView.swift in Sources */,
 				B160 /* FCButton.swift in Sources */,
 				B161 /* FCTextField.swift in Sources */,
 				B162 /* FCSetRow.swift in Sources */,
@@ -1733,6 +1756,7 @@
 				B723 /* ExercisePreferenceAssistedTests.swift in Sources */,
 				B730 /* TrendsViewPointLabelTests.swift in Sources */,
 				B240 /* HistoryReportDomainTests.swift in Sources */,
+				B944 /* HistoryFilterCriteriaTests.swift in Sources */,
 				B701 /* CompletedSessionMostRecentTests.swift in Sources */,
 				B722 /* ComparisonLoadDirectionTests.swift in Sources */,
 				B241 /* ShareReportPolicyTests.swift in Sources */,

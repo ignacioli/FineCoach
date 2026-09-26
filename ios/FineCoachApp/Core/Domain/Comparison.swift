@@ -36,25 +36,16 @@ public enum Comparison {
         public let trainingVolumeB: DecimalValue?
     }
 
-    /// Focus is "exactly equal" per M1B-FR-027/D-007: both nil/empty counts as
-    /// mutually compatible; one empty + one non-empty is INCOMPATIBLE.
-    private static func focusEqual(_ a: ValidatedText?, _ b: ValidatedText?) -> Bool {
-        let aEmpty = a == nil || a?.isEmpty == true
-        let bEmpty = b == nil || b?.isEmpty == true
-        if aEmpty && bEmpty {
-            return true
-        }
-        if aEmpty != bEmpty {
-            return false
-        }
-        return a?.value == b?.value
-    }
-
+    /// Focus compatibility per M1B-FR-027/D-013: the two Sessions' training-
+    /// focus body-part SETS must be exactly equal (order-independent, which
+    /// `Set<BodyPart>` equality already gives for free) -- both empty counts
+    /// as mutually compatible; one empty + one non-empty, or two different
+    /// non-empty sets, are both INCOMPATIBLE.
     public static func compareSessions(_ a: CompletedSession, _ b: CompletedSession) -> SessionComparisonResult {
         guard a.studentID == b.studentID else {
             return .differentStudent
         }
-        guard focusEqual(a.trainingFocus, b.trainingFocus) else {
+        guard a.trainingFocus == b.trainingFocus else {
             return .incompatibleTrainingFocus
         }
 

@@ -16,7 +16,8 @@ final class ShareReportPolicyTests: XCTestCase {
 
     private let studentDisplayName = "林青"
     private let reportNameOverride = "报告用名"
-    private let trainingFocusText = "基础力量"
+    private let trainingFocusParts: Set<BodyPart> = [.chest, .core]
+    private let trainingFocusText = "胸 · 核心"
     private let studentFacingSummaryText = "合成课后总结"
     private let privateCoachNoteText = "合成教练备注 女 13800001111"
     private let actionPrivateNoteText = "合成动作备注 linqing_test 合成伤病注意事项"
@@ -488,7 +489,7 @@ final class ShareReportPolicyTests: XCTestCase {
             interruptionStartedAtUTC: session.interruptionStartedAtUTC,
             durationNeedsReview: session.durationNeedsReview,
             coachAdjustedDurationSeconds: session.coachAdjustedDurationSeconds,
-            trainingFocus: try ValidatedText(trainingFocusText),
+            trainingFocus: trainingFocusParts,
             studentFacingSummary: try ValidatedText(studentFacingSummaryText),
             privateCoachNote: try ValidatedText(privateCoachNoteText),
             revision: session.revision,

@@ -50,7 +50,7 @@ final class HistoryReportDomainTests: XCTestCase {
             XCTAssertEqual(error as? DomainError, .invalidState)
         }
         XCTAssertThrowsError(
-            try inProgress.updatingTrainingFocus(try ValidatedText("下肢力量"), now: now)
+            try inProgress.updatingTrainingFocus([.thighs], now: now)
         ) { error in
             XCTAssertEqual(error as? DomainError, .invalidState)
         }
@@ -93,7 +93,7 @@ final class HistoryReportDomainTests: XCTestCase {
         XCTAssertEqual(session.sessionNotes.privateCoachNote?.value, "合成教练备注")
         XCTAssertNil(session.sessionNotes.studentFacingSummary)
         XCTAssertTrue(session.sessionNotes.actionPrivateNotes.isEmpty)
-        XCTAssertNil(session.trainingFocus)
+        XCTAssertTrue(session.trainingFocus.isEmpty)
         XCTAssertEqual(session.privateCoachNote?.value, "合成教练备注")
 
         let afterSummary = afterPrivateNote.addingTimeInterval(10)
@@ -122,9 +122,9 @@ final class HistoryReportDomainTests: XCTestCase {
 
         let afterFocus = afterAction.addingTimeInterval(10)
         let revisionBeforeFocus = session.revision
-        session = try session.updatingTrainingFocus(try ValidatedText("下肢力量"), now: afterFocus)
+        session = try session.updatingTrainingFocus([.thighs], now: afterFocus)
         XCTAssertGreaterThan(session.revision, revisionBeforeFocus)
-        XCTAssertEqual(session.trainingFocus?.value, "下肢力量")
+        XCTAssertEqual(session.trainingFocus, [.thighs])
         XCTAssertEqual(session.sessionNotes.privateCoachNote?.value, "合成教练备注")
         XCTAssertEqual(session.sessionNotes.studentFacingSummary?.value, "合成课后总结")
         XCTAssertEqual(session.sessionNotes.actionPrivateNotes[squatID]?.value, "合成动作备注")
@@ -135,7 +135,7 @@ final class HistoryReportDomainTests: XCTestCase {
         XCTAssertEqual(completed.studentDisplayName, studentName)
         XCTAssertEqual(completed.startedAtUTC, session.startedAtUTC)
         XCTAssertEqual(completed.completedAtUTC, session.completedAtUTC)
-        XCTAssertEqual(completed.trainingFocus?.value, "下肢力量")
+        XCTAssertEqual(completed.trainingFocus, [.thighs])
         XCTAssertEqual(completed.notes.privateCoachNote?.value, "合成教练备注")
         XCTAssertEqual(completed.notes.studentFacingSummary?.value, "合成课后总结")
         XCTAssertEqual(completed.notes.actionPrivateNotes[squatID]?.value, "合成动作备注")

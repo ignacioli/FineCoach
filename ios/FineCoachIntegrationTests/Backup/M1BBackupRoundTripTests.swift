@@ -383,7 +383,7 @@
             let template = try TrainingTemplate(
                 id: templateID,
                 name: "上肢模板",
-                trainingFocus: "上肢力量",
+                trainingFocus: [.arms],
                 createdAtUTC: now,
                 updatedAtUTC: now
             )
@@ -528,7 +528,7 @@
             // TrainingTemplate + TemplateExercise + Template-owned Section.
             let template = try await harness.templateRepository.template(id: templateID)
             XCTAssertEqual(template.name.value, "上肢模板")
-            XCTAssertEqual(template.trainingFocus?.value, "上肢力量")
+            XCTAssertEqual(template.trainingFocus, [.arms])
             let templateExercises = try await harness.templateRepository.exercises(templateID: templateID)
             XCTAssertEqual(templateExercises.map(\.id), [templateExerciseAID, templateExerciseBID])
             XCTAssertEqual(templateExercises.first?.sectionID, templateSectionID)

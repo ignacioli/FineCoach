@@ -270,8 +270,8 @@ final class BodyMeasurementComparisonTests: XCTestCase {
     // MARK: - Session comparison compatibility (M1B-FR-027/D-007)
 
     func testIncompatibleTrainingFocusSessionsNeverMerge() throws {
-        let a = try makeCompletedSession(id: makeUUID(1), trainingFocus: "上肢", exercises: [])
-        let b = try makeCompletedSession(id: makeUUID(2), trainingFocus: nil, exercises: [])
+        let a = try makeCompletedSession(id: makeUUID(1), trainingFocus: [.arms], exercises: [])
+        let b = try makeCompletedSession(id: makeUUID(2), trainingFocus: [], exercises: [])
 
         let result = Comparison.compareSessions(a, b)
         switch result {
@@ -283,8 +283,8 @@ final class BodyMeasurementComparisonTests: XCTestCase {
     }
 
     func testMatchingEmptyTrainingFocusIsCompatible() throws {
-        let a = try makeCompletedSession(id: makeUUID(1), trainingFocus: nil, exercises: [])
-        let b = try makeCompletedSession(id: makeUUID(2), trainingFocus: "", exercises: [])
+        let a = try makeCompletedSession(id: makeUUID(1), trainingFocus: [], exercises: [])
+        let b = try makeCompletedSession(id: makeUUID(2), trainingFocus: [], exercises: [])
 
         let result = Comparison.compareSessions(a, b)
         switch result {
@@ -292,6 +292,34 @@ final class BodyMeasurementComparisonTests: XCTestCase {
             break
         default:
             XCTFail("both nil/empty trainingFocus must be mutually compatible, got \(result)")
+        }
+    }
+
+    func testIdenticalMultiPartSetsAreCompatibleRegardlessOfConstructionOrder() throws {
+        let a = try makeCompletedSession(id: makeUUID(3), trainingFocus: [.chest, .core, .arms], exercises: [])
+        let b = try makeCompletedSession(id: makeUUID(4), trainingFocus: [.arms, .chest, .core], exercises: [])
+
+        let result = Comparison.compareSessions(a, b)
+        switch result {
+        case .compatible:
+            break
+        default:
+            XCTFail("identical body-part sets must be compatible regardless of order, got \(result)")
+        }
+    }
+
+    func testOverlappingButNotIdenticalSetsAreIncompatible() throws {
+        // FR-027 is exact set equality, NOT the FR-026 any-overlap rule --
+        // partial overlap must still be incompatible for comparison.
+        let a = try makeCompletedSession(id: makeUUID(5), trainingFocus: [.chest, .arms], exercises: [])
+        let b = try makeCompletedSession(id: makeUUID(6), trainingFocus: [.arms, .core], exercises: [])
+
+        let result = Comparison.compareSessions(a, b)
+        switch result {
+        case .incompatibleTrainingFocus:
+            break
+        default:
+            XCTFail("overlapping but non-identical body-part sets must be incompatible, got \(result)")
         }
     }
 
@@ -364,7 +392,7 @@ final class BodyMeasurementComparisonTests: XCTestCase {
 
     private func makeCompletedSession(
         id: StableUUID,
-        trainingFocus: String?,
+        trainingFocus: Set<BodyPart>,
         exercises: [SessionExercise]
     ) throws -> CompletedSession {
         CompletedSession(
@@ -373,7 +401,7 @@ final class BodyMeasurementComparisonTests: XCTestCase {
             studentDisplayName: try NormalizedName("学员"),
             startedAtUTC: now,
             completedAtUTC: now,
-            trainingFocus: try trainingFocus.map { try ValidatedText($0, allowEmpty: true) },
+            trainingFocus: trainingFocus,
             notes: SessionNotes(privateCoachNote: nil, studentFacingSummary: nil, actionPrivateNotes: [:]),
             exercises: exercises,
             statistics: SessionStatistics(
@@ -423,7 +451,7 @@ final class BodyMeasurementComparisonTests: XCTestCase {
             studentDisplayName: try NormalizedName("学员"),
             startedAtUTC: completedAt,
             completedAtUTC: completedAt,
-            trainingFocus: nil,
+            trainingFocus: [],
             notes: SessionNotes(privateCoachNote: nil, studentFacingSummary: nil, actionPrivateNotes: [:]),
             exercises: [exercise],
             statistics: SessionStatistics(

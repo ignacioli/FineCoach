@@ -12,7 +12,7 @@ import SwiftUI
 final class TrendsViewModel: ObservableObject {
     @Published var filterResult: HistoryFilterResult = .noMatches
     @Published var allSessions: [CompletedSession] = []
-    @Published var focusFilterText = ""
+    @Published var focusFilter: Set<BodyPart> = []
     @Published var selectedForComparison: Set<StableUUID> = []
     @Published var selectedExerciseKey: String?
     @Published var selectedTab: TrendsTab = .comparison
@@ -126,8 +126,7 @@ final class TrendsViewModel: ObservableObject {
 
     func applyFilter() async {
         do {
-            let focus = focusFilterText.trimmingCharacters(in: .whitespacesAndNewlines)
-            let criteria = HistoryFilterCriteria(trainingFocus: focus.isEmpty ? nil : focus)
+            let criteria = HistoryFilterCriteria(trainingFocus: focusFilter)
             filterResult = try await historyUseCases.filteredHistory(
                 studentID: studentID,
                 criteria: criteria,
@@ -239,7 +238,7 @@ struct TrendsView: View {
     private var filterSection: some View {
         VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
             sectionTitle(String(localized: "trends.filterSection"))
-            FCTextField(String(localized: "trends.focusLabel"), text: $viewModel.focusFilterText)
+            BodyPartMultiSelectView(title: String(localized: "trends.focusLabel"), selection: $viewModel.focusFilter)
                 .accessibilityIdentifier(FCAccessibilityID.trendsFilterFocus)
             FCButton(title: String(localized: "trends.applyFilters")) {
                 Task { await viewModel.applyFilter() }

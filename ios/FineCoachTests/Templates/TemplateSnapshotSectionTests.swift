@@ -70,7 +70,7 @@ final class TemplateSnapshotSectionTests: XCTestCase {
             interruptionStartedAtUTC: nil,
             durationNeedsReview: false,
             coachAdjustedDurationSeconds: nil,
-            trainingFocus: nil,
+            trainingFocus: [],
             studentFacingSummary: try ValidatedText(summary),
             privateCoachNote: try ValidatedText(privateNote),
             revision: 1,

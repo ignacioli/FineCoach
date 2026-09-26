@@ -2,7 +2,7 @@ import SwiftUI
 
 @MainActor
 final class SessionSummaryViewModel: ObservableObject {
-    @Published var focus = ""
+    @Published var focus: Set<BodyPart> = []
     @Published var privateNote = ""
     @Published var studentSummary = ""
     @Published var durationText = ""
@@ -20,7 +20,7 @@ final class SessionSummaryViewModel: ObservableObject {
     func load() async {
         do {
             let completed = try await useCases.detail(sessionID: sessionID)
-            focus = completed.trainingFocus?.value ?? ""
+            focus = completed.trainingFocus
             privateNote = completed.notes.privateCoachNote?.value ?? ""
             studentSummary = completed.notes.studentFacingSummary?.value ?? ""
             durationText = String(
@@ -81,11 +81,8 @@ struct SessionSummaryView: View {
                     .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
                     .accessibilityIdentifier(FCAccessibilityID.sessionSummaryCompletedSets)
 
-                labeledField(
-                    title: String(localized: "summary.focus"),
-                    text: $viewModel.focus,
-                    identifier: FCAccessibilityID.sessionSummaryFocus
-                )
+                BodyPartMultiSelectView(title: String(localized: "summary.focus"), selection: $viewModel.focus)
+                    .accessibilityIdentifier(FCAccessibilityID.sessionSummaryFocus)
                 labeledField(
                     title: String(localized: "summary.privateNote"),
                     text: $viewModel.privateNote,

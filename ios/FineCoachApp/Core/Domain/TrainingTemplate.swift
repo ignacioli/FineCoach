@@ -9,20 +9,23 @@ public struct TrainingTemplate: Hashable, Codable, Sendable, Identifiable {
     /// Required, non-empty (M1B-FR-017). A blank name-only skeleton with no
     /// Exercises yet is still valid -- `name` is the only required field.
     public let name: NormalizedName
-    public let trainingFocus: ValidatedText?
+    /// M1B-FR-017/D-013: selected/empty body-part set, unified with
+    /// Appointment/Session (§2.0); brought into the Session as part of the
+    /// deep-value snapshot when this template is applied.
+    public let trainingFocus: Set<BodyPart>
     public let createdAtUTC: Date
     public let updatedAtUTC: Date
 
     public init(
         id: StableUUID,
         name: String,
-        trainingFocus: String? = nil,
+        trainingFocus: Set<BodyPart> = [],
         createdAtUTC: Date,
         updatedAtUTC: Date
     ) throws {
         self.id = id
         self.name = try NormalizedName(name)
-        self.trainingFocus = try Self.optionalText(trainingFocus)
+        self.trainingFocus = trainingFocus
         self.createdAtUTC = createdAtUTC
         self.updatedAtUTC = updatedAtUTC
     }
@@ -31,13 +34,13 @@ public struct TrainingTemplate: Hashable, Codable, Sendable, Identifiable {
         try TrainingTemplate(
             id: id,
             name: name,
-            trainingFocus: trainingFocus?.value,
+            trainingFocus: trainingFocus,
             createdAtUTC: createdAtUTC,
             updatedAtUTC: now
         )
     }
 
-    public func updatingTrainingFocus(_ value: String?, now: Date) throws -> TrainingTemplate {
+    public func updatingTrainingFocus(_ value: Set<BodyPart>, now: Date) throws -> TrainingTemplate {
         try TrainingTemplate(
             id: id,
             name: name.value,
@@ -45,17 +48,6 @@ public struct TrainingTemplate: Hashable, Codable, Sendable, Identifiable {
             createdAtUTC: createdAtUTC,
             updatedAtUTC: now
         )
-    }
-
-    private static func optionalText(_ rawValue: String?) throws -> ValidatedText? {
-        guard let rawValue else {
-            return nil
-        }
-        let trimmed = rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
-        if trimmed.isEmpty {
-            return nil
-        }
-        return try ValidatedText(trimmed)
     }
 }
 
@@ -298,6 +290,7 @@ extension TrainingTemplate {
     public static func applying(
         exercises templateExercises: [TemplateExercise],
         sections templateSections: [SessionSection],
+        trainingFocus: Set<BodyPart> = [],
         to session: Session,
         existingSessionSections: [SessionSection],
         newExerciseIDGenerator: () -> UUID,
@@ -360,7 +353,8 @@ extension TrainingTemplate {
             }
         }
 
-        let updatedSession = try session.appendingTemplateExercises(newExercises, now: now)
+        let appended = try session.appendingTemplateExercises(newExercises, now: now)
+        let updatedSession = try appended.mergingTrainingFocus(trainingFocus, now: now)
         return TemplateApplicationResult(session: updatedSession, newSections: newSections)
     }
 }

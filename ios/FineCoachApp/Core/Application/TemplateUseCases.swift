@@ -32,7 +32,7 @@ public struct TemplateUseCases: Sendable {
     /// Creates a blank name-only template skeleton -- Exercises can be added
     /// later, or never (M1B-FR-017: "允许保存尚无动作的名称骨架").
     @discardableResult
-    public func createBlankTemplate(name: String, trainingFocus: String? = nil) async throws -> TrainingTemplate {
+    public func createBlankTemplate(name: String, trainingFocus: Set<BodyPart> = []) async throws -> TrainingTemplate {
         let now = clock.nowUTC()
         let template = try TrainingTemplate(
             id: StableUUID(ids.makeID()),
@@ -52,7 +52,7 @@ public struct TemplateUseCases: Sendable {
     }
 
     @discardableResult
-    public func updateTrainingFocus(id: StableUUID, trainingFocus: String?) async throws -> TrainingTemplate {
+    public func updateTrainingFocus(id: StableUUID, trainingFocus: Set<BodyPart>) async throws -> TrainingTemplate {
         let current = try await templateRepository.template(id: id)
         let updated = try current.updatingTrainingFocus(trainingFocus, now: clock.nowUTC())
         return try await templateRepository.updateTemplate(updated)
@@ -98,7 +98,7 @@ public struct TemplateUseCases: Sendable {
         from session: Session,
         existingSessionSections: [SessionSection],
         name: String,
-        trainingFocus: String? = nil
+        trainingFocus: Set<BodyPart> = []
     ) async throws -> TrainingTemplate {
         let now = clock.nowUTC()
         let newTemplateID = StableUUID(ids.makeID())

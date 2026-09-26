@@ -2,7 +2,7 @@ import SwiftUI
 
 @MainActor
 final class SessionEditViewModel: ObservableObject {
-    @Published var focus = ""
+    @Published var focus: Set<BodyPart> = []
     @Published var errorMessage: String?
 
     let sessionID: StableUUID
@@ -16,7 +16,7 @@ final class SessionEditViewModel: ObservableObject {
     func load() async {
         do {
             let completed = try await useCases.detail(sessionID: sessionID)
-            focus = completed.trainingFocus?.value ?? ""
+            focus = completed.trainingFocus
             errorMessage = nil
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? String(localized: "student.error.generic")
@@ -52,13 +52,7 @@ struct SessionEditView: View {
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage).foregroundStyle(FCSemanticColors.destructive)
                 }
-                Text(String(localized: "summary.focus"))
-                    .font(.footnote)
-                    .foregroundStyle(FCSemanticColors.secondaryText)
-                TextField(String(localized: "sessionEdit.focusPlaceholder"), text: $viewModel.focus, axis: .vertical)
-                    .textFieldStyle(.roundedBorder)
-                    .frame(minHeight: 44)
-                    .accessibilityLabel(Text(String(localized: "summary.focus")))
+                BodyPartMultiSelectView(title: String(localized: "summary.focus"), selection: $viewModel.focus)
                     .accessibilityIdentifier(FCAccessibilityID.sessionEditFocus)
 
                 FCButton(title: String(localized: "sessionEdit.save")) {

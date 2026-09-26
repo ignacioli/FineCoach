@@ -130,6 +130,7 @@ public struct AppointmentUseCases: Sendable {
         durationMinutes: Int = 60,
         reminderEnabled: Bool = true,
         reminderLeadMinutes: ReminderLeadMinutes? = .sixty,
+        trainingFocus: Set<BodyPart> = [],
         overrideConflict: Bool
     ) async throws -> Appointment {
         let student = try await studentRepository.student(id: studentID)
@@ -146,6 +147,7 @@ public struct AppointmentUseCases: Sendable {
             durationMinutes: durationMinutes,
             reminderEnabled: reminderEnabled,
             reminderLeadMinutes: reminderLeadMinutes,
+            trainingFocus: trainingFocus,
             createdAtUTC: now,
             updatedAtUTC: now
         )
@@ -397,6 +399,12 @@ public struct AppointmentUseCases: Sendable {
         return saved
     }
 
+    public func updateTrainingFocus(appointmentID: StableUUID, trainingFocus: Set<BodyPart>) async throws -> Appointment {
+        let current = try await appointmentRepository.appointment(id: appointmentID)
+        let updated = try current.updatingTrainingFocus(trainingFocus, now: clock.nowUTC())
+        return try await appointmentRepository.update(updated)
+    }
+
     public func markAbsent(appointmentID: StableUUID, creditChoice: AbsentCreditChoice) async throws -> Appointment {
         let current = try await appointmentRepository.appointment(id: appointmentID)
         let updated = try current.markingAbsent(creditChoice: creditChoice, now: clock.nowUTC())
@@ -417,7 +425,13 @@ public struct AppointmentUseCases: Sendable {
         guard appointment.status == .scheduled else {
             throw DomainError.invalidState
         }
-        let session = try await activeSession.startOrOpen(studentID: appointment.studentID)
+        // M1B-FR-033/D-013: prefill the new/reused Session's training focus
+        // from this appointment's own selection; the Coach may change it on
+        // the Session afterward.
+        let session = try await activeSession.startOrOpen(
+            studentID: appointment.studentID,
+            trainingFocus: appointment.trainingFocus
+        )
         guard session.studentID == appointment.studentID, appointment.linkedSessionID == nil else {
             return session
         }

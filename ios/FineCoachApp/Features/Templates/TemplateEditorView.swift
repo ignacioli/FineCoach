@@ -55,11 +55,11 @@ final class TemplateEditorViewModel: ObservableObject {
         }
     }
 
-    func updateTrainingFocus(_ value: String) async {
+    func updateTrainingFocus(_ value: Set<BodyPart>) async {
         do {
             template = try await useCases.updateTrainingFocus(
                 id: templateID,
-                trainingFocus: value.isEmpty ? nil : value
+                trainingFocus: value
             )
         } catch {
             present(error)
@@ -146,7 +146,7 @@ final class TemplateEditorViewModel: ObservableObject {
 struct TemplateEditorView: View {
     @StateObject private var viewModel: TemplateEditorViewModel
     @State private var name = ""
-    @State private var trainingFocus = ""
+    @State private var trainingFocus: Set<BodyPart> = []
 
     init(templateID: StableUUID, useCases: TemplateUseCases) {
         _viewModel = StateObject(wrappedValue: TemplateEditorViewModel(templateID: templateID, useCases: useCases))
@@ -164,7 +164,7 @@ struct TemplateEditorView: View {
                     .onChange(of: name) { _, newValue in
                         Task { await viewModel.rename(newValue) }
                     }
-                FCTextField(String(localized: "templateEditor.trainingFocus"), text: $trainingFocus)
+                BodyPartMultiSelectView(title: String(localized: "templateEditor.trainingFocus"), selection: $trainingFocus)
                     .onChange(of: trainingFocus) { _, newValue in
                         Task { await viewModel.updateTrainingFocus(newValue) }
                     }
@@ -203,7 +203,7 @@ struct TemplateEditorView: View {
         .task {
             await viewModel.reload()
             name = viewModel.template?.name.value ?? name
-            trainingFocus = viewModel.template?.trainingFocus?.value ?? ""
+            trainingFocus = viewModel.template?.trainingFocus ?? []
         }
         .confirmationDialog(
             String(localized: "templateEditor.deleteSection"),

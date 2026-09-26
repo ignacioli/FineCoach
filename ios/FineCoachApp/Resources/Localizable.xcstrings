@@ -4634,6 +4634,94 @@
           }
         }
       }
+    },
+    "bodyPart.chest": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "胸"
+          }
+        }
+      }
+    },
+    "bodyPart.shoulders": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "肩"
+          }
+        }
+      }
+    },
+    "bodyPart.back": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "背"
+          }
+        }
+      }
+    },
+    "bodyPart.thighs": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "大腿"
+          }
+        }
+      }
+    },
+    "bodyPart.calves": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "小腿"
+          }
+        }
+      }
+    },
+    "bodyPart.arms": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "臂"
+          }
+        }
+      }
+    },
+    "bodyPart.glutes": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "臀"
+          }
+        }
+      }
+    },
+    "bodyPart.core": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "核心"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

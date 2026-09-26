@@ -51,7 +51,7 @@ public struct ActiveSessionUseCases: Sendable {
         try await coordinator.checkpointOnBackground()
     }
 
-    public func startOrOpen(studentID: StableUUID) async throws -> Session {
+    public func startOrOpen(studentID: StableUUID, trainingFocus: Set<BodyPart> = []) async throws -> Session {
         if let active = try await coordinator.workingCopy() {
             return active
         }
@@ -62,6 +62,7 @@ public struct ActiveSessionUseCases: Sendable {
         let session = Session.start(
             id: StableUUID(ids.makeID()),
             studentID: student.id,
+            trainingFocus: trainingFocus,
             now: clock.nowUTC()
         )
         return try await coordinator.persist(session)
@@ -221,6 +222,7 @@ public struct ActiveSessionUseCases: Sendable {
     public func applyTemplate(
         templateExercises: [TemplateExercise],
         templateSections: [SessionSection],
+        templateTrainingFocus: Set<BodyPart> = [],
         existingSessionSections: [SessionSection]
     ) async throws -> TemplateApplicationResult {
         guard let current = try await coordinator.workingCopy() else {
@@ -230,6 +232,7 @@ public struct ActiveSessionUseCases: Sendable {
         let result = try TrainingTemplate.applying(
             exercises: templateExercises,
             sections: templateSections,
+            trainingFocus: templateTrainingFocus,
             to: current,
             existingSessionSections: existingSessionSections,
             newExerciseIDGenerator: { self.ids.makeID() },

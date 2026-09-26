@@ -118,8 +118,8 @@ struct TemplateListView: View {
                     Text(template.name.value)
                         .font(.headline)
                         .foregroundStyle(FCSemanticColors.primaryText)
-                    if let focus = template.trainingFocus, !focus.isEmpty {
-                        Text(focus.value)
+                    if let focus = BodyPart.joinedDisplayNames(for: template.trainingFocus) {
+                        Text(focus)
                             .foregroundStyle(FCSemanticColors.secondaryText)
                     }
                     Text(

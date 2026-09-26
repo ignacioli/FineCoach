@@ -103,7 +103,7 @@ final class ComparisonLoadDirectionTests: XCTestCase {
             studentDisplayName: try NormalizedName("林青"),
             startedAtUTC: completedAt.addingTimeInterval(-600),
             completedAtUTC: completedAt,
-            trainingFocus: nil,
+            trainingFocus: [],
             notes: SessionNotes(privateCoachNote: nil, studentFacingSummary: nil, actionPrivateNotes: [:]),
             exercises: [exercise],
             statistics: SessionStatistics(

@@ -44,7 +44,7 @@ final class CompletedSessionMostRecentTests: XCTestCase {
             studentDisplayName: try NormalizedName("林青"),
             startedAtUTC: completedAtUTC.addingTimeInterval(-600),
             completedAtUTC: completedAtUTC,
-            trainingFocus: nil,
+            trainingFocus: [],
             notes: SessionNotes(privateCoachNote: nil, studentFacingSummary: nil, actionPrivateNotes: [:]),
             exercises: [],
             statistics: SessionStatistics(

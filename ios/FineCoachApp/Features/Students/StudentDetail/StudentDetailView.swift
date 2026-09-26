@@ -231,7 +231,7 @@ struct StudentDetailView: View {
             return String(localized: "student.detail.recentPlaceholder")
         }
         let dateText = Self.dateText(session.completedAtUTC)
-        if let focus = session.trainingFocus?.value, !focus.isEmpty {
+        if let focus = BodyPart.joinedDisplayNames(for: session.trainingFocus) {
             return String(format: String(localized: "student.detail.recentSummaryFormat"), dateText, focus)
         }
         return String(

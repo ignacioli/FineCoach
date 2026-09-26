@@ -93,7 +93,7 @@ public enum ShareReportPolicy {
             studentDisplayName: displayName,
             sessionDateUTC: modules.includeDate ? completed.completedAtUTC : nil,
             durationSeconds: modules.includeDuration ? completed.statistics.displayedDurationSeconds : nil,
-            trainingFocus: modules.includeTrainingFocus ? completed.trainingFocus?.value : nil,
+            trainingFocus: modules.includeTrainingFocus ? BodyPart.joinedDisplayNames(for: completed.trainingFocus) : nil,
             studentFacingSummary: summary,
             trainingVolume: modules.includeTrainingVolume ? completed.statistics.ordinaryTrainingVolume : nil,
             exercises: exercises

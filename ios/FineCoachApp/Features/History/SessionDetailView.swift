@@ -96,7 +96,7 @@ struct SessionDetailView: View {
                 if let completed = viewModel.completed {
                     Text(completed.studentDisplayName.value)
                         .font(.headline)
-                    if let focus = completed.trainingFocus?.value {
+                    if let focus = BodyPart.joinedDisplayNames(for: completed.trainingFocus) {
                         labeled(String(localized: "summary.focus"), focus)
                     }
                     if let summary = completed.notes.studentFacingSummary?.value {

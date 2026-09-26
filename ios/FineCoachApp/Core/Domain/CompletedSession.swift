@@ -53,7 +53,7 @@ public struct CompletedSession: Hashable, Codable, Sendable, Identifiable {
     public let studentDisplayName: NormalizedName
     public let startedAtUTC: Date
     public let completedAtUTC: Date
-    public let trainingFocus: ValidatedText?
+    public let trainingFocus: Set<BodyPart>
     public let notes: SessionNotes
     public let exercises: [SessionExercise]
     public let statistics: SessionStatistics
@@ -66,7 +66,7 @@ public struct CompletedSession: Hashable, Codable, Sendable, Identifiable {
         studentDisplayName: NormalizedName,
         startedAtUTC: Date,
         completedAtUTC: Date,
-        trainingFocus: ValidatedText?,
+        trainingFocus: Set<BodyPart>,
         notes: SessionNotes,
         exercises: [SessionExercise],
         statistics: SessionStatistics,

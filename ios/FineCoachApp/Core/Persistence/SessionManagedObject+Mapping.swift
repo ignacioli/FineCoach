@@ -20,7 +20,7 @@ enum SessionManagedObjectMapping {
             session.coachAdjustedDurationSeconds.map { NSDecimalNumber(decimal: $0.decimal) },
             forKey: "coachAdjustedDurationSeconds"
         )
-        object.setValue(session.trainingFocus?.value, forKey: "trainingFocus")
+        object.setValue(BodyPartCoding.mask(session.trainingFocus), forKey: "trainingFocusMask")
         object.setValue(session.studentFacingSummary?.value, forKey: "studentFacingSummary")
         object.setValue(session.privateCoachNote?.value, forKey: "privateCoachNote")
         object.setValue(Int64(session.revision), forKey: "revision")
@@ -95,7 +95,7 @@ enum SessionManagedObjectMapping {
             coachAdjustedDurationSeconds: try optionalDecimal(
                 object.value(forKey: "coachAdjustedDurationSeconds")
             ),
-            trainingFocus: try optionalText(object.value(forKey: "trainingFocus") as? String),
+            trainingFocus: BodyPartCoding.parts(fromMask: object.value(forKey: "trainingFocusMask") as? Int32 ?? 0),
             studentFacingSummary: try optionalText(object.value(forKey: "studentFacingSummary") as? String),
             privateCoachNote: try optionalText(object.value(forKey: "privateCoachNote") as? String),
             revision: UInt64(max(0, revision)),

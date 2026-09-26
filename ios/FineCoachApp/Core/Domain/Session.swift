@@ -26,7 +26,7 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
     public let interruptionStartedAtUTC: Date?
     public let durationNeedsReview: Bool
     public let coachAdjustedDurationSeconds: DecimalValue?
-    public let trainingFocus: ValidatedText?
+    public let trainingFocus: Set<BodyPart>
     public let studentFacingSummary: ValidatedText?
     public let privateCoachNote: ValidatedText?
     public let revision: UInt64
@@ -96,7 +96,7 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
         interruptionStartedAtUTC: Date?,
         durationNeedsReview: Bool,
         coachAdjustedDurationSeconds: DecimalValue?,
-        trainingFocus: ValidatedText?,
+        trainingFocus: Set<BodyPart>,
         studentFacingSummary: ValidatedText?,
         privateCoachNote: ValidatedText?,
         revision: UInt64,
@@ -124,7 +124,12 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
         self.exercises = exercises
     }
 
-    public static func start(id: StableUUID, studentID: StableUUID, now: Date) -> Session {
+    public static func start(
+        id: StableUUID,
+        studentID: StableUUID,
+        trainingFocus: Set<BodyPart> = [],
+        now: Date
+    ) -> Session {
         Session(
             id: id,
             studentID: studentID,
@@ -135,7 +140,7 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
             interruptionStartedAtUTC: nil,
             durationNeedsReview: false,
             coachAdjustedDurationSeconds: nil,
-            trainingFocus: nil,
+            trainingFocus: trainingFocus,
             studentFacingSummary: nil,
             privateCoachNote: nil,
             revision: 1,
@@ -144,6 +149,20 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
             completedAtUTC: nil,
             exercises: []
         )
+    }
+
+    /// Unions `additional` body parts into the CURRENT (in-progress) Session's
+    /// training focus -- used when applying a `TrainingTemplate` mid-session
+    /// (M1B-FR-019/D-013: "应用模板时模板的部位集合随其他计划数据一起带入 Session").
+    /// Deliberately available while `.inProgress` (unlike `updatingTrainingFocus`,
+    /// which is a post-completion edit), since template application only ever
+    /// happens during an active Session.
+    public func mergingTrainingFocus(_ additional: Set<BodyPart>, now: Date) throws -> Session {
+        try ensureInProgress()
+        guard !additional.isEmpty else {
+            return self
+        }
+        return replacing(trainingFocus: .some(trainingFocus.union(additional)), revision: nextRevision, updatedAtUTC: now)
     }
 
     public func addingSessionOnlyExercise(
@@ -419,7 +438,7 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
         interruptionStartedAtUTC: Date?? = nil,
         durationNeedsReview: Bool? = nil,
         coachAdjustedDurationSeconds: DecimalValue?? = nil,
-        trainingFocus: ValidatedText?? = nil,
+        trainingFocus: Set<BodyPart>? = nil,
         studentFacingSummary: ValidatedText?? = nil,
         privateCoachNote: ValidatedText?? = nil,
         revision: UInt64,
@@ -464,7 +483,7 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
         )
     }
 
-    public func updatingTrainingFocus(_ value: ValidatedText?, now: Date) throws -> Session {
+    public func updatingTrainingFocus(_ value: Set<BodyPart>, now: Date) throws -> Session {
         try ensureCompleted()
         return replacing(trainingFocus: .some(value), revision: nextRevision, updatedAtUTC: now)
     }
@@ -486,7 +505,7 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
     }
 
     public func updatingCompletedSummary(
-        trainingFocus: ValidatedText?,
+        trainingFocus: Set<BodyPart>,
         privateCoachNote: ValidatedText?,
         studentFacingSummary: ValidatedText?,
         now: Date

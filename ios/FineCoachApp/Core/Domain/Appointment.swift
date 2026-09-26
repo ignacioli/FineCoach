@@ -36,6 +36,9 @@ public struct Appointment: Hashable, Codable, Sendable, Identifiable {
     public let reminderEnabled: Bool
     public let reminderLeadMinutes: ReminderLeadMinutes?
     public let linkedSessionID: StableUUID?
+    /// M1B-FR-033/D-013: selected/empty body-part set, prefilled into the
+    /// Session started from this appointment; Coach may change it there.
+    public let trainingFocus: Set<BodyPart>
     public let createdAtUTC: Date
     public let updatedAtUTC: Date
 
@@ -53,6 +56,7 @@ public struct Appointment: Hashable, Codable, Sendable, Identifiable {
         reminderEnabled: Bool = true,
         reminderLeadMinutes: ReminderLeadMinutes? = .sixty,
         linkedSessionID: StableUUID? = nil,
+        trainingFocus: Set<BodyPart> = [],
         createdAtUTC: Date,
         updatedAtUTC: Date
     ) throws {
@@ -80,6 +84,7 @@ public struct Appointment: Hashable, Codable, Sendable, Identifiable {
         self.reminderEnabled = reminderEnabled
         self.reminderLeadMinutes = reminderLeadMinutes
         self.linkedSessionID = linkedSessionID
+        self.trainingFocus = trainingFocus
         self.createdAtUTC = createdAtUTC
         self.updatedAtUTC = updatedAtUTC
     }
@@ -183,6 +188,15 @@ public struct Appointment: Hashable, Codable, Sendable, Identifiable {
         )
     }
 
+    /// M1B-FR-033: Coach may change the appointment's own training-focus
+    /// selection at any time before the appointment resolves.
+    public func updatingTrainingFocus(_ value: Set<BodyPart>, now: Date) throws -> Appointment {
+        guard status == .scheduled else {
+            throw DomainError.invalidState
+        }
+        return replacing(trainingFocus: value, updatedAtUTC: now)
+    }
+
     private func replacing(
         date: LocalDate? = nil,
         startTime: LocalTime? = nil,
@@ -194,6 +208,7 @@ public struct Appointment: Hashable, Codable, Sendable, Identifiable {
         reminderEnabled: Bool? = nil,
         reminderLeadMinutes: ReminderLeadMinutes?? = nil,
         linkedSessionID: StableUUID?? = nil,
+        trainingFocus: Set<BodyPart>? = nil,
         updatedAtUTC: Date
     ) -> Appointment {
         // All inputs were already validated by the calling transition method
@@ -213,6 +228,7 @@ public struct Appointment: Hashable, Codable, Sendable, Identifiable {
             reminderEnabled: reminderEnabled ?? self.reminderEnabled,
             reminderLeadMinutes: reminderLeadMinutes ?? self.reminderLeadMinutes,
             linkedSessionID: linkedSessionID ?? self.linkedSessionID,
+            trainingFocus: trainingFocus ?? self.trainingFocus,
             createdAtUTC: createdAtUTC,
             updatedAtUTC: updatedAtUTC,
             skipValidation: ()
@@ -233,6 +249,7 @@ public struct Appointment: Hashable, Codable, Sendable, Identifiable {
         reminderEnabled: Bool,
         reminderLeadMinutes: ReminderLeadMinutes?,
         linkedSessionID: StableUUID?,
+        trainingFocus: Set<BodyPart>,
         createdAtUTC: Date,
         updatedAtUTC: Date,
         skipValidation: Void
@@ -250,6 +267,7 @@ public struct Appointment: Hashable, Codable, Sendable, Identifiable {
         self.reminderEnabled = reminderEnabled
         self.reminderLeadMinutes = reminderLeadMinutes
         self.linkedSessionID = linkedSessionID
+        self.trainingFocus = trainingFocus
         self.createdAtUTC = createdAtUTC
         self.updatedAtUTC = updatedAtUTC
     }

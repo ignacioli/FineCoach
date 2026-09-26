@@ -5,12 +5,15 @@ import Foundation
 /// "don't filter on this criterion".
 public struct HistoryFilterCriteria: Equatable, Sendable {
     public var dateRange: ClosedRange<LocalDate>?
-    public var trainingFocus: String?
+    /// M1B-FR-026/D-013: any-overlap (union) match against a Session's own
+    /// training-focus set -- empty means "don't filter on this criterion",
+    /// matching `dateRange`/`exerciseID`'s `nil`-means-unset convention.
+    public var trainingFocus: Set<BodyPart>
     public var exerciseID: StableExerciseID?
 
     public init(
         dateRange: ClosedRange<LocalDate>? = nil,
-        trainingFocus: String? = nil,
+        trainingFocus: Set<BodyPart> = [],
         exerciseID: StableExerciseID? = nil
     ) {
         self.dateRange = dateRange
@@ -19,7 +22,16 @@ public struct HistoryFilterCriteria: Equatable, Sendable {
     }
 
     public var isEmpty: Bool {
-        dateRange == nil && trainingFocus == nil && exerciseID == nil
+        dateRange == nil && trainingFocus.isEmpty && exerciseID == nil
+    }
+
+    /// The ANY-overlap (union) rule itself (M1B-FR-026/D-013), pulled out as a
+    /// pure, directly unit-testable function rather than only exercised
+    /// inline inside `HistoryUseCases.filteredHistory`'s `Array.filter`.
+    /// `filter.isEmpty` means "don't filter on training focus" -- every
+    /// Session matches, regardless of its own focus.
+    public static func matchesTrainingFocus(sessionFocus: Set<BodyPart>, filter: Set<BodyPart>) -> Bool {
+        filter.isEmpty || !sessionFocus.isDisjoint(with: filter)
     }
 }
 
@@ -65,13 +77,13 @@ public struct HistoryUseCases: Sendable {
 
     public func saveSummaryNotes(
         sessionID: StableUUID,
-        trainingFocus: String,
+        trainingFocus: Set<BodyPart>,
         privateCoachNote: String,
         studentFacingSummary: String
     ) async throws -> CompletedSession {
         let session = try await sessionRepository.session(id: sessionID)
         let updated = try session.updatingCompletedSummary(
-            trainingFocus: optionalText(trainingFocus),
+            trainingFocus: trainingFocus,
             privateCoachNote: optionalText(privateCoachNote),
             studentFacingSummary: optionalText(studentFacingSummary),
             now: clock.nowUTC()
@@ -86,13 +98,12 @@ public struct HistoryUseCases: Sendable {
         return try await sessionRepository.saveCompletedEdit(updated)
     }
 
-    public func saveFocusEdit(sessionID: StableUUID, trainingFocus: String) async throws -> CompletedSession {
+    public func saveFocusEdit(sessionID: StableUUID, trainingFocus: Set<BodyPart>) async throws -> CompletedSession {
         let session = try await sessionRepository.session(id: sessionID)
-        let next = try optionalText(trainingFocus)
-        if session.trainingFocus == next {
+        if session.trainingFocus == trainingFocus {
             return try await sessionRepository.completedSession(id: sessionID)
         }
-        let updated = try session.updatingTrainingFocus(next, now: clock.nowUTC())
+        let updated = try session.updatingTrainingFocus(trainingFocus, now: clock.nowUTC())
         return try await sessionRepository.saveCompletedEdit(updated)
     }
 
@@ -149,8 +160,10 @@ public struct HistoryUseCases: Sendable {
                 let day = LocalDate(date: session.completedAtUTC, calendar: calendar)
                 guard dateRange.contains(day) else { return false }
             }
-            if let trainingFocus = criteria.trainingFocus {
-                guard session.trainingFocus?.value == trainingFocus else { return false }
+            guard HistoryFilterCriteria.matchesTrainingFocus(
+                sessionFocus: session.trainingFocus, filter: criteria.trainingFocus
+            ) else {
+                return false
             }
             if let exerciseID = criteria.exerciseID {
                 guard session.exercises.contains(where: { $0.sourceID == exerciseID }) else { return false }

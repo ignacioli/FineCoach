@@ -8,7 +8,7 @@ enum TemplateManagedObjectMapping {
     static func apply(_ template: TrainingTemplate, to object: NSManagedObject) {
         object.setValue(template.id.rawValue, forKey: "id")
         object.setValue(template.name.value, forKey: "name")
-        object.setValue(template.trainingFocus?.value, forKey: "trainingFocus")
+        object.setValue(BodyPartCoding.mask(template.trainingFocus), forKey: "trainingFocusMask")
         object.setValue(template.createdAtUTC, forKey: "createdAtUTC")
         object.setValue(template.updatedAtUTC, forKey: "updatedAtUTC")
     }
@@ -21,7 +21,7 @@ enum TemplateManagedObjectMapping {
         else {
             throw DomainError.incompatibleInput
         }
-        let trainingFocus = object.value(forKey: "trainingFocus") as? String
+        let trainingFocus = BodyPartCoding.parts(fromMask: object.value(forKey: "trainingFocusMask") as? Int32 ?? 0)
         return try TrainingTemplate(
             id: StableUUID(rawID),
             name: name,

@@ -37,6 +37,7 @@ final class ApplyTemplateViewModel: ObservableObject {
             let result = try await sessionUseCases.applyTemplate(
                 templateExercises: snapshot.exercises,
                 templateSections: snapshot.sections,
+                templateTrainingFocus: template.trainingFocus,
                 existingSessionSections: existingSessionSections
             )
             try await templateUseCases.persistAppliedSections(result.newSections)

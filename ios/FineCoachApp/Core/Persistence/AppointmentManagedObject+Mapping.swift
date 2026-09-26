@@ -21,6 +21,7 @@ enum AppointmentManagedObjectMapping {
             forKey: "reminderLeadMinutes"
         )
         object.setValue(appointment.linkedSessionID?.rawValue, forKey: "linkedSessionID")
+        object.setValue(BodyPartCoding.mask(appointment.trainingFocus), forKey: "trainingFocusMask")
         object.setValue(appointment.createdAtUTC, forKey: "createdAtUTC")
         object.setValue(appointment.updatedAtUTC, forKey: "updatedAtUTC")
     }
@@ -49,6 +50,7 @@ enum AppointmentManagedObjectMapping {
         let reminderLeadMinutes = (object.value(forKey: "reminderLeadMinutes") as? Int32)
             .flatMap { ReminderLeadMinutes(rawValue: Int($0)) }
         let linkedSessionID = (object.value(forKey: "linkedSessionID") as? UUID).map { StableUUID($0) }
+        let trainingFocus = BodyPartCoding.parts(fromMask: object.value(forKey: "trainingFocusMask") as? Int32 ?? 0)
 
         return try Appointment(
             id: StableUUID(rawID),
@@ -64,6 +66,7 @@ enum AppointmentManagedObjectMapping {
             reminderEnabled: reminderEnabled,
             reminderLeadMinutes: reminderLeadMinutes,
             linkedSessionID: linkedSessionID,
+            trainingFocus: trainingFocus,
             createdAtUTC: createdAtUTC,
             updatedAtUTC: updatedAtUTC
         )
