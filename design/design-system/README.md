@@ -28,6 +28,27 @@
   - Foundations 样张：C1、C2、C5、C6、C7，并在色板中新增 `border.control`。
 - 导出：本仓库 `design/m1-b-hifi/screens/`，文件名沿用旧版（`01-today.png` … `17-icons.png`）。2 倍图，01–16 为 780×1688，17 为 1120×1200（2026-09-23 新增一行 3 个图标后重新导出，原为 1120×1040）。04、06、07、08、12 这 5 块画板上的展示投影在导出时临时去掉、导出后立即恢复，所以导出图不含投影边距。
 
+### 1.2 T063 审核后的新增画稿（D1–D9，2026-09-26 产品负责人批准）
+
+Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并提出 D1–D9 新增设计需求（`specs/002-m1-b-coach-operations/checklists/design-review-8-screens.md`）。初稿在 Penpot「M1-B G5 Design」Foundations 页右侧绘制，经产品负责人 2026-09-26 审稿修改后批准：
+
+- 快照：`before-D1-D9-drafts 2026-09-26` → `D1-D9-drafts 2026-09-26 (pending approval)` → `D1-D9-drafts r2 …` → `D1-D9 approved 2026-09-26 (D8 variant B)`。
+- 导出：`design/m1-b-hifi/screens/18`–`32`（2 倍图）。**新画稿取代原画稿中的对应界面**：
+
+| 新画稿 | 需求 | 取代 / 补充 |
+|---|---|---|
+| `18-course-action-sheet` | D1 课程操作面板；日历入口放在「今日」标题行右侧 | 补充 01 |
+| `19-resource-hub`、`20-exercise-library` | D2 资料库入口页、动作库列表 | 新增 |
+| `21-student-list-v2`、`22-archived-students` | D3 资料库入口、训练中提示条、「已归档 · N ›」、已归档列表 | 取代 10 |
+| `23-new-appointment-v2`、`24-edit-occurrence-scope` | D4 重复规则（不重复 / 每隔一天 / 每隔两天 / 每隔一周）、训练重点部位多选、改期范围 | 取代 02 |
+| `25-calendar-v2` | D5 有课日期圆点；课程行整行可点 | 取代 03 |
+| `26-student-detail`、`27-edit-profile` | D6 学员详情页；归档与永久删除移到编辑资料页 | 新增 |
+| `28-share-settings-v2`、`29-share-preview` | D7 分享报告设置页（单次训练）与预览页 | 取代 12 |
+| `30-training-v2`、`31-add-exercise-sheet` | D8 方案 B：「＋ 新建分区」就地入口；「应用模板」并入添加动作面板；「另存为模板」移到训练结束后的总结页 | 取代 11 |
+| `32-training-history-v2` | D9 训练历史筛选结果列表 | 取代 07 |
+
+新画稿中训练重点一律显示部位名（如「大腿、臀」），对应 spec Revision 1.2 的 M1B-FR-033。
+
 ## 2. 颜色
 
 ### 2.1 原子色（FC Primitives）
@@ -71,6 +92,7 @@
 | `color.status.success` | green.600 | `#2A2822` | 成功/完成状态 |
 | `color.status.warning` | amber.700 | `#B45309` | 逾期、时间冲突图标底 |
 | `color.status.destructive` | red.700 | `#D4442A` | 失败、破坏性操作文字（O1） |
+| `color.overlay.scrim` | text.primary 40% 不透明度 | `#211F1B` @ 40% | 底部面板与弹窗背后的遮罩（D1、D4b、D8c）。2026-09-26 产品负责人批准新增 |
 
 ### 2.3 插图专用色
 
@@ -251,6 +273,20 @@
 | 空态（16） | 吉祥物插图 220×220 居中 → 标题 `headline` `action.primary`「还没有学员」→ 说明 `caption` `text.secondary` → 底部主按钮「＋ 新建学员」 |
 | 通知预览（样张） | 36×36 圆角 9 炭黑图标；标题 `callout` 600，正文 `caption`；只写通用文案和时间，不写姓名/性别/课包 |
 
+### 8.1 D1–D9 新增组件（2026-09-26）
+
+| 组件 | 规格 |
+|---|---|
+| 底部面板（sheet） | 全宽，顶部两角 `radius.lg`，白底，背后 `overlay.scrim`；顶部居中拖动条 36×5（`surface.divider`，胶囊）；标题 `headline` 或 `title`，副标题 `callout` 400 `text.secondary`；操作行高 52，行间 1pt 分割线 |
+| 操作行 | 左侧 `body` 文字；右侧可选 `caption` `text.secondary` 说明 + `›`；破坏性操作文字用 `status.destructive`，不带 `›`，点击后弹确认弹窗 |
+| 课程行（可点） | 01/03 屏的课程行整行可点，右侧状态文字后加 `›`，点击打开课程操作面板（D1）；左滑只作快捷方式 |
+| 部位多选胶囊 | 8 个部位（胸、肩、背、大腿、小腿、臂、臀、核心），高 28，配色同筛选胶囊；自动换行，行距 8 |
+| 月历有课圆点 | 日期数字下方 4pt 圆点，`action.primary`；选中日（实心圆）内不重复显示 |
+| 训练中提示条 | 学员列表顶部，样式同提示条（`surface.selected` 底、`caption` `action.primary` 字），右侧「继续训练」`callout` 600 `action.primary` |
+| 列表分组入口行 | 「已归档 · N ›」「已处理 · N ›」：`sectionLabel` `text.secondary` + 右侧 `›` |
+| 标题行图标按钮 | 大标题同一行右侧，22×20 线性图标（描边 1.5，`text.secondary`），点击区 ≥ 44×44，不加底色与阴影（日历入口、资料库入口） |
+| 标签-值两栏行 | 标签 `callout` 400 `text.secondary` 在 x=16，值 `body` 在 x=112，行高 48–52，行间分割线（02 重画、学员详情资料区、编辑资料） |
+
 **导航**：画稿中一级页面（今日 / 学员）通过顶部胶囊切换，17 屏里没有底部 Tab 栏；二级页面左上角是返回 `‹` 加 `titleLarge` 标题。
 
 ## 9. 插图资产
@@ -260,6 +296,14 @@
 | 吉祥物（空态） | `assets/mascot-empty-state.jpeg`，1024×1024 | 与 Penpot 内嵌原图 `inset-warm2.jpeg` 逐字节一致（276383 字节，SHA-256 `aca587ee…d87395b`） |
 
 吉祥物只用于空态插图，画稿显示尺寸为 220×220。
+
+### 9.1 训练部位示意图（D7，方案 A，2026-09-26 批准）
+
+- 用途：分享报告预览（`29-share-preview`），展示本次训练练到的部位。
+- 画法：正面 + 背面两个简化人形，由圆角矩形与椭圆组成的几何色块（产品负责人评价「柔和、简洁」）。只按 8 个部位分区：正面为肩、臂、胸、核心、大腿、小腿；背面为肩、臂、背、臀、大腿、小腿；头与骨盆为不计分区块。
+- 着色：主练部位 `action.primary`；次要部位 `text.disabled`（`#A8A39A`）；其余 `surface.subtle` 填充。所有区块 1pt `border.control` 描边。图下方用两个 10pt 圆点加 `caption` 文字做图例（「主练 · …」「次要 · …」）。
+- 数据：由本次训练各动作的主练部位与次要部位汇总，不新增数据；自定义动作没有部位信息，不参与着色。
+- 细分肌群图不在本次范围（specs 仓 `ideas.md` §9.31）。
 
 ## 10. 来源冲突裁决记录
 
