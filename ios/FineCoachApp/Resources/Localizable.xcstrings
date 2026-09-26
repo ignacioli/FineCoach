@@ -4722,6 +4722,105 @@
           }
         }
       }
+    },
+    "designSystem.sheet.dismiss": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭"
+          }
+        }
+      }
+    },
+    "bodyDiagram.front": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正面"
+          }
+        }
+      }
+    },
+    "bodyDiagram.back": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "背面"
+          }
+        }
+      }
+    },
+    "bodyDiagram.legend.primary": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "主练"
+          }
+        }
+      }
+    },
+    "bodyDiagram.legend.secondary": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "次要"
+          }
+        }
+      }
+    },
+    "bodyDiagram.accessibility.primaryFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "主练部位：%@"
+          }
+        }
+      }
+    },
+    "bodyDiagram.accessibility.secondaryFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "次要部位：%@"
+          }
+        }
+      }
+    },
+    "bodyDiagram.accessibility.empty": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有可显示的训练部位"
+          }
+        }
+      }
+    },
+    "designSystem.calendar.hasAppointments": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有课"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

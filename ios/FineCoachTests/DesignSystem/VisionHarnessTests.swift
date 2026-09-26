@@ -86,6 +86,13 @@ final class VisionHarnessTests: XCTestCase {
         XCTAssertEqual(FCSemanticColors.statusDestructiveHex, "#D4442A")
     }
 
+    // §2.2 `overlay.scrim` (T078, approved 2026-09-26): text.primary at 40%.
+    func testOverlayScrimValue() {
+        XCTAssertEqual(FCSemanticColors.overlayScrimHex, "#211F1B")
+        XCTAssertEqual(FCSemanticColors.overlayScrimHex, FCSemanticColors.textPrimaryHex)
+        XCTAssertEqual(FCSemanticColors.overlayScrimOpacity, 0.4)
+    }
+
     // MARK: §4 spacing (only these six values are permitted)
 
     func testSpacingTokenValues() {

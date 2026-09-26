@@ -124,6 +124,10 @@ public enum FCSemanticColors {
     public static let statusSuccessHex = FCPrimitives.green600Hex
     public static let statusWarningHex = FCPrimitives.amber700Hex
     public static let statusDestructiveHex = FCPrimitives.red700Hex
+    /// `overlay.scrim` (§2.2, approved 2026-09-26): `text.primary` at 40%
+    /// opacity, behind bottom sheets and dialogs (D1, D4b, D8c).
+    public static let overlayScrimHex = textPrimaryHex
+    public static let overlayScrimOpacity: Double = 0.4
 
     public static let actionPrimary = Color(hex: actionPrimaryHex)
     public static let actionPressed = Color(hex: actionPressedHex)
@@ -142,6 +146,7 @@ public enum FCSemanticColors {
     public static let statusSuccess = Color(hex: statusSuccessHex)
     public static let statusWarning = Color(hex: statusWarningHex)
     public static let statusDestructive = Color(hex: statusDestructiveHex)
+    public static let overlayScrim = Color(hex: overlayScrimHex).opacity(overlayScrimOpacity)
 
     // MARK: Transitional aliases — remove in T068
 

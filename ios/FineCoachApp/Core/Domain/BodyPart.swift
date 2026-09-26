@@ -44,8 +44,78 @@ public enum BodyPart: String, CaseIterable, Hashable, Codable, Sendable, Identif
     /// `TrainingSetDisplayFormatting`, `StudentListView`, `TrendsView`).
     /// Returns `nil` for an empty set so callers can fall back to their own
     /// "no focus set" placeholder rather than showing an empty string.
-    public static func joinedDisplayNames(for parts: Set<BodyPart>) -> String? {
+    /// The D1–D9 artwork lists parts inside one field with "、" (e.g. "大腿、臀");
+    /// pass that as `separator` there.
+    public static func joinedDisplayNames(for parts: Set<BodyPart>, separator: String = " · ") -> String? {
         guard !parts.isEmpty else { return nil }
-        return ordered(parts).map(\.displayName).joined(separator: " · ")
+        return ordered(parts).map(\.displayName).joined(separator: separator)
     }
+
+    /// Maps the exercise catalog's Chinese muscle-group label (the
+    /// `primaryMuscleGroup` / `secondaryMuscleGroups` values in
+    /// `provenance.json`, ordered as `ExerciseCatalogBrowse.muscleGroupOrder`)
+    /// onto a `BodyPart`. Returns `nil` for anything outside the 8 parts.
+    public init?(catalogMuscleGroup label: String) {
+        switch label {
+        case "胸": self = .chest
+        case "肩": self = .shoulders
+        case "背": self = .back
+        case "大腿": self = .thighs
+        case "小腿": self = .calves
+        case "臂": self = .arms
+        case "臀": self = .glutes
+        case "核心": self = .core
+        default: return nil
+        }
+    }
+}
+
+/// The body parts one exercise works, as recorded in the built-in catalog.
+/// Custom exercises have no catalog facet and are represented by a `nil`
+/// primary, so they never color the diagram (design system §9.1).
+public struct ExerciseBodyParts: Hashable, Sendable {
+    public let primary: BodyPart?
+    public let secondary: Set<BodyPart>
+
+    public init(primary: BodyPart?, secondary: Set<BodyPart> = []) {
+        self.primary = primary
+        self.secondary = secondary
+    }
+
+    /// Builds from the catalog's raw labels; unknown labels are dropped.
+    public init(catalogPrimary: String?, catalogSecondary: [String] = []) {
+        self.init(
+            primary: catalogPrimary.flatMap(BodyPart.init(catalogMuscleGroup:)),
+            secondary: Set(catalogSecondary.compactMap(BodyPart.init(catalogMuscleGroup:)))
+        )
+    }
+}
+
+/// The trained-body-part summary behind the share-preview body diagram
+/// (design system §9.1, D7 scheme A): the union of every exercise's primary
+/// part, and the union of their secondary parts minus any part that is
+/// already primary. Derived only — no new stored data.
+public struct TrainedBodyPartsSummary: Hashable, Sendable {
+    public let primary: Set<BodyPart>
+    public let secondary: Set<BodyPart>
+
+    public init(primary: Set<BodyPart>, secondary: Set<BodyPart>) {
+        self.primary = primary
+        self.secondary = secondary.subtracting(primary)
+    }
+
+    public init(exercises: [ExerciseBodyParts]) {
+        var primary = Set<BodyPart>()
+        var secondary = Set<BodyPart>()
+        for exercise in exercises {
+            // No primary part means a custom exercise (no catalog facet);
+            // it contributes nothing, secondary included.
+            guard let part = exercise.primary else { continue }
+            primary.insert(part)
+            secondary.formUnion(exercise.secondary)
+        }
+        self.init(primary: primary, secondary: secondary)
+    }
+
+    public var isEmpty: Bool { primary.isEmpty && secondary.isEmpty }
 }

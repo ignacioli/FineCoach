@@ -76,6 +76,11 @@
 		B913 /* FCListRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A913 /* FCListRow.swift */; };
 		B914 /* FCAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A914 /* FCAvatar.swift */; };
 		B915 /* FCHintBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A915 /* FCHintBar.swift */; };
+		B950 /* FCBottomSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A950 /* FCBottomSheet.swift */; };
+		B951 /* FCBodyDiagram.swift in Sources */ = {isa = PBXBuildFile; fileRef = A951 /* FCBodyDiagram.swift */; };
+		B952 /* FCBodyPartChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = A952 /* FCBodyPartChip.swift */; };
+		B953 /* FCCalendarDayCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A953 /* FCCalendarDayCell.swift */; };
+		B954 /* TrainedBodyPartsSummaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A954 /* TrainedBodyPartsSummaryTests.swift */; };
 		B916 /* FCTypeTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = A916 /* FCTypeTag.swift */; };
 		B917 /* FCToggleStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A917 /* FCToggleStyle.swift */; };
 		B918 /* FCSetStateCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A918 /* FCSetStateCircle.swift */; };
@@ -326,6 +331,11 @@
 		A913 /* FCListRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCListRow.swift; sourceTree = "<group>"; };
 		A914 /* FCAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCAvatar.swift; sourceTree = "<group>"; };
 		A915 /* FCHintBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCHintBar.swift; sourceTree = "<group>"; };
+		A950 /* FCBottomSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCBottomSheet.swift; sourceTree = "<group>"; };
+		A951 /* FCBodyDiagram.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCBodyDiagram.swift; sourceTree = "<group>"; };
+		A952 /* FCBodyPartChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCBodyPartChip.swift; sourceTree = "<group>"; };
+		A953 /* FCCalendarDayCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCCalendarDayCell.swift; sourceTree = "<group>"; };
+		A954 /* TrainedBodyPartsSummaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainedBodyPartsSummaryTests.swift; sourceTree = "<group>"; };
 		A916 /* FCTypeTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCTypeTag.swift; sourceTree = "<group>"; };
 		A917 /* FCToggleStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCToggleStyle.swift; sourceTree = "<group>"; };
 		A918 /* FCSetStateCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCSetStateCircle.swift; sourceTree = "<group>"; };
@@ -1027,6 +1037,10 @@
 				A913 /* FCListRow.swift */,
 				A914 /* FCAvatar.swift */,
 				A915 /* FCHintBar.swift */,
+				A950 /* FCBottomSheet.swift */,
+				A951 /* FCBodyDiagram.swift */,
+				A952 /* FCBodyPartChip.swift */,
+				A953 /* FCCalendarDayCell.swift */,
 				A916 /* FCTypeTag.swift */,
 				A917 /* FCToggleStyle.swift */,
 				A918 /* FCSetStateCircle.swift */,
@@ -1310,6 +1324,7 @@
 			isa = PBXGroup;
 			children = (
 				A241 /* ShareReportPolicyTests.swift */,
+				A954 /* TrainedBodyPartsSummaryTests.swift */,
 			);
 			path = ShareReport;
 			sourceTree = "<group>";
@@ -1699,6 +1714,10 @@
 				B913 /* FCListRow.swift in Sources */,
 				B914 /* FCAvatar.swift in Sources */,
 				B915 /* FCHintBar.swift in Sources */,
+				B950 /* FCBottomSheet.swift in Sources */,
+				B951 /* FCBodyDiagram.swift in Sources */,
+				B952 /* FCBodyPartChip.swift in Sources */,
+				B953 /* FCCalendarDayCell.swift in Sources */,
 				B916 /* FCTypeTag.swift in Sources */,
 				B917 /* FCToggleStyle.swift in Sources */,
 				B918 /* FCSetStateCircle.swift in Sources */,
@@ -1763,6 +1782,7 @@
 				B701 /* CompletedSessionMostRecentTests.swift in Sources */,
 				B722 /* ComparisonLoadDirectionTests.swift in Sources */,
 				B241 /* ShareReportPolicyTests.swift in Sources */,
+				B954 /* TrainedBodyPartsSummaryTests.swift in Sources */,
 				B500 /* VisionHarnessTests.swift in Sources */,
 				B930 /* FCStatusTests.swift in Sources */,
 				B931 /* TypographyHarnessTests.swift in Sources */,

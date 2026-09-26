@@ -149,3 +149,35 @@ public struct FCLinkButton: View {
         .accessibilityLabel(Text(title))
     }
 }
+
+/// The title-row icon button (§8.1 "标题行图标按钮": sits on the large
+/// title's line, right side; a 22×20 line icon in `text.secondary`, stroke
+/// 1.5; no fill or shadow; hit area ≥ 44×44 — the calendar entry on 今日 and
+/// the resource-hub entry on 学员). `systemImage` is an SF Symbol name;
+/// `accessibilityLabel` is required because the button has no visible text.
+public struct FCTitleIconButton: View {
+    private let systemImage: String
+    private let accessibilityLabel: String
+    private let action: () -> Void
+
+    public init(systemImage: String, accessibilityLabel: String, action: @escaping () -> Void) {
+        self.systemImage = systemImage
+        self.accessibilityLabel = accessibilityLabel
+        self.action = action
+    }
+
+    public var body: some View {
+        Button(action: action) {
+            Image(systemName: systemImage)
+                .resizable()
+                .scaledToFit()
+                .fontWeight(.light)
+                .foregroundStyle(FCSemanticColors.textSecondary)
+                .frame(width: 22, height: 20)
+                .frame(minWidth: 44, minHeight: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text(accessibilityLabel))
+    }
+}
