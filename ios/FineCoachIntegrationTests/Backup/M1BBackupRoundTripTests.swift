@@ -322,7 +322,7 @@
             let series = try RecurrenceSeries(
                 id: seriesID,
                 studentID: studentID,
-                weekdays: [.monday],
+                intervalDays: .everyWeek,
                 termination: .repeatCount(1),
                 defaultStartTime: try LocalTime(hour: 18, minute: 30),
                 defaultDurationMinutes: 90,
@@ -510,7 +510,7 @@
             let seriesAppointment = try XCTUnwrap(appointments.first { $0.id == seriesAppointmentID })
             XCTAssertEqual(seriesAppointment.seriesID, seriesID)
             let restoredSeries = try await harness.appointmentRepository.series(id: seriesID)
-            XCTAssertEqual(restoredSeries.weekdays, [.monday])
+            XCTAssertEqual(restoredSeries.intervalDays, .everyWeek)
             XCTAssertEqual(restoredSeries.termination, .repeatCount(1))
 
             // CoursePackage + CreditAdjustment (idempotency key preserved, balance derivable).

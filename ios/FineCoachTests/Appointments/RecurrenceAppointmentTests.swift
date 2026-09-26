@@ -72,24 +72,39 @@ final class RecurrenceAppointmentTests: XCTestCase {
 
     // MARK: - Materialization
 
-    func testMaterializedDatesMatchWeekdayPatternAndRepeatCount() throws {
+    func testMaterializedDatesStepByIntervalDaysAndRepeatCount() throws {
         // 2026-01-05 is a Monday.
         let first = try LocalDate(year: 2026, month: 1, day: 5)
         let dates = RecurrenceSeries.materializedDates(
-            weekdays: [.monday, .wednesday],
+            intervalDays: .everyTwoDays,
             firstOccurrenceDate: first,
             termination: .repeatCount(4),
             calendar: utc
         )
         XCTAssertEqual(dates.count, 4)
-        XCTAssertEqual(dates.map { $0.weekday(calendar: utc) }, [.monday, .wednesday, .monday, .wednesday])
         XCTAssertEqual(dates[0], first)
+        XCTAssertEqual(dates[1], first.addingDays(3, calendar: utc))
+        XCTAssertEqual(dates[2], first.addingDays(6, calendar: utc))
+        XCTAssertEqual(dates[3], first.addingDays(9, calendar: utc))
+    }
+
+    func testMaterializedDatesStepByIntervalDaysUntilEndDate() throws {
+        let first = try LocalDate(year: 2026, month: 1, day: 1)
+        let end = try LocalDate(year: 2026, month: 1, day: 15)
+        let dates = RecurrenceSeries.materializedDates(
+            intervalDays: .everyWeek,
+            firstOccurrenceDate: first,
+            termination: .endDate(end),
+            calendar: utc
+        )
+        // Jan 1, 8, 15 -- Jan 22 would be past the end date.
+        XCTAssertEqual(dates, [first, first.addingDays(7, calendar: utc), first.addingDays(14, calendar: utc)])
     }
 
     func testMaterializedDatesNeverExceedsHardCapRegardlessOfInput() throws {
         let first = try LocalDate(year: 2020, month: 1, day: 1)
         let dates = RecurrenceSeries.materializedDates(
-            weekdays: Set(Weekday.allCases),
+            intervalDays: .everyOtherDay,
             firstOccurrenceDate: first,
             termination: .repeatCount(10_000),
             calendar: utc
@@ -99,25 +114,11 @@ final class RecurrenceAppointmentTests: XCTestCase {
 
     // MARK: - RecurrenceSeries construction / ended()
 
-    func testSeriesRequiresAtLeastOneWeekday() throws {
-        XCTAssertThrowsError(
-            try RecurrenceSeries(
-                id: seriesID,
-                studentID: studentID,
-                weekdays: [],
-                termination: .repeatCount(10),
-                defaultStartTime: try LocalTime(hour: 9, minute: 0),
-                createdAtUTC: now,
-                updatedAtUTC: now
-            )
-        )
-    }
-
     func testEndedPreservesFieldsAndTerminationPersists() throws {
         let series = try RecurrenceSeries(
             id: seriesID,
             studentID: studentID,
-            weekdays: [.tuesday],
+            intervalDays: .everyWeek,
             termination: .endDate(try LocalDate(year: 2026, month: 6, day: 1)),
             defaultStartTime: try LocalTime(hour: 9, minute: 0),
             createdAtUTC: now,
@@ -126,7 +127,7 @@ final class RecurrenceAppointmentTests: XCTestCase {
         let ended = series.ended(now: now.addingTimeInterval(60))
         XCTAssertEqual(ended.status, .ended)
         XCTAssertEqual(ended.termination, series.termination)
-        XCTAssertEqual(ended.weekdays, series.weekdays)
+        XCTAssertEqual(ended.intervalDays, series.intervalDays)
         XCTAssertEqual(ended.updatedAtUTC, now.addingTimeInterval(60))
     }
 

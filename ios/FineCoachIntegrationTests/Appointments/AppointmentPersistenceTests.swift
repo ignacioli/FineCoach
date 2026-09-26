@@ -99,7 +99,7 @@
             // 2026-01-05 is a Monday.
             let first = try LocalDate(year: 2026, month: 1, day: 5)
             let draft = RecurringAppointmentDraft(
-                weekdays: [.monday, .wednesday],
+                intervalDays: .everyTwoDays,
                 termination: .repeatCount(4),
                 firstOccurrenceDate: first,
                 startTime: try LocalTime(hour: 9, minute: 0)
@@ -211,7 +211,7 @@
             )
             let first = try LocalDate(year: 2026, month: 1, day: 5)
             let draft = RecurringAppointmentDraft(
-                weekdays: [.monday],
+                intervalDays: .everyWeek,
                 termination: .repeatCount(3),
                 firstOccurrenceDate: first,
                 startTime: try LocalTime(hour: 9, minute: 0)

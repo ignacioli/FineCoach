@@ -21,16 +21,28 @@ public enum RecurrenceTermination: Hashable, Codable, Sendable {
     case repeatCount(Int)
 }
 
-/// A weekly recurrence rule for one-on-one appointments (D-002/D-003, data-model §2.1).
-/// No every-two-weeks/monthly variants. Materialization is bounded (D-012): at most
-/// 366 instances, equivalently an endDate at most 366 days after the first occurrence.
+/// The fixed-interval recurrence step (Revision 1.2/D-014, replaces the old
+/// per-weekday rule): every other day (2), every two days (3), or every week
+/// (7). "不重复" (no repeat) is not a case here -- it means no
+/// `RecurrenceSeries` is created at all; the Appointment is simply standalone
+/// (`seriesID == nil`).
+public enum RecurrenceInterval: Int, CaseIterable, Hashable, Codable, Sendable {
+    case everyOtherDay = 2
+    case everyTwoDays = 3
+    case everyWeek = 7
+}
+
+/// A fixed-interval recurrence rule for one-on-one appointments (D-014,
+/// data-model §2.1). No every-two-weeks/monthly variants. Materialization is
+/// bounded (D-012): at most 366 instances, equivalently an endDate at most
+/// 366 days after the first occurrence.
 public struct RecurrenceSeries: Hashable, Codable, Sendable, Identifiable {
     /// Hard cap on materialized instances for a single series (D-012).
     public static let maximumMaterializedInstances = 366
 
     public let id: StableUUID
     public let studentID: StableUUID
-    public let weekdays: Set<Weekday>
+    public let intervalDays: RecurrenceInterval
     public let termination: RecurrenceTermination
     public let defaultStartTime: LocalTime
     public let defaultDurationMinutes: Int
@@ -43,7 +55,7 @@ public struct RecurrenceSeries: Hashable, Codable, Sendable, Identifiable {
     public init(
         id: StableUUID,
         studentID: StableUUID,
-        weekdays: Set<Weekday>,
+        intervalDays: RecurrenceInterval,
         termination: RecurrenceTermination,
         defaultStartTime: LocalTime,
         defaultDurationMinutes: Int = 60,
@@ -53,9 +65,6 @@ public struct RecurrenceSeries: Hashable, Codable, Sendable, Identifiable {
         createdAtUTC: Date,
         updatedAtUTC: Date
     ) throws {
-        guard !weekdays.isEmpty else {
-            throw DomainError.invalidState
-        }
         guard defaultDurationMinutes > 0 else {
             throw DomainError.invalidNumber
         }
@@ -71,7 +80,7 @@ public struct RecurrenceSeries: Hashable, Codable, Sendable, Identifiable {
         }
         self.id = id
         self.studentID = studentID
-        self.weekdays = weekdays
+        self.intervalDays = intervalDays
         self.termination = termination
         self.defaultStartTime = defaultStartTime
         self.defaultDurationMinutes = defaultDurationMinutes
@@ -90,7 +99,7 @@ public struct RecurrenceSeries: Hashable, Codable, Sendable, Identifiable {
         RecurrenceSeries(
             id: id,
             studentID: studentID,
-            weekdays: weekdays,
+            intervalDays: intervalDays,
             termination: termination,
             defaultStartTime: defaultStartTime,
             defaultDurationMinutes: defaultDurationMinutes,
@@ -106,7 +115,7 @@ public struct RecurrenceSeries: Hashable, Codable, Sendable, Identifiable {
     private init(
         id: StableUUID,
         studentID: StableUUID,
-        weekdays: Set<Weekday>,
+        intervalDays: RecurrenceInterval,
         termination: RecurrenceTermination,
         defaultStartTime: LocalTime,
         defaultDurationMinutes: Int,
@@ -119,7 +128,7 @@ public struct RecurrenceSeries: Hashable, Codable, Sendable, Identifiable {
     ) {
         self.id = id
         self.studentID = studentID
-        self.weekdays = weekdays
+        self.intervalDays = intervalDays
         self.termination = termination
         self.defaultStartTime = defaultStartTime
         self.defaultDurationMinutes = defaultDurationMinutes
@@ -154,40 +163,31 @@ public struct RecurrenceSeries: Hashable, Codable, Sendable, Identifiable {
         }
     }
 
-    /// Pure materialization: every LocalDate matching `weekdays`, starting at
-    /// `firstOccurrenceDate`, until `termination` is satisfied. Always bounded by
+    /// Pure materialization: every LocalDate starting at `firstOccurrenceDate`
+    /// and stepping forward by `intervalDays.rawValue` days, until
+    /// `termination` is satisfied. Always bounded by
     /// `maximumMaterializedInstances` regardless of input, as a defense-in-depth
     /// backstop alongside `validateMaterializationBound`.
     public static func materializedDates(
-        weekdays: Set<Weekday>,
+        intervalDays: RecurrenceInterval,
         firstOccurrenceDate: LocalDate,
         termination: RecurrenceTermination,
         calendar: Calendar
     ) -> [LocalDate] {
-        guard !weekdays.isEmpty else {
-            return []
-        }
         var dates: [LocalDate] = []
         var cursor = firstOccurrenceDate
 
         switch termination {
         case .repeatCount(let count):
             let target = min(max(count, 0), maximumMaterializedInstances)
-            var daysScanned = 0
-            let scanLimit = maximumMaterializedInstances * 7 + 7
-            while dates.count < target, daysScanned < scanLimit {
-                if weekdays.contains(cursor.weekday(calendar: calendar)) {
-                    dates.append(cursor)
-                }
-                cursor = cursor.addingDays(1, calendar: calendar)
-                daysScanned += 1
+            while dates.count < target {
+                dates.append(cursor)
+                cursor = cursor.addingDays(intervalDays.rawValue, calendar: calendar)
             }
         case .endDate(let endDate):
             while cursor <= endDate, dates.count < maximumMaterializedInstances {
-                if weekdays.contains(cursor.weekday(calendar: calendar)) {
-                    dates.append(cursor)
-                }
-                cursor = cursor.addingDays(1, calendar: calendar)
+                dates.append(cursor)
+                cursor = cursor.addingDays(intervalDays.rawValue, calendar: calendar)
             }
         }
         return dates

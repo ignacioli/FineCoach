@@ -175,7 +175,7 @@
     <entity name="RecurrenceSeriesMO" representedClassName="NSManagedObject" syncable="NO">
         <attribute name="id" optional="NO" attributeType="UUID" syncable="NO"/>
         <attribute name="studentID" optional="NO" attributeType="UUID" syncable="NO"/>
-        <attribute name="weekdaysMask" optional="NO" attributeType="Integer 32" usesScalarValueType="YES" syncable="NO"/>
+        <attribute name="intervalDays" optional="NO" attributeType="Integer 32" usesScalarValueType="YES" defaultValueString="7" syncable="NO"/>
         <attribute name="terminationKind" optional="NO" attributeType="String" syncable="NO"/>
         <attribute name="endDate" optional="YES" attributeType="String" syncable="NO"/>
         <attribute name="repeatCount" optional="YES" attributeType="Integer 32" syncable="NO"/>

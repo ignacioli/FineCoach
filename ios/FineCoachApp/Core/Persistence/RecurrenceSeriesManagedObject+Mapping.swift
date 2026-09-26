@@ -4,20 +4,10 @@ import Foundation
 enum RecurrenceSeriesManagedObjectMapping {
     static let entityName = "RecurrenceSeriesMO"
 
-    static func weekdaysMask(_ weekdays: Set<Weekday>) -> Int32 {
-        weekdays.reduce(into: Int32(0)) { mask, day in
-            mask |= Int32(1 << (day.rawValue - 1))
-        }
-    }
-
-    static func weekdays(fromMask mask: Int32) -> Set<Weekday> {
-        Set(Weekday.allCases.filter { mask & Int32(1 << ($0.rawValue - 1)) != 0 })
-    }
-
     static func apply(_ series: RecurrenceSeries, to object: NSManagedObject) {
         object.setValue(series.id.rawValue, forKey: "id")
         object.setValue(series.studentID.rawValue, forKey: "studentID")
-        object.setValue(weekdaysMask(series.weekdays), forKey: "weekdaysMask")
+        object.setValue(Int32(series.intervalDays.rawValue), forKey: "intervalDays")
         switch series.termination {
         case .endDate(let date):
             object.setValue("endDate", forKey: "terminationKind")
@@ -43,7 +33,8 @@ enum RecurrenceSeriesManagedObjectMapping {
     static func makeSeries(from object: NSManagedObject) throws -> RecurrenceSeries {
         guard let rawID = object.value(forKey: "id") as? UUID,
             let studentID = object.value(forKey: "studentID") as? UUID,
-            let mask = object.value(forKey: "weekdaysMask") as? Int32,
+            let intervalDaysRaw = object.value(forKey: "intervalDays") as? Int32,
+            let intervalDays = RecurrenceInterval(rawValue: Int(intervalDaysRaw)),
             let terminationKind = object.value(forKey: "terminationKind") as? String,
             let startTimeString = object.value(forKey: "defaultStartTime") as? String,
             let durationMinutes = object.value(forKey: "defaultDurationMinutes") as? Int32,
@@ -78,7 +69,7 @@ enum RecurrenceSeriesManagedObjectMapping {
         return try RecurrenceSeries(
             id: StableUUID(rawID),
             studentID: StableUUID(studentID),
-            weekdays: weekdays(fromMask: mask),
+            intervalDays: intervalDays,
             termination: termination,
             defaultStartTime: try LocalTime(canonicalString: startTimeString),
             defaultDurationMinutes: Int(durationMinutes),

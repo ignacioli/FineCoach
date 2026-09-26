@@ -13,7 +13,7 @@ public struct AppointmentConflict: Equatable, Sendable {
 }
 
 public struct RecurringAppointmentDraft: Sendable {
-    public var weekdays: Set<Weekday>
+    public var intervalDays: RecurrenceInterval
     public var termination: RecurrenceTermination
     public var firstOccurrenceDate: LocalDate
     public var startTime: LocalTime
@@ -22,7 +22,7 @@ public struct RecurringAppointmentDraft: Sendable {
     public var reminderLeadMinutes: ReminderLeadMinutes?
 
     public init(
-        weekdays: Set<Weekday>,
+        intervalDays: RecurrenceInterval,
         termination: RecurrenceTermination,
         firstOccurrenceDate: LocalDate,
         startTime: LocalTime,
@@ -30,7 +30,7 @@ public struct RecurringAppointmentDraft: Sendable {
         reminderEnabled: Bool = true,
         reminderLeadMinutes: ReminderLeadMinutes? = .sixty
     ) {
-        self.weekdays = weekdays
+        self.intervalDays = intervalDays
         self.termination = termination
         self.firstOccurrenceDate = firstOccurrenceDate
         self.startTime = startTime
@@ -176,7 +176,7 @@ public struct AppointmentUseCases: Sendable {
         let series = try RecurrenceSeries(
             id: StableUUID(ids.makeID()),
             studentID: studentID,
-            weekdays: draft.weekdays,
+            intervalDays: draft.intervalDays,
             termination: draft.termination,
             defaultStartTime: draft.startTime,
             defaultDurationMinutes: draft.durationMinutes,
@@ -187,7 +187,7 @@ public struct AppointmentUseCases: Sendable {
         )
         let appointments = try materializedAppointments(
             for: series,
-            weekdays: draft.weekdays,
+            intervalDays: draft.intervalDays,
             firstOccurrenceDate: draft.firstOccurrenceDate,
             termination: draft.termination,
             startTime: draft.startTime,
@@ -217,7 +217,7 @@ public struct AppointmentUseCases: Sendable {
 
     private func materializedAppointments(
         for series: RecurrenceSeries,
-        weekdays: Set<Weekday>,
+        intervalDays: RecurrenceInterval,
         firstOccurrenceDate: LocalDate,
         termination: RecurrenceTermination,
         startTime: LocalTime,
@@ -229,7 +229,7 @@ public struct AppointmentUseCases: Sendable {
         now: Date
     ) throws -> [Appointment] {
         let dates = RecurrenceSeries.materializedDates(
-            weekdays: weekdays,
+            intervalDays: intervalDays,
             firstOccurrenceDate: firstOccurrenceDate,
             termination: termination,
             calendar: calendar
@@ -306,7 +306,7 @@ public struct AppointmentUseCases: Sendable {
     public func applyThisAndFuture(
         seriesID: StableUUID,
         boundaryDate: LocalDate,
-        weekdays: Set<Weekday>? = nil,
+        intervalDays: RecurrenceInterval? = nil,
         startTime: LocalTime? = nil,
         durationMinutes: Int? = nil,
         reminderEnabled: Bool? = nil,
@@ -322,7 +322,7 @@ public struct AppointmentUseCases: Sendable {
             appointment.date >= boundaryDate && appointment.status == .scheduled && !appointment.isDetachedException
         }
 
-        let resolvedWeekdays = weekdays ?? currentSeries.weekdays
+        let resolvedIntervalDays = intervalDays ?? currentSeries.intervalDays
         let resolvedStartTime = startTime ?? currentSeries.defaultStartTime
         let resolvedDuration = durationMinutes ?? currentSeries.defaultDurationMinutes
         let resolvedReminderEnabled = reminderEnabled ?? currentSeries.defaultReminderEnabled
@@ -336,7 +336,7 @@ public struct AppointmentUseCases: Sendable {
         let newSeries = try RecurrenceSeries(
             id: StableUUID(ids.makeID()),
             studentID: currentSeries.studentID,
-            weekdays: resolvedWeekdays,
+            intervalDays: resolvedIntervalDays,
             termination: currentSeries.termination,
             defaultStartTime: resolvedStartTime,
             defaultDurationMinutes: resolvedDuration,
@@ -347,7 +347,7 @@ public struct AppointmentUseCases: Sendable {
         )
         let newAppointments = try materializedAppointments(
             for: newSeries,
-            weekdays: resolvedWeekdays,
+            intervalDays: resolvedIntervalDays,
             firstOccurrenceDate: boundaryDate,
             termination: currentSeries.termination,
             startTime: resolvedStartTime,
