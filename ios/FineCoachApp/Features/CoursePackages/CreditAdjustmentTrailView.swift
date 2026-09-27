@@ -85,11 +85,15 @@ struct CreditAdjustmentTrailView: View {
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(FCSemanticColors.primaryText)
                 Spacer()
-                Text(signedAmount(adjustment))
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(
-                        adjustment.direction == .debit ? FCSemanticColors.destructive : FCSemanticColors.actionPrimary
-                    )
+                // §7.2 − / + glyph as a symbol; the amount keeps its state color.
+                HStack(spacing: FCPrimitives.space1) {
+                    FCSymbol(adjustment.direction == .debit ? .minus : .plus, color: amountColor(adjustment))
+                    Text("\(adjustment.amount)")
+                        .fcFont(.callout, weight: .semibold)
+                        .foregroundStyle(amountColor(adjustment))
+                }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(Text(signedAmount(adjustment)))
             }
             if let reasonText = adjustment.reasonText, !reasonText.isEmpty {
                 Text(reasonText.value)
@@ -104,6 +108,10 @@ struct CreditAdjustmentTrailView: View {
         .background(FCSemanticColors.elevatedSurface)
         .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusMedium))
         .accessibilityIdentifier(FCAccessibilityID.creditTrailRow(adjustment.id))
+    }
+
+    private func amountColor(_ adjustment: CreditAdjustment) -> Color {
+        adjustment.direction == .debit ? FCSemanticColors.destructive : FCSemanticColors.actionPrimary
     }
 
     private func signedAmount(_ adjustment: CreditAdjustment) -> String {

@@ -92,7 +92,9 @@ struct StudentListView: View {
                     .padding()
             }
 
-            if viewModel.students.isEmpty {
+            if viewModel.students.isEmpty, !viewModel.showsArchived, viewModel.query.isEmpty {
+                noStudentsEmptyState
+            } else if viewModel.students.isEmpty {
                 VStack(spacing: FCPrimitives.spacingSmall) {
                     Text(emptyTitle)
                         .font(.title3.weight(.semibold))
@@ -173,6 +175,37 @@ struct StudentListView: View {
         .onChange(of: path) { _, _ in
             Task { await viewModel.reload() }
         }
+    }
+
+    /// 16 空态 (T067, §8 "空态"): mascot 220×220 (decorative) → title
+    /// `headline` `action.primary` → note `caption` `text.secondary` →
+    /// pinned primary button.
+    private var noStudentsEmptyState: some View {
+        VStack(spacing: FCPrimitives.space3) {
+            Spacer(minLength: FCPrimitives.space6)
+            Image("mascot-empty-state")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 220, height: 220)
+                .accessibilityHidden(true)
+            Text(String(localized: "student.list.emptyTitle"))
+                .fcFont(.headline)
+                .foregroundStyle(FCSemanticColors.actionPrimary)
+                .padding(.top, FCPrimitives.space6)
+            Text(String(localized: "student.list.emptyBody"))
+                .fcFont(.caption)
+                .foregroundStyle(FCSemanticColors.textSecondary)
+                .multilineTextAlignment(.center)
+            Spacer()
+            FCButton(title: String(localized: "student.list.emptyAction")) {
+                path.append(.editor(.add))
+            }
+            .accessibilityIdentifier(FCAccessibilityID.studentListEmptyAdd)
+            .padding(.bottom, FCPrimitives.space4)
+        }
+        .padding(.horizontal, FCPrimitives.space4)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .accessibilityIdentifier(FCAccessibilityID.studentListEmpty)
     }
 
     private var emptyTitle: String {

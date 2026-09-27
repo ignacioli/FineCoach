@@ -155,9 +155,11 @@ struct CalendarView: View {
             Button {
                 viewModel.goToPreviousMonth()
             } label: {
-                Image(systemName: "chevron.left")
+                FCSymbol(.back)
+                    .frame(minWidth: 44, minHeight: 44)
+                    .contentShape(Rectangle())
             }
-            .frame(minWidth: 44, minHeight: 44)
+            .accessibilityLabel(Text("calendar.previousMonth"))
             .accessibilityIdentifier(FCAccessibilityID.calendarPreviousMonth)
 
             Text(CalendarDatePresentation.yearMonth(viewModel.displayedMonthStart))
@@ -166,9 +168,11 @@ struct CalendarView: View {
             Button {
                 viewModel.goToNextMonth()
             } label: {
-                Image(systemName: "chevron.right")
+                FCSymbol(.forward)
+                    .frame(minWidth: 44, minHeight: 44)
+                    .contentShape(Rectangle())
             }
-            .frame(minWidth: 44, minHeight: 44)
+            .accessibilityLabel(Text("calendar.nextMonth"))
             .accessibilityIdentifier(FCAccessibilityID.calendarNextMonth)
         }
     }
@@ -269,9 +273,7 @@ struct CalendarView: View {
                 .font(.footnote)
                 .foregroundStyle(FCSemanticColors.secondaryText)
             if showsDisclosure {
-                Image(systemName: "chevron.right")
-                    .foregroundStyle(FCSemanticColors.textSecondary)
-                    .accessibilityHidden(true)
+                FCSymbol(.forward)
             }
         }
         .frame(minHeight: 44)

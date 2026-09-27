@@ -203,9 +203,7 @@ public struct FCActionRow: View {
                         .foregroundStyle(FCSemanticColors.textSecondary)
                 }
                 if role == .normal {
-                    Image(systemName: "chevron.right")
-                        .foregroundStyle(isEnabled ? FCSemanticColors.textSecondary : FCSemanticColors.textDisabled)
-                        .accessibilityHidden(true)
+                    FCSymbol(.forward, color: isEnabled ? nil : FCSemanticColors.textDisabled)
                 }
             }
             .padding(.vertical, subtitle == nil ? 0 : FCPrimitives.space3)

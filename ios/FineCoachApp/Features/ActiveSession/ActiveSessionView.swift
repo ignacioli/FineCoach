@@ -188,7 +188,7 @@ struct ActiveSessionView: View {
                     }
                     Spacer()
                     if viewModel.selectedExerciseID == exercise.id {
-                        Image(systemName: "checkmark")
+                        FCSymbol(.check)
                     }
                 }
                 .frame(minHeight: 44)

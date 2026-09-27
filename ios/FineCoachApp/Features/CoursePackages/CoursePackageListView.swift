@@ -163,9 +163,12 @@ struct CoursePackageListView: View {
                 .foregroundStyle(FCSemanticColors.secondaryText)
                 Text(validityPeriodText(package))
                     .foregroundStyle(FCSemanticColors.secondaryText)
-                Text(String(localized: "coursePackages.viewTrailHint"))
-                    .font(.caption)
-                    .foregroundStyle(FCSemanticColors.secondaryText)
+                HStack(spacing: FCPrimitives.space1) {
+                    Text(String(localized: "coursePackages.viewTrailHint"))
+                        .fcFont(.caption)
+                        .foregroundStyle(FCSemanticColors.secondaryText)
+                    FCSymbol(.forward)
+                }
             }
             .padding(FCPrimitives.spacingMedium)
             .frame(maxWidth: .infinity, alignment: .leading)

@@ -483,7 +483,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "点上方「添加学员」创建第一位。学员不是账号，只由你在本机管理。"
+            "value": "开始记录第一堂课吧"
           }
         }
       }
@@ -2925,7 +2925,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "查看课时调整记录 ›"
+            "value": "查看课时调整记录"
           }
         }
       }
@@ -5126,6 +5126,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "编辑安排"
+          }
+        }
+      }
+    },
+    "calendar.previousMonth": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上个月"
+          }
+        }
+      }
+    },
+    "calendar.nextMonth": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下个月"
+          }
+        }
+      }
+    },
+    "student.list.emptyAction": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "＋ 新建学员"
           }
         }
       }

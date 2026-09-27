@@ -56,9 +56,7 @@ public struct FCListRow: View {
             }
             Spacer(minLength: FCPrimitives.space2)
             if showsDisclosure {
-                Image(systemName: "chevron.right")
-                    .foregroundStyle(FCSemanticColors.textSecondary)
-                    .accessibilityHidden(true)
+                FCSymbol(.forward)
             }
         }
         .padding(.leading, FCPrimitives.space4)
@@ -115,9 +113,7 @@ public struct FCGroupEntryRow: View {
                     .fcFont(.sectionLabel)
                     .foregroundStyle(FCSemanticColors.textSecondary)
                 Spacer(minLength: FCPrimitives.space2)
-                Image(systemName: "chevron.right")
-                    .foregroundStyle(FCSemanticColors.textSecondary)
-                    .accessibilityHidden(true)
+                FCSymbol(.forward)
             }
             .frame(maxWidth: .infinity, minHeight: 44)
             .contentShape(Rectangle())
@@ -191,9 +187,7 @@ public struct FCLabelValueRow<Value: View>: View {
             value
                 .frame(maxWidth: .infinity, alignment: .leading)
             if showsDisclosure {
-                Image(systemName: "chevron.right")
-                    .foregroundStyle(FCSemanticColors.textSecondary)
-                    .accessibilityHidden(true)
+                FCSymbol(.forward)
             }
         }
         .frame(maxWidth: .infinity, minHeight: 52)

@@ -76,6 +76,7 @@
 		B913 /* FCListRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A913 /* FCListRow.swift */; };
 		B914 /* FCAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A914 /* FCAvatar.swift */; };
 		B915 /* FCHintBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A915 /* FCHintBar.swift */; };
+		B957 /* FCSymbol.swift in Sources */ = {isa = PBXBuildFile; fileRef = A957 /* FCSymbol.swift */; };
 		B955 /* FCEquipmentIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = A955 /* FCEquipmentIcon.swift */; };
 		B956 /* IconConsistencyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A956 /* IconConsistencyTests.swift */; };
 		B950 /* FCBottomSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A950 /* FCBottomSheet.swift */; };
@@ -333,6 +334,7 @@
 		A913 /* FCListRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCListRow.swift; sourceTree = "<group>"; };
 		A914 /* FCAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCAvatar.swift; sourceTree = "<group>"; };
 		A915 /* FCHintBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCHintBar.swift; sourceTree = "<group>"; };
+		A957 /* FCSymbol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCSymbol.swift; sourceTree = "<group>"; };
 		A955 /* FCEquipmentIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCEquipmentIcon.swift; sourceTree = "<group>"; };
 		A956 /* IconConsistencyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconConsistencyTests.swift; sourceTree = "<group>"; };
 		A950 /* FCBottomSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCBottomSheet.swift; sourceTree = "<group>"; };
@@ -1041,6 +1043,7 @@
 				A913 /* FCListRow.swift */,
 				A914 /* FCAvatar.swift */,
 				A915 /* FCHintBar.swift */,
+				A957 /* FCSymbol.swift */,
 				A955 /* FCEquipmentIcon.swift */,
 				A950 /* FCBottomSheet.swift */,
 				A951 /* FCBodyDiagram.swift */,
@@ -1720,6 +1723,7 @@
 				B913 /* FCListRow.swift in Sources */,
 				B914 /* FCAvatar.swift in Sources */,
 				B915 /* FCHintBar.swift in Sources */,
+				B957 /* FCSymbol.swift in Sources */,
 				B955 /* FCEquipmentIcon.swift in Sources */,
 				B950 /* FCBottomSheet.swift in Sources */,
 				B951 /* FCBodyDiagram.swift in Sources */,
