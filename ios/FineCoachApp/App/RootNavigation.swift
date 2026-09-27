@@ -2,6 +2,7 @@ import SwiftUI
 
 enum RootDestination: Hashable {
     case archivedList
+    case resourceHub
     case studentDetail(UUID)
     case editor(StudentEditorMode)
     case activeSession(UUID)
@@ -97,6 +98,8 @@ struct RootNavigation: View {
                         )
                         .navigationDestination(for: RootDestination.self) { destination in
                             switch destination {
+                            case .resourceHub:
+                                ResourceHubView(path: $path)
                             case .archivedList:
                                 StudentListView(
                                     useCases: environment.requireUseCases(),
@@ -298,6 +301,9 @@ struct RootTabContainer: View {
             case .students:
                 StudentListView(
                     useCases: environment.requireUseCases(),
+                    appointmentUseCases: environment.requireAppointmentUseCases(),
+                    creditLedgerUseCases: environment.creditLedgerUseCases,
+                    calendar: environment.requireCalendar(),
                     rootTab: $rootTab,
                     path: $path
                 )
