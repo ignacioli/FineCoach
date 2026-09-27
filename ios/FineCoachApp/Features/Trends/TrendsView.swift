@@ -1,10 +1,11 @@
 import Charts
 import SwiftUI
 
-/// History filtering (M1B-FR-026) + session comparison (M1B-FR-027) +
-/// exercise trend (M1B-FR-028) + personal records (M1B-FR-029), T039. All
-/// three derived views are computed live from `Comparison` -- nothing here
-/// is cached or persisted. Trend/PR are always computed over this Student's
+/// 训练趋势: the per-exercise trend (M1B-FR-028), computed live from
+/// `Comparison`. Since T069i the history filter, session comparison and
+/// personal records live on 训练历史 (`HistoryListView`, 32 artwork); this
+/// page keeps only the exercise trend charts. Nothing here is cached or
+/// persisted. Trend/PR are always computed over this Student's
 /// FULL history (not the date-range filter, which applies only to the
 /// history list itself) since a PR or a long-run trend that silently
 /// excluded out-of-range sessions would misrepresent the Student's record.
@@ -187,159 +188,28 @@ struct TrendsView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            Picker("", selection: $viewModel.selectedTab) {
-                ForEach(TrendsTab.allCases) { tab in
-                    Text(tab.title).tag(tab)
+        ScrollView {
+            VStack(alignment: .leading, spacing: FCPrimitives.space4) {
+                Text(String(localized: "trends.title"))
+                    .fcFont(.titleLarge)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
+                if let errorMessage = viewModel.errorMessage {
+                    Text(errorMessage)
+                        .fcFont(.caption)
+                        .foregroundStyle(FCSemanticColors.statusDestructive)
                 }
+                exerciseTrendTab
             }
-            .pickerStyle(.segmented)
-            .padding(.horizontal, FCPrimitives.spacingMedium)
-            .padding(.top, FCPrimitives.spacingSmall)
-            .accessibilityIdentifier(FCAccessibilityID.trendsTabPicker)
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
-                    if let errorMessage = viewModel.errorMessage {
-                        Text(errorMessage).foregroundStyle(FCSemanticColors.destructive)
-                    }
-
-                    switch viewModel.selectedTab {
-                    case .comparison:
-                        comparisonTab
-                    case .exerciseTrend:
-                        exerciseTrendTab
-                    case .personalRecord:
-                        personalRecordTab
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(FCPrimitives.spacingMedium)
-            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.bottom, FCPrimitives.space6)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(String(localized: "trends.title"))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarRole(.editor)
         .accessibilityIdentifier(FCAccessibilityID.trendsRoot)
         .task { await viewModel.reload() }
-    }
-
-    // MARK: - 训练对比 Tab
-
-    private var comparisonTab: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
-            tabHint(String(localized: "trends.comparisonTabHint"))
-            filterSection
-            historySection
-            comparisonSection
-        }
-    }
-
-    private var filterSection: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
-            sectionTitle(String(localized: "trends.filterSection"))
-            BodyPartMultiSelectView(title: String(localized: "trends.focusLabel"), selection: $viewModel.focusFilter)
-                .accessibilityIdentifier(FCAccessibilityID.trendsFilterFocus)
-            FCButton(title: String(localized: "trends.applyFilters")) {
-                Task { await viewModel.applyFilter() }
-            }
-        }
-    }
-
-    private var historySection: some View {
-        Group {
-            if viewModel.isEmpty {
-                Text(String(localized: "trends.noMatches"))
-                    .foregroundStyle(FCSemanticColors.secondaryText)
-                    .accessibilityIdentifier(FCAccessibilityID.trendsNoMatches)
-            } else {
-                ForEach(viewModel.filteredSessions) { session in
-                    Button {
-                        viewModel.toggleComparisonSelection(session.id)
-                    } label: {
-                        HStack {
-                            Text(session.completedAtUTC, style: .date)
-                            Spacer()
-                            if viewModel.selectedForComparison.contains(session.id) {
-                                Image(systemName: "checkmark.circle.fill")
-                            }
-                        }
-                        .padding(FCPrimitives.spacingSmall)
-                        .frame(maxWidth: .infinity)
-                        .background(FCSemanticColors.elevatedSurface)
-                        .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSmall))
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-        }
-    }
-
-    private var comparisonSection: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
-            sectionTitle(String(localized: "trends.comparisonTitle"))
-            if let result = viewModel.selectedComparisonResult {
-                switch result {
-                case .compatible(let detail):
-                    comparisonChart(detail)
-                    Text("\(detail.totalSetCountA) vs \(detail.totalSetCountB) 组")
-                    if let volumeA = detail.trainingVolumeA, let volumeB = detail.trainingVolumeB {
-                        Text(
-                            String(
-                                format: String(localized: "trends.comparisonVolumeFormat"),
-                                volumeA.canonicalString,
-                                volumeB.canonicalString
-                            )
-                        )
-                    }
-                case .incompatibleTrainingFocus, .differentStudent:
-                    Text(String(localized: "trends.comparisonIncompatible"))
-                        .foregroundStyle(FCSemanticColors.secondaryText)
-                }
-            }
-        }
-        .accessibilityIdentifier(FCAccessibilityID.trendsComparisonSection)
-    }
-
-    private struct ComparisonBarDatum: Identifiable {
-        let id = UUID()
-        let metric: String
-        let session: String
-        let value: Double
-    }
-
-    private func comparisonChart(_ detail: Comparison.SessionComparisonDetail) -> some View {
-        var data: [ComparisonBarDatum] = [
-            ComparisonBarDatum(
-                metric: String(localized: "trends.comparisonMetricSets"),
-                session: "A",
-                value: Double(detail.totalSetCountA)
-            ),
-            ComparisonBarDatum(
-                metric: String(localized: "trends.comparisonMetricSets"),
-                session: "B",
-                value: Double(detail.totalSetCountB)
-            ),
-        ]
-        if let volumeA = detail.trainingVolumeA, let volumeB = detail.trainingVolumeB,
-            let a = Double(volumeA.canonicalString), let b = Double(volumeB.canonicalString)
-        {
-            data.append(
-                ComparisonBarDatum(metric: String(localized: "trends.comparisonMetricVolume"), session: "A", value: a)
-            )
-            data.append(
-                ComparisonBarDatum(metric: String(localized: "trends.comparisonMetricVolume"), session: "B", value: b)
-            )
-        }
-        return Chart(data) { datum in
-            BarMark(
-                x: .value("metric", datum.metric),
-                y: .value("value", datum.value)
-            )
-            .position(by: .value("session", datum.session))
-            .foregroundStyle(datum.session == "A" ? FCSemanticColors.actionPrimary : FCSemanticColors.actionPrimary.opacity(0.5))
-        }
-        .frame(height: 200)
     }
 
     // MARK: - 动作趋势 Tab
@@ -554,60 +424,6 @@ struct TrendsView: View {
             ? String(localized: "trends.deltaImprovement")
             : String(localized: "trends.deltaRegression")
         return String(format: String(localized: "trends.deltaSummaryFormat"), signedText, label)
-    }
-
-    // MARK: - 个人最佳 Tab
-
-    private var personalRecordTab: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
-            tabHint(String(localized: "trends.personalRecordTabHint"))
-            exercisePicker
-            personalRecordSection
-        }
-    }
-
-    private var personalRecordSection: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
-            HStack(spacing: FCPrimitives.spacingSmall) {
-                sectionTitle(String(localized: "trends.personalRecordTitle"))
-                if viewModel.isAssistedForSelectedExercise {
-                    assistedBadge
-                }
-            }
-            if let records = viewModel.personalRecords() {
-                VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
-                    if let highest = records.highestWeight {
-                        personalRecordCard("PR: \(highest.weight.canonicalString)kg")
-                    }
-                    if let longest = records.longestDuration {
-                        personalRecordCard(
-                            "PR: \(DurationTextParser.formatForEditing(secondsText: longest.seconds.canonicalString))"
-                        )
-                    }
-                    if let distance = records.longestDistance {
-                        personalRecordCard("PR: \(distance.distance.canonicalString)km")
-                    }
-                    if records.highestWeight == nil && records.longestDuration == nil
-                        && records.longestDistance == nil
-                    {
-                        Text(String(localized: "trends.personalRecordEmpty"))
-                            .foregroundStyle(FCSemanticColors.secondaryText)
-                    }
-                }
-            } else {
-                Text(String(localized: "trends.personalRecordEmpty"))
-                    .foregroundStyle(FCSemanticColors.secondaryText)
-            }
-        }
-        .accessibilityIdentifier(FCAccessibilityID.trendsPersonalRecordSection)
-    }
-
-    private func personalRecordCard(_ text: String) -> some View {
-        Text(text)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(FCPrimitives.spacingSmall)
-            .background(FCSemanticColors.elevatedSurface)
-            .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSmall))
     }
 
     // MARK: - Shared

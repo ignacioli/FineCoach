@@ -1,4 +1,4 @@
-import FineCoach
+@testable import FineCoach
 import XCTest
 
 final class HistoryReportDomainTests: XCTestCase {
@@ -451,5 +451,21 @@ final class HistoryReportDomainTests: XCTestCase {
 
     private func setExercise(in session: Session, id: StableUUID) throws -> SessionExercise {
         try XCTUnwrap(session.exercises.first { $0.id == id })
+    }
+
+    // T069i: 训练历史 date presets are inclusive, ending today (近 7 天 = today
+    // and the 6 days before it).
+    func testHistoryDateRangePresetsAreInclusiveEndingToday() throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        let today = try LocalDate(year: 2026, month: 3, day: 1)
+
+        let week = HistoryDateRangePreset.last7.range(endingAt: today, calendar: calendar)
+        XCTAssertEqual(week.lowerBound, try LocalDate(year: 2026, month: 2, day: 23))
+        XCTAssertEqual(week.upperBound, today)
+
+        let month = HistoryDateRangePreset.last30.range(endingAt: today, calendar: calendar)
+        XCTAssertEqual(month.lowerBound, try LocalDate(year: 2026, month: 1, day: 31))
+        XCTAssertTrue(month.contains(today))
     }
 }

@@ -154,6 +154,8 @@ struct RootNavigation: View {
                                 HistoryListView(
                                     studentID: StableUUID(studentID),
                                     useCases: environment.requireHistoryUseCases(),
+                                    studentUseCases: environment.requireUseCases(),
+                                    exerciseUseCases: environment.requireExerciseUseCases(),
                                     path: $path
                                 )
                             case .sessionDetail(let sessionID):

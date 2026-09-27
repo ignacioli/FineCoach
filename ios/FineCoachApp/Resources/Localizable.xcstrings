@@ -6119,6 +6119,325 @@
           }
         }
       }
+    },
+    "history.filter.lastDaysFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "近 %d 天"
+          }
+        }
+      }
+    },
+    "history.filter.date": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日期范围"
+          }
+        }
+      }
+    },
+    "history.filter.focus": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练重点"
+          }
+        }
+      }
+    },
+    "history.filter.exercise": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动作"
+          }
+        }
+      }
+    },
+    "history.filter.clear": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除筛选"
+          }
+        }
+      }
+    },
+    "history.filter.all": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全部"
+          }
+        }
+      }
+    },
+    "history.filter.allExercises": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全部动作"
+          }
+        }
+      }
+    },
+    "history.filter.selected": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已选"
+          }
+        }
+      }
+    },
+    "history.filter.done": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成"
+          }
+        }
+      }
+    },
+    "history.filter.focusHint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选中多个部位时，命中任一部位即显示。"
+          }
+        }
+      }
+    },
+    "history.filter.focusSummaryFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练重点 %@"
+          }
+        }
+      }
+    },
+    "history.filter.summaryFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已筛选：%@"
+          }
+        }
+      }
+    },
+    "history.countFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d 次训练"
+          }
+        }
+      }
+    },
+    "history.empty.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "还没有完成的训练"
+          }
+        }
+      }
+    },
+    "history.empty.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成一次训练后会出现在这里。"
+          }
+        }
+      }
+    },
+    "history.empty.filteredTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有符合条件的训练"
+          }
+        }
+      }
+    },
+    "history.empty.filteredBody": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "换一个日期范围、部位或动作试试，或清除筛选。"
+          }
+        }
+      }
+    },
+    "history.compare.pickTwo": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择两次训练进行比较。"
+          }
+        }
+      }
+    },
+    "history.compare.choose": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择训练"
+          }
+        }
+      }
+    },
+    "history.compare.setsFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "总组数 %d"
+          }
+        }
+      }
+    },
+    "history.compare.repsFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "总次数 %@"
+          }
+        }
+      }
+    },
+    "history.compare.volumeFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练容量 %@ kg"
+          }
+        }
+      }
+    },
+    "history.compare.noDifference": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动作相同"
+          }
+        }
+      }
+    },
+    "history.compare.onlyHereFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仅此次 · %@"
+          }
+        }
+      }
+    },
+    "history.pb.highestWeight": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最高重量"
+          }
+        }
+      }
+    },
+    "history.pb.mostReps": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同重量最多次"
+          }
+        }
+      }
+    },
+    "history.pb.longestDuration": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最长时长"
+          }
+        }
+      }
+    },
+    "history.pb.longestDistance": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最远距离"
+          }
+        }
+      }
+    },
+    "history.pb.shareNote": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "个人最佳在分享报告中默认关闭"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
