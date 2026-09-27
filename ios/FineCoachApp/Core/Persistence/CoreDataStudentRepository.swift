@@ -16,10 +16,25 @@ public struct StudentDeletionImpact: Equatable, Sendable {
 public struct InProgressTrainingSummary: Equatable, Sendable {
     public let studentID: StableUUID
     public let studentDisplayName: String
+    /// For the "已训练 N 分钟" line (01 hero card, 21 in-training bar).
+    public let startedAtUTC: Date?
+    public let trainingFocus: Set<BodyPart>
 
-    public init(studentID: StableUUID, studentDisplayName: String) {
+    public init(
+        studentID: StableUUID,
+        studentDisplayName: String,
+        startedAtUTC: Date? = nil,
+        trainingFocus: Set<BodyPart> = []
+    ) {
         self.studentID = studentID
         self.studentDisplayName = studentDisplayName
+        self.startedAtUTC = startedAtUTC
+        self.trainingFocus = trainingFocus
+    }
+
+    /// Whole minutes elapsed since the session started, never negative.
+    public func elapsedMinutes(now: Date) -> Int? {
+        startedAtUTC.map { max(0, Int(now.timeIntervalSince($0) / 60)) }
     }
 }
 
@@ -142,7 +157,9 @@ public struct CoreDataStudentRepository: Sendable {
             let student = try StudentManagedObjectMapping.makeStudent(from: object)
             return InProgressTrainingSummary(
                 studentID: StableUUID(studentID),
-                studentDisplayName: student.displayName.value
+                studentDisplayName: student.displayName.value,
+                startedAtUTC: session.value(forKey: "startedAtUTC") as? Date,
+                trainingFocus: BodyPartCoding.parts(fromMask: session.value(forKey: "trainingFocusMask") as? Int32 ?? 0)
             )
         }
     }

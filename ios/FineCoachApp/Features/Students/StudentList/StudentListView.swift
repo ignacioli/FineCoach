@@ -38,12 +38,16 @@ final class StudentListViewModel: ObservableObject {
 struct StudentListView: View {
     @StateObject private var viewModel: StudentListViewModel
     @Binding var path: [RootDestination]
+    /// Set only for the root 学员 screen, which shows the 今日/学员 switch.
+    private let rootTab: Binding<RootTab>?
 
     init(
         useCases: StudentUseCases,
         showsArchived: Bool = false,
+        rootTab: Binding<RootTab>? = nil,
         path: Binding<[RootDestination]>
     ) {
+        self.rootTab = rootTab
         _viewModel = StateObject(
             wrappedValue: StudentListViewModel(useCases: useCases, showsArchived: showsArchived)
         )
@@ -52,6 +56,13 @@ struct StudentListView: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            // T069a moved the switch out of RootTabContainer; T069b restyles
+            // this screen's header per 21-student-list-v2.
+            if let rootTab {
+                RootSegmentSwitch(rootTab: rootTab)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, FCPrimitives.space4)
+            }
             if !viewModel.showsArchived {
                 FCTextField(String(localized: "student.list.search"), text: $viewModel.query)
                     .padding(.horizontal, FCPrimitives.spacingMedium)

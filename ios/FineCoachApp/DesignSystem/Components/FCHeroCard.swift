@@ -29,36 +29,49 @@ public struct FCHeroCard: View {
         self.action = action
     }
 
+    /// Layout per `01-today` / `18-course-action-sheet`: badge on top; title
+    /// and subtitle on the left with the action text trailing on the title
+    /// line. With an action the whole card is one tap target (the action
+    /// text is its visible label).
     public var body: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.space2) {
+        if let action {
+            Button(action: action) { content }
+                .buttonStyle(.plain)
+        } else {
+            content
+                .accessibilityElement(children: .combine)
+        }
+    }
+
+    private var content: some View {
+        VStack(alignment: .leading, spacing: FCPrimitives.space3) {
             Text(badgeText)
                 .fcFont(.sectionLabel)
                 .foregroundStyle(FCSemanticColors.actionPrimary)
                 .frame(width: 56, height: 24)
                 .background(Capsule().fill(FCSemanticColors.surfaceCanvas))
 
-            Spacer(minLength: 0)
-
-            Text(title)
-                .fcFont(.headline)
-                .foregroundStyle(FCSemanticColors.actionOn)
-            Text(subtitle)
-                .fcFont(.callout)
-                .foregroundStyle(FCSemanticColors.textOnActionSecondary)
-
-            if let actionTitle, let action {
-                Button(action: action) {
+            HStack(alignment: .firstTextBaseline, spacing: FCPrimitives.space2) {
+                VStack(alignment: .leading, spacing: FCPrimitives.space1) {
+                    Text(title)
+                        .fcFont(.headline)
+                        .foregroundStyle(FCSemanticColors.actionOn)
+                    Text(subtitle)
+                        .fcFont(.callout)
+                        .foregroundStyle(FCSemanticColors.textOnActionSecondary)
+                }
+                Spacer(minLength: FCPrimitives.space2)
+                if let actionTitle {
                     Text(actionTitle)
                         .fcFont(.callout, weight: .semibold)
                         .foregroundStyle(FCSemanticColors.actionOn)
-                        .frame(minHeight: 44)
                 }
-                .buttonStyle(.plain)
             }
         }
         .padding(FCPrimitives.space4)
-        .frame(maxWidth: .infinity, minHeight: 100)
+        .frame(maxWidth: .infinity, minHeight: 100, alignment: .leading)
         .background(FCSemanticColors.actionPrimary)
         .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusLg))
+        .contentShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusLg))
     }
 }

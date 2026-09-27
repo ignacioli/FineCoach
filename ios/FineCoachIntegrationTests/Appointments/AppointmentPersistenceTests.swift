@@ -312,6 +312,28 @@
             XCTAssertEqual(untouched.trainingFocus, [.chest])
         }
 
+        // T069a: the Today hero card / in-training bar read the running
+        // session's start time and focus from `inProgressTraining()`.
+        func testInProgressSummaryCarriesStartTimeAndFocus() async throws {
+            let env = try await makeEnvironment(ids: (0..<6).map { _ in UUID() })
+            let appointment = try await env.appointmentUseCases.createSingle(
+                studentID: env.studentID,
+                date: try LocalDate(year: 2023, month: 11, day: 14),
+                startTime: try LocalTime(hour: 22, minute: 0),
+                trainingFocus: [.chest, .arms],
+                overrideConflict: false
+            )
+            _ = try await env.appointmentUseCases.startTraining(appointmentID: appointment.id)
+
+            let summary = try await CoreDataStudentRepository(writer: env.controller.writer).inProgressTraining()
+            let unwrapped = try XCTUnwrap(summary)
+            XCTAssertEqual(unwrapped.studentID, env.studentID)
+            XCTAssertEqual(unwrapped.trainingFocus, [.chest, .arms])
+            XCTAssertEqual(unwrapped.startedAtUTC, now)
+            XCTAssertEqual(unwrapped.elapsedMinutes(now: now.addingTimeInterval(32 * 60 + 59)), 32)
+            XCTAssertEqual(unwrapped.elapsedMinutes(now: now.addingTimeInterval(-60)), 0)
+        }
+
         // T077: "仅本次" can change schedule and focus in one write; the
         // instance becomes a detached exception.
         func testRescheduleSingleAlsoUpdatesTrainingFocus() async throws {

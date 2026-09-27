@@ -82,3 +82,39 @@ public struct FCConfirmationDialog: View {
         .contentShape(Rectangle())
     }
 }
+
+/// Presents a design-system confirmation dialog centered over
+/// `overlay.scrim` (§2.2/§8). Tapping the scrim dismisses it (the same as
+/// the cancel action). Apply at a container that covers the screen.
+private struct FCConfirmationDialogModifier: ViewModifier {
+    @Binding var isPresented: Bool
+    let dialog: () -> FCConfirmationDialog
+
+    func body(content: Content) -> some View {
+        content
+            .overlay {
+                ZStack {
+                    if isPresented {
+                        FCSemanticColors.overlayScrim
+                            .ignoresSafeArea()
+                            .onTapGesture { isPresented = false }
+                            .accessibilityHidden(true)
+                        dialog()
+                            .accessibilityAddTraits(.isModal)
+                            .accessibilityAction(.escape) { isPresented = false }
+                            .transition(.opacity)
+                    }
+                }
+                .animation(.easeOut(duration: 0.2), value: isPresented)
+            }
+    }
+}
+
+public extension View {
+    func fcConfirmationDialog(
+        isPresented: Binding<Bool>,
+        dialog: @escaping () -> FCConfirmationDialog
+    ) -> some View {
+        modifier(FCConfirmationDialogModifier(isPresented: isPresented, dialog: dialog))
+    }
+}

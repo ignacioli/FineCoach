@@ -282,20 +282,23 @@ struct RootTabContainer: View {
     @Binding var path: [RootDestination]
     let environment: AppEnvironment
 
+    // The 今日/学员 switch now sits under each screen's large title
+    // (01/21 artwork), so each root screen renders `RootSegmentSwitch`.
     var body: some View {
-        VStack(spacing: 0) {
-            segmentedControl
+        Group {
             switch rootTab {
             case .today:
                 TodayView(
                     appointmentUseCases: environment.requireAppointmentUseCases(),
                     studentUseCases: environment.requireUseCases(),
                     creditLedgerUseCases: environment.creditLedgerUseCases,
+                    rootTab: $rootTab,
                     path: $path
                 )
             case .students:
                 StudentListView(
                     useCases: environment.requireUseCases(),
+                    rootTab: $rootTab,
                     path: $path
                 )
             }
@@ -303,32 +306,25 @@ struct RootTabContainer: View {
         .background(FCSemanticColors.surfacePage)
         .accessibilityIdentifier(FCAccessibilityID.studentList)
     }
+}
 
-    private var segmentedControl: some View {
-        HStack(spacing: FCPrimitives.spacingSmall) {
-            segmentButton(String(localized: "today.segment.today"), tab: .today)
-                .accessibilityIdentifier(FCAccessibilityID.todaySegmentToday)
-            segmentButton(String(localized: "today.segment.students"), tab: .students)
-                .accessibilityIdentifier(FCAccessibilityID.todaySegmentStudents)
-            Spacer()
-        }
-        .padding(.horizontal, FCPrimitives.spacingMedium)
-        .padding(.top, FCPrimitives.spacingSmall)
-    }
+/// The top-level 今日 / 学员 switch (§8 "顶部分段切换", `FCSegmentedSwitch`).
+struct RootSegmentSwitch: View {
+    @Binding var rootTab: RootTab
 
-    private func segmentButton(_ title: String, tab: RootTab) -> some View {
-        Button {
-            rootTab = tab
-        } label: {
-            Text(title)
-                .font(.subheadline.weight(.semibold))
-                .padding(.horizontal, FCPrimitives.spacingMedium)
-                .frame(minHeight: 44)
-                .background(
-                    Capsule().fill(rootTab == tab ? FCSemanticColors.primaryText : FCSemanticColors.tint)
-                )
-                .foregroundStyle(rootTab == tab ? FCSemanticColors.surfacePage : FCSemanticColors.primaryText)
-        }
+    private static let options = [
+        FCSegmentedSwitch.Option(id: "today", title: String(localized: "today.segment.today")),
+        FCSegmentedSwitch.Option(id: "students", title: String(localized: "today.segment.students")),
+    ]
+
+    var body: some View {
+        FCSegmentedSwitch(
+            options: Self.options,
+            selection: Binding(
+                get: { rootTab == .today ? "today" : "students" },
+                set: { rootTab = $0 == "today" ? .today : .students }
+            )
+        )
     }
 }
 
