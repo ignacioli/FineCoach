@@ -1,10 +1,27 @@
 import SwiftUI
 import UIKit
 
+/// 11 训练中 (T069h; `30-training-v2`, `31-add-exercise-sheet`, D8 variant
+/// B): titleEmphasis "训练中", "学员 · 部位" with a running clock, flat
+/// exercise blocks (equipment icon + exerciseTitle), set rows, then the two
+/// link buttons "＋ 添加动作" (sheet with 动作库 / 从模板 tabs — 应用模板 now
+/// lives there) and "＋ 新建分区" (in-place sheet). 另存为模板 moved to the
+/// post-training summary (FR-017 works on a completed session).
 struct ActiveSessionView: View {
+    private enum AddTab {
+        case library
+        case template
+    }
+
     @StateObject private var viewModel: ActiveSessionViewModel
     @Binding var path: [RootDestination]
     @State private var didPushSummary = false
+    @State private var addTab: AddTab = .library
+    @State private var isCreatingSection = false
+    @State private var studentName = ""
+    private let sessionUseCases: ActiveSessionUseCases
+    private let templateUseCases: TemplateUseCases?
+    private let studentUseCases: StudentUseCases?
     /// Estimated per-row height for the non-scrolling `List` embedded under
     /// each Exercise (needed so native `.swipeActions` works -- that
     /// modifier only has an effect inside a `List`, and a `List` nested in
@@ -20,8 +37,12 @@ struct ActiveSessionView: View {
         studentID: StableUUID,
         useCases: ActiveSessionUseCases,
         templateUseCases: TemplateUseCases? = nil,
+        studentUseCases: StudentUseCases? = nil,
         path: Binding<[RootDestination]>
     ) {
+        self.sessionUseCases = useCases
+        self.templateUseCases = templateUseCases
+        self.studentUseCases = studentUseCases
         _viewModel = StateObject(
             wrappedValue: ActiveSessionViewModel(
                 studentID: studentID,
@@ -34,12 +55,15 @@ struct ActiveSessionView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+            VStack(alignment: .leading, spacing: FCPrimitives.space4) {
+                header
                 SaveStatusView(status: viewModel.saveStatus) {
                     Task { await viewModel.retrySave() }
                 }
                 if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage).foregroundStyle(FCSemanticColors.destructive)
+                    Text(errorMessage)
+                        .fcFont(.caption)
+                        .foregroundStyle(FCSemanticColors.statusDestructive)
                 }
 
                 if viewModel.session?.state == .completed {
@@ -49,13 +73,10 @@ struct ActiveSessionView: View {
                     Text(String(localized: "session.status.abandoned"))
                 }
 
-                Text(viewModel.statsText)
-                    .font(.headline)
-                    .accessibilityIdentifier(FCAccessibilityID.activeSessionStats)
-
                 if let session = viewModel.session, session.exercises.isEmpty, session.state == .inProgress {
                     Text(String(localized: "session.empty.hint"))
-                        .foregroundStyle(FCSemanticColors.secondaryText)
+                        .fcFont(.callout, weight: .regular)
+                        .foregroundStyle(FCSemanticColors.textSecondary)
                         .accessibilityIdentifier(FCAccessibilityID.activeSessionEmptyHint)
                 }
 
@@ -66,22 +87,23 @@ struct ActiveSessionView: View {
                     }
                 }
 
-                if viewModel.isAddingExercise {
-                    QuickCreateExerciseFlow(viewModel: viewModel)
-                } else if viewModel.session?.state == .inProgress {
-                    FCButton(title: String(localized: "session.action.addExercise")) {
-                        viewModel.isAddingExercise = true
-                    }
-                    .accessibilityIdentifier(FCAccessibilityID.activeSessionAddExercise)
-                }
-
                 if viewModel.session?.state == .inProgress {
-                    Divider()
-                    templateAndSectionControls
+                    HStack(spacing: FCPrimitives.space6) {
+                        FCLinkButton(title: String(localized: "session.action.addExerciseLink")) {
+                            addTab = .library
+                            viewModel.isAddingExercise = true
+                        }
+                        .accessibilityIdentifier(FCAccessibilityID.activeSessionAddExercise)
+                        FCLinkButton(title: String(localized: "activeSession.action.createSectionLink")) {
+                            isCreatingSection = true
+                        }
+                        .accessibilityIdentifier(FCAccessibilityID.activeSessionCreateSection)
+                    }
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(FCPrimitives.spacingMedium)
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.bottom, FCPrimitives.space6)
         }
         .safeAreaInset(edge: .bottom) {
             if viewModel.session?.state == .inProgress {
@@ -97,16 +119,28 @@ struct ActiveSessionView: View {
                     )
                     viewModel.requestFinish()
                 }
-                .padding(.horizontal, FCPrimitives.spacingMedium)
-                .padding(.bottom, FCPrimitives.spacingSmall)
+                .padding(.horizontal, FCPrimitives.space4)
+                .padding(.vertical, FCPrimitives.space2)
+                .background(FCSemanticColors.surfacePage)
                 .accessibilityIdentifier(FCAccessibilityID.activeSessionFinish)
             }
         }
         .scrollDismissesKeyboard(.interactively)
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(String(localized: "session.title"))
         .navigationBarTitleDisplayMode(.inline)
-        .task { await viewModel.load() }
+        .toolbarRole(.editor)
+        .fcBottomSheet(isPresented: $viewModel.isAddingExercise) {
+            addExerciseSheet
+        }
+        .fcBottomSheet(isPresented: $isCreatingSection) {
+            createSectionSheet
+        }
+        .task {
+            await viewModel.load()
+            if let studentUseCases, let student = try? await studentUseCases.student(id: viewModel.studentID) {
+                studentName = student.displayName.value
+            }
+        }
         .confirmationDialog(
             String(localized: "activeSession.deleteSection"),
             isPresented: Binding(
@@ -179,20 +213,21 @@ struct ActiveSessionView: View {
                     if let icon = exercise.sourceID.flatMap({ FCEquipmentIcon.icon(forExerciseID: $0.rawValue) }) {
                         FCEquipmentIconView(icon)
                     }
-                    VStack(alignment: .leading) {
-                        Text(exercise.displayNameSnapshot.value)
-                            .font(.headline)
-                        Text(modeTitle(exercise.recordModeSnapshot))
-                            .font(.footnote)
-                            .foregroundStyle(FCSemanticColors.secondaryText)
-                    }
-                    Spacer()
+                    Text(exercise.displayNameSnapshot.value)
+                        .fcFont(.exerciseTitle)
+                        .foregroundStyle(FCSemanticColors.textPrimary)
+                    Spacer(minLength: FCPrimitives.space2)
+                    Text(modeTitle(exercise.recordModeSnapshot))
+                        .fcFont(.caption)
+                        .foregroundStyle(FCSemanticColors.textSecondary)
                     if viewModel.selectedExerciseID == exercise.id {
                         FCSymbol(.check)
                     }
                 }
                 .frame(minHeight: 44)
+                .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
             .accessibilityIdentifier(FCAccessibilityID.exerciseAt(index))
             .accessibilityLabel(
                 "\(exercise.displayNameSnapshot.value)，\(modeTitle(exercise.recordModeSnapshot))"
@@ -207,7 +242,7 @@ struct ActiveSessionView: View {
                         setRow(trainingSet, index: setIndex, in: exercise)
                             .listRowInsets(EdgeInsets())
                             .listRowSeparator(.hidden)
-                            .listRowBackground(FCSemanticColors.elevatedSurface)
+                            .listRowBackground(FCSemanticColors.surfacePage)
                             .swipeActions(
                                 edge: .trailing,
                                 allowsFullSwipe: trainingSet.state != .completed
@@ -229,27 +264,29 @@ struct ActiveSessionView: View {
             }
 
             if viewModel.selectedExerciseID == exercise.id, viewModel.session?.state == .inProgress {
-                HStack(spacing: FCPrimitives.spacingSmall) {
-                    Button(String(localized: "session.action.moveUp")) {
+                HStack(spacing: FCPrimitives.space4) {
+                    FCLinkButton(title: String(localized: "session.action.moveUp")) {
                         Task { await viewModel.moveExercise(offset: -1) }
                     }
-                    .frame(minHeight: 44)
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionMoveUp)
 
-                    Button(String(localized: "session.action.moveDown")) {
+                    FCLinkButton(title: String(localized: "session.action.moveDown")) {
                         Task { await viewModel.moveExercise(offset: 1) }
                     }
-                    .frame(minHeight: 44)
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionMoveDown)
 
-                    Button(String(localized: "session.action.deleteExercise")) {
+                    Button {
                         viewModel.requestDeleteExercise()
+                    } label: {
+                        Text(String(localized: "session.action.deleteExercise"))
+                            .fcFont(.callout, weight: .semibold)
+                            .foregroundStyle(FCSemanticColors.statusDestructive)
+                            .frame(minHeight: 44)
                     }
-                    .frame(minHeight: 44)
-                    .foregroundStyle(FCSemanticColors.destructive)
+                    .buttonStyle(.plain)
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionDeleteExercise)
 
-                    Menu(String(localized: "activeSession.moveToSection")) {
+                    Menu {
                         Button(String(localized: "activeSession.unsectioned")) {
                             Task { await viewModel.moveExercise(exercise.id, toSectionID: nil) }
                         }
@@ -258,15 +295,17 @@ struct ActiveSessionView: View {
                                 Task { await viewModel.moveExercise(exercise.id, toSectionID: section.id) }
                             }
                         }
+                    } label: {
+                        Text(String(localized: "activeSession.moveToSection"))
+                            .fcFont(.callout, weight: .semibold)
+                            .foregroundStyle(FCSemanticColors.actionPrimary)
+                            .frame(minHeight: 44)
                     }
-                    .frame(minHeight: 44)
                 }
                 SetEditor(viewModel: viewModel, exercise: exercise)
             }
+            FCListRowDivider()
         }
-        .padding(FCPrimitives.spacingSmall)
-        .background(FCSemanticColors.elevatedSurface)
-        .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSmall))
     }
 
     /// Shows a Section header immediately before the first Exercise that
@@ -281,54 +320,100 @@ struct ActiveSessionView: View {
             let section = viewModel.sections.first(where: { $0.id == sectionID })
         {
             HStack {
-                Text(section.name.value)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(FCSemanticColors.secondaryText)
+                FCSectionLabel(section.name.value)
                 Spacer()
                 if viewModel.session?.state == .inProgress {
-                    Button(String(localized: "activeSession.deleteSection")) {
+                    Button {
                         viewModel.requestDeleteSection(section)
+                    } label: {
+                        Text(String(localized: "activeSession.deleteSection"))
+                            .fcFont(.caption)
+                            .foregroundStyle(FCSemanticColors.statusDestructive)
+                            .frame(minHeight: 44)
                     }
-                    .frame(minHeight: 44)
-                    .foregroundStyle(FCSemanticColors.destructive)
+                    .buttonStyle(.plain)
                 }
             }
             .accessibilityIdentifier(FCAccessibilityID.activeSessionSectionHeader(section.id))
         }
     }
 
-    private var templateAndSectionControls: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
-            FCTextField(String(localized: "activeSession.sectionNamePrompt"), text: $viewModel.newSectionName)
-                .accessibilityIdentifier(FCAccessibilityID.activeSessionSectionName)
-            FCButton(title: String(localized: "activeSession.action.createSection")) {
-                Task { await viewModel.createSection() }
-            }
-            .accessibilityIdentifier(FCAccessibilityID.activeSessionCreateSection)
+    // MARK: Header (30)
 
-            if viewModel.isSavingAsTemplate {
-                FCTextField(
-                    String(localized: "activeSession.saveAsTemplateNamePrompt"),
-                    text: $viewModel.saveAsTemplateName
-                )
-                .accessibilityIdentifier(FCAccessibilityID.activeSessionSaveAsTemplateName)
-                FCButton(title: String(localized: "activeSession.saveAsTemplateConfirm")) {
-                    Task { await viewModel.saveAsTemplate() }
+    private var header: some View {
+        VStack(alignment: .leading, spacing: FCPrimitives.space2) {
+            Text(String(localized: "session.title"))
+                .fcFont(.titleEmphasis)
+                .foregroundStyle(FCSemanticColors.textPrimary)
+                .accessibilityAddTraits(.isHeader)
+            HStack(alignment: .firstTextBaseline) {
+                Text(TodayRowPresentation.nameAndFocus(studentName, viewModel.session?.trainingFocus ?? []))
+                    .fcFont(.headline)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
+                Spacer(minLength: FCPrimitives.space2)
+                if let session = viewModel.session, session.state == .inProgress {
+                    TimelineView(.periodic(from: .now, by: 1)) { context in
+                        Text(ActiveSessionClock.text(from: session.startedAtUTC, to: context.date))
+                            .fcFont(.headline)
+                            .monospacedDigit()
+                            .foregroundStyle(FCSemanticColors.textPrimary)
+                    }
+                    .accessibilityLabel(Text("session.clock.a11y"))
                 }
-                .accessibilityIdentifier(FCAccessibilityID.activeSessionSaveAsTemplateConfirm)
-            } else {
-                Button(String(localized: "activeSession.action.saveAsTemplate")) {
-                    viewModel.isSavingAsTemplate = true
-                }
-                .frame(minHeight: 44)
-                .accessibilityIdentifier(FCAccessibilityID.activeSessionSaveAsTemplate)
             }
+            Text(viewModel.statsText)
+                .fcFont(.caption)
+                .foregroundStyle(FCSemanticColors.textSecondary)
+                .accessibilityIdentifier(FCAccessibilityID.activeSessionStats)
+        }
+    }
 
-            Button(String(localized: "activeSession.action.applyTemplate")) {
-                path.append(.applyTemplate)
+    // MARK: Sheets (31, 新建分区)
+
+    private var addExerciseSheet: some View {
+        FCBottomSheet(title: String(localized: "session.action.addExercise")) {
+            VStack(alignment: .leading, spacing: FCPrimitives.space3) {
+                if templateUseCases != nil {
+                    HStack(spacing: FCPrimitives.space2) {
+                        FCFilterChip(title: String(localized: "session.add.tabLibrary"), isSelected: addTab == .library) {
+                            addTab = .library
+                        }
+                        FCFilterChip(title: String(localized: "session.add.tabTemplate"), isSelected: addTab == .template) {
+                            addTab = .template
+                        }
+                        .accessibilityIdentifier(FCAccessibilityID.activeSessionApplyTemplate)
+                    }
+                }
+                ScrollView {
+                    if addTab == .template, let templateUseCases {
+                        TemplatePickList(templateUseCases: templateUseCases, sessionUseCases: sessionUseCases) {
+                            viewModel.isAddingExercise = false
+                            Task { await viewModel.load() }
+                        }
+                    } else {
+                        QuickCreateExerciseFlow(viewModel: viewModel)
+                    }
+                }
+                .frame(maxHeight: 460)
             }
-            .frame(minHeight: 44)
-            .accessibilityIdentifier(FCAccessibilityID.activeSessionApplyTemplate)
+        }
+    }
+
+    private var createSectionSheet: some View {
+        FCBottomSheet(title: String(localized: "activeSession.action.createSection")) {
+            VStack(spacing: FCPrimitives.space3) {
+                FCTextField(String(localized: "activeSession.sectionNamePrompt"), text: $viewModel.newSectionName)
+                    .accessibilityIdentifier(FCAccessibilityID.activeSessionSectionName)
+                FCButton(
+                    title: String(localized: "activeSession.action.createSection"),
+                    isEnabled: !viewModel.newSectionName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                ) {
+                    Task {
+                        await viewModel.createSection()
+                        isCreatingSection = false
+                    }
+                }
+            }
         }
     }
 
@@ -394,4 +479,19 @@ struct ActiveSessionView: View {
         set.displaySummary
     }
 
+}
+
+/// "32:00" / "1:02:03" since the session started (display only; the
+/// persisted duration and its review rules are unchanged).
+enum ActiveSessionClock {
+    static func text(from start: Date, to now: Date) -> String {
+        let total = max(0, Int(now.timeIntervalSince(start)))
+        let hours = total / 3600
+        let minutes = (total % 3600) / 60
+        let seconds = total % 60
+        if hours > 0 {
+            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
+        }
+        return String(format: "%02d:%02d", minutes, seconds)
+    }
 }

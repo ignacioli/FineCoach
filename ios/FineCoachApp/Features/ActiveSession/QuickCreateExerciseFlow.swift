@@ -16,8 +16,15 @@ struct QuickCreateExerciseFlow: View {
                         Button {
                             Task { await viewModel.addCatalogMatch(entry.id) }
                         } label: {
-                            Text(entry.displayedName)
-                                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                            HStack(spacing: FCPrimitives.space2) {
+                                if let icon = FCEquipmentIcon.icon(equipmentClass: entry.equipmentClass, primaryMuscleGroup: entry.primaryMuscleGroup) {
+                                    FCEquipmentIconView(icon)
+                                }
+                                Text(entry.displayedName)
+                                    .fcFont(.body)
+                                    .foregroundStyle(FCSemanticColors.textPrimary)
+                            }
+                            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
                         }
                         .buttonStyle(.borderless)
                         .accessibilityIdentifier(FCAccessibilityID.activeSessionCatalogRow(entry.id))
@@ -25,14 +32,12 @@ struct QuickCreateExerciseFlow: View {
                     }
                 }
             }
-            HStack(spacing: FCPrimitives.spacingSmall) {
+            FCFlowLayout(horizontalSpacing: FCPrimitives.space2, verticalSpacing: FCPrimitives.space2 - (44 - 30)) {
                 modeChip(
                     .weightReps,
                     title: String(localized: "session.mode.weightReps"),
                     id: FCAccessibilityID.activeSessionModeWeightReps
                 )
-            }
-            HStack(spacing: FCPrimitives.spacingSmall) {
                 modeChip(
                     .reps,
                     title: String(localized: "session.mode.reps"),
@@ -51,7 +56,8 @@ struct QuickCreateExerciseFlow: View {
             }
             if let exerciseNameConflict = viewModel.exerciseNameConflict {
                 Text(exerciseNameConflict)
-                    .foregroundStyle(FCSemanticColors.destructive)
+                    .fcFont(.caption)
+                    .foregroundStyle(FCSemanticColors.statusDestructive)
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionExerciseNameConflict)
             }
             FCButton(
@@ -72,20 +78,9 @@ struct QuickCreateExerciseFlow: View {
     }
 
     private func modeChip(_ mode: RecordMode, title: String, id: String) -> some View {
-        Button(title) {
+        FCFilterChip(title: title, isSelected: viewModel.recordMode == mode) {
             viewModel.recordMode = mode
         }
-        .frame(minHeight: 44)
-        .padding(.horizontal, FCPrimitives.spacingSmall)
-        .background(
-            viewModel.recordMode == mode ? FCSemanticColors.primaryText : FCSemanticColors.separator
-        )
-        .foregroundStyle(
-            viewModel.recordMode == mode ? FCSemanticColors.elevatedSurface : FCSemanticColors.primaryText
-        )
-        .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSmall))
         .accessibilityIdentifier(id)
-        .accessibilityLabel(title)
-        .accessibilityAddTraits(viewModel.recordMode == mode ? [.isSelected] : [])
     }
 }

@@ -8,13 +8,38 @@ final class SessionSummaryViewModel: ObservableObject {
     @Published var durationText = ""
     @Published var completedSetsText = ""
     @Published var errorMessage: String?
+    @Published var templateName = ""
+    @Published var savedTemplateName: String?
 
     let sessionID: StableUUID
     private let useCases: HistoryUseCases
+    let templateUseCases: TemplateUseCases?
 
-    init(sessionID: StableUUID, useCases: HistoryUseCases) {
+    init(sessionID: StableUUID, useCases: HistoryUseCases, templateUseCases: TemplateUseCases? = nil) {
         self.sessionID = sessionID
         self.useCases = useCases
+        self.templateUseCases = templateUseCases
+    }
+
+    /// 另存为模板 (M1B-FR-017/018), moved here from the in-training screen by
+    /// D8 variant B: snapshots the completed session's exercises and planned
+    /// set shape into a new template (never its notes or student identity).
+    func saveAsTemplate() async -> Bool {
+        guard let templateUseCases else { return false }
+        let name = templateName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty else { return false }
+        do {
+            let session = try await useCases.fullSession(id: sessionID)
+            let sections = try await templateUseCases.sessionSections(sessionID: sessionID)
+            _ = try await templateUseCases.saveAsTemplate(from: session, existingSessionSections: sections, name: name)
+            savedTemplateName = name
+            templateName = ""
+            errorMessage = nil
+            return true
+        } catch {
+            errorMessage = (error as? LocalizedError)?.errorDescription ?? String(localized: "templates.error.generic")
+            return false
+        }
     }
 
     func load() async {
@@ -57,10 +82,16 @@ final class SessionSummaryViewModel: ObservableObject {
 struct SessionSummaryView: View {
     @StateObject private var viewModel: SessionSummaryViewModel
     @Binding var path: [RootDestination]
+    @State private var isNamingTemplate = false
 
-    init(sessionID: StableUUID, useCases: HistoryUseCases, path: Binding<[RootDestination]>) {
+    init(
+        sessionID: StableUUID,
+        useCases: HistoryUseCases,
+        templateUseCases: TemplateUseCases? = nil,
+        path: Binding<[RootDestination]>
+    ) {
         _viewModel = StateObject(
-            wrappedValue: SessionSummaryViewModel(sessionID: sessionID, useCases: useCases)
+            wrappedValue: SessionSummaryViewModel(sessionID: sessionID, useCases: useCases, templateUseCases: templateUseCases)
         )
         _path = path
     }
@@ -94,6 +125,22 @@ struct SessionSummaryView: View {
                     identifier: FCAccessibilityID.sessionSummaryStudentSummary
                 )
 
+                if viewModel.templateUseCases != nil {
+                    VStack(spacing: 0) {
+                        FCListRowDivider()
+                        FCActionRow(
+                            title: String(localized: "activeSession.action.saveAsTemplate"),
+                            note: viewModel.savedTemplateName.map {
+                                String(format: String(localized: "summary.savedTemplateFormat"), $0)
+                            }
+                        ) {
+                            isNamingTemplate = true
+                        }
+                        .accessibilityIdentifier(FCAccessibilityID.activeSessionSaveAsTemplate)
+                        FCListRowDivider()
+                    }
+                }
+
                 FCButton(title: String(localized: "summary.generateReport")) {
                     Task {
                         guard await viewModel.persistNotes() else { return }
@@ -119,6 +166,28 @@ struct SessionSummaryView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .task { await viewModel.load() }
+        .fcBottomSheet(isPresented: $isNamingTemplate) {
+            FCBottomSheet(
+                title: String(localized: "activeSession.action.saveAsTemplate"),
+                subtitle: String(localized: "summary.saveAsTemplateNote")
+            ) {
+                VStack(spacing: FCPrimitives.space3) {
+                    FCTextField(String(localized: "activeSession.saveAsTemplateNamePrompt"), text: $viewModel.templateName)
+                        .accessibilityIdentifier(FCAccessibilityID.activeSessionSaveAsTemplateName)
+                    FCButton(
+                        title: String(localized: "activeSession.saveAsTemplateConfirm"),
+                        isEnabled: !viewModel.templateName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                    ) {
+                        Task {
+                            if await viewModel.saveAsTemplate() {
+                                isNamingTemplate = false
+                            }
+                        }
+                    }
+                    .accessibilityIdentifier(FCAccessibilityID.activeSessionSaveAsTemplateConfirm)
+                }
+            }
+        }
         .accessibilityIdentifier(FCAccessibilityID.sessionSummaryRoot)
     }
 

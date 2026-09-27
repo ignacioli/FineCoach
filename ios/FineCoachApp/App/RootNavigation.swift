@@ -138,6 +138,7 @@ struct RootNavigation: View {
                                     studentID: StableUUID(studentID),
                                     useCases: environment.requireSessionUseCases(),
                                     templateUseCases: environment.templateUseCases,
+                                    studentUseCases: environment.requireUseCases(),
                                     path: $path
                                 )
                             case .exerciseLibrary:
@@ -146,6 +147,7 @@ struct RootNavigation: View {
                                 SessionSummaryView(
                                     sessionID: StableUUID(sessionID),
                                     useCases: environment.requireHistoryUseCases(),
+                                    templateUseCases: environment.templateUseCases,
                                     path: $path
                                 )
                             case .history(let studentID):

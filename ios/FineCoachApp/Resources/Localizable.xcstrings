@@ -6020,6 +6020,105 @@
           }
         }
       }
+    },
+    "session.action.addExerciseLink": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "＋ 添加动作"
+          }
+        }
+      }
+    },
+    "activeSession.action.createSectionLink": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "＋ 新建分区"
+          }
+        }
+      }
+    },
+    "session.add.tabLibrary": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动作库"
+          }
+        }
+      }
+    },
+    "session.add.tabTemplate": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从模板"
+          }
+        }
+      }
+    },
+    "session.clock.a11y": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已训练时间"
+          }
+        }
+      }
+    },
+    "applyTemplate.apply": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "应用"
+          }
+        }
+      }
+    },
+    "applyTemplate.note": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "应用后生成本次训练的独立副本，已完成的组不受影响。"
+          }
+        }
+      }
+    },
+    "summary.savedTemplateFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已保存「%@」"
+          }
+        }
+      }
+    },
+    "summary.saveAsTemplateNote": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "只保存动作和组的计划，不含备注与学员信息。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
