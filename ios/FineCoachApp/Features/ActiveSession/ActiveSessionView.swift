@@ -22,14 +22,15 @@ struct ActiveSessionView: View {
     private let sessionUseCases: ActiveSessionUseCases
     private let templateUseCases: TemplateUseCases?
     private let studentUseCases: StudentUseCases?
-    /// Estimated per-row height for the non-scrolling `List` embedded under
-    /// each Exercise (needed so native `.swipeActions` works -- that
-    /// modifier only has an effect inside a `List`, and a `List` nested in
-    /// a `ScrollView` must be given an explicit height). Scales with
-    /// Dynamic Type; deliberately generous so growing content is never
-    /// clipped -- worst case is a little extra blank space, verified by a
-    /// human on-device per this repo's UI acceptance rules, not by an
-    /// automated screenshot loop.
+    /// The per-Exercise sets live in a non-scrolling `List` (native
+    /// `.swipeActions` only works inside a `List`), and a `List` nested in a
+    /// `ScrollView` needs an explicit height. Each row reports its measured
+    /// height here (including an open set editor), and the list is sized to
+    /// their sum, so there is no blank gap after an edited set (owner
+    /// walkthrough 2026-09-27; the old fixed +460pt editor estimate left
+    /// one). The scaled values below are only the first-frame fallback for
+    /// a row not yet measured.
+    @State private var measuredSetRowHeights: [StableUUID: CGFloat] = [:]
     @ScaledMetric private var setRowHeight: CGFloat = 76
     @ScaledMetric private var setEditorExtraHeight: CGFloat = 460
 
@@ -452,15 +453,21 @@ struct ActiveSessionView: View {
                     .padding(.bottom, FCPrimitives.spacingSmall)
             }
         }
+        .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { height in
+            measuredSetRowHeights[trainingSet.id] = height
+        }
     }
 
-    /// See the `setRowHeight`/`setEditorExtraHeight` doc comment -- a
-    /// deliberately generous, Dynamic-Type-scaled estimate for the
-    /// non-scrolling per-Exercise sets `List`.
+    /// Sum of the measured row heights (see `measuredSetRowHeights`); a
+    /// row not measured yet falls back to the scaled estimate.
     private func setsListHeight(for exercise: SessionExercise) -> CGFloat {
-        let base = CGFloat(exercise.sets.count) * setRowHeight
-        let isEditingHere = exercise.sets.contains { $0.id == viewModel.editingSetID }
-        return base + (isEditingHere ? setEditorExtraHeight : 0)
+        exercise.sets.reduce(0) { total, trainingSet in
+            if let measured = measuredSetRowHeights[trainingSet.id] {
+                return total + measured
+            }
+            let isEditing = trainingSet.id == viewModel.editingSetID
+            return total + setRowHeight + (isEditing ? setEditorExtraHeight : 0)
+        }
     }
 
     private func rowState(_ state: SetRecordingState) -> FCSetRow.State {
