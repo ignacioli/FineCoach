@@ -177,6 +177,7 @@ public enum FCAccessibilityID {
     public static let detailBackup = "studentDetail.backup"
     public static let detailArchivedStatus = "studentDetail.archivedStatus"
     public static let detailCoursePackages = "studentDetail.coursePackages"
+    public static let detailNextClass = "studentDetail.nextClass"
     public static let detailBodyData = "studentDetail.bodyData"
     public static let detailTrends = "studentDetail.trends"
 

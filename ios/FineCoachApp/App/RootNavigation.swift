@@ -115,6 +115,9 @@ struct RootNavigation: View {
                                     studentID: StableUUID(id),
                                     useCases: environment.requireUseCases(),
                                     historyUseCases: environment.requireHistoryUseCases(),
+                                    appointmentUseCases: environment.requireAppointmentUseCases(),
+                                    creditLedgerUseCases: environment.creditLedgerUseCases,
+                                    calendar: environment.requireCalendar(),
                                     path: $path
                                 )
                             case .editor(let mode):

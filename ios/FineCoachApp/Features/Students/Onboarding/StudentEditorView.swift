@@ -8,8 +8,11 @@ final class StudentEditorViewModel: ObservableObject {
     @Published var saveError: String?
     @Published var isSaving = false
 
+    /// Loaded in edit mode; drives whether 归档学员 is offered.
+    @Published var lifecycle: StudentLifecycle?
+
     let mode: StudentEditorMode
-    private let useCases: StudentUseCases
+    let useCases: StudentUseCases
 
     init(mode: StudentEditorMode, useCases: StudentUseCases, existing: Student? = nil) {
         self.mode = mode
@@ -40,6 +43,7 @@ final class StudentEditorViewModel: ObservableObject {
             do {
                 let student = try await useCases.student(id: StableUUID(id))
                 draft = student.draft
+                lifecycle = student.lifecycle
             } catch {
                 saveError = (error as? LocalizedError)?.errorDescription ?? String(localized: "student.error.generic")
             }
@@ -78,6 +82,13 @@ final class StudentEditorViewModel: ObservableObject {
         }
     }
 
+    var editingStudentID: StableUUID? {
+        if case .edit(let id) = mode {
+            return StableUUID(id)
+        }
+        return nil
+    }
+
     func skipFirstCreate() async -> Bool {
         do {
             try await useCases.completeOnboarding()
@@ -89,150 +100,247 @@ final class StudentEditorViewModel: ObservableObject {
     }
 }
 
+private enum StudentManagementCover: String, Identifiable {
+    case archive
+    case delete
+
+    var id: String { rawValue }
+}
+
+/// 新建 / 编辑资料 (T069g; `27-edit-profile`): titleLarge, label–value rows
+/// with inline fields, sex chips (all four M1A-FR-003 options — the artwork
+/// draws only 男/女), pinned 保存. In edit mode a 管理 section carries
+/// 归档学员 and 永久删除 (moved here from the detail page, D6); both open the
+/// existing confirmation flows.
 struct StudentEditorView: View {
     @ObservedObject var viewModel: StudentEditorViewModel
     @Binding var path: [RootDestination]
     var onFinished: (Student?) -> Void
+    @State private var cover: StudentManagementCover?
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
-                Text(String(localized: "student.editor.kicker"))
-                    .foregroundStyle(FCSemanticColors.secondaryText)
-                fieldLabel(String(localized: "student.field.displayName"), required: true)
-                FCTextField(String(localized: "student.field.displayName"), text: $viewModel.draft.displayName)
-                    .accessibilityIdentifier(FCAccessibilityID.editorName)
-                if let nameError = viewModel.nameError {
-                    Text(nameError).foregroundStyle(FCSemanticColors.destructive)
-                }
-                Text(String(localized: "student.editor.duplicateHint"))
-                    .font(.footnote)
-                    .foregroundStyle(FCSemanticColors.secondaryText)
+            VStack(alignment: .leading, spacing: 0) {
+                Text(viewModel.title)
+                    .fcFont(.titleLarge)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
+                    .padding(.bottom, FCPrimitives.space4)
+                FCListRowDivider()
 
-                Text(String(localized: "student.field.sex"))
-                    .font(.headline)
-                sexChips
-                if let sexError = viewModel.sexError {
-                    Text(sexError).foregroundStyle(FCSemanticColors.destructive)
-                }
-
-                fieldLabel(String(localized: "student.field.trainingGoal"), required: false)
-                FCTextField(String(localized: "student.field.trainingGoal"), text: $viewModel.draft.trainingGoal)
-                    .accessibilityIdentifier(FCAccessibilityID.editorGoal)
-
-                fieldLabel(String(localized: "student.field.injuryNotes"), required: false)
-                TextField(
-                    String(localized: "student.field.injuryNotes"),
-                    text: $viewModel.draft.injuryNotes,
-                    axis: .vertical
+                fieldRow(
+                    String(localized: "student.editor.nameLabel"),
+                    placeholder: String(localized: "student.required"),
+                    text: $viewModel.draft.displayName,
+                    identifier: FCAccessibilityID.editorName
                 )
-                .lineLimit(3...6)
-                .frame(minHeight: 44)
-                .accessibilityIdentifier(FCAccessibilityID.editorInjuryNotes)
-                .accessibilityLabel(String(localized: "student.field.injuryNotes"))
+                errorText(viewModel.nameError)
+                FCListRowDivider()
 
-                fieldLabel(String(localized: "student.field.phone"), required: false)
-                FCTextField(String(localized: "student.field.phone"), text: $viewModel.draft.phone)
-                    .keyboardType(.phonePad)
-                    .textContentType(.none)
-                    .accessibilityIdentifier(FCAccessibilityID.editorPhone)
-                fieldLabel(String(localized: "student.field.wechat"), required: false)
-                FCTextField(String(localized: "student.field.wechat"), text: $viewModel.draft.wechatID)
-                    .textContentType(.none)
-                    .accessibilityIdentifier(FCAccessibilityID.editorWechat)
-                Text(String(localized: "student.editor.contactHint"))
-                    .font(.footnote)
-                    .foregroundStyle(FCSemanticColors.secondaryText)
-
-                fieldLabel(String(localized: "student.field.privateNote"), required: false)
-                FCTextField(String(localized: "student.field.privateNote"), text: $viewModel.draft.privateCoachNote)
-                    .accessibilityIdentifier(FCAccessibilityID.editorPrivateNote)
-
-                if let saveError = viewModel.saveError {
-                    Text(saveError).foregroundStyle(FCSemanticColors.destructive)
-                }
-
-                FCButton(
-                    title: String(localized: "student.editor.save"),
-                    isEnabled: !viewModel.isSaving
-                ) {
-                    Task {
-                        if let student = await viewModel.save() {
-                            onFinished(student)
-                            if !path.isEmpty {
-                                path.removeLast()
+                FCLabelValueRow(label: String(localized: "student.field.sex")) {
+                    FCFlowLayout(horizontalSpacing: FCPrimitives.space2, verticalSpacing: FCPrimitives.space2 - (44 - 30)) {
+                        ForEach([StudentSex.male, .female, .other, .undisclosed], id: \.self) { sex in
+                            FCFilterChip(title: StudentSexPresentation.title(sex), isSelected: viewModel.draft.sex == sex) {
+                                viewModel.draft.sex = sex
+                                viewModel.sexError = nil
                             }
+                            .accessibilityIdentifier(FCAccessibilityID.sexIdentifier(sex))
                         }
                     }
                 }
-                .accessibilityIdentifier(FCAccessibilityID.editorSave)
+                errorText(viewModel.sexError)
+                FCListRowDivider()
+
+                fieldRow(
+                    String(localized: "student.field.trainingGoal"),
+                    placeholder: String(localized: "student.optional"),
+                    text: $viewModel.draft.trainingGoal,
+                    identifier: FCAccessibilityID.editorGoal
+                )
+                FCListRowDivider()
+                fieldRow(
+                    String(localized: "student.field.phone"),
+                    placeholder: String(localized: "student.optional"),
+                    text: $viewModel.draft.phone,
+                    identifier: FCAccessibilityID.editorPhone,
+                    keyboard: .phonePad
+                )
+                FCListRowDivider()
+                fieldRow(
+                    String(localized: "student.field.wechat"),
+                    placeholder: String(localized: "student.optional"),
+                    text: $viewModel.draft.wechatID,
+                    identifier: FCAccessibilityID.editorWechat
+                )
+                FCListRowDivider()
+                fieldRow(
+                    String(localized: "student.field.privateNote"),
+                    placeholder: String(localized: "student.optional"),
+                    text: $viewModel.draft.privateCoachNote,
+                    identifier: FCAccessibilityID.editorPrivateNote,
+                    multiline: true
+                )
+                FCListRowDivider()
+                fieldRow(
+                    String(localized: "student.field.injuryNotes"),
+                    placeholder: String(localized: "student.optional"),
+                    text: $viewModel.draft.injuryNotes,
+                    identifier: FCAccessibilityID.editorInjuryNotes,
+                    multiline: true
+                )
+                FCListRowDivider()
+
+                Text(String(localized: "student.editor.contactHint"))
+                    .fcFont(.caption)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
+                    .padding(.top, FCPrimitives.space3)
+
+                errorText(viewModel.saveError)
+
+                if viewModel.editingStudentID != nil {
+                    managementSection
+                }
 
                 if viewModel.showsSkip {
-                    Button(String(localized: "student.editor.skip")) {
+                    FCLinkButton(title: String(localized: "student.editor.skip")) {
                         Task {
                             if await viewModel.skipFirstCreate() {
                                 onFinished(nil)
                             }
                         }
                     }
-                    .frame(minHeight: 44)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, FCPrimitives.space4)
                     .accessibilityIdentifier(FCAccessibilityID.editorSkip)
                 }
             }
-            .padding(FCPrimitives.spacingMedium)
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.bottom, FCPrimitives.space6)
+        }
+        .safeAreaInset(edge: .bottom) {
+            FCButton(
+                title: String(localized: "student.editor.save"),
+                isEnabled: !viewModel.isSaving
+            ) {
+                Task {
+                    if let student = await viewModel.save() {
+                        onFinished(student)
+                        if !path.isEmpty {
+                            path.removeLast()
+                        }
+                    }
+                }
+            }
+            .accessibilityIdentifier(FCAccessibilityID.editorSave)
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.vertical, FCPrimitives.space2)
+            .background(FCSemanticColors.surfacePage)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(viewModel.title)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarRole(.editor)
         .task { await viewModel.loadIfNeeded() }
         .accessibilityIdentifier(FCAccessibilityID.editorRoot)
-    }
-
-    private var sexChips: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
-            HStack(spacing: FCPrimitives.spacingSmall) {
-                sexChip(.male)
-                sexChip(.female)
-            }
-            HStack(spacing: FCPrimitives.spacingSmall) {
-                sexChip(.other)
-                sexChip(.undisclosed)
+        .fullScreenCover(item: $cover) { item in
+            if let studentID = viewModel.editingStudentID {
+                NavigationStack {
+                    if item == .archive {
+                        ArchiveStudentView(
+                            studentID: studentID,
+                            useCases: viewModel.useCases,
+                            onCancel: { cover = nil },
+                            onArchived: {
+                                cover = nil
+                                // Back to the detail page, which now shows the archived state.
+                                if !path.isEmpty {
+                                    path.removeLast()
+                                }
+                            }
+                        )
+                    } else {
+                        DeleteStudentFlow(
+                            studentID: studentID,
+                            useCases: viewModel.useCases,
+                            onFinish: { result in
+                                cover = nil
+                                switch result {
+                                case .cancelled:
+                                    break
+                                case .deleted:
+                                    path.removeAll()
+                                case .backup:
+                                    path.append(.backupRestore)
+                                case .continueTraining:
+                                    path.append(.activeSession(studentID.rawValue))
+                                }
+                            }
+                        )
+                    }
+                }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private func sexChip(_ sex: StudentSex) -> some View {
-        Button {
-            viewModel.draft.sex = sex
-            viewModel.sexError = nil
-        } label: {
-            HStack(spacing: 6) {
-                Image(systemName: StudentSexPresentation.symbolName(sex))
-                Text(StudentSexPresentation.title(sex))
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.8)
+    private var managementSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            FCSectionLabel(String(localized: "student.editor.management"))
+                .padding(.top, FCPrimitives.space6)
+                .padding(.bottom, FCPrimitives.space2)
+            FCListRowDivider()
+            if viewModel.lifecycle == .active {
+                FCActionRow(
+                    title: String(localized: "student.detail.archive"),
+                    note: String(localized: "student.editor.archiveNote")
+                ) {
+                    cover = .archive
+                }
+                .accessibilityIdentifier(FCAccessibilityID.detailArchive)
+                FCListRowDivider()
             }
-            .frame(maxWidth: .infinity, minHeight: 44)
-            .padding(.horizontal, 8)
-            .background(
-                viewModel.draft.sex == sex
-                    ? FCSemanticColors.primaryText.opacity(0.12)
-                    : FCSemanticColors.elevatedSurface
+            FCActionRow(
+                title: String(localized: "student.detail.delete"),
+                note: String(localized: "student.editor.deleteNote"),
+                role: .destructive
+            ) {
+                cover = .delete
+            }
+            .accessibilityIdentifier(FCAccessibilityID.detailDelete)
+            FCListRowDivider()
+        }
+    }
+
+    @ViewBuilder
+    private func errorText(_ message: String?) -> some View {
+        if let message {
+            Text(message)
+                .fcFont(.caption)
+                .foregroundStyle(FCSemanticColors.statusDestructive)
+                .padding(.bottom, FCPrimitives.space2)
+        }
+    }
+
+    private func fieldRow(
+        _ label: String,
+        placeholder: String,
+        text: Binding<String>,
+        identifier: String,
+        keyboard: UIKeyboardType = .default,
+        multiline: Bool = false
+    ) -> some View {
+        FCLabelValueRow(label: label) {
+            TextField(
+                "",
+                text: text,
+                prompt: Text(placeholder).fcFont(.body),
+                axis: multiline ? .vertical : .horizontal
             )
-            .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSmall))
-        }
-        .accessibilityIdentifier(FCAccessibilityID.sexIdentifier(sex))
-        .accessibilityLabel(StudentSexPresentation.title(sex))
-        .accessibilityAddTraits(viewModel.draft.sex == sex ? [.isSelected] : [])
-    }
-
-    private func fieldLabel(_ title: String, required: Bool) -> some View {
-        HStack {
-            Text(title).font(.headline)
-            Text(required ? String(localized: "student.required") : String(localized: "student.optional"))
-                .font(.footnote)
-                .foregroundStyle(FCSemanticColors.secondaryText)
+            .fcFont(.body)
+            .foregroundStyle(FCSemanticColors.textPrimary)
+            .keyboardType(keyboard)
+            .textContentType(.none)
+            .lineLimit(multiline ? 1...5 : 1...1)
+            .accessibilityLabel(Text(label))
+            .accessibilityIdentifier(identifier)
         }
     }
 }
