@@ -76,6 +76,7 @@
 		B913 /* FCListRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A913 /* FCListRow.swift */; };
 		B914 /* FCAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A914 /* FCAvatar.swift */; };
 		B915 /* FCHintBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A915 /* FCHintBar.swift */; };
+		B960 /* CourseActionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A960 /* CourseActionSheet.swift */; };
 		B958 /* ResourceHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A958 /* ResourceHubView.swift */; };
 		B957 /* FCSymbol.swift in Sources */ = {isa = PBXBuildFile; fileRef = A957 /* FCSymbol.swift */; };
 		B955 /* FCEquipmentIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = A955 /* FCEquipmentIcon.swift */; };
@@ -335,6 +336,7 @@
 		A913 /* FCListRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCListRow.swift; sourceTree = "<group>"; };
 		A914 /* FCAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCAvatar.swift; sourceTree = "<group>"; };
 		A915 /* FCHintBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCHintBar.swift; sourceTree = "<group>"; };
+		A960 /* CourseActionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CourseActionSheet.swift; sourceTree = "<group>"; };
 		A958 /* ResourceHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceHubView.swift; sourceTree = "<group>"; };
 		A957 /* FCSymbol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCSymbol.swift; sourceTree = "<group>"; };
 		A955 /* FCEquipmentIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCEquipmentIcon.swift; sourceTree = "<group>"; };
@@ -701,6 +703,7 @@
 			isa = PBXGroup;
 			children = (
 				A527 /* AppointmentEditorView.swift */,
+				A960 /* CourseActionSheet.swift */,
 			);
 			path = Appointments;
 			sourceTree = "<group>";
@@ -1652,6 +1655,7 @@
 				B127 /* HistoryUseCases.swift in Sources */,
 				B521 /* TodayOrderingPolicy.swift in Sources */,
 				B523 /* TodayView.swift in Sources */,
+				B960 /* CourseActionSheet.swift in Sources */,
 				B958 /* ResourceHubView.swift in Sources */,
 				B524 /* CalendarView.swift in Sources */,
 				B525 /* AppointmentEditorView.swift in Sources */,

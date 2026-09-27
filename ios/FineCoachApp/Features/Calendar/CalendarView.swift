@@ -12,10 +12,21 @@ final class CalendarViewModel: ObservableObject {
     private let studentUseCases: StudentUseCases
     private let calendar: Calendar
 
-    init(appointmentUseCases: AppointmentUseCases, studentUseCases: StudentUseCases, calendar: Calendar) {
+    let courseActions: CourseActions
+
+    init(
+        appointmentUseCases: AppointmentUseCases,
+        studentUseCases: StudentUseCases,
+        creditLedgerUseCases: CreditLedgerUseCases? = nil,
+        calendar: Calendar
+    ) {
         self.appointmentUseCases = appointmentUseCases
         self.studentUseCases = studentUseCases
         self.calendar = calendar
+        self.courseActions = CourseActions(
+            appointmentUseCases: appointmentUseCases,
+            creditLedgerUseCases: creditLedgerUseCases
+        )
         let today = appointmentUseCases.todayLocalDate()
         self.displayedMonthStart = (try? LocalDate(year: today.year, month: today.month, day: 1)) ?? today
         self.selectedDate = today
@@ -98,17 +109,27 @@ final class CalendarViewModel: ObservableObject {
     func displayName(for studentID: StableUUID) -> String {
         studentNames[studentID] ?? ""
     }
+
+    func present(_ message: String) {
+        errorMessage = message
+    }
 }
 
+/// 03 月历 (T069e; `25-calendar-v2`): title and month switcher on one row,
+/// Sunday-first grid of `FCCalendarDayCell` with has-appointment dots, the
+/// selected day's rows (time · 学员 · 部位, status, ›) opening the same D1
+/// course action sheet as 今日, and a pinned "＋ 添加课程安排" button.
 struct CalendarView: View {
     @StateObject private var viewModel: CalendarViewModel
     @Binding var path: [RootDestination]
+    @State private var sheetAppointment: Appointment?
 
     private static let weekdaySymbols = ["日", "一", "二", "三", "四", "五", "六"]
 
     init(
         appointmentUseCases: AppointmentUseCases,
         studentUseCases: StudentUseCases,
+        creditLedgerUseCases: CreditLedgerUseCases? = nil,
         calendar: Calendar,
         path: Binding<[RootDestination]>
     ) {
@@ -116,6 +137,7 @@ struct CalendarView: View {
             wrappedValue: CalendarViewModel(
                 appointmentUseCases: appointmentUseCases,
                 studentUseCases: studentUseCases,
+                creditLedgerUseCases: creditLedgerUseCases,
                 calendar: calendar
             )
         )
@@ -123,21 +145,38 @@ struct CalendarView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            ScrollView {
-                VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
-                    header
-                    weekdayHeaderRow
-                    monthGrid
-                    Divider()
-                    selectedDaySection
-                }
-                .padding(FCPrimitives.spacingMedium)
+        ScrollView {
+            VStack(alignment: .leading, spacing: FCPrimitives.space4) {
+                header
+                weekdayHeaderRow
+                monthGrid
+                FCListRowDivider()
+                selectedDaySection
             }
-            addButton
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.bottom, FCPrimitives.space6)
+        }
+        .safeAreaInset(edge: .bottom) {
+            FCButton(title: String(localized: "calendar.addAppointment")) {
+                path.append(.appointmentEditor(.create(studentID: nil, date: viewModel.selectedDate)))
+            }
+            .accessibilityIdentifier(FCAccessibilityID.calendarAdd)
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.vertical, FCPrimitives.space2)
+            .background(FCSemanticColors.surfacePage)
         }
         .background(FCSemanticColors.surfacePage)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarRole(.editor)
         .accessibilityIdentifier(FCAccessibilityID.calendarRoot)
+        .courseActionSheet(
+            appointment: $sheetAppointment,
+            path: $path,
+            actions: viewModel.courseActions,
+            studentName: { viewModel.displayName(for: $0) },
+            onChanged: { await viewModel.reload() },
+            onError: { viewModel.present($0) }
+        )
         .task { await viewModel.reload() }
         .onChange(of: viewModel.displayedMonthStart) { _, _ in
             Task { await viewModel.reload() }
@@ -148,10 +187,15 @@ struct CalendarView: View {
     }
 
     private var header: some View {
-        HStack {
+        HStack(alignment: .center, spacing: FCPrimitives.space2) {
             Text(String(localized: "calendar.title"))
-                .font(.title2.weight(.bold))
-            Spacer()
+                .fcFont(.titleLarge)
+                .foregroundStyle(FCSemanticColors.textPrimary)
+                .accessibilityAddTraits(.isHeader)
+            Spacer(minLength: FCPrimitives.space2)
+            Text(CalendarDatePresentation.yearMonth(viewModel.displayedMonthStart))
+                .fcFont(.headline)
+                .foregroundStyle(FCSemanticColors.textPrimary)
             Button {
                 viewModel.goToPreviousMonth()
             } label: {
@@ -159,12 +203,9 @@ struct CalendarView: View {
                     .frame(minWidth: 44, minHeight: 44)
                     .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
             .accessibilityLabel(Text("calendar.previousMonth"))
             .accessibilityIdentifier(FCAccessibilityID.calendarPreviousMonth)
-
-            Text(CalendarDatePresentation.yearMonth(viewModel.displayedMonthStart))
-                .font(.subheadline)
-
             Button {
                 viewModel.goToNextMonth()
             } label: {
@@ -172,27 +213,29 @@ struct CalendarView: View {
                     .frame(minWidth: 44, minHeight: 44)
                     .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
             .accessibilityLabel(Text("calendar.nextMonth"))
             .accessibilityIdentifier(FCAccessibilityID.calendarNextMonth)
         }
     }
 
     private var weekdayHeaderRow: some View {
-        HStack {
+        HStack(spacing: 0) {
             ForEach(Self.weekdaySymbols, id: \.self) { symbol in
                 Text(symbol)
-                    .font(.footnote)
-                    .foregroundStyle(FCSemanticColors.secondaryText)
+                    .fcFont(.sectionLabel)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
                     .frame(maxWidth: .infinity)
             }
         }
+        .accessibilityHidden(true)
     }
 
     private var monthGrid: some View {
-        let columns = Array(repeating: GridItem(.flexible()), count: 7)
-        return LazyVGrid(columns: columns, spacing: FCPrimitives.spacingSmall) {
+        let columns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 7)
+        return LazyVGrid(columns: columns, spacing: FCPrimitives.space2) {
             ForEach(-viewModel.leadingBlankCount..<0, id: \.self) { _ in
-                Color.clear.frame(height: 36)
+                Color.clear.frame(height: 44)
             }
             ForEach(1...viewModel.daysInDisplayedMonth, id: \.self) { day in
                 dayCell(day)
@@ -201,97 +244,75 @@ struct CalendarView: View {
     }
 
     private func dayCell(_ day: Int) -> some View {
-        let date = (try? LocalDate(year: viewModel.displayedMonthStart.year, month: viewModel.displayedMonthStart.month, day: day))
-        let isSelected = date == viewModel.selectedDate
+        let date = try? LocalDate(year: viewModel.displayedMonthStart.year, month: viewModel.displayedMonthStart.month, day: day)
         let hasAppointments = date.map { !(viewModel.appointmentsByDate[$0] ?? []).isEmpty } ?? false
-        return Button {
+        return FCCalendarDayCell(
+            day: day,
+            isSelected: date == viewModel.selectedDate,
+            hasAppointments: hasAppointments
+        ) {
             viewModel.selectDay(day)
-        } label: {
-            VStack(spacing: 2) {
-                Text("\(day)")
-                    .font(.subheadline.weight(isSelected ? .bold : .regular))
-                    .frame(width: 32, height: 32)
-                    .background(Circle().fill(isSelected ? FCSemanticColors.primaryText : Color.clear))
-                    .foregroundStyle(isSelected ? FCSemanticColors.surfacePage : FCSemanticColors.primaryText)
-                Circle()
-                    .fill(hasAppointments ? FCSemanticColors.actionPrimary : Color.clear)
-                    .frame(width: 4, height: 4)
-            }
-            .frame(maxWidth: .infinity, minHeight: 44)
         }
         .accessibilityIdentifier(FCAccessibilityID.calendarDay(day))
     }
 
     private var selectedDaySection: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
+        VStack(alignment: .leading, spacing: FCPrimitives.space2) {
             Text(CalendarDatePresentation.selectedDayTitle(viewModel.selectedDate))
-                .font(.headline)
+                .fcFont(.headline)
+                .foregroundStyle(FCSemanticColors.textPrimary)
 
             if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
-                    .foregroundStyle(FCSemanticColors.destructive)
+                    .fcFont(.caption)
+                    .foregroundStyle(FCSemanticColors.statusDestructive)
             }
 
             if viewModel.selectedDateAppointments.isEmpty {
                 Text(String(localized: "calendar.empty"))
-                    .foregroundStyle(FCSemanticColors.secondaryText)
+                    .fcFont(.callout, weight: .regular)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
             } else {
-                ForEach(viewModel.selectedDateAppointments, id: \.id) { appointment in
-                    appointmentRow(appointment)
-                    Divider()
+                VStack(spacing: 0) {
+                    ForEach(viewModel.selectedDateAppointments, id: \.id) { appointment in
+                        appointmentRow(appointment)
+                        FCListRowDivider()
+                    }
                 }
             }
         }
     }
 
-    @ViewBuilder
+    /// Whole row tappable for a scheduled appointment → D1 sheet (D5).
     private func appointmentRow(_ appointment: Appointment) -> some View {
-        if appointment.status == .scheduled {
-            // T077: the edit entry (仅本次 / 本次及以后 for series members).
-            // T069e replaces this target with the D1 course action sheet.
-            Button {
-                path.append(.appointmentEditor(.edit(appointment.id.rawValue)))
-            } label: {
-                appointmentRowContent(appointment, showsDisclosure: true)
+        let isActionable = appointment.status == .scheduled
+        return Button {
+            if isActionable {
+                sheetAppointment = appointment
             }
-            .buttonStyle(.plain)
-        } else {
-            appointmentRowContent(appointment, showsDisclosure: false)
-        }
-    }
-
-    private func appointmentRowContent(_ appointment: Appointment, showsDisclosure: Bool) -> some View {
-        HStack(alignment: .top) {
-            Text(appointment.startTime.canonicalString)
-                .font(.headline)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(viewModel.displayName(for: appointment.studentID))
-                    .font(.subheadline)
-            }
-            Spacer()
-            Text(TodayRowStatusPresentation.title(for: TodayOrderedAppointment(appointment: appointment, section: .remainingToday)))
-                .font(.footnote)
-                .foregroundStyle(FCSemanticColors.secondaryText)
-            if showsDisclosure {
-                FCSymbol(.forward)
-            }
-        }
-        .frame(minHeight: 44)
-        .contentShape(Rectangle())
-        .accessibilityIdentifier(FCAccessibilityID.calendarAppointmentRow(appointment.id))
-    }
-
-    private var addButton: some View {
-        Button {
-            path.append(.appointmentEditor(.create(studentID: nil, date: viewModel.selectedDate)))
         } label: {
-            Text(String(localized: "calendar.addAppointment"))
-                .frame(maxWidth: .infinity, minHeight: 44)
+            HStack(spacing: FCPrimitives.space3) {
+                Text(appointment.startTime.canonicalString)
+                    .fcFont(.callout, weight: .semibold)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                Text(TodayRowPresentation.nameAndFocus(viewModel.displayName(for: appointment.studentID), appointment.trainingFocus))
+                    .fcFont(.body)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                    .lineLimit(1)
+                Spacer(minLength: FCPrimitives.space2)
+                Text(TodayRowStatusPresentation.title(for: TodayOrderedAppointment(appointment: appointment, section: .remainingToday)))
+                    .fcFont(.caption)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
+                if isActionable {
+                    FCSymbol(.forward)
+                }
+            }
+            .frame(minHeight: 52)
+            .contentShape(Rectangle())
         }
-        .padding(FCPrimitives.spacingMedium)
-        .background(FCSemanticColors.primaryText)
-        .foregroundStyle(FCSemanticColors.surfacePage)
-        .accessibilityIdentifier(FCAccessibilityID.calendarAdd)
+        .buttonStyle(.plain)
+        .disabled(!isActionable)
+        .accessibilityIdentifier(FCAccessibilityID.calendarAppointmentRow(appointment.id))
     }
 }
 
@@ -307,7 +328,7 @@ enum CalendarDatePresentation {
         let formatter = DateFormatter()
         formatter.calendar = calendar
         formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateFormat = "M月d日 · EEEE"
+        formatter.dateFormat = "M月d日 · EEE"
         return formatter.string(from: instant)
     }
 }

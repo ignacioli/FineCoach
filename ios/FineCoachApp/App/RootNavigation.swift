@@ -182,6 +182,7 @@ struct RootNavigation: View {
                                 CalendarView(
                                     appointmentUseCases: environment.requireAppointmentUseCases(),
                                     studentUseCases: environment.requireUseCases(),
+                                    creditLedgerUseCases: environment.creditLedgerUseCases,
                                     calendar: environment.requireCalendar(),
                                     path: $path
                                 )

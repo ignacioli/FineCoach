@@ -23,7 +23,13 @@ final class TodayViewModel: ObservableObject {
         self.studentUseCases = studentUseCases
         self.creditLedgerUseCases = creditLedgerUseCases
         self.todayDate = appointmentUseCases.todayLocalDate()
+        self.courseActions = CourseActions(
+            appointmentUseCases: appointmentUseCases,
+            creditLedgerUseCases: creditLedgerUseCases
+        )
     }
+
+    let courseActions: CourseActions
 
     let todayDate: LocalDate
 
@@ -69,50 +75,8 @@ final class TodayViewModel: ObservableObject {
         }
     }
 
-    @discardableResult
-    func startTraining(appointmentID: StableUUID) async -> StableUUID? {
-        do {
-            let session = try await appointmentUseCases.startTraining(appointmentID: appointmentID)
-            await reload()
-            return session.studentID
-        } catch {
-            errorMessage = String(localized: "today.error.generic")
-            return nil
-        }
-    }
-
-    func cancel(appointmentID: StableUUID) async {
-        do {
-            _ = try await appointmentUseCases.cancel(appointmentID: appointmentID, reason: nil)
-            await reload()
-        } catch {
-            errorMessage = String(localized: "today.error.generic")
-        }
-    }
-
-    func markAbsent(appointmentID: StableUUID, creditChoice: AbsentCreditChoice) async {
-        do {
-            let updated = try await appointmentUseCases.markAbsent(
-                appointmentID: appointmentID,
-                creditChoice: creditChoice
-            )
-            // M1B-FR-014: absence handling is never blocked by the credit ledger --
-            // if there is no active package (or the ledger write itself fails), the
-            // absence status change above still stands; this is a best-effort
-            // side effect, not a precondition of markAbsent succeeding.
-            if creditChoice == .charged, let creditLedgerUseCases {
-                if let activePackage = try? await creditLedgerUseCases.activePackage(studentID: updated.studentID) {
-                    _ = try? await creditLedgerUseCases.applyAbsence(
-                        packageID: activePackage.id,
-                        appointmentID: appointmentID,
-                        creditChoice: creditChoice
-                    )
-                }
-            }
-            await reload()
-        } catch {
-            errorMessage = String(localized: "today.error.generic")
-        }
+    func present(_ message: String) {
+        errorMessage = message
     }
 }
 
@@ -145,8 +109,6 @@ struct TodayView: View {
     @Binding var rootTab: RootTab
     @Binding var path: [RootDestination]
     @State private var sheetAppointment: Appointment?
-    @State private var isChoosingAbsence = false
-    @State private var isConfirmingCancel = false
 
     init(
         appointmentUseCases: AppointmentUseCases,
@@ -194,28 +156,14 @@ struct TodayView: View {
         .background(FCSemanticColors.surfacePage)
         .toolbar(.hidden, for: .navigationBar)
         .accessibilityIdentifier(FCAccessibilityID.todayRoot)
-        .fcBottomSheet(isPresented: sheetPresented) {
-            if let appointment = sheetAppointment {
-                courseSheet(appointment)
-            }
-        }
-        .fcConfirmationDialog(isPresented: $isConfirmingCancel) {
-            FCConfirmationDialog(
-                title: String(localized: "today.cancelConfirm.title"),
-                message: String(localized: "today.cancelConfirm.message"),
-                cancelAction: .init(title: String(localized: "today.cancelConfirm.keep")) {
-                    isConfirmingCancel = false
-                },
-                confirmAction: .init(title: String(localized: "today.cancelConfirm.confirm")) {
-                    let appointment = sheetAppointment
-                    isConfirmingCancel = false
-                    closeSheet()
-                    if let appointment {
-                        Task { await viewModel.cancel(appointmentID: appointment.id) }
-                    }
-                }
-            )
-        }
+        .courseActionSheet(
+            appointment: $sheetAppointment,
+            path: $path,
+            actions: viewModel.courseActions,
+            studentName: { viewModel.displayName(for: $0) },
+            onChanged: { await viewModel.reload() },
+            onError: { viewModel.present($0) }
+        )
         .task { await viewModel.reload() }
         .onChange(of: path) { _, _ in
             Task { await viewModel.reload() }
@@ -395,125 +343,9 @@ struct TodayView: View {
         .accessibilityIdentifier(FCAccessibilityID.todayRow(appointment.id))
     }
 
-    // MARK: Course action sheet (D1)
-
-    private var sheetPresented: Binding<Bool> {
-        Binding(
-            get: { sheetAppointment != nil && !isConfirmingCancel },
-            set: { if !$0 { closeSheet() } }
-        )
-    }
-
     private func openSheet(_ appointment: Appointment) {
         guard appointment.status == .scheduled else { return }
-        isChoosingAbsence = false
         sheetAppointment = appointment
-    }
-
-    private func closeSheet() {
-        sheetAppointment = nil
-        isChoosingAbsence = false
-    }
-
-    private func courseSheet(_ appointment: Appointment) -> some View {
-        FCBottomSheet(
-            title: String(
-                format: String(localized: "today.sheet.titleFormat"),
-                appointment.startTime.canonicalString,
-                appointment.durationMinutes
-            ),
-            titleStyle: .title,
-            subtitle: TodayRowPresentation.nameAndFocus(viewModel.displayName(for: appointment.studentID), appointment.trainingFocus),
-            accessory: {
-                Text(String(localized: "today.status.pending"))
-                    .fcFont(.caption)
-                    .foregroundStyle(FCSemanticColors.textSecondary)
-            }
-        ) {
-            if isChoosingAbsence {
-                absenceChoices(appointment)
-            } else {
-                courseActions(appointment)
-            }
-        }
-    }
-
-    private func courseActions(_ appointment: Appointment) -> some View {
-        VStack(spacing: 0) {
-            FCButton(title: String(localized: "today.action.start")) {
-                closeSheet()
-                Task {
-                    if let studentID = await viewModel.startTraining(appointmentID: appointment.id) {
-                        path.append(.activeSession(studentID.rawValue))
-                    }
-                }
-            }
-            .padding(.bottom, FCPrimitives.space2)
-            FCActionRow(
-                title: String(localized: "today.action.markAbsent"),
-                note: String(localized: "today.sheet.absentNote")
-            ) {
-                isChoosingAbsence = true
-            }
-            FCListRowDivider()
-            FCActionRow(title: String(localized: "today.action.edit")) {
-                closeSheet()
-                path.append(.appointmentEditor(.edit(appointment.id.rawValue)))
-            }
-            FCListRowDivider()
-            FCActionRow(
-                title: String(localized: "today.action.cancelThis"),
-                note: String(localized: "today.sheet.cancelNote"),
-                role: .destructive
-            ) {
-                isConfirmingCancel = true
-            }
-        }
-    }
-
-    /// "标记缺席" second step: 不扣课 listed first as the no-consequence
-    /// default; 扣课 is the deliberate second choice.
-    private func absenceChoices(_ appointment: Appointment) -> some View {
-        VStack(spacing: 0) {
-            FCSectionLabel(String(localized: "today.action.markAbsent"))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.bottom, FCPrimitives.space2)
-            FCListRowDivider()
-            FCActionRow(title: String(localized: "today.action.markAbsentNotCharged")) {
-                closeSheet()
-                Task { await viewModel.markAbsent(appointmentID: appointment.id, creditChoice: .notCharged) }
-            }
-            FCListRowDivider()
-            FCActionRow(title: String(localized: "today.action.markAbsentCharged")) {
-                closeSheet()
-                Task { await viewModel.markAbsent(appointmentID: appointment.id, creditChoice: .charged) }
-            }
-            FCListRowDivider()
-            FCLinkButton(title: String(localized: "today.sheet.back")) {
-                isChoosingAbsence = false
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.top, FCPrimitives.space2)
-        }
-    }
-}
-
-enum TodayRowPresentation {
-    /// "张伟 · 大腿、臀", or just the name when no focus is set.
-    static func nameAndFocus(_ name: String, _ focus: Set<BodyPart>) -> String {
-        guard let parts = BodyPart.joinedDisplayNames(for: focus, separator: "、") else {
-            return name
-        }
-        return "\(name) · \(parts)"
-    }
-
-    /// "60 分钟 · 大腿、臀"
-    static func durationAndFocus(_ appointment: Appointment) -> String {
-        let duration = String(format: String(localized: "today.durationFormat"), appointment.durationMinutes)
-        guard let parts = BodyPart.joinedDisplayNames(for: appointment.trainingFocus, separator: "、") else {
-            return duration
-        }
-        return "\(duration) · \(parts)"
     }
 }
 
