@@ -47,6 +47,18 @@ final class TemplateEditorViewModel: ObservableObject {
         }
     }
 
+    /// T069c moved 删除模板 here from the list (05 artwork has no inline
+    /// delete); guarded by an FCConfirmationDialog in the view.
+    func deleteTemplate() async -> Bool {
+        do {
+            try await useCases.deleteTemplate(id: templateID)
+            return true
+        } catch {
+            present(error)
+            return false
+        }
+    }
+
     func rename(_ name: String) async {
         do {
             template = try await useCases.renameTemplate(id: templateID, name: name)
@@ -148,6 +160,9 @@ struct TemplateEditorView: View {
     @State private var name = ""
     @State private var trainingFocus: Set<BodyPart> = []
 
+    @Environment(\.dismiss) private var dismiss
+    @State private var isConfirmingDelete = false
+
     init(templateID: StableUUID, useCases: TemplateUseCases) {
         _viewModel = StateObject(wrappedValue: TemplateEditorViewModel(templateID: templateID, useCases: useCases))
     }
@@ -193,6 +208,12 @@ struct TemplateEditorView: View {
                     Task { await viewModel.createSection() }
                 }
                 .accessibilityIdentifier(FCAccessibilityID.templateEditorCreateSection)
+
+                FCListRowDivider()
+                FCActionRow(title: String(localized: "templateEditor.deleteTemplate"), role: .destructive) {
+                    isConfirmingDelete = true
+                }
+                .accessibilityIdentifier(FCAccessibilityID.templateListDelete)
             }
             .padding(FCPrimitives.spacingMedium)
         }
@@ -200,6 +221,23 @@ struct TemplateEditorView: View {
         .navigationTitle(String(localized: "templateEditor.title"))
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier(FCAccessibilityID.templateEditorRoot)
+        .fcConfirmationDialog(isPresented: $isConfirmingDelete) {
+            FCConfirmationDialog(
+                title: String(localized: "templateEditor.deleteTemplate.title"),
+                message: String(localized: "templateEditor.deleteTemplate.message"),
+                cancelAction: .init(title: String(localized: "templateEditor.deleteTemplate.keep")) {
+                    isConfirmingDelete = false
+                },
+                confirmAction: .init(title: String(localized: "templateEditor.deleteTemplate.confirm")) {
+                    isConfirmingDelete = false
+                    Task {
+                        if await viewModel.deleteTemplate() {
+                            dismiss()
+                        }
+                    }
+                }
+            )
+        }
         .task {
             await viewModel.reload()
             name = viewModel.template?.name.value ?? name

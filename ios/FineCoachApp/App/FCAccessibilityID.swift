@@ -242,6 +242,7 @@ public enum FCAccessibilityID {
     public static let exerciseLibrarySearch = "exerciseLibrary.search"
     public static let exerciseLibraryAddCustom = "exerciseLibrary.addCustom"
     public static let exerciseLibraryShowHidden = "exerciseLibrary.showHidden"
+    public static let exerciseLibraryFilter = "exerciseLibrary.filter"
     public static let exerciseLibraryConflict = "exerciseLibrary.conflict"
     public static let exerciseLibraryMuscleAll = "exerciseLibrary.muscle.all"
     public static let exerciseLibraryEquipmentAll = "exerciseLibrary.equipment.all"

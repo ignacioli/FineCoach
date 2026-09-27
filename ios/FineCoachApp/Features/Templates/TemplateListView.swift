@@ -61,9 +61,14 @@ final class TemplateListViewModel: ObservableObject {
     }
 }
 
+/// 训练模板 (T069c; `05-training-template`): titleLarge + note, rows
+/// (name, "训练重点 · 部位 · N 个动作" or "未设重点 · …", ›), pinned
+/// "＋ 新建模板" which asks for the name in a bottom sheet. Deleting a
+/// template now lives in the template editor.
 struct TemplateListView: View {
     @StateObject private var viewModel: TemplateListViewModel
     @Binding var path: [RootDestination]
+    @State private var isNamingNewTemplate = false
 
     init(useCases: TemplateUseCases, path: Binding<[RootDestination]>) {
         _viewModel = StateObject(wrappedValue: TemplateListViewModel(useCases: useCases))
@@ -72,37 +77,68 @@ struct TemplateListView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+            VStack(alignment: .leading, spacing: FCPrimitives.space4) {
+                Text(String(localized: "templates.title"))
+                    .fcFont(.titleLarge)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
+                Text(String(localized: "templates.note"))
+                    .fcFont(.callout, weight: .regular)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
+
                 if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage).foregroundStyle(FCSemanticColors.destructive)
-                }
-
-                FCTextField(String(localized: "templates.newTemplateNamePrompt"), text: $viewModel.newTemplateName)
-                    .accessibilityIdentifier(FCAccessibilityID.templateListAdd)
-
-                FCButton(title: String(localized: "templates.newTemplate")) {
-                    Task {
-                        if let id = await viewModel.createBlankTemplate() {
-                            path.append(.templateEditor(id.rawValue))
-                        }
-                    }
+                    Text(errorMessage)
+                        .fcFont(.caption)
+                        .foregroundStyle(FCSemanticColors.statusDestructive)
                 }
 
                 if viewModel.templates.isEmpty {
                     Text(String(localized: "templates.empty"))
-                        .foregroundStyle(FCSemanticColors.secondaryText)
+                        .fcFont(.callout, weight: .regular)
+                        .foregroundStyle(FCSemanticColors.textSecondary)
                 } else {
-                    ForEach(viewModel.templates) { template in
-                        templateRow(template)
+                    VStack(spacing: FCPrimitives.space1) {
+                        ForEach(viewModel.templates) { template in
+                            templateRow(template)
+                            FCListRowDivider()
+                        }
                     }
                 }
             }
-            .padding(FCPrimitives.spacingMedium)
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.bottom, FCPrimitives.space6)
+        }
+        .safeAreaInset(edge: .bottom) {
+            FCButton(title: String(localized: "templates.newTemplateButton")) {
+                isNamingNewTemplate = true
+            }
+            .accessibilityIdentifier(FCAccessibilityID.templateListAdd)
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.vertical, FCPrimitives.space2)
+            .background(FCSemanticColors.surfacePage)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(String(localized: "templates.title"))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarRole(.editor)
         .accessibilityIdentifier(FCAccessibilityID.templateListRoot)
+        .fcBottomSheet(isPresented: $isNamingNewTemplate) {
+            FCBottomSheet(title: String(localized: "templates.newTemplate")) {
+                VStack(spacing: FCPrimitives.space3) {
+                    FCTextField(String(localized: "templates.newTemplateNamePrompt"), text: $viewModel.newTemplateName)
+                    FCButton(
+                        title: String(localized: "templates.create"),
+                        isEnabled: !viewModel.newTemplateName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                    ) {
+                        Task {
+                            if let id = await viewModel.createBlankTemplate() {
+                                isNamingNewTemplate = false
+                                path.append(.templateEditor(id.rawValue))
+                            }
+                        }
+                    }
+                }
+            }
+        }
         .task { await viewModel.reload() }
         .onChange(of: path) { _, _ in
             Task { await viewModel.reload() }
@@ -110,42 +146,36 @@ struct TemplateListView: View {
     }
 
     private func templateRow(_ template: TrainingTemplate) -> some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
-            Button {
-                path.append(.templateEditor(template.id.rawValue))
-            } label: {
-                VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
+        Button {
+            path.append(.templateEditor(template.id.rawValue))
+        } label: {
+            HStack(spacing: FCPrimitives.space2) {
+                VStack(alignment: .leading, spacing: FCPrimitives.space1) {
                     Text(template.name.value)
-                        .font(.headline)
-                        .foregroundStyle(FCSemanticColors.primaryText)
-                    if let focus = BodyPart.joinedDisplayNames(for: template.trainingFocus) {
-                        Text(focus)
-                            .foregroundStyle(FCSemanticColors.secondaryText)
-                    }
-                    Text(
-                        String(
-                            format: String(localized: "templates.exerciseCount"),
-                            viewModel.exerciseCounts[template.id] ?? 0
-                        )
-                    )
-                    .font(.caption)
-                    .foregroundStyle(FCSemanticColors.secondaryText)
+                        .fcFont(.headline)
+                        .foregroundStyle(FCSemanticColors.textPrimary)
+                    Text(TemplateListPresentation.subtitle(
+                        focus: template.trainingFocus,
+                        exerciseCount: viewModel.exerciseCounts[template.id] ?? 0
+                    ))
+                    .fcFont(.caption)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                Spacer(minLength: FCPrimitives.space2)
+                FCSymbol(.forward)
             }
-            .buttonStyle(.plain)
-
-            Button(String(localized: "templates.delete")) {
-                Task { await viewModel.deleteTemplate(template.id) }
-            }
-            .frame(minHeight: 44)
-            .foregroundStyle(FCSemanticColors.destructive)
-            .accessibilityIdentifier(FCAccessibilityID.templateListDelete)
+            .padding(.vertical, FCPrimitives.space3)
+            .contentShape(Rectangle())
         }
-        .padding(FCPrimitives.spacingMedium)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(FCSemanticColors.elevatedSurface)
-        .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusMedium))
+        .buttonStyle(.plain)
         .accessibilityIdentifier(FCAccessibilityID.templateRow(template.id))
+    }
+}
+
+enum TemplateListPresentation {
+    /// "训练重点 · 胸、肩 · 6 个动作" / "未设重点 · 4 个动作"
+    static func subtitle(focus: Set<BodyPart>, exerciseCount: Int) -> String {
+        let count = String(format: String(localized: "templates.exerciseCount"), exerciseCount)
+        return "\(StudentListPresentation.focus(focus)) · \(count)"
     }
 }

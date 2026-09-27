@@ -254,6 +254,8 @@ public struct ExerciseLibraryEntry: Hashable, Codable, Sendable, Identifiable {
     public let preference: ExercisePreference?
     public let primaryMuscleGroup: String?
     public let equipmentClass: String?
+    /// Catalog secondary parts ("次要：肩、臂", 20 artwork); empty for custom.
+    public let secondaryMuscleGroups: [String]
 
     public var id: StableExerciseID { item.id }
 
@@ -268,22 +270,26 @@ public struct ExerciseLibraryEntry: Hashable, Codable, Sendable, Identifiable {
         item: ExerciseCatalogItem,
         preference: ExercisePreference?,
         primaryMuscleGroup: String? = nil,
-        equipmentClass: String? = nil
+        equipmentClass: String? = nil,
+        secondaryMuscleGroups: [String] = []
     ) {
         self.item = item
         self.preference = preference
         self.primaryMuscleGroup = primaryMuscleGroup
         self.equipmentClass = equipmentClass
+        self.secondaryMuscleGroups = secondaryMuscleGroups
     }
 }
 
 public struct ExerciseCatalogBrowseFacet: Hashable, Sendable {
     public let primaryMuscleGroup: String
     public let equipmentClass: String
+    public let secondaryMuscleGroups: [String]
 
-    public init(primaryMuscleGroup: String, equipmentClass: String) {
+    public init(primaryMuscleGroup: String, equipmentClass: String, secondaryMuscleGroups: [String] = []) {
         self.primaryMuscleGroup = primaryMuscleGroup
         self.equipmentClass = equipmentClass
+        self.secondaryMuscleGroups = secondaryMuscleGroups
     }
 }
 

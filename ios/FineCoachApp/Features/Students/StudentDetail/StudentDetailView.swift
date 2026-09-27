@@ -124,11 +124,6 @@ struct StudentDetailView: View {
                     }
                     .accessibilityIdentifier(FCAccessibilityID.detailDelete)
 
-                    FCButton(title: String(localized: "student.detail.backup")) {
-                        path.append(.backupRestore)
-                    }
-                    .accessibilityIdentifier(FCAccessibilityID.detailBackup)
-
                     FCButton(title: String(localized: "student.detail.coursePackages")) {
                         path.append(.coursePackages(student.id.rawValue))
                     }

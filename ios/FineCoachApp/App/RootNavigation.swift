@@ -99,7 +99,11 @@ struct RootNavigation: View {
                         .navigationDestination(for: RootDestination.self) { destination in
                             switch destination {
                             case .resourceHub:
-                                ResourceHubView(path: $path)
+                                ResourceHubView(
+                                    exerciseUseCases: environment.requireExerciseUseCases(),
+                                    templateUseCases: environment.requireTemplateUseCases(),
+                                    path: $path
+                                )
                             case .archivedList:
                                 StudentListView(
                                     useCases: environment.requireUseCases(),

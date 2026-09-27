@@ -54,7 +54,8 @@ public struct CoreDataExerciseRepository: Sendable {
                         item: item,
                         preference: preference,
                         primaryMuscleGroup: item.kind == .builtIn ? facet?.primaryMuscleGroup : nil,
-                        equipmentClass: item.kind == .builtIn ? facet?.equipmentClass : nil
+                        equipmentClass: item.kind == .builtIn ? facet?.equipmentClass : nil,
+                        secondaryMuscleGroups: item.kind == .builtIn ? facet?.secondaryMuscleGroups ?? [] : []
                     )
                 )
             }

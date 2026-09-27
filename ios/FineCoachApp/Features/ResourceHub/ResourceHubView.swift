@@ -2,9 +2,14 @@ import SwiftUI
 
 /// 资料库 (D2, `19-resource-hub`): the coach's own material, not tied to a
 /// student — 动作库, 训练模板, 备份与恢复. Reached from the 学员 title row
-/// (T069b); T069c adds the per-row counts and restyles the pages behind it.
+/// (T069b); counts added in T069c. No last-backup date is recorded
+/// anywhere, so the backup row has no subtitle rather than an invented one.
 struct ResourceHubView: View {
+    let exerciseUseCases: ExerciseLibraryUseCases
+    let templateUseCases: TemplateUseCases
     @Binding var path: [RootDestination]
+    @State private var exerciseSummary: String?
+    @State private var templateSummary: String?
 
     var body: some View {
         ScrollView {
@@ -18,6 +23,7 @@ struct ResourceHubView: View {
                     FCListRowDivider()
                     hubRow(
                         title: String(localized: "exercise.library.entry"),
+                        subtitle: exerciseSummary,
                         icon: FCEquipmentIconView(.barbell),
                         identifier: FCAccessibilityID.exerciseLibraryEntry
                     ) {
@@ -26,6 +32,7 @@ struct ResourceHubView: View {
                     FCListRowDivider()
                     hubRow(
                         title: String(localized: "resourceHub.templates"),
+                        subtitle: templateSummary,
                         icon: hubSymbol("list.bullet.rectangle"),
                         identifier: FCAccessibilityID.templatesEntry
                     ) {
@@ -34,6 +41,7 @@ struct ResourceHubView: View {
                     FCListRowDivider()
                     hubRow(
                         title: String(localized: "backup.title"),
+                        subtitle: nil,
                         icon: hubSymbol("externaldrive"),
                         identifier: FCAccessibilityID.resourceHubBackup
                     ) {
@@ -52,6 +60,21 @@ struct ResourceHubView: View {
         .background(FCSemanticColors.surfacePage)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarRole(.editor)
+        .task { await loadSummaries() }
+    }
+
+    private func loadSummaries() async {
+        if let entries = try? await exerciseUseCases.search(query: "", includeHidden: true) {
+            let custom = entries.filter { $0.item.kind == .custom }.count
+            exerciseSummary = String(
+                format: String(localized: "resourceHub.exerciseCountFormat"),
+                entries.count - custom,
+                custom
+            )
+        }
+        if let templates = try? await templateUseCases.templates() {
+            templateSummary = String(format: String(localized: "resourceHub.templateCountFormat"), templates.count)
+        }
     }
 
     private func hubSymbol(_ name: String) -> some View {
@@ -65,6 +88,7 @@ struct ResourceHubView: View {
 
     private func hubRow<Icon: View>(
         title: String,
+        subtitle: String?,
         icon: Icon,
         identifier: String,
         action: @escaping () -> Void
@@ -72,9 +96,16 @@ struct ResourceHubView: View {
         Button(action: action) {
             HStack(spacing: FCPrimitives.space4) {
                 icon
-                Text(title)
-                    .fcFont(.headline)
-                    .foregroundStyle(FCSemanticColors.textPrimary)
+                VStack(alignment: .leading, spacing: FCPrimitives.space1) {
+                    Text(title)
+                        .fcFont(.headline)
+                        .foregroundStyle(FCSemanticColors.textPrimary)
+                    if let subtitle {
+                        Text(subtitle)
+                            .fcFont(.caption)
+                            .foregroundStyle(FCSemanticColors.textSecondary)
+                    }
+                }
                 Spacer(minLength: FCPrimitives.space2)
                 FCSymbol(.forward)
             }

@@ -80,6 +80,25 @@ final class TrainedBodyPartsSummaryTests: XCTestCase {
         XCTAssertEqual(unmapped, [], "catalog labels with no BodyPart: \(unmapped.sorted())")
     }
 
+    /// T069c: catalog facets carry the JSON's secondary parts (used by the
+    /// library row "次要：…" and, later, the share-preview diagram).
+    func testCatalogFacetsCarryBundledSecondaryMuscleGroups() throws {
+        let url = try XCTUnwrap(
+            Bundle.main.url(forResource: "provenance", withExtension: "json")
+                ?? Bundle.main.url(forResource: "provenance", withExtension: "json", subdirectory: "ExerciseCatalog")
+        )
+        let root = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any])
+        let exercises = try XCTUnwrap(root["exercises"] as? [[String: Any]])
+        let facets = PlaceholderExerciseCatalogLoader.facetsByID()
+        var checked = 0
+        for exercise in exercises {
+            guard let id = exercise["id"] as? String, let facet = facets[id] else { continue }
+            XCTAssertEqual(facet.secondaryMuscleGroups, exercise["secondaryMuscleGroups"] as? [String] ?? [], id)
+            checked += 1
+        }
+        XCTAssertGreaterThan(checked, 0)
+    }
+
     /// §9.1: front shows shoulders/arms/chest/core/thighs/calves, back shows
     /// shoulders/arms/back/glutes/thighs/calves; together all 8 parts.
     func testDiagramGeometryCoversEachPartOnTheDocumentedSide() {
