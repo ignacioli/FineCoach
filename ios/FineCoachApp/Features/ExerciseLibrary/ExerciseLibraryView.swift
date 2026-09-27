@@ -199,6 +199,10 @@ struct ExerciseLibraryView: View {
 
     private func row(for entry: ExerciseLibraryEntry) -> some View {
         HStack(spacing: FCPrimitives.spacingSmall) {
+            // T065 / §7.1: decorative; no placeholder when there is no icon.
+            if let icon = FCEquipmentIcon.icon(equipmentClass: entry.equipmentClass, primaryMuscleGroup: entry.primaryMuscleGroup) {
+                FCEquipmentIconView(icon)
+            }
             if entry.item.kind == .custom {
                 Button {
                     editorRoute = .edit(entry.item)

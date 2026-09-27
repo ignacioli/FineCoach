@@ -173,7 +173,12 @@ struct ActiveSessionView: View {
             Button {
                 viewModel.selectExercise(exercise.id)
             } label: {
-                HStack {
+                HStack(spacing: FCPrimitives.space2) {
+                    // T065 / §7.1: 24×24, name starts 8pt after it; none for
+                    // custom exercises or unmapped equipment.
+                    if let icon = exercise.sourceID.flatMap({ FCEquipmentIcon.icon(forExerciseID: $0.rawValue) }) {
+                        FCEquipmentIconView(icon)
+                    }
                     VStack(alignment: .leading) {
                         Text(exercise.displayNameSnapshot.value)
                             .font(.headline)

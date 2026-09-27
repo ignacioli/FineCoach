@@ -76,6 +76,8 @@
 		B913 /* FCListRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A913 /* FCListRow.swift */; };
 		B914 /* FCAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A914 /* FCAvatar.swift */; };
 		B915 /* FCHintBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A915 /* FCHintBar.swift */; };
+		B955 /* FCEquipmentIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = A955 /* FCEquipmentIcon.swift */; };
+		B956 /* IconConsistencyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A956 /* IconConsistencyTests.swift */; };
 		B950 /* FCBottomSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A950 /* FCBottomSheet.swift */; };
 		B951 /* FCBodyDiagram.swift in Sources */ = {isa = PBXBuildFile; fileRef = A951 /* FCBodyDiagram.swift */; };
 		B952 /* FCBodyPartChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = A952 /* FCBodyPartChip.swift */; };
@@ -331,6 +333,8 @@
 		A913 /* FCListRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCListRow.swift; sourceTree = "<group>"; };
 		A914 /* FCAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCAvatar.swift; sourceTree = "<group>"; };
 		A915 /* FCHintBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCHintBar.swift; sourceTree = "<group>"; };
+		A955 /* FCEquipmentIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCEquipmentIcon.swift; sourceTree = "<group>"; };
+		A956 /* IconConsistencyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconConsistencyTests.swift; sourceTree = "<group>"; };
 		A950 /* FCBottomSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCBottomSheet.swift; sourceTree = "<group>"; };
 		A951 /* FCBodyDiagram.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCBodyDiagram.swift; sourceTree = "<group>"; };
 		A952 /* FCBodyPartChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCBodyPartChip.swift; sourceTree = "<group>"; };
@@ -1037,6 +1041,7 @@
 				A913 /* FCListRow.swift */,
 				A914 /* FCAvatar.swift */,
 				A915 /* FCHintBar.swift */,
+				A955 /* FCEquipmentIcon.swift */,
 				A950 /* FCBottomSheet.swift */,
 				A951 /* FCBodyDiagram.swift */,
 				A952 /* FCBodyPartChip.swift */,
@@ -1304,6 +1309,7 @@
 			isa = PBXGroup;
 			children = (
 				A501 /* VisionHarnessTests.swift */,
+				A956 /* IconConsistencyTests.swift */,
 				A930 /* FCStatusTests.swift */,
 				A931 /* TypographyHarnessTests.swift */,
 				A932 /* DesignValueScanTests.swift */,
@@ -1714,6 +1720,7 @@
 				B913 /* FCListRow.swift in Sources */,
 				B914 /* FCAvatar.swift in Sources */,
 				B915 /* FCHintBar.swift in Sources */,
+				B955 /* FCEquipmentIcon.swift in Sources */,
 				B950 /* FCBottomSheet.swift in Sources */,
 				B951 /* FCBodyDiagram.swift in Sources */,
 				B952 /* FCBodyPartChip.swift in Sources */,
@@ -1784,6 +1791,7 @@
 				B241 /* ShareReportPolicyTests.swift in Sources */,
 				B954 /* TrainedBodyPartsSummaryTests.swift in Sources */,
 				B500 /* VisionHarnessTests.swift in Sources */,
+				B956 /* IconConsistencyTests.swift in Sources */,
 				B930 /* FCStatusTests.swift in Sources */,
 				B931 /* TypographyHarnessTests.swift in Sources */,
 				B932 /* DesignValueScanTests.swift in Sources */,
