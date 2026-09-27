@@ -64,6 +64,10 @@ public struct CreditLedgerUseCases: Sendable {
         try await repository.packages(studentID: studentID)
     }
 
+    public func package(id: StableUUID) async throws -> CoursePackage {
+        try await repository.package(id: id)
+    }
+
     public func balance(packageID: StableUUID) async throws -> Int {
         try await repository.balance(packageID: packageID)
     }

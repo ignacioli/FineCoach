@@ -3266,7 +3266,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "训练完成扣课"
+            "value": "完成训练"
           }
         }
       }
@@ -3277,7 +3277,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "缺席扣课"
+            "value": "学员缺席"
           }
         }
       }
@@ -3288,7 +3288,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "临时课扣课"
+            "value": "临时加课"
           }
         }
       }
@@ -3310,7 +3310,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "重开训练返还"
+            "value": "重新打开训练"
           }
         }
       }
@@ -5654,6 +5654,182 @@
           "stringUnit": {
             "state": "translated",
             "value": "%d 个模板"
+          }
+        }
+      }
+    },
+    "packageDetail.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课包详情"
+          }
+        }
+      }
+    },
+    "packageDetail.remaining": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "剩余课时"
+          }
+        }
+      }
+    },
+    "packageDetail.totalFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "共 %d 课时"
+          }
+        }
+      }
+    },
+    "packageDetail.validity": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有效期"
+          }
+        }
+      }
+    },
+    "packageDetail.noEndDate": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "长期有效"
+          }
+        }
+      }
+    },
+    "packageDetail.status": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "状态"
+          }
+        }
+      }
+    },
+    "packageDetail.adjustments": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课时调整"
+          }
+        }
+      }
+    },
+    "packageDetail.debitFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "扣减 %d 课时"
+          }
+        }
+      }
+    },
+    "packageDetail.creditFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "返还 %d 课时"
+          }
+        }
+      }
+    },
+    "packageDetail.balanceA11yFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "剩余 %d 课时"
+          }
+        }
+      }
+    },
+    "packageDetail.manualAdjust": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "人工调整"
+          }
+        }
+      }
+    },
+    "packageDetail.management": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课包管理"
+          }
+        }
+      }
+    },
+    "packageDetail.endConfirm.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束当前课包？"
+          }
+        }
+      }
+    },
+    "packageDetail.endConfirm.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束后这个课包不再扣课，调整记录保留，可在「课包管理」的历史课包里查看。"
+          }
+        }
+      }
+    },
+    "packageDetail.endConfirm.keep": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保留"
+          }
+        }
+      }
+    },
+    "packageDetail.endConfirm.confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束课包"
           }
         }
       }

@@ -1,14 +1,135 @@
 import SwiftUI
 
-/// Full traceable ledger trail for one `CoursePackage` (data-model §2.4:
-/// "每笔扣减/返还/缺席扣课都可查看"). Also the one place a `sessionReopen`
-/// credit-back is explained to the coach in plain language (T024
-/// "重开返还提示") -- there is no separate "reopen" trigger UI in this
-/// codebase yet (no Session-reopen feature exists outside the ledger), so
-/// this view's row rendering is where that entry becomes visible after the
-/// fact.
+/// The 04 课包详情 body (T069f; `04-package-detail`), shared by the active
+/// package page (`CoursePackageListView`) and a historical package's page
+/// below: student name, `numeralHero` balance, "剩余课时 | 共 N 课时",
+/// "有效期", and the full traceable ledger (data-model §2.4: every debit /
+/// credit-back / absence charge is visible, newest first).
+struct PackageDetailContent: View {
+    let studentName: String?
+    let package: CoursePackage
+    let balance: Int
+    let adjustments: [CreditAdjustment]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: FCPrimitives.space4) {
+            if let studentName, !studentName.isEmpty {
+                Text(studentName)
+                    .fcFont(.headline)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
+            }
+
+            Text("\(balance)")
+                .fcFont(.numeralHero)
+                .foregroundStyle(FCSemanticColors.textPrimary)
+                .accessibilityLabel(Text(String(format: String(localized: "packageDetail.balanceA11yFormat"), balance)))
+
+            VStack(spacing: 0) {
+                FCLabelValueRow(
+                    label: String(localized: "packageDetail.remaining"),
+                    value: String(format: String(localized: "packageDetail.totalFormat"), package.totalCredits)
+                )
+                FCLabelValueRow(
+                    label: String(localized: "packageDetail.validity"),
+                    value: PackageDetailPresentation.validity(package)
+                )
+                if package.status == .ended {
+                    FCLabelValueRow(
+                        label: String(localized: "packageDetail.status"),
+                        value: String(localized: "coursePackages.statusEnded")
+                    )
+                }
+                FCListRowDivider()
+            }
+
+            FCSectionLabel(String(localized: "packageDetail.adjustments"))
+
+            if adjustments.isEmpty {
+                Text(String(localized: "creditTrail.empty"))
+                    .fcFont(.callout, weight: .regular)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
+            } else {
+                VStack(spacing: 0) {
+                    ForEach(adjustments) { adjustment in
+                        adjustmentRow(adjustment)
+                        FCListRowDivider()
+                    }
+                }
+            }
+        }
+    }
+
+    /// "− 扣减 1 课时 / 完成训练 · 备注 ... 9月1日"
+    private func adjustmentRow(_ adjustment: CreditAdjustment) -> some View {
+        HStack(alignment: .top, spacing: FCPrimitives.space3) {
+            FCSymbol(adjustment.direction == .debit ? .minus : .plus, color: FCSemanticColors.textPrimary)
+                .frame(width: 24)
+            VStack(alignment: .leading, spacing: FCPrimitives.space1) {
+                Text(PackageDetailPresentation.amountTitle(adjustment))
+                    .fcFont(.body)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                Text(PackageDetailPresentation.reason(adjustment))
+                    .fcFont(.caption)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
+            }
+            Spacer(minLength: FCPrimitives.space2)
+            Text(PackageDetailPresentation.day(adjustment.createdAtUTC))
+                .fcFont(.caption)
+                .foregroundStyle(FCSemanticColors.textSecondary)
+        }
+        .padding(.vertical, FCPrimitives.space3)
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier(FCAccessibilityID.creditTrailRow(adjustment.id))
+    }
+}
+
+enum PackageDetailPresentation {
+    /// "扣减 1 课时" / "返还 1 课时"
+    static func amountTitle(_ adjustment: CreditAdjustment) -> String {
+        let format = adjustment.direction == .debit
+            ? String(localized: "packageDetail.debitFormat")
+            : String(localized: "packageDetail.creditFormat")
+        return String(format: format, adjustment.amount)
+    }
+
+    /// "完成训练" plus the coach's reason text, if any.
+    static func reason(_ adjustment: CreditAdjustment) -> String {
+        let title: String
+        switch adjustment.reasonKind {
+        case .sessionComplete: title = String(localized: "creditTrail.reason.sessionComplete")
+        case .appointmentAbsent: title = String(localized: "creditTrail.reason.appointmentAbsent")
+        case .adhocSession: title = String(localized: "creditTrail.reason.adhocSession")
+        case .manualCorrection: title = String(localized: "creditTrail.reason.manualCorrection")
+        case .sessionReopen: title = String(localized: "creditTrail.reason.sessionReopen")
+        }
+        guard let text = adjustment.reasonText?.value, !text.isEmpty else {
+            return title
+        }
+        return "\(title) · \(text)"
+    }
+
+    /// "9月1日" in the device's time zone.
+    static func day(_ instant: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.dateFormat = "M月d日"
+        return formatter.string(from: instant)
+    }
+
+    /// "2026年12月31日", or "长期有效" without an end date.
+    static func validity(_ package: CoursePackage) -> String {
+        guard let end = package.endDate else {
+            return String(localized: "packageDetail.noEndDate")
+        }
+        return "\(end.year)年\(end.month)月\(end.day)日"
+    }
+}
+
+/// A single package's page (route `.creditAdjustmentTrail`), used for
+/// historical packages: the same 04 layout, read-only.
 @MainActor
 final class CreditAdjustmentTrailViewModel: ObservableObject {
+    @Published var package: CoursePackage?
     @Published var adjustments: [CreditAdjustment] = []
     @Published var balance: Int = 0
     @Published var errorMessage: String?
@@ -21,14 +142,11 @@ final class CreditAdjustmentTrailViewModel: ObservableObject {
         self.useCases = useCases
     }
 
-    /// Newest first, for the coach's most recent change to always be at the top.
-    var orderedAdjustments: [CreditAdjustment] {
-        adjustments.sorted { $0.createdAtUTC > $1.createdAtUTC }
-    }
-
     func reload() async {
         do {
+            package = try await useCases.package(id: packageID)
             adjustments = try await useCases.adjustments(packageID: packageID)
+                .sorted { $0.createdAtUTC > $1.createdAtUTC }
             balance = try await useCases.balance(packageID: packageID)
             errorMessage = nil
         } catch {
@@ -49,97 +167,34 @@ struct CreditAdjustmentTrailView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+            VStack(alignment: .leading, spacing: FCPrimitives.space4) {
+                Text(viewModel.package?.displayName ?? String(localized: "packageDetail.title"))
+                    .fcFont(.titleLarge)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
+
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
-                        .foregroundStyle(FCSemanticColors.destructive)
+                        .fcFont(.caption)
+                        .foregroundStyle(FCSemanticColors.statusDestructive)
                 }
 
-                Text(String(format: String(localized: "creditTrail.balanceFormat"), viewModel.balance))
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(FCSemanticColors.primaryText)
-
-                if viewModel.orderedAdjustments.isEmpty {
-                    Text(String(localized: "creditTrail.empty"))
-                        .foregroundStyle(FCSemanticColors.secondaryText)
-                }
-
-                ForEach(viewModel.orderedAdjustments) { adjustment in
-                    row(for: adjustment)
+                if let package = viewModel.package {
+                    PackageDetailContent(
+                        studentName: nil,
+                        package: package,
+                        balance: viewModel.balance,
+                        adjustments: viewModel.adjustments
+                    )
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(FCPrimitives.spacingMedium)
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.bottom, FCPrimitives.space6)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(String(localized: "creditTrail.title"))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarRole(.editor)
         .accessibilityIdentifier(FCAccessibilityID.creditTrailRoot)
         .task { await viewModel.reload() }
-    }
-
-    private func row(for adjustment: CreditAdjustment) -> some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
-            HStack {
-                Text(reasonTitle(adjustment))
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(FCSemanticColors.primaryText)
-                Spacer()
-                // §7.2 − / + glyph as a symbol; the amount keeps its state color.
-                HStack(spacing: FCPrimitives.space1) {
-                    FCSymbol(adjustment.direction == .debit ? .minus : .plus, color: amountColor(adjustment))
-                    Text("\(adjustment.amount)")
-                        .fcFont(.callout, weight: .semibold)
-                        .foregroundStyle(amountColor(adjustment))
-                }
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel(Text(signedAmount(adjustment)))
-            }
-            if let reasonText = adjustment.reasonText, !reasonText.isEmpty {
-                Text(reasonText.value)
-                    .foregroundStyle(FCSemanticColors.secondaryText)
-            }
-            Text(Self.dateTimeText(adjustment.createdAtUTC))
-                .font(.caption)
-                .foregroundStyle(FCSemanticColors.secondaryText)
-        }
-        .padding(FCPrimitives.spacingMedium)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(FCSemanticColors.elevatedSurface)
-        .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusMedium))
-        .accessibilityIdentifier(FCAccessibilityID.creditTrailRow(adjustment.id))
-    }
-
-    private func amountColor(_ adjustment: CreditAdjustment) -> Color {
-        adjustment.direction == .debit ? FCSemanticColors.destructive : FCSemanticColors.actionPrimary
-    }
-
-    private func signedAmount(_ adjustment: CreditAdjustment) -> String {
-        let sign = adjustment.direction == .debit ? "-" : "+"
-        return "\(sign)\(adjustment.amount)"
-    }
-
-    private static func dateTimeText(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .short
-        return formatter.string(from: date)
-    }
-
-    private func reasonTitle(_ adjustment: CreditAdjustment) -> String {
-        switch adjustment.reasonKind {
-        case .sessionComplete:
-            return String(localized: "creditTrail.reason.sessionComplete")
-        case .appointmentAbsent:
-            return String(localized: "creditTrail.reason.appointmentAbsent")
-        case .adhocSession:
-            return String(localized: "creditTrail.reason.adhocSession")
-        case .manualCorrection:
-            return String(localized: "creditTrail.reason.manualCorrection")
-        case .sessionReopen:
-            return String(localized: "creditTrail.reason.sessionReopen")
-        }
     }
 }

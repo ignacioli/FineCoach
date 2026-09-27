@@ -8,14 +8,18 @@ import SwiftUI
 final class CoursePackageListViewModel: ObservableObject {
     @Published var packages: [CoursePackage] = []
     @Published var balances: [StableUUID: Int] = [:]
+    @Published var activeAdjustments: [CreditAdjustment] = []
+    @Published var studentName: String?
     @Published var errorMessage: String?
 
     let studentID: StableUUID
     private let useCases: CreditLedgerUseCases
+    private let studentUseCases: StudentUseCases?
 
-    init(studentID: StableUUID, useCases: CreditLedgerUseCases) {
+    init(studentID: StableUUID, useCases: CreditLedgerUseCases, studentUseCases: StudentUseCases? = nil) {
         self.studentID = studentID
         self.useCases = useCases
+        self.studentUseCases = studentUseCases
     }
 
     var activePackage: CoursePackage? {
@@ -35,6 +39,15 @@ final class CoursePackageListViewModel: ObservableObject {
                 newBalances[package.id] = try await useCases.balance(packageID: package.id)
             }
             balances = newBalances
+            if let active = loaded.first(where: { $0.status == .active }) {
+                activeAdjustments = try await useCases.adjustments(packageID: active.id)
+                    .sorted { $0.createdAtUTC > $1.createdAtUTC }
+            } else {
+                activeAdjustments = []
+            }
+            if studentName == nil, let studentUseCases {
+                studentName = try? await studentUseCases.student(id: studentID).displayName.value
+            }
             errorMessage = nil
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription
@@ -60,131 +73,143 @@ final class CoursePackageListViewModel: ObservableObject {
     }
 }
 
+/// 04 课包详情 (T069f): the student's active package on one page — name,
+/// balance, totals, validity, the adjustment trail — with 人工调整 pinned
+/// (was split across 课包与课时 and 课时调整记录). Package management that
+/// the artwork doesn't draw but M1B-FR-012 needs stays reachable below:
+/// 新建课包, 结束当前课包 (confirmed), and 历史课包 rows.
 struct CoursePackageListView: View {
     @StateObject private var viewModel: CoursePackageListViewModel
     @Binding var path: [RootDestination]
+    @State private var isConfirmingEnd = false
 
-    init(studentID: StableUUID, useCases: CreditLedgerUseCases, path: Binding<[RootDestination]>) {
+    init(
+        studentID: StableUUID,
+        useCases: CreditLedgerUseCases,
+        studentUseCases: StudentUseCases? = nil,
+        path: Binding<[RootDestination]>
+    ) {
         _viewModel = StateObject(
-            wrappedValue: CoursePackageListViewModel(studentID: studentID, useCases: useCases)
+            wrappedValue: CoursePackageListViewModel(
+                studentID: studentID,
+                useCases: useCases,
+                studentUseCases: studentUseCases
+            )
         )
         _path = path
     }
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+            VStack(alignment: .leading, spacing: FCPrimitives.space4) {
+                Text(String(localized: "packageDetail.title"))
+                    .fcFont(.titleLarge)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
+
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
-                        .foregroundStyle(FCSemanticColors.destructive)
+                        .fcFont(.caption)
+                        .foregroundStyle(FCSemanticColors.statusDestructive)
                 }
 
-                sectionTitle(String(localized: "coursePackages.activeSectionTitle"))
-
                 if let active = viewModel.activePackage {
-                    packageCard(active)
+                    PackageDetailContent(
+                        studentName: viewModel.studentName,
+                        package: active,
+                        balance: viewModel.balance(for: active),
+                        adjustments: viewModel.activeAdjustments
+                    )
+                } else {
+                    if let name = viewModel.studentName {
+                        Text(name)
+                            .fcFont(.headline)
+                            .foregroundStyle(FCSemanticColors.textSecondary)
+                    }
+                    Text(String(localized: "coursePackages.noActive"))
+                        .fcFont(.callout, weight: .regular)
+                        .foregroundStyle(FCSemanticColors.textSecondary)
+                }
 
-                    FCButton(title: String(localized: "coursePackages.manualAdjust")) {
+                managementSection
+            }
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.bottom, FCPrimitives.space6)
+        }
+        .safeAreaInset(edge: .bottom) {
+            Group {
+                if let active = viewModel.activePackage {
+                    FCButton(title: String(localized: "packageDetail.manualAdjust")) {
                         path.append(.manualCreditAdjustment(active.id.rawValue))
                     }
                     .accessibilityIdentifier(FCAccessibilityID.coursePackageListManualAdjust)
-
-                    Button(String(localized: "coursePackages.endActive")) {
-                        Task { await viewModel.endActivePackage() }
-                    }
-                    .frame(minHeight: 44)
-                    .foregroundStyle(FCSemanticColors.destructive)
-                    .accessibilityIdentifier(FCAccessibilityID.coursePackageListEnd)
                 } else {
-                    Text(String(localized: "coursePackages.noActive"))
-                        .foregroundStyle(FCSemanticColors.secondaryText)
-                }
-
-                FCButton(title: String(localized: "coursePackages.newPackage")) {
-                    path.append(.coursePackageEditor(viewModel.studentID.rawValue))
-                }
-                .accessibilityIdentifier(FCAccessibilityID.coursePackageListAdd)
-
-                if !viewModel.historicalPackages.isEmpty {
-                    Divider()
-                    sectionTitle(String(localized: "coursePackages.historySectionTitle"))
-                    ForEach(viewModel.historicalPackages) { package in
-                        packageCard(package)
+                    FCButton(title: String(localized: "coursePackages.newPackage")) {
+                        path.append(.coursePackageEditor(viewModel.studentID.rawValue))
                     }
+                    .accessibilityIdentifier(FCAccessibilityID.coursePackageListAdd)
                 }
             }
-            .padding(FCPrimitives.spacingMedium)
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.vertical, FCPrimitives.space2)
+            .background(FCSemanticColors.surfacePage)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(String(localized: "coursePackages.title"))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarRole(.editor)
         .accessibilityIdentifier(FCAccessibilityID.coursePackageListRoot)
+        .fcConfirmationDialog(isPresented: $isConfirmingEnd) {
+            FCConfirmationDialog(
+                title: String(localized: "packageDetail.endConfirm.title"),
+                message: String(localized: "packageDetail.endConfirm.message"),
+                cancelAction: .init(title: String(localized: "packageDetail.endConfirm.keep")) {
+                    isConfirmingEnd = false
+                },
+                confirmAction: .init(title: String(localized: "packageDetail.endConfirm.confirm")) {
+                    isConfirmingEnd = false
+                    Task { await viewModel.endActivePackage() }
+                }
+            )
+        }
         .task { await viewModel.reload() }
         .onChange(of: path) { _, _ in
             Task { await viewModel.reload() }
         }
     }
 
-    private func sectionTitle(_ text: String) -> some View {
-        Text(text)
-            .font(.subheadline.weight(.semibold))
-            .foregroundStyle(FCSemanticColors.secondaryText)
-    }
-
-    /// Tapping a package opens its full traceable ledger trail (data-model
-    /// §2.4: "每笔余额变化可查看对应课时调整").
-    private func packageCard(_ package: CoursePackage) -> some View {
-        Button {
-            path.append(.creditAdjustmentTrail(package.id.rawValue))
-        } label: {
-            VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
-                HStack {
-                    Text(package.displayName)
-                        .font(.headline)
-                        .foregroundStyle(FCSemanticColors.primaryText)
-                    Spacer()
-                    Text(
-                        package.status == .active
-                            ? String(localized: "coursePackages.statusActive")
-                            : String(localized: "coursePackages.statusEnded")
-                    )
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(
-                        package.status == .active ? FCSemanticColors.actionPrimary : FCSemanticColors.secondaryText
-                    )
+    @ViewBuilder
+    private var managementSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            FCSectionLabel(String(localized: "packageDetail.management"))
+                .padding(.top, FCPrimitives.space4)
+                .padding(.bottom, FCPrimitives.space2)
+            FCListRowDivider()
+            if viewModel.activePackage != nil {
+                FCActionRow(title: String(localized: "coursePackages.newPackage")) {
+                    path.append(.coursePackageEditor(viewModel.studentID.rawValue))
                 }
-                Text(
-                    String(
+                .accessibilityIdentifier(FCAccessibilityID.coursePackageListAdd)
+                FCListRowDivider()
+                FCActionRow(title: String(localized: "coursePackages.endActive"), role: .destructive) {
+                    isConfirmingEnd = true
+                }
+                .accessibilityIdentifier(FCAccessibilityID.coursePackageListEnd)
+                FCListRowDivider()
+            }
+            ForEach(viewModel.historicalPackages) { package in
+                FCActionRow(
+                    title: package.displayName,
+                    note: String(
                         format: String(localized: "coursePackages.balanceFormat"),
                         viewModel.balance(for: package),
                         package.totalCredits
                     )
-                )
-                .foregroundStyle(FCSemanticColors.secondaryText)
-                Text(validityPeriodText(package))
-                    .foregroundStyle(FCSemanticColors.secondaryText)
-                HStack(spacing: FCPrimitives.space1) {
-                    Text(String(localized: "coursePackages.viewTrailHint"))
-                        .fcFont(.caption)
-                        .foregroundStyle(FCSemanticColors.secondaryText)
-                    FCSymbol(.forward)
+                ) {
+                    path.append(.creditAdjustmentTrail(package.id.rawValue))
                 }
+                .accessibilityIdentifier(FCAccessibilityID.coursePackageRow(package.id))
+                FCListRowDivider()
             }
-            .padding(FCPrimitives.spacingMedium)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(FCSemanticColors.elevatedSurface)
-            .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusMedium))
         }
-        .buttonStyle(.plain)
-        .accessibilityIdentifier(FCAccessibilityID.coursePackageRow(package.id))
-    }
-
-    /// "有效期：<start> ~ <end>" -- `LocalDate.canonicalString` is already
-    /// yyyy-MM-dd (the same format `CoursePackage.displayName`'s fallback
-    /// uses), so no separate date formatter is needed here.
-    private func validityPeriodText(_ package: CoursePackage) -> String {
-        let start = package.startDate?.canonicalString ?? String(localized: "coursePackages.noStartDate")
-        let end = package.endDate?.canonicalString ?? String(localized: "coursePackages.noEndDate")
-        return String(format: String(localized: "coursePackages.validityPeriodFormat"), start, end)
     }
 }

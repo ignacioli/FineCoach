@@ -197,6 +197,7 @@ struct RootNavigation: View {
                                 CoursePackageListView(
                                     studentID: StableUUID(studentID),
                                     useCases: environment.requireCreditLedgerUseCases(),
+                                    studentUseCases: environment.requireUseCases(),
                                     path: $path
                                 )
                             case .coursePackageEditor(let studentID):
