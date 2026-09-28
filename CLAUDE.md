@@ -26,14 +26,20 @@ fine.
 
 ## Worktree bootstrap
 
-After `git worktree add`, and before using project skills, SpecKit,
-`.handoff`, or subagents in that worktree, run
-`scripts/bootstrap-local-worktree.sh` with the worktree as `cwd` (it
-relative-symlinks ignored runtime subtrees from the primary checkout;
-never symlink all of `.specify/`, `.cursor/`, or `.codex/`). The private
-specs repository (`specs/` symlink target) is a separate git repo and is
-not wired by this script — `cd` into its resolved path before committing
-there.
+- After `git worktree add`, and before using project skills, SpecKit,
+  `.handoff`, or subagents in that worktree, run
+  `scripts/bootstrap-local-worktree.sh` with the worktree as `cwd` (it
+  relative-symlinks ignored runtime subtrees from the primary checkout;
+  never symlink all of `.specify/`, `.cursor/`, or `.codex/`). The private
+  specs repository (`specs/` symlink target) is a separate git repo and is
+  not wired by this script — `cd` into its resolved path before committing
+  there.
+
+- Edits and commits in the private specs repository reached through the
+  `specs/` symlink (task ticks, checklists, plan/spec updates for the
+  active feature) are pre-authorized by the project owner; do them
+  without asking. This does not extend to pushing, deleting files, or 
+  rewriting history there.
 
 ## Verification gates — what "done" actually means here
 
