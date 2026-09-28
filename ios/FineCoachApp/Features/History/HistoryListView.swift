@@ -30,6 +30,10 @@ final class HistoryListViewModel: ObservableObject {
         let name: String
         let kind: String
         let value: String
+        /// "9月17日" — the session the best comes from.
+        let day: String?
+        /// "25 kg × 8 次" — the set behind a weight best.
+        let detail: String?
     }
 
     @Published var allSessions: [CompletedSession] = []
@@ -38,8 +42,10 @@ final class HistoryListViewModel: ObservableObject {
     @Published var dateRange: HistoryDateRangePreset?
     @Published var focusFilter: Set<BodyPart> = []
     @Published var exerciseFilter: ExerciseOption?
-    @Published var comparisonA: StableUUID?
-    @Published var comparisonB: StableUUID?
+    /// The two sessions being compared, oldest pick first; picking a third
+    /// drops the oldest pick (owner 2026-09-28: in-list selection).
+    @Published private(set) var comparisonSelection: [StableUUID] = []
+    @Published var isSelectingForComparison = false
     @Published var assistedExerciseIDs: Set<StableExerciseID> = []
     @Published var errorMessage: String?
 
@@ -127,29 +133,47 @@ final class HistoryListViewModel: ObservableObject {
 
     /// Default comparison: the newest result and the next-newest one with
     /// the same body-part set (FR-027 compatible), if any; the coach can
-    /// change either side.
+    /// re-pick in selection mode.
     private func pickDefaultComparison() {
         let ids = Set(results.map(\.id))
-        if let a = comparisonA, let b = comparisonB, ids.contains(a), ids.contains(b) {
-            return
-        }
+        comparisonSelection = comparisonSelection.filter { ids.contains($0) }
+        guard comparisonSelection.count < 2, !isSelectingForComparison else { return }
         guard let newest = results.first else {
-            comparisonA = nil
-            comparisonB = nil
+            comparisonSelection = []
             return
         }
-        comparisonA = newest.id
-        comparisonB = results.dropFirst().first { $0.trainingFocus == newest.trainingFocus }?.id
-            ?? results.dropFirst().first?.id
+        let partner = results.dropFirst().first { $0.trainingFocus == newest.trainingFocus } ?? results.dropFirst().first
+        comparisonSelection = [newest.id] + (partner.map { [$0.id] } ?? [])
+    }
+
+    func toggleComparison(_ id: StableUUID) {
+        if let index = comparisonSelection.firstIndex(of: id) {
+            comparisonSelection.remove(at: index)
+            return
+        }
+        if comparisonSelection.count >= 2 {
+            comparisonSelection.removeFirst()
+        }
+        comparisonSelection.append(id)
+    }
+
+    func isSelectedForComparison(_ id: StableUUID) -> Bool {
+        comparisonSelection.contains(id)
     }
 
     func session(_ id: StableUUID?) -> CompletedSession? {
         id.flatMap { id in results.first { $0.id == id } }
     }
 
+    /// The two picks ordered newer-first, for a stable left/right layout.
+    var comparedSessions: [CompletedSession] {
+        comparisonSelection.compactMap { session($0) }.sorted { $0.completedAtUTC > $1.completedAtUTC }
+    }
+
     var comparison: Comparison.SessionComparisonResult? {
-        guard let a = session(comparisonA), let b = session(comparisonB), a.id != b.id else { return nil }
-        return Comparison.compareSessions(a, b)
+        let pair = comparedSessions
+        guard pair.count == 2 else { return nil }
+        return Comparison.compareSessions(pair[0], pair[1])
     }
 
     /// One best per exercise appearing in the current results, computed over
@@ -172,7 +196,13 @@ final class HistoryListViewModel: ObservableObject {
                     across: allSessions,
                     loadDirection: direction
                 )
-                if let row = HistoryPresentation.bestRow(key: key, name: exercise.displayNameSnapshot.value, records: records) {
+                let completedAt = Dictionary(allSessions.map { ($0.id, $0.completedAtUTC) }, uniquingKeysWith: { first, _ in first })
+                if let row = HistoryPresentation.bestRow(
+                    key: key,
+                    name: exercise.displayNameSnapshot.value,
+                    records: records,
+                    completedAt: completedAt
+                ) {
                     rows.append(row)
                 }
             }
@@ -197,30 +227,74 @@ enum HistoryPresentation {
             parts.append(focus)
         }
         parts.append(String(format: String(localized: "student.detail.setCountFormat"), session.statistics.completedSetCount))
-        if let seconds = Double(session.statistics.displayedDurationSeconds.canonicalString), seconds > 0 {
-            parts.append(String(format: String(localized: "today.durationFormat"), Int((seconds / 60).rounded())))
-        }
+        parts.append(duration(seconds: Double(session.statistics.displayedDurationSeconds.canonicalString) ?? 0))
         return parts.joined(separator: " · ")
     }
 
-    static func bestRow(key: String, name: String, records: Comparison.PersonalRecordSet?) -> HistoryListViewModel.PersonalBestRow? {
-        guard let records else { return nil }
-        if let highest = records.highestWeight {
-            return .init(id: key, name: name, kind: String(localized: "history.pb.highestWeight"), value: "\(highest.weight.canonicalString) kg")
+    /// "58 分钟", or "不足 1 分钟" under a minute (never "0 分钟").
+    static func duration(seconds: Double) -> String {
+        guard seconds >= 60 else {
+            return String(localized: "history.duration.underMinute")
         }
-        if let reps = records.mostRepsAtWeight {
-            return .init(id: key, name: name, kind: String(localized: "history.pb.mostReps"), value: "\(reps.reps.canonicalString) 次")
+        return String(format: String(localized: "today.durationFormat"), Int((seconds / 60).rounded()))
+    }
+
+    /// One best per exercise: the top weight shown big, with the day and
+    /// "重量 × 次数" of the set behind it (most reps at that weight, ties to
+    /// the most recent session — resolved in `Comparison.personalRecords`).
+    static func bestRow(
+        key: String,
+        name: String,
+        records: Comparison.PersonalRecordSet?,
+        completedAt: [StableUUID: Date]
+    ) -> HistoryListViewModel.PersonalBestRow? {
+        guard let records else { return nil }
+        func dayOf(_ sessionID: StableUUID) -> String? {
+            completedAt[sessionID].map(PackageDetailPresentation.day)
+        }
+        if let best = records.mostRepsAtWeight {
+            return .init(
+                id: key,
+                name: name,
+                kind: String(localized: "history.pb.highestWeight"),
+                value: "\(best.weight.canonicalString) kg",
+                day: dayOf(best.sessionID),
+                detail: String(
+                    format: String(localized: "history.pb.setDetailFormat"),
+                    best.weight.canonicalString,
+                    best.reps.canonicalString
+                )
+            )
+        }
+        if let highest = records.highestWeight {
+            return .init(
+                id: key,
+                name: name,
+                kind: String(localized: "history.pb.highestWeight"),
+                value: "\(highest.weight.canonicalString) kg",
+                day: dayOf(highest.sessionID),
+                detail: nil
+            )
         }
         if let duration = records.longestDuration {
             return .init(
                 id: key,
                 name: name,
                 kind: String(localized: "history.pb.longestDuration"),
-                value: DurationTextParser.formatForEditing(secondsText: duration.seconds.canonicalString)
+                value: DurationTextParser.formatForEditing(secondsText: duration.seconds.canonicalString),
+                day: dayOf(duration.sessionID),
+                detail: nil
             )
         }
         if let distance = records.longestDistance {
-            return .init(id: key, name: name, kind: String(localized: "history.pb.longestDistance"), value: "\(distance.distance.canonicalString) km")
+            return .init(
+                id: key,
+                name: name,
+                kind: String(localized: "history.pb.longestDistance"),
+                value: "\(distance.distance.canonicalString) km",
+                day: dayOf(distance.sessionID),
+                detail: nil
+            )
         }
         return nil
     }
@@ -430,14 +504,35 @@ struct HistoryListView: View {
             .accessibilityIdentifier(FCAccessibilityID.trendsNoMatches)
         } else {
             VStack(alignment: .leading, spacing: FCPrimitives.space2) {
-                FCSectionLabel(String(format: String(localized: "history.countFormat"), viewModel.results.count))
+                HStack(alignment: .center) {
+                    FCSectionLabel(String(format: String(localized: "history.countFormat"), viewModel.results.count))
+                    Spacer(minLength: FCPrimitives.space2)
+                    if viewModel.results.count >= 2 {
+                        FCLinkButton(title: String(localized: viewModel.isSelectingForComparison ? "history.compare.done" : "history.compare.select")) {
+                            withAnimation(.easeOut(duration: 0.2)) {
+                                viewModel.isSelectingForComparison.toggle()
+                            }
+                        }
+                        .accessibilityIdentifier(FCAccessibilityID.historyCompareSelect)
+                    }
+                }
                 VStack(spacing: 0) {
                     FCListRowDivider()
                     ForEach(Array(viewModel.results.enumerated()), id: \.element.id) { index, session in
                         Button {
-                            path.append(.sessionDetail(session.id.rawValue))
+                            if viewModel.isSelectingForComparison {
+                                withAnimation(.easeOut(duration: 0.15)) {
+                                    viewModel.toggleComparison(session.id)
+                                }
+                            } else {
+                                path.append(.sessionDetail(session.id.rawValue))
+                            }
                         } label: {
-                            HStack(spacing: FCPrimitives.space2) {
+                            HStack(spacing: FCPrimitives.space3) {
+                                if viewModel.isSelectingForComparison {
+                                    FCSetStateCircle(viewModel.isSelectedForComparison(session.id) ? .completed : .pending)
+                                        .transition(.move(edge: .leading).combined(with: .opacity))
+                                }
                                 VStack(alignment: .leading, spacing: FCPrimitives.space1) {
                                     Text(HistoryPresentation.day(session.completedAtUTC))
                                         .fcFont(.headline)
@@ -447,12 +542,17 @@ struct HistoryListView: View {
                                         .foregroundStyle(FCSemanticColors.textSecondary)
                                 }
                                 Spacer(minLength: FCPrimitives.space2)
-                                FCSymbol(.forward)
+                                if !viewModel.isSelectingForComparison {
+                                    FCSymbol(.forward)
+                                }
                             }
                             .padding(.vertical, FCPrimitives.space3)
                             .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
+                        .accessibilityAddTraits(
+                            viewModel.isSelectingForComparison && viewModel.isSelectedForComparison(session.id) ? .isSelected : []
+                        )
                         .accessibilityIdentifier(FCAccessibilityID.historyRow(index))
                         FCListRowDivider()
                     }
@@ -465,10 +565,24 @@ struct HistoryListView: View {
 
     private var comparisonSection: some View {
         VStack(alignment: .leading, spacing: FCPrimitives.space3) {
-            FCSectionLabel(String(localized: "trends.comparisonTitle"))
-            HStack(alignment: .top, spacing: FCPrimitives.space4) {
-                sessionPicker(selection: $viewModel.comparisonA)
-                sessionPicker(selection: $viewModel.comparisonB)
+            FCSectionLabel(
+                viewModel.isSelectingForComparison
+                    ? String(format: String(localized: "history.compare.selectedFormat"), viewModel.comparisonSelection.count)
+                    : String(localized: "trends.comparisonTitle")
+            )
+            let pair = viewModel.comparedSessions
+            if !pair.isEmpty {
+                HStack(alignment: .top, spacing: FCPrimitives.space4) {
+                    ForEach(pair) { session in
+                        Text(comparisonTitle(session))
+                            .fcFont(.headline)
+                            .foregroundStyle(FCSemanticColors.textPrimary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    if pair.count == 1 {
+                        Spacer().frame(maxWidth: .infinity)
+                    }
+                }
             }
             switch viewModel.comparison {
             case .compatible(let detail):
@@ -503,31 +617,8 @@ struct HistoryListView: View {
         .accessibilityIdentifier(FCAccessibilityID.trendsComparisonSection)
     }
 
-    private func sessionPicker(selection: Binding<StableUUID?>) -> some View {
-        Menu {
-            ForEach(viewModel.results) { session in
-                Button("\(HistoryPresentation.day(session.completedAtUTC)) · \(BodyPart.joinedDisplayNames(for: session.trainingFocus, separator: "、") ?? String(localized: "student.list.noFocus"))") {
-                    selection.wrappedValue = session.id
-                }
-            }
-        } label: {
-            HStack(spacing: FCPrimitives.space1) {
-                Text(pickerTitle(viewModel.session(selection.wrappedValue)))
-                    .fcFont(.headline)
-                    .foregroundStyle(FCSemanticColors.textPrimary)
-                    .multilineTextAlignment(.leading)
-                FCSymbol(.collapse)
-            }
-            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-        }
-        .accessibilityLabel(Text(String(localized: "history.compare.choose")))
-        .accessibilityValue(Text(pickerTitle(viewModel.session(selection.wrappedValue))))
-    }
-
-    private func pickerTitle(_ session: CompletedSession?) -> String {
-        guard let session else {
-            return String(localized: "history.compare.choose")
-        }
+    /// "9月1日 · 大腿、臀"
+    private func comparisonTitle(_ session: CompletedSession) -> String {
         let day = PackageDetailPresentation.day(session.completedAtUTC)
         guard let focus = BodyPart.joinedDisplayNames(for: session.trainingFocus, separator: "、") else {
             return day
@@ -565,7 +656,7 @@ struct HistoryListView: View {
         let rows = viewModel.personalBests
         if !rows.isEmpty {
             VStack(alignment: .leading, spacing: FCPrimitives.space2) {
-                FCSectionLabel(String(localized: "trends.personalRecordTitle"))
+                FCSectionLabel(String(localized: "history.pb.title"))
                 VStack(spacing: 0) {
                     ForEach(rows) { row in
                         HStack(alignment: .center, spacing: FCPrimitives.space4) {
@@ -581,7 +672,20 @@ struct HistoryListView: View {
                             Text(row.value)
                                 .fcFont(.titleEmphasis)
                                 .foregroundStyle(FCSemanticColors.textPrimary)
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .lineLimit(1)
+                            VStack(alignment: .trailing, spacing: FCPrimitives.space1) {
+                                if let day = row.day {
+                                    Text(day)
+                                        .fcFont(.caption)
+                                        .foregroundStyle(FCSemanticColors.textSecondary)
+                                }
+                                if let detail = row.detail {
+                                    Text(detail)
+                                        .fcFont(.caption)
+                                        .foregroundStyle(FCSemanticColors.textSecondary)
+                                }
+                            }
+                            .frame(minWidth: 88, alignment: .trailing)
                         }
                         .padding(.vertical, FCPrimitives.space3)
                         .accessibilityElement(children: .combine)

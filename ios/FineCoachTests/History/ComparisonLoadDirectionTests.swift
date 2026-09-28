@@ -65,7 +65,76 @@ final class ComparisonLoadDirectionTests: XCTestCase {
         XCTAssertEqual(records.highestWeight?.sessionID, sessionUUID(forSuffix: "2"))
     }
 
+    // T069i (owner 2026-09-28): the personal best shows its day and reps —
+    // the most reps at the top weight, ties going to the most recent session.
+    func testMostRepsAtTopWeightUsesTheSetsOfTheOwnersExample() throws {
+        // 哈克深蹲: 25kg × 8, 20kg × 12, 20kg × 12 in one session.
+        let session = try makeSession(idSuffix: "1", sets: [("25", "8"), ("20", "12"), ("20", "12")], daysOffset: 0)
+
+        let records = Comparison.personalRecords(exerciseID: exerciseID, recordMode: .weightReps, across: [session])
+        XCTAssertEqual(records.mostRepsAtWeight?.weight.canonicalString, "25")
+        XCTAssertEqual(records.mostRepsAtWeight?.reps.canonicalString, "8")
+        XCTAssertEqual(records.mostRepsAtWeight?.sessionID, sessionUUID(forSuffix: "1"))
+    }
+
+    func testSameTopWeightInTwoSessionsPicksTheOneWithMoreReps() throws {
+        let sessions = try [
+            makeSession(idSuffix: "1", sets: [("25", "10")], daysOffset: 0),
+            makeSession(idSuffix: "2", sets: [("25", "8")], daysOffset: 3),
+        ]
+
+        let records = Comparison.personalRecords(exerciseID: exerciseID, recordMode: .weightReps, across: sessions)
+        XCTAssertEqual(records.mostRepsAtWeight?.reps.canonicalString, "10")
+        XCTAssertEqual(records.mostRepsAtWeight?.sessionID, sessionUUID(forSuffix: "1"))
+    }
+
+    func testExactTieGoesToTheMostRecentSessionRegardlessOfOrder() throws {
+        let older = try makeSession(idSuffix: "1", sets: [("25", "8")], daysOffset: 0)
+        let newer = try makeSession(idSuffix: "2", sets: [("25", "8")], daysOffset: 5)
+
+        for order in [[older, newer], [newer, older]] {
+            let records = Comparison.personalRecords(exerciseID: exerciseID, recordMode: .weightReps, across: order)
+            XCTAssertEqual(records.mostRepsAtWeight?.sessionID, sessionUUID(forSuffix: "2"))
+        }
+    }
+
     // MARK: - Fixtures
+
+    private func makeSession(idSuffix: String, sets setValues: [(weight: String, reps: String)], daysOffset: Int) throws -> CompletedSession {
+        let base = try makeSession(idSuffix: idSuffix, weight: setValues[0].weight, daysOffset: daysOffset)
+        let exercise = base.exercises[0]
+        let sets = try setValues.enumerated().map { index, value in
+            try makeSet(orderIndex: UInt32(index), weight: value.weight, reps: value.reps, sessionExerciseID: exercise.id)
+        }
+        let rebuilt = try SessionExercise(
+            id: exercise.id,
+            sessionID: exercise.sessionID,
+            orderIndex: exercise.orderIndex,
+            sourceKind: exercise.sourceKind,
+            sourceID: exercise.sourceID,
+            displayNameSnapshot: exercise.displayNameSnapshot,
+            recordModeSnapshot: exercise.recordModeSnapshot,
+            actionPrivateNote: nil,
+            sets: sets
+        )
+        return CompletedSession(
+            id: base.id,
+            studentID: base.studentID,
+            studentDisplayName: base.studentDisplayName,
+            startedAtUTC: base.startedAtUTC,
+            completedAtUTC: base.completedAtUTC,
+            trainingFocus: [],
+            notes: base.notes,
+            exercises: [rebuilt],
+            statistics: SessionStatistics(
+                completedSetCount: sets.count,
+                displayedDurationSeconds: try DecimalValue("600"),
+                ordinaryTrainingVolume: nil
+            ),
+            revision: 1,
+            latestReport: nil
+        )
+    }
 
     private func sessionUUID(forSuffix suffix: String) -> StableUUID {
         StableUUID(UUID(uuidString: "22222222-2222-4222-8222-22222222222\(suffix)")!)
@@ -160,7 +229,7 @@ final class ComparisonLoadDirectionTests: XCTestCase {
         XCTAssertEqual(sufficientPoints.count, 3)
     }
 
-    private func makeSet(orderIndex: UInt32, weight: String, sessionExerciseID: StableUUID) throws -> TrainingSet {
+    private func makeSet(orderIndex: UInt32, weight: String, reps: String = "8", sessionExerciseID: StableUUID) throws -> TrainingSet {
         try TrainingSet(
             id: StableUUID(UUID()),
             sessionExerciseID: sessionExerciseID,
@@ -168,7 +237,7 @@ final class ComparisonLoadDirectionTests: XCTestCase {
             state: .completed,
             recordMode: .weightReps,
             weightValue: DecimalValue(weight),
-            repetitionCount: DecimalValue("8"),
+            repetitionCount: DecimalValue(reps),
             durationSeconds: nil,
             unit: .kilograms,
             side: .none,

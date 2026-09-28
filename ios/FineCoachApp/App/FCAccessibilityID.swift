@@ -46,6 +46,7 @@ public enum FCAccessibilityID {
     public static let studentListEmpty = "studentList.empty"
     public static let studentListEmptyAdd = "studentList.emptyAdd"
     public static let resourceHubEntry = "resourceHub.entry"
+    public static let historyCompareSelect = "history.compareSelect"
     public static let resourceHubBackup = "resourceHub.backup"
     public static let studentListArchived = "studentList.archived"
     public static let studentListInProgress = "studentList.inProgress"

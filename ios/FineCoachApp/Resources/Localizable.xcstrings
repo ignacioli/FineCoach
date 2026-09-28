@@ -6313,7 +6313,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "选择两次训练进行比较。"
+            "value": "点「选择」，在上方列表中勾选两次训练进行比较。"
           }
         }
       }
@@ -6435,6 +6435,72 @@
           "stringUnit": {
             "state": "translated",
             "value": "个人最佳在分享报告中默认关闭"
+          }
+        }
+      }
+    },
+    "history.compare.select": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择"
+          }
+        }
+      }
+    },
+    "history.compare.done": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成"
+          }
+        }
+      }
+    },
+    "history.compare.selectedFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课程比较（已选 %d / 2）"
+          }
+        }
+      }
+    },
+    "history.pb.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "个人最佳"
+          }
+        }
+      }
+    },
+    "history.pb.setDetailFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ kg × %2$@ 次"
+          }
+        }
+      }
+    },
+    "history.duration.underMinute": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不足 1 分钟"
           }
         }
       }

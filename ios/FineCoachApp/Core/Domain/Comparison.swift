@@ -245,6 +245,13 @@ public enum Comparison {
         var mostRepsAtWeight: (StableUUID, DecimalValue, DecimalValue)?
         var longestDuration: (StableUUID, DecimalValue)?
         var longestDistance: (StableUUID, DecimalValue)?
+        // Completion time of the session each record currently points at:
+        // an exact tie (same weight and reps / same duration / same
+        // distance) goes to the MOST RECENT session, independent of the
+        // order `sessions` arrives in (owner 2026-09-28, T069i).
+        var repsRecordAt: Date?
+        var durationRecordAt: Date?
+        var distanceRecordAt: Date?
 
         func isBetterWeight(_ candidate: DecimalValue, than current: DecimalValue) -> Bool {
             switch loadDirection {
@@ -266,19 +273,28 @@ public enum Comparison {
                         if let reps = set.repetitionCount {
                             if mostRepsAtWeight == nil || isBetterWeight(weight, than: mostRepsAtWeight!.1)
                                 || (weight == mostRepsAtWeight!.1 && reps > mostRepsAtWeight!.2)
+                                || (weight == mostRepsAtWeight!.1 && reps == mostRepsAtWeight!.2
+                                    && session.completedAtUTC > (repsRecordAt ?? .distantPast))
                             {
                                 mostRepsAtWeight = (session.id, weight, reps)
+                                repsRecordAt = session.completedAtUTC
                             }
                         }
                     }
                     if let duration = set.durationSeconds {
-                        if longestDuration == nil || duration > longestDuration!.1 {
+                        if longestDuration == nil || duration > longestDuration!.1
+                            || (duration == longestDuration!.1 && session.completedAtUTC > (durationRecordAt ?? .distantPast))
+                        {
                             longestDuration = (session.id, duration)
+                            durationRecordAt = session.completedAtUTC
                         }
                     }
                     if recordMode == .cardio, let distance = set.distanceValue {
-                        if longestDistance == nil || distance > longestDistance!.1 {
+                        if longestDistance == nil || distance > longestDistance!.1
+                            || (distance == longestDistance!.1 && session.completedAtUTC > (distanceRecordAt ?? .distantPast))
+                        {
                             longestDistance = (session.id, distance)
+                            distanceRecordAt = session.completedAtUTC
                         }
                     }
                 }
