@@ -7,7 +7,16 @@ import UIKit
 /// (M1B-FR-030). Used both for the on-screen preview and, via
 /// `ShareReportCardRenderer`, for the one long image that is shared.
 struct ShareReportCardView: View {
+    enum Style {
+        /// The fixed-width shared image, with the footer.
+        case shareCard
+        /// The in-app 训练记录 page (`35-session-detail`): same sections,
+        /// full width, no footer; the page supplies its own padding.
+        case page
+    }
+
     let dto: ShareReportDTO
+    var style: Style = .shareCard
 
     var body: some View {
         VStack(alignment: .leading, spacing: FCPrimitives.space6) {
@@ -55,17 +64,33 @@ struct ShareReportCardView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
-            VStack(alignment: .leading, spacing: FCPrimitives.space3) {
-                FCListRowDivider()
-                Text(String(localized: "shareCard.footer"))
-                    .fcFont(.caption)
-                    .foregroundStyle(FCSemanticColors.textSecondary)
+            if style == .shareCard {
+                VStack(alignment: .leading, spacing: FCPrimitives.space3) {
+                    FCListRowDivider()
+                    Text(String(localized: "shareCard.footer"))
+                        .fcFont(.caption)
+                        .foregroundStyle(FCSemanticColors.textSecondary)
+                }
             }
         }
-        .padding(.horizontal, FCPrimitives.space6)
-        .padding(.vertical, FCPrimitives.space8)
-        .frame(width: ShareReportCardRenderer.cardWidth, alignment: .leading)
-        .background(FCSemanticColors.surfacePage)
+        .modifier(CardFrame(style: style))
+    }
+
+    private struct CardFrame: ViewModifier {
+        let style: Style
+
+        func body(content: Content) -> some View {
+            switch style {
+            case .shareCard:
+                content
+                    .padding(.horizontal, FCPrimitives.space6)
+                    .padding(.vertical, FCPrimitives.space8)
+                    .frame(width: ShareReportCardRenderer.cardWidth, alignment: .leading)
+                    .background(FCSemanticColors.surfacePage)
+            case .page:
+                content.frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
     }
 
     // MARK: Parts

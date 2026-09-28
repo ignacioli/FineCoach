@@ -3,6 +3,10 @@ import SwiftUI
 @MainActor
 final class SessionDetailViewModel: ObservableObject {
     @Published var completed: CompletedSession?
+    /// The record rendered with the report card's sections (T069j review,
+    /// owner 2026-09-28: the page must read like 29, not a data table).
+    /// This view model only feeds the on-screen page; nothing is exported.
+    @Published var record: ShareReportDTO?
     @Published var errorMessage: String?
     @Published var isSavingAsTemplate = false
     @Published var saveAsTemplateName = ""
@@ -22,7 +26,9 @@ final class SessionDetailViewModel: ObservableObject {
 
     func load() async {
         do {
-            completed = try await useCases.detail(sessionID: sessionID)
+            let loaded = try await useCases.detail(sessionID: sessionID)
+            completed = loaded
+            record = try ShareReportPolicy.makeDTO(from: loaded, modules: .privacySafeDefaults)
             errorMessage = nil
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? String(localized: "student.error.generic")
@@ -82,75 +88,48 @@ struct SessionDetailView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+            VStack(alignment: .leading, spacing: FCPrimitives.space6) {
                 if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage).foregroundStyle(FCSemanticColors.destructive)
+                    Text(errorMessage)
+                        .fcFont(.callout, weight: .regular)
+                        .foregroundStyle(FCSemanticColors.destructive)
                 }
 
-                Text(String(localized: "detail.readonly"))
-                    .font(.footnote)
-                    .foregroundStyle(FCSemanticColors.secondaryText)
-                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-                    .accessibilityIdentifier(FCAccessibilityID.sessionDetailReadonly)
+                if let record = viewModel.record {
+                    ShareReportCardView(dto: record, style: .page)
+                }
 
-                if let completed = viewModel.completed {
-                    Text(completed.studentDisplayName.value)
-                        .font(.headline)
-                    if let focus = BodyPart.joinedDisplayNames(for: completed.trainingFocus) {
-                        labeled(String(localized: "summary.focus"), focus)
-                    }
-                    if let summary = completed.notes.studentFacingSummary?.value {
-                        labeled(String(localized: "summary.studentSummary"), summary)
-                    }
-                    Text(
-                        String(
-                            format: String(localized: "summary.duration.format"),
-                            completed.statistics.displayedDurationSeconds.canonicalString
-                        )
-                    )
-                    Text(
-                        String(
-                            format: String(localized: "summary.sets.format"),
-                            Int64(completed.statistics.completedSetCount)
-                        )
-                    )
-
-                    if completed.latestReport?.freshness == .stale {
-                        Text(String(localized: "detail.reportStale"))
-                            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-                            .accessibilityIdentifier(FCAccessibilityID.sessionDetailReportStale)
-                    }
-                    if completed.latestReport?.handedToSystemAtUTC != nil {
-                        Text(String(localized: "share.handedToSystem"))
-                            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                if let report = viewModel.completed?.latestReport,
+                   report.freshness == .stale || report.handedToSystemAtUTC != nil {
+                    VStack(alignment: .leading, spacing: FCPrimitives.space2) {
+                        if report.freshness == .stale {
+                            FCStatusLabel(text: String(localized: "detail.reportStale"), symbolName: "exclamationmark")
+                                .accessibilityIdentifier(FCAccessibilityID.sessionDetailReportStale)
+                        }
+                        if report.handedToSystemAtUTC != nil {
+                            FCStatusLabel(
+                                text: String(localized: "share.handedToSystem"),
+                                symbolName: "info",
+                                badgeColor: FCSemanticColors.actionPrimary
+                            )
                             .accessibilityIdentifier(FCAccessibilityID.sessionDetailHandedToSystem)
-                    }
-
-                    ForEach(completed.exercises, id: \.id) { exercise in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(exercise.displayNameSnapshot.value).font(.headline)
-                            ForEach(exercise.sets.filter(\.contributesToStatistics), id: \.id) { trainingSet in
-                                Text(setLine(trainingSet))
-                                    .font(.footnote)
-                            }
                         }
                     }
                 }
 
-                FCButton(title: String(localized: "detail.edit")) {
-                    path.append(.sessionEdit(viewModel.sessionID.rawValue))
-                }
-                .accessibilityIdentifier(FCAccessibilityID.sessionDetailEdit)
-
-                FCButton(title: String(localized: "summary.generateReport")) {
-                    path.append(.shareReport(viewModel.sessionID.rawValue))
-                }
-                .accessibilityIdentifier(FCAccessibilityID.sessionDetailGenerateReport)
-
-                saveAsTemplateControls
+                actions
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(FCPrimitives.spacingMedium)
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.vertical, FCPrimitives.space4)
+        }
+        .safeAreaInset(edge: .bottom) {
+            FCButton(title: String(localized: "summary.generateReport")) {
+                path.append(.shareReport(viewModel.sessionID.rawValue))
+            }
+            .accessibilityIdentifier(FCAccessibilityID.sessionDetailGenerateReport)
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.vertical, FCPrimitives.space2)
+            .background(FCSemanticColors.surfacePage)
         }
         .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "detail.title"))
@@ -159,46 +138,54 @@ struct SessionDetailView: View {
         .onChange(of: path) { _, _ in
             Task { await viewModel.load() }
         }
+        .fcBottomSheet(isPresented: $viewModel.isSavingAsTemplate) {
+            FCBottomSheet(
+                title: String(localized: "activeSession.action.saveAsTemplate"),
+                subtitle: String(localized: "summary.saveAsTemplateNote")
+            ) {
+                VStack(spacing: FCPrimitives.space3) {
+                    FCTextField(
+                        String(localized: "activeSession.saveAsTemplateNamePrompt"),
+                        text: $viewModel.saveAsTemplateName
+                    )
+                    .accessibilityIdentifier(FCAccessibilityID.sessionDetailSaveAsTemplateName)
+                    FCButton(
+                        title: String(localized: "activeSession.saveAsTemplateConfirm"),
+                        isEnabled: !viewModel.saveAsTemplateName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                    ) {
+                        Task { await viewModel.saveAsTemplate() }
+                    }
+                    .accessibilityIdentifier(FCAccessibilityID.sessionDetailSaveAsTemplateConfirm)
+                }
+            }
+        }
         .accessibilityIdentifier(FCAccessibilityID.sessionDetailRoot)
     }
 
-    /// Mirrors `ActiveSessionView.templateAndSectionControls`'s
-    /// toggle-between-button-and-inline-name-field pattern, reusing that
-    /// flow's existing localization keys verbatim (M1B-FR-017 requires this
-    /// second entry point, not new wording).
-    @ViewBuilder
-    private var saveAsTemplateControls: some View {
-        if viewModel.canSaveAsTemplate {
-            if viewModel.isSavingAsTemplate {
-                FCTextField(
-                    String(localized: "activeSession.saveAsTemplateNamePrompt"),
-                    text: $viewModel.saveAsTemplateName
-                )
-                .accessibilityIdentifier(FCAccessibilityID.sessionDetailSaveAsTemplateName)
-                FCButton(title: String(localized: "activeSession.saveAsTemplateConfirm")) {
-                    Task { await viewModel.saveAsTemplate() }
-                }
-                .accessibilityIdentifier(FCAccessibilityID.sessionDetailSaveAsTemplateConfirm)
-            } else {
-                Button(String(localized: "activeSession.action.saveAsTemplate")) {
+    /// The record itself is read-only; the rows below are the only edits.
+    private var actions: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            FCListRowDivider()
+            FCActionRow(title: String(localized: "detail.edit")) {
+                path.append(.sessionEdit(viewModel.sessionID.rawValue))
+            }
+            .accessibilityIdentifier(FCAccessibilityID.sessionDetailEdit)
+            if viewModel.canSaveAsTemplate {
+                FCListRowDivider()
+                FCActionRow(
+                    title: String(localized: "activeSession.action.saveAsTemplate"),
+                    note: viewModel.didSaveAsTemplate ? String(localized: "detail.savedAsTemplate") : nil
+                ) {
                     viewModel.isSavingAsTemplate = true
                 }
-                .frame(minHeight: 44)
                 .accessibilityIdentifier(FCAccessibilityID.sessionDetailSaveAsTemplate)
             }
+            FCListRowDivider()
+            Text(String(localized: "detail.readonly"))
+                .fcFont(.caption)
+                .foregroundStyle(FCSemanticColors.textSecondary)
+                .padding(.top, FCPrimitives.space2)
+                .accessibilityIdentifier(FCAccessibilityID.sessionDetailReadonly)
         }
-    }
-
-    private func labeled(_ title: String, _ value: String) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(title)
-                .font(.footnote)
-                .foregroundStyle(FCSemanticColors.secondaryText)
-            Text(value)
-        }
-    }
-
-    private func setLine(_ trainingSet: TrainingSet) -> String {
-        "组\(trainingSet.orderIndex + 1) \(trainingSet.displaySummary)"
     }
 }

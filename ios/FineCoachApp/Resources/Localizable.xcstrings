@@ -2012,7 +2012,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "只读"
+            "value": "训练数据为只读记录，可编辑训练重点。"
           }
         }
       }
@@ -2024,6 +2024,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "编辑训练重点"
+          }
+        }
+      }
+    },
+    "detail.savedAsTemplate": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已保存为模板"
           }
         }
       }
