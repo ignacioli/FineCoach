@@ -181,9 +181,12 @@
                 trainingSet.setValue(sessionExercise, forKey: "sessionExercise")
 
                 try context.save()
+                // A private-queue context may only be touched on its own
+                // queue; resetting it outside `performAndWait` intermittently
+                // crashed in -[NSManagedObjectContext reset] (EXC_BAD_ACCESS).
+                context.reset()
             }
 
-            context.reset()
             for store in coordinator.persistentStores {
                 try coordinator.remove(store)
             }
