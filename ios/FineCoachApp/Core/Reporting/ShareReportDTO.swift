@@ -9,6 +9,10 @@ public struct ShareReportDTO: Hashable, Sendable {
     public let studentFacingSummary: String?
     public let trainingVolume: DecimalValue?
     public let exercises: [ShareReportExerciseDTO]
+    /// Bests set in THIS session; empty unless the coach opted in for this
+    /// generation (M1B-FR-030 default off; not persisted, so every
+    /// generation starts without it, M1A-FR-035).
+    public let personalBests: [ShareReportPersonalBestDTO]
 
     public init(
         schemaVersion: Int,
@@ -18,7 +22,8 @@ public struct ShareReportDTO: Hashable, Sendable {
         trainingFocus: String?,
         studentFacingSummary: String?,
         trainingVolume: DecimalValue?,
-        exercises: [ShareReportExerciseDTO]
+        exercises: [ShareReportExerciseDTO],
+        personalBests: [ShareReportPersonalBestDTO] = []
     ) {
         self.schemaVersion = schemaVersion
         self.studentDisplayName = studentDisplayName
@@ -28,16 +33,65 @@ public struct ShareReportDTO: Hashable, Sendable {
         self.studentFacingSummary = studentFacingSummary
         self.trainingVolume = trainingVolume
         self.exercises = exercises
+        self.personalBests = personalBests
+    }
+}
+
+/// One personal best achieved in the shared session (M1B-FR-029 rules).
+public struct ShareReportPersonalBestDTO: Hashable, Sendable {
+    public enum Kind: String, Hashable, Sendable {
+        case highestWeight
+        case longestDuration
+        case longestDistance
+    }
+
+    public let displayName: String
+    public let kind: Kind
+    public let weightValue: DecimalValue?
+    public let repetitionCount: DecimalValue?
+    public let durationSeconds: DecimalValue?
+    public let distanceValue: DecimalValue?
+
+    public init(
+        displayName: String,
+        kind: Kind,
+        weightValue: DecimalValue? = nil,
+        repetitionCount: DecimalValue? = nil,
+        durationSeconds: DecimalValue? = nil,
+        distanceValue: DecimalValue? = nil
+    ) {
+        self.displayName = displayName
+        self.kind = kind
+        self.weightValue = weightValue
+        self.repetitionCount = repetitionCount
+        self.durationSeconds = durationSeconds
+        self.distanceValue = distanceValue
     }
 }
 
 public struct ShareReportExerciseDTO: Hashable, Sendable {
     public let displayName: String
     public let confirmedSets: [ShareReportSetDTO]
+    /// Catalog-derived presentation data (T069j, 29 preview): the §7.1
+    /// equipment icon and the exercise's primary/secondary body parts for
+    /// the trained-parts diagram. Derived from the built-in catalog only —
+    /// never from the student's body data. `nil`/empty for custom exercises.
+    public let equipmentIcon: String?
+    public let primaryBodyPart: BodyPart?
+    public let secondaryBodyParts: Set<BodyPart>
 
-    public init(displayName: String, confirmedSets: [ShareReportSetDTO]) {
+    public init(
+        displayName: String,
+        confirmedSets: [ShareReportSetDTO],
+        equipmentIcon: String? = nil,
+        primaryBodyPart: BodyPart? = nil,
+        secondaryBodyParts: Set<BodyPart> = []
+    ) {
         self.displayName = displayName
         self.confirmedSets = confirmedSets
+        self.equipmentIcon = equipmentIcon
+        self.primaryBodyPart = primaryBodyPart
+        self.secondaryBodyParts = secondaryBodyParts
     }
 }
 

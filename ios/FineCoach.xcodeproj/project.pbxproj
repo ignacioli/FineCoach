@@ -76,6 +76,7 @@
 		B913 /* FCListRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A913 /* FCListRow.swift */; };
 		B914 /* FCAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A914 /* FCAvatar.swift */; };
 		B915 /* FCHintBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A915 /* FCHintBar.swift */; };
+		B961 /* ShareReportCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A961 /* ShareReportCardView.swift */; };
 		B960 /* CourseActionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A960 /* CourseActionSheet.swift */; };
 		B958 /* ResourceHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A958 /* ResourceHubView.swift */; };
 		B957 /* FCSymbol.swift in Sources */ = {isa = PBXBuildFile; fileRef = A957 /* FCSymbol.swift */; };
@@ -336,6 +337,7 @@
 		A913 /* FCListRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCListRow.swift; sourceTree = "<group>"; };
 		A914 /* FCAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCAvatar.swift; sourceTree = "<group>"; };
 		A915 /* FCHintBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCHintBar.swift; sourceTree = "<group>"; };
+		A961 /* ShareReportCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareReportCardView.swift; sourceTree = "<group>"; };
 		A960 /* CourseActionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CourseActionSheet.swift; sourceTree = "<group>"; };
 		A958 /* ResourceHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceHubView.swift; sourceTree = "<group>"; };
 		A957 /* FCSymbol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCSymbol.swift; sourceTree = "<group>"; };
@@ -1122,6 +1124,7 @@
 			isa = PBXGroup;
 			children = (
 				A364 /* ShareReportFlowView.swift */,
+				A961 /* ShareReportCardView.swift */,
 			);
 			path = ShareReport;
 			sourceTree = "<group>";
@@ -1778,6 +1781,7 @@
 				B362 /* SessionDetailView.swift in Sources */,
 				B363 /* SessionEditView.swift in Sources */,
 				B364 /* ShareReportFlowView.swift in Sources */,
+				B961 /* ShareReportCardView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

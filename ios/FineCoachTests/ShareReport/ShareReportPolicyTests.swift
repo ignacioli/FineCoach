@@ -17,7 +17,7 @@ final class ShareReportPolicyTests: XCTestCase {
     private let studentDisplayName = "林青"
     private let reportNameOverride = "报告用名"
     private let trainingFocusParts: Set<BodyPart> = [.chest, .core]
-    private let trainingFocusText = "胸 · 核心"
+    private let trainingFocusText = "胸、核心"
     private let studentFacingSummaryText = "合成课后总结"
     private let privateCoachNoteText = "合成教练备注 女 13800001111"
     private let actionPrivateNoteText = "合成动作备注 linqing_test 合成伤病注意事项"
@@ -34,11 +34,17 @@ final class ShareReportPolicyTests: XCTestCase {
         "studentFacingSummary",
         "trainingVolume",
         "exercises",
+        "personalBests",
     ]
 
+    // T069j (schema 2): catalog-derived icon and body parts per exercise —
+    // training-performance presentation data, never the student's body data.
     private static let allowedShareReportExerciseDTOPropertyNames: Set<String> = [
         "displayName",
         "confirmedSets",
+        "equipmentIcon",
+        "primaryBodyPart",
+        "secondaryBodyParts",
     ]
 
     private static let allowedShareReportSetDTOPropertyNames: Set<String> = [
@@ -76,7 +82,7 @@ final class ShareReportPolicyTests: XCTestCase {
         let completed = try makeCompleted(includingNotes: true, includingUnresolvedSets: false)
         let dto = try ShareReportPolicy.makeDTO(from: completed)
         XCTAssertEqual(dto.schemaVersion, ShareReportPolicy.schemaVersion)
-        XCTAssertEqual(ShareReportPolicy.schemaVersion, 1)
+        XCTAssertEqual(ShareReportPolicy.schemaVersion, 2)
 
         XCTAssertEqual(propertyLabels(dto), Self.allowedShareReportDTOPropertyNames)
         XCTAssertEqual(propertyLabels(dto), ShareReportPolicy.allowedDTOPropertyNames)
@@ -114,6 +120,19 @@ final class ShareReportPolicyTests: XCTestCase {
             rightValue: nil
         )
         XCTAssertEqual(propertyLabels(standaloneSet), Self.allowedShareReportSetDTOPropertyNames)
+    }
+
+    // M1B-FR-030: personal bests are off unless the coach opts in for this
+    // generation; the default DTO carries none.
+    func testPersonalBestsAreAbsentByDefault() throws {
+        let completed = try makeCompleted(includingNotes: true, includingUnresolvedSets: false)
+        XCTAssertTrue(try ShareReportPolicy.makeDTO(from: completed).personalBests.isEmpty)
+
+        let optedIn = try ShareReportPolicy.makeDTO(
+            from: completed,
+            personalBests: [ShareReportPersonalBestDTO(displayName: "杠铃深蹲", kind: .highestWeight, weightValue: DecimalValue("40"))]
+        )
+        XCTAssertEqual(optedIn.personalBests.map(\.displayName), ["杠铃深蹲"])
     }
 
     func testForbiddenIdentifierTokensDoNotAppearOnDTOSurface() throws {

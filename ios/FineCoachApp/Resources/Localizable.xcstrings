@@ -2045,7 +2045,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "训练报告"
+            "value": "分享报告"
           }
         }
       }
@@ -2056,7 +2056,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "报告模块"
+            "value": "包含内容"
           }
         }
       }
@@ -6523,6 +6523,259 @@
           "stringUnit": {
             "state": "translated",
             "value": "相同动作"
+          }
+        }
+      }
+    },
+    "share.subtitleFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · %2$@ 训练"
+          }
+        }
+      }
+    },
+    "share.viewFull": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "查看完整报告 ›"
+          }
+        }
+      }
+    },
+    "share.module.record": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练记录"
+          }
+        }
+      }
+    },
+    "share.module.recordNote": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日期、时长与部位"
+          }
+        }
+      }
+    },
+    "share.module.exercises": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动作与组数"
+          }
+        }
+      }
+    },
+    "share.module.exercisesNote": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "含训练部位图"
+          }
+        }
+      }
+    },
+    "share.module.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课程总结"
+          }
+        }
+      }
+    },
+    "share.pb.hintFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本次刷新 %d 项"
+          }
+        }
+      }
+    },
+    "share.pb.none": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本次无新纪录"
+          }
+        }
+      }
+    },
+    "share.defaultOff": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "默认关闭"
+          }
+        }
+      }
+    },
+    "share.privacyNote": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "身体数据、伤病与联系方式\n不会出现在报告里"
+          }
+        }
+      }
+    },
+    "share.generateCard": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "生成报告卡"
+          }
+        }
+      }
+    },
+    "share.shareAction": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分享"
+          }
+        }
+      }
+    },
+    "shareCard.trainedParts": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练部位"
+          }
+        }
+      }
+    },
+    "shareCard.exercises": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动作"
+          }
+        }
+      }
+    },
+    "shareCard.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课后总结"
+          }
+        }
+      }
+    },
+    "shareCard.footer": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "由 精练教练 生成 · 身体数据不会出现在报告中"
+          }
+        }
+      }
+    },
+    "shareCard.defaultTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练报告"
+          }
+        }
+      }
+    },
+    "shareCard.titleFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@训练"
+          }
+        }
+      }
+    },
+    "shareCard.stat.sets": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "总组数"
+          }
+        }
+      }
+    },
+    "shareCard.stat.reps": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "总次数"
+          }
+        }
+      }
+    },
+    "shareCard.stat.volume": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "总容量 kg"
+          }
+        }
+      }
+    },
+    "shareCard.stat.minutes": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分钟"
           }
         }
       }

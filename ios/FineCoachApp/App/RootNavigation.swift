@@ -175,8 +175,8 @@ struct RootNavigation: View {
                                 ShareReportFlowView(
                                     sessionID: StableUUID(sessionID),
                                     useCases: environment.requireHistoryUseCases(),
+                                    exerciseUseCases: environment.requireExerciseUseCases(),
                                     reportsRootURL: environment.requireReportsRootURL(),
-                                    renderer: ShareReportRenderer(),
                                     shareAdapter: environment.requireShareAdapter(),
                                     path: $path
                                 )

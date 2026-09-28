@@ -344,6 +344,8 @@ public enum FCAccessibilityID {
     public static let shareReportShare = "shareReport.share"
     public static let shareReportRetry = "shareReport.retry"
     public static let shareReportClose = "shareReport.close"
+    public static let shareReportGenerateCard = "shareReport.generateCard"
+    public static let shareReportPersonalBestToggle = "shareReport.personalBestToggle"
     public static let shareReportNotSentStatus = "shareReport.notSentStatus"
     public static let shareReportHandedOffStatus = "shareReport.handedOffStatus"
 

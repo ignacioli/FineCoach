@@ -122,6 +122,22 @@ final class ComparisonLoadDirectionTests: XCTestCase {
         XCTAssertEqual(shared[0].b, olderLines)
     }
 
+    // T069j: the share settings hint / opt-in section lists only the bests
+    // SET in the shared session, judged against the full history.
+    func testPersonalBestsSetInSessionOnlyCountsThatSessionsRecords() throws {
+        let older = try makeSession(idSuffix: "1", sets: [("30", "8")], daysOffset: 0)
+        let newer = try makeSession(idSuffix: "2", sets: [("25", "12")], daysOffset: 7)
+        let best = try makeSession(idSuffix: "3", sets: [("35", "6")], daysOffset: 14)
+        let history = [older, newer, best]
+
+        XCTAssertTrue(ShareReportPolicy.personalBestsSet(in: newer, history: history).isEmpty)
+        let set = ShareReportPolicy.personalBestsSet(in: best, history: history)
+        XCTAssertEqual(set.count, 1)
+        XCTAssertEqual(set.first?.kind, .highestWeight)
+        XCTAssertEqual(set.first?.weightValue?.canonicalString, "35")
+        XCTAssertEqual(set.first?.repetitionCount?.canonicalString, "6")
+    }
+
     // MARK: - Fixtures
 
     private func makeSession(idSuffix: String, sets setValues: [(weight: String, reps: String)], daysOffset: Int) throws -> CompletedSession {
