@@ -6504,6 +6504,28 @@
           }
         }
       }
+    },
+    "history.compare.runFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · %2$d 组"
+          }
+        }
+      }
+    },
+    "history.compare.sharedTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "相同动作"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

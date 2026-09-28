@@ -231,6 +231,41 @@ enum HistoryPresentation {
         return parts.joined(separator: " · ")
     }
 
+    /// A completed-set list as lines, merging consecutive identical sets:
+    /// [30×10, 25×12, 25×12] → ["30kg × 10次", "25kg × 12次 · 2 组"]
+    /// (owner 2026-09-28: compare the full set lists of shared exercises).
+    static func setRuns(_ sets: [TrainingSet]) -> [String] {
+        var runs: [(text: String, count: Int)] = []
+        for set in sets where set.contributesToStatistics {
+            let text = set.displaySummary
+            if let last = runs.last, last.text == text {
+                runs[runs.count - 1].count += 1
+            } else {
+                runs.append((text, 1))
+            }
+        }
+        return runs.map { run in
+            run.count > 1
+                ? String(format: String(localized: "history.compare.runFormat"), run.text, run.count)
+                : run.text
+        }
+    }
+
+    /// Exercises present in both sessions (same name, as `Comparison`'s
+    /// 动作差异 matches), in the first session's order, with each side's
+    /// merged set lines.
+    static func sharedExercises(_ a: CompletedSession, _ b: CompletedSession) -> [(name: String, a: [String], b: [String])] {
+        var seen = Set<String>()
+        return a.exercises.compactMap { exercise in
+            let name = exercise.displayNameSnapshot.value
+            guard seen.insert(name).inserted else { return nil }
+            let inB = b.exercises.filter { $0.displayNameSnapshot.value == name }
+            guard !inB.isEmpty else { return nil }
+            let setsA = a.exercises.filter { $0.displayNameSnapshot.value == name }.flatMap(\.sets)
+            return (name, setRuns(setsA), setRuns(inB.flatMap(\.sets)))
+        }
+    }
+
     /// "58 分钟", or "不足 1 分钟" under a minute (never "0 分钟").
     static func duration(seconds: Double) -> String {
         guard seconds >= 60 else {
@@ -317,6 +352,9 @@ struct HistoryListView: View {
     @StateObject private var viewModel: HistoryListViewModel
     @Binding var path: [RootDestination]
     @State private var filterSheet: FilterSheet?
+    /// Shared-exercise blocks the coach expanded or collapsed, keyed per
+    /// compared pair; unset means "first expanded, others collapsed".
+    @State private var expandedShared: [String: Bool] = [:]
 
     init(
         studentID: StableUUID,
@@ -600,6 +638,9 @@ struct HistoryListView: View {
                         onlyHere: detail.exercisesOnlyInB
                     )
                 }
+                if pair.count == 2 {
+                    sharedExercisesBlock(pair[0], pair[1])
+                }
             case .incompatibleTrainingFocus, .differentStudent:
                 VStack(alignment: .leading, spacing: FCPrimitives.space2) {
                     FCStatusLabel(.notComparable)
@@ -615,6 +656,63 @@ struct HistoryListView: View {
             FCListRowDivider()
         }
         .accessibilityIdentifier(FCAccessibilityID.trendsComparisonSection)
+    }
+
+    /// Same exercises in both sessions with their full set lists side by
+    /// side; the first is expanded, the rest collapsed until tapped.
+    @ViewBuilder
+    private func sharedExercisesBlock(_ a: CompletedSession, _ b: CompletedSession) -> some View {
+        let shared = HistoryPresentation.sharedExercises(a, b)
+        if !shared.isEmpty {
+            VStack(alignment: .leading, spacing: 0) {
+                FCSectionLabel(String(localized: "history.compare.sharedTitle"))
+                    .padding(.top, FCPrimitives.space2)
+                    .padding(.bottom, FCPrimitives.space1)
+                ForEach(Array(shared.enumerated()), id: \.element.name) { index, item in
+                    let key = "\(a.id.rawValue)|\(b.id.rawValue)|\(item.name)"
+                    let isExpanded = expandedShared[key] ?? (index == 0)
+                    FCListRowDivider()
+                    Button {
+                        withAnimation(.easeOut(duration: 0.2)) {
+                            expandedShared[key] = !isExpanded
+                        }
+                    } label: {
+                        HStack(spacing: FCPrimitives.space2) {
+                            Text(item.name)
+                                .fcFont(.headline)
+                                .foregroundStyle(FCSemanticColors.textPrimary)
+                            Spacer(minLength: FCPrimitives.space2)
+                            FCSymbol(.collapse)
+                                .rotationEffect(.degrees(isExpanded ? 180 : 0))
+                        }
+                        .frame(minHeight: 44)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityValue(Text(isExpanded ? "today.resolved.expanded" : "today.resolved.collapsed"))
+                    if isExpanded {
+                        HStack(alignment: .top, spacing: FCPrimitives.space4) {
+                            setLines(item.a)
+                            setLines(item.b)
+                        }
+                        .padding(.bottom, FCPrimitives.space3)
+                        .transition(.opacity)
+                    }
+                }
+            }
+        }
+    }
+
+    private func setLines(_ lines: [String]) -> some View {
+        VStack(alignment: .leading, spacing: FCPrimitives.space1) {
+            ForEach(Array(lines.enumerated()), id: \.offset) { _, line in
+                Text(line)
+                    .fcFont(.callout, weight: .regular)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .combine)
     }
 
     /// "9月1日 · 大腿、臀"

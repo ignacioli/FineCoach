@@ -1,4 +1,4 @@
-import FineCoach
+@testable import FineCoach
 import XCTest
 
 /// M1B-FR-028: `Comparison.exerciseTrend`/`personalRecords` must let a
@@ -96,6 +96,30 @@ final class ComparisonLoadDirectionTests: XCTestCase {
             let records = Comparison.personalRecords(exerciseID: exerciseID, recordMode: .weightReps, across: order)
             XCTAssertEqual(records.mostRepsAtWeight?.sessionID, sessionUUID(forSuffix: "2"))
         }
+    }
+
+    // T069i (owner 2026-09-28): the comparison lists each shared exercise's
+    // completed sets, merging consecutive identical sets into one line.
+    func testSetRunsMergeConsecutiveIdenticalSets() throws {
+        let newer = try makeSession(idSuffix: "1", sets: [("30", "10"), ("25", "12"), ("25", "12")], daysOffset: 12)
+        let older = try makeSession(
+            idSuffix: "2",
+            sets: [("25", "12"), ("25", "12"), ("25", "12"), ("25", "12"), ("25", "12"), ("25", "12")],
+            daysOffset: 0
+        )
+
+        let newerLines = HistoryPresentation.setRuns(newer.exercises[0].sets)
+        let olderLines = HistoryPresentation.setRuns(older.exercises[0].sets)
+        XCTAssertEqual(newerLines.count, 2)
+        XCTAssertTrue(newerLines[1].hasSuffix("2 组"), newerLines[1])
+        XCTAssertFalse(newerLines[0].contains("组"), newerLines[0])
+        XCTAssertEqual(olderLines.count, 1)
+        XCTAssertTrue(olderLines[0].hasSuffix("6 组"), olderLines[0])
+
+        let shared = HistoryPresentation.sharedExercises(newer, older)
+        XCTAssertEqual(shared.map(\.name), ["辅助引体向上"])
+        XCTAssertEqual(shared[0].a, newerLines)
+        XCTAssertEqual(shared[0].b, olderLines)
     }
 
     // MARK: - Fixtures
