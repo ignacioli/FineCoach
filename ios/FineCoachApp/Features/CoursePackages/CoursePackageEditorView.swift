@@ -104,6 +104,7 @@ final class CoursePackageEditorViewModel: ObservableObject {
 struct CoursePackageEditorView: View {
     @StateObject private var viewModel: CoursePackageEditorViewModel
     @Environment(\.dismiss) private var dismiss
+    @State private var expandedDate: ExpandedDate?
     @Binding var path: [RootDestination]
 
     init(studentID: StableUUID, useCases: CreditLedgerUseCases, path: Binding<[RootDestination]>) {
@@ -152,8 +153,14 @@ struct CoursePackageEditorView: View {
                 FCListRowDivider()
 
                 if viewModel.hasStartDate {
-                    editorRow(String(localized: "coursePackageEditor.startDate")) {
+                    FCLabelValueRow(
+                        label: String(localized: "coursePackageEditor.startDate"),
+                        value: Self.dateText(viewModel.startDate),
+                        action: { toggle(.start) }
+                    )
+                    if expandedDate == .start {
                         DatePicker("", selection: startDateBinding, displayedComponents: .date)
+                            .datePickerStyle(.graphical)
                             .labelsHidden()
                             .tint(FCSemanticColors.actionPrimary)
                     }
@@ -168,8 +175,14 @@ struct CoursePackageEditorView: View {
                 FCListRowDivider()
 
                 if viewModel.hasEndDate {
-                    editorRow(String(localized: "coursePackageEditor.endDate")) {
+                    FCLabelValueRow(
+                        label: String(localized: "coursePackageEditor.endDate"),
+                        value: Self.dateText(viewModel.endDate),
+                        action: { toggle(.end) }
+                    )
+                    if expandedDate == .end {
                         DatePicker("", selection: endDateBinding, displayedComponents: .date)
+                            .datePickerStyle(.graphical)
                             .labelsHidden()
                             .tint(FCSemanticColors.actionPrimary)
                     }
@@ -237,6 +250,31 @@ struct CoursePackageEditorView: View {
                 )
             }
         }
+    }
+
+    /// Which date row has its calendar expanded under it -- the same
+    /// tap-to-expand row as 02 新建课程安排 (T069l, owner 2026-09-29).
+    private enum ExpandedDate {
+        case start
+        case end
+    }
+
+    private func toggle(_ date: ExpandedDate) {
+        withAnimation(.easeOut(duration: 0.2)) {
+            expandedDate = expandedDate == date ? nil : date
+        }
+    }
+
+    /// Full date with year: a package's validity can run into next year.
+    private static func dateText(_ date: LocalDate) -> String {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.locale = Locale(identifier: "zh_CN")
+        let formatter = DateFormatter()
+        formatter.calendar = calendar
+        formatter.timeZone = calendar.timeZone
+        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.dateFormat = "yyyy年M月d日"
+        return formatter.string(from: date.startOfDay(calendar: calendar))
     }
 
     private func editorRow<Control: View>(_ label: String, @ViewBuilder control: () -> Control) -> some View {
