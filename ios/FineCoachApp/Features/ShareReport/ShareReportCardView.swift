@@ -5,7 +5,7 @@ import UIKit
 /// ONLY a `ShareReportDTO` — the privacy gate (`ShareReportPolicy`) decides
 /// what the card can ever show; body data is never part of the DTO
 /// (M1B-FR-030). Used both for the on-screen preview and, via
-/// `ShareReportCardRenderer`, for the one long image that is shared.
+/// `ShareReportCardRenderer`, for the shared image(s).
 struct ShareReportCardView: View {
     enum Style {
         /// The fixed-width shared image, with the footer.
@@ -15,65 +15,109 @@ struct ShareReportCardView: View {
         case page
     }
 
+    /// One unit the shared image may be split between (owner 2026-09-29:
+    /// split a too-long report into ordered images, never lower its
+    /// resolution). A block is never cut in half.
+    enum Block: Hashable {
+        case header
+        case stats
+        case trainedParts
+        /// Exercise at this index; index 0 carries the "动作" section label.
+        case exercise(Int)
+        case personalBests
+        case summary
+        case footer
+    }
+
     let dto: ShareReportDTO
     var style: Style = .shareCard
+    /// The blocks to draw; `nil` draws the whole report.
+    var blocks: [Block]?
+
+    /// Every block of this report, in reading order.
+    static func blocks(for dto: ShareReportDTO, style: Style = .shareCard) -> [Block] {
+        var result: [Block] = [.header]
+        if !ShareReportCardPresentation.stats(dto).isEmpty { result.append(.stats) }
+        if let parts = trainedParts(dto), !parts.isEmpty { result.append(.trainedParts) }
+        result.append(contentsOf: dto.exercises.indices.map(Block.exercise))
+        if !dto.personalBests.isEmpty { result.append(.personalBests) }
+        if let summary = dto.studentFacingSummary, !summary.isEmpty { result.append(.summary) }
+        if style == .shareCard { result.append(.footer) }
+        return result
+    }
+
+    /// Space above `block` when something precedes it on the same image:
+    /// consecutive exercises sit `space4` apart inside their section; every
+    /// other block starts a new section `space6` below.
+    static func spacing(before block: Block) -> CGFloat {
+        if case .exercise(let index) = block, index > 0 { return FCPrimitives.space4 }
+        return FCPrimitives.space6
+    }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.space6) {
-            header
-            if !stats.isEmpty {
-                statsRow
+        let shown = blocks ?? Self.blocks(for: dto, style: style)
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(Array(shown.enumerated()), id: \.offset) { position, block in
+                content(for: block)
+                    .padding(.top, position == 0 ? 0 : Self.spacing(before: block))
             }
-            if let summary = trainedParts, !summary.isEmpty {
+        }
+        .modifier(CardFrame(style: style))
+    }
+
+    @ViewBuilder
+    private func content(for block: Block) -> some View {
+        switch block {
+        case .header:
+            header
+        case .stats:
+            statsRow
+        case .trainedParts:
+            if let summary = Self.trainedParts(dto) {
                 section(String(localized: "shareCard.trainedParts")) {
                     FCBodyDiagram(summary: summary)
                 }
             }
-            if !dto.exercises.isEmpty {
+        case .exercise(let index):
+            if index == 0 {
                 section(String(localized: "shareCard.exercises")) {
-                    VStack(alignment: .leading, spacing: FCPrimitives.space4) {
-                        ForEach(Array(dto.exercises.enumerated()), id: \.offset) { _, exercise in
-                            exerciseBlock(exercise)
+                    exerciseBlock(dto.exercises[index])
+                }
+            } else {
+                exerciseBlock(dto.exercises[index])
+            }
+        case .personalBests:
+            section(String(localized: "history.pb.title")) {
+                VStack(spacing: 0) {
+                    ForEach(Array(dto.personalBests.enumerated()), id: \.offset) { _, best in
+                        HStack {
+                            Text(best.displayName)
+                                .fcFont(.headline)
+                                .foregroundStyle(FCSemanticColors.textPrimary)
+                            Spacer(minLength: FCPrimitives.space2)
+                            Text(ShareReportCardPresentation.bestValue(best))
+                                .fcFont(.titleEmphasis)
+                                .foregroundStyle(FCSemanticColors.textPrimary)
                         }
+                        .padding(.vertical, FCPrimitives.space2)
                     }
                 }
             }
-            if !dto.personalBests.isEmpty {
-                section(String(localized: "history.pb.title")) {
-                    VStack(spacing: 0) {
-                        ForEach(Array(dto.personalBests.enumerated()), id: \.offset) { _, best in
-                            HStack {
-                                Text(best.displayName)
-                                    .fcFont(.headline)
-                                    .foregroundStyle(FCSemanticColors.textPrimary)
-                                Spacer(minLength: FCPrimitives.space2)
-                                Text(ShareReportCardPresentation.bestValue(best))
-                                    .fcFont(.titleEmphasis)
-                                    .foregroundStyle(FCSemanticColors.textPrimary)
-                            }
-                            .padding(.vertical, FCPrimitives.space2)
-                        }
-                    }
-                }
+        case .summary:
+            section(String(localized: "shareCard.summary")) {
+                Text(dto.studentFacingSummary ?? "")
+                    .fcFont(.body)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            if let summary = dto.studentFacingSummary, !summary.isEmpty {
-                section(String(localized: "shareCard.summary")) {
-                    Text(summary)
-                        .fcFont(.body)
-                        .foregroundStyle(FCSemanticColors.textPrimary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-            if style == .shareCard {
-                VStack(alignment: .leading, spacing: FCPrimitives.space3) {
-                    FCListRowDivider()
-                    Text(String(localized: "shareCard.footer"))
-                        .fcFont(.caption)
-                        .foregroundStyle(FCSemanticColors.textSecondary)
-                }
+        case .footer:
+            VStack(alignment: .leading, spacing: FCPrimitives.space3) {
+                FCListRowDivider()
+                Text(String(localized: "shareCard.footer"))
+                    .fcFont(.caption)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
             }
         }
-        .modifier(CardFrame(style: style))
     }
 
     private struct CardFrame: ViewModifier {
@@ -133,7 +177,7 @@ struct ShareReportCardView: View {
         }
     }
 
-    private var trainedParts: TrainedBodyPartsSummary? {
+    private static func trainedParts(_ dto: ShareReportDTO) -> TrainedBodyPartsSummary? {
         guard !dto.exercises.isEmpty else { return nil }
         return TrainedBodyPartsSummary(exercises: dto.exercises.map {
             ExerciseBodyParts(primary: $0.primaryBodyPart, secondary: $0.secondaryBodyParts)
@@ -243,37 +287,71 @@ enum ShareReportCardPresentation {
     }
 }
 
-/// Renders the card to ONE long PNG (M1A-FR-038 allows a long image; owner
-/// 2026-09-28 chose one). Input is only the DTO, and the raster stays within
-/// `peakRasterBudgetBytes` — scaled down if a very long report would exceed it.
+/// Renders the card to ordered PNG images at a fixed 2× (M1A-FR-038 allows
+/// one long image or ordered images). Owner 2026-09-29: a report too long
+/// for one image is split between whole blocks -- never downscaled. Input
+/// is only the DTO.
 @MainActor
 enum ShareReportCardRenderer {
     static let cardWidth: CGFloat = 390
+    static let scale: CGFloat = 2
     static let peakRasterBudgetBytes = 32 * 1024 * 1024
+    /// `ImageRenderer` returns nil past an undocumented per-side pixel limit
+    /// (a 390pt-wide card failed at ~8800 px tall and rendered at ~7000 px on
+    /// the iOS 26.5 simulator), so each image stays at or under 8000 px.
+    static let maxPagePixelHeight: CGFloat = 8000
 
-    static func render(dto: ShareReportDTO, preferredScale: CGFloat = 2) throws -> Data {
-        let renderer = ImageRenderer(content: ShareReportCardView(dto: dto))
+    /// Vertical card padding (`space8` top and bottom, see `CardFrame`).
+    private static let cardVerticalPadding = FCPrimitives.space8 * 2
+
+    static func render(dto: ShareReportDTO) throws -> [Data] {
+        let pages = try paginate(dto: dto)
+        return try pages.map { blocks in
+            let renderer = ImageRenderer(content: ShareReportCardView(dto: dto, blocks: blocks))
+            renderer.proposedSize = ProposedViewSize(width: cardWidth, height: nil)
+            renderer.scale = scale
+            guard let data = renderer.uiImage?.pngData() else {
+                throw DomainError.invalidFileOperation
+            }
+            return data
+        }
+    }
+
+    /// Groups the report's blocks into pages whose rendered height fits
+    /// `maxPagePixelHeight` at `scale`; a single block taller than that
+    /// still gets its own page.
+    static func paginate(dto: ShareReportDTO) throws -> [[ShareReportCardView.Block]] {
+        let maxHeight = maxPagePixelHeight / scale
+        let all = ShareReportCardView.blocks(for: dto)
+        if try pointHeight(dto: dto, blocks: all) <= maxHeight {
+            return [all]
+        }
+        var pages: [[ShareReportCardView.Block]] = []
+        var current: [ShareReportCardView.Block] = []
+        var height = cardVerticalPadding
+        for block in all {
+            let blockHeight = try pointHeight(dto: dto, blocks: [block]) - cardVerticalPadding
+            let added = current.isEmpty ? blockHeight : ShareReportCardView.spacing(before: block) + blockHeight
+            if !current.isEmpty, height + added > maxHeight {
+                pages.append(current)
+                current = [block]
+                height = cardVerticalPadding + blockHeight
+            } else {
+                current.append(block)
+                height += added
+            }
+        }
+        if !current.isEmpty { pages.append(current) }
+        return pages
+    }
+
+    private static func pointHeight(dto: ShareReportDTO, blocks: [ShareReportCardView.Block]) throws -> CGFloat {
+        let renderer = ImageRenderer(content: ShareReportCardView(dto: dto, blocks: blocks))
         renderer.proposedSize = ProposedViewSize(width: cardWidth, height: nil)
         renderer.scale = 1
-        guard let probe = renderer.uiImage else {
+        guard let image = renderer.uiImage else {
             throw DomainError.invalidFileOperation
         }
-        let pointArea = probe.size.width * probe.size.height
-        let maxScale = (Double(peakRasterBudgetBytes) / (4 * pointArea)).squareRoot()
-        // `ImageRenderer` returns nil past an undocumented per-side pixel limit
-        // even inside the byte budget (a 390×5680pt card failed at 1.95×), so
-        // step the scale down until it renders; 1× already succeeded above.
-        var scale = min(preferredScale, CGFloat(maxScale))
-        while scale > 1 {
-            renderer.scale = scale
-            if let data = renderer.uiImage?.pngData() {
-                return data
-            }
-            scale = max(1, (scale * 0.8 * 100).rounded(.down) / 100)
-        }
-        guard let data = probe.pngData() else {
-            throw DomainError.invalidFileOperation
-        }
-        return data
+        return image.size.height
     }
 }

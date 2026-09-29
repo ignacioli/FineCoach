@@ -94,16 +94,17 @@ final class ShareReportFlowViewModel: ObservableObject {
         }
     }
 
-    /// Renders the one long image from the current DTO, then hands it to
-    /// the system share sheet.
+    /// Renders the report images (one, or several ordered ones for a very
+    /// long report) from the current DTO, then hands them to the system
+    /// share sheet.
     func share() async {
         guard !isSharing, let dto else { return }
         isSharing = true
         defer { isSharing = false }
         do {
-            let page = try ShareReportCardRenderer.render(dto: dto)
+            let pages = try ShareReportCardRenderer.render(dto: dto)
             var currentLease = try lease ?? TempReportLease(rootURL: reportsRootURL, flowID: UUID())
-            _ = try currentLease.replacePreview(pages: [page])
+            _ = try currentLease.replacePreview(pages: pages)
             lease = currentLease
             let outcome = await shareAdapter.share(fileURLs: currentLease.fileURLs)
             if let report {

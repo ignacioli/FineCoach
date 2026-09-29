@@ -4,7 +4,7 @@
 
     @testable import FineCoach
 
-    /// The share flow's only renderer (`ShareReportCardRenderer`, one long PNG).
+    /// The share flow's only renderer (`ShareReportCardRenderer`: one PNG, or ordered 2× pages).
     /// Generic filenames are owned by `TempReportLease` and covered in
     /// `TempReportLifecycleTests`; this file covers the image itself.
     @MainActor
@@ -12,24 +12,28 @@
         private let sessionDate = Date(timeIntervalSince1970: 1_700_000_000)
         private let pngSignature = Data([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A])
 
-        func testRendersOnePNGAtCardWidth() throws {
-            let data = try ShareReportCardRenderer.render(dto: try makeDTO(exerciseCount: 1))
-            XCTAssertEqual(Data(data.prefix(pngSignature.count)), pngSignature)
-            let image = try XCTUnwrap(UIImage(data: data))
-            XCTAssertEqual(
-                image.size.width * image.scale,
-                ShareReportCardRenderer.cardWidth * 2,
-                accuracy: 1
-            )
+        func testShortReportIsOnePNGAtTwiceTheCardWidth() throws {
+            let pages = try ShareReportCardRenderer.render(dto: try makeDTO(exerciseCount: 1))
+            XCTAssertEqual(pages.count, 1)
+            try assertFullResolutionPage(pages[0])
         }
 
-        func testLongReportStaysWithinPeakRasterBudget() throws {
+        /// Owner 2026-09-29: a report too long for one image is split into
+        /// ordered images, each still at 2× -- never downscaled.
+        func testLongReportSplitsIntoFullResolutionPagesWithinLimits() throws {
             XCTAssertEqual(ShareReportCardRenderer.peakRasterBudgetBytes, 32 * 1024 * 1024)
-            let data = try ShareReportCardRenderer.render(dto: try makeDTO(exerciseCount: 40))
-            let image = try XCTUnwrap(UIImage(data: data))
-            let pixelWidth = Int((image.size.width * image.scale).rounded())
-            let pixelHeight = Int((image.size.height * image.scale).rounded())
-            XCTAssertLessThanOrEqual(pixelWidth * pixelHeight * 4, ShareReportCardRenderer.peakRasterBudgetBytes)
+            let dto = try makeDTO(exerciseCount: 40)
+            let pages = try ShareReportCardRenderer.render(dto: dto)
+            XCTAssertGreaterThan(pages.count, 1)
+            for page in pages {
+                try assertFullResolutionPage(page)
+            }
+
+            // Every block appears exactly once, in reading order, and the
+            // footer only ends the last page.
+            let layout = try ShareReportCardRenderer.paginate(dto: dto)
+            XCTAssertEqual(layout.flatMap { $0 }, ShareReportCardView.blocks(for: dto))
+            XCTAssertEqual(layout.last?.last, .footer)
         }
 
         func testEmptyDTORendersAPNG() throws {
@@ -43,8 +47,21 @@
                 trainingVolume: nil,
                 exercises: []
             )
-            let data = try ShareReportCardRenderer.render(dto: dto)
-            XCTAssertEqual(Data(data.prefix(pngSignature.count)), pngSignature)
+            let pages = try ShareReportCardRenderer.render(dto: dto)
+            XCTAssertEqual(pages.count, 1)
+            try assertFullResolutionPage(pages[0])
+        }
+
+        private func assertFullResolutionPage(_ data: Data, file: StaticString = #filePath, line: UInt = #line) throws {
+            XCTAssertEqual(Data(data.prefix(pngSignature.count)), pngSignature, file: file, line: line)
+            let image = try XCTUnwrap(UIImage(data: data), file: file, line: line)
+            let pixelWidth = image.size.width * image.scale
+            let pixelHeight = image.size.height * image.scale
+            XCTAssertEqual(pixelWidth, ShareReportCardRenderer.cardWidth * 2, accuracy: 1, file: file, line: line)
+            XCTAssertLessThanOrEqual(pixelHeight, ShareReportCardRenderer.maxPagePixelHeight, file: file, line: line)
+            XCTAssertLessThanOrEqual(
+                Int(pixelWidth * pixelHeight) * 4, ShareReportCardRenderer.peakRasterBudgetBytes, file: file, line: line
+            )
         }
 
         private func makeDTO(exerciseCount: Int) throws -> ShareReportDTO {
