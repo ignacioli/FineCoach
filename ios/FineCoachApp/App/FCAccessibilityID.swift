@@ -364,6 +364,7 @@ public enum FCAccessibilityID {
     public static let restoreConfirm = "restore.confirm"
     public static let restoreRetry = "restore.retry"
     public static let restoreFailed = "restore.failed"
+    public static let restoreSucceeded = "restore.succeeded"
 
     public static func studentRow(_ id: StableUUID) -> String {
         "studentList.row.\(id.rawValue.uuidString)"

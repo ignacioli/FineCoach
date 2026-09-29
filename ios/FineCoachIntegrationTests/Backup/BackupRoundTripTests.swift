@@ -180,6 +180,50 @@
             XCTAssertEqual(students.map(\.displayName.value), [expectedDisplayName])
         }
 
+        /// T072 (owner 2026-09-29): a committed restore from the 备份与恢复
+        /// page ends in the in-place 恢复完成 state, not silence.
+        func testRestoreFromThePageShowsCompletedState() async throws {
+            let source = try makeHarness(
+                generationUUID: sourceGenerationID,
+                ids: inventoryIDs(includeInProgress: false)
+            )
+            try await seedLinQingInventory(on: source, includeInProgress: false)
+            let exported = try await exportInventory(from: source, backupFileID: backupFileID)
+            try await source.controller.shutdownForTesting()
+
+            let destinationRoot = try TemporaryProtectedDirectory()
+            try await Self.restoreThroughPage(
+                rootURL: destinationRoot.url,
+                clock: TestClock(utcDate: now),
+                ids: TestIDGenerator(ids: [restoredGenerationID]),
+                passwordText: exportPasswordText,
+                fileURL: exported.fileURL,
+                expectedDisplayName: FictitiousFixtures.student.displayName
+            )
+        }
+
+        @MainActor
+        private static func restoreThroughPage(
+            rootURL: URL,
+            clock: TestClock,
+            ids: TestIDGenerator,
+            passwordText: String,
+            fileURL: URL,
+            expectedDisplayName: String
+        ) async throws {
+            let environment = try AppEnvironment(rootURL: rootURL, clock: clock, idGenerator: ids)
+            let viewModel = BackupRestoreFlowViewModel(coordinator: try environment.requireBackupCoordinator())
+            viewModel.password = passwordText
+            viewModel.pickedFileURL = fileURL
+            await viewModel.restoreNow(using: environment)
+
+            XCTAssertTrue(viewModel.succeeded)
+            XCTAssertFalse(viewModel.failed)
+            XCTAssertNil(viewModel.errorMessage)
+            let students = try await environment.requireUseCases().searchActive(query: "")
+            XCTAssertEqual(students.map(\.displayName.value), [expectedDisplayName])
+        }
+
         func testWrongPasswordRestoreLeavesCurrentStudentUnchanged() async throws {
             let source = try makeHarness(
                 generationUUID: sourceGenerationID, ids: inventoryIDs(includeInProgress: false))

@@ -6,6 +6,9 @@ final class BackupRestoreFlowViewModel: ObservableObject {
     @Published var password = ""
     @Published var errorMessage: String?
     @Published var failed = false
+    /// Restore committed and the live stack reloaded: show 恢复完成 in place
+    /// (owner 2026-09-29) so the coach knows to check the restored data.
+    @Published var succeeded = false
     @Published var showsRetry = false
     @Published var isRestoring = false
     @Published var pickedFileURL: URL?
@@ -23,7 +26,7 @@ final class BackupRestoreFlowViewModel: ObservableObject {
             return
         }
         restoreTask?.cancel()
-        restoreTask = Task { await performRestore(using: environment) }
+        restoreTask = Task { await restoreNow(using: environment) }
     }
 
     func cancelInFlight() {
@@ -31,11 +34,12 @@ final class BackupRestoreFlowViewModel: ObservableObject {
         isRestoring = false
     }
 
-    private func performRestore(using environment: AppEnvironment) async {
+    func restoreNow(using environment: AppEnvironment) async {
         isRestoring = true
         defer { isRestoring = false }
         errorMessage = nil
         failed = false
+        succeeded = false
         showsRetry = false
 
         #if DEBUG
@@ -46,6 +50,7 @@ final class BackupRestoreFlowViewModel: ObservableObject {
                 return
             }
             if arguments.contains("-FineCoachSimulateRestoreCompletion") {
+                succeeded = true
                 return
             }
         #endif
@@ -62,6 +67,7 @@ final class BackupRestoreFlowViewModel: ObservableObject {
                 BackupRestoreRequest(password: imported, sourceFileURL: sourceURL)
             )
             try environment.reloadAfterCommittedRestore()
+            succeeded = true
         } catch {
             failed = true
             showsRetry = true
@@ -123,6 +129,10 @@ struct BackupRestoreFlowView: View {
             .padding(.top, FCPrimitives.space1)
             .accessibilityIdentifier(FCAccessibilityID.restoreConfirm)
 
+            if viewModel.succeeded {
+                successState
+                    .padding(.top, FCPrimitives.space4)
+            }
             if viewModel.failed {
                 failureState
                     .padding(.top, FCPrimitives.space4)
@@ -147,6 +157,26 @@ struct BackupRestoreFlowView: View {
                 viewModel.pickedFileName = url.lastPathComponent
             }
         }
+    }
+
+    /// Mirrors the failure block: a `action.primary` ✓ badge (an
+    /// informational state, §7.2), "恢复完成", and a prompt to check the
+    /// restored data. Text only -- no navigation link (owner 2026-09-29).
+    private var successState: some View {
+        VStack(alignment: .leading, spacing: FCPrimitives.space1) {
+            HStack(spacing: FCPrimitives.space2) {
+                FCStatusBadge(symbolName: "checkmark", color: FCSemanticColors.actionPrimary)
+                Text(String(localized: "backup.restore.succeededTitle"))
+                    .fcFont(.callout, weight: .semibold)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+            }
+            Text(String(localized: "backup.restore.succeeded"))
+                .fcFont(.caption)
+                .foregroundStyle(FCSemanticColors.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier(FCAccessibilityID.restoreSucceeded)
     }
 
     /// 08's failure block: "恢复失败" in `status.destructive` with a "!" badge

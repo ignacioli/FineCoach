@@ -2204,6 +2204,28 @@
         }
       }
     },
+    "backup.restore.succeededTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复完成"
+          }
+        }
+      }
+    },
+    "backup.restore.succeeded": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本机数据已替换为备份中的版本。请到学员、课包、模板等页面检查数据是否正确。"
+          }
+        }
+      }
+    },
     "backup.title": {
       "extractionState": "manual",
       "localizations": {
