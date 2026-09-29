@@ -86,16 +86,35 @@ public struct FCStatusLabel: View {
             Text(text)
                 .fcFont(.caption)
         } icon: {
-            ZStack {
-                Circle().fill(badgeColor)
-                Image(systemName: symbolName)
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(FCSemanticColors.actionOn)
-            }
-            .frame(width: 22, height: 22)
+            FCStatusBadge(symbolName: symbolName, color: badgeColor)
         }
         .foregroundStyle(FCSemanticColors.textSecondary)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(text))
+    }
+}
+
+/// The 22×22 status badge (§7.2): a filled circle with a white glyph. Used
+/// by `FCStatusLabel`, and on its own where the status text has its own
+/// style (08 恢复失败 in `status.destructive`). Decorative -- the text next to
+/// it carries the meaning.
+public struct FCStatusBadge: View {
+    private let symbolName: String
+    private let color: Color
+
+    public init(symbolName: String, color: Color) {
+        self.symbolName = symbolName
+        self.color = color
+    }
+
+    public var body: some View {
+        ZStack {
+            Circle().fill(color)
+            Image(systemName: symbolName)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(FCSemanticColors.actionOn)
+        }
+        .frame(width: 22, height: 22)
+        .accessibilityHidden(true)
     }
 }

@@ -266,12 +266,10 @@ enum HistoryPresentation {
         }
     }
 
-    /// "58 分钟", or "不足 1 分钟" under a minute (never "0 分钟").
+    /// "58 分钟"; under a minute shows "1 分钟" (never "0 分钟"), the same
+    /// rule as the report card and 训练记录 (owner 2026-09-29).
     static func duration(seconds: Double) -> String {
-        guard seconds >= 60 else {
-            return String(localized: "history.duration.underMinute")
-        }
-        return String(format: String(localized: "today.durationFormat"), Int((seconds / 60).rounded()))
+        String(format: String(localized: "today.durationFormat"), max(1, Int((seconds / 60).rounded())))
     }
 
     /// One best per exercise: the top weight shown big, with the day and

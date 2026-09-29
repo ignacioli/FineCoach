@@ -8,27 +8,36 @@ import SwiftUI
 public struct FCTextField: View {
     private let title: String
     @Binding private var text: String
+    private let isSecure: Bool
 
-    public init(_ title: String, text: Binding<String>) {
+    /// - Parameter isSecure: masks the entry (backup 口令, 08), same look.
+    public init(_ title: String, text: Binding<String>, isSecure: Bool = false) {
         self.title = title
         self._text = text
+        self.isSecure = isSecure
     }
 
     public var body: some View {
-        TextField(
-            "",
-            text: $text,
-            prompt: Text(title)
-                .fcFont(.callout)
-                .foregroundStyle(FCSemanticColors.textSecondary)
-        )
-        .fcFont(.body)
-        .foregroundStyle(FCSemanticColors.textPrimary)
-        .padding(.horizontal, FCPrimitives.space4)
-        .frame(maxWidth: .infinity, minHeight: 48)
-        .background(FCSemanticColors.surfaceCanvas)
-        .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSm))
-        .accessibilityLabel(Text(title))
+        field
+            .fcFont(.body)
+            .foregroundStyle(FCSemanticColors.textPrimary)
+            .padding(.horizontal, FCPrimitives.space4)
+            .frame(maxWidth: .infinity, minHeight: 48)
+            .background(FCSemanticColors.surfaceCanvas)
+            .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSm))
+            .accessibilityLabel(Text(title))
+    }
+
+    @ViewBuilder
+    private var field: some View {
+        let prompt = Text(title)
+            .fcFont(.callout)
+            .foregroundStyle(FCSemanticColors.textSecondary)
+        if isSecure {
+            SecureField("", text: $text, prompt: prompt)
+        } else {
+            TextField("", text: $text, prompt: prompt)
+        }
     }
 }
 

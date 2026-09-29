@@ -82,17 +82,17 @@ struct BackupRestoreFlowView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.space4) {
+        VStack(alignment: .leading, spacing: FCPrimitives.space3) {
+            FCSectionLabel(String(localized: "backup.restore.section"))
             Text(String(localized: "backup.restore.warning"))
+                .fcFont(.caption)
+                .foregroundStyle(FCSemanticColors.textSecondary)
                 .accessibilityIdentifier(FCAccessibilityID.restoreWarning)
             Text(String(localized: "backup.restore.suggestBackup"))
+                .fcFont(.caption)
                 .foregroundStyle(FCSemanticColors.textSecondary)
                 .accessibilityIdentifier(FCAccessibilityID.restoreSuggestBackup)
-            SecureField(String(localized: "backup.restore.password"), text: $viewModel.password)
-                .textContentType(.password)
-                .frame(minHeight: 44)
-                .accessibilityIdentifier(FCAccessibilityID.restorePassword)
-            FCButton(
+            FCSecondaryButton(
                 title: String(localized: "backup.restore.pickFile"),
                 isEnabled: !viewModel.isRestoring,
                 action: {
@@ -105,17 +105,13 @@ struct BackupRestoreFlowView: View {
                     .fcFont(.caption)
                     .foregroundStyle(FCSemanticColors.textSecondary)
             }
+            FCTextField(String(localized: "backup.restore.password"), text: $viewModel.password, isSecure: true)
+                .textContentType(.password)
+                .accessibilityIdentifier(FCAccessibilityID.restorePassword)
             if viewModel.isRestoring {
                 ProgressView(String(localized: "backup.restore.working"))
-            }
-            if let errorMessage = viewModel.errorMessage {
-                Text(errorMessage)
-                    .foregroundStyle(FCSemanticColors.statusDestructive)
-            }
-            if viewModel.failed {
-                Text(String(localized: "backup.restore.failed"))
-                    .foregroundStyle(FCSemanticColors.statusDestructive)
-                    .accessibilityIdentifier(FCAccessibilityID.restoreFailed)
+                    .tint(FCSemanticColors.actionPrimary)
+                    .fcFont(.callout, weight: .regular)
             }
             FCButton(
                 title: String(localized: "backup.restore.confirm"),
@@ -124,15 +120,18 @@ struct BackupRestoreFlowView: View {
                     viewModel.restore(using: environment)
                 }
             )
+            .padding(.top, FCPrimitives.space1)
             .accessibilityIdentifier(FCAccessibilityID.restoreConfirm)
+
+            if viewModel.failed {
+                failureState
+                    .padding(.top, FCPrimitives.space4)
+            }
             if viewModel.showsRetry {
-                FCButton(
-                    title: String(localized: "backup.retry"),
-                    isEnabled: !viewModel.isRestoring,
-                    action: {
-                        viewModel.restore(using: environment)
-                    }
-                )
+                FCLinkButton(title: String(localized: "backup.retry"), isEnabled: !viewModel.isRestoring) {
+                    viewModel.restore(using: environment)
+                }
+                .frame(maxWidth: .infinity)
                 .accessibilityIdentifier(FCAccessibilityID.restoreRetry)
             }
         }
@@ -148,5 +147,24 @@ struct BackupRestoreFlowView: View {
                 viewModel.pickedFileName = url.lastPathComponent
             }
         }
+    }
+
+    /// 08's failure block: "恢复失败" in `status.destructive` with a "!" badge
+    /// (state is never color-only, NFR-005 / §7.2), then why and that the
+    /// current data is untouched.
+    private var failureState: some View {
+        VStack(alignment: .leading, spacing: FCPrimitives.space1) {
+            HStack(spacing: FCPrimitives.space2) {
+                FCStatusBadge(symbolName: "exclamationmark", color: FCSemanticColors.statusDestructive)
+                Text(String(localized: "backup.restore.failedTitle"))
+                    .fcFont(.callout, weight: .semibold)
+                    .foregroundStyle(FCSemanticColors.statusDestructive)
+            }
+            Text(viewModel.errorMessage ?? String(localized: "backup.restore.failed"))
+                .fcFont(.caption)
+                .foregroundStyle(FCSemanticColors.textSecondary)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier(FCAccessibilityID.restoreFailed)
     }
 }

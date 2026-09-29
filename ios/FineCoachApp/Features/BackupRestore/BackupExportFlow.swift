@@ -97,10 +97,14 @@ final class BackupExportFlowViewModel: ObservableObject {
     }
 }
 
+/// 08 备份与恢复 (T071, `08-backup-restore`): title + subtitle, then the
+/// 导出 and 恢复 sections split by a divider. The artwork draws the two
+/// password fields under 恢复; they belong to export (set + confirm the
+/// 口令), while restore needs one 口令 and a file -- placed by function,
+/// backup/restore logic unchanged.
 struct BackupExportFlowView: View {
     @StateObject private var viewModel: BackupExportFlowViewModel
     @Binding var path: [RootDestination]
-    @State private var showingRestore = false
     private let coordinator: BackupCoordinator
 
     init(coordinator: BackupCoordinator, path: Binding<[RootDestination]>) {
@@ -111,87 +115,93 @@ struct BackupExportFlowView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: FCPrimitives.space4) {
-                SecureField(String(localized: "backup.password.placeholder"), text: $viewModel.password)
-                    .textContentType(.password)
-                    .frame(minHeight: 44)
-                    .accessibilityIdentifier(FCAccessibilityID.backupPassword)
-                SecureField(String(localized: "backup.passwordConfirm.placeholder"), text: $viewModel.passwordConfirm)
-                    .textContentType(.password)
-                    .frame(minHeight: 44)
-                    .accessibilityIdentifier(FCAccessibilityID.backupPasswordConfirm)
-                Text(String(localized: "backup.password.hint"))
-                    .fcFont(.caption)
+            VStack(alignment: .leading, spacing: 0) {
+                Text(String(localized: "backup.title"))
+                    .fcFont(.titleLarge)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
+                Text(String(localized: "backup.subtitle"))
+                    .fcFont(.callout, weight: .regular)
                     .foregroundStyle(FCSemanticColors.textSecondary)
-                    .accessibilityIdentifier(FCAccessibilityID.backupPasswordHint)
+                    .padding(.top, FCPrimitives.space3)
 
-                if viewModel.isExporting {
-                    ProgressView(String(localized: "backup.export.working"))
-                }
-                if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage)
-                        .foregroundStyle(FCSemanticColors.statusDestructive)
-                }
-                if let exportStatus = viewModel.exportStatus {
-                    Text(exportStatus)
-                        .accessibilityIdentifier(FCAccessibilityID.backupExportStatus)
-                }
+                exportSection
+                    .padding(.top, FCPrimitives.space6)
 
-                FCButton(
-                    title: String(localized: "backup.export"),
-                    isEnabled: !viewModel.isExporting,
-                    action: {
-                        viewModel.export()
-                    }
-                )
-                .accessibilityIdentifier(FCAccessibilityID.backupExport)
+                FCListRowDivider()
+                    .padding(.vertical, FCPrimitives.space6)
 
-                if viewModel.showsRetry {
-                    FCButton(
-                        title: String(localized: "backup.retry"),
-                        isEnabled: !viewModel.isExporting,
-                        action: {
-                            viewModel.export()
-                        }
-                    )
-                    .accessibilityIdentifier(FCAccessibilityID.backupRetry)
-                }
-
-                FCButton(
-                    title: String(localized: "backup.restore.entry"),
-                    isEnabled: !viewModel.isExporting,
-                    action: {
-                        showingRestore = true
-                    }
-                )
-                .accessibilityIdentifier(FCAccessibilityID.restoreImporter)
-
-                if showingRestore {
-                    BackupRestoreFlowView(coordinator: coordinator, path: $path)
-                }
+                BackupRestoreFlowView(coordinator: coordinator, path: $path)
             }
-            .padding(FCPrimitives.space4)
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.bottom, FCPrimitives.space8)
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier(FCAccessibilityID.backupRoot)
         }
-        .safeAreaInset(edge: .bottom) {
-            FCButton(
-                title: String(localized: "backup.cancel"),
-                action: {
-                    viewModel.cancelInFlight()
-                    path.removeAll()
-                }
-            )
-            .padding(.horizontal, FCPrimitives.space4)
-            .padding(.bottom, FCPrimitives.space2)
-            .accessibilityIdentifier(FCAccessibilityID.backupCancel)
-        }
+        .scrollDismissesKeyboard(.interactively)
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(String(localized: "backup.title"))
         .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
+        .toolbarRole(.editor)
         .onDisappear {
             viewModel.cancelInFlight()
+        }
+    }
+
+    private var exportSection: some View {
+        VStack(alignment: .leading, spacing: FCPrimitives.space3) {
+            FCSectionLabel(String(localized: "backup.export.section"))
+            Text(String(localized: "backup.export.lead"))
+                .fcFont(.caption)
+                .foregroundStyle(FCSemanticColors.textSecondary)
+            FCTextField(String(localized: "backup.password.placeholder"), text: $viewModel.password, isSecure: true)
+                .textContentType(.password)
+                .accessibilityIdentifier(FCAccessibilityID.backupPassword)
+            FCTextField(
+                String(localized: "backup.passwordConfirm.placeholder"),
+                text: $viewModel.passwordConfirm,
+                isSecure: true
+            )
+            .textContentType(.password)
+            .accessibilityIdentifier(FCAccessibilityID.backupPasswordConfirm)
+            Text(String(localized: "backup.password.hint"))
+                .fcFont(.caption)
+                .foregroundStyle(FCSemanticColors.textSecondary)
+                .accessibilityIdentifier(FCAccessibilityID.backupPasswordHint)
+
+            if viewModel.isExporting {
+                ProgressView(String(localized: "backup.export.working"))
+                    .tint(FCSemanticColors.actionPrimary)
+                    .fcFont(.callout, weight: .regular)
+            }
+            if let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
+                    .fcFont(.callout, weight: .regular)
+                    .foregroundStyle(FCSemanticColors.statusDestructive)
+            }
+            if let exportStatus = viewModel.exportStatus {
+                Text(exportStatus)
+                    .fcFont(.callout, weight: .regular)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
+                    .accessibilityIdentifier(FCAccessibilityID.backupExportStatus)
+            }
+
+            FCButton(
+                title: String(localized: "backup.export"),
+                isEnabled: !viewModel.isExporting,
+                action: {
+                    viewModel.export()
+                }
+            )
+            .padding(.top, FCPrimitives.space1)
+            .accessibilityIdentifier(FCAccessibilityID.backupExport)
+
+            if viewModel.showsRetry {
+                FCLinkButton(title: String(localized: "backup.retry"), isEnabled: !viewModel.isExporting) {
+                    viewModel.export()
+                }
+                .frame(maxWidth: .infinity)
+                .accessibilityIdentifier(FCAccessibilityID.backupRetry)
+            }
         }
     }
 }

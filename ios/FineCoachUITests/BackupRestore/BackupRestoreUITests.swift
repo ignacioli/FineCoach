@@ -25,7 +25,7 @@ final class BackupRestoreUITests: XCTestCase {
         XCTAssertTrue(element(in: app, identifier: "backup.passwordConfirm").waitForExistence(timeout: 8))
         assertPasswordHintUnrecoverable(in: app)
         fillMatchingExportPasswords(in: app)
-        tapControl(in: app, identifier: "backup.export", label: "导出备份")
+        tapControl(in: app, identifier: "backup.export", label: "导出完整备份")
 
         XCTAssertTrue(
             element(in: app, identifier: "backup.exportStatus").waitForExistence(timeout: 8),
@@ -66,7 +66,7 @@ final class BackupRestoreUITests: XCTestCase {
             typeInto(in: app, identifier: "restore.password", text: exportPassword)
             dismissKeyboard(in: app)
         }
-        tapControl(in: app, identifier: "restore.confirm", label: "确认恢复")
+        tapControl(in: app, identifier: "restore.confirm", label: "恢复")
 
         XCTAssertTrue(
             element(in: app, identifier: "restore.failed").waitForExistence(timeout: 8)
@@ -100,7 +100,7 @@ final class BackupRestoreUITests: XCTestCase {
 
         XCTAssertTrue(element(in: app, identifier: "backup.export").waitForExistence(timeout: 8))
         XCTAssertTrue(element(in: app, identifier: "backup.cancel").waitForExistence(timeout: 8))
-        assertHittableTarget(in: app, identifier: "backup.export", label: "导出备份")
+        assertHittableTarget(in: app, identifier: "backup.export", label: "导出完整备份")
         assertHittableTarget(in: app, identifier: "backup.cancel", label: "取消")
         assertNoEnglishDomainCopy(in: app)
     }
@@ -111,7 +111,7 @@ final class BackupRestoreUITests: XCTestCase {
         addStudentLinQing(in: app)
         openBackupFromStudentDetail(in: app)
         fillMatchingExportPasswords(in: app)
-        tapControl(in: app, identifier: "backup.export", label: "导出备份")
+        tapControl(in: app, identifier: "backup.export", label: "导出完整备份")
 
         XCTAssertTrue(
             element(in: app, identifier: "backup.retry").waitForExistence(timeout: 8),

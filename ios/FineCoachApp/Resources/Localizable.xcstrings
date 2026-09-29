@@ -2149,6 +2149,61 @@
         }
       }
     },
+    "backup.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本地加密备份，完整替换恢复"
+          }
+        }
+      }
+    },
+    "backup.export.section": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导出"
+          }
+        }
+      }
+    },
+    "backup.export.lead": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "包含课程安排、课包、模板、身体数据等全部数据"
+          }
+        }
+      }
+    },
+    "backup.restore.section": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复"
+          }
+        }
+      }
+    },
+    "backup.restore.failedTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复失败"
+          }
+        }
+      }
+    },
     "backup.title": {
       "extractionState": "manual",
       "localizations": {
@@ -2210,7 +2265,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "导出备份"
+            "value": "导出完整备份"
           }
         }
       }
@@ -2237,17 +2292,6 @@
         }
       }
     },
-    "backup.cancel": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "取消"
-          }
-        }
-      }
-    },
     "backup.retry": {
       "extractionState": "manual",
       "localizations": {
@@ -2259,24 +2303,13 @@
         }
       }
     },
-    "backup.restore.entry": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "从备份恢复"
-          }
-        }
-      }
-    },
     "backup.restore.warning": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "恢复将完整替换本机数据。"
+            "value": "从备份文件完整替换当前数据"
           }
         }
       }
@@ -2309,7 +2342,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "确认恢复"
+            "value": "恢复"
           }
         }
       }
@@ -2320,7 +2353,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "恢复失败，本机数据未改动。"
+            "value": "文件损坏或口令错误，当前数据未改变。"
           }
         }
       }
@@ -6578,17 +6611,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$@ kg × %2$@ 次"
-          }
-        }
-      }
-    },
-    "history.duration.underMinute": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "不足 1 分钟"
           }
         }
       }
