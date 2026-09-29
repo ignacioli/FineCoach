@@ -244,6 +244,7 @@ struct RootNavigation: View {
                                 BodyDataListView(
                                     studentID: StableUUID(studentID),
                                     useCases: environment.requireBodyDataUseCases(),
+                                    studentUseCases: environment.requireUseCases(),
                                     path: $path
                                 )
                             case .bodyMeasurementEntry(let studentID, let metricID):

@@ -12,6 +12,8 @@ final class BodyDataListViewModel: ObservableObject {
     /// with no recorded measurement are simply absent (no placeholder row).
     @Published var latestByMetric: [StableUUID: BodyMeasurement] = [:]
     @Published var errorMessage: String?
+    /// Shown under the page title, as on `06-body-data` and 04 课包详情.
+    @Published var studentName: String?
     @Published var showingNewCustomMetric = false
     @Published var newMetricName = ""
     @Published var newMetricUnit = ""
@@ -24,10 +26,17 @@ final class BodyDataListViewModel: ObservableObject {
     let studentID: StableUUID
     private let useCases: BodyDataUseCases
     private let unitPreferences: BodyDataUnitPreferences
+    private let studentUseCases: StudentUseCases?
 
-    init(studentID: StableUUID, useCases: BodyDataUseCases, unitPreferences: BodyDataUnitPreferences = .shared) {
+    init(
+        studentID: StableUUID,
+        useCases: BodyDataUseCases,
+        studentUseCases: StudentUseCases? = nil,
+        unitPreferences: BodyDataUnitPreferences = .shared
+    ) {
         self.studentID = studentID
         self.useCases = useCases
+        self.studentUseCases = studentUseCases
         self.unitPreferences = unitPreferences
     }
 
@@ -79,6 +88,9 @@ final class BodyDataListViewModel: ObservableObject {
         do {
             metrics = try await useCases.metrics(studentID: studentID)
             latestByMetric = try await useCases.latestMeasurements(studentID: studentID)
+            if studentName == nil, let studentUseCases {
+                studentName = try? await studentUseCases.student(id: studentID).displayName.value
+            }
             errorMessage = nil
         } catch {
             errorMessage =
@@ -161,18 +173,36 @@ struct BodyDataListView: View {
     @ScaledMetric(relativeTo: .footnote) private var unitColumnWidth: CGFloat = 84
     @Binding var path: [RootDestination]
 
-    init(studentID: StableUUID, useCases: BodyDataUseCases, path: Binding<[RootDestination]>) {
-        _viewModel = StateObject(wrappedValue: BodyDataListViewModel(studentID: studentID, useCases: useCases))
+    init(
+        studentID: StableUUID,
+        useCases: BodyDataUseCases,
+        studentUseCases: StudentUseCases? = nil,
+        path: Binding<[RootDestination]>
+    ) {
+        _viewModel = StateObject(
+            wrappedValue: BodyDataListViewModel(studentID: studentID, useCases: useCases, studentUseCases: studentUseCases)
+        )
         _path = path
     }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
+                Text(String(localized: "bodyData.title"))
+                    .fcFont(.titleLarge)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
+                if let name = viewModel.studentName {
+                    Text(name)
+                        .fcFont(.headline)
+                        .foregroundStyle(FCSemanticColors.textSecondary)
+                        .padding(.top, FCPrimitives.space4)
+                }
+
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
                         .foregroundStyle(FCSemanticColors.statusDestructive)
-                        .padding(.bottom, FCPrimitives.space3)
+                        .padding(.top, FCPrimitives.space3)
                 }
 
                 if viewModel.metrics.isEmpty {
@@ -205,8 +235,8 @@ struct BodyDataListView: View {
             .background(FCSemanticColors.surfacePage)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(String(localized: "bodyData.title"))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarRole(.editor)
         .accessibilityIdentifier(FCAccessibilityID.bodyDataListRoot)
         .task { await viewModel.reload() }
         .sheet(isPresented: $viewModel.showingNewCustomMetric) {
