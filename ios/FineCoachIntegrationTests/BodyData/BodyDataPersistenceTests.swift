@@ -57,6 +57,41 @@
             )
         }
 
+        // MARK: - List screen (T069k, 06 artwork)
+
+        func testListGroupsBuiltInsPerArtworkAndShowsDashWithUnitWhenUnrecorded() async throws {
+            let env = try await makeEnvironment(ids: (0..<3).map { UUID(uuidString: "33333333-3333-4333-8333-33333333333\($0)")! })
+            let defaults = try XCTUnwrap(UserDefaults(suiteName: "T069k-\(UUID().uuidString)"))
+            let preferences = await BodyDataUnitPreferences(defaults: defaults)
+            _ = try await env.useCases.recordMeasurement(
+                studentID: env.studentID, metricID: BuiltInBodyMetric.weight.id, value: "68.5", enteredUnit: "kg",
+                at: try utcInstant(year: 2026, month: 1, day: 1)
+            )
+            let viewModel = await BodyDataListViewModel(
+                studentID: env.studentID, useCases: env.useCases, unitPreferences: preferences
+            )
+            await viewModel.reload()
+
+            let basic = await viewModel.basicMetrics
+            let girth = await viewModel.girthMetrics
+            XCTAssertEqual(basic.map(\.id), [
+                BuiltInBodyMetric.weight.id, BuiltInBodyMetric.bodyFatPercent.id, BuiltInBodyMetric.height.id,
+            ])
+            XCTAssertEqual(girth.map(\.id), [
+                BuiltInBodyMetric.chest.id, BuiltInBodyMetric.waist.id, BuiltInBodyMetric.hip.id,
+                BuiltInBodyMetric.upperArm.id, BuiltInBodyMetric.thigh.id,
+            ])
+
+            let weight = await viewModel.latestDisplay(for: basic[0])
+            XCTAssertEqual(weight.value, "68.5")
+            XCTAssertEqual(weight.unit, "kg")
+            let bodyFat = await viewModel.latestDisplay(for: basic[1])
+            XCTAssertEqual(bodyFat.value, "—")
+            XCTAssertEqual(bodyFat.unit, "%")
+            let summary = await viewModel.unitSummary
+            XCTAssertEqual(summary, "单位 · kg / cm")
+        }
+
         // MARK: - Batch "latest per metric" query
 
         func testLatestMeasurementsReturnsNewestDayPerMetricInOneBatchCall() async throws {

@@ -31,8 +31,29 @@ final class BodyDataListViewModel: ObservableObject {
         self.unitPreferences = unitPreferences
     }
 
-    var builtInMetrics: [BodyMetricDefinition] {
-        metrics.filter { $0.kind == .builtIn }
+    /// "基本指标" in the order the 06 artwork lists them.
+    var basicMetrics: [BodyMetricDefinition] {
+        builtIns([.weight, .bodyFatPercent, .height])
+    }
+
+    /// "围度" in the order the 06 artwork lists them.
+    var girthMetrics: [BodyMetricDefinition] {
+        builtIns([.chest, .waist, .hip, .upperArm, .thigh])
+    }
+
+    private func builtIns(_ order: [BuiltInBodyMetric]) -> [BodyMetricDefinition] {
+        order.compactMap { builtIn in metrics.first { $0.kind == .builtIn && $0.id == builtIn.id } }
+    }
+
+    /// The display units currently used for built-in weight/length values,
+    /// e.g. "单位 · kg / cm". Display only -- the unit is switched on the entry
+    /// screen (T069k, owner 2026-09-29).
+    var unitSummary: String {
+        String(
+            format: String(localized: "bodyData.unitSummaryFormat"),
+            unitPreferences.weightUnit.rawValue,
+            unitPreferences.lengthUnit.rawValue
+        )
     }
 
     /// Active custom metrics first, then archived (archived still shown so
@@ -66,32 +87,33 @@ final class BodyDataListViewModel: ObservableObject {
         }
     }
 
-    /// Converts a metric's latest recorded value into its currently
-    /// preferred display form -- built-in weight/length metrics are
-    /// converted through `BuiltInUnitConversion` using the coach's saved
-    /// display-unit preference (mirrors
-    /// `BodyMeasurementEntryViewModel.displayValue(for:)`); percent and
-    /// custom metrics show their stored value/unit unchanged.
-    func latestDisplayValue(for metric: BodyMetricDefinition) -> String? {
-        guard let measurement = latestByMetric[metric.id] else { return nil }
-        guard metric.kind == .builtIn else {
-            return "\(measurement.value.canonicalString) \(measurement.enteredUnit)"
-        }
-        switch metric.unitRuleKind {
-        case .weight:
+    /// A metric's latest recorded value and unit in its currently preferred
+    /// display form -- built-in weight/length metrics are converted through
+    /// `BuiltInUnitConversion` using the coach's saved display-unit
+    /// preference (mirrors `BodyMeasurementEntryViewModel.displayValue(for:)`);
+    /// percent and custom metrics show their stored value/unit unchanged.
+    /// With no recorded measurement the value is "—" and the unit is the one
+    /// a new entry would use (owner 2026-09-29, T069k).
+    func latestDisplay(for metric: BodyMetricDefinition) -> (value: String, unit: String) {
+        let measurement = latestByMetric[metric.id]
+        switch (metric.kind, metric.unitRuleKind) {
+        case (.builtIn, .weight):
             let unit = unitPreferences.weightUnit
+            guard let measurement else { return (String(localized: "bodyData.noValue"), unit.rawValue) }
             let converted =
                 (try? BuiltInUnitConversion.weight(canonicalKilograms: measurement.value, displayedAs: unit))
                 ?? measurement.value
-            return "\(converted.canonicalString) \(unit.rawValue)"
-        case .length:
+            return (converted.canonicalString, unit.rawValue)
+        case (.builtIn, .length):
             let unit = unitPreferences.lengthUnit
+            guard let measurement else { return (String(localized: "bodyData.noValue"), unit.rawValue) }
             let converted =
                 (try? BuiltInUnitConversion.length(canonicalCentimeters: measurement.value, displayedAs: unit))
                 ?? measurement.value
-            return "\(converted.canonicalString) \(unit.rawValue)"
-        case .percent, .customUnit:
-            return "\(measurement.value.canonicalString) \(measurement.enteredUnit)"
+            return (converted.canonicalString, unit.rawValue)
+        default:
+            guard let measurement else { return (String(localized: "bodyData.noValue"), metric.currentUnit) }
+            return (measurement.value.canonicalString, measurement.enteredUnit)
         }
     }
 
@@ -128,42 +150,15 @@ final class BodyDataListViewModel: ObservableObject {
         newMetricErrorMessage = nil
         showingNewCustomMetric = false
     }
-
-    func toggleArchive(_ metric: BodyMetricDefinition) async {
-        do {
-            if metric.lifecycle == .active {
-                _ = try await useCases.archiveCustomMetric(id: metric.id)
-            } else {
-                _ = try await useCases.restoreCustomMetric(id: metric.id)
-            }
-            await reload()
-        } catch {
-            errorMessage =
-                (error as? LocalizedError)?.errorDescription
-                ?? String(localized: "bodyData.error.generic")
-        }
-    }
-
-    /// Deletion is only possible with zero recorded measurements
-    /// (M1B-FR-023/D-009) -- `deleteCustomMetricIfUnused` counts live and
-    /// refuses otherwise; this surfaces that refusal as a real message
-    /// rather than a silent no-op.
-    func deleteIfUnused(_ metric: BodyMetricDefinition) async {
-        do {
-            try await useCases.deleteCustomMetricIfUnused(id: metric.id)
-            await reload()
-        } catch DomainError.conflict {
-            errorMessage = String(localized: "bodyData.deleteBlocked")
-        } catch {
-            errorMessage =
-                (error as? LocalizedError)?.errorDescription
-                ?? String(localized: "bodyData.error.generic")
-        }
-    }
 }
 
 struct BodyDataListView: View {
     @StateObject private var viewModel: BodyDataListViewModel
+    /// Value and unit column widths measured from `06-body-data` (values
+    /// start at x=200, units at x=290 of 390), scaled with Dynamic Type so
+    /// the columns stay aligned across rows.
+    @ScaledMetric(relativeTo: .title2) private var valueColumnWidth: CGFloat = 90
+    @ScaledMetric(relativeTo: .footnote) private var unitColumnWidth: CGFloat = 84
     @Binding var path: [RootDestination]
 
     init(studentID: StableUUID, useCases: BodyDataUseCases, path: Binding<[RootDestination]>) {
@@ -173,9 +168,11 @@ struct BodyDataListView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: FCPrimitives.space4) {
+            VStack(alignment: .leading, spacing: 0) {
                 if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage).foregroundStyle(FCSemanticColors.statusDestructive)
+                    Text(errorMessage)
+                        .foregroundStyle(FCSemanticColors.statusDestructive)
+                        .padding(.bottom, FCPrimitives.space3)
                 }
 
                 if viewModel.metrics.isEmpty {
@@ -184,33 +181,28 @@ struct BodyDataListView: View {
                         .accessibilityIdentifier(FCAccessibilityID.bodyDataEmptyState)
                 }
 
-                sectionTitle(String(localized: "bodyData.builtInSection"))
-                ForEach(viewModel.builtInMetrics) { metric in
-                    metricRow(metric)
-                }
-
-                if !viewModel.activeCustomMetrics.isEmpty {
-                    FCListRowDivider()
-                    sectionTitle(String(localized: "bodyData.customSection"))
-                    ForEach(viewModel.activeCustomMetrics) { metric in
-                        metricRow(metric)
-                    }
-                }
-
-                if !viewModel.archivedCustomMetrics.isEmpty {
-                    FCListRowDivider()
-                    sectionTitle(String(localized: "bodyData.customSection.archived"))
-                    ForEach(viewModel.archivedCustomMetrics) { metric in
-                        metricRow(metric)
-                    }
-                }
-
-                FCButton(title: String(localized: "bodyData.addCustomMetric")) {
+                metricSection(String(localized: "bodyData.basicSection"), viewModel.basicMetrics)
+                metricSection(String(localized: "bodyData.girthSection"), viewModel.girthMetrics)
+                metricSection(String(localized: "bodyData.customSection"), viewModel.activeCustomMetrics)
+                metricSection(String(localized: "bodyData.customSection.archived"), viewModel.archivedCustomMetrics)
+            }
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.bottom, FCPrimitives.space4)
+        }
+        .safeAreaInset(edge: .bottom) {
+            HStack {
+                Text(viewModel.unitSummary)
+                    .fcFont(.callout, weight: .regular)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
+                Spacer(minLength: FCPrimitives.space2)
+                FCLinkButton(title: String(localized: "bodyData.addCustomMetric")) {
                     viewModel.presentNewCustomMetricSheet()
                 }
                 .accessibilityIdentifier(FCAccessibilityID.bodyDataAddCustomMetric)
             }
-            .padding(FCPrimitives.space4)
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.vertical, FCPrimitives.space2)
+            .background(FCSemanticColors.surfacePage)
         }
         .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "bodyData.title"))
@@ -245,59 +237,48 @@ struct BodyDataListView: View {
         .background(FCSemanticColors.surfacePage)
     }
 
-    private func sectionTitle(_ text: String) -> some View {
-        Text(text)
-            .fcFont(.sectionLabel)
-            .foregroundStyle(FCSemanticColors.textSecondary)
+    /// One 06-artwork section: label, then a "name · value · unit" row per
+    /// metric with a 1pt divider under each (design system §6). Empty
+    /// sections are omitted.
+    @ViewBuilder
+    private func metricSection(_ title: String, _ metrics: [BodyMetricDefinition]) -> some View {
+        if !metrics.isEmpty {
+            FCSectionLabel(title)
+                .padding(.top, FCPrimitives.space6)
+                .padding(.bottom, FCPrimitives.space1)
+            ForEach(metrics) { metric in
+                metricRow(metric)
+                FCListRowDivider()
+            }
+        }
     }
 
     private func metricRow(_ metric: BodyMetricDefinition) -> some View {
-        HStack {
-            Button {
-                path.append(
-                    .bodyMeasurementEntry(studentID: viewModel.studentID.rawValue, metricID: metric.id.rawValue))
-            } label: {
-                VStack(alignment: .leading, spacing: FCPrimitives.space2) {
-                    HStack {
-                        Text(metric.name.value)
-                            .fcFont(.headline)
-                            .foregroundStyle(FCSemanticColors.textPrimary)
-                        if metric.lifecycle == .archived {
-                            Text(String(localized: "bodyData.archived"))
-                                .fcFont(.sectionLabel)
-                                .foregroundStyle(FCSemanticColors.textSecondary)
-                        }
-                    }
-                    Text(metric.currentUnit)
-                        .fcFont(.caption)
-                        .foregroundStyle(FCSemanticColors.textSecondary)
-                    if let latestValue = viewModel.latestDisplayValue(for: metric) {
-                        Text(latestValue)
-                            .fcFont(.callout)
-                            .foregroundStyle(FCSemanticColors.textPrimary)
-                    }
-                }
-                .padding(FCPrimitives.space4)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(FCSemanticColors.surfaceElevated)
-                .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusMd))
+        let display = viewModel.latestDisplay(for: metric)
+        return Button {
+            path.append(
+                .bodyMeasurementEntry(studentID: viewModel.studentID.rawValue, metricID: metric.id.rawValue))
+        } label: {
+            HStack(alignment: .firstTextBaseline, spacing: 0) {
+                Text(metric.name.value)
+                    .fcFont(.callout, weight: .regular)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Text(display.value)
+                    .fcFont(.numeralLarge)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                    .frame(minWidth: valueColumnWidth, alignment: .leading)
+                Text(display.unit)
+                    .fcFont(.caption)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
+                    .frame(minWidth: unitColumnWidth, alignment: .leading)
             }
-            .buttonStyle(.plain)
+            .padding(.vertical, FCPrimitives.space3)
+            .frame(minHeight: 52)
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
         .accessibilityIdentifier(FCAccessibilityID.bodyDataMetricRow(metric.id))
-        .contextMenu {
-            if metric.kind == .custom {
-                Button(
-                    metric.lifecycle == .active
-                        ? String(localized: "bodyData.archive")
-                        : String(localized: "bodyData.restore")
-                ) {
-                    Task { await viewModel.toggleArchive(metric) }
-                }
-                Button(String(localized: "bodyData.delete"), role: .destructive) {
-                    Task { await viewModel.deleteIfUnused(metric) }
-                }
-            }
-        }
     }
 }

@@ -16,6 +16,12 @@ final class BodyMeasurementEntryViewModel: ObservableObject {
     /// this metric) -- mirrors `pendingDeleteID`'s single-row confirmation
     /// pattern, just at metric scope.
     @Published var showingDeleteAllConfirm = false
+    /// Confirmation gate for permanently deleting this custom metric (T069k:
+    /// moved here from a long-press-only menu on the list row, now behind a
+    /// visible "…" menu and a confirmation).
+    @Published var showingDeleteMetricConfirm = false
+    /// Set once the custom metric itself is deleted, so the view pops back.
+    @Published var didDeleteMetric = false
     /// Coach's current display-unit choice for THIS metric's unit family
     /// (M1B-FR-025) -- only meaningful when `metric.kind == .builtIn` and
     /// `unitRuleKind` is `.weight`/`.length`; irrelevant otherwise. Seeded
@@ -48,6 +54,8 @@ final class BodyMeasurementEntryViewModel: ObservableObject {
         guard let today = history.map(\.localCalendarDay).max() else { return nil }
         return history.first { $0.localCalendarDay == today }
     }
+
+    var isCustomMetric: Bool { metric?.kind == .custom }
 
     var isBuiltInWeight: Bool { metric?.kind == .builtIn && metric?.unitRuleKind == .weight }
     var isBuiltInLength: Bool { metric?.kind == .builtIn && metric?.unitRuleKind == .length }
@@ -157,11 +165,47 @@ final class BodyMeasurementEntryViewModel: ObservableObject {
         }
     }
 
+    /// 停用 / 恢复 for a custom metric (M1B-FR-023); archived metrics keep
+    /// their history reachable.
+    func toggleArchive() async {
+        guard let metric, metric.kind == .custom else { return }
+        do {
+            if metric.lifecycle == .active {
+                _ = try await useCases.archiveCustomMetric(id: metric.id)
+            } else {
+                _ = try await useCases.restoreCustomMetric(id: metric.id)
+            }
+            await reload()
+        } catch {
+            errorMessage =
+                (error as? LocalizedError)?.errorDescription
+                ?? String(localized: "bodyMeasurementEntry.error.generic")
+        }
+    }
+
+    /// Deletion is only possible with zero recorded measurements
+    /// (M1B-FR-023/D-009) -- `deleteCustomMetricIfUnused` counts live and
+    /// refuses otherwise; this surfaces that refusal as a real message
+    /// rather than a silent no-op.
+    func confirmDeleteMetric() async {
+        showingDeleteMetricConfirm = false
+        do {
+            try await useCases.deleteCustomMetricIfUnused(id: metricID)
+            didDeleteMetric = true
+        } catch DomainError.conflict {
+            errorMessage = String(localized: "bodyData.deleteBlocked")
+        } catch {
+            errorMessage =
+                (error as? LocalizedError)?.errorDescription
+                ?? String(localized: "bodyMeasurementEntry.error.generic")
+        }
+    }
+
     /// Clears every recorded measurement for this metric (with the coach
     /// having already confirmed via `showingDeleteAllConfirm`). Never
     /// touches the metric definition itself -- if this metric has zero
-    /// other references, the coach can now successfully delete it from the
-    /// list screen (`deleteCustomMetricIfUnused` re-validates the count).
+    /// other references, the coach can now delete it from this screen's "…"
+    /// menu (`deleteCustomMetricIfUnused` re-validates the count).
     func confirmDeleteAll() async {
         do {
             try await useCases.deleteAllMeasurements(studentID: studentID, metricID: metricID)
@@ -178,6 +222,7 @@ final class BodyMeasurementEntryViewModel: ObservableObject {
 
 struct BodyMeasurementEntryView: View {
     @StateObject private var viewModel: BodyMeasurementEntryViewModel
+    @Environment(\.dismiss) private var dismiss
 
     init(studentID: StableUUID, metricID: StableUUID, useCases: BodyDataUseCases) {
         _viewModel = StateObject(
@@ -277,6 +322,32 @@ struct BodyMeasurementEntryView: View {
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementEntryRoot)
         .task { await viewModel.reload() }
+        .toolbar {
+            if viewModel.isCustomMetric {
+                ToolbarItem(placement: .topBarTrailing) {
+                    metricActionsMenu
+                }
+            }
+        }
+        .onChange(of: viewModel.didDeleteMetric) { _, deleted in
+            if deleted {
+                dismiss()
+            }
+        }
+        .confirmationDialog(
+            String(localized: "bodyData.deleteConfirmTitle"),
+            isPresented: $viewModel.showingDeleteMetricConfirm,
+            titleVisibility: .visible
+        ) {
+            Button(String(localized: "bodyData.delete"), role: .destructive) {
+                Task { await viewModel.confirmDeleteMetric() }
+            }
+            Button(String(localized: "bodyData.deleteCancel"), role: .cancel) {
+                viewModel.showingDeleteMetricConfirm = false
+            }
+        } message: {
+            Text(String(localized: "bodyData.deleteConfirmMessage"))
+        }
         .confirmationDialog(
             String(localized: "bodyMeasurementEntry.deleteConfirmTitle"),
             isPresented: Binding(
@@ -312,6 +383,29 @@ struct BodyMeasurementEntryView: View {
         } message: {
             Text(String(localized: "bodyMeasurementEntry.deleteAllConfirmMessage"))
         }
+    }
+
+    /// Visible "…" menu for a custom metric's lifecycle actions (CLAUDE.md
+    /// "Discoverable affordances": never long-press only).
+    private var metricActionsMenu: some View {
+        Menu {
+            Button(
+                viewModel.metric?.lifecycle == .archived
+                    ? String(localized: "bodyData.restore")
+                    : String(localized: "bodyData.archive")
+            ) {
+                Task { await viewModel.toggleArchive() }
+            }
+            Button(String(localized: "bodyData.delete"), role: .destructive) {
+                viewModel.showingDeleteMetricConfirm = true
+            }
+        } label: {
+            Image(systemName: "ellipsis")
+                .foregroundStyle(FCSemanticColors.textSecondary)
+                .frame(minWidth: 44, minHeight: 44)
+                .contentShape(Rectangle())
+        }
+        .accessibilityLabel(String(localized: "bodyData.moreActions"))
     }
 
     private func historyRow(_ measurement: BodyMeasurement) -> some View {

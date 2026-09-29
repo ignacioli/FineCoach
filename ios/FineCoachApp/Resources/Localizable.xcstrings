@@ -3777,13 +3777,90 @@
         }
       }
     },
-    "bodyData.builtInSection": {
+    "bodyData.basicSection": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "常用指标"
+            "value": "基本指标"
+          }
+        }
+      }
+    },
+    "bodyData.girthSection": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "围度"
+          }
+        }
+      }
+    },
+    "bodyData.unitSummaryFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "单位 · %1$@ / %2$@"
+          }
+        }
+      }
+    },
+    "bodyData.noValue": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "—"
+          }
+        }
+      }
+    },
+    "bodyData.moreActions": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更多操作"
+          }
+        }
+      }
+    },
+    "bodyData.deleteConfirmTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除这个自定义指标？"
+          }
+        }
+      }
+    },
+    "bodyData.deleteConfirmMessage": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "指标会被永久删除，无法恢复。只有没有任何记录的指标才能删除。"
+          }
+        }
+      }
+    },
+    "bodyData.deleteCancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
           }
         }
       }
@@ -3827,7 +3904,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "添加自定义指标"
+            "value": "＋ 自定义指标"
           }
         }
       }
