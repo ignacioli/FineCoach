@@ -9,6 +9,9 @@ final class TodayViewModel: ObservableObject {
     /// The training in progress, whether or not it started from an
     /// appointment (T063 01 #1).
     @Published var inProgress: InProgressTrainingSummary?
+    /// Students whose active 课包 is expired or out of credits (M1B-FR-014):
+    /// today only warns briefly (NFR-005), never shows the balance.
+    @Published var packageAlertStudentIDs: Set<StableUUID> = []
 
     private let appointmentUseCases: AppointmentUseCases
     private let studentUseCases: StudentUseCases
@@ -69,10 +72,30 @@ final class TodayViewModel: ObservableObject {
                 }
             }
             studentNames = names
+            await reloadPackageAlerts()
             errorMessage = nil
         } catch {
             errorMessage = String(localized: "today.error.generic")
         }
+    }
+
+    private func reloadPackageAlerts() async {
+        guard let creditLedgerUseCases else {
+            packageAlertStudentIDs = []
+            return
+        }
+        var alerts: Set<StableUUID> = []
+        for studentID in Set(rows.map(\.appointment.studentID)) {
+            guard let package = try? await creditLedgerUseCases.activePackage(studentID: studentID) else {
+                continue
+            }
+            if package.isExpired(asOf: todayDate)
+                || package.isBalanceLow(ledgerBalance: package.remainingCreditsCache)
+            {
+                alerts.insert(studentID)
+            }
+        }
+        packageAlertStudentIDs = alerts
     }
 
     func present(_ message: String) {
@@ -295,6 +318,9 @@ struct TodayView: View {
                     Text(TodayRowPresentation.durationAndFocus(appointment))
                         .fcFont(.caption)
                         .foregroundStyle(FCSemanticColors.textSecondary)
+                    if viewModel.packageAlertStudentIDs.contains(appointment.studentID) {
+                        FCStatusLabel(.coursePackageInvalid)
+                    }
                 }
                 Spacer(minLength: FCPrimitives.space2)
                 FCSymbol(.forward)
@@ -319,10 +345,15 @@ struct TodayView: View {
                 Text(appointment.startTime.canonicalString)
                     .fcFont(.callout, weight: .semibold)
                     .foregroundStyle(FCSemanticColors.textPrimary)
-                Text(TodayRowPresentation.nameAndFocus(viewModel.displayName(for: appointment.studentID), appointment.trainingFocus))
-                    .fcFont(.body)
-                    .foregroundStyle(FCSemanticColors.textPrimary)
-                    .lineLimit(1)
+                VStack(alignment: .leading, spacing: FCPrimitives.space1) {
+                    Text(TodayRowPresentation.nameAndFocus(viewModel.displayName(for: appointment.studentID), appointment.trainingFocus))
+                        .fcFont(.body)
+                        .foregroundStyle(FCSemanticColors.textPrimary)
+                        .lineLimit(1)
+                    if viewModel.packageAlertStudentIDs.contains(appointment.studentID) {
+                        FCStatusLabel(.coursePackageInvalid)
+                    }
+                }
                 Spacer(minLength: FCPrimitives.space2)
                 if row.section == .overdue {
                     FCStatusLabel(.overdue)

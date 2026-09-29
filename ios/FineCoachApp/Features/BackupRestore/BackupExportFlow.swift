@@ -35,6 +35,13 @@ final class BackupExportFlowViewModel: ObservableObject {
     func cancelInFlight() {
         exportTask?.cancel()
         isExporting = false
+        clearPasswords()
+    }
+
+    /// The 口令 must not outlive the export flow in memory (T052 finding 3).
+    private func clearPasswords() {
+        password = ""
+        passwordConfirm = ""
     }
 
     private func performExport() async {
@@ -84,6 +91,7 @@ final class BackupExportFlowViewModel: ObservableObject {
             switch outcome {
             case .completed:
                 exportStatus = String(localized: "backup.export.handedOff")
+                clearPasswords()
             case .cancelled, .failed:
                 showsRetry = true
             }

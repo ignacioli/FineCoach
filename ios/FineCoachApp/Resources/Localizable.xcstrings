@@ -2820,6 +2820,17 @@
         }
       }
     },
+    "appointmentEditor.openSystemSettings": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "前往系统设置开启通知"
+          }
+        }
+      }
+    },
     "appointmentEditor.conflictTitle": {
       "extractionState": "manual",
       "localizations": {

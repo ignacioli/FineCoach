@@ -21,16 +21,18 @@ public struct LaunchArgumentSharePresenter: SystemSharePresenting {
     public init() {}
 
     public func present(fileURLs: [URL]) async -> SystemShareOutcome {
-        let arguments = ProcessInfo.processInfo.arguments
-        if arguments.contains("-FineCoachSimulateShareCompletion") {
-            return .completed
-        }
-        if arguments.contains("-FineCoachSimulateShareCancel") {
-            return .cancelled
-        }
-        if arguments.contains("-FineCoachSimulateShareFailure") {
-            return .failed
-        }
+        #if DEBUG
+            let arguments = ProcessInfo.processInfo.arguments
+            if arguments.contains("-FineCoachSimulateShareCompletion") {
+                return .completed
+            }
+            if arguments.contains("-FineCoachSimulateShareCancel") {
+                return .cancelled
+            }
+            if arguments.contains("-FineCoachSimulateShareFailure") {
+                return .failed
+            }
+        #endif
         return await UIKitSystemSharePresenter().present(fileURLs: fileURLs)
     }
 }

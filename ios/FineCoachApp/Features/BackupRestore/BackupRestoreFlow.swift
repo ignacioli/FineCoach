@@ -32,6 +32,7 @@ final class BackupRestoreFlowViewModel: ObservableObject {
     func cancelInFlight() {
         restoreTask?.cancel()
         isRestoring = false
+        password = ""
     }
 
     func restoreNow(using environment: AppEnvironment) async {
@@ -68,6 +69,7 @@ final class BackupRestoreFlowViewModel: ObservableObject {
             )
             try environment.reloadAfterCommittedRestore()
             succeeded = true
+            password = ""
         } catch {
             failed = true
             showsRetry = true
@@ -147,6 +149,9 @@ struct BackupRestoreFlowView: View {
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.restoreRoot)
+        .onDisappear {
+            viewModel.cancelInFlight()
+        }
         .fileImporter(
             isPresented: $isImporterPresented,
             allowedContentTypes: [.fineCoachBackup, .data],

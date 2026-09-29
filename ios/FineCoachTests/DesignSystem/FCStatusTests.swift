@@ -17,4 +17,31 @@ final class FCStatusTests: XCTestCase {
             XCTAssertFalse(status.symbolName.isEmpty, "\(status) must have an SF Symbol name")
         }
     }
+
+    /// T047a (c): where each of the 5 statuses is shown. The status must be
+    /// rendered through `FCStatusLabel(.<case>)` (text + icon, NFR-005) in
+    /// its registered Feature file. Plain source scan; no view inspection.
+    func testEveryStatusIsShownThroughStatusLabelInItsRegisteredFile() throws {
+        let locations: [(status: String, file: String)] = [
+            ("overdue", "Features/Today/TodayView.swift"),
+            ("conflict", "Features/Appointments/AppointmentEditorView.swift"),
+            ("coursePackageInvalid", "Features/Today/TodayView.swift"),
+            ("notComparable", "Features/History/HistoryListView.swift"),
+            ("permissionDenied", "Features/Appointments/AppointmentEditorView.swift"),
+        ]
+        XCTAssertEqual(Set(locations.map(\.status)).count, FCStatus.allCases.count)
+        let appRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent() // DesignSystem/
+            .deletingLastPathComponent() // FineCoachTests/
+            .deletingLastPathComponent() // ios/
+            .appendingPathComponent("FineCoachApp")
+        for location in locations {
+            let url = appRoot.appendingPathComponent(location.file)
+            let source = try String(contentsOf: url, encoding: .utf8)
+            XCTAssertTrue(
+                source.contains("FCStatusLabel(.\(location.status))"),
+                "\(location.file) must show .\(location.status) via FCStatusLabel"
+            )
+        }
+    }
 }

@@ -423,7 +423,9 @@ struct AppointmentEditorView: View {
 
     @StateObject private var viewModel: AppointmentEditorViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
     @State private var expanded: ExpandedField?
+    @State private var notificationStatus: NotificationAuthorizationStatus = .notDetermined
 
     init(
         mode: AppointmentEditorMode,
@@ -513,6 +515,21 @@ struct AppointmentEditorView: View {
                         .padding(.top, FCPrimitives.space3)
                 }
 
+                if viewModel.hasConflictPrompt {
+                    FCStatusLabel(.conflict)
+                        .padding(.top, FCPrimitives.space3)
+                }
+
+                if viewModel.reminderEnabled && notificationStatus == .denied {
+                    VStack(alignment: .leading, spacing: FCPrimitives.space1) {
+                        FCStatusLabel(.permissionDenied)
+                        FCLinkButton(title: String(localized: "appointmentEditor.openSystemSettings")) {
+                            SystemSettingsLink.openNotificationSettings()
+                        }
+                    }
+                    .padding(.top, FCPrimitives.space3)
+                }
+
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
                         .fcFont(.caption)
@@ -543,6 +560,7 @@ struct AppointmentEditorView: View {
             scopeSheet
         }
         .task { await viewModel.load() }
+        .task(id: scenePhase) { notificationStatus = await SystemNotificationAdapter().currentStatus() }
         .onChange(of: viewModel.didSave) { _, saved in
             if saved {
                 dismiss()
