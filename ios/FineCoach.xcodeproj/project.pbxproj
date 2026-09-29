@@ -79,6 +79,7 @@
 		B961 /* ShareReportCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A961 /* ShareReportCardView.swift */; };
 		B960 /* CourseActionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A960 /* CourseActionSheet.swift */; };
 		B958 /* ResourceHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A958 /* ResourceHubView.swift */; };
+		AD5E02 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5E01 /* SettingsView.swift */; };
 		B957 /* FCSymbol.swift in Sources */ = {isa = PBXBuildFile; fileRef = A957 /* FCSymbol.swift */; };
 		B955 /* FCEquipmentIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = A955 /* FCEquipmentIcon.swift */; };
 		B956 /* IconConsistencyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A956 /* IconConsistencyTests.swift */; };
@@ -340,6 +341,7 @@
 		A915 /* FCHintBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCHintBar.swift; sourceTree = "<group>"; };
 		A961 /* ShareReportCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareReportCardView.swift; sourceTree = "<group>"; };
 		A960 /* CourseActionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CourseActionSheet.swift; sourceTree = "<group>"; };
+		AD5E01 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A958 /* ResourceHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceHubView.swift; sourceTree = "<group>"; };
 		A957 /* FCSymbol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCSymbol.swift; sourceTree = "<group>"; };
 		A955 /* FCEquipmentIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCEquipmentIcon.swift; sourceTree = "<group>"; };
@@ -769,8 +771,17 @@
 				A445 /* BackupRestore */,
 				A943 /* Shared */,
 				A959 /* ResourceHub */,
+				AD5E03 /* Settings */,
 			);
 			path = Features;
+			sourceTree = "<group>";
+		};
+		AD5E03 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				AD5E01 /* SettingsView.swift */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 		A959 /* ResourceHub */ = {
@@ -1663,6 +1674,7 @@
 				B523 /* TodayView.swift in Sources */,
 				B960 /* CourseActionSheet.swift in Sources */,
 				B958 /* ResourceHubView.swift in Sources */,
+				AD5E02 /* SettingsView.swift in Sources */,
 				B524 /* CalendarView.swift in Sources */,
 				B525 /* AppointmentEditorView.swift in Sources */,
 				B518 /* NotificationScheduler.swift in Sources */,

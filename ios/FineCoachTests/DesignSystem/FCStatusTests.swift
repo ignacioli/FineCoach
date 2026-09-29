@@ -28,8 +28,9 @@ final class FCStatusTests: XCTestCase {
             ("coursePackageInvalid", "Features/Today/TodayView.swift"),
             ("notComparable", "Features/History/HistoryListView.swift"),
             ("permissionDenied", "Features/Appointments/AppointmentEditorView.swift"),
+            ("permissionDenied", "Features/Settings/SettingsView.swift"),
         ]
-        XCTAssertEqual(Set(locations.map(\.status)).count, FCStatus.allCases.count)
+        XCTAssertEqual(Set(locations.map(\.status)).count, FCStatus.allCases.count, "every status needs a registered location")
         let appRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent() // DesignSystem/
             .deletingLastPathComponent() // FineCoachTests/

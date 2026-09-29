@@ -1,9 +1,8 @@
 import SwiftUI
 
 /// 资料库 (D2, `19-resource-hub`): the coach's own material, not tied to a
-/// student — 动作库, 训练模板, 备份与恢复. Reached from the 学员 title row
-/// (T069b); counts added in T069c. No last-backup date is recorded
-/// anywhere, so the backup row has no subtitle rather than an invented one.
+/// student — 动作库, 训练模板. Reached from the 学员 title row (T069b); counts
+/// added in T069c. 备份与恢复 moved to 设置 (D15, T079).
 struct ResourceHubView: View {
     let exerciseUseCases: ExerciseLibraryUseCases
     let templateUseCases: TemplateUseCases
@@ -37,15 +36,6 @@ struct ResourceHubView: View {
                         identifier: FCAccessibilityID.templatesEntry
                     ) {
                         path.append(.templates)
-                    }
-                    FCListRowDivider()
-                    hubRow(
-                        title: String(localized: "backup.title"),
-                        subtitle: nil,
-                        icon: hubSymbol("externaldrive"),
-                        identifier: FCAccessibilityID.resourceHubBackup
-                    ) {
-                        path.append(.backupRestore)
                     }
                     FCListRowDivider()
                 }

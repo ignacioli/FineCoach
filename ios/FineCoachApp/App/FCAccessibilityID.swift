@@ -31,6 +31,12 @@ public enum FCAccessibilityID {
     public static let todayInProgress = "today.inProgress"
     public static let todayResolvedFold = "today.resolvedFold"
     public static let todayCalendarEntry = "today.calendarEntry"
+    public static let todayAddAppointment = "today.addAppointment"
+    public static let settingsEntry = "settings.entry"
+    public static let settingsRoot = "settings.root"
+    public static let settingsNotifications = "settings.notifications"
+    public static let settingsBackup = "settings.backup"
+    public static let settingsAbout = "settings.about"
 
     public static func todayRow(_ id: StableUUID) -> String {
         "today.row.\(id.rawValue.uuidString)"
@@ -47,7 +53,6 @@ public enum FCAccessibilityID {
     public static let studentListEmptyAdd = "studentList.emptyAdd"
     public static let resourceHubEntry = "resourceHub.entry"
     public static let historyCompareSelect = "history.compareSelect"
-    public static let resourceHubBackup = "resourceHub.backup"
     public static let studentListArchived = "studentList.archived"
     public static let studentListInProgress = "studentList.inProgress"
 

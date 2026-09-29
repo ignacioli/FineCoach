@@ -203,10 +203,18 @@ struct TodayView: View {
                     .foregroundStyle(FCSemanticColors.actionPrimary)
                     .accessibilityAddTraits(.isHeader)
                 Spacer()
+                FCTitleAddButton(accessibilityLabel: String(localized: "today.addAppointment")) {
+                    path.append(.appointmentEditor(.create(studentID: nil, date: viewModel.todayDate)))
+                }
+                .accessibilityIdentifier(FCAccessibilityID.todayAddAppointment)
                 FCTitleIconButton(systemImage: "calendar", accessibilityLabel: String(localized: "calendar.title")) {
                     path.append(.calendar)
                 }
                 .accessibilityIdentifier(FCAccessibilityID.todayCalendarEntry)
+                FCTitleIconButton(systemImage: "gearshape", accessibilityLabel: String(localized: "settings.entry")) {
+                    path.append(.settings)
+                }
+                .accessibilityIdentifier(FCAccessibilityID.settingsEntry)
             }
             Text(TodayDatePresentation.longDay(viewModel.todayDate))
                 .fcFont(.callout, weight: .regular)

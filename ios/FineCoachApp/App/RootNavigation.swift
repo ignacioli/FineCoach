@@ -3,6 +3,7 @@ import SwiftUI
 enum RootDestination: Hashable {
     case archivedList
     case resourceHub
+    case settings
     case studentDetail(UUID)
     case editor(StudentEditorMode)
     case activeSession(UUID)
@@ -180,6 +181,8 @@ struct RootNavigation: View {
                                     shareAdapter: environment.requireShareAdapter(),
                                     path: $path
                                 )
+                            case .settings:
+                                SettingsView(path: $path)
                             case .backupRestore:
                                 BackupExportFlowView(
                                     coordinator: environment.requireBackupCoordinator(),

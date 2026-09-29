@@ -181,3 +181,30 @@ public struct FCTitleIconButton: View {
         .accessibilityLabel(Text(accessibilityLabel))
     }
 }
+
+/// 标题行「＋」主入口 (D15a): solid `action.primary` circle with a white
+/// plus, tap target ≥ 44×44. Only the 今日 title row uses it, and it always
+/// means 新建预约.
+public struct FCTitleAddButton: View {
+    private let accessibilityLabel: String
+    private let action: () -> Void
+
+    public init(accessibilityLabel: String, action: @escaping () -> Void) {
+        self.accessibilityLabel = accessibilityLabel
+        self.action = action
+    }
+
+    public var body: some View {
+        Button(action: action) {
+            Image(systemName: "plus")
+                .fontWeight(.semibold)
+                .foregroundStyle(FCSemanticColors.actionOn)
+                .frame(width: 36, height: 36)
+                .background(Circle().fill(FCSemanticColors.actionPrimary))
+                .frame(minWidth: 44, minHeight: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text(accessibilityLabel))
+    }
+}

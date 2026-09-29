@@ -271,6 +271,10 @@ struct StudentListView: View {
                 path.append(.resourceHub)
             }
             .accessibilityIdentifier(FCAccessibilityID.resourceHubEntry)
+            FCTitleIconButton(systemImage: "gearshape", accessibilityLabel: String(localized: "settings.entry")) {
+                path.append(.settings)
+            }
+            .accessibilityIdentifier(FCAccessibilityID.settingsEntry)
         }
         .padding(.top, FCPrimitives.space4)
     }
