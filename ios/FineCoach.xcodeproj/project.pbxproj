@@ -258,6 +258,7 @@
 		B241 /* ShareReportPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A241 /* ShareReportPolicyTests.swift */; };
 		B500 /* VisionHarnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A501 /* VisionHarnessTests.swift */; };
 		AD5F02 /* CapabilityManifestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5F01 /* CapabilityManifestTests.swift */; };
+		AD5F12 /* LogSurfaceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5F11 /* LogSurfaceTests.swift */; };
 		B930 /* FCStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A930 /* FCStatusTests.swift */; };
 		B963 /* FCStepperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A963 /* FCStepperTests.swift */; };
 		B931 /* TypographyHarnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A931 /* TypographyHarnessTests.swift */; };
@@ -493,6 +494,7 @@
 		A241 /* ShareReportPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareReportPolicyTests.swift; sourceTree = "<group>"; };
 		A501 /* VisionHarnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionHarnessTests.swift; sourceTree = "<group>"; };
 		AD5F01 /* CapabilityManifestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapabilityManifestTests.swift; sourceTree = "<group>"; };
+		AD5F11 /* LogSurfaceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogSurfaceTests.swift; sourceTree = "<group>"; };
 		A930 /* FCStatusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCStatusTests.swift; sourceTree = "<group>"; };
 		A963 /* FCStepperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCStepperTests.swift; sourceTree = "<group>"; };
 		A931 /* TypographyHarnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypographyHarnessTests.swift; sourceTree = "<group>"; };
@@ -1345,6 +1347,7 @@
 			isa = PBXGroup;
 			children = (
 				AD5F01 /* CapabilityManifestTests.swift */,
+				AD5F11 /* LogSurfaceTests.swift */,
 			);
 			path = Privacy;
 			sourceTree = "<group>";
@@ -1844,6 +1847,7 @@
 				B956 /* IconConsistencyTests.swift in Sources */,
 				B930 /* FCStatusTests.swift in Sources */,
 				AD5F02 /* CapabilityManifestTests.swift in Sources */,
+				AD5F12 /* LogSurfaceTests.swift in Sources */,
 				B963 /* FCStepperTests.swift in Sources */,
 				B931 /* TypographyHarnessTests.swift in Sources */,
 				B932 /* DesignValueScanTests.swift in Sources */,
