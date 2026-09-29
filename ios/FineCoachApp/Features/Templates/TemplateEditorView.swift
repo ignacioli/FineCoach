@@ -169,9 +169,9 @@ struct TemplateEditorView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+            VStack(alignment: .leading, spacing: FCPrimitives.space4) {
                 if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage).foregroundStyle(FCSemanticColors.destructive)
+                    Text(errorMessage).foregroundStyle(FCSemanticColors.statusDestructive)
                 }
 
                 FCTextField(String(localized: "templateEditor.name"), text: $name)
@@ -184,7 +184,7 @@ struct TemplateEditorView: View {
                         Task { await viewModel.updateTrainingFocus(newValue) }
                     }
 
-                Divider()
+                FCListRowDivider()
 
                 ForEach(viewModel.unsectionedExercises) { exercise in
                     exerciseRow(exercise)
@@ -194,7 +194,7 @@ struct TemplateEditorView: View {
                     sectionBlock(section)
                 }
 
-                Divider()
+                FCListRowDivider()
 
                 FCTextField(String(localized: "templateEditor.exerciseNamePrompt"), text: $viewModel.newExerciseName)
                 FCButton(title: String(localized: "templateEditor.addExercise")) {
@@ -215,7 +215,7 @@ struct TemplateEditorView: View {
                 }
                 .accessibilityIdentifier(FCAccessibilityID.templateListDelete)
             }
-            .padding(FCPrimitives.spacingMedium)
+            .padding(FCPrimitives.space4)
         }
         .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "templateEditor.title"))
@@ -263,7 +263,7 @@ struct TemplateEditorView: View {
     private func exerciseRow(_ exercise: TemplateExercise) -> some View {
         HStack {
             Text(exercise.displayNameSnapshot.value)
-                .foregroundStyle(FCSemanticColors.primaryText)
+                .foregroundStyle(FCSemanticColors.textPrimary)
             Spacer()
             Menu(String(localized: "templateEditor.moveToUnsectioned")) {
                 Button(String(localized: "templateEditor.unsectioned")) {
@@ -280,34 +280,34 @@ struct TemplateEditorView: View {
                 Task { await viewModel.removeExercise(exercise.id) }
             }
             .frame(minHeight: 44)
-            .foregroundStyle(FCSemanticColors.destructive)
+            .foregroundStyle(FCSemanticColors.statusDestructive)
         }
-        .padding(FCPrimitives.spacingSmall)
-        .background(FCSemanticColors.elevatedSurface)
-        .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSmall))
+        .padding(FCPrimitives.space2)
+        .background(FCSemanticColors.surfaceElevated)
+        .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSm))
         .accessibilityIdentifier(FCAccessibilityID.templateExerciseRow(exercise.id))
     }
 
     private func sectionBlock(_ section: SessionSection) -> some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
+        VStack(alignment: .leading, spacing: FCPrimitives.space2) {
             HStack {
                 Text(section.name.value)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(FCSemanticColors.secondaryText)
+                    .fcFont(.sectionLabel)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
                 Spacer()
                 Button(String(localized: "templateEditor.deleteSection")) {
                     viewModel.requestDeleteSection(section)
                 }
                 .frame(minHeight: 44)
-                .foregroundStyle(FCSemanticColors.destructive)
+                .foregroundStyle(FCSemanticColors.statusDestructive)
             }
             .accessibilityIdentifier(FCAccessibilityID.templateSectionRow(section.id))
             ForEach(viewModel.exercises(in: section)) { exercise in
                 exerciseRow(exercise)
             }
         }
-        .padding(FCPrimitives.spacingSmall)
-        .background(FCSemanticColors.tint)
-        .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSmall))
+        .padding(FCPrimitives.space2)
+        .background(FCSemanticColors.surfaceSelected)
+        .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSm))
     }
 }

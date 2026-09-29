@@ -4,7 +4,7 @@ public struct PrivacyCover: View {
     public init() {}
 
     public var body: some View {
-        Color.black
+        FCSemanticColors.actionPrimary
             .ignoresSafeArea()
             .allowsHitTesting(true)
             .accessibilityIdentifier(FCAccessibilityID.privacyCover)

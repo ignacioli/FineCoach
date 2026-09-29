@@ -122,47 +122,54 @@ struct CoursePackageEditorView: View {
             VStack(alignment: .leading, spacing: 0) {
                 editorRow(String(localized: "coursePackageEditor.name")) {
                     TextField("", text: $viewModel.name)
+                        .fcFont(.body)
                         .multilineTextAlignment(.trailing)
                 }
                 .accessibilityIdentifier(FCAccessibilityID.coursePackageEditorName)
-                Divider()
+                FCListRowDivider()
 
                 editorRow(String(localized: "coursePackageEditor.totalCredits")) {
-                    HStack(spacing: FCPrimitives.spacingSmall) {
+                    HStack(spacing: FCPrimitives.space2) {
+                        Spacer(minLength: 0)
                         Text("\(viewModel.totalCredits)")
+                            .fcFont(.body)
                         Stepper("", value: $viewModel.totalCredits, in: 1...999)
                             .labelsHidden()
                     }
                 }
                 .accessibilityIdentifier(FCAccessibilityID.coursePackageEditorTotalCredits)
-                Divider()
+                FCListRowDivider()
 
                 editorRow(String(localized: "coursePackageEditor.hasStartDate")) {
-                    Toggle("", isOn: $viewModel.hasStartDate)
+                    Toggle(String(localized: "coursePackageEditor.hasStartDate"), isOn: $viewModel.hasStartDate)
+                        .toggleStyle(FCToggleStyle())
                         .labelsHidden()
                 }
-                Divider()
+                FCListRowDivider()
 
                 if viewModel.hasStartDate {
                     editorRow(String(localized: "coursePackageEditor.startDate")) {
                         DatePicker("", selection: startDateBinding, displayedComponents: .date)
                             .labelsHidden()
+                            .tint(FCSemanticColors.actionPrimary)
                     }
-                    Divider()
+                    FCListRowDivider()
                 }
 
                 editorRow(String(localized: "coursePackageEditor.hasEndDate")) {
-                    Toggle("", isOn: $viewModel.hasEndDate)
+                    Toggle(String(localized: "coursePackageEditor.hasEndDate"), isOn: $viewModel.hasEndDate)
+                        .toggleStyle(FCToggleStyle())
                         .labelsHidden()
                 }
-                Divider()
+                FCListRowDivider()
 
                 if viewModel.hasEndDate {
                     editorRow(String(localized: "coursePackageEditor.endDate")) {
                         DatePicker("", selection: endDateBinding, displayedComponents: .date)
                             .labelsHidden()
+                            .tint(FCSemanticColors.actionPrimary)
                     }
-                    Divider()
+                    FCListRowDivider()
                 }
 
                 if let existingActivePackage = viewModel.existingActivePackage {
@@ -173,14 +180,16 @@ struct CoursePackageEditorView: View {
                             viewModel.existingActivePackageBalance
                         )
                     )
-                    .foregroundStyle(FCSemanticColors.warning)
-                    .padding(.vertical, FCPrimitives.spacingSmall)
+                    .fcFont(.callout, weight: .regular)
+                    .foregroundStyle(FCSemanticColors.statusWarning)
+                    .padding(.vertical, FCPrimitives.space2)
                 }
 
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
-                        .foregroundStyle(FCSemanticColors.destructive)
-                        .padding(.vertical, FCPrimitives.spacingSmall)
+                        .fcFont(.callout, weight: .regular)
+                        .foregroundStyle(FCSemanticColors.statusDestructive)
+                        .padding(.vertical, FCPrimitives.space2)
                 }
 
                 FCButton(
@@ -189,10 +198,10 @@ struct CoursePackageEditorView: View {
                 ) {
                     Task { await viewModel.save() }
                 }
-                .padding(.top, FCPrimitives.spacingMedium)
+                .padding(.top, FCPrimitives.space4)
                 .accessibilityIdentifier(FCAccessibilityID.coursePackageEditorSave)
             }
-            .padding(FCPrimitives.spacingMedium)
+            .padding(FCPrimitives.space4)
         }
         .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "coursePackageEditor.title"))
@@ -227,14 +236,13 @@ struct CoursePackageEditorView: View {
     }
 
     private func editorRow<Control: View>(_ label: String, @ViewBuilder control: () -> Control) -> some View {
-        HStack {
-            Text(label)
-                .foregroundStyle(FCSemanticColors.primaryText)
-            Spacer()
-            control()
-                .foregroundStyle(FCSemanticColors.primaryText)
+        FCLabelValueRow(label: label) {
+            HStack(spacing: 0) {
+                Spacer(minLength: 0)
+                control()
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+            }
         }
-        .frame(minHeight: 44)
     }
 
     private var startDateBinding: Binding<Date> {

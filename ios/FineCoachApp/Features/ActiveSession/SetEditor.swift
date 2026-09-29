@@ -12,7 +12,7 @@ struct SetEditor: View {
     private var isEditMode: Bool { targetSetID != nil }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
+        VStack(alignment: .leading, spacing: FCPrimitives.space2) {
             if exercise.recordModeSnapshot == .weightReps {
                 FCTextField(String(localized: "session.field.weight"), text: $viewModel.weight)
                     .keyboardType(.decimalPad)
@@ -43,7 +43,7 @@ struct SetEditor: View {
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionDuration)
             }
 
-            HStack(spacing: FCPrimitives.spacingSmall) {
+            HStack(spacing: FCPrimitives.space2) {
                 sideButton(
                     title: String(localized: "session.side.none"),
                     identifier: FCAccessibilityID.activeSessionSideNone,
@@ -66,7 +66,7 @@ struct SetEditor: View {
             }
 
             if isEditMode {
-                HStack(spacing: FCPrimitives.spacingSmall) {
+                HStack(spacing: FCPrimitives.space2) {
                     FCButton(title: String(localized: "session.action.saveSetEdit")) {
                         Task { await viewModel.saveEditingSet() }
                     }
@@ -89,7 +89,7 @@ struct SetEditor: View {
                 }
                 .accessibilityIdentifier(FCAccessibilityID.activeSessionConfirmSet)
 
-                HStack(spacing: FCPrimitives.spacingSmall) {
+                HStack(spacing: FCPrimitives.space2) {
                     Button(String(localized: "session.action.copyPrevious")) {
                         Task { await viewModel.copyPrevious() }
                     }
@@ -117,14 +117,14 @@ struct SetEditor: View {
             viewModel.side = value
         }
         .frame(minHeight: 44)
-        .padding(.horizontal, FCPrimitives.spacingSmall)
+        .padding(.horizontal, FCPrimitives.space2)
         .background(
-            viewModel.side == value ? FCSemanticColors.primaryText : FCSemanticColors.elevatedSurface
+            viewModel.side == value ? FCSemanticColors.textPrimary : FCSemanticColors.surfaceElevated
         )
         .foregroundStyle(
-            viewModel.side == value ? FCSemanticColors.elevatedSurface : FCSemanticColors.primaryText
+            viewModel.side == value ? FCSemanticColors.surfaceElevated : FCSemanticColors.textPrimary
         )
-        .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSmall))
+        .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSm))
         .accessibilityIdentifier(identifier)
         .accessibilityAddTraits(viewModel.side == value ? [.isSelected] : [])
     }

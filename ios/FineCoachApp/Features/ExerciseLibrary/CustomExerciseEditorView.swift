@@ -122,21 +122,21 @@ struct CustomExerciseEditorView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+            VStack(alignment: .leading, spacing: FCPrimitives.space4) {
                 Text(String(localized: "exercise.editor.name"))
-                    .font(.headline)
+                    .fcFont(.headline)
                 FCTextField(String(localized: "exercise.editor.name"), text: $viewModel.name)
                     .accessibilityIdentifier(FCAccessibilityID.customExerciseName)
                     .disabled(viewModel.lifecycle == .archived)
 
-                HStack(spacing: FCPrimitives.spacingSmall) {
+                HStack(spacing: FCPrimitives.space2) {
                     modeChip(
                         .weightReps,
                         title: String(localized: "session.mode.weightReps"),
                         id: FCAccessibilityID.customExerciseModeWeightReps
                     )
                 }
-                HStack(spacing: FCPrimitives.spacingSmall) {
+                HStack(spacing: FCPrimitives.space2) {
                     modeChip(
                         .reps,
                         title: String(localized: "session.mode.reps"),
@@ -151,12 +151,12 @@ struct CustomExerciseEditorView: View {
 
                 if let conflictMessage = viewModel.conflictMessage {
                     Text(conflictMessage)
-                        .foregroundStyle(FCSemanticColors.destructive)
+                        .foregroundStyle(FCSemanticColors.statusDestructive)
                         .accessibilityIdentifier(FCAccessibilityID.exerciseLibraryConflict)
                 }
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
-                        .foregroundStyle(FCSemanticColors.destructive)
+                        .foregroundStyle(FCSemanticColors.statusDestructive)
                 }
 
                 FCButton(
@@ -176,7 +176,7 @@ struct CustomExerciseEditorView: View {
                         Task { _ = await viewModel.archive() }
                     }
                     .frame(maxWidth: .infinity, minHeight: 44)
-                    .foregroundStyle(FCSemanticColors.destructive)
+                    .foregroundStyle(FCSemanticColors.statusDestructive)
                     .accessibilityIdentifier(FCAccessibilityID.customExerciseArchive)
                     .accessibilityLabel(String(localized: "exercise.editor.archive"))
                 }
@@ -192,7 +192,7 @@ struct CustomExerciseEditorView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(FCPrimitives.spacingMedium)
+            .padding(FCPrimitives.space4)
         }
         .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "exercise.editor.title"))
@@ -206,14 +206,14 @@ struct CustomExerciseEditorView: View {
             viewModel.recordMode = mode
         }
         .frame(minHeight: 44)
-        .padding(.horizontal, FCPrimitives.spacingSmall)
+        .padding(.horizontal, FCPrimitives.space2)
         .background(
-            viewModel.recordMode == mode ? FCSemanticColors.primaryText : FCSemanticColors.separator
+            viewModel.recordMode == mode ? FCSemanticColors.textPrimary : FCSemanticColors.surfaceDivider
         )
         .foregroundStyle(
-            viewModel.recordMode == mode ? FCSemanticColors.elevatedSurface : FCSemanticColors.primaryText
+            viewModel.recordMode == mode ? FCSemanticColors.surfaceElevated : FCSemanticColors.textPrimary
         )
-        .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSmall))
+        .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSm))
         .disabled(viewModel.lifecycle == .archived)
         .accessibilityIdentifier(id)
         .accessibilityLabel(title)

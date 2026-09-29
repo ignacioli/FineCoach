@@ -72,13 +72,13 @@ struct ApplyTemplateView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+            VStack(alignment: .leading, spacing: FCPrimitives.space4) {
                 if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage).foregroundStyle(FCSemanticColors.destructive)
+                    Text(errorMessage).foregroundStyle(FCSemanticColors.statusDestructive)
                 }
                 if viewModel.templates.isEmpty {
                     Text(String(localized: "applyTemplate.empty"))
-                        .foregroundStyle(FCSemanticColors.secondaryText)
+                        .foregroundStyle(FCSemanticColors.textSecondary)
                 } else {
                     ForEach(viewModel.templates) { template in
                         Button {
@@ -98,7 +98,7 @@ struct ApplyTemplateView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(FCPrimitives.spacingMedium)
+            .padding(FCPrimitives.space4)
         }
         .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "applyTemplate.title"))

@@ -204,7 +204,7 @@ struct ActiveSessionView: View {
     }
 
     private func exerciseCard(_ exercise: SessionExercise, index: Int) -> some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
+        VStack(alignment: .leading, spacing: FCPrimitives.space2) {
             Button {
                 viewModel.selectExercise(exercise.id)
             } label: {
@@ -429,7 +429,7 @@ struct ActiveSessionView: View {
 
     @ViewBuilder
     private func setRow(_ trainingSet: TrainingSet, index: Int, in exercise: SessionExercise) -> some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
+        VStack(alignment: .leading, spacing: FCPrimitives.space2) {
             FCSetRow(
                 title: setTitle(trainingSet, index: index),
                 value: setValue(trainingSet),
@@ -443,14 +443,14 @@ struct ActiveSessionView: View {
             .accessibilityAddTraits(.updatesFrequently)
             .background {
                 Text(trainingSet.state.rawValue)
-                    .font(.caption2)
+                    .fcFont(.caption)
                     .foregroundStyle(.clear)
                     .accessibilityIdentifier(FCAccessibilityID.setState(trainingSet.state))
             }
 
             if viewModel.editingSetID == trainingSet.id {
                 SetEditor(viewModel: viewModel, exercise: exercise, targetSetID: trainingSet.id)
-                    .padding(.bottom, FCPrimitives.spacingSmall)
+                    .padding(.bottom, FCPrimitives.space2)
             }
         }
         .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { height in

@@ -92,7 +92,7 @@ struct SessionDetailView: View {
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
                         .fcFont(.callout, weight: .regular)
-                        .foregroundStyle(FCSemanticColors.destructive)
+                        .foregroundStyle(FCSemanticColors.statusDestructive)
                 }
 
                 if let record = viewModel.record {

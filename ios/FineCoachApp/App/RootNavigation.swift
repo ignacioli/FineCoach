@@ -351,14 +351,14 @@ struct PlaceholderDestinationView: View {
     let kind: PlaceholderKind
 
     var body: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+        VStack(alignment: .leading, spacing: FCPrimitives.space4) {
             Text(title)
-                .font(.title2.weight(.semibold))
+                .fcFont(.title)
             Text(String(localized: "placeholder.boundary"))
-                .foregroundStyle(FCSemanticColors.secondaryText)
+                .foregroundStyle(FCSemanticColors.textSecondary)
             Spacer()
         }
-        .padding(FCPrimitives.spacingMedium)
+        .padding(FCPrimitives.space4)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(FCSemanticColors.surfacePage)
         .navigationTitle(title)

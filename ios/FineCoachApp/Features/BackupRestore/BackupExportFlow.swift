@@ -111,7 +111,7 @@ struct BackupExportFlowView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+            VStack(alignment: .leading, spacing: FCPrimitives.space4) {
                 SecureField(String(localized: "backup.password.placeholder"), text: $viewModel.password)
                     .textContentType(.password)
                     .frame(minHeight: 44)
@@ -121,8 +121,8 @@ struct BackupExportFlowView: View {
                     .frame(minHeight: 44)
                     .accessibilityIdentifier(FCAccessibilityID.backupPasswordConfirm)
                 Text(String(localized: "backup.password.hint"))
-                    .font(.footnote)
-                    .foregroundStyle(FCSemanticColors.secondaryText)
+                    .fcFont(.caption)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
                     .accessibilityIdentifier(FCAccessibilityID.backupPasswordHint)
 
                 if viewModel.isExporting {
@@ -130,7 +130,7 @@ struct BackupExportFlowView: View {
                 }
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
-                        .foregroundStyle(FCSemanticColors.destructive)
+                        .foregroundStyle(FCSemanticColors.statusDestructive)
                 }
                 if let exportStatus = viewModel.exportStatus {
                     Text(exportStatus)
@@ -170,7 +170,7 @@ struct BackupExportFlowView: View {
                     BackupRestoreFlowView(coordinator: coordinator, path: $path)
                 }
             }
-            .padding(FCPrimitives.spacingMedium)
+            .padding(FCPrimitives.space4)
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier(FCAccessibilityID.backupRoot)
         }
@@ -182,8 +182,8 @@ struct BackupExportFlowView: View {
                     path.removeAll()
                 }
             )
-            .padding(.horizontal, FCPrimitives.spacingMedium)
-            .padding(.bottom, FCPrimitives.spacingSmall)
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.bottom, FCPrimitives.space2)
             .accessibilityIdentifier(FCAccessibilityID.backupCancel)
         }
         .background(FCSemanticColors.surfacePage)

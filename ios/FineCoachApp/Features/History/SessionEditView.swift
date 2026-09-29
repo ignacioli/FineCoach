@@ -48,9 +48,9 @@ struct SessionEditView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+            VStack(alignment: .leading, spacing: FCPrimitives.space4) {
                 if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage).foregroundStyle(FCSemanticColors.destructive)
+                    Text(errorMessage).foregroundStyle(FCSemanticColors.statusDestructive)
                 }
                 BodyPartMultiSelectView(title: String(localized: "summary.focus"), selection: $viewModel.focus)
                     .accessibilityIdentifier(FCAccessibilityID.sessionEditFocus)
@@ -65,7 +65,7 @@ struct SessionEditView: View {
                 }
                 .accessibilityIdentifier(FCAccessibilityID.sessionEditSave)
             }
-            .padding(FCPrimitives.spacingMedium)
+            .padding(FCPrimitives.space4)
         }
         .scrollDismissesKeyboard(.interactively)
         .background(FCSemanticColors.surfacePage)

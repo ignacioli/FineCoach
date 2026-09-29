@@ -30,12 +30,12 @@ struct OnboardingView: View {
     var body: some View {
         NavigationStack(path: $path) {
             ScrollView {
-                VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+                VStack(alignment: .leading, spacing: FCPrimitives.space4) {
                     Text(String(localized: "onboarding.kicker"))
-                        .font(.subheadline)
-                        .foregroundStyle(FCSemanticColors.secondaryText)
+                        .fcFont(.callout, weight: .regular)
+                        .foregroundStyle(FCSemanticColors.textSecondary)
                     Text(String(localized: "onboarding.title"))
-                        .font(.title.weight(.semibold))
+                        .fcFont(.titleLarge)
                         .accessibilityIdentifier(FCAccessibilityID.onboardingTitle)
                     Text(String(localized: "onboarding.lead"))
                         .accessibilityIdentifier(FCAccessibilityID.onboardingLead)
@@ -44,7 +44,7 @@ struct OnboardingView: View {
                     rule(String(localized: "onboarding.operator"), identifier: "onboarding.operator")
                     if let errorMessage = viewModel.errorMessage {
                         Text(errorMessage)
-                            .foregroundStyle(FCSemanticColors.destructive)
+                            .foregroundStyle(FCSemanticColors.statusDestructive)
                     }
                     FCButton(title: String(localized: "onboarding.start")) {
                         path.append(.editor(.firstCreate))
@@ -64,7 +64,7 @@ struct OnboardingView: View {
                     .accessibilityIdentifier(FCAccessibilityID.onboardingSkip)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(FCPrimitives.spacingMedium)
+                .padding(FCPrimitives.space4)
             }
             .background(FCSemanticColors.surfacePage)
             .navigationTitle(String(localized: "app.title"))
@@ -92,10 +92,10 @@ struct OnboardingView: View {
 
     private func rule(_ text: String, identifier: String) -> some View {
         Text(text)
-            .padding(FCPrimitives.spacingSmall)
+            .padding(FCPrimitives.space2)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(FCSemanticColors.elevatedSurface)
-            .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSmall))
+            .background(FCSemanticColors.surfaceElevated)
+            .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSm))
             .accessibilityIdentifier(identifier)
     }
 }

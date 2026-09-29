@@ -6,15 +6,15 @@ struct DeleteExerciseFlow: View {
     let onConfirm: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+        VStack(alignment: .leading, spacing: FCPrimitives.space4) {
             Text(String(localized: "session.deleteExercise.title"))
-                .font(.title3.weight(.semibold))
+                .fcFont(.title)
             Text(String(localized: "session.deleteExercise.lead"))
             Text(
                 "• \(exercise.displayNameSnapshot.value) · \(exercise.sets.filter(\.contributesToStatistics).count)"
             )
             Text(String(localized: "session.deleteExercise.hint"))
-                .foregroundStyle(FCSemanticColors.secondaryText)
+                .foregroundStyle(FCSemanticColors.textSecondary)
             FCButton(title: String(localized: "session.deleteExercise.confirm")) {
                 onConfirm()
             }
@@ -23,7 +23,7 @@ struct DeleteExerciseFlow: View {
                 .frame(minHeight: 44)
             Spacer()
         }
-        .padding(FCPrimitives.spacingMedium)
+        .padding(FCPrimitives.space4)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "session.deleteExercise.title"))

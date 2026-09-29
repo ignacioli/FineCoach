@@ -88,17 +88,6 @@ public enum FCPrimitives {
     /// Confirmation-dialog action buttons (36pt tall); off the 8/12/16/20
     /// scale but consistently used in the approved artwork (§5, §10 C8).
     public static let radiusDialogAction: CGFloat = 10
-
-    // MARK: Transitional aliases — remove in T068
-
-    /// Transitional alias — remove in T068
-    public static let spacingSmall: CGFloat = 8
-    /// Transitional alias — remove in T068
-    public static let spacingMedium: CGFloat = 16
-    /// Transitional alias — remove in T068
-    public static let radiusSmall: CGFloat = 8
-    /// Transitional alias — remove in T068
-    public static let radiusMedium: CGFloat = 14
 }
 
 /// FC Semantic Color: the design-system semantic aliases used by SwiftUI
@@ -147,21 +136,4 @@ public enum FCSemanticColors {
     public static let statusWarning = Color(hex: statusWarningHex)
     public static let statusDestructive = Color(hex: statusDestructiveHex)
     public static let overlayScrim = Color(hex: overlayScrimHex).opacity(overlayScrimOpacity)
-
-    // MARK: Transitional aliases — remove in T068
-
-    /// Transitional alias — remove in T068
-    public static let elevatedSurface = surfaceElevated
-    /// Transitional alias — remove in T068
-    public static let primaryText = textPrimary
-    /// Transitional alias — remove in T068
-    public static let secondaryText = textSecondary
-    /// Transitional alias — remove in T068
-    public static let separator = surfaceDivider
-    /// Transitional alias — remove in T068
-    public static let destructive = statusDestructive
-    /// Transitional alias — remove in T068
-    public static let tint = surfaceSelected
-    /// Transitional alias — remove in T068
-    public static let warning = statusWarning
 }

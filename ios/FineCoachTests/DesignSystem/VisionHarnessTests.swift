@@ -116,27 +116,6 @@ final class VisionHarnessTests: XCTestCase {
         XCTAssertEqual(FCPrimitives.radiusDialogAction, 10)
     }
 
-    // MARK: Transitional aliases (T057) — pin their CURRENT values so they can't
-    // silently drift before T068 removes them. Per T054/T057, these intentionally
-    // still hold their pre-design-system values, not the new token values.
-
-    func testTransitionalSpacingAndRadiusAliasValues() {
-        XCTAssertEqual(FCPrimitives.spacingSmall, 8)
-        XCTAssertEqual(FCPrimitives.spacingMedium, 16)
-        XCTAssertEqual(FCPrimitives.radiusSmall, 8)
-        XCTAssertEqual(FCPrimitives.radiusMedium, 14)
-    }
-
-    func testTransitionalColorAliasesTrackTheirSemanticTarget() {
-        XCTAssertEqual(FCSemanticColors.elevatedSurface, FCSemanticColors.surfaceElevated)
-        XCTAssertEqual(FCSemanticColors.primaryText, FCSemanticColors.textPrimary)
-        XCTAssertEqual(FCSemanticColors.secondaryText, FCSemanticColors.textSecondary)
-        XCTAssertEqual(FCSemanticColors.separator, FCSemanticColors.surfaceDivider)
-        XCTAssertEqual(FCSemanticColors.destructive, FCSemanticColors.statusDestructive)
-        XCTAssertEqual(FCSemanticColors.tint, FCSemanticColors.surfaceSelected)
-        XCTAssertEqual(FCSemanticColors.warning, FCSemanticColors.statusWarning)
-    }
-
     // MARK: Contrast utility self-checks (full §11 palette contrast assertions: T045)
 
     func testContrastRatioOfIdenticalColorsIsOne() {

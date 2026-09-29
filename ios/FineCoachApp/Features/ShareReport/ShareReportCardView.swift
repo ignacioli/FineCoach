@@ -245,11 +245,11 @@ enum ShareReportCardPresentation {
 
 /// Renders the card to ONE long PNG (M1A-FR-038 allows a long image; owner
 /// 2026-09-28 chose one). Input is only the DTO, and the raster stays within
-/// the same peak budget as `ShareReportRenderer` — scaled down if a very
-/// long report would exceed it.
+/// `peakRasterBudgetBytes` — scaled down if a very long report would exceed it.
 @MainActor
 enum ShareReportCardRenderer {
     static let cardWidth: CGFloat = 390
+    static let peakRasterBudgetBytes = 32 * 1024 * 1024
 
     static func render(dto: ShareReportDTO, preferredScale: CGFloat = 2) throws -> Data {
         let renderer = ImageRenderer(content: ShareReportCardView(dto: dto))
@@ -259,9 +259,19 @@ enum ShareReportCardRenderer {
             throw DomainError.invalidFileOperation
         }
         let pointArea = probe.size.width * probe.size.height
-        let maxScale = (Double(ShareReportRenderer.peakRasterBudgetBytes) / (4 * pointArea)).squareRoot()
-        renderer.scale = min(preferredScale, CGFloat(maxScale))
-        guard let image = renderer.uiImage, let data = image.pngData() else {
+        let maxScale = (Double(peakRasterBudgetBytes) / (4 * pointArea)).squareRoot()
+        // `ImageRenderer` returns nil past an undocumented per-side pixel limit
+        // even inside the byte budget (a 390×5680pt card failed at 1.95×), so
+        // step the scale down until it renders; 1× already succeeded above.
+        var scale = min(preferredScale, CGFloat(maxScale))
+        while scale > 1 {
+            renderer.scale = scale
+            if let data = renderer.uiImage?.pngData() {
+                return data
+            }
+            scale = max(1, (scale * 0.8 * 100).rounded(.down) / 100)
+        }
+        guard let data = probe.pngData() else {
             throw DomainError.invalidFileOperation
         }
         return data

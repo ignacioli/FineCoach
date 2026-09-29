@@ -64,40 +64,57 @@ struct ManualCreditAdjustmentView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 editorRow(String(localized: "manualAdjustment.direction")) {
-                    Picker("", selection: $viewModel.direction) {
-                        Text(String(localized: "manualAdjustment.direction.debit")).tag(CreditDirection.debit)
-                        Text(String(localized: "manualAdjustment.direction.credit")).tag(CreditDirection.credit)
-                    }
-                    .pickerStyle(.segmented)
-                    .labelsHidden()
+                    FCSegmentedSwitch(
+                        options: [
+                            .init(
+                                id: CreditDirection.debit.rawValue,
+                                title: String(localized: "manualAdjustment.direction.debit")
+                            ),
+                            .init(
+                                id: CreditDirection.credit.rawValue,
+                                title: String(localized: "manualAdjustment.direction.credit")
+                            ),
+                        ],
+                        selection: Binding(
+                            get: { viewModel.direction.rawValue },
+                            set: { viewModel.direction = CreditDirection(rawValue: $0) ?? viewModel.direction }
+                        )
+                    )
                 }
                 .accessibilityIdentifier(FCAccessibilityID.manualAdjustmentDirection)
-                Divider()
+                FCListRowDivider()
 
                 editorRow(String(localized: "manualAdjustment.amount")) {
-                    HStack(spacing: FCPrimitives.spacingSmall) {
+                    HStack(spacing: FCPrimitives.space2) {
+                        Spacer(minLength: 0)
                         Text("\(viewModel.amount)")
+                            .fcFont(.body)
                         Stepper("", value: $viewModel.amount, in: 1...999)
                             .labelsHidden()
                     }
                 }
                 .accessibilityIdentifier(FCAccessibilityID.manualAdjustmentAmount)
-                Divider()
+                FCListRowDivider()
 
                 Text(String(localized: "manualAdjustment.reasonLabel"))
-                    .foregroundStyle(FCSemanticColors.primaryText)
-                    .padding(.top, FCPrimitives.spacingMedium)
+                    .fcFont(.callout, weight: .regular)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
+                    .padding(.top, FCPrimitives.space4)
                 TextField(String(localized: "manualAdjustment.reasonPlaceholder"), text: $viewModel.reason, axis: .vertical)
                     .lineLimit(3, reservesSpace: true)
-                    .padding(FCPrimitives.spacingSmall)
-                    .background(FCSemanticColors.elevatedSurface)
-                    .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSmall))
+                    .fcFont(.body)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                    .padding(.horizontal, FCPrimitives.space4)
+                    .padding(.vertical, FCPrimitives.space3)
+                    .background(FCSemanticColors.surfaceCanvas)
+                    .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSm))
                     .accessibilityIdentifier(FCAccessibilityID.manualAdjustmentReason)
 
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
-                        .foregroundStyle(FCSemanticColors.destructive)
-                        .padding(.vertical, FCPrimitives.spacingSmall)
+                        .fcFont(.callout, weight: .regular)
+                        .foregroundStyle(FCSemanticColors.statusDestructive)
+                        .padding(.vertical, FCPrimitives.space2)
                 }
 
                 FCButton(
@@ -106,10 +123,10 @@ struct ManualCreditAdjustmentView: View {
                 ) {
                     Task { await viewModel.save() }
                 }
-                .padding(.top, FCPrimitives.spacingMedium)
+                .padding(.top, FCPrimitives.space4)
                 .accessibilityIdentifier(FCAccessibilityID.manualAdjustmentSave)
             }
-            .padding(FCPrimitives.spacingMedium)
+            .padding(FCPrimitives.space4)
         }
         .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "manualAdjustment.title"))
@@ -123,13 +140,12 @@ struct ManualCreditAdjustmentView: View {
     }
 
     private func editorRow<Control: View>(_ label: String, @ViewBuilder control: () -> Control) -> some View {
-        HStack {
-            Text(label)
-                .foregroundStyle(FCSemanticColors.primaryText)
-            Spacer()
-            control()
-                .foregroundStyle(FCSemanticColors.primaryText)
+        FCLabelValueRow(label: label) {
+            HStack(spacing: 0) {
+                Spacer(minLength: 0)
+                control()
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+            }
         }
-        .frame(minHeight: 44)
     }
 }

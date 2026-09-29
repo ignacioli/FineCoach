@@ -35,7 +35,7 @@ public struct FCSetRow: View {
     }
 
     public var body: some View {
-        HStack(spacing: FCPrimitives.spacingSmall) {
+        HStack(spacing: FCPrimitives.space2) {
             confirmControl
             // Long-press-to-edit is scoped to JUST this title+value block,
             // not the whole row -- a `.onLongPressGesture` on the full
@@ -43,23 +43,23 @@ public struct FCSetRow: View {
             // steal their tap gestures (classic SwiftUI parent-gesture-wins
             // conflict), which is exactly what made both buttons dead on a
             // real device despite compiling and unit-testing fine.
-            VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
+            VStack(alignment: .leading, spacing: FCPrimitives.space2) {
                 Text(title)
-                    .font(.body)
-                    .foregroundStyle(state == .completed ? FCSemanticColors.primaryText : FCSemanticColors.secondaryText)
-                Text(value).font(.subheadline).foregroundStyle(FCSemanticColors.secondaryText)
+                    .fcFont(.body)
+                    .foregroundStyle(state == .completed ? FCSemanticColors.textPrimary : FCSemanticColors.textSecondary)
+                Text(value).fcFont(.callout, weight: .regular).foregroundStyle(FCSemanticColors.textSecondary)
             }
             .contentShape(Rectangle())
             .onLongPressGesture(minimumDuration: 0.5) {
                 onEdit?()
             }
-            Spacer(minLength: FCPrimitives.spacingSmall)
+            Spacer(minLength: FCPrimitives.space2)
             Text(state.rawValue)
-                .font(.subheadline)
-                .foregroundStyle(FCSemanticColors.secondaryText)
+                .fcFont(.callout, weight: .regular)
+                .foregroundStyle(FCSemanticColors.textSecondary)
             editControl
         }
-        .padding(.vertical, FCPrimitives.spacingSmall)
+        .padding(.vertical, FCPrimitives.space2)
         .frame(minHeight: 44)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("\(title)，\(value)，\(state.rawValue)"))
@@ -106,7 +106,7 @@ public struct FCSetRow: View {
         if let onEdit {
             Button(action: onEdit) {
                 Image(systemName: "pencil")
-                    .foregroundStyle(FCSemanticColors.secondaryText)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
                     .frame(minWidth: 44, minHeight: 44)
             }
             .accessibilityHidden(true)

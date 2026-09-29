@@ -11,15 +11,15 @@ import XCTest
 ///   that same system color passed to `.foregroundStyle`/`.foregroundColor`.
 /// - `systemFont`: `.font(.something)` — any SwiftUI built-in `Font` static member
 ///   (`.body`, `.headline`, `.system(...)`, …) used instead of `.fcFont(_:)`.
-/// - `spacingLiteral`: a bare numeric literal passed to `.padding(...)` (single- or
-///   edge+value form) or to an `spacing:` parameter (`HStack(spacing: 8)`, …).
+/// - `spacingLiteral`: a bare non-zero numeric literal passed to `.padding(...)`
+///   (single- or edge+value form) or to a `spacing:` parameter (`HStack(spacing: 8)`,
+///   …). A literal `0` means "no gap" rather than a design value, so it is exempt
+///   (design system §4, owner decision 2026-09-28 in T068).
 /// - `cornerRadiusLiteral`: a bare numeric literal passed to `cornerRadius:` (e.g.
 ///   `RoundedRectangle(cornerRadius: 14)`) or `.cornerRadius(...)`.
 ///
-/// This is a baseline tracker, not a hard gate yet: `violations.count` is asserted
-/// `<= baselineViolationCount` (recorded below) so the count can only go down, never
-/// up, before T068 migrates feature screens onto T054–T059's tokens/components. T068
-/// flips this assertion to `== 0`.
+/// Hard gate since T068: feature source MUST have zero violations (the T062 baseline
+/// of 131 was migrated onto T054–T059's tokens/components in T068).
 final class DesignValueScanTests: XCTestCase {
     private struct Violation: Comparable {
         let relativePath: String
@@ -56,7 +56,7 @@ final class DesignValueScanTests: XCTestCase {
         ),
         ScanRule(
             name: "spacingLiteral",
-            pattern: #"\.padding\(\s*\d|\.padding\(\.\w+,\s*\d|spacing:\s*\d"#
+            pattern: #"\.padding\(\s*(?!0(?![.\d]))\d|\.padding\(\.\w+,\s*(?!0(?![.\d]))\d|spacing:\s*(?!0(?![.\d]))\d"#
         ),
         ScanRule(
             name: "cornerRadiusLiteral",
@@ -64,12 +64,7 @@ final class DesignValueScanTests: XCTestCase {
         ),
     ]
 
-    /// Recorded 2026-09-24 against `002-m1-b` after T054–T059/T061 landed. Only this
-    /// task's own scanner-authoring commit may change this number; any other change
-    /// MUST move the count down, never up, until T068 flips the assertion to `== 0`.
-    private let baselineViolationCount = 131
-
-    func testFeatureSourceDoesNotExceedTheRecordedBaselineViolationCount() throws {
+    func testFeatureSourceHasNoDesignValueViolations() throws {
         let violations = try scanFeatureSource()
 
         var byRule: [String: Int] = [:]
@@ -78,17 +73,17 @@ final class DesignValueScanTests: XCTestCase {
         for v in violations { byFile[v.relativePath, default: 0] += 1 }
         let topFiles = byFile.sorted { $0.value != $1.value ? $0.value > $1.value : $0.key < $1.key }.prefix(5)
 
-        print("DesignValueScanTests: \(violations.count) violation(s) (baseline \(baselineViolationCount))")
+        print("DesignValueScanTests: \(violations.count) violation(s)")
         print("DesignValueScanTests: by rule -> \(byRule.sorted { $0.key < $1.key })")
         print("DesignValueScanTests: top files -> \(Array(topFiles))")
         for v in violations {
             print("\(v.relativePath):\(v.line): \(v.rule): \(v.text)")
         }
 
-        XCTAssertLessThanOrEqual(
-            violations.count, baselineViolationCount,
-            "design-value violations grew past the recorded baseline; either this is a " +
-            "real regression to fix, or the baseline needs a deliberate, reviewed update"
+        XCTAssertEqual(
+            violations.count, 0,
+            "feature source bypasses design-system tokens; use FCPrimitives / " +
+            "FCSemanticColors / .fcFont(_:) instead (see the printed list)"
         )
     }
 

@@ -20,7 +20,7 @@ public struct FCSaveStatusView: View {
             Image(systemName: iconName)
                 .accessibilityHidden(true)
         }
-        .foregroundStyle(status == .failed ? FCSemanticColors.destructive : FCSemanticColors.secondaryText)
+        .foregroundStyle(status == .failed ? FCSemanticColors.statusDestructive : FCSemanticColors.textSecondary)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(status.rawValue))
         .frame(minHeight: 44)

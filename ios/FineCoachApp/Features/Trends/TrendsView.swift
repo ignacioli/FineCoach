@@ -215,7 +215,7 @@ struct TrendsView: View {
     // MARK: - 动作趋势 Tab
 
     private var exerciseTrendTab: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+        VStack(alignment: .leading, spacing: FCPrimitives.space4) {
             tabHint(String(localized: "trends.exerciseTrendTabHint"))
             exercisePicker
             exerciseTrendSection
@@ -223,8 +223,8 @@ struct TrendsView: View {
     }
 
     private var exerciseTrendSection: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
-            HStack(spacing: FCPrimitives.spacingSmall) {
+        VStack(alignment: .leading, spacing: FCPrimitives.space2) {
+            HStack(spacing: FCPrimitives.space2) {
                 sectionTitle(String(localized: "trends.exerciseTrendTitle"))
                 if viewModel.isAssistedForSelectedExercise {
                     assistedBadge
@@ -232,17 +232,20 @@ struct TrendsView: View {
             }
             let points = viewModel.exerciseTrend()
             if points.first?.recordMode == .weightReps {
-                Picker(String(localized: "trends.metricPickerLabel"), selection: $selectedTrendMetric) {
-                    ForEach(TrendMetric.allCases) { metric in
-                        Text(metric.label).tag(metric)
-                    }
-                }
-                .pickerStyle(.segmented)
+                FCSegmentedSwitch(
+                    options: TrendMetric.allCases.map { .init(id: $0.rawValue, title: $0.label) },
+                    selection: Binding(
+                        get: { selectedTrendMetric.rawValue },
+                        set: { selectedTrendMetric = TrendMetric(rawValue: $0) ?? selectedTrendMetric }
+                    )
+                )
+                .accessibilityElement(children: .contain)
+                .accessibilityLabel(String(localized: "trends.metricPickerLabel"))
                 .accessibilityIdentifier(FCAccessibilityID.trendsMetricPicker)
                 if selectedTrendMetric == .volume {
                     Text(String(localized: "trends.volumeCaption"))
-                        .font(.footnote)
-                        .foregroundStyle(FCSemanticColors.secondaryText)
+                        .fcFont(.caption)
+                        .foregroundStyle(FCSemanticColors.textSecondary)
                 }
             }
             trendContent(for: Comparison.TrendSampleDensity.classify(points))
@@ -286,7 +289,7 @@ struct TrendsView: View {
         switch density {
         case .empty:
             Text(String(localized: "trends.exerciseTrendEmpty"))
-                .foregroundStyle(FCSemanticColors.secondaryText)
+                .foregroundStyle(FCSemanticColors.textSecondary)
         case .single(let point):
             singlePointTrendView(point)
         case .sparse(let points):
@@ -308,8 +311,8 @@ struct TrendsView: View {
                 let summary = trendDeltaSummary(points)
             {
                 Text(summary)
-                    .font(.footnote)
-                    .foregroundStyle(FCSemanticColors.secondaryText)
+                    .fcFont(.caption)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
             }
         } else {
             trendRows(points)
@@ -333,8 +336,8 @@ struct TrendsView: View {
                 .foregroundStyle(FCSemanticColors.actionPrimary)
                 .annotation(position: .top) {
                     Text(Self.pointLabel(value, unit: metric.unit))
-                        .font(.caption2)
-                        .foregroundStyle(FCSemanticColors.secondaryText)
+                        .fcFont(.caption)
+                        .foregroundStyle(FCSemanticColors.textSecondary)
                 }
             }
         }
@@ -354,7 +357,7 @@ struct TrendsView: View {
     }
 
     private func trendRows(_ points: [Comparison.SetTrendPoint]) -> some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
+        VStack(alignment: .leading, spacing: FCPrimitives.space2) {
             ForEach(Array(points.enumerated()), id: \.offset) { _, point in
                 HStack {
                     Text(point.completedAtUTC, style: .date)
@@ -376,16 +379,16 @@ struct TrendsView: View {
     }
 
     private func singlePointTrendView(_ point: Comparison.SetTrendPoint) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: FCPrimitives.space1) {
             Text(point.recordMode == .weightReps ? metricSingleValueText(point) : trendValueText(point))
-                .font(.system(size: 34, weight: .bold))
-                .foregroundStyle(FCSemanticColors.primaryText)
+                .fcFont(.numeralLarge)
+                .foregroundStyle(FCSemanticColors.textPrimary)
             Text(point.completedAtUTC, style: .date)
-                .font(.footnote)
-                .foregroundStyle(FCSemanticColors.secondaryText)
+                .fcFont(.caption)
+                .foregroundStyle(FCSemanticColors.textSecondary)
             Text(String(localized: "trends.exerciseTrendSingleHint"))
-                .font(.footnote)
-                .foregroundStyle(FCSemanticColors.secondaryText)
+                .fcFont(.caption)
+                .foregroundStyle(FCSemanticColors.textSecondary)
         }
     }
 
@@ -430,18 +433,14 @@ struct TrendsView: View {
 
     private var exercisePicker: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack {
+            HStack(spacing: FCPrimitives.space2) {
                 ForEach(viewModel.exerciseOptions, id: \.key) { option in
-                    Button(option.name) {
+                    FCFilterChip(
+                        title: option.name,
+                        isSelected: viewModel.selectedExerciseKey == option.key
+                    ) {
                         viewModel.selectExercise(key: option.key)
                     }
-                    .padding(.horizontal, FCPrimitives.spacingSmall)
-                    .frame(minHeight: 44)
-                    .background(
-                        viewModel.selectedExerciseKey == option.key
-                            ? FCSemanticColors.actionPrimary.opacity(0.2) : Color.clear
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSmall))
                 }
             }
         }
@@ -449,24 +448,24 @@ struct TrendsView: View {
 
     private var assistedBadge: some View {
         Text(String(localized: "trends.assistedBadge"))
-            .font(.caption.weight(.semibold))
-            .padding(.horizontal, FCPrimitives.spacingSmall)
-            .padding(.vertical, 4)
-            .background(FCSemanticColors.warning.opacity(0.15))
-            .foregroundStyle(FCSemanticColors.warning)
+            .fcFont(.sectionLabel)
+            .padding(.horizontal, FCPrimitives.space2)
+            .padding(.vertical, FCPrimitives.space1)
+            .background(FCSemanticColors.surfaceSelected)
+            .foregroundStyle(FCSemanticColors.statusWarning)
             .clipShape(Capsule())
             .accessibilityIdentifier(FCAccessibilityID.trendsAssistedBadge)
     }
 
     private func tabHint(_ text: String) -> some View {
         Text(text)
-            .font(.footnote)
-            .foregroundStyle(FCSemanticColors.secondaryText)
+            .fcFont(.caption)
+            .foregroundStyle(FCSemanticColors.textSecondary)
     }
 
     private func sectionTitle(_ text: String) -> some View {
         Text(text)
-            .font(.subheadline.weight(.semibold))
-            .foregroundStyle(FCSemanticColors.secondaryText)
+            .fcFont(.sectionLabel)
+            .foregroundStyle(FCSemanticColors.textSecondary)
     }
 }

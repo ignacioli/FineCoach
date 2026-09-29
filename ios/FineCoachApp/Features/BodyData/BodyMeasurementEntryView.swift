@@ -187,15 +187,15 @@ struct BodyMeasurementEntryView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+            VStack(alignment: .leading, spacing: FCPrimitives.space4) {
                 if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage).foregroundStyle(FCSemanticColors.destructive)
+                    Text(errorMessage).foregroundStyle(FCSemanticColors.statusDestructive)
                 }
 
                 if viewModel.todaysMeasurement != nil {
                     Text(String(localized: "bodyMeasurementEntry.overwriteHint"))
-                        .font(.footnote)
-                        .foregroundStyle(FCSemanticColors.secondaryText)
+                        .fcFont(.caption)
+                        .foregroundStyle(FCSemanticColors.textSecondary)
                 }
 
                 FCTextField(String(localized: "bodyMeasurementEntry.valuePlaceholder"), text: $viewModel.valueText)
@@ -203,32 +203,38 @@ struct BodyMeasurementEntryView: View {
                     .keyboardType(.decimalPad)
 
                 if viewModel.isBuiltInWeight {
-                    Picker(
-                        String(localized: "bodyMeasurementEntry.displayUnit"),
+                    FCSegmentedSwitch(
+                        options: BuiltInUnitConversion.WeightDisplayUnit.allCases.map {
+                            .init(id: $0.rawValue, title: $0.rawValue)
+                        },
                         selection: Binding(
-                            get: { viewModel.weightDisplayUnit },
-                            set: { viewModel.setWeightDisplayUnit($0) }
+                            get: { viewModel.weightDisplayUnit.rawValue },
+                            set: { raw in
+                                if let unit = BuiltInUnitConversion.WeightDisplayUnit(rawValue: raw) {
+                                    viewModel.setWeightDisplayUnit(unit)
+                                }
+                            }
                         )
-                    ) {
-                        ForEach(BuiltInUnitConversion.WeightDisplayUnit.allCases, id: \.self) { unit in
-                            Text(unit.rawValue).tag(unit)
-                        }
-                    }
-                    .pickerStyle(.segmented)
+                    )
+                    .accessibilityElement(children: .contain)
+                    .accessibilityLabel(String(localized: "bodyMeasurementEntry.displayUnit"))
                     .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementEntryUnitToggle)
                 } else if viewModel.isBuiltInLength {
-                    Picker(
-                        String(localized: "bodyMeasurementEntry.displayUnit"),
+                    FCSegmentedSwitch(
+                        options: BuiltInUnitConversion.LengthDisplayUnit.allCases.map {
+                            .init(id: $0.rawValue, title: $0.rawValue)
+                        },
                         selection: Binding(
-                            get: { viewModel.lengthDisplayUnit },
-                            set: { viewModel.setLengthDisplayUnit($0) }
+                            get: { viewModel.lengthDisplayUnit.rawValue },
+                            set: { raw in
+                                if let unit = BuiltInUnitConversion.LengthDisplayUnit(rawValue: raw) {
+                                    viewModel.setLengthDisplayUnit(unit)
+                                }
+                            }
                         )
-                    ) {
-                        ForEach(BuiltInUnitConversion.LengthDisplayUnit.allCases, id: \.self) { unit in
-                            Text(unit.rawValue).tag(unit)
-                        }
-                    }
-                    .pickerStyle(.segmented)
+                    )
+                    .accessibilityElement(children: .contain)
+                    .accessibilityLabel(String(localized: "bodyMeasurementEntry.displayUnit"))
                     .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementEntryUnitToggle)
                 } else {
                     FCTextField(String(localized: "bodyMeasurementEntry.unitPlaceholder"), text: $viewModel.unitText)
@@ -239,17 +245,17 @@ struct BodyMeasurementEntryView: View {
                 }
                 .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementEntrySave)
 
-                Divider()
+                FCListRowDivider()
                 HStack {
                     Text(String(localized: "bodyMeasurementEntry.historySection"))
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(FCSemanticColors.secondaryText)
+                        .fcFont(.sectionLabel)
+                        .foregroundStyle(FCSemanticColors.textSecondary)
                     Spacer()
                     if !viewModel.history.isEmpty {
                         Button(String(localized: "bodyMeasurementEntry.deleteAll"), role: .destructive) {
                             viewModel.showingDeleteAllConfirm = true
                         }
-                        .font(.footnote)
+                        .fcFont(.caption)
                         .frame(minHeight: 44)
                         .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementDeleteAll)
                     }
@@ -257,14 +263,14 @@ struct BodyMeasurementEntryView: View {
 
                 if viewModel.history.isEmpty {
                     Text(String(localized: "bodyMeasurementEntry.empty"))
-                        .foregroundStyle(FCSemanticColors.secondaryText)
+                        .foregroundStyle(FCSemanticColors.textSecondary)
                 } else {
                     ForEach(viewModel.history) { measurement in
                         historyRow(measurement)
                     }
                 }
             }
-            .padding(FCPrimitives.spacingMedium)
+            .padding(FCPrimitives.space4)
         }
         .background(FCSemanticColors.surfacePage)
         .navigationTitle(viewModel.metric?.name.value ?? String(localized: "bodyMeasurementEntry.title"))
@@ -310,24 +316,24 @@ struct BodyMeasurementEntryView: View {
 
     private func historyRow(_ measurement: BodyMeasurement) -> some View {
         HStack {
-            VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
+            VStack(alignment: .leading, spacing: FCPrimitives.space2) {
                 Text(measurement.localCalendarDay.canonicalString)
-                    .font(.body.weight(.medium))
+                    .fcFont(.body)
                 Text(viewModel.displayValue(for: measurement))
-                    .foregroundStyle(FCSemanticColors.secondaryText)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
             }
             Spacer()
             Button {
                 viewModel.pendingDeleteID = measurement.id
             } label: {
                 Image(systemName: "trash")
-                    .foregroundStyle(FCSemanticColors.destructive)
+                    .foregroundStyle(FCSemanticColors.statusDestructive)
             }
             .frame(minWidth: 44, minHeight: 44)
         }
-        .padding(FCPrimitives.spacingMedium)
-        .background(FCSemanticColors.elevatedSurface)
-        .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusMedium))
+        .padding(FCPrimitives.space4)
+        .background(FCSemanticColors.surfaceElevated)
+        .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusMd))
         .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementRow(measurement.id))
     }
 }

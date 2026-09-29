@@ -4,14 +4,14 @@ struct QuickCreateExerciseFlow: View {
     @ObservedObject var viewModel: ActiveSessionViewModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
+        VStack(alignment: .leading, spacing: FCPrimitives.space2) {
             FCTextField(String(localized: "session.field.exerciseName"), text: $viewModel.exerciseName)
                 .accessibilityIdentifier(FCAccessibilityID.activeSessionExerciseName)
                 .onChange(of: viewModel.exerciseName) { _, _ in
                     viewModel.scheduleCatalogSearch()
                 }
             if !viewModel.catalogMatches.isEmpty {
-                VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
+                VStack(alignment: .leading, spacing: FCPrimitives.space2) {
                     ForEach(viewModel.catalogMatches) { entry in
                         Button {
                             Task { await viewModel.addCatalogMatch(entry.id) }

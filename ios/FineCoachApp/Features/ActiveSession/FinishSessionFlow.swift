@@ -7,11 +7,11 @@ struct FinishSessionFlow: View {
     let onReturn: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+        VStack(alignment: .leading, spacing: FCPrimitives.space4) {
             Text(title)
-                .font(.title3.weight(.semibold))
+                .fcFont(.title)
             Text(bodyText)
-                .foregroundStyle(FCSemanticColors.secondaryText)
+                .foregroundStyle(FCSemanticColors.textSecondary)
 
             switch gate {
             case .abandonEmpty:
@@ -37,7 +37,7 @@ struct FinishSessionFlow: View {
             }
             Spacer()
         }
-        .padding(FCPrimitives.spacingMedium)
+        .padding(FCPrimitives.space4)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(FCSemanticColors.surfacePage)
         .navigationTitle(title)
@@ -81,9 +81,9 @@ struct DurationReviewFlow: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+        VStack(alignment: .leading, spacing: FCPrimitives.space4) {
             Text(String(localized: "session.duration.reviewLead"))
-                .foregroundStyle(FCSemanticColors.secondaryText)
+                .foregroundStyle(FCSemanticColors.textSecondary)
             FCTextField(String(localized: "session.field.duration"), text: $durationText)
                 .accessibilityIdentifier(FCAccessibilityID.activeSessionDurationValue)
             FCButton(title: String(localized: "session.duration.confirm")) {
@@ -94,7 +94,7 @@ struct DurationReviewFlow: View {
                 .frame(minHeight: 44)
             Spacer()
         }
-        .padding(FCPrimitives.spacingMedium)
+        .padding(FCPrimitives.space4)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "session.duration.reviewTitle"))

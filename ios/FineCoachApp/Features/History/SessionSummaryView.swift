@@ -98,13 +98,13 @@ struct SessionSummaryView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+            VStack(alignment: .leading, spacing: FCPrimitives.space4) {
                 if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage).foregroundStyle(FCSemanticColors.destructive)
+                    Text(errorMessage).foregroundStyle(FCSemanticColors.statusDestructive)
                 }
 
                 Text(viewModel.durationText)
-                    .font(.headline)
+                    .fcFont(.headline)
                     .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
                     .accessibilityIdentifier(FCAccessibilityID.sessionSummaryDuration)
 
@@ -158,7 +158,7 @@ struct SessionSummaryView: View {
                 .accessibilityIdentifier(FCAccessibilityID.sessionSummarySkipShare)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(FCPrimitives.spacingMedium)
+            .padding(FCPrimitives.space4)
         }
         .scrollDismissesKeyboard(.interactively)
         .background(FCSemanticColors.surfacePage)
@@ -192,13 +192,18 @@ struct SessionSummaryView: View {
     }
 
     private func labeledField(title: String, text: Binding<String>, identifier: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: FCPrimitives.space1) {
             Text(title)
-                .font(.footnote)
-                .foregroundStyle(FCSemanticColors.secondaryText)
+                .fcFont(.caption)
+                .foregroundStyle(FCSemanticColors.textSecondary)
             TextField(title, text: text, axis: .vertical)
-                .textFieldStyle(.roundedBorder)
-                .frame(minHeight: 44)
+                .fcFont(.body)
+                .foregroundStyle(FCSemanticColors.textPrimary)
+                .padding(.horizontal, FCPrimitives.space4)
+                .padding(.vertical, FCPrimitives.space3)
+                .frame(maxWidth: .infinity, minHeight: 48, alignment: .leading)
+                .background(FCSemanticColors.surfaceCanvas)
+                .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSm))
                 .accessibilityLabel(Text(title))
                 .accessibilityIdentifier(identifier)
         }

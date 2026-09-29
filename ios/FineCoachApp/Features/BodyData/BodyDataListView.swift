@@ -173,14 +173,14 @@ struct BodyDataListView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+            VStack(alignment: .leading, spacing: FCPrimitives.space4) {
                 if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage).foregroundStyle(FCSemanticColors.destructive)
+                    Text(errorMessage).foregroundStyle(FCSemanticColors.statusDestructive)
                 }
 
                 if viewModel.metrics.isEmpty {
                     Text(String(localized: "bodyData.empty"))
-                        .foregroundStyle(FCSemanticColors.secondaryText)
+                        .foregroundStyle(FCSemanticColors.textSecondary)
                         .accessibilityIdentifier(FCAccessibilityID.bodyDataEmptyState)
                 }
 
@@ -190,7 +190,7 @@ struct BodyDataListView: View {
                 }
 
                 if !viewModel.activeCustomMetrics.isEmpty {
-                    Divider()
+                    FCListRowDivider()
                     sectionTitle(String(localized: "bodyData.customSection"))
                     ForEach(viewModel.activeCustomMetrics) { metric in
                         metricRow(metric)
@@ -198,7 +198,7 @@ struct BodyDataListView: View {
                 }
 
                 if !viewModel.archivedCustomMetrics.isEmpty {
-                    Divider()
+                    FCListRowDivider()
                     sectionTitle(String(localized: "bodyData.customSection.archived"))
                     ForEach(viewModel.archivedCustomMetrics) { metric in
                         metricRow(metric)
@@ -210,7 +210,7 @@ struct BodyDataListView: View {
                 }
                 .accessibilityIdentifier(FCAccessibilityID.bodyDataAddCustomMetric)
             }
-            .padding(FCPrimitives.spacingMedium)
+            .padding(FCPrimitives.space4)
         }
         .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "bodyData.title"))
@@ -223,12 +223,12 @@ struct BodyDataListView: View {
     }
 
     private var newCustomMetricSheet: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+        VStack(alignment: .leading, spacing: FCPrimitives.space4) {
             Text(String(localized: "bodyData.newCustomMetric.title"))
-                .font(.title3.weight(.semibold))
+                .fcFont(.title)
             if let newMetricErrorMessage = viewModel.newMetricErrorMessage {
                 Text(newMetricErrorMessage)
-                    .foregroundStyle(FCSemanticColors.destructive)
+                    .foregroundStyle(FCSemanticColors.statusDestructive)
                     .accessibilityIdentifier(FCAccessibilityID.bodyDataNewCustomMetricError)
             }
             FCTextField(String(localized: "bodyData.newCustomMetric.namePlaceholder"), text: $viewModel.newMetricName)
@@ -241,14 +241,14 @@ struct BodyDataListView: View {
             }
             .frame(minHeight: 44)
         }
-        .padding(FCPrimitives.spacingMedium)
+        .padding(FCPrimitives.space4)
         .background(FCSemanticColors.surfacePage)
     }
 
     private func sectionTitle(_ text: String) -> some View {
         Text(text)
-            .font(.subheadline.weight(.semibold))
-            .foregroundStyle(FCSemanticColors.secondaryText)
+            .fcFont(.sectionLabel)
+            .foregroundStyle(FCSemanticColors.textSecondary)
     }
 
     private func metricRow(_ metric: BodyMetricDefinition) -> some View {
@@ -257,30 +257,30 @@ struct BodyDataListView: View {
                 path.append(
                     .bodyMeasurementEntry(studentID: viewModel.studentID.rawValue, metricID: metric.id.rawValue))
             } label: {
-                VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
+                VStack(alignment: .leading, spacing: FCPrimitives.space2) {
                     HStack {
                         Text(metric.name.value)
-                            .font(.headline)
-                            .foregroundStyle(FCSemanticColors.primaryText)
+                            .fcFont(.headline)
+                            .foregroundStyle(FCSemanticColors.textPrimary)
                         if metric.lifecycle == .archived {
                             Text(String(localized: "bodyData.archived"))
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(FCSemanticColors.secondaryText)
+                                .fcFont(.sectionLabel)
+                                .foregroundStyle(FCSemanticColors.textSecondary)
                         }
                     }
                     Text(metric.currentUnit)
-                        .font(.caption)
-                        .foregroundStyle(FCSemanticColors.secondaryText)
+                        .fcFont(.caption)
+                        .foregroundStyle(FCSemanticColors.textSecondary)
                     if let latestValue = viewModel.latestDisplayValue(for: metric) {
                         Text(latestValue)
-                            .font(.subheadline.weight(.medium))
-                            .foregroundStyle(FCSemanticColors.primaryText)
+                            .fcFont(.callout)
+                            .foregroundStyle(FCSemanticColors.textPrimary)
                     }
                 }
-                .padding(FCPrimitives.spacingMedium)
+                .padding(FCPrimitives.space4)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(FCSemanticColors.elevatedSurface)
-                .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusMedium))
+                .background(FCSemanticColors.surfaceElevated)
+                .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusMd))
             }
             .buttonStyle(.plain)
         }

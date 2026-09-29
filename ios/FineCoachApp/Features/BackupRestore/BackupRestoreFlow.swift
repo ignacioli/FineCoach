@@ -82,11 +82,11 @@ struct BackupRestoreFlowView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingMedium) {
+        VStack(alignment: .leading, spacing: FCPrimitives.space4) {
             Text(String(localized: "backup.restore.warning"))
                 .accessibilityIdentifier(FCAccessibilityID.restoreWarning)
             Text(String(localized: "backup.restore.suggestBackup"))
-                .foregroundStyle(FCSemanticColors.secondaryText)
+                .foregroundStyle(FCSemanticColors.textSecondary)
                 .accessibilityIdentifier(FCAccessibilityID.restoreSuggestBackup)
             SecureField(String(localized: "backup.restore.password"), text: $viewModel.password)
                 .textContentType(.password)
@@ -102,19 +102,19 @@ struct BackupRestoreFlowView: View {
             .accessibilityIdentifier(FCAccessibilityID.restorePickFile)
             if let pickedFileName = viewModel.pickedFileName {
                 Text(pickedFileName)
-                    .font(.footnote)
-                    .foregroundStyle(FCSemanticColors.secondaryText)
+                    .fcFont(.caption)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
             }
             if viewModel.isRestoring {
                 ProgressView(String(localized: "backup.restore.working"))
             }
             if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
-                    .foregroundStyle(FCSemanticColors.destructive)
+                    .foregroundStyle(FCSemanticColors.statusDestructive)
             }
             if viewModel.failed {
                 Text(String(localized: "backup.restore.failed"))
-                    .foregroundStyle(FCSemanticColors.destructive)
+                    .foregroundStyle(FCSemanticColors.statusDestructive)
                     .accessibilityIdentifier(FCAccessibilityID.restoreFailed)
             }
             FCButton(

@@ -5,14 +5,14 @@ struct SaveStatusView: View {
     let onRetry: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.spacingSmall) {
+        VStack(alignment: .leading, spacing: FCPrimitives.space2) {
             FCSaveStatusView(status: displayStatus)
                 .accessibilityIdentifier(statusIdentifier)
 
             if case .failed = status {
                 Text(String(localized: "session.save.finishBlocked"))
-                    .font(.footnote)
-                    .foregroundStyle(FCSemanticColors.destructive)
+                    .fcFont(.caption)
+                    .foregroundStyle(FCSemanticColors.statusDestructive)
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionFinishBlocked)
 
                 FCButton(title: String(localized: "session.save.retry"), action: onRetry)
