@@ -120,22 +120,26 @@ struct CoursePackageEditorView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
+                Text(String(localized: "coursePackageEditor.title"))
+                    .fcFont(.titleLarge)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
+                    .padding(.bottom, FCPrimitives.space4)
+                FCListRowDivider()
                 editorRow(String(localized: "coursePackageEditor.name")) {
                     TextField("", text: $viewModel.name)
                         .fcFont(.body)
-                        .multilineTextAlignment(.trailing)
+                        .multilineTextAlignment(.leading)
                 }
                 .accessibilityIdentifier(FCAccessibilityID.coursePackageEditorName)
                 FCListRowDivider()
 
                 editorRow(String(localized: "coursePackageEditor.totalCredits")) {
-                    HStack(spacing: FCPrimitives.space2) {
-                        Spacer(minLength: 0)
-                        Text("\(viewModel.totalCredits)")
-                            .fcFont(.body)
-                        Stepper("", value: $viewModel.totalCredits, in: 1...999)
-                            .labelsHidden()
-                    }
+                    FCStepper(
+                        String(localized: "coursePackageEditor.totalCredits"),
+                        value: $viewModel.totalCredits,
+                        in: 1...999
+                    )
                 }
                 .accessibilityIdentifier(FCAccessibilityID.coursePackageEditorTotalCredits)
                 FCListRowDivider()
@@ -204,8 +208,8 @@ struct CoursePackageEditorView: View {
             .padding(FCPrimitives.space4)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(String(localized: "coursePackageEditor.title"))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarRole(.editor)
         .accessibilityIdentifier(FCAccessibilityID.coursePackageEditorRoot)
         .task { await viewModel.loadExistingActivePackage() }
         .onChange(of: viewModel.didSave) { _, saved in

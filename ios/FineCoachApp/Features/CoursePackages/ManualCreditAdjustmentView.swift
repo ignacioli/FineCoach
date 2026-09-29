@@ -63,6 +63,12 @@ struct ManualCreditAdjustmentView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
+                Text(String(localized: "manualAdjustment.title"))
+                    .fcFont(.titleLarge)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
+                    .padding(.bottom, FCPrimitives.space4)
+                FCListRowDivider()
                 editorRow(String(localized: "manualAdjustment.direction")) {
                     FCSegmentedSwitch(
                         options: [
@@ -85,13 +91,11 @@ struct ManualCreditAdjustmentView: View {
                 FCListRowDivider()
 
                 editorRow(String(localized: "manualAdjustment.amount")) {
-                    HStack(spacing: FCPrimitives.space2) {
-                        Spacer(minLength: 0)
-                        Text("\(viewModel.amount)")
-                            .fcFont(.body)
-                        Stepper("", value: $viewModel.amount, in: 1...999)
-                            .labelsHidden()
-                    }
+                    FCStepper(
+                        String(localized: "manualAdjustment.amount"),
+                        value: $viewModel.amount,
+                        in: 1...999
+                    )
                 }
                 .accessibilityIdentifier(FCAccessibilityID.manualAdjustmentAmount)
                 FCListRowDivider()
@@ -129,8 +133,8 @@ struct ManualCreditAdjustmentView: View {
             .padding(FCPrimitives.space4)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(String(localized: "manualAdjustment.title"))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarRole(.editor)
         .accessibilityIdentifier(FCAccessibilityID.manualAdjustmentRoot)
         .onChange(of: viewModel.didSave) { _, saved in
             if saved {

@@ -89,6 +89,7 @@
 		B954 /* TrainedBodyPartsSummaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A954 /* TrainedBodyPartsSummaryTests.swift */; };
 		B916 /* FCTypeTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = A916 /* FCTypeTag.swift */; };
 		B917 /* FCToggleStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A917 /* FCToggleStyle.swift */; };
+		B962 /* FCStepper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A962 /* FCStepper.swift */; };
 		B918 /* FCSetStateCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A918 /* FCSetStateCircle.swift */; };
 		B919 /* FCStatusLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A919 /* FCStatusLabel.swift */; };
 		B920 /* FCConfirmationDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A920 /* FCConfirmationDialog.swift */; };
@@ -256,6 +257,7 @@
 		B241 /* ShareReportPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A241 /* ShareReportPolicyTests.swift */; };
 		B500 /* VisionHarnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A501 /* VisionHarnessTests.swift */; };
 		B930 /* FCStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A930 /* FCStatusTests.swift */; };
+		B963 /* FCStepperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A963 /* FCStepperTests.swift */; };
 		B931 /* TypographyHarnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A931 /* TypographyHarnessTests.swift */; };
 		B932 /* DesignValueScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A932 /* DesignValueScanTests.swift */; };
 		B933 /* ContrastHarnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A933 /* ContrastHarnessTests.swift */; };
@@ -349,6 +351,7 @@
 		A954 /* TrainedBodyPartsSummaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainedBodyPartsSummaryTests.swift; sourceTree = "<group>"; };
 		A916 /* FCTypeTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCTypeTag.swift; sourceTree = "<group>"; };
 		A917 /* FCToggleStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCToggleStyle.swift; sourceTree = "<group>"; };
+		A962 /* FCStepper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCStepper.swift; sourceTree = "<group>"; };
 		A918 /* FCSetStateCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCSetStateCircle.swift; sourceTree = "<group>"; };
 		A919 /* FCStatusLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCStatusLabel.swift; sourceTree = "<group>"; };
 		A920 /* FCConfirmationDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCConfirmationDialog.swift; sourceTree = "<group>"; };
@@ -487,6 +490,7 @@
 		A241 /* ShareReportPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareReportPolicyTests.swift; sourceTree = "<group>"; };
 		A501 /* VisionHarnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionHarnessTests.swift; sourceTree = "<group>"; };
 		A930 /* FCStatusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCStatusTests.swift; sourceTree = "<group>"; };
+		A963 /* FCStepperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCStepperTests.swift; sourceTree = "<group>"; };
 		A931 /* TypographyHarnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypographyHarnessTests.swift; sourceTree = "<group>"; };
 		A932 /* DesignValueScanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignValueScanTests.swift; sourceTree = "<group>"; };
 		A933 /* ContrastHarnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContrastHarnessTests.swift; sourceTree = "<group>"; };
@@ -1064,6 +1068,7 @@
 				A953 /* FCCalendarDayCell.swift */,
 				A916 /* FCTypeTag.swift */,
 				A917 /* FCToggleStyle.swift */,
+				A962 /* FCStepper.swift */,
 				A918 /* FCSetStateCircle.swift */,
 				A919 /* FCStatusLabel.swift */,
 				A920 /* FCConfirmationDialog.swift */,
@@ -1328,6 +1333,7 @@
 				A501 /* VisionHarnessTests.swift */,
 				A956 /* IconConsistencyTests.swift */,
 				A930 /* FCStatusTests.swift */,
+				A963 /* FCStepperTests.swift */,
 				A931 /* TypographyHarnessTests.swift */,
 				A932 /* DesignValueScanTests.swift */,
 				A933 /* ContrastHarnessTests.swift */,
@@ -1746,6 +1752,7 @@
 				B953 /* FCCalendarDayCell.swift in Sources */,
 				B916 /* FCTypeTag.swift in Sources */,
 				B917 /* FCToggleStyle.swift in Sources */,
+				B962 /* FCStepper.swift in Sources */,
 				B918 /* FCSetStateCircle.swift in Sources */,
 				B919 /* FCStatusLabel.swift in Sources */,
 				B920 /* FCConfirmationDialog.swift in Sources */,
@@ -1813,6 +1820,7 @@
 				B500 /* VisionHarnessTests.swift in Sources */,
 				B956 /* IconConsistencyTests.swift in Sources */,
 				B930 /* FCStatusTests.swift in Sources */,
+				B963 /* FCStepperTests.swift in Sources */,
 				B931 /* TypographyHarnessTests.swift in Sources */,
 				B932 /* DesignValueScanTests.swift in Sources */,
 				B933 /* ContrastHarnessTests.swift in Sources */,
