@@ -194,6 +194,7 @@ struct CreditAdjustmentTrailView: View {
         .background(FCSemanticColors.surfacePage)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarRole(.editor)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.creditTrailRoot)
         .task { await viewModel.reload() }
     }

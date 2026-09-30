@@ -260,6 +260,7 @@
 		AD5F02 /* CapabilityManifestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5F01 /* CapabilityManifestTests.swift */; };
 		AD5F12 /* LogSurfaceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5F11 /* LogSurfaceTests.swift */; };
 		AD5F22 /* PrivacyCoverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5F21 /* PrivacyCoverTests.swift */; };
+		AD5F42 /* TouchTargetComponentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5F41 /* TouchTargetComponentTests.swift */; };
 		B930 /* FCStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A930 /* FCStatusTests.swift */; };
 		B963 /* FCStepperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A963 /* FCStepperTests.swift */; };
 		B931 /* TypographyHarnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A931 /* TypographyHarnessTests.swift */; };
@@ -497,6 +498,7 @@
 		AD5F01 /* CapabilityManifestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapabilityManifestTests.swift; sourceTree = "<group>"; };
 		AD5F11 /* LogSurfaceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogSurfaceTests.swift; sourceTree = "<group>"; };
 		AD5F21 /* PrivacyCoverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyCoverTests.swift; sourceTree = "<group>"; };
+		AD5F41 /* TouchTargetComponentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchTargetComponentTests.swift; sourceTree = "<group>"; };
 		A930 /* FCStatusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCStatusTests.swift; sourceTree = "<group>"; };
 		A963 /* FCStepperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCStepperTests.swift; sourceTree = "<group>"; };
 		A931 /* TypographyHarnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypographyHarnessTests.swift; sourceTree = "<group>"; };
@@ -1361,6 +1363,7 @@
 				A501 /* VisionHarnessTests.swift */,
 				A956 /* IconConsistencyTests.swift */,
 				A930 /* FCStatusTests.swift */,
+				AD5F41 /* TouchTargetComponentTests.swift */,
 				A963 /* FCStepperTests.swift */,
 				A931 /* TypographyHarnessTests.swift */,
 				A932 /* DesignValueScanTests.swift */,
@@ -1849,6 +1852,7 @@
 				B500 /* VisionHarnessTests.swift in Sources */,
 				B956 /* IconConsistencyTests.swift in Sources */,
 				B930 /* FCStatusTests.swift in Sources */,
+				AD5F42 /* TouchTargetComponentTests.swift in Sources */,
 				AD5F02 /* CapabilityManifestTests.swift in Sources */,
 				AD5F12 /* LogSurfaceTests.swift in Sources */,
 				AD5F22 /* PrivacyCoverTests.swift in Sources */,
@@ -1920,7 +1924,7 @@
 				B226 /* HistoryShareUITests.swift in Sources */,
 				B227 /* BackupRestoreUITests.swift in Sources */,
 				B253 /* PrivacyCoverUITests.swift in Sources */,
-			);
+					);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */

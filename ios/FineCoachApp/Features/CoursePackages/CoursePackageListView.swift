@@ -157,6 +157,7 @@ struct CoursePackageListView: View {
         .background(FCSemanticColors.surfacePage)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarRole(.editor)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.coursePackageListRoot)
         .fcConfirmationDialog(isPresented: $isConfirmingEnd) {
             FCConfirmationDialog(

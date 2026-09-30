@@ -135,6 +135,7 @@ struct ManualCreditAdjustmentView: View {
         .background(FCSemanticColors.surfacePage)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarRole(.editor)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.manualAdjustmentRoot)
         .onChange(of: viewModel.didSave) { _, saved in
             if saved {

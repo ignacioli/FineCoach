@@ -268,6 +268,7 @@ struct RootNavigation: View {
                             }
                         }
                     }
+                    .accessibilityElement(children: .contain)
                     .accessibilityIdentifier(FCAccessibilityID.studentList)
                 }
             }
@@ -327,6 +328,7 @@ struct RootTabContainer: View {
             }
         }
         .background(FCSemanticColors.surfacePage)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.studentList)
     }
 }

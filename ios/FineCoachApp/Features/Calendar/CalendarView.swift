@@ -168,6 +168,7 @@ struct CalendarView: View {
         .background(FCSemanticColors.surfacePage)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarRole(.editor)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.calendarRoot)
         .courseActionSheet(
             appointment: $sheetAppointment,

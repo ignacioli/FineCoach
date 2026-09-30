@@ -159,6 +159,7 @@ struct SessionDetailView: View {
                 }
             }
         }
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.sessionDetailRoot)
     }
 

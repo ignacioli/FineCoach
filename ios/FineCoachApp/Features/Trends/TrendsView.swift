@@ -208,6 +208,7 @@ struct TrendsView: View {
         .background(FCSemanticColors.surfacePage)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarRole(.editor)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.trendsRoot)
         .task { await viewModel.reload() }
     }

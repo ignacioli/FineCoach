@@ -158,6 +158,7 @@ struct StudentDetailView: View {
         .onChange(of: path) { _, _ in
             Task { await viewModel.reload() }
         }
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.detailRoot)
     }
 

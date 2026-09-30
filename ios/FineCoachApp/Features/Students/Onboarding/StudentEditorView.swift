@@ -240,6 +240,7 @@ struct StudentEditorView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarRole(.editor)
         .task { await viewModel.loadIfNeeded() }
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.editorRoot)
         .fullScreenCover(item: $cover) { item in
             if let studentID = viewModel.editingStudentID {

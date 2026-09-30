@@ -103,6 +103,7 @@ struct ApplyTemplateView: View {
         .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "applyTemplate.title"))
         .navigationBarTitleDisplayMode(.inline)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.applyTemplateRoot)
         .task { await viewModel.reload() }
     }

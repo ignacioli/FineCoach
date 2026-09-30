@@ -72,6 +72,7 @@ struct SessionEditView: View {
         .navigationTitle(String(localized: "detail.edit"))
         .navigationBarTitleDisplayMode(.inline)
         .task { await viewModel.load() }
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.sessionEditRoot)
     }
 }

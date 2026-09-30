@@ -555,6 +555,7 @@ struct AppointmentEditorView: View {
         .background(FCSemanticColors.surfacePage)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarRole(.editor)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.appointmentEditorRoot)
         .fcBottomSheet(isPresented: $viewModel.isScopeSheetPresented) {
             scopeSheet

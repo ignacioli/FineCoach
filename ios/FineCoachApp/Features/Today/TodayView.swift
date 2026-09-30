@@ -178,6 +178,7 @@ struct TodayView: View {
         }
         .background(FCSemanticColors.surfacePage)
         .toolbar(.hidden, for: .navigationBar)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.todayRoot)
         .courseActionSheet(
             appointment: $sheetAppointment,

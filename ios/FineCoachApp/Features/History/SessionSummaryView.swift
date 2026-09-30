@@ -188,6 +188,7 @@ struct SessionSummaryView: View {
                 }
             }
         }
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.sessionSummaryRoot)
     }
 

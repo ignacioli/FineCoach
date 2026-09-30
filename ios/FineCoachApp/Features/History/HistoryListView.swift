@@ -414,6 +414,7 @@ struct HistoryListView: View {
         .onChange(of: path) { _, _ in
             Task { await viewModel.load() }
         }
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.historyRoot)
     }
 

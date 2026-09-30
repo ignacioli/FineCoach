@@ -223,6 +223,7 @@ struct CoursePackageEditorView: View {
         .background(FCSemanticColors.surfacePage)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarRole(.editor)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.coursePackageEditorRoot)
         .task { await viewModel.loadExistingActivePackage() }
         .onChange(of: viewModel.didSave) { _, saved in

@@ -220,6 +220,7 @@ struct TemplateEditorView: View {
         .background(FCSemanticColors.surfacePage)
         .navigationTitle(String(localized: "templateEditor.title"))
         .navigationBarTitleDisplayMode(.inline)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.templateEditorRoot)
         .fcConfirmationDialog(isPresented: $isConfirmingDelete) {
             FCConfirmationDialog(

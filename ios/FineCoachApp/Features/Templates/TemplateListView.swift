@@ -120,6 +120,7 @@ struct TemplateListView: View {
         .background(FCSemanticColors.surfacePage)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarRole(.editor)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.templateListRoot)
         .fcBottomSheet(isPresented: $isNamingNewTemplate) {
             FCBottomSheet(title: String(localized: "templates.newTemplate")) {

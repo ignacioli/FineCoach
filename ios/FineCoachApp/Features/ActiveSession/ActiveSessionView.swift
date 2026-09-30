@@ -164,6 +164,7 @@ struct ActiveSessionView: View {
             didPushSummary = true
             path.append(.sessionSummary(sessionID.rawValue))
         }
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.activeSessionRoot)
         .fullScreenCover(item: $viewModel.presentedSheet) { sheet in
             NavigationStack {

@@ -237,6 +237,7 @@ struct BodyDataListView: View {
         .background(FCSemanticColors.surfacePage)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarRole(.editor)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.bodyDataListRoot)
         .task { await viewModel.reload() }
         .sheet(isPresented: $viewModel.showingNewCustomMetric) {

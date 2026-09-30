@@ -320,6 +320,7 @@ struct BodyMeasurementEntryView: View {
         .background(FCSemanticColors.surfacePage)
         .navigationTitle(viewModel.metric?.name.value ?? String(localized: "bodyMeasurementEntry.title"))
         .navigationBarTitleDisplayMode(.inline)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementEntryRoot)
         .task { await viewModel.reload() }
         .toolbar {
