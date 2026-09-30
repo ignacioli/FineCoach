@@ -241,6 +241,7 @@ struct BodyDataListView: View {
         .task { await viewModel.reload() }
         .sheet(isPresented: $viewModel.showingNewCustomMetric) {
             newCustomMetricSheet
+                .fcPrivacyCovered()
         }
     }
 

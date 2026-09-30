@@ -200,6 +200,7 @@ struct ActiveSessionView: View {
                     )
                 }
             }
+            .fcPrivacyCovered()
         }
     }
 

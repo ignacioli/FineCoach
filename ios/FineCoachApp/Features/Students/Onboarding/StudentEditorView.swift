@@ -277,6 +277,7 @@ struct StudentEditorView: View {
                         )
                     }
                 }
+                .fcPrivacyCovered()
             }
         }
     }
