@@ -151,3 +151,37 @@ G4 已于 2026-08-30 通过。R1 已实现并验收。下一步唯一允许：�
 | SC-001、SC-002 | `product-owner-acceptance.md` |
 | SC-006 | `performance.md`、`t116-results.json` |
 | 独立隐私安全 gate | `privacy-security-gate.md`（PASS WITH RESIDUALS） |
+
+## M1-B Phase 8 证据对照（2026-09-30，T051）
+
+会话分支 `claude/finecoach-m1b-phase8-ecf1d1`，输入提交 `f9c810b`。Simulator：iPhone 17 Pro Max，iOS 26.5，Debug。**模拟器结果是工程回归，不是物理设备验收。**
+
+自动化门（最后一次）：`xcodebuild build` 通过；`FineCoachTests` 266 项（1 项按设计跳过）0 失败；`FineCoachIntegrationTests` 95/95；设计值扫描 0 违规。
+
+| 需求 | 证据 | 证明什么 / 不证明什么 |
+| --- | --- | --- |
+| NFR-005、M1B-FR-009、AC-015 | `FCStatusTests`（5 类状态各有文字与图标、各自登记的显示文件都用 `FCStatusLabel`） | 状态不只靠颜色；显示位置为静态登记。界面待人工审核 |
+| NFR-002、NFR-007 | `CapabilityManifestTests`（Info.plist、entitlements、隐私清单、工程文件、源码无网络/通讯录/相册/相机/定位/遥测） | 只证明声明与静态引用，不证明运行时 |
+| NFR-002 | `LogSurfaceTests`（日志只有固定枚举标识；`AppLogger` 之外只有 T116 harness 写控制台） | 不是统一日志的运行时抓取 |
+| NFR-003 | `PrivacyCoverTests` + `ScenePrivacyCoordinatorTests` + 已有 `PrivacyCoverUITests`；系统模态内容加了同一个遮罩 | 遮罩存在与接线；**App 切换器实际截图未验证**（沿用 M1-A `app-switcher-privacy.md` 的残留） |
+| NFR-004 | `TouchTargetComponentTests`（交互组件都声明 ≥44pt 点击区） | 组件层保证；页面渲染与大字号截断由 T070、人工审核覆盖，**没有整页 XCUITest** |
+| AC-013、NFR-001（T049） | `CapabilityManifestTests`：无网络框架、无 `URLSession`/`NWConnection`、无第三方包；M1-A 飞行模式审计 `ValidationEvidence/offline-core.md` | M1-B 未新增联网代码；**没有重新做飞行模式实测**（模拟器无法切飞行模式） |
+| T052 独立隐私/安全审查 | `mobile-privacy-security-reviewer`，PASS WITH FINDINGS | 见下表处置 |
+
+### T052 发现处置
+
+| 发现 | 处置 |
+| --- | --- |
+| (1) 分享模拟启动参数正式版可用 | 已修：`#if DEBUG` |
+| (2) `T116PerformanceHarness` 正式版可用 | **登记例外（产品负责人 2026-09-30）**：只写合成数据到独立存储，只能由启动参数触发，安装版无法传参 |
+| (3) 备份口令留在 ViewModel 内存 | 已修：导出成功、取消、离开页面、恢复成功时清空 |
+| (4) 导出临时副本未走 `ProtectedFileStore` | **登记为可接受（产品负责人 2026-09-30）**：文件本身已用口令加密，用后即删 |
+| 系统模态遮罩 | 已修：结束/删除训练、归档学员、新建指标三处加遮罩；系统文件选择器无法覆盖，登记为已知限制 |
+
+### 已知缺口与遗留（如实记录）
+
+- 未验证：锁屏通知文字、系统分享实际投递、真机文件保护、App 切换器实际截图、正式版二进制。
+- 出口合规：`Info.plist` 未设 `ITSAppUsesNonExemptEncryption`。产品负责人计划订阅 Apple Developer；上传 TestFlight 前由产品负责人在 App Store Connect 决定「使用加密 / 是否豁免」，再用一行写入 `Info.plist`。
+- 旧界面测试：`StudentLifecycleUITests` 4 项因 App 启动落在「今日」而失败（等待学员页标识）。早于本轮，不在验收门内，未修。
+- 屏幕根容器标识覆盖子控件标识的问题已修（21 处）。
+- 物理设备验收与人工模拟器验收是独立的门，本节不替代。
