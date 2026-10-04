@@ -18,7 +18,7 @@ Outside approved M1-A behavior, do not infer whether Students directly use the A
 
 ## Current Phase
 
-M1-A (R1) is implemented and accepted (G4 passed 2026-08-30). M1-B (`002-m1-b`) is implemented: the G5 design review passed, and all `tasks.md` tasks through Phase 8 are complete, including the product-owner simulator walkthrough of the Phase 8 checkpoint (2026-10-03). Physical-device acceptance remains a separate gate and has not been run for M1-B; `ios/VALIDATION.md` records the evidence and its known gaps. Do not create an M2 feature spec until the product owner accepts M1-B. The shipped stack is native Swift/SwiftUI on iOS 18.0+, using Apple frameworks and local Core Data persistence. Android and requirements outside approved specs remain in discovery.
+M1-A (R1) is implemented and accepted (G4 passed 2026-08-30). M1-B (`002-m1-b`) is implemented: the G5 design review passed, and all `tasks.md` tasks through Phase 8 are complete, including the product-owner simulator walkthrough of the Phase 8 checkpoint (2026-10-03). The product owner passed G6 (M1-B implementation acceptance) on 2026-10-03 and decided not to run physical-device acceptance for M1-B; `ios/VALIDATION.md` records the evidence and its known gaps. M1-B is accepted (R2). M2 (R3) work may now begin, starting with the M2 `spec.md` after its open items are resolved. The shipped stack is native Swift/SwiftUI on iOS 18.0+, using Apple frameworks and local Core Data persistence. Android and requirements outside approved specs remain in discovery.
 
 Before implementing work outside approved M1-A scope:
 

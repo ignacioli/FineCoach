@@ -154,7 +154,7 @@ G4 已于 2026-08-30 通过。R1 已实现并验收。下一步唯一允许：�
 
 ## M1-B Phase 8 证据对照（2026-09-30，T051）
 
-会话分支 `claude/finecoach-m1b-phase8-ecf1d1`，输入提交 `HEAD`（Phase 8 收尾，2026-10-03）。Simulator：iPhone 17 Pro Max，iOS 26.5，Debug。**模拟器结果是工程回归，不是物理设备验收。**
+会话分支 `claude/finecoach-m1b-phase8-ecf1d1`，输入提交 `7a7b5a5`（Phase 8 收尾，2026-10-03）。Simulator：iPhone 17 Pro Max，iOS 26.5，Debug。**模拟器结果是工程回归，不是物理设备验收。**
 
 自动化门（最后一次）：`xcodebuild build` 通过；`FineCoachTests` 267 项（1 项按设计跳过）0 失败；`FineCoachIntegrationTests` 96/96；设计值扫描 0 违规。
 
@@ -184,4 +184,4 @@ G4 已于 2026-08-30 通过。R1 已实现并验收。下一步唯一允许：�
 - 出口合规：`Info.plist` 未设 `ITSAppUsesNonExemptEncryption`。产品负责人计划订阅 Apple Developer；上传 TestFlight 前由产品负责人在 App Store Connect 决定「使用加密 / 是否豁免」，再用一行写入 `Info.plist`。
 - 旧界面测试：`StudentLifecycleUITests` 因 App 启动落在「今日」、空状态按钮标识被盖住而失败，已修复 2 项（首次启动、大字号）；另 2 项（归档/永久删除）因 D6 把入口移到编辑资料页而过期，已标记跳过，T081 登记重写。界面测试不在验收门内。
 - 屏幕根容器标识覆盖子控件标识的问题已修（21 处）。
-- 物理设备验收与人工模拟器验收是独立的门，本节不替代。
+- 物理设备验收：产品负责人 2026-10-03 决定 M1-B **不做**；上述未验证项作为已知缺口保留。G6 于同日通过。
