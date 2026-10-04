@@ -336,6 +336,73 @@
 
         // T077: "仅本次" can change schedule and focus in one write; the
         // instance becomes a detached exception.
+        // T019 / SC-002 (M1B-FR-004/005): both termination conditions survive a
+        // restart, 仅本次 and 本次及以后 stay distinguishable, and instances
+        // before the boundary are not touched.
+        func testBothTerminationConditionsAndScopeSurviveRestartWithoutTouchingHistory() async throws {
+            let env = try await makeEnvironment(ids: (0..<12).map { _ in UUID() })
+            let byCount = try await env.appointmentUseCases.createRecurring(
+                studentID: env.studentID,
+                draft: RecurringAppointmentDraft(
+                    intervalDays: .everyWeek,
+                    termination: .repeatCount(3),
+                    firstOccurrenceDate: try LocalDate(year: 2026, month: 1, day: 5),
+                    startTime: try LocalTime(hour: 9, minute: 0)
+                ),
+                overrideConflict: false
+            )
+            let byEndDate = try await env.appointmentUseCases.createRecurring(
+                studentID: env.studentID,
+                draft: RecurringAppointmentDraft(
+                    intervalDays: .everyWeek,
+                    termination: .endDate(try LocalDate(year: 2026, month: 2, day: 2)),
+                    firstOccurrenceDate: try LocalDate(year: 2026, month: 1, day: 6),
+                    startTime: try LocalTime(hour: 14, minute: 0)
+                ),
+                overrideConflict: false
+            )
+            let countSeriesID = try XCTUnwrap(byCount.first?.seriesID)
+            let endDateSeriesID = try XCTUnwrap(byEndDate.first?.seriesID)
+
+            // 仅本次 on the count series' last instance; 本次及以后 on the end-date series.
+            let single = try await env.appointmentUseCases.rescheduleSingle(
+                appointmentID: byCount[2].id,
+                startTime: try LocalTime(hour: 11, minute: 0),
+                overrideConflict: false
+            )
+            XCTAssertTrue(single.isDetachedException)
+            let boundary = byEndDate[2].date
+            _ = try await env.appointmentUseCases.applyThisAndFuture(
+                seriesID: endDateSeriesID,
+                boundaryDate: boundary,
+                startTime: try LocalTime(hour: 16, minute: 0),
+                overrideConflict: false
+            )
+
+            try await env.controller.shutdownForTesting()
+            let reopened = try PersistenceController(storeURL: env.directory.url.appendingPathComponent("generation/FineCoach.sqlite"))
+            let repository = CoreDataAppointmentRepository(writer: reopened.writer)
+
+            let countSeries = try await repository.series(id: countSeriesID)
+            XCTAssertEqual(countSeries.termination, .repeatCount(3))
+            XCTAssertEqual(countSeries.status, .active, "仅本次 must not end the series")
+            let countInstances = try await repository.appointments(seriesID: countSeriesID)
+            XCTAssertEqual(countInstances.filter(\.isDetachedException).count, 1)
+
+            let endSeries = try await repository.series(id: endDateSeriesID)
+            XCTAssertEqual(endSeries.termination, .endDate(try LocalDate(year: 2026, month: 2, day: 2)))
+            XCTAssertEqual(endSeries.status, .ended, "本次及以后 ends the old series")
+
+            // Instances before the boundary keep their original date and time.
+            let history = try await repository.appointments(seriesID: endDateSeriesID)
+            XCTAssertEqual(history.count, 2)
+            for (original, kept) in zip(byEndDate.prefix(2), history.sorted { $0.date < $1.date }) {
+                XCTAssertEqual(kept.date, original.date)
+                XCTAssertEqual(kept.startTime, original.startTime)
+            }
+            try await reopened.shutdownForTesting()
+        }
+
         func testRescheduleSingleAlsoUpdatesTrainingFocus() async throws {
             let env = try await makeEnvironment(ids: (0..<4).map { _ in UUID() })
             let created = try await env.appointmentUseCases.createRecurring(

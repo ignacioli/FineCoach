@@ -365,6 +365,7 @@ struct StudentListView: View {
         }
         .padding(.horizontal, FCPrimitives.space4)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.studentListEmpty)
     }
 

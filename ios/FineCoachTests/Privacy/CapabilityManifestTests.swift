@@ -58,7 +58,7 @@ final class CapabilityManifestTests: XCTestCase {
     func testAppSourcesImportNoNetworkOrSensitiveFrameworks() throws {
         let forbiddenImports: Set<String> = [
             "Network", "NetworkExtension", "CFNetwork", "WebKit", "SafariServices",
-            "Contacts", "ContactsUI", "Photos", "PhotosUI", "AVFoundation", "CoreLocation",
+            "EventKit", "EventKitUI", "Contacts", "ContactsUI", "Photos", "PhotosUI", "AVFoundation", "CoreLocation",
             "CloudKit", "MetricKit", "AdSupport", "AppTrackingTransparency", "StoreKit",
             "FirebaseCore", "FirebaseAnalytics", "FirebaseCrashlytics", "Sentry", "Amplitude", "Mixpanel",
         ]
@@ -81,5 +81,14 @@ final class CapabilityManifestTests: XCTestCase {
             }
         }
         XCTAssertTrue(violations.isEmpty, "forbidden usage: \(violations.sorted())")
+    }
+
+    /// T019 / M1B-FR-003: the calendar is the app's own month view; there is no
+    /// system calendar sync (no EventKit, checked above) and no week or day view.
+    func testNoWeekOrDayViewScreens() throws {
+        let enumerator = try XCTUnwrap(FileManager.default.enumerator(at: iosRoot.appendingPathComponent("FineCoachApp/Features"), includingPropertiesForKeys: nil))
+        let screens = enumerator.compactMap { ($0 as? URL)?.lastPathComponent }
+            .filter { $0.hasSuffix(".swift") && ($0.contains("WeekView") || $0.contains("DayView")) }
+        XCTAssertTrue(screens.isEmpty, "week/day view screens are out of scope: \(screens)")
     }
 }
