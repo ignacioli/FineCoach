@@ -1,6 +1,24 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.2 -> 1.0.3
+- Version change: 1.0.3 -> 1.1.0
+- Modified principles: none
+- Added principles:
+  - VI. Design-System-Governed UI: user-visible UI follows the design system and the component
+    anatomy spec (`design/design-system/components.md`); visual work is classified by design delta
+    and component scope before editing; component specs precede dependent code; visual acceptance
+    shifts left to automated token/component checks, with page composition sampled and human visual
+    review reserved for named triggers.
+- Added sections: none
+- Removed sections: none
+- Templates requiring updates: none required. `plan-template.md` already runs a Constitution Check,
+  which now includes Principle VI; feature plans that touch UI record the five-line execution record
+  from `components.md` §1.5.
+- Follow-up TODOs: M2 (`specs/003-m2-personal-training-archive`) hi-fi design and plan MUST apply
+  Principle VI; register M2 screens in `design/m2-hifi/implementation-map.md` when that design starts.
+- Rationale: approved tokens, hi-fi screens, and screenshots did not prevent UI drift in a prior
+  project, because tokens do not define structure and page-by-page visual review is costly and late.
+
+Previous report (1.0.2 -> 1.0.3)
 - Modified principles:
   - V. Accessible, Testable, and Honest Outcomes: clarify that test-first / red-green TDD is not a delivery gate. Each approved spec sets verification depth. Core-path unit and integration tests remain required in proportion to risk. Full UI, fault-injection, and performance matrices are not default unless the applicable spec requires them. M1-A already-shipped test-first tasks are not retroactively reopened.
 - Added sections: none
@@ -109,6 +127,28 @@ speculative cross-platform costs.
 Rationale: Accessibility and evidence quality determine whether FineCoach is usable and whether a
 milestone can truthfully be accepted.
 
+### VI. Design-System-Governed UI
+
+- User-visible UI MUST follow `design/design-system/README.md` (token and component values) and
+  `design/design-system/components.md` (component anatomy, states, invariants, reuse boundaries).
+  Feature views MUST compose design-system components and tokens. They MUST NOT introduce their own
+  visual values or copy a component's structure by hand.
+- Before editing, visual work MUST be classified by design delta (0→1 design, approved-design
+  revision, spec backfill, or implementation drift repair). Each affected component MUST then be
+  classified as reused, extended, newly shared, or feature-owned. New visual decisions require
+  product-owner design review before code. Drift repair MUST change code, never the approved design.
+- A component's anatomy spec MUST be finalized before code that depends on it. Extending a component
+  MUST name its affected consumers and MUST NOT silently change their approved appearance.
+- Visual acceptance MUST shift left. Automated token and component-contract checks pass first. Page
+  compositions are then sampled. Human visual review is reserved for the triggers named in
+  `components.md` §1.4. Automated results, human visual review, and product-owner decisions MUST be
+  recorded separately and MUST NOT substitute for one another. Screenshot-driven fix loops MUST NOT
+  serve as an acceptance mechanism.
+
+Rationale: Tokens define values but not structure, and screenshots show one state per screen. Specifying
+each component once and locking it with automated checks prevents drift at its source. It also replaces
+repeated page-by-page human inspection with a small number of targeted reviews.
+
 ## Project Constraints
 
 - Product authority flows from the constitution and approved roadmap to PRD, feature specification,
@@ -162,4 +202,4 @@ milestone can truthfully be accepted.
 - Compliance MUST be rechecked at plan approval, task generation and analysis, implementation
   checkpoints, privacy/security review, and milestone acceptance.
 
-**Version**: 1.0.3 | **Ratified**: 2026-08-26 | **Last Amended**: 2026-08-30
+**Version**: 1.1.0 | **Ratified**: 2026-08-26 | **Last Amended**: 2026-10-05

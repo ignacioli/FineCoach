@@ -63,7 +63,7 @@ fine.
 - No ViewInspector-level structural assertions on Feature screens unless
   explicitly requested.
 
-## Checkpoint completion — manual walkthrough is not optional
+## Checkpoint completion — structural evidence per checkpoint, human walkthrough per milestone
 
 A story/phase Checkpoint is not "done" when tests are green. It requires
 BOTH:
@@ -71,21 +71,31 @@ BOTH:
 1. `xcodebuild build` + `FineCoachTests` + `FineCoachIntegrationTests`
    green (the automated gate — proves domain logic and persistence are
    correct).
-2. A human has actually opened the built app on a simulator (or real
-   device) and operated every new user-facing interaction at least
-   once, checking two things automated tests structurally cannot see:
-   whether it renders at a sane layout/width, and whether a first-time
-   user would ever find it without being told.
+2. An **entry and layout map** in the execution record
+   (`design/design-system/components.md` §1.4): one line per new
+   user-facing interaction — screen → visible control → accessibility
+   identifier → whether it mutates data → which component or container
+   makes it fill the width. Every line must point at real code. A
+   missing entry, a gesture-only or contextMenu-only mutation, or a
+   width that no component/container fills is a defect to fix, not
+   something to leave for a human to find.
 
 Unit/integration tests in this repo do not render SwiftUI views and
 cannot detect a missing `.frame(maxWidth: .infinity)`, a control hidden
 behind an undiscoverable gesture, or "this logic is fully tested but has
-no UI entry point at all." These are real defect classes, not
-hypothetical — three shipped in Phase 4 despite 100% green tests, found
-only by a manual walkthrough. Do not report a phase/Checkpoint as
-complete, or describe Feature UI as "done," until step 2 has actually
-happened; say explicitly when it hasn't (see the existing rule below on
-not claiming "visually verified" without a human having looked).
+no UI entry point at all." These are real defect classes — three shipped
+in Phase 4 despite 100% green tests. The entry and layout map exists to
+catch exactly these three structurally.
+
+A human walkthrough is no longer required at every checkpoint. It
+happens only under the L3 triggers in `components.md` §1.4: product-owner
+review of new design decisions (in Penpot), a feature spec's named core
+screens once when first implemented, **one consolidated walkthrough
+before the milestone acceptance gate** (the agent seeds the simulator
+and lists only new interactions + core screens), and specific doubts the
+agent names that structural evidence cannot settle. Never describe
+Feature UI as "visually verified" unless a human actually looked; say
+explicitly when that has not happened yet.
 
 ## Discoverable affordances — no contextMenu-only actions
 
@@ -140,8 +150,15 @@ Simulator control tool and any other screenshot-capable tool.
 §Current Artifacts and Authority). `design/design-system/README.md`
 defines every color, type style, spacing, radius, icon, and component
 value; Feature views consume those tokens and never introduce their own
-values. Compare a screen against its `design/m1-b-hifi/screens/*.png`
-target during the human walkthrough — this is checking against a fixed
+values. `design/design-system/components.md` defines component anatomy
+and the mandatory visual workflow (`AGENTS.md` §Visual Work:
+Component-First): classify the design delta (A/B/C/D) and
+reuse/extend/new per component yourself, finalize the component spec
+before dependent code, pass automated token/component checks before
+sampling pages, and request human review only under its L3 triggers.
+Human walkthroughs (only under the L3 triggers) never mean comparing
+every page against its PNG. Compare a screen against its approved
+`design/*/screens/*.png` target during such a walkthrough — this is checking against a fixed
 approved image, not the forbidden screenshot loop above. A design
 change goes into the design-system doc and is backfilled into Penpot
 「M1-B G5 Design」 in the same round; never let code, doc, and Penpot

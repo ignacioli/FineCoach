@@ -2,6 +2,7 @@
 
 > 状态：v1.0（2026-09-22 产品负责人批准）。修订历史：v0.2 按产品负责人决定修复了评分卡的定量扣分项（O1/O2/O3/O5、C10），全部待确认项已关闭；v0.3 已把全部画稿修改回填到 Penpot 源文件，并在本仓库重新导出 17 屏（§1.1）。
 > 作用：FineCoach iOS 界面视觉的**唯一实现依据**。后续 spec / plan / tasks 与代码（`ios/FineCoachApp/DesignSystem/`）都引用本文，不再各自转述设计数值。
+> 组件结构（anatomy、变体、状态、不变量、代码映射）与视觉工作流见 [`components.md`](components.md)；数值仍以本文为准。
 
 ## 1. 权威来源与优先级
 
@@ -54,6 +55,13 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 | `39-backup-restore-success` | D14b 恢复完成状态（T072，产品负责人 2026-09-29）：恢复成功后在「恢复」按钮下方就地显示，与失败状态对称——22×22 `action.primary` 圆底白色 ✓ 徽标（信息性状态，§7.2）+「恢复完成」`callout` 600 `text.primary` + `caption` `text.secondary`「本机数据已替换为备份中的版本。请到学员、课包、模板等页面检查数据是否正确。」；只有文字提示，不加跳转链接。快照 `before-T072-restore-success 2026-09-29` → `T072 restore success state (D14b) 2026-09-29` | 补充 38 |
 
 新画稿中训练重点一律显示部位名（如「大腿、臀」），对应 spec Revision 1.2 的 M1B-FR-033。
+
+### 1.3 组件规格回填 Penpot（2026-10-05）
+
+- 快照：`before-component-spec-backfill 2026-10-05`（revn 179）→ `component-spec-backfill 2026-10-05 (DS-* layer names + plugin data, deprecated CG-2 comments)`（revn 180）。`File.validate()` 0 个错误。
+- 内容：按 [`components.md`](components.md) 的组件 ID，用几何与填色特征（取自本文 §8）识别 43 块画板中的组件，730 个图层写入 shared plugin data（namespace `finecoach`：`component` / `part` / `spec` / `status`），其中 168 个原名为 `Rectangle` / `Ellipse` 等的图层改名为「DS-xxx · 部件」；02、15 画板的废弃设计加评论；「01 今日」上方加一条说明评论。
+- 只改图层名、元数据和评论，不改任何视觉，因此不重新导出 `screens/*.png`。
+- 未自动标注的组件（结构无法靠单个图层的几何可靠识别）：`DS-TITLE-ACTION`、`DS-ACTION-ROW`、`DS-LABEL-VALUE-ROW`、`DS-SYMBOL`、`DS-EQUIPMENT-ICON`、`DS-BODY-DIAGRAM`，以及页面组合模式 `DS-HUB-ROW`、`DS-INLINE-RESULT`、`DS-EMPTY-STATE`；`DS-SAVE-STATUS` 没有画稿。
 
 ## 2. 颜色
 
@@ -263,9 +271,8 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 | 主按钮（页面底部） | 358×52，`radius.md`，底色 `action.primary`，按下 `action.pressed`；文字 `headline` 白色 |
 | 次按钮（样张） | 白底，1.5pt `action.primary` 描边，`radius.md`；文字 `headline` `action.primary` |
 | 链接式按钮 | 无底色，文字 `callout` 600 `action.primary`（例：「＋ 添加动作」「＋ 自定义指标」「重试」） |
-| 顶部分段切换（今日 / 学员） | 选中项 50×32 胶囊，`action.primary` 底 + `headline` 白字；未选中项为纯文字 `body` `text.secondary` |
+| 顶部分段切换（今日 / 学员） | 选中项 50×32 胶囊，`action.primary` 底 + `headline` 白字；未选中项为纯文字 `body` `text.secondary`。同一外观也用于页内 2–3 个互斥短选项（37「扣减 / 返还」；趋势指标、身体数据录入单位），选项更多或文字较长时改用筛选胶囊（2026-10-05，§10 C11） |
 | 筛选胶囊（07） | 高 30 胶囊；未选中 `surface.selected` 底 + `chipLabel` `text.primary`；选中 `action.primary` 底 + 白字 |
-| 星期多选（02） | 64×28 胶囊，选中/未选中配色同筛选胶囊 |
 | 开关 | 44×26 胶囊，滑块 18×18 白色圆，**左关右开**（iOS 惯例，与画稿 02/12 一致）。开启：轨道 `action.primary`。关闭：轨道 `surface.divider` 底 + 1.5pt `border.control` 内描边（O7）。实现为系统原生 `Toggle` + 自定义外观样式，保留系统开关的无障碍语义；可点击区域不小于 44×44 |
 | 深色 hero 卡（01） | 358×100，`radius.lg`，`action.primary` 底；内含徽标（56×24 胶囊，`surface.canvas` 底，`sectionLabel` `action.primary` 字）、`headline` 白字标题、`text.onActionSecondary` 副文字、`callout` 600 白字操作。每屏最多一个 |
 | 列表行 | 左 16；主文字 `headline` 或 `body`，元信息 `caption` `text.secondary`，右侧 `›`；行间用 1pt 分割线 |
@@ -274,10 +281,10 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 | 搜索框 | 358×40，`radius.sm`，`surface.canvas` 底，占位文字 `callout` 400 `text.secondary` |
 | 输入框（08） | 358×48，`radius.sm`，`surface.canvas` 底（与搜索框一致）；占位文字 `callout` 400 `text.secondary`（对 `#F7F4EE` 6.29:1）。画稿原为白底无描边，边界不可见（O3） |
 | 提示条 | 358×44，`radius.md`，`surface.selected` 底，`caption` `action.primary` 字 |
-| 类型标签（15「有氧」） | 48×24 胶囊，`surface.selected` 底，`sectionLabel` `action.primary` 字 |
 | 组状态圆圈 | 22×22，见 §6 |
 | 确认弹窗 | 宽 300（屏内）/ 320（样张），`radius.lg`，白底；标题 `headline`，说明 `caption` `text.secondary`；两个 36 高按钮，`radius.dialogAction`：取消/保守选项 `surface.selected` 底 + `callout` 600 `action.primary`，确认选项 `action.primary` 底 + 白字 |
 | 空态（16） | 吉祥物插图 220×220 居中 → 标题 `headline` `action.primary`「还没有学员」→ 说明 `caption` `text.secondary` → 底部主按钮「＋ 新建学员」 |
+| 保存状态（训练中，无画稿） | 图标 + 文字横排，最小高 44：保存中 `arrow.triangle.2.circlepath`、已保存 `checkmark.circle`、保存失败 `exclamationmark.triangle`；文字 `body` 400；保存中 / 已保存 `text.secondary`，保存失败 `status.destructive`（图标同色）。整体读作一个无障碍元素。按 M1 已验收的实际呈现补登记，不出画稿（产品负责人 2026-10-05，§10 C12） |
 | 通知预览（样张） | 36×36 圆角 9 炭黑图标；标题 `callout` 600，正文 `caption`；只写通用文案和时间，不写姓名/性别/课包 |
 
 ### 8.1 D1–D9 新增组件（2026-09-26）
@@ -346,6 +353,9 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 | I1 | Penpot 17 屏、11 屏里的器材图标是旧画法（描边 3pt/2pt 混用），与 `icons/` 目录的重绘版不一致 | 以 `icons/` 为准，已替换 | 已定，已回填 |
 | O5 | 画稿只覆盖了空态和训练三种状态，缺少加载、错误、离线状态（评分卡维度 9 扣分项） | 不另出设计稿，用本文的组件与颜色组合实现，并在逐屏走查时人工确认 | 已定（产品负责人） |
 | O7 | 关闭态开关轨道 `#ECE9E2` 对白底 1.21:1，开关状态只靠轨道体现，低于非文本元素 3:1（spec NFR-010；2026-09-23 对抗性审查 #1） | 保留画稿外观，轨道加 1.5pt `border.control` 内描边（3.48:1），与 O2 同一处理方式；已回填 Penpot 12 屏（快照 `before-switch-off-outline 2026-09-23` → `switch-off-outline 2026-09-23 (…)`）并重新导出 `12-share-report.png` | 已定（产品负责人 2026-09-23），已回填 |
+| C11 | `FCSegmentedSwitch` 在 README 中只定义为「今日 / 学员」顶部切换，代码另用于人工调整、趋势指标、身体数据录入单位 | 37 画稿（D13b，2026-09-29 批准）已在页内用同一胶囊表达「扣减 / 返还」，属于已批准的复用；限定为 2–3 个互斥短选项。不用系统分段 `Picker`（色板外，与 D13 取代系统 `Stepper` 同理），也不用筛选胶囊（筛选 / 多选语义） | 已定（产品负责人授权 AI 裁决，2026-10-05） |
+| C12 | 保存状态组件没有画稿行，组件代码也未显式声明字体（继承 App 根部 `body`） | 按 M1 已验收的实际呈现补规格（§8「保存状态」）；非核心链路，不出画稿 | 已定（产品负责人 2026-10-05） |
+| C13 | §8「星期多选（02）」「类型标签（15「有氧」）」对应组件没有任何界面使用：02 已被 23（D4 重复规则）取代；15 的「有氧」标签从未实现，训练中用记录方式选择表达有氧 | 作为废弃设计删除这两行，并删除 `FCWeekdayChip`、`FCTypeTag` 代码；02、15 画板保留为历史画稿，其中这两处不再是实现依据，Penpot 已加评论标注。D6b 编辑资料的「男 / 女」也画成 64×28 胶囊，但实现为 4 个选项的 `FCFilterChip`（G6 已验收），按筛选胶囊对待，64 固定宽不作为规格 | 已定（产品负责人 2026-10-05） |
 | O6 | 吉祥物造型与知名动画角色是否存在版权关联 | 产品负责人确认：吉祥物为其自行生成的原创形象，与该角色无关，不涉及版权问题 | 已定（产品负责人） |
 
 ## 11. 对比度核验（WCAG 2.x）

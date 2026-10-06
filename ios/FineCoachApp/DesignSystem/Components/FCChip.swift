@@ -31,33 +31,3 @@ public struct FCFilterChip: View {
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
-
-/// The weekday multi-select chip (§8 "星期多选（02）": 64×28 capsule, same
-/// color scheme as the filter chip).
-public struct FCWeekdayChip: View {
-    private let title: String
-    private let isSelected: Bool
-    private let action: () -> Void
-
-    public init(title: String, isSelected: Bool, action: @escaping () -> Void) {
-        self.title = title
-        self.isSelected = isSelected
-        self.action = action
-    }
-
-    public var body: some View {
-        Button(action: action) {
-            Text(title)
-                .fcFont(.chipLabel)
-                .foregroundStyle(isSelected ? FCSemanticColors.actionOn : FCSemanticColors.textPrimary)
-                .frame(width: 64, height: 28)
-                .background(
-                    Capsule().fill(isSelected ? FCSemanticColors.actionPrimary : FCSemanticColors.surfaceSelected)
-                )
-        }
-        .buttonStyle(.plain)
-        .frame(minWidth: 44, minHeight: 44)
-        .contentShape(Rectangle())
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
-    }
-}

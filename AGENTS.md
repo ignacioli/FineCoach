@@ -15,6 +15,19 @@ Outside approved M1-A behavior, do not infer whether Students directly use the A
 - `specs/002-m1-b-coach-operations/spec.md` is the approved M1-B feature specification (`1.2-approved`; Revision 1.2 approved 2026-09-26), including §10 decisions. Its approved `plan.md` and `tasks.md` describe the M1-B slice, which is implemented. M1-B verification MUST follow that spec §2.3 (core-path unit and integration tests; no TDD/red-green gate).
 - The approved M1-A artifacts override discovery input only within their explicit scope. Do not promote remaining ideas into requirements.
 - `design/` in this repository is the single authoritative visual design baseline and source (product-owner decision, 2026-09-22): `design/design-system/README.md` defines color, typography, spacing, radius, icon, and component rules; `design/m1-b-hifi/` holds the approved hi-fi screens, equipment icons, and design notes; `design/12d-visual-scorecard.md` is the visual quality bar. They are backed by the Penpot file「M1-B G5 Design」, which must be kept in sync with any design-system change. The private specs repository keeps only design-discovery evidence and must not be used as a visual source.
+- `design/design-system/components.md` is the component anatomy spec: stable `DS-*` component IDs, parts and reading order, variants, states, invariants, reuse boundaries, code mapping, and the visual workflow. Token and component values stay in `design/design-system/README.md`; structure lives in `components.md`.
+
+## Visual Work: Component-First
+
+Every task that creates or changes user-visible UI follows `design/design-system/components.md` §1 before editing:
+
+1. **Read before editing.** Read the affected approved screens (`design/*/screens/*.png`), the relevant `README.md` sections, and the affected `components.md` entries. Tokens alone do not define layout; anatomy does.
+2. **Classify by design delta, not by wording.** Decide per affected component whether the work is (A) 0→1 design, (B) revision of an approved design, (C) spec backfill for an unchanged approved design, or (D) implementation drift repair; then whether each component is reused, extended, newly shared, or feature-owned. State the rationale yourself; routine human confirmation of the classification is not required. A and B need product-owner design review in Penpot before code; C and D do not repeat visual approval. Never change the design to legitimize drifted code.
+3. **Spec before code.** A component's `components.md` entry (or the milestone `implementation-map.md` entry for a feature-owned component) is finalized before code that depends on it. Feature views compose `DS-*` components and tokens only; repeated hand-built structure is a missing component — register it in `components.md` §5 instead of copying it again.
+4. **Validate components first, then sample pages.** L0 token and L1 component-contract checks are automated and must pass first (add or update a component-level test for each automatable invariant you introduce). L2 page composition relies on `DesignValueScanTests` plus the composition list in the execution record. Each checkpoint carries an entry and layout map (one line per new interaction: screen, visible control, identifier, data mutation, width owner) instead of a human walkthrough. L3 human review is reserved for new design decisions, a spec's named core screens when first implemented, one consolidated walkthrough before the milestone acceptance gate, and specific doubts the agent names — not for every page or every checkpoint.
+5. **Record the five-line execution record** (`components.md` §1.5) in the plan, tasks, or milestone implementation map, with actual results rather than intentions.
+
+Ask the product owner one targeted question only for a real authority conflict, an undecidable design delta that changes the approach, or an unapproved substantive design decision; keep doing work that does not depend on the answer.
 
 ## Current Phase
 

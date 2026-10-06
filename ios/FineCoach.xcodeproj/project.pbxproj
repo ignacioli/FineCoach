@@ -88,7 +88,6 @@
 		B952 /* FCBodyPartChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = A952 /* FCBodyPartChip.swift */; };
 		B953 /* FCCalendarDayCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A953 /* FCCalendarDayCell.swift */; };
 		B954 /* TrainedBodyPartsSummaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A954 /* TrainedBodyPartsSummaryTests.swift */; };
-		B916 /* FCTypeTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = A916 /* FCTypeTag.swift */; };
 		B917 /* FCToggleStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A917 /* FCToggleStyle.swift */; };
 		B962 /* FCStepper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A962 /* FCStepper.swift */; };
 		B918 /* FCSetStateCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A918 /* FCSetStateCircle.swift */; };
@@ -263,6 +262,7 @@
 		AD5F42 /* TouchTargetComponentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5F41 /* TouchTargetComponentTests.swift */; };
 		B930 /* FCStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A930 /* FCStatusTests.swift */; };
 		B963 /* FCStepperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A963 /* FCStepperTests.swift */; };
+		AC0C02 /* ComponentCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0C01 /* ComponentCatalogTests.swift */; };
 		B931 /* TypographyHarnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A931 /* TypographyHarnessTests.swift */; };
 		B932 /* DesignValueScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A932 /* DesignValueScanTests.swift */; };
 		B933 /* ContrastHarnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A933 /* ContrastHarnessTests.swift */; };
@@ -355,7 +355,6 @@
 		A952 /* FCBodyPartChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCBodyPartChip.swift; sourceTree = "<group>"; };
 		A953 /* FCCalendarDayCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCCalendarDayCell.swift; sourceTree = "<group>"; };
 		A954 /* TrainedBodyPartsSummaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainedBodyPartsSummaryTests.swift; sourceTree = "<group>"; };
-		A916 /* FCTypeTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCTypeTag.swift; sourceTree = "<group>"; };
 		A917 /* FCToggleStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCToggleStyle.swift; sourceTree = "<group>"; };
 		A962 /* FCStepper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCStepper.swift; sourceTree = "<group>"; };
 		A918 /* FCSetStateCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCSetStateCircle.swift; sourceTree = "<group>"; };
@@ -501,6 +500,7 @@
 		AD5F41 /* TouchTargetComponentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchTargetComponentTests.swift; sourceTree = "<group>"; };
 		A930 /* FCStatusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCStatusTests.swift; sourceTree = "<group>"; };
 		A963 /* FCStepperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCStepperTests.swift; sourceTree = "<group>"; };
+		AC0C01 /* ComponentCatalogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentCatalogTests.swift; sourceTree = "<group>"; };
 		A931 /* TypographyHarnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypographyHarnessTests.swift; sourceTree = "<group>"; };
 		A932 /* DesignValueScanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignValueScanTests.swift; sourceTree = "<group>"; };
 		A933 /* ContrastHarnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContrastHarnessTests.swift; sourceTree = "<group>"; };
@@ -1086,7 +1086,6 @@
 				A951 /* FCBodyDiagram.swift */,
 				A952 /* FCBodyPartChip.swift */,
 				A953 /* FCCalendarDayCell.swift */,
-				A916 /* FCTypeTag.swift */,
 				A917 /* FCToggleStyle.swift */,
 				A962 /* FCStepper.swift */,
 				A918 /* FCSetStateCircle.swift */,
@@ -1365,6 +1364,7 @@
 				A930 /* FCStatusTests.swift */,
 				AD5F41 /* TouchTargetComponentTests.swift */,
 				A963 /* FCStepperTests.swift */,
+				AC0C01 /* ComponentCatalogTests.swift */,
 				A931 /* TypographyHarnessTests.swift */,
 				A932 /* DesignValueScanTests.swift */,
 				A933 /* ContrastHarnessTests.swift */,
@@ -1782,7 +1782,6 @@
 				B951 /* FCBodyDiagram.swift in Sources */,
 				B952 /* FCBodyPartChip.swift in Sources */,
 				B953 /* FCCalendarDayCell.swift in Sources */,
-				B916 /* FCTypeTag.swift in Sources */,
 				B917 /* FCToggleStyle.swift in Sources */,
 				B962 /* FCStepper.swift in Sources */,
 				B918 /* FCSetStateCircle.swift in Sources */,
@@ -1857,6 +1856,7 @@
 				AD5F12 /* LogSurfaceTests.swift in Sources */,
 				AD5F22 /* PrivacyCoverTests.swift in Sources */,
 				B963 /* FCStepperTests.swift in Sources */,
+				AC0C02 /* ComponentCatalogTests.swift in Sources */,
 				B931 /* TypographyHarnessTests.swift in Sources */,
 				B932 /* DesignValueScanTests.swift in Sources */,
 				B933 /* ContrastHarnessTests.swift in Sources */,
