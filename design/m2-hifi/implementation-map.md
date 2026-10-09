@@ -10,7 +10,7 @@
 | Penpot 文件 | 「M1-B G5 Design」→ 新页面「M2 G7 Design」（与 Foundations 同文件，沿用同一套 token 与已标注的组件图层；决定见 2026-10-05 交接） |
 | Penpot 快照 | 绘制前 `before-M2-G7-design 2026-10-08`（revn 181）→ `M2-G7-design-draft 2026-10-08 (24 boards, pending review)`（快照名中的「24」是笔误，实际 26 块）→ `M2-G7-design-draft r2 2026-10-08 (26 boards; 06d spacing; destructive trash icon)`（revn 200）→ review 第 1 轮后 `M2-G7-design r3 2026-10-09 (review round 1: …)`（重画 02a、02b、03、06a–d、08a、08b、19b）→ `M2 G7 design approved 2026-10-09 (core pages M2-02, M2-11)`（revn 215）。每次 `File.validate()` 均为 0 个错误 |
 | 画板命名 | `M2-NN 页面名 · 状态`，与导出图文件名一一对应 |
-| 导出图 | `design/m2-hifi/screens/M2-NN-*.png`，共 26 张。**当前是 1 倍图**（宽 390；Penpot MCP 导出工具没有倍率参数）。各画板已在 Penpot 设好 2 倍 PNG 导出预设，G7 review 通过后从 Penpot 批量导出 2 倍图覆盖同名文件（README §1.1 规格） |
+| 导出图 | `design/m2-hifi/screens/M2-NN-*.png`，共 26 张。2 倍图（宽 780，规格同 README §1.1）。2026-10-09 由产品负责人在 Penpot 用画板上的 2 倍导出预设一次批量导出，按画板编号覆盖同名文件（Penpot MCP 的 `export_shape` 没有倍率参数，只能出 1 倍图） |
 | 行为输入 | spec §12 输入范围 1–6；低保真原型 `design/prototypes/m2/01-archive-export`、`02-viewer-mode` 只作 discovery 证据，其中的英文领域词、「课程记录」、文件名含姓名、4 位密码、底部 Tab 栏、动作静态图占位一律不采用 |
 
 ### 1.1 产品负责人在起草时的决定（2026-10-08）
@@ -158,7 +158,7 @@ feature 专有组件见 §4。共享组件的新增 / 扩展条目写在 `compon
 影响范围：新增共享 DS-PAGE-HEADER；DS-HUB-ROW、DS-INLINE-RESULT 由组合模式提升为共享组件；扩展 DS-LIST-ROW；DS-CONFIRM-DIALOG 补内容变长规则。M1 消费者在 Phase 0 迁移时外观不变：ResourceHub、Settings、BackupRestoreFlow、StudentDetailView。需同步：components.md §4.7、本文、Penpot「M2 G7 Design」、screens/。
 设计决定：沿用 H1–H3（产品负责人 2026-10-08）；新的视觉 / 交互决定（§2 的 B 类各项、§4.2 子行规则）待 G7 设计载体 review。
 实施与验证：设计阶段，无代码。Phase 0 的组件不变量与测试见 components.md §4.7；入口与布局清单在实现检查点提交。绘制期间按画板导出图做过排版自查（文字重叠、换行溢出、间距），属于绘制过程中的检查，不是视觉验收；修正了 M2-03 长文本压日期、M2-09 编号换行、M2-10 多行值溢出、M2-06d 说明贴近按钮、M2-13 示意图越权、M2-18 危险删除缺图标。
-结果：PASS。2026-10-09 产品负责人 review 通过 26 块画板与本文，G7 整体通过（spec `1.1-approved`）。review 中的行为调整已回修 PRD 1.2 / spec 1.1。剩余项：导出图仍为 1 倍，需从 Penpot 批量导出 2 倍图覆盖（画板已设好导出预设）；§4.7 组件代码在 M2 tasks Phase 0 实现。没有任何代码改动；没有人工视觉验收。
+结果：PASS。2026-10-09 产品负责人 review 通过 26 块画板与本文，G7 整体通过（spec `1.1-approved`）。review 中的行为调整已回修 PRD 1.2 / spec 1.1。导出图已于 2026-10-09 换成 2 倍图。剩余项：§4.7 组件代码在 M2 tasks Phase 0 实现。没有任何代码改动；没有人工视觉验收。
 ```
 
 ## 8. 待产品负责人确认的问题

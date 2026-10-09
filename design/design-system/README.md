@@ -67,7 +67,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 
 - 同一 Penpot 文件新增页面「M2 G7 Design」，26 块画板（`M2-01` … `M2-20`）。快照：`before-M2-G7-design 2026-10-08`（revn 181）→ `M2-G7-design-draft r2 2026-10-08 (26 boards; …)`（revn 200）→ `M2-G7-design r3 2026-10-09 (review round 1: …)`，每次 `File.validate()` 0 个错误。Foundations 页没有改动。
 - 画板图层按 §1.3 方式标注（图层名 + shared plugin data `finecoach.component` / `part`）；新组件用 `components.md` §4.7 的 ID，feature 专有组件用 `design/m2-hifi/implementation-map.md` 的 ID。
-- 导出：`design/m2-hifi/screens/`（目前为 1 倍图，review 通过后补 2 倍图）。
+- 导出：`design/m2-hifi/screens/`，2 倍图（宽 780），2026-10-09 用画板上的 2 倍导出预设从 Penpot 批量导出。
 - 2026-10-09 产品负责人 review 通过（G7 整体通过），核心页面 M2-02、M2-11。新的视觉决定（实施映射 §2）以 `components.md` §4.7 与实施映射为准；本文 §2–§9 的数值不变，没有新增 token。
 
 ## 2. 颜色
