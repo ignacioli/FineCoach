@@ -317,11 +317,72 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 
 | ID | anatomy | 画板 | 当前实现 |
 |---|---|---|---|
-| `DS-PAGE-PRIMARY` 一级页 | 顶部 `FCSegmentedSwitch`（今日 / 学员）→ 标题行：`display` 大标题（`action.primary`）+ 右侧 `DS-TITLE-ACTION` → 内容；隐藏系统导航栏 | 01/21/40/41 | Today、StudentList 各自拼装 |
+| `DS-PAGE-PRIMARY` 一级页 | 顶部 `FCSegmentedSwitch`（今日 / 学员）→ 标题行：`display` 大标题（`action.primary`）+ 右侧 `DS-TITLE-ACTION` → 内容；隐藏系统导航栏。**查看模式变体**（M2，2026-10-09 G7 批准）：没有顶部分段切换，标题行只有设置齿轮，其余相同 | 01/21/40/41；M2-11 | Today、StudentList 各自拼装 |
 | `DS-PAGE-SECONDARY` 二级页 | 系统导航栏只显示返回 `‹`（inline，无标题）→ 页面内 `titleLarge` 标题（`text.primary`，带 header 属性）→ 可选副标题（`callout` 400 `text.secondary`）→ 内容 → 可选底部主按钮 | 23/26/28/36/37/38 | 约 20 个 feature 文件各自拼装 |
-| `DS-HUB-ROW` 入口行 | 24pt 图标（`action.primary`）→ 标题（`headline`）/ 副标题（`caption` `text.secondary`）→ `›`；最小高 64，间距 `space.4` | 19/42/43 | ResourceHub 的私有 `hubRow`；Settings 另有一份 |
-| `DS-INLINE-RESULT` 就地结果 | 22×22 `FCStatusBadge` → 标题（`callout` 600；失败为 `status.destructive`，成功为 `text.primary`）→ 说明（`caption` `text.secondary`）→ 失败时显示居中「重试」`FCLinkButton` | 38/39 | BackupRestoreFlow |
+| `DS-HUB-ROW` 入口行 | 24pt 图标（`action.primary`）→ 标题（`headline`）/ 副标题（`caption` `text.secondary`）→ `›`；最小高 64，间距 `space.4` | 19/42/43 | ResourceHub 的私有 `hubRow`；Settings 另有一份。**M2 提升为共享组件**，规格见 §4.7 |
+| `DS-INLINE-RESULT` 就地结果 | 22×22 `FCStatusBadge` → 标题（`callout` 600；失败为 `status.destructive`，成功为 `text.primary`）→ 说明（`caption` `text.secondary`）→ 失败时显示居中「重试」`FCLinkButton` | 38/39 | BackupRestoreFlow。**M2 提升为共享组件**，规格见 §4.7 |
 | `DS-EMPTY-STATE` 空态 | 吉祥物 220×220 居中 → 标题（`headline` `action.primary`）→ 说明（`caption` `text.secondary`）→ 底部主按钮 | 16 | StudentList |
+
+### 4.7 已定稿规格、待实现（M2 Phase 0）
+
+状态：**已审定**（2026-10-08 起草，2026-10-09 随 M2 G7 设计载体 review 通过；来源 `design/m2-hifi/implementation-map.md` §2）。在 M2 tasks Phase 0 实现；代码合入时再把对应行加进 §3 索引（`ComponentCatalogTests` 要求索引与 `DesignSystem/` 公开类型一一对应，所以在代码存在之前不进 §3）。下面写的 Swift 类型名是拟定名称，实现时如需改名，同步修改本节。
+
+#### `DS-PAGE-HEADER` 二级页页头（新增共享，CG-8）
+
+拟定代码：`FCPageHeader`。把 §4.6 `DS-PAGE-SECONDARY` 的页头部分做成组件，外观不变（C 类）。
+
+- **部件**：系统导航栏只显示返回 `‹`（inline，无标题；由调用页的 `.navigationBarTitleDisplayMode(.inline)` 与 `.toolbarRole(.editor)` 提供，不属于本组件）→ 页面内标题（`titleLarge` `text.primary`，带 `.isHeader`）→ 可选副标题（`callout` 400 `text.secondary`，与标题间距 `space.2`）→ 可选尾部操作（与标题首行同一行右侧，`callout` 600 `action.primary` 文字按钮，例如 26「编辑资料」）。
+- **状态**：只有静态内容；尾部操作可禁用（`text.disabled`）。
+- **不变量**：标题带 header 无障碍属性（可自动）；尾部操作点击区 ≥ 44（可自动：`TouchTargetComponentTests` 扩展）；标题与副标题随动态字体换行，不截断（人工，组件引入时看一次）；尾部操作存在时标题宽度让出操作文字，标题换行而不是与操作重叠（人工）。
+- **复用边界**：所有二级页页头都用它；一级页（今日、学员、查看模式首页）不用，见 `DS-PAGE-PRIMARY`。35 训练记录详情把「训练记录」放在导航栏 inline 标题、页面内是日期与训练标题，这是 35 自己的组合，不属于本组件。
+- **迁移范围（Phase 0）**：M2 新页面全部使用；M1 只迁移 M2 改动的 `StudentDetailView`（26，带尾部操作）。其余约 20 个手工页头不迁移。
+
+#### `DS-HUB-ROW` 入口行（由组合模式提升为共享组件，CG-8）
+
+拟定代码：`FCHubRow`。外观沿用 19/42/43（C 类）；新增尾部说明与不可用态（B 类，M2-11 首次使用）。
+
+- **部件**：leading 24pt 线性图标（`action.primary`，装饰性）→ 标题（`headline`）/ 可选副标题（`caption` `text.secondary`，可换为 `FCStatusLabel`，如 43 通知被拒）→ 弹性空白 → 可选尾部说明（`caption` `text.secondary`，例如「24 次」）或尾部操作文字（`callout` 600 `action.primary`，如 43「前往设置」）→ 可选 `›`。最小高 64，图标与文字间距 `space.4`；行间由调用方放 `FCListRowDivider`。
+- **变体 / 状态**：可点（带 `›`）；不可点（无 `›`，如 42「关于」）；**不可用**（新）：图标与标题改为 `text.disabled`，尾部说明写原因（如「档案未包含」），无 `›`，整行不可点，读作「标题，原因」。
+- **不变量**：带 action 时整行可点（可自动）；不可用态没有点击动作（可自动）；整行合并为一个无障碍元素，读出标题、副标题与尾部说明（可自动）；点击区 ≥ 44（自动）。
+- **复用边界**：用于入口列表页（资料库 19、设置 42、首次启动二选一 M2-07、查看模式首页 M2-11）。操作区里的单行操作用 `DS-ACTION-ROW`，普通内容列表用 `DS-LIST-ROW`。
+- **迁移范围（Phase 0）**：ResourceHub `hubRow`、Settings `row` 改用本组件，外观不得改变。
+
+#### `DS-INLINE-RESULT` 就地结果（由组合模式提升为共享组件）
+
+拟定代码：`FCInlineResult`。失败 / 成功沿用 38/39（C 类）；新增信息变体（B 类）。
+
+- **部件**：22×22 `FCStatusBadge` → 标题（`callout` 600）→ 说明（`caption` `text.secondary`，换行不截断）→ 可选居中「重试」`FCLinkButton`。图标与标题同一行，说明在标题下方左对齐。
+- **变体**：失败：`status.destructive` +「!」，标题 `status.destructive`；成功：`action.primary` + ✓，标题 `text.primary`；**信息**（新）：`action.primary` +「i」，标题 `text.primary`，用于不是错误、但流程没有完成的结果（例如「已取消，未交付」）。三种变体都可以带或不带「重试」。
+- **不变量**：恰好 3 个变体，每个都有字形和标题（可自动）；徽标对无障碍隐藏，标题与说明合并为一个元素，「重试」单独可访问（可自动）；「重试」点击区 ≥ 44（自动）。
+- **复用边界**：只表示一次操作在当前页面的结果。需要教练处理的持续业务状态用 `DS-STATUS`；保存进度用 `DS-SAVE-STATUS`。
+- **迁移范围（Phase 0）**：BackupRestoreFlow 的失败 / 成功状态改用本组件，外观不变。
+
+#### `DS-LIST-ROW` 扩展（CG-1）
+
+在 §4.3 现有 anatomy 上增加 slot 与状态（B 类，M2 首次使用；`FCListRow` 目前 0 个消费者，无回归面）：
+
+- **部件**（新增项标「新」）：左边距 16 →（新）可选 leading：24×24 `DS-EQUIPMENT-ICON`，与文字间距 `space.3`；leading slot 启用但该行没有图标时保留空位，使文字对齐 →（新）可选缩进：子行文字左移 `space.4`（x=32）→ 主文字 → 可选元信息（新：允许多行，换行不截断，用于自由文本预览）→ 弹性空白 →（新）可选尾部说明（`caption` `text.secondary`）→ 尾部二选一：`›`，或（新）勾选圈（外观复用 `FCSetStateCircle`：未选为待完成描边、已选为实心 + ✓，与 28/32 一致）。
+- **状态**（新）：已选 / 未选（勾选圈变体，整行点击切换，带 `.isSelected`）；**不可用**：主文字 `text.disabled`，尾部说明写原因，不显示勾选圈与 `›`，整行不可点，读作「标题，原因」。
+- **分组变体**（新，M2-02）：主文字 `headline` → 尾部说明 → 展开符号（`FCSymbol(.collapse)`，展开时朝上）→ 三态勾选圈：全选（实心 + ✓）、**部分选中**（`action.primary` 实心 + 白色「−」，复用 `FCSymbol(.minus)` 字形）、全不选（描边）。两个点击区：勾选圈切换整组（≥ 44×44），行的其余部分展开 / 折叠；展开后子行用缩进变体排在分组行下方。无障碍：分组行读作「标题，说明，已全选 / 部分选中 / 未选，已展开 / 已折叠」，提供「切换选择」「展开 / 折叠」两个动作。
+- **不变量**：部分选中只由子项状态推导，不能单独设置（类型保证：分组状态是计算值）；勾选圈变体的整行是一个点击目标（分组变体除外，见上），点击区 ≥ 44（可自动）；已选状态通过 `.isSelected` 读出，不只靠勾选圈外观（可自动）；不可用态没有点击动作（可自动）；`›` 与勾选圈不同时出现（类型保证）。
+- **迁移范围（Phase 0）**：M2 新页面使用；M1 只迁移 M2 查看模式会复用的列表（训练历史结果行 32、身体数据指标行 06）。其余 CG-1 列出的私有行不迁移。
+
+#### `DS-ACTION-ROW` 扩展：destructive 图标
+
+B 类，M2-18「删除本机档案」首次使用。spec NFR-005（M2）要求危险删除同时用文字和图标表达，现有 destructive 行只有红字。
+
+- **部件**（新增）：destructive 变体可选 leading 图标：24×24 线性垃圾桶（SF Symbol `trash`），`status.destructive`，装饰性；标题右移到 x=48。普通变体不使用该 slot。
+- **不变量**：图标对无障碍隐藏，可访问名称仍是标题（可自动）；图标与标题同色（可自动：源码断言）。
+- **迁移范围**：现有 10 个消费者不传图标，外观不变；是否给 M1 的 destructive 行（如编辑资料「永久删除」）补图标，不在 M2 范围。
+
+#### `DS-CONFIRM-DIALOG` 内容变长规则（CG-6）
+
+C 类，只补规则，默认字号下外观不变：
+
+- 卡片宽度保持 300（屏宽不足 300 + 2×`space.4` 时取屏宽减 2×`space.4`）；高度随内容增长，超过屏高的 80% 时说明区内部滚动，标题与按钮行固定。
+- 标题、说明换行不截断。
+- 两个按钮文字在动态字体放大后任一放不下一行时，按钮行改为上下堆叠：确认在上、取消在下，各自占满卡片内宽，视觉高度随文字增长，最小点击区仍为 44。
+- **不变量**：上述规则在组件内实现，调用方不传尺寸（可自动：源码扫描调用方没有 `.frame(width:)`）；堆叠时的视觉在组件修改时看一次（人工）。
 
 ## 5. 缺口与偏差登记
 
@@ -329,14 +390,14 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 
 | # | 缺口 | 证据 | 状态 / 处理 |
 |---|---|---|---|
-| CG-1 | `FCListRow` 没有消费者；feature 中至少 10 个私有 `xxxRow` 各自拼装行结构 | Today `nextUpRow` / `compactRow`、Calendar `appointmentRow`、StudentList `activeRow` / `archivedRow`、TemplateList `templateRow`、BodyData `metricRow`、BodyMeasurementEntry `historyRow`、CreditAdjustmentTrail `adjustmentRow`、TemplateEditor `exerciseRow` 等 | **M2 Phase 0**：先扩展 `FCListRow` 的 slot（leading 图标 / 头像、trailing 状态），只迁移 M2 会读取或改动的页面（见下方「M2 影响」）；其余页面不动 |
+| CG-1 | `FCListRow` 没有消费者；feature 中至少 10 个私有 `xxxRow` 各自拼装行结构 | Today `nextUpRow` / `compactRow`、Calendar `appointmentRow`、StudentList `activeRow` / `archivedRow`、TemplateList `templateRow`、BodyData `metricRow`、BodyMeasurementEntry `historyRow`、CreditAdjustmentTrail `adjustmentRow`、TemplateEditor `exerciseRow` 等 | **M2 Phase 0**：先扩展 `FCListRow` 的 slot（leading 图标 / 头像、trailing 状态），只迁移 M2 会读取或改动的页面（见下方「M2 影响」）；其余页面不动。扩展规格已起草（§4.7，2026-10-08，随 G7 review 审定） |
 | CG-2 | `FCWeekdayChip`、`FCTypeTag` 没有消费者 | 02 的星期多选已被 23 取代；15 的「有氧」标签从未实现 | **已解决（2026-10-05）**：代码与 README §8 两行删除（README §10 C13） |
 | CG-3 | `FCSaveStatusView` 未显式声明字体（继承 App 根部 `.fcFont(.body)`，渲染为 Noto Sans SC 17/400）；状态文字是写死的中文 `rawValue`，不是本地化键 | `FineCoachApp.swift:20`、`FCSaveStatusView.swift` | 规格**已补**（§4.5、README §8，§10 C12）。**M2 Phase 0**：显式写 `.fcFont(.body)` 并改用本地化键（D 类，外观不变） |
 | CG-4 | `FCSetRow` 的状态文字写死在 `rawValue` 中 | `FCSetRow.swift` | 本地化问题，与视觉无关；下次修改该组件时处理 |
 | CG-5 | CoursePackageEditor、ManualCreditAdjustment 各有私有 `editorRow`，与 `FCLabelValueRow` 职责重叠 | 两个文件中的 `editorRow` | 只在这两个页面被修改时迁移；M2 不涉及课包，不安排 |
-| CG-6 | `FCHeroCard` 徽标固定 56 宽、`FCConfirmationDialog` 固定 300 宽，字号放大时的规则没写 | 两个组件源码 | 下次涉及时先补「内容变长」规则（C 类）；M2 若使用确认弹窗（删除档案、替换档案），在 Phase 0 补规则 |
+| CG-6 | `FCHeroCard` 徽标固定 56 宽、`FCConfirmationDialog` 固定 300 宽，字号放大时的规则没写 | 两个组件源码 | 下次涉及时先补「内容变长」规则（C 类）；M2 若使用确认弹窗（删除档案、替换档案），在 Phase 0 补规则。确认弹窗规则已起草（§4.7，2026-10-08）；M2 不使用 hero 卡，徽标规则不处理 |
 | CG-7 | `FCSegmentedSwitch` 在页内使用超出 README 原定义 | 37 画稿 | **已解决（2026-10-05）**：裁决为已批准的复用，限 2–3 个互斥短选项（README §10 C11） |
-| CG-8 | 二级页头 `DS-PAGE-SECONDARY` 约 20 处手工拼装；入口行 `DS-HUB-ROW` 有两份（ResourceHub、Settings） | 约 20 个 feature 文件直接写 `.fcFont(.titleLarge)` 页头；`hubRow` 与 Settings `row` | **M2 Phase 0**：抽取共享 `FCPageHeader`（及入口行，如 M2 设置页用到），补组件测试；只迁移 M2 改动的页面 |
+| CG-8 | 二级页头 `DS-PAGE-SECONDARY` 约 20 处手工拼装；入口行 `DS-HUB-ROW` 有两份（ResourceHub、Settings） | 约 20 个 feature 文件直接写 `.fcFont(.titleLarge)` 页头；`hubRow` 与 Settings `row` | **M2 Phase 0**：抽取共享 `FCPageHeader`（及入口行，如 M2 设置页用到），补组件测试；只迁移 M2 改动的页面。`DS-PAGE-HEADER`、`DS-HUB-ROW` 规格已起草（§4.7，2026-10-08，随 G7 review 审定） |
 | CG-9 | 组件文件中没有任何 `#Preview` | `ios/FineCoachApp` 中搜索不到 `#Preview` | 规则而非一次性任务：新增或扩展组件时，在组件文件里加覆盖代表状态的 `#Preview`（只在 DEBUG 下编译，不新增 target），供 L3 查看组件时使用 |
 
 **M2 影响（CG-1 / CG-8 为什么需要处理）**：M1 已验收不等于 M2 不碰这些代码。M2 spec（`specs/003-m2-personal-training-archive/spec.md`）明确要求：
