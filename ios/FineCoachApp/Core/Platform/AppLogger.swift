@@ -6,6 +6,8 @@ public enum AppLogEvent: String, CaseIterable, Sendable {
     case filePolicyApplied = "foundation.file_policy_applied"
     case generationValidated = "foundation.generation_validated"
     case privacyCoverChanged = "foundation.privacy_cover_changed"
+    /// A viewer archive and Coach work data coexist; viewer mode wins (data-model §4).
+    case archiveInstallViewerPrecedence = "archive.viewer_precedence"
 }
 
 public enum AppLogOperation: String, CaseIterable, Sendable {

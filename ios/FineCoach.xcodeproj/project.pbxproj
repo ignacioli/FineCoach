@@ -287,6 +287,13 @@
 		B252 /* ScenePrivacyCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A252 /* ScenePrivacyCoordinatorTests.swift */; };
 		B253 /* PrivacyCoverUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A253 /* PrivacyCoverUITests.swift */; };
 		B254 /* PerformanceMeasurementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A254 /* PerformanceMeasurementTests.swift */; };
+		52F0F239CC8C090C2B18DA5D /* AppRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CDBD58CE091F27B6E3B3E4A /* AppRoot.swift */; };
+		A658F9E08D9256CA89FCEA55 /* ArchiveViewerRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF8E7D172A3DF3760358667 /* ArchiveViewerRoot.swift */; };
+		DB917AA76DB9EBDB29F79D82 /* CoreDataCoachInstallProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDA4A73E8E5695C107D3D31 /* CoreDataCoachInstallProbe.swift */; };
+		CB1B2C5675F891415DEB0FF5 /* ArchiveIdentityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41EDF71686C1213186596B1 /* ArchiveIdentityService.swift */; };
+		203A4CF1F8AE462BE4A0E2AC /* InstallStateResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD2193CBA15B1635513D6E0A /* InstallStateResolver.swift */; };
+		EE8E3E431D53C0F5413E7A3D /* ArchiveFoundationIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE017497F4CAFFE91103028B /* ArchiveFoundationIntegrationTests.swift */; };
+		62BB7045D90B6E928206733B /* ArchiveFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87A3055CF641A027271A023C /* ArchiveFixtures.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -586,6 +593,12 @@
 		A344 /* DeleteExerciseFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteExerciseFlow.swift; sourceTree = "<group>"; };
 		A345 /* FinishSessionFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinishSessionFlow.swift; sourceTree = "<group>"; };
 		A346 /* SaveStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveStatusView.swift; sourceTree = "<group>"; };
+		9CDBD58CE091F27B6E3B3E4A /* AppRoot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRoot.swift; sourceTree = "<group>"; };
+		BAF8E7D172A3DF3760358667 /* ArchiveViewerRoot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveViewerRoot.swift; sourceTree = "<group>"; };
+		6DDA4A73E8E5695C107D3D31 /* CoreDataCoachInstallProbe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataCoachInstallProbe.swift; sourceTree = "<group>"; };
+		C41EDF71686C1213186596B1 /* ArchiveIdentityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveIdentityService.swift; sourceTree = "<group>"; };
+		AD2193CBA15B1635513D6E0A /* InstallStateResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallStateResolver.swift; sourceTree = "<group>"; };
+		EE017497F4CAFFE91103028B /* ArchiveFoundationIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveFoundationIntegrationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -690,6 +703,7 @@
 				A100 /* AppEnvironment.swift */,
 				A180 /* FCAccessibilityID.swift */,
 				A181 /* RootNavigation.swift */,
+				9CDBD58CE091F27B6E3B3E4A /* AppRoot.swift */,
 				A102 /* PrivacyCover.swift */,
 				A103 /* ScenePrivacyCoordinator.swift */,
 				A104 /* AppLifecycleCoordinator.swift */,
@@ -797,6 +811,7 @@
 				A553 /* Templates */,
 				A610 /* BodyData */,
 				A611 /* Trends */,
+				E9E38568DB5C19179EDAE367 /* ArchiveViewer */,
 				A441 /* ExerciseLibrary */,
 				A442 /* ActiveSession */,
 				A443 /* History */,
@@ -937,6 +952,7 @@
 				A532 /* CreditLedgerUseCases.swift */,
 				A546 /* TemplateUseCases.swift */,
 				A604 /* BodyDataUseCases.swift */,
+				DC98C0B09037E1C5F3C19A05 /* Archive */,
 			);
 			path = Application;
 			sourceTree = "<group>";
@@ -967,6 +983,7 @@
 				A143 /* CurrentGenerationPointer.swift */,
 				A144 /* StudentManagedObject+Mapping.swift */,
 				A145 /* CoreDataStudentRepository.swift */,
+				6DDA4A73E8E5695C107D3D31 /* CoreDataCoachInstallProbe.swift */,
 				A146 /* SessionManagedObject+Mapping.swift */,
 				A147 /* CoreDataSessionRepository.swift */,
 				A148 /* ExerciseManagedObject+Mapping.swift */,
@@ -1038,6 +1055,7 @@
 				A483 /* ExerciseLibrary */,
 				A487 /* ShareReport */,
 				A490 /* Backup */,
+				AAFA81129A6F4C6DD93F3D77 /* Archive */,
 				A494 /* Performance */,
 				A721 /* BodyData */,
 			);
@@ -1548,6 +1566,31 @@
 			path = Archive;
 			sourceTree = "<group>";
 		};
+		E9E38568DB5C19179EDAE367 /* ArchiveViewer */ = {
+			isa = PBXGroup;
+			children = (
+				BAF8E7D172A3DF3760358667 /* ArchiveViewerRoot.swift */,
+			);
+			path = ArchiveViewer;
+			sourceTree = "<group>";
+		};
+		DC98C0B09037E1C5F3C19A05 /* Archive */ = {
+			isa = PBXGroup;
+			children = (
+				C41EDF71686C1213186596B1 /* ArchiveIdentityService.swift */,
+				AD2193CBA15B1635513D6E0A /* InstallStateResolver.swift */,
+			);
+			path = Archive;
+			sourceTree = "<group>";
+		};
+		AAFA81129A6F4C6DD93F3D77 /* Archive */ = {
+			isa = PBXGroup;
+			children = (
+				EE017497F4CAFFE91103028B /* ArchiveFoundationIntegrationTests.swift */,
+			);
+			path = Archive;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1719,6 +1762,11 @@
 				B101 /* FineCoachApp.swift in Sources */,
 				B180 /* FCAccessibilityID.swift in Sources */,
 				B181 /* RootNavigation.swift in Sources */,
+				52F0F239CC8C090C2B18DA5D /* AppRoot.swift in Sources */,
+				A658F9E08D9256CA89FCEA55 /* ArchiveViewerRoot.swift in Sources */,
+				DB917AA76DB9EBDB29F79D82 /* CoreDataCoachInstallProbe.swift in Sources */,
+				CB1B2C5675F891415DEB0FF5 /* ArchiveIdentityService.swift in Sources */,
+				203A4CF1F8AE462BE4A0E2AC /* InstallStateResolver.swift in Sources */,
 				B102 /* PrivacyCover.swift in Sources */,
 				B103 /* ScenePrivacyCoordinator.swift in Sources */,
 				B104 /* AppLifecycleCoordinator.swift in Sources */,
@@ -1979,6 +2027,8 @@
 				B245 /* RestoreCrashRecoveryTests.swift in Sources */,
 				B246 /* RestoreFaultMatrixTests.swift in Sources */,
 				B247 /* M1BBackupRoundTripTests.swift in Sources */,
+				62BB7045D90B6E928206733B /* ArchiveFixtures.swift in Sources */,
+				EE8E3E431D53C0F5413E7A3D /* ArchiveFoundationIntegrationTests.swift in Sources */,
 				B254 /* PerformanceMeasurementTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

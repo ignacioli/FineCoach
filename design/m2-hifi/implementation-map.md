@@ -186,6 +186,16 @@ feature 专有组件见 §4。共享组件的新增 / 扩展条目写在 `compon
 学员详情 26 → 「编辑资料」尾部操作 → studentDetail.edit → 否（进入编辑页）→ FCPageHeader 标题行（StudentDetailView.swift:173）
 ```
 
+### 7.2 Phase 2（tasks T014–T026，档案基础设施，2026-10-10）
+
+```text
+分类与依据：无视觉工作（档案容器、快照存储、身份 setting、恢复兼容、安装状态、启动分流）。批准来源：plan §4 D-M2-001/002/003/005/007、data-model §1–§6、contracts/archive-file-v1.md。
+影响范围：无新组件、无新 Feature 页面。新增 AppRoot 作为场景根（根部 PrivacyCover 自 RootNavigation 移入）；ArchiveViewerRoot 仅为占位（两段静态文字，不接收 Coach 环境），由 US-2 T046 替换。
+设计决定：无。产品负责人 2026-10-10 确认档案文件上限 = 明文 64 MiB + 容器开销（plan §7.3 已改）。
+实施与验证：ArchiveFoundationTests、ArchiveFileCodecTests、PrivacyCoverTests、ArchiveFoundationIntegrationTests。入口与布局清单：ArchiveViewerRoot → 占位标题与说明（无控件）→ archive.viewer.root → 否 → 根 VStack .frame(maxWidth: .infinity, maxHeight: .infinity)（ArchiveViewerRoot.swift）。L3 未触发。
+结果：PASS（自动门）。xcodebuild build 成功；FineCoachTests 351 项 0 失败、1 项跳过（既有 WCAG 豁免）；FineCoachIntegrationTests 106 项 0 失败。占位页未经人工查看；.fcarchive 的系统打开路由未在设备上验证（处理逻辑在 T044）。
+```
+
 ## 8. 待产品负责人确认的问题
 
 1. ~~M2-09 的进入路径~~：**已定（R4）**，支持系统打开档案文件，spec D-010 已修订。

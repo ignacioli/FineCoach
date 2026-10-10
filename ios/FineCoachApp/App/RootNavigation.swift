@@ -58,14 +58,14 @@ enum RootTab: Hashable {
 @MainActor
 struct RootNavigation: View {
     @EnvironmentObject private var environment: AppEnvironment
-    @EnvironmentObject private var privacyCoordinator: ScenePrivacyCoordinator
     @State private var path: [RootDestination] = []
     @State private var onboardingCompleted = false
     @State private var didLoadOnboarding = false
     @State private var rootTab: RootTab = .today
 
     var body: some View {
-        ZStack {
+        // The app-wide `PrivacyCover` now lives in `AppRoot`, above this branch.
+        Group {
             Group {
                 if !environment.isStorageAvailable {
                     Text(environment.startupErrorDescription ?? String(localized: "storage.unavailable"))
@@ -271,10 +271,6 @@ struct RootNavigation: View {
                     .accessibilityElement(children: .contain)
                     .accessibilityIdentifier(FCAccessibilityID.studentList)
                 }
-            }
-
-            if privacyCoordinator.isCovered {
-                PrivacyCover()
             }
         }
         .task {

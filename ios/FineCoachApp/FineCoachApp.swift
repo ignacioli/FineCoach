@@ -14,7 +14,7 @@ struct FineCoachApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootNavigation()
+            AppRoot()
                 // Default type for any text without its own `.fcFont(_:)` (T068):
                 // Noto Sans SC `body`, never the system font (design system §3.1).
                 .fcFont(.body)

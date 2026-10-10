@@ -7142,6 +7142,28 @@
           }
         }
       }
+    },
+    "archive.viewer.placeholder.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我的训练档案"
+          }
+        }
+      }
+    },
+    "archive.viewer.placeholder.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "只读档案查看功能将在后续版本提供。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

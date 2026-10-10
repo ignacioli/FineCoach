@@ -1,6 +1,57 @@
 import CoreData
 import Foundation
 
+/// The current install's archive identity settings, captured before a restore builds its
+/// candidate generation (M2-FR-051, D-013, data-model §3). Keys the backup carries always keep
+/// the backup value; missing ones are filled from the current install, and only for students
+/// that still exist in the candidate. The backup payload schema is unchanged.
+struct ArchiveIdentityCarryOver: Sendable {
+    private let sourceID: BackupSettingRecord?
+    private let studentIDs: [String: BackupSettingRecord]
+
+    static func capture(in context: NSManagedObjectContext) throws -> ArchiveIdentityCarryOver {
+        func record(key: String, value: String) -> BackupSettingRecord? {
+            // A value that is not a UUID is never propagated into the restored install.
+            UUID(uuidString: value) == nil
+                ? nil : BackupSettingRecord(key: key, typedValue: value, schemaVersion: 1)
+        }
+        let source = try StudentManagedObjectMapping.settingValue(
+            key: StudentManagedObjectMapping.archiveSourceIDKey,
+            in: context
+        ).flatMap { record(key: StudentManagedObjectMapping.archiveSourceIDKey, value: $0) }
+        var students: [String: BackupSettingRecord] = [:]
+        for entry in try StudentManagedObjectMapping.settings(
+            withKeyPrefix: StudentManagedObjectMapping.archiveStudentIDKeyPrefix,
+            in: context
+        ) {
+            students[entry.key] = record(key: entry.key, value: entry.value)
+        }
+        return ArchiveIdentityCarryOver(sourceID: source, studentIDs: students)
+    }
+
+    /// The candidate inventory with current-install identity settings added where the backup
+    /// has none. Keys for students absent from the candidate are never written.
+    func applying(to inventory: BackupInventory) -> BackupInventory {
+        let existingKeys = Set(inventory.settings.map(\.key))
+        var additions: [BackupSettingRecord] = []
+        if let sourceID, !existingKeys.contains(sourceID.key) {
+            additions.append(sourceID)
+        }
+        for student in inventory.students {
+            let key = StudentManagedObjectMapping.archiveStudentIDKey(for: student.id.rawValue)
+            if !existingKeys.contains(key), let current = studentIDs[key] {
+                additions.append(current)
+            }
+        }
+        guard !additions.isEmpty else {
+            return inventory
+        }
+        var merged = inventory
+        merged.settings.append(contentsOf: additions)
+        return merged
+    }
+}
+
 enum CandidateGenerationBuilder {
     static func apply(
         _ inventory: BackupInventory,

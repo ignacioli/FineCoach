@@ -1,5 +1,6 @@
-import FineCoach
 import XCTest
+
+@testable import FineCoach
 
 #if DEBUG
     private struct ArchiveStoreFaultInjector: FaultInjector {
@@ -14,8 +15,8 @@ import XCTest
 #endif
 
 /// Rule-level tests for the M2 archive domain types (T014), password and replacement policy
-/// (T015) and the viewer snapshot store (T017). Install-state and open-router tests are added
-/// to this file by later tasks.
+/// (T015), the viewer snapshot store (T017), the source short label (T018), the install-state
+/// resolver and the open router (T020).
 final class ArchiveFoundationTests: XCTestCase {
     private typealias F = ArchiveFixtures
 
@@ -354,6 +355,199 @@ final class ArchiveFoundationTests: XCTestCase {
         try FileManager.default.removeItem(at: root.appendingPathComponent("current.json"))
         try store.runStartupJanitor()
         XCTAssertEqual(entries(root), [])
+    }
+
+    // MARK: Short label (T018)
+
+    func testShortLabelIsDeterministicAndMatchesIndependentlyComputedValues() {
+        // Expected values computed outside Swift: SHA-256 of the 16 UUID bytes, first four
+        // bytes as a big-endian integer, modulo 10000.
+        let cases: [(String, String)] = [
+            ("11111111-2222-3333-4444-555555555555", "5048"),
+            ("00000000-0000-0000-0000-000000000000", "2239"),
+            ("AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE", "3435"),
+            ("00000000-0000-0000-0000-000000000014", "0752"),
+            ("00000000-0000-0000-0000-000000000221", "0035"),
+        ]
+        for (raw, expected) in cases {
+            let id = UUID(uuidString: raw)!
+            XCTAssertEqual(ArchiveIdentityService.shortLabel(forSourceID: id), expected, raw)
+            XCTAssertEqual(ArchiveIdentityService.shortLabel(forSourceID: id), expected, "deterministic")
+        }
+        XCTAssertEqual(ArchiveIdentityService.shortLabel(forSourceID: F.sourceID), "5048")
+    }
+
+    func testShortLabelIsAlwaysFourDigits() {
+        for index in 0..<200 {
+            let id = UUID(uuidString: String(format: "00000000-0000-0000-0000-%012d", index))!
+            let label = ArchiveIdentityService.shortLabel(forSourceID: id)
+            XCTAssertEqual(label.count, 4)
+            XCTAssertTrue(label.allSatisfy(\.isNumber))
+        }
+    }
+
+    // MARK: ArchiveOpenRouter (T020)
+
+    func testOpenRouterMapsEachInstallStateToItsDestination() {
+        XCTAssertEqual(ArchiveOpenRouter.destination(for: .unselected), .importPrefilled)
+        XCTAssertEqual(ArchiveOpenRouter.destination(for: .viewer), .replacePrefilled)
+        XCTAssertEqual(ArchiveOpenRouter.destination(for: .coach), .blocked)
+    }
+
+    // MARK: InstallStateResolver (T020)
+
+    private struct StubProbe: CoachInstallProbe {
+        let result: Result<CoachInstallSnapshot, Error>
+
+        init(onboarding: Bool = false, workData: Bool = false) {
+            result = .success(CoachInstallSnapshot(onboardingCompleted: onboarding, hasWorkData: workData))
+        }
+
+        init(failing error: Error) {
+            result = .failure(error)
+        }
+
+        func read() async throws -> CoachInstallSnapshot {
+            try result.get()
+        }
+    }
+
+    private func resolver(
+        root: URL,
+        probe: any CoachInstallProbe
+    ) -> InstallStateResolver {
+        InstallStateResolver(store: ArchiveSnapshotStore(rootURL: root), probe: probe)
+    }
+
+    func testResolverReturnsEachOfTheThreeStates() async throws {
+        let emptyRoot = try makeRoot()
+        let unselected = try await resolver(root: emptyRoot, probe: StubProbe()).resolve()
+        XCTAssertEqual(unselected, .unselected)
+
+        let coachByWork = try await resolver(root: emptyRoot, probe: StubProbe(workData: true)).resolve()
+        XCTAssertEqual(coachByWork, .coach)
+        let coachByMarker = try await resolver(root: emptyRoot, probe: StubProbe(onboarding: true)).resolve()
+        XCTAssertEqual(coachByMarker, .coach)
+
+        let viewerRoot = try makeRoot()
+        try ArchiveSnapshotStore(rootURL: viewerRoot).commit(snapshot: F.fullSnapshot())
+        let viewer = try await resolver(root: viewerRoot, probe: StubProbe()).resolve()
+        XCTAssertEqual(viewer, .viewer)
+    }
+
+    func testViewerWinsWhenThePointerAndCoachDataBothExist() async throws {
+        let root = try makeRoot()
+        try ArchiveSnapshotStore(rootURL: root).commit(snapshot: F.fullSnapshot())
+        let state = try await resolver(root: root, probe: StubProbe(onboarding: true, workData: true)).resolve()
+        XCTAssertEqual(state, .viewer)
+        // The viewer answer does not depend on the Coach store being readable.
+        let unreadable = try await resolver(
+            root: root,
+            probe: StubProbe(failing: PersistenceControllerError.storeLoadFailed)
+        ).resolve()
+        XCTAssertEqual(unreadable, .viewer)
+    }
+
+    func testViewerPrecedenceEventIsAFixedIDWithoutUserData() {
+        XCTAssertEqual(AppLogEvent.archiveInstallViewerPrecedence.rawValue, "archive.viewer_precedence")
+    }
+
+    func testUnreadableOrNewerSnapshotPointerIsNotViewer() async throws {
+        let root = try makeRoot()
+        let store = ArchiveSnapshotStore(rootURL: root)
+        try store.commit(snapshot: F.fullSnapshot())
+        let generations = root.appendingPathComponent("generations")
+        let generation = generations.appendingPathComponent(entries(generations)[0])
+        try Data("{}".utf8).write(to: generation.appendingPathComponent("snapshot.bin"))
+        let unreadable = try await resolver(root: root, probe: StubProbe()).resolve()
+        XCTAssertEqual(unreadable, .unselected)
+
+        let newerPointer = #"{"generation":"\#(UUID().uuidString)","snapshotSchemaVersion":2}"#
+        try Data(newerPointer.utf8).write(to: root.appendingPathComponent("current.json"))
+        let newer = try await resolver(root: root, probe: StubProbe(workData: true)).resolve()
+        XCTAssertEqual(newer, .coach)
+    }
+
+    func testUnreadableCoachStoreWithoutViewerThrowsInsteadOfGuessingUnselected() async throws {
+        let root = try makeRoot()
+        do {
+            _ = try await resolver(root: root, probe: StubProbe(failing: PersistenceControllerError.storeLoadFailed))
+                .resolve()
+            XCTFail("a Coach store that cannot be read must not resolve to a state")
+        } catch {
+            XCTAssertEqual(error as? PersistenceControllerError, .storeLoadFailed)
+        }
+    }
+
+    // Real Core Data counts: these cases are about what counts as Coach work data.
+
+    private func makeCoachStore() throws -> PersistenceController {
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("InstallStateTests-\(UUID().uuidString).sqlite")
+        return try PersistenceController(storeURL: url, inMemory: true)
+    }
+
+    private func resolveWithRealCounts(_ controller: PersistenceController) async throws -> InstallState {
+        try await resolver(root: try makeRoot(), probe: CoreDataCoachInstallProbe(writer: controller.writer))
+            .resolve()
+    }
+
+    func testEmptyCoachStoreResolvesToUnselected() async throws {
+        let controller = try makeCoachStore()
+        let state = try await resolveWithRealCounts(controller)
+        XCTAssertEqual(state, .unselected)
+    }
+
+    func testOnlyOneArchivedStudentResolvesToCoach() async throws {
+        let controller = try makeCoachStore()
+        let repository = CoreDataStudentRepository(writer: controller.writer)
+        let useCases = StudentUseCases(
+            repository: repository,
+            clock: TestClock(),
+            ids: TestIDGenerator(ids: [UUID(uuidString: "a0000000-0000-4000-8000-000000000001")!])
+        )
+        let student = try await useCases.create(draft: StudentDraft(displayName: "林青", sex: .female))
+        _ = try await useCases.archive(id: student.id)
+        let active = try await useCases.searchActive(query: "")
+        XCTAssertTrue(active.isEmpty, "the only student is archived")
+
+        let state = try await resolveWithRealCounts(controller)
+        XCTAssertEqual(state, .coach)
+    }
+
+    func testOnlyTheBuiltInExerciseLibraryResolvesToUnselected() async throws {
+        let controller = try makeCoachStore()
+        let exercises = ExerciseLibraryUseCases(
+            repository: CoreDataExerciseRepository(writer: controller.writer),
+            clock: TestClock(),
+            ids: TestIDGenerator(ids: [])
+        )
+        try await exercises.seedIfNeeded()
+        let library = try await exercises.search(query: "")
+        XCTAssertFalse(library.isEmpty, "the built-in library is seeded")
+
+        let state = try await resolveWithRealCounts(controller)
+        XCTAssertEqual(state, .unselected)
+    }
+
+    func testM1UpgradeWithOnboardingCompletedAndNoStudentsResolvesToCoach() async throws {
+        let controller = try makeCoachStore()
+        let repository = CoreDataStudentRepository(writer: controller.writer)
+        try await repository.markOnboardingCompleted()
+        let state = try await resolveWithRealCounts(controller)
+        XCTAssertEqual(state, .coach)
+    }
+
+    func testACustomExerciseCountsAsCoachWorkData() async throws {
+        let controller = try makeCoachStore()
+        let exercises = ExerciseLibraryUseCases(
+            repository: CoreDataExerciseRepository(writer: controller.writer),
+            clock: TestClock(),
+            ids: TestIDGenerator(ids: [UUID(uuidString: "e0000000-0000-4000-8000-000000000001")!])
+        )
+        _ = try await exercises.createCustom(name: "壶铃摆动", recordMode: .weightReps)
+        let state = try await resolveWithRealCounts(controller)
+        XCTAssertEqual(state, .coach)
     }
 
     #if DEBUG

@@ -6,6 +6,13 @@ enum StudentManagedObjectMapping {
     static let sessionEntityName = "SessionMO"
     static let settingEntityName = "AppSettingMO"
     static let onboardingCompletedKey = "onboarding.completed"
+    /// M2 archive identity setting keys (data-model §3). Values never reach logs or UI.
+    static let archiveSourceIDKey = "archive.sourceID"
+    static let archiveStudentIDKeyPrefix = "archive.studentID."
+
+    static func archiveStudentIDKey(for studentID: UUID) -> String {
+        archiveStudentIDKeyPrefix + studentID.uuidString
+    }
 
     static func apply(_ student: Student, to object: NSManagedObject) {
         object.setValue(student.id.rawValue, forKey: "id")
@@ -162,6 +169,50 @@ enum StudentManagedObjectMapping {
         object.setValue(onboardingCompletedKey, forKey: "key")
         object.setValue("true", forKey: "typedValue")
         object.setValue(Int64(1), forKey: "schemaVersion")
+    }
+
+    static func fetchSetting(key: String, in context: NSManagedObjectContext) throws -> NSManagedObject? {
+        let request = NSFetchRequest<NSManagedObject>(entityName: settingEntityName)
+        request.predicate = NSPredicate(format: "key == %@", key)
+        request.fetchLimit = 1
+        return try context.fetch(request).first
+    }
+
+    static func settingValue(key: String, in context: NSManagedObjectContext) throws -> String? {
+        try fetchSetting(key: key, in: context)?.value(forKey: "typedValue") as? String
+    }
+
+    /// Inserts or updates one `AppSettingMO` row through the existing setting mechanism.
+    static func writeSetting(key: String, value: String, in context: NSManagedObjectContext) throws {
+        let object =
+            try fetchSetting(key: key, in: context)
+            ?? NSEntityDescription.insertNewObject(forEntityName: settingEntityName, into: context)
+        object.setValue(key, forKey: "key")
+        object.setValue(value, forKey: "typedValue")
+        object.setValue(Int64(1), forKey: "schemaVersion")
+    }
+
+    static func removeSetting(key: String, in context: NSManagedObjectContext) throws {
+        if let object = try fetchSetting(key: key, in: context) {
+            context.delete(object)
+        }
+    }
+
+    /// Every `(key, typedValue)` whose key starts with `prefix`, in key order.
+    static func settings(withKeyPrefix prefix: String, in context: NSManagedObjectContext) throws -> [(
+        key: String, value: String
+    )] {
+        let request = NSFetchRequest<NSManagedObject>(entityName: settingEntityName)
+        request.predicate = NSPredicate(format: "key BEGINSWITH %@", prefix)
+        return try context.fetch(request).compactMap { object in
+            guard let key = object.value(forKey: "key") as? String,
+                let value = object.value(forKey: "typedValue") as? String
+            else {
+                return nil
+            }
+            return (key, value)
+        }
+        .sorted { $0.key < $1.key }
     }
 
     private static func optionalStoredText(_ rawValue: String?) throws -> ValidatedText? {

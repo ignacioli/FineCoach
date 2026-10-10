@@ -141,6 +141,11 @@ public struct CoreDataStudentRepository: Sendable {
                 expected: student.displayName,
                 typed: confirmedDisplayName
             )
+            // M2 data-model §3: the student's archive identity goes in the same transaction.
+            try StudentManagedObjectMapping.removeSetting(
+                key: StudentManagedObjectMapping.archiveStudentIDKey(for: id.rawValue),
+                in: context
+            )
             context.delete(object)
         }
     }

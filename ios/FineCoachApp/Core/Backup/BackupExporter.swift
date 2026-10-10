@@ -225,6 +225,13 @@ public struct BackupCoordinator: Sendable {
             throw BackupError.authenticationFailed
         }
 
+        // M2-FR-051: capture the current archive identity before the candidate exists, so a
+        // failure here leaves no candidate generation behind.
+        let carryOver = try await writer.read { context in
+            try ArchiveIdentityCarryOver.capture(in: context)
+        }
+        let candidateInventory = carryOver.applying(to: inventory)
+
         let newUUID = ids.makeID()
         candidateUUID = newUUID
         try protectedFileStore.prepareDirectory(
@@ -246,7 +253,7 @@ public struct BackupCoordinator: Sendable {
         )
         do {
             let active = try await candidate.writer.transaction { context in
-                try CandidateGenerationBuilder.apply(inventory, in: context)
+                try CandidateGenerationBuilder.apply(candidateInventory, in: context)
             }
             try candidate.detachPersistentStores()
             try writeRecovery(active: active, generationUUID: newUUID, at: directory.recoveryURL(for: newUUID))

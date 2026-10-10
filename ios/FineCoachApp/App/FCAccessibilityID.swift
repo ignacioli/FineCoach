@@ -3,6 +3,8 @@ import Foundation
 public enum FCAccessibilityID {
     public static let privacyCover = "privacy.cover"
 
+    public static let archiveViewerRoot = "archive.viewer.root"
+
     public static let onboardingTitle = "onboarding.title"
     public static let onboardingLead = "onboarding.lead"
     public static let onboardingLocalRule = "onboarding.local"

@@ -19,10 +19,45 @@ final class PrivacyCoverTests: XCTestCase {
         try String(contentsOf: appRoot.appendingPathComponent(relativePath), encoding: .utf8)
     }
 
+    /// The cover is one layer in `AppRoot`, drawn after (above) every branch, so it covers the
+    /// viewer, Coach and first-launch branches alike (T022, adversarial review #1).
     func testRootCoverIsShownWhileTheSceneIsCovered() throws {
-        let root = try source("App/RootNavigation.swift")
+        let root = try source("App/AppRoot.swift")
         XCTAssertTrue(root.contains("if privacyCoordinator.isCovered"))
         XCTAssertTrue(root.contains("PrivacyCover()"))
+        XCTAssertEqual(root.components(separatedBy: "PrivacyCover()").count - 1, 1)
+        let coverIndex = try XCTUnwrap(root.range(of: "if privacyCoordinator.isCovered")).lowerBound
+        for branch in ["ArchiveViewerRoot()", "RootNavigation()"] {
+            let branchIndex = try XCTUnwrap(root.range(of: branch), branch).lowerBound
+            XCTAssertLessThan(branchIndex, coverIndex, "\(branch) must sit below the cover layer")
+        }
+    }
+
+    func testBranchViewsAppearOnlyAsChildrenOfTheAppRootLayer() throws {
+        let enumerator = try XCTUnwrap(FileManager.default.enumerator(at: appRoot, includingPropertiesForKeys: nil))
+        var constructors: [String: [String]] = [:]
+        for case let url as URL in enumerator where url.pathExtension == "swift" {
+            let text = try String(contentsOf: url, encoding: .utf8)
+            for branch in ["ArchiveViewerRoot()", "RootNavigation()", "AppRoot()"] where text.contains(branch) {
+                constructors[branch, default: []].append(url.lastPathComponent)
+            }
+        }
+        XCTAssertEqual(constructors["ArchiveViewerRoot()"], ["AppRoot.swift"])
+        XCTAssertEqual(constructors["RootNavigation()"], ["AppRoot.swift"])
+        XCTAssertEqual(constructors["AppRoot()"], ["FineCoachApp.swift"])
+    }
+
+    func testRootNavigationNoLongerCarriesTheDuplicateCover() throws {
+        let navigation = try source("App/RootNavigation.swift")
+        XCTAssertFalse(navigation.contains("if privacyCoordinator.isCovered"))
+        XCTAssertFalse(navigation.contains("PrivacyCover()"))
+    }
+
+    func testViewerBranchHoldsNoCoachEnvironmentOrWriteUseCases() throws {
+        let viewer = try source("Features/ArchiveViewer/ArchiveViewerRoot.swift")
+        for forbidden in ["AppEnvironment", "environment", "UseCases", "Repository", "PersistenceWriter"] {
+            XCTAssertFalse(viewer.contains(forbidden), "viewer root must not reference \(forbidden)")
+        }
     }
 
     func testEveryScenePhaseCoversExceptActive() throws {
