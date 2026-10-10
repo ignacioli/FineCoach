@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5B26357EC039B8C2F8BAE943 /* ArchiveFoundationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE13168A5E0392CB8EBB7549 /* ArchiveFoundationTests.swift */; };
+		C4FDE713157F6853CEFC13F2 /* ArchiveFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87A3055CF641A027271A023C /* ArchiveFixtures.swift */; };
+		A1347A5C9F8EAB6547AD2AC8 /* ArchiveFileCodecTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1BDC9E4D3F6407C74541328 /* ArchiveFileCodecTests.swift */; };
+		0F99ADE084165D922190C0BE /* ArchiveSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2006252EADBCD54770FC395D /* ArchiveSnapshotStore.swift */; };
+		E04D56B29CFF00C4D1BC50FD /* ArchiveFileCodec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C5160897D203188575478DD /* ArchiveFileCodec.swift */; };
+		6F9904C6D3AC33B86DF61242 /* ArchiveReplacementPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D0BEC80E024754F67C2CE4 /* ArchiveReplacementPolicy.swift */; };
+		E8702EB9D219CCB312BF229C /* ArchivePassword.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3845A89225201E48DD6D5B9E /* ArchivePassword.swift */; };
+		6D8C36391FCED40470CA13D8 /* ArchiveSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E74595D75134E6D5B4BE7C /* ArchiveSnapshot.swift */; };
 		4C5E5DF530413B0D0088237A /* FictitiousFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = A201 /* FictitiousFixtures.swift */; };
 		4C5E5DF630413B0D0088237A /* TestClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A202 /* TestClock.swift */; };
 		4C5E5DF730413B0D0088237A /* TestIDGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A203 /* TestIDGenerator.swift */; };
@@ -306,6 +314,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		CE13168A5E0392CB8EBB7549 /* ArchiveFoundationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveFoundationTests.swift; sourceTree = "<group>"; };
+		87A3055CF641A027271A023C /* ArchiveFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveFixtures.swift; sourceTree = "<group>"; };
+		A1BDC9E4D3F6407C74541328 /* ArchiveFileCodecTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveFileCodecTests.swift; sourceTree = "<group>"; };
+		2006252EADBCD54770FC395D /* ArchiveSnapshotStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveSnapshotStore.swift; sourceTree = "<group>"; };
+		3C5160897D203188575478DD /* ArchiveFileCodec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveFileCodec.swift; sourceTree = "<group>"; };
+		18D0BEC80E024754F67C2CE4 /* ArchiveReplacementPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveReplacementPolicy.swift; sourceTree = "<group>"; };
+		3845A89225201E48DD6D5B9E /* ArchivePassword.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchivePassword.swift; sourceTree = "<group>"; };
+		B1E74595D75134E6D5B4BE7C /* ArchiveSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveSnapshot.swift; sourceTree = "<group>"; };
 		A003 /* FineCoach.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FineCoach.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A004 /* FineCoachTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FineCoachTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A005 /* FineCoachIntegrationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FineCoachIntegrationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -691,6 +707,7 @@
 				A415 /* Recovery */,
 				A416 /* Reporting */,
 				A417 /* Backup */,
+				026182BB9953698BFB917870 /* Archive */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -864,6 +881,7 @@
 				A500 /* DesignSystem */,
 				AD5F03 /* Privacy */,
 				A731 /* Trends */,
+				DC1A5A5B0FFBCD9EE6DA56AB /* Archive */,
 			);
 			path = FineCoachTests;
 			sourceTree = "<group>";
@@ -897,6 +915,7 @@
 				A602 /* BodyMeasurement.swift */,
 				A603 /* Comparison.swift */,
 				A940 /* BodyPart.swift */,
+				DBDF5EB56C78518E6D59ADBB /* Archive */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -1500,6 +1519,35 @@
 			path = Fixtures;
 			sourceTree = "<group>";
 		};
+		DBDF5EB56C78518E6D59ADBB /* Archive */ = {
+			isa = PBXGroup;
+			children = (
+				B1E74595D75134E6D5B4BE7C /* ArchiveSnapshot.swift */,
+				3845A89225201E48DD6D5B9E /* ArchivePassword.swift */,
+				18D0BEC80E024754F67C2CE4 /* ArchiveReplacementPolicy.swift */,
+			);
+			path = Archive;
+			sourceTree = "<group>";
+		};
+		026182BB9953698BFB917870 /* Archive */ = {
+			isa = PBXGroup;
+			children = (
+				3C5160897D203188575478DD /* ArchiveFileCodec.swift */,
+				2006252EADBCD54770FC395D /* ArchiveSnapshotStore.swift */,
+			);
+			path = Archive;
+			sourceTree = "<group>";
+		};
+		DC1A5A5B0FFBCD9EE6DA56AB /* Archive */ = {
+			isa = PBXGroup;
+			children = (
+				A1BDC9E4D3F6407C74541328 /* ArchiveFileCodecTests.swift */,
+				87A3055CF641A027271A023C /* ArchiveFixtures.swift */,
+				CE13168A5E0392CB8EBB7549 /* ArchiveFoundationTests.swift */,
+			);
+			path = Archive;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1831,6 +1879,11 @@
 				B363 /* SessionEditView.swift in Sources */,
 				B364 /* ShareReportFlowView.swift in Sources */,
 				B961 /* ShareReportCardView.swift in Sources */,
+				6D8C36391FCED40470CA13D8 /* ArchiveSnapshot.swift in Sources */,
+				E8702EB9D219CCB312BF229C /* ArchivePassword.swift in Sources */,
+				6F9904C6D3AC33B86DF61242 /* ArchiveReplacementPolicy.swift in Sources */,
+				E04D56B29CFF00C4D1BC50FD /* ArchiveFileCodec.swift in Sources */,
+				0F99ADE084165D922190C0BE /* ArchiveSnapshotStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1888,6 +1941,9 @@
 				B502 /* TestCalendarProvider.swift in Sources */,
 				B503 /* TestNotificationAuthorizationProvider.swift in Sources */,
 				B206 /* TestFaultInjector.swift in Sources */,
+				A1347A5C9F8EAB6547AD2AC8 /* ArchiveFileCodecTests.swift in Sources */,
+				C4FDE713157F6853CEFC13F2 /* ArchiveFixtures.swift in Sources */,
+				5B26357EC039B8C2F8BAE943 /* ArchiveFoundationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

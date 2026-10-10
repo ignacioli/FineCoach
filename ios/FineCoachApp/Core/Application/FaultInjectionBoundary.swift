@@ -6,6 +6,8 @@
         case persistenceWriterSave
         case generationMetadataWrite
         case currentPointerReplace
+        case archiveStoreAfterGenerationWritten = "archive.store.afterGenerationWritten"
+        case archiveStoreAfterPointerRemoved = "archive.store.afterPointerRemoved"
     }
 
     public enum FaultInjectionError: Error, Equatable, LocalizedError, Sendable {
