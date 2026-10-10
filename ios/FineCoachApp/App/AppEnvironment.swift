@@ -320,6 +320,8 @@ public final class AppEnvironment: ObservableObject {
             idGenerator: idGenerator
         )
         try TempReportLease.cleanupOrphans(in: root, keepingFlowIDs: [])
+        // A failed archive-export janitor is retried at the next launch; it must not block startup.
+        try? ArchiveExportUseCases.cleanupOrphans(in: root)
     }
 
     private init(failure: Error) {

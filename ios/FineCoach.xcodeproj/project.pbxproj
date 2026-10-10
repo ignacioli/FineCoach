@@ -294,6 +294,15 @@
 		203A4CF1F8AE462BE4A0E2AC /* InstallStateResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD2193CBA15B1635513D6E0A /* InstallStateResolver.swift */; };
 		EE8E3E431D53C0F5413E7A3D /* ArchiveFoundationIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE017497F4CAFFE91103028B /* ArchiveFoundationIntegrationTests.swift */; };
 		62BB7045D90B6E928206733B /* ArchiveFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87A3055CF641A027271A023C /* ArchiveFixtures.swift */; };
+		78C2ADD55441321A99B91C8E /* ArchiveModuleSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5042310E831492CDFCC1E8C /* ArchiveModuleSelection.swift */; };
+		03546028DA5687194DAE7D2D /* ArchiveExportPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C229A829FC1D960B005092D5 /* ArchiveExportPolicy.swift */; };
+		519565499ADEE5D706EAFAAE /* ArchiveExportSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 707070532E30DA15399160A9 /* ArchiveExportSource.swift */; };
+		40C78842B848E9DD4FE3978C /* ArchiveExportTempLease.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D793747374F5BC53CE9EBF5 /* ArchiveExportTempLease.swift */; };
+		4273AC98B42ABFBF649C7CCA /* ArchiveExportUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 221708E8AFBF6B27643957EC /* ArchiveExportUseCases.swift */; };
+		CB905CFCA28988F304401F0A /* ArchiveExportPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B8E4B00F2CA5F5719EC6C2E /* ArchiveExportPolicyTests.swift */; };
+		8EE69B2A44B60DEA2D434676 /* ArchiveExportIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE52AEF96A85C6122BD92D45 /* ArchiveExportIntegrationTests.swift */; };
+		8FE54578732674057F095EBA /* ArchiveExportFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C064C982C9D5E5968959CB /* ArchiveExportFixtures.swift */; };
+		83C0625A76E06855F0309F7F /* ArchiveExportFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C064C982C9D5E5968959CB /* ArchiveExportFixtures.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -599,6 +608,14 @@
 		C41EDF71686C1213186596B1 /* ArchiveIdentityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveIdentityService.swift; sourceTree = "<group>"; };
 		AD2193CBA15B1635513D6E0A /* InstallStateResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallStateResolver.swift; sourceTree = "<group>"; };
 		EE017497F4CAFFE91103028B /* ArchiveFoundationIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveFoundationIntegrationTests.swift; sourceTree = "<group>"; };
+		F5042310E831492CDFCC1E8C /* ArchiveModuleSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveModuleSelection.swift; sourceTree = "<group>"; };
+		C229A829FC1D960B005092D5 /* ArchiveExportPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportPolicy.swift; sourceTree = "<group>"; };
+		707070532E30DA15399160A9 /* ArchiveExportSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportSource.swift; sourceTree = "<group>"; };
+		3D793747374F5BC53CE9EBF5 /* ArchiveExportTempLease.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportTempLease.swift; sourceTree = "<group>"; };
+		221708E8AFBF6B27643957EC /* ArchiveExportUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportUseCases.swift; sourceTree = "<group>"; };
+		1B8E4B00F2CA5F5719EC6C2E /* ArchiveExportPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportPolicyTests.swift; sourceTree = "<group>"; };
+		FE52AEF96A85C6122BD92D45 /* ArchiveExportIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportIntegrationTests.swift; sourceTree = "<group>"; };
+		32C064C982C9D5E5968959CB /* ArchiveExportFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportFixtures.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1540,6 +1557,8 @@
 		DBDF5EB56C78518E6D59ADBB /* Archive */ = {
 			isa = PBXGroup;
 			children = (
+				C229A829FC1D960B005092D5 /* ArchiveExportPolicy.swift */,
+				F5042310E831492CDFCC1E8C /* ArchiveModuleSelection.swift */,
 				B1E74595D75134E6D5B4BE7C /* ArchiveSnapshot.swift */,
 				3845A89225201E48DD6D5B9E /* ArchivePassword.swift */,
 				18D0BEC80E024754F67C2CE4 /* ArchiveReplacementPolicy.swift */,
@@ -1559,6 +1578,8 @@
 		DC1A5A5B0FFBCD9EE6DA56AB /* Archive */ = {
 			isa = PBXGroup;
 			children = (
+				32C064C982C9D5E5968959CB /* ArchiveExportFixtures.swift */,
+				1B8E4B00F2CA5F5719EC6C2E /* ArchiveExportPolicyTests.swift */,
 				A1BDC9E4D3F6407C74541328 /* ArchiveFileCodecTests.swift */,
 				87A3055CF641A027271A023C /* ArchiveFixtures.swift */,
 				CE13168A5E0392CB8EBB7549 /* ArchiveFoundationTests.swift */,
@@ -1577,6 +1598,9 @@
 		DC98C0B09037E1C5F3C19A05 /* Archive */ = {
 			isa = PBXGroup;
 			children = (
+				221708E8AFBF6B27643957EC /* ArchiveExportUseCases.swift */,
+				3D793747374F5BC53CE9EBF5 /* ArchiveExportTempLease.swift */,
+				707070532E30DA15399160A9 /* ArchiveExportSource.swift */,
 				C41EDF71686C1213186596B1 /* ArchiveIdentityService.swift */,
 				AD2193CBA15B1635513D6E0A /* InstallStateResolver.swift */,
 			);
@@ -1586,6 +1610,7 @@
 		AAFA81129A6F4C6DD93F3D77 /* Archive */ = {
 			isa = PBXGroup;
 			children = (
+				FE52AEF96A85C6122BD92D45 /* ArchiveExportIntegrationTests.swift */,
 				EE017497F4CAFFE91103028B /* ArchiveFoundationIntegrationTests.swift */,
 			);
 			path = Archive;
@@ -1758,6 +1783,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4273AC98B42ABFBF649C7CCA /* ArchiveExportUseCases.swift in Sources */,
+				40C78842B848E9DD4FE3978C /* ArchiveExportTempLease.swift in Sources */,
+				519565499ADEE5D706EAFAAE /* ArchiveExportSource.swift in Sources */,
+				03546028DA5687194DAE7D2D /* ArchiveExportPolicy.swift in Sources */,
+				78C2ADD55441321A99B91C8E /* ArchiveModuleSelection.swift in Sources */,
 				B100 /* AppEnvironment.swift in Sources */,
 				B101 /* FineCoachApp.swift in Sources */,
 				B180 /* FCAccessibilityID.swift in Sources */,
@@ -1939,6 +1969,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8FE54578732674057F095EBA /* ArchiveExportFixtures.swift in Sources */,
+				CB905CFCA28988F304401F0A /* ArchiveExportPolicyTests.swift in Sources */,
 				B200 /* SetupSmokeTests.swift in Sources */,
 				B230 /* StudentDomainTests.swift in Sources */,
 				B510 /* RecurrenceAppointmentTests.swift in Sources */,
@@ -1999,6 +2031,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				83C0625A76E06855F0309F7F /* ArchiveExportFixtures.swift in Sources */,
+				8EE69B2A44B60DEA2D434676 /* ArchiveExportIntegrationTests.swift in Sources */,
 				4C5E5DF530413B0D0088237A /* FictitiousFixtures.swift in Sources */,
 				4C5E5DF630413B0D0088237A /* TestClock.swift in Sources */,
 				4C5E5DF730413B0D0088237A /* TestIDGenerator.swift in Sources */,

@@ -8,6 +8,13 @@ public enum AppLogEvent: String, CaseIterable, Sendable {
     case privacyCoverChanged = "foundation.privacy_cover_changed"
     /// A viewer archive and Coach work data coexist; viewer mode wins (data-model §4).
     case archiveInstallViewerPrecedence = "archive.viewer_precedence"
+    /// An export produced more than a plan §7.3 limit allows. Fixed ID only; no counts.
+    case archiveExportLimitExceeded = "archive.export_limit_exceeded"
+    /// The system accepted the archive file (not "received by the student").
+    case archiveExportHandedOff = "archive.export_handed_off"
+    case archiveExportDeliveryCancelled = "archive.export_delivery_cancelled"
+    /// Generation or delivery failed.
+    case archiveExportFailed = "archive.export_failed"
 }
 
 public enum AppLogOperation: String, CaseIterable, Sendable {
@@ -16,6 +23,7 @@ public enum AppLogOperation: String, CaseIterable, Sendable {
     case fileProtection
     case generation
     case scenePrivacy
+    case archiveExport = "archive_export"
 }
 
 public enum AppLogErrorCategory: String, CaseIterable, Sendable {
@@ -27,7 +35,16 @@ public enum AppLogErrorCategory: String, CaseIterable, Sendable {
     case externalCancelled = "external_cancelled"
 }
 
-public struct AppLogger: Sendable {
+/// The logging surface use cases depend on, so tests can observe fixed event IDs.
+public protocol AppLogging: Sendable {
+    func info(_ event: AppLogEvent, operation: AppLogOperation)
+    func failure(_ event: AppLogEvent, operation: AppLogOperation, category: AppLogErrorCategory)
+}
+
+public struct AppLogger: AppLogging {
+    /// Default instance for call sites outside this file.
+    public static var standard: AppLogger { AppLogger() }
+
     private let logger: Logger
 
     public init(
