@@ -21,28 +21,20 @@ struct SettingsView: View {
                     FCListRowDivider()
                     notificationsRow
                     FCListRowDivider()
-                    row(
-                        symbol: "externaldrive",
+                    FCHubRow(
+                        icon: .symbol("externaldrive"),
                         title: String(localized: "backup.title"),
-                        identifier: FCAccessibilityID.settingsBackup,
-                        showsForward: true
-                    ) {
-                        path.append(.backupRestore)
-                    } subtitle: {
-                        EmptyView()
-                    }
+                        mode: .action { path.append(.backupRestore) }
+                    )
+                    .accessibilityIdentifier(FCAccessibilityID.settingsBackup)
                     FCListRowDivider()
-                    row(
-                        symbol: "info.circle",
+                    FCHubRow(
+                        icon: .symbol("info.circle"),
                         title: String(localized: "settings.about"),
-                        identifier: FCAccessibilityID.settingsAbout,
-                        showsForward: false,
-                        action: nil
-                    ) {
-                        Text(versionText)
-                            .fcFont(.caption)
-                            .foregroundStyle(FCSemanticColors.textSecondary)
-                    }
+                        subtitle: .text(versionText),
+                        mode: .informational
+                    )
+                    .accessibilityIdentifier(FCAccessibilityID.settingsAbout)
                     FCListRowDivider()
                 }
             }
@@ -66,82 +58,21 @@ struct SettingsView: View {
         return String(format: String(localized: "settings.about.versionFormat"), version, build)
     }
 
-    @ViewBuilder
     private var notificationsRow: some View {
-        if notificationStatus == .denied {
-            row(
-                symbol: "bell",
-                title: String(localized: "settings.notifications"),
-                identifier: FCAccessibilityID.settingsNotifications,
-                showsForward: true,
-                trailingLink: String(localized: "settings.notifications.openSettings")
-            ) {
-                SystemSettingsLink.openNotificationSettings()
-            } subtitle: {
-                FCStatusLabel(.permissionDenied)
-            }
-        } else {
-            row(
-                symbol: "bell",
-                title: String(localized: "settings.notifications"),
-                identifier: FCAccessibilityID.settingsNotifications,
-                showsForward: true
-            ) {
-                SystemSettingsLink.openNotificationSettings()
-            } subtitle: {
-                Text(
+        let denied = notificationStatus == .denied
+        return FCHubRow(
+            icon: .symbol("bell"),
+            title: String(localized: "settings.notifications"),
+            subtitle: denied
+                ? .status(.permissionDenied)
+                : .text(
                     notificationStatus == .notDetermined
                         ? String(localized: "settings.notifications.undetermined")
                         : String(localized: "settings.notifications.on")
-                )
-                .fcFont(.caption)
-                .foregroundStyle(FCSemanticColors.textSecondary)
-            }
-        }
-    }
-
-    private func row<Subtitle: View>(
-        symbol: String,
-        title: String,
-        identifier: String,
-        showsForward: Bool,
-        trailingLink: String? = nil,
-        action: (() -> Void)?,
-        @ViewBuilder subtitle: () -> Subtitle
-    ) -> some View {
-        let content = HStack(spacing: FCPrimitives.space4) {
-            Image(systemName: symbol)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 24, height: 24)
-                .foregroundStyle(FCSemanticColors.actionPrimary)
-                .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: FCPrimitives.space1) {
-                Text(title)
-                    .fcFont(.headline)
-                    .foregroundStyle(FCSemanticColors.textPrimary)
-                subtitle()
-            }
-            Spacer(minLength: FCPrimitives.space2)
-            if let trailingLink {
-                Text(trailingLink)
-                    .fcFont(.callout, weight: .semibold)
-                    .foregroundStyle(FCSemanticColors.actionPrimary)
-            }
-            if showsForward {
-                FCSymbol(.forward)
-            }
-        }
-        .frame(maxWidth: .infinity, minHeight: 64)
-        .contentShape(Rectangle())
-        return Group {
-            if let action {
-                Button(action: action) { content }
-                    .buttonStyle(.plain)
-            } else {
-                content.accessibilityElement(children: .combine)
-            }
-        }
-        .accessibilityIdentifier(identifier)
+                ),
+            trailing: denied ? .actionText(String(localized: "settings.notifications.openSettings")) : .none,
+            mode: .action { SystemSettingsLink.openNotificationSettings() }
+        )
+        .accessibilityIdentifier(FCAccessibilityID.settingsNotifications)
     }
 }

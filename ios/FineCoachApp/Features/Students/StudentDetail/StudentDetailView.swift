@@ -166,17 +166,15 @@ struct StudentDetailView: View {
 
     private func header(_ student: Student) -> some View {
         VStack(alignment: .leading, spacing: FCPrimitives.space4) {
-            HStack(alignment: .center) {
-                Text(student.displayName.value)
-                    .fcFont(.titleLarge)
-                    .foregroundStyle(FCSemanticColors.textPrimary)
-                    .accessibilityAddTraits(.isHeader)
-                Spacer(minLength: FCPrimitives.space2)
-                FCLinkButton(title: String(localized: "student.detail.edit")) {
+            FCPageHeader(
+                title: student.displayName.value,
+                trailingAction: .init(
+                    title: String(localized: "student.detail.edit"),
+                    accessibilityIdentifier: "studentDetail.edit"
+                ) {
                     path.append(.editor(.edit(viewModel.studentID.rawValue)))
                 }
-                .accessibilityIdentifier("studentDetail.edit")
-            }
+            )
             HStack(spacing: FCPrimitives.space4) {
                 FCAvatar(initial: String(student.displayName.value.prefix(1)))
                 Text(StudentDetailPresentation.goal(student))

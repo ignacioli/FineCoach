@@ -39,10 +39,21 @@ final class FCStatusTests: XCTestCase {
         for location in locations {
             let url = appRoot.appendingPathComponent(location.file)
             let source = try String(contentsOf: url, encoding: .utf8)
+            // `FCHubRow`'s `.status(.x)` subtitle renders `FCStatusLabel(x)` (asserted below).
             XCTAssertTrue(
-                source.contains("FCStatusLabel(.\(location.status))"),
+                source.contains("FCStatusLabel(.\(location.status))") || source.contains(".status(.\(location.status))"),
                 "\(location.file) must show .\(location.status) via FCStatusLabel"
             )
         }
+    }
+
+    func testHubRowStatusSubtitleRendersThroughStatusLabel() throws {
+        let url = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent() // DesignSystem/
+            .deletingLastPathComponent() // FineCoachTests/
+            .deletingLastPathComponent() // ios/
+            .appendingPathComponent("FineCoachApp/DesignSystem/Components/FCHubRow.swift")
+        let source = try String(contentsOf: url, encoding: .utf8)
+        XCTAssertTrue(source.contains("case .status(let status):\n                        FCStatusLabel(status)"))
     }
 }

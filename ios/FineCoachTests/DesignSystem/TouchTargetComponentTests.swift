@@ -37,4 +37,29 @@ final class TouchTargetComponentTests: XCTestCase {
         // settings, resource-hub and 新建预约 entries.
         XCTAssertGreaterThanOrEqual(source.components(separatedBy: ".frame(minWidth: 44, minHeight: 44)").count - 1, 3)
     }
+
+    /// M2 Phase 1 (T009): the hit areas added by the §4.7 components.
+    func testM2ComponentsDeclareTheirHitAreas() throws {
+        let directory = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent() // DesignSystem/
+            .deletingLastPathComponent() // FineCoachTests/
+            .deletingLastPathComponent() // ios/
+            .appendingPathComponent("FineCoachApp/DesignSystem/Components")
+        func source(_ name: String) throws -> String {
+            try String(contentsOf: directory.appendingPathComponent(name), encoding: .utf8)
+        }
+
+        // Page header trailing action: 44x44.
+        XCTAssertTrue(try source("FCPageHeader.swift").contains(".frame(minWidth: 44, minHeight: 44)"))
+        // Hub row: whole row, min height 64 (>= 44).
+        XCTAssertTrue(try source("FCHubRow.swift").contains("minHeight: 64"))
+        // Inline result retry reuses FCLinkButton (44x44, asserted above).
+        XCTAssertTrue(try source("FCInlineResult.swift").contains("FCLinkButton("))
+        // Group row: the selection circle is its own 44x44 target; the rest of the row is >= 44 tall.
+        let list = try source("FCListRow.swift")
+        XCTAssertTrue(list.contains(".frame(minWidth: 44, minHeight: 44)"))
+        XCTAssertGreaterThanOrEqual(list.components(separatedBy: "minHeight: 44").count - 1, 3)
+        // Stacked and side-by-side dialog buttons keep the 44pt hit area (36pt visual).
+        XCTAssertTrue(try source("FCConfirmationDialog.swift").contains(".frame(minHeight: 44)"))
+    }
 }

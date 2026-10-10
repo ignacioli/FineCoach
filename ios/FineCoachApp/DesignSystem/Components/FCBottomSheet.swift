@@ -154,6 +154,12 @@ public extension View {
 /// With a `subtitle` (the two-line rows of `24-edit-occurrence-scope`), the
 /// title is `headline` and the subtitle `caption` `text.secondary` below it.
 /// A disabled row renders its text in `text.disabled` and ignores taps.
+///
+/// A destructive row may set `showsTrashIcon` for a leading 24×24 `trash`
+/// symbol in the title's colour (`status.destructive`), so the danger is
+/// conveyed by icon and text, not colour alone (§4.7 `DS-ACTION-ROW`); the
+/// title then starts at x=48. The icon is decorative (hidden from
+/// accessibility). It has no effect on `normal` rows.
 public struct FCActionRow: View {
     public enum Role {
         case normal
@@ -165,6 +171,7 @@ public struct FCActionRow: View {
     private let note: String?
     private let role: Role
     private let isEnabled: Bool
+    private let showsTrashIcon: Bool
     private let action: () -> Void
 
     public init(
@@ -173,6 +180,7 @@ public struct FCActionRow: View {
         note: String? = nil,
         role: Role = .normal,
         isEnabled: Bool = true,
+        showsTrashIcon: Bool = false,
         action: @escaping () -> Void
     ) {
         self.title = title
@@ -180,12 +188,21 @@ public struct FCActionRow: View {
         self.note = note
         self.role = role
         self.isEnabled = isEnabled
+        self.showsTrashIcon = showsTrashIcon
         self.action = action
     }
 
     public var body: some View {
         Button(action: action) {
             HStack(spacing: FCPrimitives.space2) {
+                if role == .destructive && showsTrashIcon {
+                    Image(systemName: "trash")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 24, height: 24)
+                        .foregroundStyle(titleColor)
+                        .accessibilityHidden(true)
+                }
                 VStack(alignment: .leading, spacing: FCPrimitives.space1) {
                     Text(title)
                         .fcFont(subtitle == nil ? .body : .headline)

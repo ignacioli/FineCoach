@@ -139,13 +139,6 @@ struct BackupRestoreFlowView: View {
                 failureState
                     .padding(.top, FCPrimitives.space4)
             }
-            if viewModel.showsRetry {
-                FCLinkButton(title: String(localized: "backup.retry"), isEnabled: !viewModel.isRestoring) {
-                    viewModel.restore(using: environment)
-                }
-                .frame(maxWidth: .infinity)
-                .accessibilityIdentifier(FCAccessibilityID.restoreRetry)
-            }
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.restoreRoot)
@@ -164,42 +157,38 @@ struct BackupRestoreFlowView: View {
         }
     }
 
-    /// Mirrors the failure block: a `action.primary` ✓ badge (an
-    /// informational state, §7.2), "恢复完成", and a prompt to check the
-    /// restored data. Text only -- no navigation link (owner 2026-09-29).
+    /// 恢复完成: an `action.primary` ✓ result (informational, §7.2) with a
+    /// prompt to check the restored data. Text only -- no navigation link
+    /// (owner 2026-09-29).
     private var successState: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.space1) {
-            HStack(spacing: FCPrimitives.space2) {
-                FCStatusBadge(symbolName: "checkmark", color: FCSemanticColors.actionPrimary)
-                Text(String(localized: "backup.restore.succeededTitle"))
-                    .fcFont(.callout, weight: .semibold)
-                    .foregroundStyle(FCSemanticColors.textPrimary)
-            }
-            Text(String(localized: "backup.restore.succeeded"))
-                .fcFont(.caption)
-                .foregroundStyle(FCSemanticColors.textSecondary)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier(FCAccessibilityID.restoreSucceeded)
+        FCInlineResult(
+            .success,
+            title: String(localized: "backup.restore.succeededTitle"),
+            message: String(localized: "backup.restore.succeeded"),
+            accessibilityIdentifier: FCAccessibilityID.restoreSucceeded
+        )
     }
 
-    /// 08's failure block: "恢复失败" in `status.destructive` with a "!" badge
+    /// 08's failure result: "恢复失败" in `status.destructive` with a "!" badge
     /// (state is never color-only, NFR-005 / §7.2), then why and that the
-    /// current data is untouched.
+    /// current data is untouched, plus 重试.
     private var failureState: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.space1) {
-            HStack(spacing: FCPrimitives.space2) {
-                FCStatusBadge(symbolName: "exclamationmark", color: FCSemanticColors.statusDestructive)
-                Text(String(localized: "backup.restore.failedTitle"))
-                    .fcFont(.callout, weight: .semibold)
-                    .foregroundStyle(FCSemanticColors.statusDestructive)
-            }
-            Text(viewModel.errorMessage ?? String(localized: "backup.restore.failed"))
-                .fcFont(.caption)
-                .foregroundStyle(FCSemanticColors.textSecondary)
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier(FCAccessibilityID.restoreFailed)
+        FCInlineResult(
+            .failure,
+            title: String(localized: "backup.restore.failedTitle"),
+            message: viewModel.errorMessage ?? String(localized: "backup.restore.failed"),
+            retry: retryAction,
+            accessibilityIdentifier: FCAccessibilityID.restoreFailed
+        )
+    }
+
+    private var retryAction: FCInlineResult.Retry? {
+        guard viewModel.showsRetry else { return nil }
+        return FCInlineResult.Retry(
+            title: String(localized: "backup.retry"),
+            isEnabled: !viewModel.isRestoring,
+            accessibilityIdentifier: FCAccessibilityID.restoreRetry,
+            handler: { viewModel.restore(using: environment) }
+        )
     }
 }

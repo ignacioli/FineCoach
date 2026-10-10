@@ -74,6 +74,9 @@
 		B911 /* FCChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = A911 /* FCChip.swift */; };
 		B912 /* FCHeroCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A912 /* FCHeroCard.swift */; };
 		B913 /* FCListRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A913 /* FCListRow.swift */; };
+		6DFE845FB27C1F6C1609B9C5 /* FCInlineResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A6AFABC349B7FD5D1B3F29 /* FCInlineResult.swift */; };
+		5F21772D9C8C226454B34246 /* FCHubRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4724C9B83F97BD6324CEE69 /* FCHubRow.swift */; };
+		66E40901340314406459ABC4 /* FCPageHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1555EA92BF1009B5B3EDFF1F /* FCPageHeader.swift */; };
 		B914 /* FCAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A914 /* FCAvatar.swift */; };
 		B915 /* FCHintBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A915 /* FCHintBar.swift */; };
 		B961 /* ShareReportCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A961 /* ShareReportCardView.swift */; };
@@ -260,6 +263,7 @@
 		AD5F12 /* LogSurfaceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5F11 /* LogSurfaceTests.swift */; };
 		AD5F22 /* PrivacyCoverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5F21 /* PrivacyCoverTests.swift */; };
 		AD5F42 /* TouchTargetComponentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5F41 /* TouchTargetComponentTests.swift */; };
+		62EC3C824E401E4C5E09C3CD /* M2ComponentContractTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 748962A31B5656501D5FB6D4 /* M2ComponentContractTests.swift */; };
 		B930 /* FCStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A930 /* FCStatusTests.swift */; };
 		B963 /* FCStepperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A963 /* FCStepperTests.swift */; };
 		AC0C02 /* ComponentCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0C01 /* ComponentCatalogTests.swift */; };
@@ -341,6 +345,9 @@
 		A911 /* FCChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCChip.swift; sourceTree = "<group>"; };
 		A912 /* FCHeroCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCHeroCard.swift; sourceTree = "<group>"; };
 		A913 /* FCListRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCListRow.swift; sourceTree = "<group>"; };
+		18A6AFABC349B7FD5D1B3F29 /* FCInlineResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCInlineResult.swift; sourceTree = "<group>"; };
+		D4724C9B83F97BD6324CEE69 /* FCHubRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCHubRow.swift; sourceTree = "<group>"; };
+		1555EA92BF1009B5B3EDFF1F /* FCPageHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCPageHeader.swift; sourceTree = "<group>"; };
 		A914 /* FCAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCAvatar.swift; sourceTree = "<group>"; };
 		A915 /* FCHintBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCHintBar.swift; sourceTree = "<group>"; };
 		A961 /* ShareReportCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareReportCardView.swift; sourceTree = "<group>"; };
@@ -498,6 +505,7 @@
 		AD5F11 /* LogSurfaceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogSurfaceTests.swift; sourceTree = "<group>"; };
 		AD5F21 /* PrivacyCoverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyCoverTests.swift; sourceTree = "<group>"; };
 		AD5F41 /* TouchTargetComponentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchTargetComponentTests.swift; sourceTree = "<group>"; };
+		748962A31B5656501D5FB6D4 /* M2ComponentContractTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M2ComponentContractTests.swift; sourceTree = "<group>"; };
 		A930 /* FCStatusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCStatusTests.swift; sourceTree = "<group>"; };
 		A963 /* FCStepperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCStepperTests.swift; sourceTree = "<group>"; };
 		AC0C01 /* ComponentCatalogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentCatalogTests.swift; sourceTree = "<group>"; };
@@ -1078,6 +1086,9 @@
 				A911 /* FCChip.swift */,
 				A912 /* FCHeroCard.swift */,
 				A913 /* FCListRow.swift */,
+				18A6AFABC349B7FD5D1B3F29 /* FCInlineResult.swift */,
+				D4724C9B83F97BD6324CEE69 /* FCHubRow.swift */,
+				1555EA92BF1009B5B3EDFF1F /* FCPageHeader.swift */,
 				A914 /* FCAvatar.swift */,
 				A915 /* FCHintBar.swift */,
 				A957 /* FCSymbol.swift */,
@@ -1363,6 +1374,7 @@
 				A956 /* IconConsistencyTests.swift */,
 				A930 /* FCStatusTests.swift */,
 				AD5F41 /* TouchTargetComponentTests.swift */,
+				748962A31B5656501D5FB6D4 /* M2ComponentContractTests.swift */,
 				A963 /* FCStepperTests.swift */,
 				AC0C01 /* ComponentCatalogTests.swift */,
 				A931 /* TypographyHarnessTests.swift */,
@@ -1774,6 +1786,9 @@
 				B911 /* FCChip.swift in Sources */,
 				B912 /* FCHeroCard.swift in Sources */,
 				B913 /* FCListRow.swift in Sources */,
+				6DFE845FB27C1F6C1609B9C5 /* FCInlineResult.swift in Sources */,
+				5F21772D9C8C226454B34246 /* FCHubRow.swift in Sources */,
+				66E40901340314406459ABC4 /* FCPageHeader.swift in Sources */,
 				B914 /* FCAvatar.swift in Sources */,
 				B915 /* FCHintBar.swift in Sources */,
 				B957 /* FCSymbol.swift in Sources */,
@@ -1852,6 +1867,7 @@
 				B956 /* IconConsistencyTests.swift in Sources */,
 				B930 /* FCStatusTests.swift in Sources */,
 				AD5F42 /* TouchTargetComponentTests.swift in Sources */,
+				62EC3C824E401E4C5E09C3CD /* M2ComponentContractTests.swift in Sources */,
 				AD5F02 /* CapabilityManifestTests.swift in Sources */,
 				AD5F12 /* LogSurfaceTests.swift in Sources */,
 				AD5F22 /* PrivacyCoverTests.swift in Sources */,

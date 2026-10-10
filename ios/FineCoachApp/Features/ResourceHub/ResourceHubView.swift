@@ -20,23 +20,21 @@ struct ResourceHubView: View {
 
                 VStack(spacing: 0) {
                     FCListRowDivider()
-                    hubRow(
+                    FCHubRow(
+                        icon: .equipment(.barbell),
                         title: String(localized: "exercise.library.entry"),
-                        subtitle: exerciseSummary,
-                        icon: FCEquipmentIconView(.barbell),
-                        identifier: FCAccessibilityID.exerciseLibraryEntry
-                    ) {
-                        path.append(.exerciseLibrary)
-                    }
+                        subtitle: exerciseSummary.map { .text($0) },
+                        mode: .action { path.append(.exerciseLibrary) }
+                    )
+                    .accessibilityIdentifier(FCAccessibilityID.exerciseLibraryEntry)
                     FCListRowDivider()
-                    hubRow(
+                    FCHubRow(
+                        icon: .symbol("list.bullet.rectangle"),
                         title: String(localized: "resourceHub.templates"),
-                        subtitle: templateSummary,
-                        icon: hubSymbol("list.bullet.rectangle"),
-                        identifier: FCAccessibilityID.templatesEntry
-                    ) {
-                        path.append(.templates)
-                    }
+                        subtitle: templateSummary.map { .text($0) },
+                        mode: .action { path.append(.templates) }
+                    )
+                    .accessibilityIdentifier(FCAccessibilityID.templatesEntry)
                     FCListRowDivider()
                 }
 
@@ -65,44 +63,5 @@ struct ResourceHubView: View {
         if let templates = try? await templateUseCases.templates() {
             templateSummary = String(format: String(localized: "resourceHub.templateCountFormat"), templates.count)
         }
-    }
-
-    private func hubSymbol(_ name: String) -> some View {
-        Image(systemName: name)
-            .resizable()
-            .scaledToFit()
-            .frame(width: 24, height: 24)
-            .foregroundStyle(FCSemanticColors.actionPrimary)
-            .accessibilityHidden(true)
-    }
-
-    private func hubRow<Icon: View>(
-        title: String,
-        subtitle: String?,
-        icon: Icon,
-        identifier: String,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            HStack(spacing: FCPrimitives.space4) {
-                icon
-                VStack(alignment: .leading, spacing: FCPrimitives.space1) {
-                    Text(title)
-                        .fcFont(.headline)
-                        .foregroundStyle(FCSemanticColors.textPrimary)
-                    if let subtitle {
-                        Text(subtitle)
-                            .fcFont(.caption)
-                            .foregroundStyle(FCSemanticColors.textSecondary)
-                    }
-                }
-                Spacer(minLength: FCPrimitives.space2)
-                FCSymbol(.forward)
-            }
-            .frame(maxWidth: .infinity, minHeight: 64)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityIdentifier(identifier)
     }
 }

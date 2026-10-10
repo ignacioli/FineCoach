@@ -1,10 +1,19 @@
 import SwiftUI
 
 public struct FCSaveStatusView: View {
-    public enum Status: String, Sendable {
-        case saving = "保存中"
-        case saved = "已保存"
-        case failed = "保存失败"
+    public enum Status: Sendable {
+        case saving
+        case saved
+        case failed
+
+        /// The state text (localized keys; zh-Hans: 保存中 / 已保存 / 保存失败).
+        public var text: String {
+            switch self {
+            case .saving: return String(localized: "designSystem.saveStatus.saving")
+            case .saved: return String(localized: "designSystem.saveStatus.saved")
+            case .failed: return String(localized: "designSystem.saveStatus.failed")
+            }
+        }
     }
 
     private let status: Status
@@ -15,14 +24,15 @@ public struct FCSaveStatusView: View {
 
     public var body: some View {
         Label {
-            Text(status.rawValue)
+            Text(status.text)
+                .fcFont(.body)
         } icon: {
             Image(systemName: iconName)
                 .accessibilityHidden(true)
         }
         .foregroundStyle(status == .failed ? FCSemanticColors.statusDestructive : FCSemanticColors.textSecondary)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text(status.rawValue))
+        .accessibilityLabel(Text(status.text))
         .frame(minHeight: 44)
     }
 

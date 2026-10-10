@@ -161,6 +161,31 @@ feature 专有组件见 §4。共享组件的新增 / 扩展条目写在 `compon
 结果：PASS。2026-10-09 产品负责人 review 通过 26 块画板与本文，G7 整体通过（spec `1.1-approved`）。review 中的行为调整已回修 PRD 1.2 / spec 1.1。导出图已于 2026-10-09 换成 2 倍图。剩余项：§4.7 组件代码在 M2 tasks Phase 0 实现。没有任何代码改动；没有人工视觉验收。
 ```
 
+### 7.1 Phase 1（tasks T001–T013，设计系统组件，2026-10-10）
+
+```text
+分类与依据：D 类（规格已在 components.md §4.7 定稿，本阶段无新视觉决定）；目标设计不变。批准来源：components.md §4.7（2026-10-09 随 G7 审定）、M1-B 画稿 19/26/38/39/42/43。
+影响范围：新增 FCPageHeader（DS-PAGE-HEADER）、FCHubRow（DS-HUB-ROW）、FCInlineResult（DS-INLINE-RESULT）；扩展 FCListRow 并新增分组变体 FCListGroupRow（DS-LIST-ROW）、FCActionRow showsTrashIcon（DS-ACTION-ROW）、FCConfirmationDialog 内容变长规则（DS-CONFIRM-DIALOG）、FCSaveStatusView 显式字体与本地化键（CG-3；Status 不再以 String 为 rawValue）。迁移消费者：ResourceHubView（私有 hubRow / hubSymbol 删除）、SettingsView（私有 row 删除）、BackupRestoreFlow（成功 / 失败结果，重试并入失败结果）、StudentDetailView 页头。components.md §3/§4.6/§4.7/CG-3 已同步；Swift 名称与 §4.7 拟定名一致，参数形态见 §4.7 各条「状态」行。
+设计决定：沿用已审定规格，无新决定。FCStatusTests 的登记位置断言放宽为同时接受 `FCStatusLabel(.permissionDenied)` 与 FCHubRow 的 `.status(.permissionDenied)`，并新增断言 FCHubRow 的 `.status` 副标题经 FCStatusLabel 渲染——证明强度不变。
+实施与验证：L1 不变量测试 M2ComponentContractTests（10 项）+ TouchTargetComponentTests 扩展；ComponentCatalogTests、DesignValueScanTests、FCStatusTests、PrivacyCoverTests 通过。入口与布局清单见下。L3：未触发（D 类、非核心页面）；§4.7 标「人工」的不变量（页头长标题换行、确认弹窗堆叠观感）在组件首次被人查看时看一次，列入 T069 集中走查。
+结果：PASS（自动门）。xcodebuild build 成功；FineCoachTests 281 项，0 失败，1 项跳过（ContrastHarnessTests.testTextDisabledOnSurfacePageIsWCAGExempt，既有 WCAG 豁免）；FineCoachIntegrationTests 96 项，0 失败。模拟器 iPhone 17 Pro Max（iOS 26.5，按设备 id 指定；quickstart §2 的 name= 写法在本机匹配失败）。已知缺口：迁移页面（19/26/38/39/42/43）外观是否不变**未经人工视觉检查**；确认弹窗在大字号下的堆叠 / 80% 高度上限、分组行「部分选中」字形在 22pt 圆内的观感未经人工检查（列入 T069 L3 疑点）。
+```
+
+入口与布局清单（`components.md` §1.4）：
+
+```text
+资料库 19 → 「动作库」入口行（器材图标、计数副标题、›）→ FCAccessibilityID.exerciseLibraryEntry → 否（导航）→ FCHubRow .frame(maxWidth: .infinity, minHeight: 64)（ResourceHubView.swift:23）
+资料库 19 → 「训练模板」入口行 → FCAccessibilityID.templatesEntry → 否（导航）→ FCHubRow（ResourceHubView.swift:31）
+设置 42/43 → 「通知」入口行（被拒时 FCStatusLabel 副标题 +「前往设置」）→ FCAccessibilityID.settingsNotifications → 否（打开系统设置）→ FCHubRow（SettingsView.swift:63，用于 :22）
+设置 42 → 「备份与恢复」入口行 → FCAccessibilityID.settingsBackup → 否（导航）→ FCHubRow（SettingsView.swift:24）
+设置 42 → 「关于」行（版本号，无 ›，不可点）→ FCAccessibilityID.settingsAbout → 否 → FCHubRow（SettingsView.swift:31）
+备份与恢复 39 → 「恢复完成」就地结果 → FCAccessibilityID.restoreSucceeded → 否 → FCInlineResult .frame(maxWidth: .infinity)（BackupRestoreFlow.swift:164）
+备份与恢复 38 → 「恢复失败」就地结果 → FCAccessibilityID.restoreFailed → 否 → FCInlineResult（BackupRestoreFlow.swift:176）
+备份与恢复 38 → 「重试」可见链接按钮（恢复中禁用）→ FCAccessibilityID.restoreRetry → 是（重新执行恢复；可见按钮，非手势）→ FCInlineResult 内 FCLinkButton .frame(maxWidth: .infinity)（BackupRestoreFlow.swift:186）
+学员详情 26 → 页头标题（header 属性）→ 无（与迁移前相同）→ 否 → FCPageHeader .frame(maxWidth: .infinity)（StudentDetailView.swift:169）
+学员详情 26 → 「编辑资料」尾部操作 → studentDetail.edit → 否（进入编辑页）→ FCPageHeader 标题行（StudentDetailView.swift:173）
+```
+
 ## 8. 待产品负责人确认的问题
 
 1. ~~M2-09 的进入路径~~：**已定（R4）**，支持系统打开档案文件，spec D-010 已修订。
