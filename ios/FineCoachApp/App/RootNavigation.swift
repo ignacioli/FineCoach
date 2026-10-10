@@ -26,6 +26,7 @@ enum RootDestination: Hashable {
     case bodyData(UUID)
     case bodyMeasurementEntry(studentID: UUID, metricID: UUID)
     case trends(UUID)
+    case archiveExport(UUID)
     case placeholder(PlaceholderKind)
 }
 
@@ -262,6 +263,13 @@ struct RootNavigation: View {
                                     historyUseCases: environment.requireHistoryUseCases(),
                                     exerciseUseCases: environment.requireExerciseUseCases(),
                                     calendarProvider: SystemLocalCalendarProvider()
+                                )
+                            case .archiveExport(let studentID):
+                                ArchiveExportFlowView(
+                                    studentID: StableUUID(studentID),
+                                    useCases: environment.requireArchiveExportUseCases(),
+                                    studentUseCases: environment.requireUseCases(),
+                                    path: $path
                                 )
                             case .placeholder(let kind):
                                 PlaceholderDestinationView(kind: kind)

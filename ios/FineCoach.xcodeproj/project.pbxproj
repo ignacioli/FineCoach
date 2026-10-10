@@ -303,6 +303,18 @@
 		8EE69B2A44B60DEA2D434676 /* ArchiveExportIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE52AEF96A85C6122BD92D45 /* ArchiveExportIntegrationTests.swift */; };
 		8FE54578732674057F095EBA /* ArchiveExportFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C064C982C9D5E5968959CB /* ArchiveExportFixtures.swift */; };
 		83C0625A76E06855F0309F7F /* ArchiveExportFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C064C982C9D5E5968959CB /* ArchiveExportFixtures.swift */; };
+		DF5BBDD59FF71E4042E1A2FA /* ArchiveExclusionNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41004E3E69D3A5C1D18FAB46 /* ArchiveExclusionNote.swift */; };
+		0C8C968BB090ED16265732A8 /* ArchiveExportFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AE4578E63E75F016B4A4C /* ArchiveExportFlowView.swift */; };
+		355A8FEE4A93CFE82C8FD939 /* ArchiveExportPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02D979A740DC48D93C43C2AC /* ArchiveExportPresentation.swift */; };
+		A64B3FED784C16C6C821D8EC /* ArchiveExportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E1E954E76EF01957273826 /* ArchiveExportViewModel.swift */; };
+		A9A1CE8D2AA24A41AD6D1471 /* ArchivePasswordField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B2276996E211D637F2C737 /* ArchivePasswordField.swift */; };
+		6A3ED52750147977D7266356 /* ArchiveSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7976C1805F77146E86C165 /* ArchiveSelectionView.swift */; };
+		85D6BC60F08F5208292FDC17 /* ArchivePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82E97B7DF0CDC12AEFED76BE /* ArchivePreviewView.swift */; };
+		940979B6D2B408BFEB4C97DF /* ArchiveDeliveryWarningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F8734BC67743896D6B20F22 /* ArchiveDeliveryWarningView.swift */; };
+		7C2344D0C6D4067AD017C374 /* ArchivePasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C080751D5F8FA6E1FD117F /* ArchivePasswordView.swift */; };
+		71F372DF4FD322366CEA4AF5 /* ArchiveDeliveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F80D6F31F404A5F07E2DB8B /* ArchiveDeliveryView.swift */; };
+		016E1128FF8B3A0A928741A8 /* ArchiveExportDebugSeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38987A9BE9D66B2A01BC2302 /* ArchiveExportDebugSeed.swift */; };
+		84D9618B61F2BC059C9B7FF6 /* ArchiveExportScreenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 359027FF7430F369D5495762 /* ArchiveExportScreenTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -616,6 +628,18 @@
 		1B8E4B00F2CA5F5719EC6C2E /* ArchiveExportPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportPolicyTests.swift; sourceTree = "<group>"; };
 		FE52AEF96A85C6122BD92D45 /* ArchiveExportIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportIntegrationTests.swift; sourceTree = "<group>"; };
 		32C064C982C9D5E5968959CB /* ArchiveExportFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportFixtures.swift; sourceTree = "<group>"; };
+		41004E3E69D3A5C1D18FAB46 /* ArchiveExclusionNote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExclusionNote.swift; sourceTree = "<group>"; };
+		436AE4578E63E75F016B4A4C /* ArchiveExportFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportFlowView.swift; sourceTree = "<group>"; };
+		02D979A740DC48D93C43C2AC /* ArchiveExportPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportPresentation.swift; sourceTree = "<group>"; };
+		50E1E954E76EF01957273826 /* ArchiveExportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportViewModel.swift; sourceTree = "<group>"; };
+		B1B2276996E211D637F2C737 /* ArchivePasswordField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchivePasswordField.swift; sourceTree = "<group>"; };
+		3A7976C1805F77146E86C165 /* ArchiveSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveSelectionView.swift; sourceTree = "<group>"; };
+		82E97B7DF0CDC12AEFED76BE /* ArchivePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchivePreviewView.swift; sourceTree = "<group>"; };
+		7F8734BC67743896D6B20F22 /* ArchiveDeliveryWarningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveDeliveryWarningView.swift; sourceTree = "<group>"; };
+		05C080751D5F8FA6E1FD117F /* ArchivePasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchivePasswordView.swift; sourceTree = "<group>"; };
+		9F80D6F31F404A5F07E2DB8B /* ArchiveDeliveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveDeliveryView.swift; sourceTree = "<group>"; };
+		38987A9BE9D66B2A01BC2302 /* ArchiveExportDebugSeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportDebugSeed.swift; sourceTree = "<group>"; };
+		359027FF7430F369D5495762 /* ArchiveExportScreenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportScreenTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -820,6 +844,7 @@
 		A404 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				6FAE837533B1926DF296B96A /* ArchiveExport */,
 				A446 /* Students */,
 				A524 /* Today */,
 				A526 /* Calendar */,
@@ -977,6 +1002,7 @@
 		A413 /* Platform */ = {
 			isa = PBXGroup;
 			children = (
+				38987A9BE9D66B2A01BC2302 /* ArchiveExportDebugSeed.swift */,
 				A130 /* SystemClock.swift */,
 				A504 /* SystemLocalCalendarProvider.swift */,
 				A517 /* NotificationAdapter.swift */,
@@ -1578,6 +1604,7 @@
 		DC1A5A5B0FFBCD9EE6DA56AB /* Archive */ = {
 			isa = PBXGroup;
 			children = (
+				359027FF7430F369D5495762 /* ArchiveExportScreenTests.swift */,
 				32C064C982C9D5E5968959CB /* ArchiveExportFixtures.swift */,
 				1B8E4B00F2CA5F5719EC6C2E /* ArchiveExportPolicyTests.swift */,
 				A1BDC9E4D3F6407C74541328 /* ArchiveFileCodecTests.swift */,
@@ -1614,6 +1641,23 @@
 				EE017497F4CAFFE91103028B /* ArchiveFoundationIntegrationTests.swift */,
 			);
 			path = Archive;
+			sourceTree = "<group>";
+		};
+		6FAE837533B1926DF296B96A /* ArchiveExport */ = {
+			isa = PBXGroup;
+			children = (
+				9F80D6F31F404A5F07E2DB8B /* ArchiveDeliveryView.swift */,
+				05C080751D5F8FA6E1FD117F /* ArchivePasswordView.swift */,
+				7F8734BC67743896D6B20F22 /* ArchiveDeliveryWarningView.swift */,
+				82E97B7DF0CDC12AEFED76BE /* ArchivePreviewView.swift */,
+				3A7976C1805F77146E86C165 /* ArchiveSelectionView.swift */,
+				B1B2276996E211D637F2C737 /* ArchivePasswordField.swift */,
+				50E1E954E76EF01957273826 /* ArchiveExportViewModel.swift */,
+				02D979A740DC48D93C43C2AC /* ArchiveExportPresentation.swift */,
+				436AE4578E63E75F016B4A4C /* ArchiveExportFlowView.swift */,
+				41004E3E69D3A5C1D18FAB46 /* ArchiveExclusionNote.swift */,
+			);
+			path = ArchiveExport;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1783,6 +1827,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				016E1128FF8B3A0A928741A8 /* ArchiveExportDebugSeed.swift in Sources */,
+				71F372DF4FD322366CEA4AF5 /* ArchiveDeliveryView.swift in Sources */,
+				7C2344D0C6D4067AD017C374 /* ArchivePasswordView.swift in Sources */,
+				940979B6D2B408BFEB4C97DF /* ArchiveDeliveryWarningView.swift in Sources */,
+				85D6BC60F08F5208292FDC17 /* ArchivePreviewView.swift in Sources */,
+				6A3ED52750147977D7266356 /* ArchiveSelectionView.swift in Sources */,
+				A9A1CE8D2AA24A41AD6D1471 /* ArchivePasswordField.swift in Sources */,
+				A64B3FED784C16C6C821D8EC /* ArchiveExportViewModel.swift in Sources */,
+				355A8FEE4A93CFE82C8FD939 /* ArchiveExportPresentation.swift in Sources */,
+				0C8C968BB090ED16265732A8 /* ArchiveExportFlowView.swift in Sources */,
+				DF5BBDD59FF71E4042E1A2FA /* ArchiveExclusionNote.swift in Sources */,
 				4273AC98B42ABFBF649C7CCA /* ArchiveExportUseCases.swift in Sources */,
 				40C78842B848E9DD4FE3978C /* ArchiveExportTempLease.swift in Sources */,
 				519565499ADEE5D706EAFAAE /* ArchiveExportSource.swift in Sources */,
@@ -1969,6 +2024,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84D9618B61F2BC059C9B7FF6 /* ArchiveExportScreenTests.swift in Sources */,
 				8FE54578732674057F095EBA /* ArchiveExportFixtures.swift in Sources */,
 				CB905CFCA28988F304401F0A /* ArchiveExportPolicyTests.swift in Sources */,
 				B200 /* SetupSmokeTests.swift in Sources */,

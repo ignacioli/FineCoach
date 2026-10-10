@@ -196,6 +196,46 @@ feature 专有组件见 §4。共享组件的新增 / 扩展条目写在 `compon
 结果：PASS（自动门）。xcodebuild build 成功；FineCoachTests 351 项 0 失败、1 项跳过（既有 WCAG 豁免）；FineCoachIntegrationTests 106 项 0 失败。占位页未经人工查看；.fcarchive 的系统打开路由未在设备上验证（处理逻辑在 T044）。
 ```
 
+### 7.3 US-1 导出（tasks T027–T037、T034a，2026-10-10）
+
+```text
+分类与依据：B 类按 §2 已审定（M2-01 加一行、模块选择子行交互、M2-FACT-ROW）；其余 C 类复用 Phase 1 组件。批准来源：本文 §3–§5、screens/M2-01～06d、spec 1.1.3（D-005「不透露」视为无数据、D-008 汇总署名）。
+影响范围：新增 Features/ArchiveExport/（M2-02～06 单一 push 页面，页面由 ArchiveExportFlow.state 决定）、feature 专有 ArchiveFactRow（M2-FACT-ROW）、ArchiveExclusionNote（M2-EXCLUSION-NOTE）、ArchivePasswordField（唯一密码输入配置）；StudentDetailView 加 M2-01 行；RootDestination.archiveExport；DEBUG 种子 ArchiveExportDebugSeed。无新设计系统组件。
+设计决定：文案在 PNG 与本文不一致处以已审定 PNG 为准（M2-05 规则与占位、M2-06b 说明）；交付失败 / 取消只保留单一「交给系统…」按钮作为重试入口（M2-06c/06d 画稿），不另加重试链接；M2-EXCLUSION-NOTE 的「查看全部」实现为只展开 / 收起文字清单的 Button（不改数据）。自拟文案待 T038 确认：密码过短「密码至少需要 8 个字符」、意外错误「操作没有完成」、清单前缀「永远不会导出：…」、展开后「收起」、「N / M 项指标」「X（自定义）」。
+实施与验证：ArchiveExportPolicyTests、ArchiveExportScreenTests（12 项：密码配置唯一、排除说明无开关、离开流程调用 leave()、入口为 FCActionRow 无 contextMenu、本地化键齐全、事实行顺序、预览原文与排除值）、ArchiveExportIntegrationTests；PrivacyCoverTests、DesignValueScanTests、LogSurfaceTests 通过。L3：核心页面 M2-02 首次实现，T038 请产品负责人对照 M2-02a/02b 看一次。
+结果：PASS（自动门）。xcodebuild build 成功；FineCoachTests 396 项 0 失败、1 项跳过（既有 WCAG 豁免）；FineCoachIntegrationTests 112 项 0 失败。T038 人工查看结论待记录。M2-02～06 **未经人工视觉检查**；密码框不出现钥匙串保存 / 强密码建议、真实分享面板取消后临时文件清理均为设备检查项，未验证。
+```
+
+入口与布局清单（`components.md` §1.4）：
+
+```text
+学员详情 M2-01 → 「导出个人训练档案 ›」→ studentDetail.exportArchive → 否（push 流程；已归档学员同样显示）→ FCActionRow（StudentDetailView.swift:333）
+M2-02 → 系统返回 / 侧滑 → 无 → 离开流程（leave() 删除临时文件）→ 系统导航栏（ArchiveExportFlowView.swift）
+M2-02 → 页头 → 无 → 否 → FCPageHeader（ArchiveSelectionView.swift:12）
+M2-02 → 分组行 基本资料 / 训练内容 / 身体数据 → archiveExport.group.<key> → 圆圈：是（整组选择）；其余：否（展开 / 折叠）→ FCListGroupRow（ArchiveSelectionView.swift:54），不可用组 FCListRow.unavailable（:45）
+M2-02 → 子行（姓名、性别、训练记录、趋势与个人最佳、学员课后总结、动作资料、各身体指标）→ archiveExport.item.<key> → 是（切换选择；不可用行无控件，显示「无数据」/「需同时选择训练记录」）→ FCListRow 可选（:87）/ 不可用（:80）
+M2-02 → 排除说明「查看全部」/「收起」→ archiveExport.exclusion.viewAll → 否（只显示 / 隐藏文字清单）→ ArchiveExclusionNote VStack maxWidth .infinity（ArchiveExclusionNote.swift:21）
+M2-02 → 「预览」→ archiveExport.preview → 是（流程状态 selecting → previewing；无有效选择时禁用）→ FCButton 经 archiveBottomButton（ArchiveSelectionView.swift:30）
+M2-03 → 自定义返回 → archiveExport.back → 是（flow.back() 回 selecting）→ 工具栏前导项 44×44（ArchiveExportFlowView.swift:50）
+M2-03 → 各区段行 → 无 → 否 → FCLabelValueRow（ArchivePreviewView.swift）
+M2-03 → 自由文本条目（自定义 / 仅本次动作名、学员总结、自定义指标名）→ 无 → 否（不可点）→ FCListRow showsDisclosure: false（ArchivePreviewView.swift:122、:137）
+M2-03 → 自由文本提示 → archiveExport.preview.freeTextNotice → 否 → FCStatusLabel maxWidth .infinity（ArchivePreviewView.swift:25）
+M2-03 → 占位说明 → archiveExport.preview.placeholderNote → 否 → Text maxWidth .infinity（ArchivePreviewView.swift:71）
+M2-03 → 「继续」→ archiveExport.continue → 是（previewing → confirmingFacts）→ FCButton 经 archiveBottomButton（ArchivePreviewView.swift:28）
+M2-04 → 自定义返回 → archiveExport.back → 是（回 previewing）→ 工具栏前导项
+M2-04 → 6 条事实行 → 无 → 否 → ArchiveFactRow maxWidth .infinity（ArchiveDeliveryWarningView.swift:18）
+M2-04 → 「我已了解，设置密码」→ archiveExport.confirmFacts → 是（confirmingFacts → settingPassword）→ FCButton 经 archiveBottomButton（ArchiveDeliveryWarningView.swift:24）
+M2-05 → 自定义返回 → archiveExport.back → 是（回 confirmingFacts，丢弃密码）→ 工具栏前导项
+M2-05 → 设置密码 / 再次输入 → archiveExport.password / archiveExport.passwordConfirm → 否（仅内存）→ ArchivePasswordField 包 FCTextField（ArchivePasswordView.swift:17、:19）
+M2-05 → 密码不符结果 → archiveExport.passwordError → 否 → FCInlineResult（ArchivePasswordView.swift:28）
+M2-05 → 「生成档案」→ archiveExport.generate → 是（settingPassword → generating → generated / failed；写临时文件，首次写身份 setting）→ FCButton 经 archiveBottomButton（ArchivePasswordView.swift:39）
+M2-06a～d → 系统返回 → 无 → 离开流程（leave() 删除临时文件）→ 系统导航栏
+M2-06a～d → 结果 → archiveExport.deliveryResult → 否 → FCInlineResult（ArchiveDeliveryView.swift:48、:55、:62、:69）
+M2-06a/c/d → 「交给系统…」→ archiveExport.deliver → 是（deliver()；取消 / 失败后先 retry() 再 deliver()）→ FCButton（ArchiveDeliveryView.swift:22）
+M2-06b → 「完成」→ archiveExport.done → 是（leave() 并返回学员详情）→ FCButton safeAreaInset 底部（ArchiveDeliveryView.swift:35）
+加载错误 / 意外错误 → archiveExport.loadError / archiveExport.actionError → 否 → FCInlineResult（ArchiveExportFlowView.swift:79、:32）
+```
+
 ## 8. 待产品负责人确认的问题
 
 1. ~~M2-09 的进入路径~~：**已定（R4）**，支持系统打开档案文件，spec D-010 已修订。

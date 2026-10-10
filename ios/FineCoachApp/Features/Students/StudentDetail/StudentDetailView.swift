@@ -329,6 +329,12 @@ struct StudentDetailView: View {
             }
             .accessibilityIdentifier(FCAccessibilityID.detailBodyData)
             FCListRowDivider()
+            // M2-01: also shown for archived students (D-006).
+            FCActionRow(title: String(localized: "student.detail.exportArchive")) {
+                path.append(.archiveExport(student.id.rawValue))
+            }
+            .accessibilityIdentifier(FCAccessibilityID.detailExportArchive)
+            FCListRowDivider()
         }
     }
 

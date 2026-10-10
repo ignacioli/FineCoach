@@ -7164,6 +7164,930 @@
           }
         }
       }
+    },
+    "student.detail.exportArchive": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导出个人训练档案"
+          }
+        }
+      }
+    },
+    "archive.export.back": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "返回"
+          }
+        }
+      }
+    },
+    "archive.export.error.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "操作没有完成"
+          }
+        }
+      }
+    },
+    "archive.export.error.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "档案尚未生成。请返回后重试。"
+          }
+        }
+      }
+    },
+    "archive.export.selection.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导出个人训练档案"
+          }
+        }
+      }
+    },
+    "archive.export.selection.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ · 档案只包含这名学员的数据"
+          }
+        }
+      }
+    },
+    "archive.export.selection.section": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "包含内容"
+          }
+        }
+      }
+    },
+    "archive.export.selection.preview": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "预览"
+          }
+        }
+      }
+    },
+    "archive.export.group.basicProfile": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "基本资料"
+          }
+        }
+      }
+    },
+    "archive.export.group.trainingContent": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练内容"
+          }
+        }
+      }
+    },
+    "archive.export.group.bodyData": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "身体数据"
+          }
+        }
+      }
+    },
+    "archive.export.group.trainingContent.note": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld 次训练 · %2$lld 项"
+          }
+        }
+      }
+    },
+    "archive.export.group.bodyData.note.all": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 项指标"
+          }
+        }
+      }
+    },
+    "archive.export.group.bodyData.note.partial": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld / %2$lld 项指标"
+          }
+        }
+      }
+    },
+    "archive.export.list.separator": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "、"
+          }
+        }
+      }
+    },
+    "archive.export.item.displayName": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "姓名"
+          }
+        }
+      }
+    },
+    "archive.export.item.sex": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "性别"
+          }
+        }
+      }
+    },
+    "archive.export.item.trainingRecords": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练记录"
+          }
+        }
+      }
+    },
+    "archive.export.item.trends": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "趋势与个人最佳"
+          }
+        }
+      }
+    },
+    "archive.export.item.summaries": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学员课后总结"
+          }
+        }
+      }
+    },
+    "archive.export.item.exerciseInfo": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动作资料"
+          }
+        }
+      }
+    },
+    "archive.export.item.customMetric": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@（自定义）"
+          }
+        }
+      }
+    },
+    "archive.export.note.trainingRecords": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 次训练"
+          }
+        }
+      }
+    },
+    "archive.export.note.trends": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按已选内容计算"
+          }
+        }
+      }
+    },
+    "archive.export.note.summaries": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 条"
+          }
+        }
+      }
+    },
+    "archive.export.note.exerciseInfo": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 个动作 · 不含图片"
+          }
+        }
+      }
+    },
+    "archive.export.note.measurements": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 次测量"
+          }
+        }
+      }
+    },
+    "archive.export.reason.noData": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无数据"
+          }
+        }
+      }
+    },
+    "archive.export.reason.requiresTrainingRecords": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需同时选择训练记录"
+          }
+        }
+      }
+    },
+    "archive.export.exclusion.text": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "伤病、联系方式、教练备注、课包等永远不会导出"
+          }
+        }
+      }
+    },
+    "archive.export.exclusion.viewAll": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "查看全部"
+          }
+        }
+      }
+    },
+    "archive.export.exclusion.collapse": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "收起"
+          }
+        }
+      }
+    },
+    "archive.export.exclusion.fullList": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永远不会导出：伤病与注意事项、教练备注、动作私有备注、课包、课程安排、课时调整、电话和微信、动作图片、训练模板"
+          }
+        }
+      }
+    },
+    "archive.export.date.full": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld年%2$lld月%3$lld日"
+          }
+        }
+      }
+    },
+    "archive.export.date.monthDay": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld月%2$lld日"
+          }
+        }
+      }
+    },
+    "archive.export.date.range": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ – %2$@"
+          }
+        }
+      }
+    },
+    "archive.export.exercise.custom": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自定义动作"
+          }
+        }
+      }
+    },
+    "archive.export.exercise.oneOff": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仅本次动作"
+          }
+        }
+      }
+    },
+    "archive.export.preview.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "预览档案内容"
+          }
+        }
+      }
+    },
+    "archive.export.preview.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "以下就是档案里的全部内容"
+          }
+        }
+      }
+    },
+    "archive.export.preview.range": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "范围"
+          }
+        }
+      }
+    },
+    "archive.export.preview.count": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "条数"
+          }
+        }
+      }
+    },
+    "archive.export.preview.placeholderNames": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动作显示为「动作 1」「动作 2」…"
+          }
+        }
+      }
+    },
+    "archive.export.preview.exerciseSection": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动作资料 · %lld 个动作"
+          }
+        }
+      }
+    },
+    "archive.export.preview.builtInExercises": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "内置动作"
+          }
+        }
+      }
+    },
+    "archive.export.preview.builtInValue": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 个（名称、肌群、器材）"
+          }
+        }
+      }
+    },
+    "archive.export.preview.customNames": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "教练填写的动作名称"
+          }
+        }
+      }
+    },
+    "archive.export.preview.trendsScope": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "计算范围"
+          }
+        }
+      }
+    },
+    "archive.export.preview.trendsScopeValue": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "只用本档案的训练记录"
+          }
+        }
+      }
+    },
+    "archive.export.preview.summariesSection": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学员课后总结 · %lld 条"
+          }
+        }
+      }
+    },
+    "archive.export.preview.metricDetail": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "archive.export.preview.freeTextNotice": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FineCoach 不会自动识别文字里的敏感内容，请逐条检查后再继续。"
+          }
+        }
+      }
+    },
+    "archive.export.preview.continue": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "继续"
+          }
+        }
+      }
+    },
+    "archive.export.warning.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "交付前确认"
+          }
+        }
+      }
+    },
+    "archive.export.warning.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请确认以下事实后再设置密码"
+          }
+        }
+      }
+    },
+    "archive.export.warning.confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我已了解，设置密码"
+          }
+        }
+      }
+    },
+    "archive.export.fact.notABackup": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "档案不是完整备份，不能用来恢复你的数据。"
+          }
+        }
+      }
+    },
+    "archive.export.fact.includesPreviewedData": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "档案会包含刚才预览中的全部资料。"
+          }
+        }
+      }
+    },
+    "archive.export.fact.irrevocableOnceReceived": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文件交出并被接收后，你和 FineCoach 都无法撤回。"
+          }
+        }
+      }
+    },
+    "archive.export.fact.studentDeletesOwnCopy": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学员只能删除自己设备上的副本。"
+          }
+        }
+      }
+    },
+    "archive.export.fact.studentDeletionDoesNotAffectYou": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学员删除不会影响你的原始数据、已保存的文件或其他副本。"
+          }
+        }
+      }
+    },
+    "archive.export.fact.sharePasswordSeparately": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请通过其他方式把密码单独告诉学员，不要和档案一起发送。"
+          }
+        }
+      }
+    },
+    "archive.export.password.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置档案密码"
+          }
+        }
+      }
+    },
+    "archive.export.password.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学员打开档案时需要输入这个密码"
+          }
+        }
+      }
+    },
+    "archive.export.password.new": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置密码（至少 8 个字符）"
+          }
+        }
+      }
+    },
+    "archive.export.password.confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "再次输入密码"
+          }
+        }
+      }
+    },
+    "archive.export.password.rule": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "密码不会被保存，也无法找回。请通过其他方式单独告诉学员。"
+          }
+        }
+      }
+    },
+    "archive.export.password.error.mismatch": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "两次输入的密码不一致"
+          }
+        }
+      }
+    },
+    "archive.export.password.error.tooShort": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "密码至少需要 8 个字符"
+          }
+        }
+      }
+    },
+    "archive.export.password.error.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请重新输入。档案尚未生成。"
+          }
+        }
+      }
+    },
+    "archive.export.password.generate": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "生成档案"
+          }
+        }
+      }
+    },
+    "archive.export.delivery.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "交付档案"
+          }
+        }
+      }
+    },
+    "archive.export.delivery.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@的个人训练档案"
+          }
+        }
+      }
+    },
+    "archive.export.delivery.generated.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "档案已生成"
+          }
+        }
+      }
+    },
+    "archive.export.delivery.generated.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文件名不含学员姓名或其他资料。"
+          }
+        }
+      }
+    },
+    "archive.export.delivery.handed.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已交给系统"
+          }
+        }
+      }
+    },
+    "archive.export.delivery.handed.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "系统已接管文件。这不代表学员已收到或已导入。"
+          }
+        }
+      }
+    },
+    "archive.export.delivery.cancelled.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已取消，未交付"
+          }
+        }
+      }
+    },
+    "archive.export.delivery.cancelled.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "临时文件已清理。可以重新交给系统。"
+          }
+        }
+      }
+    },
+    "archive.export.delivery.failed.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "交付失败"
+          }
+        }
+      }
+    },
+    "archive.export.delivery.failed.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "系统没有接管文件，临时文件已清理。可以重新交给系统。"
+          }
+        }
+      }
+    },
+    "archive.export.delivery.deliver": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "交给系统…"
+          }
+        }
+      }
+    },
+    "archive.export.delivery.done": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成"
+          }
+        }
+      }
+    },
+    "archive.export.delivery.caption": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在系统面板中可以存到「文件」或发给其他 App。FineCoach 不托管文件，也不生成公开链接。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

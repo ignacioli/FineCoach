@@ -5,6 +5,35 @@ public enum FCAccessibilityID {
 
     public static let archiveViewerRoot = "archive.viewer.root"
 
+    // M2 export flow (M2-01 to M2-06).
+    public static let detailExportArchive = "studentDetail.exportArchive"
+    public static let archiveExportRoot = "archiveExport.root"
+    public static let archiveExportBack = "archiveExport.back"
+    public static let archiveExportActionError = "archiveExport.actionError"
+    public static let archiveExportLoadError = "archiveExport.loadError"
+    public static let archiveExportPreview = "archiveExport.preview"
+    public static let archiveExportExclusionViewAll = "archiveExport.exclusion.viewAll"
+    public static let archiveExportExclusionList = "archiveExport.exclusion.list"
+    public static let archiveExportFreeTextNotice = "archiveExport.preview.freeTextNotice"
+    public static let archiveExportPlaceholderNote = "archiveExport.preview.placeholderNote"
+    public static let archiveExportContinue = "archiveExport.continue"
+    public static let archiveExportConfirmFacts = "archiveExport.confirmFacts"
+    public static let archiveExportPassword = "archiveExport.password"
+    public static let archiveExportPasswordConfirm = "archiveExport.passwordConfirm"
+    public static let archiveExportPasswordError = "archiveExport.passwordError"
+    public static let archiveExportGenerate = "archiveExport.generate"
+    public static let archiveExportDeliveryResult = "archiveExport.deliveryResult"
+    public static let archiveExportDeliver = "archiveExport.deliver"
+    public static let archiveExportDone = "archiveExport.done"
+
+    public static func archiveExportGroup(_ key: String) -> String {
+        "archiveExport.group.\(key)"
+    }
+
+    public static func archiveExportItem(_ key: String) -> String {
+        "archiveExport.item.\(key)"
+    }
+
     public static let onboardingTitle = "onboarding.title"
     public static let onboardingLead = "onboarding.lead"
     public static let onboardingLocalRule = "onboarding.local"

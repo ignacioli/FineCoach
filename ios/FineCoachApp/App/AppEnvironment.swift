@@ -15,6 +15,7 @@ public final class AppEnvironment: ObservableObject {
     public private(set) var templateUseCases: TemplateUseCases?
     public private(set) var bodyDataUseCases: BodyDataUseCases?
     public private(set) var backupCoordinator: BackupCoordinator?
+    public private(set) var archiveExportUseCases: ArchiveExportUseCases?
     public let startupErrorDescription: String?
     @Published public private(set) var catalogUnavailableMessage: String?
     private var studentRepository: CoreDataStudentRepository?
@@ -138,6 +139,13 @@ public final class AppEnvironment: ObservableObject {
             preconditionFailure("System share adapter requires available local storage.")
         }
         return shareAdapter
+    }
+
+    func requireArchiveExportUseCases() -> ArchiveExportUseCases {
+        guard let archiveExportUseCases else {
+            preconditionFailure("Archive export use cases require available local storage.")
+        }
+        return archiveExportUseCases
     }
 
     func requireBackupCoordinator() -> BackupCoordinator {
@@ -303,6 +311,7 @@ public final class AppEnvironment: ObservableObject {
         self.templateUseCases = nil
         self.bodyDataUseCases = nil
         self.backupCoordinator = nil
+        self.archiveExportUseCases = nil
         self.reportsRootURL = nil
         self.shareAdapter = nil
         self.applicationRootURL = root
@@ -338,6 +347,7 @@ public final class AppEnvironment: ObservableObject {
         self.templateUseCases = nil
         self.bodyDataUseCases = nil
         self.backupCoordinator = nil
+        self.archiveExportUseCases = nil
         self.reportsRootURL = nil
         self.shareAdapter = nil
         self.applicationRootURL = nil
@@ -457,6 +467,17 @@ public final class AppEnvironment: ObservableObject {
         if shareAdapter == nil {
             shareAdapter = SystemShareAdapter(presenter: LaunchArgumentSharePresenter())
         }
+        if let shareAdapter {
+            archiveExportUseCases = ArchiveExportUseCases(
+                sourceReader: ArchiveExportSourceReader(writer: controller.writer),
+                identity: ArchiveIdentityService(writer: controller.writer, ids: idGenerator),
+                share: shareAdapter,
+                tempRootURL: root,
+                clock: clock,
+                calendarProvider: SystemLocalCalendarProvider(),
+                ids: idGenerator
+            )
+        }
         backupCoordinator = BackupCoordinator(
             rootURL: root,
             writer: controller.writer,
@@ -527,11 +548,18 @@ public final class AppEnvironment: ObservableObject {
             if arguments.contains("-FineCoachResetStore") {
                 try? fileManager.removeItem(at: root)
             }
-            return try AppEnvironment(rootURL: root)
+            return try AppEnvironment(
+                rootURL: root,
+                clock: ArchiveExportDebugSeed.isRequested ? ArchiveExportDebugSeed.makeClock() : SystemClock()
+            )
         }
 
         func applyUITestSeedingIfNeeded() async {
             let arguments = ProcessInfo.processInfo.arguments
+            if ArchiveExportDebugSeed.isRequested {
+                await ArchiveExportDebugSeed.seed(in: self)
+                return
+            }
             guard arguments.contains("-FineCoachSeedInProgressSession"),
                 let useCases = studentUseCases,
                 let repository = studentRepository
