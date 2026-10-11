@@ -14,6 +14,9 @@ struct AppRoot: View {
     @EnvironmentObject private var environment: AppEnvironment
     @EnvironmentObject private var privacyCoordinator: ScenePrivacyCoordinator
     @State private var installState: InstallState?
+    /// Archive-mode services for the import and viewer pages (T041+ pass them on; T045 only
+    /// builds them so there is one store and one resolver per launch).
+    @State private var archiveServices: ArchiveServices?
 
     var body: some View {
         ZStack {
@@ -43,22 +46,14 @@ struct AppRoot: View {
     /// Janitor first, then the resolver. A Coach store that cannot be read must not become
     /// `unselected`; `RootNavigation` reports storage problems itself, so it is the fallback.
     private func resolveInstallState() async -> InstallState {
-        guard let rootURL = try? ArchiveSnapshotStore.defaultRootURL() else {
+        guard let services = try? environment.makeArchiveServices() else {
             return .coach
         }
-        let store = ArchiveSnapshotStore(rootURL: rootURL)
+        archiveServices = services
+        let store = services.store
         // A failed janitor is not fatal: leftovers are retried on the next launch and an
         // unreadable snapshot already resolves as "not viewer".
         await Task.detached { try? store.runStartupJanitor() }.value
-        let probe: any CoachInstallProbe =
-            environment.persistenceWriter.map { CoreDataCoachInstallProbe(writer: $0) }
-            ?? UnavailableCoachInstallProbe()
-        return (try? await InstallStateResolver(store: store, probe: probe).resolve()) ?? .coach
-    }
-}
-
-private struct UnavailableCoachInstallProbe: CoachInstallProbe {
-    func read() async throws -> CoachInstallSnapshot {
-        throw PersistenceControllerError.storeLoadFailed
+        return (try? await services.installStateResolver.resolve()) ?? .coach
     }
 }

@@ -15,6 +15,22 @@ public enum AppLogEvent: String, CaseIterable, Sendable {
     case archiveExportDeliveryCancelled = "archive.export_delivery_cancelled"
     /// Generation or delivery failed.
     case archiveExportFailed = "archive.export_failed"
+    /// A first import was committed. Fixed ID only; no source, count or time.
+    case archiveImportCompleted = "archive.import_completed"
+    /// Wrong password, tampering, truncation or any failed authentication.
+    case archiveImportRejectedCorrupted = "archive.import_rejected_corrupted"
+    /// Container, KDF or schema version this build cannot read.
+    case archiveImportRejectedIncompatible = "archive.import_rejected_incompatible"
+    /// Not a FineCoach archive, over a resource limit, or structurally invalid.
+    case archiveImportRejectedInvalid = "archive.import_rejected_invalid"
+    /// Coach data exists on this install (M2-FR-026); the file was not read.
+    case archiveImportBlockedCoachData = "archive.import_blocked_coach_data"
+    /// A first import was attempted while an archive is already installed.
+    case archiveImportBlockedNotFirst = "archive.import_blocked_not_first"
+    /// The install state could not be determined, so nothing was imported.
+    case archiveImportStateUnavailable = "archive.import_state_unavailable"
+    /// Cancelled or failed to commit; the pre-import state stands.
+    case archiveImportInterrupted = "archive.import_interrupted"
 }
 
 public enum AppLogOperation: String, CaseIterable, Sendable {
@@ -24,6 +40,7 @@ public enum AppLogOperation: String, CaseIterable, Sendable {
     case generation
     case scenePrivacy
     case archiveExport = "archive_export"
+    case archiveImport = "archive_import"
 }
 
 public enum AppLogErrorCategory: String, CaseIterable, Sendable {
