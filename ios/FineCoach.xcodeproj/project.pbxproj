@@ -1981,6 +1981,7 @@
 		A031 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = FineCoachApp/FineCoach.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
@@ -2001,6 +2002,7 @@
 		A032 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = FineCoachApp/FineCoach.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
