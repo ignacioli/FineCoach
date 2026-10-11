@@ -126,6 +126,7 @@
 		B210 /* FoundationIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A210 /* FoundationIntegrationTests.swift */; };
 		B516 /* AppointmentPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A515 /* AppointmentPersistenceTests.swift */; };
 		B543 /* CreditLedgerRestartTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A543 /* CreditLedgerRestartTests.swift */; };
+		B9F1 /* SessionCreditSettlementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9F1 /* SessionCreditSettlementTests.swift */; };
 		B700 /* CoursePackageEditorViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A700 /* CoursePackageEditorViewModelTests.swift */; };
 		B507 /* V1ToV2MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A505 /* V1ToV2MigrationTests.swift */; };
 		B945 /* V2ToV3MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A945 /* V2ToV3MigrationTests.swift */; };
@@ -432,6 +433,7 @@
 		A210 /* FoundationIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationIntegrationTests.swift; sourceTree = "<group>"; };
 		A515 /* AppointmentPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentPersistenceTests.swift; sourceTree = "<group>"; };
 		A543 /* CreditLedgerRestartTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CreditLedgerRestartTests.swift"; sourceTree = "<group>"; };
+		A9F1 /* SessionCreditSettlementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SessionCreditSettlementTests.swift"; sourceTree = "<group>"; };
 		A700 /* CoursePackageEditorViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoursePackageEditorViewModelTests.swift"; sourceTree = "<group>"; };
 		A505 /* V1ToV2MigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V1ToV2MigrationTests.swift; sourceTree = "<group>"; };
 		A945 /* V2ToV3MigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2ToV3MigrationTests.swift; sourceTree = "<group>"; };
@@ -1135,6 +1137,7 @@
 			isa = PBXGroup;
 			children = (
 				A543 /* CreditLedgerRestartTests.swift */,
+				A9F1 /* SessionCreditSettlementTests.swift */,
 				A700 /* CoursePackageEditorViewModelTests.swift */,
 			);
 			path = CoursePackages;
@@ -2101,6 +2104,7 @@
 				B210 /* FoundationIntegrationTests.swift in Sources */,
 				B516 /* AppointmentPersistenceTests.swift in Sources */,
 				B543 /* CreditLedgerRestartTests.swift in Sources */,
+				B9F1 /* SessionCreditSettlementTests.swift in Sources */,
 				B700 /* CoursePackageEditorViewModelTests.swift in Sources */,
 				B507 /* V1ToV2MigrationTests.swift in Sources */,
 				B945 /* V2ToV3MigrationTests.swift in Sources */,
