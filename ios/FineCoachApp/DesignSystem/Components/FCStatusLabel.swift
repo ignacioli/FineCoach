@@ -110,9 +110,14 @@ public struct FCStatusBadge: View {
     public var body: some View {
         ZStack {
             Circle().fill(color)
-            Image(systemName: symbolName)
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(FCSemanticColors.actionOn)
+            if symbolName == "checkmark" {
+                // The artwork's ✓ is a Noto Sans SC glyph (README §7.2).
+                FCSymbol(.checkOnFill)
+            } else {
+                Image(systemName: symbolName)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(FCSemanticColors.actionOn)
+            }
         }
         .frame(width: 22, height: 22)
         .accessibilityHidden(true)

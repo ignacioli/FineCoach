@@ -11,7 +11,8 @@ struct ArchivePreviewView: View {
         ArchiveExportPage {
             FCPageHeader(
                 title: String(localized: "archive.export.preview.title"),
-                subtitle: String(localized: "archive.export.preview.subtitle")
+                subtitle: String(localized: "archive.export.preview.subtitle"),
+                back: model.headerBack
             )
             if let preview = model.preview {
                 sections(preview)
@@ -62,7 +63,7 @@ struct ArchivePreviewView: View {
                     )
                     FCListRowDivider()
                     if !preview.modules.exerciseInfo {
-                        Text("archive.export.preview.placeholderNames")
+                        Text(String(localized: "archive.export.preview.placeholderNames"))
                             .fcFont(.caption)
                             .foregroundStyle(FCSemanticColors.textSecondary)
                             .fixedSize(horizontal: false, vertical: true)

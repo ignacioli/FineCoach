@@ -99,6 +99,19 @@ final class ArchiveExportScreenTests: XCTestCase {
         XCTAssertTrue(navigation.contains("environment.requireArchiveExportUseCases()"))
     }
 
+    /// `Text("literal.key")` is a `LocalizedStringKey`; with the bundled Noto Sans SC it lays out the
+    /// ideographic comma `、` with an extra half em after it (measured on the simulator: gap 16pt vs
+    /// 9.5pt in the artwork), while `Text(String(localized:))` does not. Visible export copy
+    /// therefore goes through `String(localized:)` like the rest of the app (owner walkthrough
+    /// 2026-10-10: the exclusion note's wide gaps).
+    func testVisibleExportCopyIsNotALocalizedStringKeyLiteral() throws {
+        let pattern = try NSRegularExpression(pattern: "(?<![A-Za-z])Text\\(\"archive\\.export\\.[A-Za-z.]+\"\\)")
+        for file in try swiftSources(under: "Features/ArchiveExport") {
+            let range = NSRange(file.text.startIndex..., in: file.text)
+            XCTAssertEqual(pattern.numberOfMatches(in: file.text, range: range), 0, "\(file.name) has a literal-key Text")
+        }
+    }
+
     func testEveryStudentDetailEntryIsAVisibleActionRow() throws {
         let detail = try source("Features/Students/StudentDetail/StudentDetailView.swift")
         XCTAssertTrue(detail.contains("FCActionRow(title: String(localized: \"student.detail.exportArchive\"))"))

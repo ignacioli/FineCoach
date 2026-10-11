@@ -53,6 +53,21 @@ final class ArchiveExportViewModel: ObservableObject {
         }
     }
 
+    /// The inline back control of the current page (`FCPageHeader.back`): a step back inside the
+    /// flow on M2-03 to M2-05, leaving the flow (pop) on M2-02 and M2-06, none while busy.
+    var headerBack: FCPageHeader.BackAction? {
+        if usesStepBack {
+            return .init(accessibilityIdentifier: FCAccessibilityID.archiveExportBack) { [weak self] in
+                guard let self else { return }
+                Task { await self.stepBack() }
+            }
+        }
+        return hidesSystemBack ? nil : .init()
+    }
+
+    /// The edge swipe leaves the flow only where the inline back does.
+    var allowsSwipeBack: Bool { !hidesSystemBack }
+
     var hidesSystemBack: Bool {
         switch state {
         case .selecting, .generated, .handedToSystem, .cancelled, .failed: return isBusy

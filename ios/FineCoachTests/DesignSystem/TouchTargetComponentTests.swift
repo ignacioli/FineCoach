@@ -1,3 +1,4 @@
+@testable import FineCoach
 import XCTest
 
 /// T047 (NFR-004): every interactive design-system component declares a
@@ -57,8 +58,11 @@ final class TouchTargetComponentTests: XCTestCase {
         XCTAssertTrue(try source("FCInlineResult.swift").contains("FCLinkButton("))
         // Group row: the selection circle is its own 44x44 target; the rest of the row is >= 44 tall.
         let list = try source("FCListRow.swift")
-        XCTAssertTrue(list.contains(".frame(minWidth: 44, minHeight: 44)"))
-        XCTAssertGreaterThanOrEqual(list.components(separatedBy: "minHeight: 44").count - 1, 3)
+        XCTAssertTrue(list.contains(".frame(minWidth: 44, minHeight: FCListRowGeometry.minHeight, alignment: .trailing)"))
+        XCTAssertGreaterThanOrEqual(list.components(separatedBy: "minHeight: FCListRowGeometry.minHeight").count - 1, 3)
+        XCTAssertGreaterThanOrEqual(FCListRowGeometry.minHeight, 44)
+        // Page header back: 44x44 hit area drawn over the 16pt glyph.
+        XCTAssertTrue(try source("FCPageHeader.swift").contains(".frame(width: 44, height: 44)"))
         // Stacked and side-by-side dialog buttons keep the 44pt hit area (36pt visual).
         XCTAssertTrue(try source("FCConfirmationDialog.swift").contains(".frame(minHeight: 44)"))
     }

@@ -7176,7 +7176,7 @@
         }
       }
     },
-    "archive.export.back": {
+    "common.back": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {

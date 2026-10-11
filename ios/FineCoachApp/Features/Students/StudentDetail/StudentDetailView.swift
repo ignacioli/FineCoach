@@ -135,6 +135,9 @@ struct StudentDetailView: View {
                     overviewSection(student)
                     recordsSection(student)
                     profileSection(student)
+                } else {
+                    // Not loaded (or failed): the page still needs its back.
+                    FCPageHeader(title: "", back: .init())
                 }
             }
             .padding(.horizontal, FCPrimitives.space4)
@@ -144,8 +147,7 @@ struct StudentDetailView: View {
             bottomAction
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarRole(.editor)
+        .fcSecondaryPage()
         .courseActionSheetIfAvailable(
             appointment: $sheetAppointment,
             path: $path,
@@ -168,6 +170,7 @@ struct StudentDetailView: View {
         VStack(alignment: .leading, spacing: FCPrimitives.space4) {
             FCPageHeader(
                 title: student.displayName.value,
+                back: .init(),
                 trailingAction: .init(
                     title: String(localized: "student.detail.edit"),
                     accessibilityIdentifier: "studentDetail.edit"

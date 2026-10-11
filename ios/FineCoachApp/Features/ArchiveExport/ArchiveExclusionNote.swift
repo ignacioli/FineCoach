@@ -13,7 +13,7 @@ struct ArchiveExclusionNote: View {
                 Image(systemName: "lock.fill")
                     .foregroundStyle(FCSemanticColors.textSecondary)
                     .accessibilityHidden(true)
-                Text("archive.export.exclusion.text")
+                Text(String(localized: "archive.export.exclusion.text"))
                     .fcFont(.caption)
                     .foregroundStyle(FCSemanticColors.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -31,7 +31,7 @@ struct ArchiveExclusionNote: View {
                 .accessibilityIdentifier(FCAccessibilityID.archiveExportExclusionViewAll)
             }
             if showsFullList {
-                Text("archive.export.exclusion.fullList")
+                Text(String(localized: "archive.export.exclusion.fullList"))
                     .fcFont(.caption)
                     .foregroundStyle(FCSemanticColors.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)

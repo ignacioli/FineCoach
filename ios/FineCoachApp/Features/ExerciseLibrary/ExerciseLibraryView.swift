@@ -74,8 +74,7 @@ struct ExerciseLibraryView: View {
             .padding(.bottom, FCPrimitives.space6)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarRole(.editor)
+        .fcSecondaryPage()
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.exerciseLibraryRoot)
         .fcBottomSheet(isPresented: $isFilterSheetPresented) {
@@ -112,11 +111,7 @@ struct ExerciseLibraryView: View {
 
     private var header: some View {
         HStack(alignment: .center) {
-            Text(String(localized: "exercise.library.title"))
-                .fcFont(.titleLarge)
-                .foregroundStyle(FCSemanticColors.textPrimary)
-                .accessibilityAddTraits(.isHeader)
-            Spacer()
+            FCPageHeader(title: String(localized: "exercise.library.title"), back: .init())
             FCLinkButton(title: String(localized: "exercise.library.addCustomShort")) {
                 editorRoute = .create
             }

@@ -41,24 +41,7 @@ struct ArchiveExportFlowView: View {
             content
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarRole(.editor)
-        .navigationBarBackButtonHidden(model.hidesSystemBack)
-        .toolbar {
-            if model.usesStepBack {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        Task { await model.stepBack() }
-                    } label: {
-                        FCSymbol(.back)
-                            .frame(minWidth: 44, minHeight: 44)
-                            .contentShape(Rectangle())
-                    }
-                    .accessibilityLabel(Text("archive.export.back"))
-                    .accessibilityIdentifier(FCAccessibilityID.archiveExportBack)
-                }
-            }
-        }
+        .fcSecondaryPage(swipeBackEnabled: model.allowsSwipeBack)
         .task { await model.start() }
         .onDisappear {
             Task { await model.leave() }
@@ -71,11 +54,18 @@ struct ArchiveExportFlowView: View {
     private var content: some View {
         switch model.load {
         case .loading:
-            ProgressView()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            VStack(spacing: 0) {
+                FCPageHeader(title: "", back: model.headerBack)
+                    .padding(.horizontal, FCPrimitives.space4)
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
         case .failed:
             ArchiveExportPage {
-                FCPageHeader(title: String(localized: "archive.export.selection.title"))
+                FCPageHeader(
+                    title: String(localized: "archive.export.selection.title"),
+                    back: model.headerBack
+                )
                 FCInlineResult(
                     .failure,
                     title: String(localized: "archive.export.error.title"),

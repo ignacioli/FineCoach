@@ -1,5 +1,15 @@
 import SwiftUI
 
+/// `DS-LIST-ROW` geometry (components.md §4.7), measured from M2-02a/02b/03:
+/// the rows sit inside the page's own 16pt margins (no extra leading inset, so
+/// titles start at the divider's x); a row is 52pt tall (+ the 1pt divider = a
+/// 53pt pitch); a child row is indented by `space.4` and its divider starts at
+/// the same indent.
+enum FCListRowGeometry {
+    static let minHeight: CGFloat = 52
+    static let indent: CGFloat = FCPrimitives.space4
+}
+
 /// The standard list row (§8 "列表行": left margin 16; main text `headline` or
 /// `body`; meta text `caption` `text.secondary`; trailing `›`; rows separated
 /// by a 1pt divider), with the M2 slots of `DS-LIST-ROW` (components.md §4.7):
@@ -167,8 +177,8 @@ public struct FCListRow: View {
                 accessory
             }
         }
-        .padding(.leading, isIndented ? FCPrimitives.space4 * 2 : FCPrimitives.space4)
-        .frame(maxWidth: .infinity, minHeight: 44)
+        .padding(.leading, isIndented ? FCListRowGeometry.indent : 0)
+        .frame(maxWidth: .infinity, minHeight: FCListRowGeometry.minHeight)
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
     }
@@ -261,20 +271,19 @@ public struct FCListGroupRow: View {
                     FCSymbol(.collapse)
                         .rotationEffect(.degrees(isExpanded ? 180 : 0))
                 }
-                .padding(.leading, FCPrimitives.space4)
-                .frame(maxWidth: .infinity, minHeight: 44)
+                .frame(maxWidth: .infinity, minHeight: FCListRowGeometry.minHeight)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
 
             Button(action: onToggleSelection) {
                 FCListSelectionCircle(circleState)
-                    .frame(minWidth: 44, minHeight: 44)
+                    .frame(minWidth: 44, minHeight: FCListRowGeometry.minHeight, alignment: .trailing)
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
         }
-        .frame(maxWidth: .infinity, minHeight: 44)
+        .frame(maxWidth: .infinity, minHeight: FCListRowGeometry.minHeight)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(accessibilityLabelText))
         .accessibilityValue(Text(accessibilityValueText))

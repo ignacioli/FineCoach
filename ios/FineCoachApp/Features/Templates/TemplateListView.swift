@@ -78,10 +78,7 @@ struct TemplateListView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: FCPrimitives.space4) {
-                Text(String(localized: "templates.title"))
-                    .fcFont(.titleLarge)
-                    .foregroundStyle(FCSemanticColors.textPrimary)
-                    .accessibilityAddTraits(.isHeader)
+                FCPageHeader(title: String(localized: "templates.title"), back: .init())
                 Text(String(localized: "templates.note"))
                     .fcFont(.callout, weight: .regular)
                     .foregroundStyle(FCSemanticColors.textSecondary)
@@ -118,8 +115,7 @@ struct TemplateListView: View {
             .background(FCSemanticColors.surfacePage)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarRole(.editor)
+        .fcSecondaryPage()
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.templateListRoot)
         .fcBottomSheet(isPresented: $isNamingNewTemplate) {
