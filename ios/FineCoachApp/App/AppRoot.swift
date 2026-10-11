@@ -34,6 +34,8 @@ struct AppRoot: View {
     @State private var firstLaunchRoute: FirstLaunchRoute = .choice
     @State private var showsImportFromChoice = false
     @State private var systemOpen: SystemOpenRequest?
+    /// Changes when the installed archive was replaced from a system open, so the viewer reloads.
+    @State private var viewerGeneration = UUID()
     /// A file opened before the archive services were ready (cold start).
     @State private var pendingOpenURL: URL?
 
@@ -47,6 +49,8 @@ struct AppRoot: View {
             case .viewer:
                 if let archiveServices {
                     ArchiveViewerRoot(services: archiveServices)
+                        .onArchiveRemoved { Task { await refreshInstallState() } }
+                        .id(viewerGeneration)
                 }
             case .coach:
                 RootNavigation()
@@ -123,8 +127,17 @@ struct AppRoot: View {
             case .blocked:
                 ArchiveImportBlockedView(onDismiss: { closeSystemOpen(request, services: services) })
             case .replacePrefilled:
-                // US-3 (T055) changes this mapping only: the routing above stays.
-                ArchiveReplacePlaceholderView(onBack: { closeSystemOpen(request, services: services) })
+                NavigationStack {
+                    ArchiveReplaceFlowView(
+                        useCases: services.importUseCases,
+                        prefilledURL: request.url,
+                        onBack: { closeSystemOpen(request, services: services) },
+                        onReplaced: {
+                            systemOpen = nil
+                            viewerGeneration = UUID()
+                        }
+                    )
+                }
             }
         }
         .id(request.id)

@@ -2,10 +2,15 @@ import SwiftUI
 
 /// M2-18 查看模式设置 (T049): the three local display settings, each a label row with a segmented
 /// switch, and the 「档案」 section. They change only how this device shows the archive, never
-/// the archive (M2-FR-032). 「导入较新档案」 and 「删除本机档案」 are inert placeholders until T055
-/// and T058 wire them (disabled rows: no action, text.disabled).
+/// the archive (M2-FR-032). 「导入较新档案」 opens the replace page (M2-19, T055); 「删除本机档案」 is
+/// a destructive row that asks for confirmation (M2-20, T058) and then removes the local archive.
 struct ArchiveSettingsView: View {
     @ObservedObject var model: ArchiveViewerModel
+    /// Open 「导入较新档案」.
+    let onImportNewer: () -> Void
+    /// The local archive is gone: the host recomputes the install state (M2-FR-050).
+    let onDeleted: () -> Void
+    @State private var isConfirmingDelete = false
 
     var body: some View {
         ScrollView {
@@ -64,15 +69,28 @@ struct ArchiveSettingsView: View {
                     .padding(.top, FCPrimitives.space6)
                 VStack(spacing: 0) {
                     FCListRowDivider()
-                    FCActionRow(title: String(localized: "archive.settings.importNewer"), isEnabled: false) {}
+                    FCActionRow(title: String(localized: "archive.settings.importNewer"), action: onImportNewer)
                         .accessibilityIdentifier(FCAccessibilityID.archiveSettingsImportNewer)
                     FCListRowDivider()
                     FCActionRow(
-                        title: String(localized: "archive.settings.delete"), role: .destructive, isEnabled: false,
-                        showsTrashIcon: true
-                    ) {}
+                        title: String(localized: "archive.settings.delete"), role: .destructive,
+                        isEnabled: !model.isDeleting, showsTrashIcon: true
+                    ) { isConfirmingDelete = true }
                     .accessibilityIdentifier(FCAccessibilityID.archiveSettingsDelete)
                     FCListRowDivider()
+                }
+                if model.deleteFailed {
+                    FCInlineResult(
+                        .failure,
+                        title: String(localized: "archive.settings.deleteFailed.title"),
+                        message: String(localized: "archive.settings.deleteFailed.message"),
+                        retry: .init(
+                            title: String(localized: "archive.import.retry"),
+                            isEnabled: !model.isDeleting,
+                            accessibilityIdentifier: FCAccessibilityID.archiveSettingsDeleteRetry
+                        ) { deleteConfirmed() },
+                        accessibilityIdentifier: FCAccessibilityID.archiveSettingsDeleteFailure
+                    )
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -83,6 +101,27 @@ struct ArchiveSettingsView: View {
         .fcSecondaryPage()
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.archiveSettingsRoot)
+        .fcConfirmationDialog(isPresented: $isConfirmingDelete) {
+            FCConfirmationDialog(
+                title: String(localized: "archive.settings.deleteConfirm.title"),
+                message: String(localized: "archive.settings.deleteConfirm.message"),
+                cancelAction: .init(title: String(localized: "archive.settings.deleteConfirm.cancel")) {
+                    isConfirmingDelete = false
+                },
+                confirmAction: .init(title: String(localized: "archive.settings.deleteConfirm.confirm")) {
+                    isConfirmingDelete = false
+                    deleteConfirmed()
+                }
+            )
+        }
+    }
+
+    private func deleteConfirmed() {
+        Task {
+            if await model.deleteArchive() {
+                onDeleted()
+            }
+        }
     }
 
     private func switchRow(

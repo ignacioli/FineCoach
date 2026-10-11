@@ -8,6 +8,11 @@ import Foundation
 // `ArchiveImportFailure`, which maps one-to-one onto the reason categories of
 // `design/m2-hifi/implementation-map.md` §5. Nothing here holds Coach write use cases.
 //
+// Replacement (US-3) is two steps on the same type: `prepareReplacement` validates in memory and
+// applies `ArchiveReplacementPolicy`, `confirmReplacement` commits the held candidate after the
+// user agreed (M2-FR-038). A rejected or interrupted replacement leaves the installed snapshot
+// byte-identical (M2-FR-039).
+//
 // Fail-closed order: cancellation -> install state (a Coach install never reads the file) ->
 // read -> decode and validate in memory (contract §5) -> commit through
 // `ArchiveSnapshotStore`. Any failure drops the in-memory plaintext and writes nothing;
@@ -58,6 +63,39 @@ public enum ArchiveImportState: Equatable, Sendable {
     case failed(ArchiveImportFailure)
 }
 
+/// Why a replacement did not happen (US-3, M2-FR-039). Whatever the reason, the installed
+/// snapshot is untouched. The UI owns all wording (implementation map §5).
+public enum ArchiveReplaceFailure: Error, Equatable, Sendable {
+    /// Candidate `snapshotAtUTC` is older than or equal to the installed one (D-004).
+    case notNewer
+    /// Candidate comes from another Coach install.
+    case differentSource
+    /// Candidate belongs to another student of the same source.
+    case differentStudent
+    case wrongPasswordOrCorrupted
+    case incompatibleVersion
+    case invalidArchive
+    /// No readable archive is installed, so there is nothing to replace.
+    case notInstalled
+    /// Cancelled, or the commit did not complete. The installed snapshot stands.
+    case interrupted
+    /// A second import or replacement was requested while one is running.
+    case importInProgress
+    /// `confirmReplacement()` without a validated candidate.
+    case noPendingReplacement
+}
+
+/// What the confirmation page (M2-19a) shows before the user agrees (M2-FR-038).
+public struct ArchiveReplacementPreview: Equatable, Sendable {
+    public let current: ArchiveImportSummary
+    public let candidate: ArchiveImportSummary
+
+    public init(current: ArchiveImportSummary, candidate: ArchiveImportSummary) {
+        self.current = current
+        self.candidate = candidate
+    }
+}
+
 /// Reads the bytes of the chosen archive. The default implementation goes through
 /// `SecurityScopedFileAdapter`; tests inject a recorder to prove a branch never reads.
 public protocol ArchiveFileReading: Sendable {
@@ -96,6 +134,9 @@ public actor ArchiveImportUseCases {
     private let logger: any AppLogging
     private let inboxRootURL: URL?
     private var isRunning = false
+    /// The decoded candidate of a validated replacement, held in memory only until the user
+    /// confirms, cancels or leaves the page. Never written anywhere before the commit.
+    private var pendingReplacement: ArchiveSnapshot?
 
     /// - Parameters:
     ///   - resolver: the same install-state resolver the app root uses (viewer > coach >
@@ -133,6 +174,7 @@ public actor ArchiveImportUseCases {
             return
         }
         state = .idle
+        pendingReplacement = nil
     }
 
     /// First import. See the file header for the order of checks.
@@ -155,6 +197,77 @@ public actor ArchiveImportUseCases {
             log(failure)
             throw failure
         }
+    }
+
+    // MARK: Replacement (US-3)
+
+    /// Step 1 of a replacement (viewer mode only): decodes and validates the candidate in
+    /// memory, applies `ArchiveReplacementPolicy` against the installed snapshot and, when it
+    /// accepts, keeps the candidate in memory for `confirmReplacement()`. Writes nothing; every
+    /// failure leaves the installed snapshot untouched (M2-FR-039).
+    public func prepareReplacement(from fileURL: URL, password rawPassword: String) async throws -> ArchiveReplacementPreview {
+        guard !isRunning else {
+            throw ArchiveReplaceFailure.importInProgress
+        }
+        isRunning = true
+        pendingReplacement = nil
+        defer { isRunning = false }
+        do {
+            let preview = try await performPrepare(from: fileURL, password: rawPassword)
+            return preview
+        } catch {
+            let failure = (error as? ArchiveReplaceFailure) ?? .interrupted
+            log(failure)
+            throw failure
+        }
+    }
+
+    /// Step 2: replaces the installed snapshot with the validated candidate as a whole
+    /// (M2-FR-037, M2-FR-040). The policy is evaluated again against what is installed now.
+    /// Display settings are kept by `ArchiveSnapshotStore.commit`.
+    @discardableResult
+    public func confirmReplacement() async throws -> ArchiveImportSummary {
+        guard !isRunning else {
+            throw ArchiveReplaceFailure.importInProgress
+        }
+        guard let candidate = pendingReplacement else {
+            throw ArchiveReplaceFailure.noPendingReplacement
+        }
+        isRunning = true
+        defer { isRunning = false }
+        do {
+            try Task.checkCancellation()
+            let current = try await currentManifest()
+            try Self.requireAccepted(current: current, candidate: candidate.manifest)
+            let store = self.store
+            do {
+                try await Task.detached(priority: .userInitiated) {
+                    try store.commit(snapshot: candidate)
+                }.value
+            } catch {
+                // The installed snapshot stands; the janitor removes a generation the failed
+                // commit may have left behind. Best effort: the launch janitor repeats it.
+                try? store.runStartupJanitor()
+                throw ArchiveReplaceFailure.interrupted
+            }
+            pendingReplacement = nil
+            logger.info(.archiveReplaceCompleted, operation: .archiveReplace)
+            return Self.summary(of: candidate.manifest)
+        } catch is CancellationError {
+            pendingReplacement = nil
+            log(ArchiveReplaceFailure.interrupted)
+            throw ArchiveReplaceFailure.interrupted
+        } catch {
+            pendingReplacement = nil
+            let failure = (error as? ArchiveReplaceFailure) ?? .interrupted
+            log(failure)
+            throw failure
+        }
+    }
+
+    /// The user left the confirmation page without confirming: the candidate is dropped.
+    public func cancelReplacement() {
+        pendingReplacement = nil
     }
 
     /// Deletes the copy the system placed in the app's `Documents/Inbox/` once a branch of the
@@ -221,6 +334,70 @@ public actor ArchiveImportUseCases {
         )
     }
 
+    private func performPrepare(from fileURL: URL, password rawPassword: String) async throws -> ArchiveReplacementPreview {
+        try Task.checkCancellation()
+
+        // The installed snapshot comes first: with nothing to replace the file is not read.
+        let current = try await currentManifest()
+
+        let password: ArchivePassword
+        do {
+            password = try ArchivePassword(importing: rawPassword)
+        } catch {
+            throw ArchiveReplaceFailure.wrongPasswordOrCorrupted
+        }
+        let candidate: ArchiveSnapshot
+        do {
+            candidate = try await decode(fileURL: fileURL, password: password)
+        } catch let failure as ArchiveImportFailure {
+            throw Self.replaceFailure(for: failure)
+        }
+        try Task.checkCancellation()
+        try Self.requireAccepted(current: current, candidate: candidate.manifest)
+        pendingReplacement = candidate
+        return ArchiveReplacementPreview(
+            current: Self.summary(of: current),
+            candidate: Self.summary(of: candidate.manifest)
+        )
+    }
+
+    /// The manifest of the readable installed snapshot, loaded off the actor.
+    private func currentManifest() async throws -> ArchiveManifest {
+        let store = self.store
+        let loaded = await Task.detached(priority: .userInitiated) { try? store.load() }.value
+        guard let loaded else {
+            throw ArchiveReplaceFailure.notInstalled
+        }
+        return loaded.manifest
+    }
+
+    private static func requireAccepted(current: ArchiveManifest, candidate: ArchiveManifest) throws {
+        switch ArchiveReplacementPolicy.evaluate(current: current, candidate: candidate) {
+        case .accept: return
+        case .differentSource: throw ArchiveReplaceFailure.differentSource
+        case .differentStudent: throw ArchiveReplaceFailure.differentStudent
+        case .notNewer: throw ArchiveReplaceFailure.notNewer
+        }
+    }
+
+    private static func summary(of manifest: ArchiveManifest) -> ArchiveImportSummary {
+        ArchiveImportSummary(
+            sourceLabel: ArchiveIdentityService.shortLabel(forSourceID: manifest.sourceID),
+            snapshotAtUTC: manifest.snapshotAtUTC,
+            modules: manifest.modules
+        )
+    }
+
+    private static func replaceFailure(for failure: ArchiveImportFailure) -> ArchiveReplaceFailure {
+        switch failure {
+        case .wrongPasswordOrCorrupted: return .wrongPasswordOrCorrupted
+        case .incompatibleVersion: return .incompatibleVersion
+        case .interrupted: return .interrupted
+        case .invalidArchive, .blockedByCoachData, .alreadyInstalled, .installStateUnavailable, .importInProgress:
+            return .invalidArchive
+        }
+    }
+
     /// Reads and decodes off the actor (the key derivation is deliberately slow). The plaintext
     /// lives only inside the detached task.
     private func decode(fileURL: URL, password: ArchivePassword) async throws -> ArchiveSnapshot {
@@ -263,6 +440,27 @@ public actor ArchiveImportUseCases {
         }
         return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?
             .appendingPathComponent("Inbox", isDirectory: true)
+    }
+
+    private func log(_ failure: ArchiveReplaceFailure) {
+        switch failure {
+        case .notNewer:
+            logger.failure(.archiveReplaceRejectedNotNewer, operation: .archiveReplace, category: .conflict)
+        case .differentSource:
+            logger.failure(.archiveReplaceRejectedSource, operation: .archiveReplace, category: .conflict)
+        case .differentStudent:
+            logger.failure(.archiveReplaceRejectedStudent, operation: .archiveReplace, category: .conflict)
+        case .wrongPasswordOrCorrupted:
+            logger.failure(.archiveImportRejectedCorrupted, operation: .archiveReplace, category: .validation)
+        case .incompatibleVersion:
+            logger.failure(.archiveImportRejectedIncompatible, operation: .archiveReplace, category: .incompatibleInput)
+        case .invalidArchive:
+            logger.failure(.archiveImportRejectedInvalid, operation: .archiveReplace, category: .validation)
+        case .interrupted:
+            logger.failure(.archiveReplaceInterrupted, operation: .archiveReplace, category: .externalCancelled)
+        case .notInstalled, .importInProgress, .noPendingReplacement:
+            break
+        }
     }
 
     private func log(_ failure: ArchiveImportFailure) {

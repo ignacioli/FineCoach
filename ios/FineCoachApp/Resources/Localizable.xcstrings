@@ -8298,13 +8298,134 @@
         }
       }
     },
-    "archive.replace.unavailable": {
+    "archive.replace.section.current": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "导入较新档案的功能尚未提供。"
+            "value": "当前档案"
+          }
+        }
+      }
+    },
+    "archive.replace.section.new": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新档案"
+          }
+        }
+      }
+    },
+    "archive.replace.confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "替换为新档案"
+          }
+        }
+      }
+    },
+    "archive.replace.failure.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法替换"
+          }
+        }
+      }
+    },
+    "archive.replace.failure.notNewer": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这份档案不比当前档案新。当前档案没有改变。"
+          }
+        }
+      }
+    },
+    "archive.replace.failure.source": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这份档案来自另一个来源。当前档案没有改变。"
+          }
+        }
+      }
+    },
+    "archive.replace.failure.student": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这份档案属于另一名学员。当前档案没有改变。"
+          }
+        }
+      }
+    },
+    "archive.replace.failure.password": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "密码错误或文件已损坏。当前档案没有改变。"
+          }
+        }
+      }
+    },
+    "archive.replace.failure.version": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这份档案来自不兼容的精练教练版本。当前档案没有改变。"
+          }
+        }
+      }
+    },
+    "archive.replace.failure.invalid": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这不是有效的个人训练档案。当前档案没有改变。"
+          }
+        }
+      }
+    },
+    "archive.replace.failure.notInstalled": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前档案暂时无法读取，没有进行替换。"
+          }
+        }
+      }
+    },
+    "archive.replace.failure.interrupted": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "替换没有完成。当前档案没有改变。"
           }
         }
       }
@@ -8811,6 +8932,72 @@
           "stringUnit": {
             "state": "translated",
             "value": "删除本机档案"
+          }
+        }
+      }
+    },
+    "archive.settings.deleteConfirm.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除本机档案？"
+          }
+        }
+      }
+    },
+    "archive.settings.deleteConfirm.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除后这台设备上无法再查看档案，显示设置一并清除。不影响 Coach 的原始数据和档案文件本身。"
+          }
+        }
+      }
+    },
+    "archive.settings.deleteConfirm.cancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        }
+      }
+    },
+    "archive.settings.deleteConfirm.confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除"
+          }
+        }
+      }
+    },
+    "archive.settings.deleteFailed.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除失败"
+          }
+        }
+      }
+    },
+    "archive.settings.deleteFailed.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本机档案没有删除完成，请重试。"
           }
         }
       }

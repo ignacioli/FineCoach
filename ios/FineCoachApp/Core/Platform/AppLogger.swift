@@ -31,6 +31,20 @@ public enum AppLogEvent: String, CaseIterable, Sendable {
     case archiveImportStateUnavailable = "archive.import_state_unavailable"
     /// Cancelled or failed to commit; the pre-import state stands.
     case archiveImportInterrupted = "archive.import_interrupted"
+    /// A newer snapshot replaced the installed one. Fixed ID only; no source, count or time.
+    case archiveReplaceCompleted = "archive.replace_completed"
+    /// Candidate is not newer than the installed snapshot (older or same time).
+    case archiveReplaceRejectedNotNewer = "archive.replace_rejected_not_newer"
+    /// Candidate comes from another Coach install.
+    case archiveReplaceRejectedSource = "archive.replace_rejected_source"
+    /// Candidate belongs to another student of the same source.
+    case archiveReplaceRejectedStudent = "archive.replace_rejected_student"
+    /// Cancelled or failed to commit; the installed snapshot stands.
+    case archiveReplaceInterrupted = "archive.replace_interrupted"
+    /// The local archive was deleted.
+    case archiveDeleteCompleted = "archive.delete_completed"
+    /// Deleting the local archive did not finish; the next launch resumes the cleanup.
+    case archiveDeleteFailed = "archive.delete_failed"
 }
 
 public enum AppLogOperation: String, CaseIterable, Sendable {
@@ -41,6 +55,8 @@ public enum AppLogOperation: String, CaseIterable, Sendable {
     case scenePrivacy
     case archiveExport = "archive_export"
     case archiveImport = "archive_import"
+    case archiveReplace = "archive_replace"
+    case archiveDelete = "archive_delete"
 }
 
 public enum AppLogErrorCategory: String, CaseIterable, Sendable {

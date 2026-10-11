@@ -19,6 +19,22 @@ enum ArchiveImportPresentation {
         }
     }
 
+    /// The reason line of 「无法替换」 (§5). Every line ends with the fact that the installed
+    /// archive is unchanged.
+    static func replaceFailureMessage(_ failure: ArchiveReplaceFailure) -> String {
+        switch failure {
+        case .notNewer: return String(localized: "archive.replace.failure.notNewer")
+        case .differentSource: return String(localized: "archive.replace.failure.source")
+        case .differentStudent: return String(localized: "archive.replace.failure.student")
+        case .wrongPasswordOrCorrupted: return String(localized: "archive.replace.failure.password")
+        case .incompatibleVersion: return String(localized: "archive.replace.failure.version")
+        case .invalidArchive: return String(localized: "archive.replace.failure.invalid")
+        case .notInstalled: return String(localized: "archive.replace.failure.notInstalled")
+        case .interrupted, .importInProgress, .noPendingReplacement:
+            return String(localized: "archive.replace.failure.interrupted")
+        }
+    }
+
     /// 「个人训练档案 · 9月25日」 for a file named `FineCoach-档案-YYYYMMDD-HHmm.fcarchive`
     /// (contract §1: the name carries only the time). Any other name is shown as it is.
     static func fileDisplayName(_ url: URL) -> String {

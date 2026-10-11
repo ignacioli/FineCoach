@@ -275,6 +275,27 @@ M2-06b → 「完成」→ archiveExport.done → 是（leave() 并返回学员�
 
 **T053 L3 走查（产品负责人 2026-10-11，iPhone 17 Pro Max 模拟器，虚构档案）**：M2-11 及其下各页逐项点过，无大问题。上面「待确认」中的自定文案全部同意；「近 N 天」以档案快照日为基准，同意。无训练重点的记录标题「训练报告」暂沿用 M1 35 口径（只出现在 M2-13 详情页标题，本次档案中的记录都有训练重点，因此走查时看不到）。**T053 结论：PASS。**
 
+### 7.5 US-3 替换较新档案、US-4 删除本机档案（tasks T054–T060，2026-10-11）
+
+自动门全绿（数字见提交说明）。**未经人工目视**：M2-19a、M2-19b、M2-20 留到里程碑前的集中走查。文件选择器与系统打开路径未在模拟器或真机上操作过，只有用例与视图模型层测试。
+
+| 页面 | 控件 | 标识 | 写数据 | 宽度 |
+|---|---|---|---|---|
+| M2-18 | 「导入较新档案 ›」 | `archiveSettings.importNewer` | 否（push 替换页） | `FCActionRow`（`ArchiveSettingsView.swift:73`） |
+| M2-18 | 「删除本机档案」（垃圾桶，destructive） | `archiveSettings.delete` | 否（只弹确认） | `FCActionRow`（`:79`） |
+| M2-20 | 「删除」/「取消」 | —（`FCConfirmationDialog` 不支持标识） | 删除 = **是**（`deleteAll`，回到 M2-07） | `FCConfirmationDialog`（`ArchiveSettingsView.swift:104`） |
+| M2-18 | 删除失败 +「重试」 | `archiveSettings.deleteFailure` / `.deleteRetry` | 重试 = **是** | `FCInlineResult`（`:90–92`） |
+| M2-19b | 页头 `‹` | `archiveReplace.back` | 否 | `FCPageHeader`（`ArchiveReplaceView.swift:59`） |
+| M2-19b | 档案文件行 / 密码框 | `archiveReplace.file` / `.password` | 否 | `FCLabelValueRow` / `ArchivePasswordField`（`:69,73`），页面 VStack `maxWidth`（`:80`） |
+| M2-19b | 「导入」 | `archiveReplace.submit` | 否（只校验，候选只在内存） | `FCButton`（`:77`） |
+| M2-19b | 失败 +「重试」 | `archiveReplace.failure` / `.retry` | 否（重新校验） | `FCInlineResult`（`:116–118`） |
+| M2-19a | 页头 `‹` | `archiveReplace.confirmBack` | 否（丢弃候选与密码） | `FCPageHeader`（`:138`） |
+| M2-19a | 「替换为新档案」 | `archiveReplace.confirm` | **是**（整体替换，保留显示设置） | `FCButton`（`:152`），页面 VStack `maxWidth`（`:144`） |
+
+系统打开较新档案（`AppRoot.swift` 的 `replacePrefilled`）进入同一替换流程。查看模式仍没有编辑、分享、导出、备份入口。查看模式唯一的两处写入就是上表的替换与删除，`ArchiveViewerQueryTests` 断言 `ArchiveViewerUseCases.swift` 中恰好一处 `deleteAll()`。
+
+**实现时的自定文案与判断（待集中走查时确认）**：「删除失败」/「本机档案没有删除完成，请重试。」；「当前档案暂时无法读取，没有进行替换。」；替换中断显示「替换没有完成。当前档案没有改变。」（首次导入中断不提示，替换中断改为提示，避免点了「替换为新档案」后无声返回）；替换成功后直接回到查看首页并重新载入，没有成功摘要页。
+
 ## 8. 待产品负责人确认的问题
 
 1. ~~M2-09 的进入路径~~：**已定（R4）**，支持系统打开档案文件，spec D-010 已修订。

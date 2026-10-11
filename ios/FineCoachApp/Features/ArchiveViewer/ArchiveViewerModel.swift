@@ -15,6 +15,8 @@ final class ArchiveViewerModel: ObservableObject {
     @Published private(set) var phase: Phase = .loading
     @Published private(set) var settings: ArchiveDisplaySettings
     @Published private(set) var settingsSaveFailed = false
+    @Published private(set) var isDeleting = false
+    @Published private(set) var deleteFailed = false
 
     private let useCases: ArchiveViewerUseCases
 
@@ -47,6 +49,22 @@ final class ArchiveViewerModel: ObservableObject {
             settingsSaveFailed = false
         } catch {
             settingsSaveFailed = true
+        }
+    }
+
+    /// Deletes the local archive (M2-20 confirmed). Returns whether it is gone; the host then
+    /// recomputes the install state. A second call while one runs is ignored.
+    func deleteArchive() async -> Bool {
+        guard !isDeleting else { return false }
+        isDeleting = true
+        defer { isDeleting = false }
+        do {
+            try await useCases.deleteArchive()
+            deleteFailed = false
+            return true
+        } catch {
+            deleteFailed = true
+            return false
         }
     }
 }

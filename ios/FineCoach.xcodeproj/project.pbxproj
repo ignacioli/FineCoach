@@ -26,6 +26,8 @@
 		32F2DDC4CBE5BD935420EDC8 /* ArchiveImportFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F5D16678F4203E364FE789C /* ArchiveImportFlowView.swift */; };
 		1C7EE5E3CFA0F6574286DE7F /* ArchiveImportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 213B17E0B02E04219FF671D5 /* ArchiveImportViewModel.swift */; };
 		73A3FA545FC87EDDC23AF89F /* ArchiveImportPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BF159DF275C16B25EEF9CE /* ArchiveImportPresentation.swift */; };
+		6F5AF894133136E283203796 /* ArchiveReplaceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25EE784D498BBB3572711F61 /* ArchiveReplaceViewModel.swift */; };
+		83C7A8779714BF290A1859B3 /* ArchiveReplaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40301605903DF84CCAC6DF5 /* ArchiveReplaceView.swift */; };
 		BE3D885E0D7A5C994B355949 /* ArchiveViewerDebugSeedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09F15FFF9A8FA53D946F4290 /* ArchiveViewerDebugSeedTests.swift */; };
 		C6458F72160E53B9DB76FB06 /* ArchiveViewerScreenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E79D77E7B05B7DD8BD7CA5 /* ArchiveViewerScreenTests.swift */; };
 		5B26357EC039B8C2F8BAE943 /* ArchiveFoundationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE13168A5E0392CB8EBB7549 /* ArchiveFoundationTests.swift */; };
@@ -328,6 +330,8 @@
 		50AD3DA54B8DCFCF39AD52D9 /* ArchiveViewerQueryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA5FF65FD5325F173475C61C /* ArchiveViewerQueryTests.swift */; };
 		8EE69B2A44B60DEA2D434676 /* ArchiveExportIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE52AEF96A85C6122BD92D45 /* ArchiveExportIntegrationTests.swift */; };
 		80767B234DEBABF5598A510D /* ArchiveImportIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739AFF177606FF32EC4EDAF7 /* ArchiveImportIntegrationTests.swift */; };
+		B80077D9B966AB499B3B15B7 /* ArchiveDeleteIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EC08854D77F42FF5DBC8C71 /* ArchiveDeleteIntegrationTests.swift */; };
+		44EE45B2F1E70DB8CA2453E2 /* ArchiveReplaceIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B895809CA1129C2780BE99 /* ArchiveReplaceIntegrationTests.swift */; };
 		8FE54578732674057F095EBA /* ArchiveExportFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C064C982C9D5E5968959CB /* ArchiveExportFixtures.swift */; };
 		83C0625A76E06855F0309F7F /* ArchiveExportFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C064C982C9D5E5968959CB /* ArchiveExportFixtures.swift */; };
 		DF5BBDD59FF71E4042E1A2FA /* ArchiveExclusionNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41004E3E69D3A5C1D18FAB46 /* ArchiveExclusionNote.swift */; };
@@ -388,6 +392,8 @@
 		4F5D16678F4203E364FE789C /* ArchiveImportFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveImportFlowView.swift; sourceTree = "<group>"; };
 		213B17E0B02E04219FF671D5 /* ArchiveImportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveImportViewModel.swift; sourceTree = "<group>"; };
 		31BF159DF275C16B25EEF9CE /* ArchiveImportPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveImportPresentation.swift; sourceTree = "<group>"; };
+		25EE784D498BBB3572711F61 /* ArchiveReplaceViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveReplaceViewModel.swift; sourceTree = "<group>"; };
+		F40301605903DF84CCAC6DF5 /* ArchiveReplaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveReplaceView.swift; sourceTree = "<group>"; };
 		09F15FFF9A8FA53D946F4290 /* ArchiveViewerDebugSeedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveViewerDebugSeedTests.swift; sourceTree = "<group>"; };
 		31E79D77E7B05B7DD8BD7CA5 /* ArchiveViewerScreenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveViewerScreenTests.swift; sourceTree = "<group>"; };
 		CE13168A5E0392CB8EBB7549 /* ArchiveFoundationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveFoundationTests.swift; sourceTree = "<group>"; };
@@ -681,6 +687,8 @@
 		CA5FF65FD5325F173475C61C /* ArchiveViewerQueryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveViewerQueryTests.swift; sourceTree = "<group>"; };
 		FE52AEF96A85C6122BD92D45 /* ArchiveExportIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportIntegrationTests.swift; sourceTree = "<group>"; };
 		739AFF177606FF32EC4EDAF7 /* ArchiveImportIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveImportIntegrationTests.swift; sourceTree = "<group>"; };
+		9EC08854D77F42FF5DBC8C71 /* ArchiveDeleteIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveDeleteIntegrationTests.swift; sourceTree = "<group>"; };
+		D7B895809CA1129C2780BE99 /* ArchiveReplaceIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveReplaceIntegrationTests.swift; sourceTree = "<group>"; };
 		32C064C982C9D5E5968959CB /* ArchiveExportFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportFixtures.swift; sourceTree = "<group>"; };
 		41004E3E69D3A5C1D18FAB46 /* ArchiveExclusionNote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExclusionNote.swift; sourceTree = "<group>"; };
 		436AE4578E63E75F016B4A4C /* ArchiveExportFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportFlowView.swift; sourceTree = "<group>"; };
@@ -747,6 +755,8 @@
 				4F5D16678F4203E364FE789C /* ArchiveImportFlowView.swift */,
 				213B17E0B02E04219FF671D5 /* ArchiveImportViewModel.swift */,
 				31BF159DF275C16B25EEF9CE /* ArchiveImportPresentation.swift */,
+				25EE784D498BBB3572711F61 /* ArchiveReplaceViewModel.swift */,
+				F40301605903DF84CCAC6DF5 /* ArchiveReplaceView.swift */,
 			);
 			path = ArchiveImport;
 			sourceTree = "<group>";
@@ -1727,6 +1737,8 @@
 			children = (
 				FE52AEF96A85C6122BD92D45 /* ArchiveExportIntegrationTests.swift */,
 				739AFF177606FF32EC4EDAF7 /* ArchiveImportIntegrationTests.swift */,
+				9EC08854D77F42FF5DBC8C71 /* ArchiveDeleteIntegrationTests.swift */,
+				D7B895809CA1129C2780BE99 /* ArchiveReplaceIntegrationTests.swift */,
 				EE017497F4CAFFE91103028B /* ArchiveFoundationIntegrationTests.swift */,
 			);
 			path = Archive;
@@ -1941,6 +1953,8 @@
 				32F2DDC4CBE5BD935420EDC8 /* ArchiveImportFlowView.swift in Sources */,
 				1C7EE5E3CFA0F6574286DE7F /* ArchiveImportViewModel.swift in Sources */,
 				73A3FA545FC87EDDC23AF89F /* ArchiveImportPresentation.swift in Sources */,
+				6F5AF894133136E283203796 /* ArchiveReplaceViewModel.swift in Sources */,
+				83C7A8779714BF290A1859B3 /* ArchiveReplaceView.swift in Sources */,
 				A9A1CE8D2AA24A41AD6D1471 /* ArchivePasswordField.swift in Sources */,
 				A64B3FED784C16C6C821D8EC /* ArchiveExportViewModel.swift in Sources */,
 				355A8FEE4A93CFE82C8FD939 /* ArchiveExportPresentation.swift in Sources */,
@@ -2205,6 +2219,8 @@
 				83C0625A76E06855F0309F7F /* ArchiveExportFixtures.swift in Sources */,
 				8EE69B2A44B60DEA2D434676 /* ArchiveExportIntegrationTests.swift in Sources */,
 				80767B234DEBABF5598A510D /* ArchiveImportIntegrationTests.swift in Sources */,
+				B80077D9B966AB499B3B15B7 /* ArchiveDeleteIntegrationTests.swift in Sources */,
+				44EE45B2F1E70DB8CA2453E2 /* ArchiveReplaceIntegrationTests.swift in Sources */,
 				4C5E5DF530413B0D0088237A /* FictitiousFixtures.swift in Sources */,
 				4C5E5DF630413B0D0088237A /* TestClock.swift in Sources */,
 				4C5E5DF730413B0D0088237A /* TestIDGenerator.swift in Sources */,

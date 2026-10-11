@@ -16,13 +16,17 @@ public enum ArchiveViewerError: Error, Equatable, Sendable {
     case archiveUnreadable
     /// The archive does not contain the module this query needs (「档案未包含」).
     case moduleNotIncluded
+    /// Deleting the local archive did not finish (M2-FR-041). Retrying is safe.
+    case deleteFailed
 }
 
 public struct ArchiveViewerUseCases: Sendable {
     private let store: ArchiveSnapshotStore
+    private let logger: any AppLogging
 
-    public init(store: ArchiveSnapshotStore) {
+    public init(store: ArchiveSnapshotStore, logger: any AppLogging = AppLogger.standard) {
         self.store = store
+        self.logger = logger
     }
 
     /// Reads and validates the installed snapshot off the caller's thread.
@@ -40,6 +44,24 @@ public struct ArchiveViewerUseCases: Sendable {
                 throw ArchiveViewerError.archiveUnreadable
             }
         }.value
+    }
+
+    /// Deletes the local archive (M2-FR-041..043, T058): the pointer first, then every
+    /// generation, staging and the display settings (`ArchiveSnapshotStore.deleteAll`). It
+    /// touches nothing outside `ArchiveViewer/`: no Coach data, no source file (M2-FR-043). On
+    /// failure it throws `.deleteFailed`; a retry finishes the job, and a pointer that is already
+    /// gone resolves as "no archive" on the next install-state read.
+    public func deleteArchive() async throws {
+        let store = self.store
+        do {
+            try await Task.detached(priority: .userInitiated) { try store.deleteAll() }.value
+        } catch {
+            // Best effort: with the pointer gone the janitor finishes the cleanup.
+            try? store.runStartupJanitor()
+            logger.failure(.archiveDeleteFailed, operation: .archiveDelete, category: .persistenceFailed)
+            throw ArchiveViewerError.deleteFailed
+        }
+        logger.info(.archiveDeleteCompleted, operation: .archiveDelete)
     }
 
     /// kg/lb, cm/in and list density; defaults when nothing valid is stored.

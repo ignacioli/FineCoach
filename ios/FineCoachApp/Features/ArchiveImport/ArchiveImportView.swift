@@ -6,7 +6,8 @@ struct ArchiveImportView: View {
     @ObservedObject var model: ArchiveImportViewModel
     let onBack: () -> Void
 
-    private static var archiveType: UTType {
+    /// The archive file type; the replace page (M2-19) picks the same kind of file.
+    static var archiveType: UTType {
         UTType("com.finecoach.archive") ?? .data
     }
 
@@ -53,18 +54,8 @@ struct ArchiveImportView: View {
         .accessibilityIdentifier(FCAccessibilityID.archiveImportRoot)
     }
 
-    @ViewBuilder
     private var fileValue: some View {
-        if let url = model.fileURL {
-            Text(ArchiveImportPresentation.fileDisplayName(url))
-                .fcFont(.body)
-                .foregroundStyle(FCSemanticColors.textPrimary)
-                .fixedSize(horizontal: false, vertical: true)
-        } else {
-            Text(String(localized: "archive.import.file.none"))
-                .fcFont(.body)
-                .foregroundStyle(FCSemanticColors.textSecondary)
-        }
+        ArchiveImportFileValue(url: model.fileURL)
     }
 
     @ViewBuilder
@@ -95,33 +86,21 @@ struct ArchiveImportView: View {
     }
 }
 
-/// Placeholder for 「导入较新档案」 reached by opening an archive file in viewer mode (D-010).
-/// US-3 (T055) replaces it; until then it only says so and ends the flow, deleting the Inbox
-/// copy. It reads nothing from the file.
-struct ArchiveReplacePlaceholderView: View {
-    let onBack: () -> Void
+/// The value side of the 「档案文件」 row (M2-08, M2-19b): the chosen file's display name, or the
+/// 「未选择」 hint.
+struct ArchiveImportFileValue: View {
+    let url: URL?
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: FCPrimitives.space4) {
-                FCPageHeader(
-                    title: String(localized: "archive.replace.title"),
-                    subtitle: String(localized: "archive.replace.subtitle"),
-                    back: .init(accessibilityIdentifier: FCAccessibilityID.archiveImportBack, handler: onBack)
-                )
-                FCStatusLabel(
-                    text: String(localized: "archive.replace.unavailable"),
-                    symbolName: "info",
-                    badgeColor: FCSemanticColors.actionPrimary
-                )
-                .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, FCPrimitives.space4)
+        if let url {
+            Text(ArchiveImportPresentation.fileDisplayName(url))
+                .fcFont(.body)
+                .foregroundStyle(FCSemanticColors.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+        } else {
+            Text(String(localized: "archive.import.file.none"))
+                .fcFont(.body)
+                .foregroundStyle(FCSemanticColors.textSecondary)
         }
-        .background(FCSemanticColors.surfacePage)
-        .fcSecondaryPage()
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier(FCAccessibilityID.archiveImportReplacePlaceholder)
     }
 }

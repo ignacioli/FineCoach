@@ -174,4 +174,81 @@ final class ArchiveViewerScreenTests: XCTestCase {
         await other.finish()
         XCTAssertTrue(FileManager.default.fileExists(atPath: source.path), "a picked file is never deleted")
     }
+
+    // MARK: Replace and delete (T055, T058)
+
+    func testSettingsRowsAreWiredAndDeleteAsksForConfirmation() throws {
+        let text = try XCTUnwrap(viewerSources().first { $0.name == "ArchiveSettingsView.swift" }).text
+        XCTAssertFalse(text.contains("isEnabled: false"), "the import and delete rows are no longer placeholders")
+        XCTAssertTrue(text.contains("action: onImportNewer"))
+        XCTAssertTrue(text.contains(".fcConfirmationDialog(isPresented: $isConfirmingDelete)"))
+        XCTAssertTrue(text.contains("role: .destructive"))
+        // The delete row only opens the dialog; the deletion runs from the dialog's confirm action.
+        XCTAssertTrue(text.contains("{ isConfirmingDelete = true }"))
+    }
+
+    func testEveryReplaceFailureHasItsReasonCopyEndingWithTheArchiveBeingUnchanged() {
+        let expected: [(ArchiveReplaceFailure, String)] = [
+            (.notNewer, "这份档案不比当前档案新。当前档案没有改变。"),
+            (.differentSource, "这份档案来自另一个来源。当前档案没有改变。"),
+            (.differentStudent, "这份档案属于另一名学员。当前档案没有改变。"),
+            (.wrongPasswordOrCorrupted, "密码错误或文件已损坏。当前档案没有改变。"),
+            (.incompatibleVersion, "这份档案来自不兼容的精练教练版本。当前档案没有改变。"),
+            (.invalidArchive, "这不是有效的个人训练档案。当前档案没有改变。"),
+            (.interrupted, "替换没有完成。当前档案没有改变。"),
+        ]
+        for (failure, text) in expected {
+            XCTAssertEqual(ArchiveImportPresentation.replaceFailureMessage(failure), text)
+        }
+        XCTAssertEqual(String(localized: "archive.replace.failure.title"), "无法替换")
+    }
+
+    @MainActor
+    func testReplaceModelMovesFromFormToConfirmationToReplacedAndKeepsPickedFiles() async throws {
+        let work = FileManager.default.temporaryDirectory.appendingPathComponent("ReplaceFlow-\(UUID().uuidString)")
+        let inbox = work.appendingPathComponent("Inbox", isDirectory: true)
+        try FileManager.default.createDirectory(at: inbox, withIntermediateDirectories: true)
+        addTeardownBlock { try? FileManager.default.removeItem(at: work) }
+        let store = ArchiveSnapshotStore(rootURL: work.appendingPathComponent("ArchiveViewer"))
+        try store.commit(snapshot: ArchiveFixtures.summariesOnlySnapshot())
+        let newer = ArchiveFixtures.summariesOnlySnapshot(snapshotAt: ArchiveFixtures.snapshotAt.addingTimeInterval(60))
+        let copy = inbox.appendingPathComponent("new.fcarchive")
+        try ArchiveFileCodec.encode(
+            snapshot: newer, password: try ArchivePassword(creating: ArchiveFixtures.password),
+            salt: ArchiveFixtures.fixedSalt, noncePrefix: ArchiveFixtures.fixedNoncePrefix
+        ).write(to: copy)
+        let useCases = ArchiveImportUseCases(
+            store: store, resolver: InstallStateResolver(store: store, probe: EmptyCoachProbe()), inboxRootURL: inbox)
+
+        let model = ArchiveReplaceViewModel(useCases: useCases, prefilledURL: copy)
+        XCTAssertFalse(model.canImport, "no password yet")
+        model.password = "错误的口令12345"
+        await model.submit()
+        XCTAssertEqual(model.phase, .rejected(.wrongPasswordOrCorrupted))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: copy.path), "kept for the retry")
+
+        model.password = ArchiveFixtures.password
+        await model.submit()
+        guard case .confirm(let preview) = model.phase else { return XCTFail("expected the confirmation facts") }
+        XCTAssertEqual(preview.candidate.snapshotAtUTC, newer.manifest.snapshotAtUTC)
+        XCTAssertEqual(try store.load(), ArchiveFixtures.summariesOnlySnapshot(), "nothing is written before the confirmation")
+
+        await model.backToForm()
+        XCTAssertEqual(model.phase, .form)
+        XCTAssertEqual(model.password, "", "going back drops the password")
+
+        model.password = ArchiveFixtures.password
+        await model.submit()
+        await model.confirm()
+        XCTAssertTrue(model.replaced)
+        XCTAssertEqual(try store.load(), newer)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: copy.path), "the Inbox copy goes after the replacement")
+
+        let source = work.appendingPathComponent("picked.fcarchive")
+        try Data([1]).write(to: source)
+        let picked = ArchiveReplaceViewModel(useCases: useCases, prefilledURL: nil)
+        picked.fileChosen(.success([source]))
+        await picked.finish()
+        XCTAssertTrue(FileManager.default.fileExists(atPath: source.path), "a picked file is never deleted")
+    }
 }

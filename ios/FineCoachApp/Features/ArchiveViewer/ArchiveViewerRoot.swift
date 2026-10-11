@@ -9,6 +9,7 @@ enum ArchiveViewerDestination: Hashable {
     case metricHistory(String)
     case trends
     case settings
+    case replace
 }
 
 /// Viewer-mode root (M2-11 and its pages). It receives only the archive services, never the
@@ -16,9 +17,19 @@ enum ArchiveViewerDestination: Hashable {
 struct ArchiveViewerRoot: View {
     @StateObject private var model: ArchiveViewerModel
     @State private var path: [ArchiveViewerDestination] = []
+    private let importUseCases: ArchiveImportUseCases
+    private var onArchiveRemoved: () -> Void = {}
 
     init(services: ArchiveServices) {
         _model = StateObject(wrappedValue: ArchiveViewerModel(useCases: services.viewerUseCases))
+        importUseCases = services.importUseCases
+    }
+
+    /// The host recomputes the install state once the local archive was deleted (M2-FR-050).
+    func onArchiveRemoved(_ handler: @escaping () -> Void) -> Self {
+        var copy = self
+        copy.onArchiveRemoved = handler
+        return copy
     }
 
     var body: some View {
@@ -76,7 +87,22 @@ struct ArchiveViewerRoot: View {
             case .trends:
                 ArchiveTrendsView(content: content, model: model)
             case .settings:
-                ArchiveSettingsView(model: model)
+                ArchiveSettingsView(
+                    model: model,
+                    onImportNewer: { path.append(.replace) },
+                    onDeleted: onArchiveRemoved
+                )
+            case .replace:
+                ArchiveReplaceFlowView(
+                    useCases: importUseCases,
+                    prefilledURL: nil,
+                    onBack: { path.removeAll { $0 == .replace } },
+                    onReplaced: {
+                        // Back to the home page, which shows the new archive (M2-FR-040).
+                        path.removeAll()
+                        Task { await model.load() }
+                    }
+                )
             }
         }
     }

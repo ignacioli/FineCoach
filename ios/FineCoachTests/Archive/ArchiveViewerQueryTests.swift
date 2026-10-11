@@ -488,10 +488,14 @@ final class ArchiveViewerQueryTests: XCTestCase {
             let text = try String(contentsOf: root.appendingPathComponent(name), encoding: .utf8)
             for forbidden in [
                 "HistoryUseCases", "ExerciseLibraryUseCases", "StudentUseCases", "BodyDataUseCases",
-                "PersistenceWriter", "Repository", ".commit(", "deleteAll", "atomicReplace",
+                "PersistenceWriter", "Repository", ".commit(", "atomicReplace",
             ] {
                 XCTAssertFalse(text.contains(forbidden), "\(name) must not reference \(forbidden)")
             }
+            // T058: the one write the viewer owns is deleting the local archive (M2-FR-041), so
+            // `ArchiveViewerUseCases` calls `store.deleteAll()` exactly once; nothing else may.
+            let deleteCalls = text.components(separatedBy: "deleteAll()").count - 1
+            XCTAssertEqual(deleteCalls, name == "ArchiveViewerUseCases.swift" ? 1 : 0, "\(name) deleteAll() calls")
         }
     }
 }
