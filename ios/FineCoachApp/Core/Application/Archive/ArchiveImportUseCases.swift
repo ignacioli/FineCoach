@@ -276,16 +276,58 @@ public actor ArchiveImportUseCases {
     /// was deleted.
     @discardableResult
     public func discardInboxCopy(at url: URL) -> Bool {
-        guard let inbox = inboxRoot() else {
+        Self.discardInboxCopy(at: url, inboxRoot: inboxRoot())
+    }
+
+    /// The Inbox-only deletion guard, usable before the services exist (cold start). Resolves
+    /// symlinks, requires the Inbox prefix and never deletes the Inbox itself. `nil` resolves
+    /// `Documents/Inbox`.
+    @discardableResult
+    public nonisolated static func discardInboxCopy(at url: URL, inboxRoot: URL? = nil) -> Bool {
+        guard let root = inboxRoot ?? defaultInboxRoot(), let file = guardedInboxEntry(url, root: root) else {
             return false
         }
+        return (try? FileManager.default.removeItem(at: file)) != nil
+    }
+
+    /// Launch-time sweep (privacy review F1): deletes every entry of the Inbox except the URLs
+    /// in `keeping`, which are still in flight. Copies are otherwise only deleted by a clean
+    /// in-app exit, so a killed process or an ignored open would leave an encrypted archive
+    /// behind. Only the Inbox is touched. Returns how many entries were deleted.
+    @discardableResult
+    public nonisolated static func sweepInbox(inboxRoot: URL? = nil, keeping: [URL] = []) -> Int {
+        guard let root = inboxRoot ?? defaultInboxRoot() else {
+            return 0
+        }
+        let kept = Set(keeping.map { $0.resolvingSymlinksInPath().standardizedFileURL.path })
+        let entries =
+            (try? FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil, options: [])) ?? []
+        var removed = 0
+        for entry in entries {
+            guard !kept.contains(entry.resolvingSymlinksInPath().standardizedFileURL.path) else {
+                continue
+            }
+            if discardInboxCopy(at: entry, inboxRoot: root) {
+                removed += 1
+            }
+        }
+        return removed
+    }
+
+    private nonisolated static func defaultInboxRoot() -> URL? {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?
+            .appendingPathComponent("Inbox", isDirectory: true)
+    }
+
+    /// The resolved file URL when it lies strictly inside the resolved Inbox root.
+    private nonisolated static func guardedInboxEntry(_ url: URL, root inbox: URL) -> URL? {
         let file = url.resolvingSymlinksInPath().standardizedFileURL
         let root = inbox.resolvingSymlinksInPath().standardizedFileURL
         let rootPath = root.path.hasSuffix("/") ? root.path : root.path + "/"
         guard file.path.hasPrefix(rootPath), file.path != root.path else {
-            return false
+            return nil
         }
-        return (try? FileManager.default.removeItem(at: file)) != nil
+        return file
     }
 
     // MARK: Steps
@@ -435,11 +477,7 @@ public actor ArchiveImportUseCases {
     }
 
     private func inboxRoot() -> URL? {
-        if let inboxRootURL {
-            return inboxRootURL
-        }
-        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?
-            .appendingPathComponent("Inbox", isDirectory: true)
+        inboxRootURL ?? Self.defaultInboxRoot()
     }
 
     private func log(_ failure: ArchiveReplaceFailure) {

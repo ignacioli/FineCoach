@@ -8,6 +8,9 @@ public enum AppLogEvent: String, CaseIterable, Sendable {
     case privacyCoverChanged = "foundation.privacy_cover_changed"
     /// A viewer archive and Coach work data coexist; viewer mode wins (data-model §4).
     case archiveInstallViewerPrecedence = "archive.viewer_precedence"
+    /// A viewer pointer exists but cannot be read or loaded and the Coach store is empty; the
+    /// install state is withheld and the data is kept. Fixed ID only.
+    case archiveInstallPointerUnreadable = "archive.install_pointer_unreadable"
     /// An export produced more than a plan §7.3 limit allows. Fixed ID only; no counts.
     case archiveExportLimitExceeded = "archive.export_limit_exceeded"
     /// The system accepted the archive file (not "received by the student").

@@ -189,6 +189,34 @@
             XCTAssertFalse(h.logger.events.contains("archive.import_completed"))
         }
 
+        /// Privacy review F2: a pointer that exists but cannot be read must not become `unselected`,
+        /// or a first import would overwrite data a newer build or a repair could still read.
+        func testUnreadableViewerPointerWithAnEmptyCoachStoreFailsClosedAndKeepsThePointer() async throws {
+            let file = try write(Self.goldenFile, in: try await makeHarness().workDirectory)
+            let garbage = Data("not json".utf8)
+            let newerSchema = Data(#"{"generation":"\#(UUID().uuidString)","snapshotSchemaVersion":2}"#.utf8)
+            for pointerBytes in [garbage, newerSchema] {
+                let h = try await makeHarness()
+                try FileManager.default.createDirectory(at: h.viewerRoot, withIntermediateDirectories: true)
+                let pointerURL = h.viewerRoot.appendingPathComponent("current.json")
+                try pointerBytes.write(to: pointerURL)
+
+                do {
+                    _ = try await h.useCases.importArchive(from: file, password: F.password)
+                    XCTFail("an unreadable viewer pointer must block the import")
+                } catch {
+                    XCTAssertEqual(error as? ArchiveImportFailure, .installStateUnavailable)
+                }
+                XCTAssertEqual(try Data(contentsOf: pointerURL), pointerBytes, "pointer bytes unchanged")
+                XCTAssertEqual(listing(h.viewerRoot.appendingPathComponent("generations")), [], "no generation written")
+                XCTAssertEqual(h.reader.readCount, 0, "the file was not read")
+                do {
+                    _ = try await h.resolver().resolve()
+                    XCTFail("the resolver must fail closed")
+                } catch {}
+            }
+        }
+
         func testFailedImportCanBeRetriedWithTheRightPassword() async throws {
             let h = try await makeHarness()
             let file = try write(Self.goldenFile, in: h.workDirectory)

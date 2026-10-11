@@ -39,12 +39,20 @@ public struct InstallStateResolver: Sendable {
         self.logger = logger
     }
 
-    /// Throws only when the Coach store cannot be read and the install is not a viewer. The
-    /// caller must not treat that as `unselected`, which would offer an archive import on top
-    /// of possibly existing Coach data.
+    /// Throws when the Coach store cannot be read and the install is not a viewer, and when a
+    /// viewer pointer exists but cannot be read or loaded while the Coach store is empty. The
+    /// caller must not treat either as `unselected`: that would offer an archive import on top
+    /// of possibly existing Coach data, or let a first import overwrite an archive a newer
+    /// build or a repair could still read.
     public func resolve() async throws -> InstallState {
         // An unreadable or newer-schema snapshot is "not viewer" (data-model §4).
-        let hasViewerArchive = (try? store.load()) != nil
+        var viewerLoadError: Error?
+        var hasViewerArchive = false
+        do {
+            hasViewerArchive = try store.load() != nil
+        } catch {
+            viewerLoadError = error
+        }
         if hasViewerArchive {
             if let snapshot = try? await probe.read(), snapshot.hasWorkData {
                 logger.info(.archiveInstallViewerPrecedence, operation: .startup)
@@ -52,6 +60,15 @@ public struct InstallStateResolver: Sendable {
             return .viewer
         }
         let snapshot = try await probe.read()
-        return snapshot.onboardingCompleted || snapshot.hasWorkData ? .coach : .unselected
+        if snapshot.onboardingCompleted || snapshot.hasWorkData {
+            return .coach
+        }
+        // `load()` throws only when a pointer file exists, so this is "present but unusable",
+        // never "absent". Keep the data and fail closed (the startup janitor does the same).
+        if let viewerLoadError {
+            logger.info(.archiveInstallPointerUnreadable, operation: .startup)
+            throw viewerLoadError
+        }
+        return .unselected
     }
 }

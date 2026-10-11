@@ -459,13 +459,90 @@ final class ArchiveFoundationTests: XCTestCase {
         let generations = root.appendingPathComponent("generations")
         let generation = generations.appendingPathComponent(entries(generations)[0])
         try Data("{}".utf8).write(to: generation.appendingPathComponent("snapshot.bin"))
-        let unreadable = try await resolver(root: root, probe: StubProbe()).resolve()
-        XCTAssertEqual(unreadable, .unselected)
+        // Coach data present: unreadable viewer data is "not viewer" and the Coach side wins.
+        let unreadableWithCoach = try await resolver(root: root, probe: StubProbe(workData: true)).resolve()
+        XCTAssertEqual(unreadableWithCoach, .coach)
+        // Empty Coach store: fail closed instead of offering a first import (privacy review F2).
+        do {
+            _ = try await resolver(root: root, probe: StubProbe()).resolve()
+            XCTFail("an unreadable viewer snapshot with an empty Coach store must not resolve to unselected")
+        } catch {
+            XCTAssertEqual(error as? ArchiveSnapshotStoreError, .snapshotUnreadable)
+        }
 
         let newerPointer = #"{"generation":"\#(UUID().uuidString)","snapshotSchemaVersion":2}"#
         try Data(newerPointer.utf8).write(to: root.appendingPathComponent("current.json"))
         let newer = try await resolver(root: root, probe: StubProbe(workData: true)).resolve()
         XCTAssertEqual(newer, .coach)
+    }
+
+    func testNewerSchemaPointerWithAnEmptyCoachStoreThrowsInsteadOfUnselected() async throws {
+        let root = try makeRoot()
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        let newerPointer = #"{"generation":"\#(UUID().uuidString)","snapshotSchemaVersion":2}"#
+        try Data(newerPointer.utf8).write(to: root.appendingPathComponent("current.json"))
+        do {
+            _ = try await resolver(root: root, probe: StubProbe()).resolve()
+            XCTFail("a newer-schema pointer must not resolve to unselected")
+        } catch {
+            XCTAssertEqual(error as? ArchiveSnapshotStoreError, .incompatibleSnapshotSchema)
+        }
+    }
+
+    // MARK: Inbox sweep (privacy review F1)
+
+    func testInboxSweepDeletesEveryEntryExceptTheInFlightOneAndNeverTouchesOutsideFiles() throws {
+        let base = try makeRoot()
+        let inbox = base.appendingPathComponent("Inbox", isDirectory: true)
+        try FileManager.default.createDirectory(at: inbox, withIntermediateDirectories: true)
+        let archive = inbox.appendingPathComponent("a.fcarchive")
+        let backup = inbox.appendingPathComponent("b.fcbackup")
+        let stray = inbox.appendingPathComponent("stray.txt")
+        let inFlight = inbox.appendingPathComponent("inflight.fcarchive")
+        let sibling = base.appendingPathComponent("outside.fcarchive")
+        for url in [archive, backup, stray, inFlight, sibling] {
+            try Data("x".utf8).write(to: url)
+        }
+
+        let removed = ArchiveImportUseCases.sweepInbox(inboxRoot: inbox, keeping: [inFlight])
+        XCTAssertEqual(removed, 3)
+        XCTAssertEqual(entries(inbox), ["inflight.fcarchive"])
+        XCTAssertTrue(FileManager.default.fileExists(atPath: sibling.path), "files outside Inbox are untouched")
+
+        XCTAssertEqual(ArchiveImportUseCases.sweepInbox(inboxRoot: inbox), 1)
+        XCTAssertEqual(entries(inbox), [])
+        XCTAssertTrue(FileManager.default.fileExists(atPath: inbox.path), "the Inbox itself stays")
+        XCTAssertTrue(FileManager.default.fileExists(atPath: sibling.path))
+    }
+
+    func testDiscardInboxCopyRefusesOutsideFilesAndTheInboxRoot() throws {
+        let base = try makeRoot()
+        let inbox = base.appendingPathComponent("Inbox", isDirectory: true)
+        try FileManager.default.createDirectory(at: inbox, withIntermediateDirectories: true)
+        let outside = base.appendingPathComponent("outside.fcbackup")
+        try Data("x".utf8).write(to: outside)
+        XCTAssertFalse(ArchiveImportUseCases.discardInboxCopy(at: outside, inboxRoot: inbox))
+        XCTAssertFalse(ArchiveImportUseCases.discardInboxCopy(at: inbox, inboxRoot: inbox))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: outside.path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: inbox.path))
+        let inside = inbox.appendingPathComponent("x.fcbackup")
+        try Data("x".utf8).write(to: inside)
+        XCTAssertTrue(ArchiveImportUseCases.discardInboxCopy(at: inside, inboxRoot: inbox))
+    }
+
+    // MARK: snapshot.bin protection (privacy review F3)
+
+    func testCommittedSnapshotFileIsProtectedAndExcludedFromBackup() throws {
+        let root = try makeRoot()
+        let store = ArchiveSnapshotStore(rootURL: root)
+        try store.commit(snapshot: F.fullSnapshot())
+        let generations = root.appendingPathComponent("generations")
+        let file = generations.appendingPathComponent(entries(generations)[0]).appendingPathComponent("snapshot.bin")
+        let audit = try ProtectedFileStore().audit(url: file)
+        XCTAssertTrue(audit.isExcludedFromBackup)
+        #if !targetEnvironment(simulator)
+            XCTAssertEqual(audit.protectionRawValue, FileProtectionType.completeUnlessOpen.rawValue)
+        #endif
     }
 
     func testUnreadableCoachStoreWithoutViewerThrowsInsteadOfGuessingUnselected() async throws {

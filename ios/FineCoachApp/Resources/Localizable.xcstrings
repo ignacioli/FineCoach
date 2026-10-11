@@ -7660,6 +7660,17 @@
         }
       }
     },
+    "archive.export.preview.sectionNames": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分区名称"
+          }
+        }
+      }
+    },
     "archive.export.preview.trendsScope": {
       "extractionState": "manual",
       "localizations": {

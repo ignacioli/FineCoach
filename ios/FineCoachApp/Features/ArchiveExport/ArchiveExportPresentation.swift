@@ -160,6 +160,9 @@ struct ArchivePreviewModel {
     let exerciseCount: Int
     let builtInExerciseCount: Int
     let customExercises: [Entry]
+    /// Session section names the archive carries, deduplicated, in first-seen order. Empty
+    /// unless training records are selected (the policy writes no sessions otherwise).
+    let sectionNames: [String]
     let summaries: [Entry]
     let metrics: [MetricLine]
 
@@ -185,6 +188,10 @@ struct ArchivePreviewModel {
                 ? String(localized: "archive.export.exercise.custom")
                 : String(localized: "archive.export.exercise.oneOff")
             return Entry(id: index, text: info.name, meta: meta)
+        }
+        var seenSectionNames = Set<String>()
+        sectionNames = snapshot.sessions.flatMap(\.sections).compactMap(\.name).filter {
+            !$0.isEmpty && seenSectionNames.insert($0).inserted
         }
         let referenceYear = (dates + snapshot.summaries.map(\.localDate)).max()?.year ?? 0
         summaries = snapshot.summaries

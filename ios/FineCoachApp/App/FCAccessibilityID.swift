@@ -91,6 +91,7 @@ public enum FCAccessibilityID {
     public static let archiveExportExclusionViewAll = "archiveExport.exclusion.viewAll"
     public static let archiveExportExclusionList = "archiveExport.exclusion.list"
     public static let archiveExportFreeTextNotice = "archiveExport.preview.freeTextNotice"
+    public static let archiveExportSectionNames = "archiveExport.preview.sectionNames"
     public static let archiveExportPlaceholderNote = "archiveExport.preview.placeholderNote"
     public static let archiveExportContinue = "archiveExport.continue"
     public static let archiveExportConfirmFacts = "archiveExport.confirmFacts"

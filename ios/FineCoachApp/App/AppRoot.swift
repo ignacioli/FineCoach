@@ -155,9 +155,15 @@ struct AppRoot: View {
     /// Only `.fcarchive` files are accepted; anything else is ignored and left untouched.
     private func handleOpen(_ url: URL) {
         guard url.isFileURL, url.pathExtension.lowercased() == "fcarchive" else {
+            // Ignored, but the system may have copied it into Documents/Inbox. Only an Inbox
+            // copy is deleted; the guard refuses anything else (privacy review F1).
+            ArchiveImportUseCases.discardInboxCopy(at: url)
             return
         }
         guard let services = archiveServices else {
+            if let previous = pendingOpenURL, previous != url {
+                ArchiveImportUseCases.discardInboxCopy(at: previous)
+            }
             pendingOpenURL = url
             return
         }
@@ -182,6 +188,10 @@ struct AppRoot: View {
     /// Janitor first, then the resolver. A Coach store that cannot be read must not become
     /// `unselected`; `RootNavigation` reports storage problems itself, so it is the fallback.
     private func resolveInstallState() async -> InstallState {
+        // Before anything else: copies left by a killed process, an ignored open or a failed
+        // start never survive a launch. Runs synchronously on the main actor, so no open that
+        // arrives later can be swept; only an already-held URL is kept (privacy review F1).
+        ArchiveImportUseCases.sweepInbox(keeping: [pendingOpenURL, systemOpen?.url].compactMap { $0 })
         guard let services = try? environment.makeArchiveServices() else {
             return .coach
         }

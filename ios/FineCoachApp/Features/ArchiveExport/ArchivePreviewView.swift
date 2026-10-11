@@ -62,6 +62,17 @@ struct ArchivePreviewView: View {
                         )
                     )
                     FCListRowDivider()
+                    if !preview.sectionNames.isEmpty {
+                        FCSectionLabel(String(localized: "archive.export.preview.sectionNames"))
+                            .padding(.top, FCPrimitives.space3)
+                            .padding(.bottom, FCPrimitives.space2)
+                            .accessibilityIdentifier(FCAccessibilityID.archiveExportSectionNames)
+                        FCListRowDivider()
+                        ForEach(Array(preview.sectionNames.enumerated()), id: \.offset) { _, name in
+                            FCListRow(title: name, showsDisclosure: false)
+                            FCListRowDivider()
+                        }
+                    }
                     if !preview.modules.exerciseInfo {
                         Text(String(localized: "archive.export.preview.placeholderNames"))
                             .fcFont(.caption)

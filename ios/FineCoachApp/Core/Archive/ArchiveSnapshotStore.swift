@@ -313,11 +313,23 @@ public final class ArchiveSnapshotStore: @unchecked Sendable {
         try protectedFileStore.atomicReplace(data: encoder.encode(pointer), at: pointerURL, policy: .business)
     }
 
-    /// Creates the file, writes, `fsync`s, then applies protection and backup exclusion.
+    /// Creates the empty file already protected and excluded from backup, writes, `fsync`s,
+    /// then re-applies both and audits the readback. The plaintext is never on disk
+    /// without protection or outside the backup exclusion.
     private func writeSynchronized(_ data: Data, to url: URL) throws {
-        guard fileManager.createFile(atPath: url.path, contents: nil) else {
+        guard
+            fileManager.createFile(
+                atPath: url.path,
+                contents: nil,
+                attributes: [.protectionKey: ProtectedFilePolicy.business.fileProtection]
+            )
+        else {
             throw DomainError.invalidFileOperation
         }
+        var excluded = URLResourceValues()
+        excluded.isExcludedFromBackup = true
+        var mutableURL = url
+        try mutableURL.setResourceValues(excluded)
         let handle = try FileHandle(forWritingTo: url)
         defer { try? handle.close() }
         try handle.write(contentsOf: data)

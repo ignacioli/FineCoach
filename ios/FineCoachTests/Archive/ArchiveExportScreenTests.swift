@@ -229,6 +229,51 @@ final class ArchiveExportScreenTests: XCTestCase {
         XCTAssertTrue(preview.modules.trainingRecords)
     }
 
+    /// Privacy review F4 (owner decision 2026-10-11): session section names travel with the
+    /// training records, so the preview lists them: deduplicated, first-seen order, and equal
+    /// to what the exported (encoded and decoded) snapshot carries.
+    func testPreviewSectionNamesEqualTheExportedSectionNames() throws {
+        func exercise() -> ArchiveExportSource.Exercise {
+            .init(
+                identity: .stable("builtin-1"), kind: .builtIn, isAssisted: false, name: "示例动作",
+                catalog: .init(
+                    primaryMuscles: ["胸"], secondaryMuscles: [], equipment: "杠铃", sourceName: "wger.de",
+                    licenseName: "CC-BY-SA-3.0", licenseText: "示例许可文本"),
+                recordMode: .weightReps,
+                sets: [ArchiveSet(weightValue: try! DecimalValue("40"), repetitionCount: try! DecimalValue("8"), unit: .kilograms)])
+        }
+        func session(day: Int, _ names: [String?]) -> ArchiveExportSource.Session {
+            .init(
+                completedAtUTC: Date(timeIntervalSince1970: 1_788_228_000 + Double(day) * 86_400),
+                localDate: try! LocalDate(year: 2026, month: 9, day: day), durationMinutes: 45,
+                trainingFocus: [.chest], summary: nil,
+                sections: names.map { .init(name: $0, exercises: [exercise()]) })
+        }
+        let source = ArchiveExportSource(
+            student: .init(displayName: "示例学员", sex: .other),
+            sessions: [
+                session(day: 1, ["示例热身", nil, "示例主项"]),
+                session(day: 2, ["示例主项", "示例收操", "示例热身"]),
+            ],
+            bodyMetrics: [])
+        let all = X.selection(for: source, keeping: Set(source.availability.allItems))
+        let snapshot = try ArchiveExportPolicy.makeSnapshot(source: source, selection: all, identity: X.identity, now: X.now)
+
+        let exported = try JSONDecoder().decode(ArchiveSnapshot.self, from: JSONEncoder().encode(snapshot))
+        var seen = Set<String>()
+        let exportedNames = exported.sessions.flatMap(\.sections).compactMap(\.name).filter { seen.insert($0).inserted }
+        XCTAssertEqual(exportedNames, ["示例热身", "示例主项", "示例收操"])
+        XCTAssertEqual(ArchivePreviewModel(snapshot: snapshot).sectionNames, exportedNames)
+
+        // Training records off: the export carries no sessions, so the preview lists none.
+        let withoutRecords = X.selection(
+            for: source, keeping: Set(source.availability.allItems).subtracting([.trainingRecords]))
+        let noRecordsSnapshot = try ArchiveExportPolicy.makeSnapshot(
+            source: source, selection: withoutRecords, identity: X.identity, now: X.now)
+        XCTAssertTrue(noRecordsSnapshot.sessions.isEmpty)
+        XCTAssertTrue(ArchivePreviewModel(snapshot: noRecordsSnapshot).sectionNames.isEmpty)
+    }
+
     nonisolated(unsafe) private static var cachedSource: ArchiveExportSource?
 
     private func seededSource() async throws -> ArchiveExportSource {
