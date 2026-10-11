@@ -30,12 +30,12 @@ final class M2ComponentContractTests: XCTestCase {
 
     /// Every secondary page hides the system bar through `fcSecondaryPage` and draws the inline
     /// back; none keeps the `.toolbarRole(.editor)` system back row (owner walkthrough 2026-10-10).
-    /// Left on the system bar on purpose: ActiveSessionView (the artwork 11/30 draws no back and a
-    /// 22pt title; owner decision pending) and the nav-title pages whose title sits in the bar.
+    /// Left on the system bar on purpose: only the nav-title pages whose title sits in the bar
+    /// (ActiveSessionView moved to the inline back, owner 2026-10-10).
     func testEverySecondaryPageUsesTheInlineBack() throws {
         let features = appRoot().appendingPathComponent("Features")
         let enumerator = try XCTUnwrap(FileManager.default.enumerator(at: features, includingPropertiesForKeys: nil))
-        let systemBackAllowed: Set<String> = ["ActiveSessionView.swift"]
+        let systemBackAllowed: Set<String> = []
         var secondaryPages = 0
         for case let url as URL in enumerator where url.pathExtension == "swift" {
             let name = url.lastPathComponent

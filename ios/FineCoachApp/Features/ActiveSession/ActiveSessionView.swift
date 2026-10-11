@@ -128,8 +128,7 @@ struct ActiveSessionView: View {
         }
         .scrollDismissesKeyboard(.interactively)
         .background(FCSemanticColors.surfacePage)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarRole(.editor)
+        .fcSecondaryPage()
         .fcBottomSheet(isPresented: $viewModel.isAddingExercise) {
             addExerciseSheet
         }
@@ -345,10 +344,9 @@ struct ActiveSessionView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: FCPrimitives.space2) {
-            Text(String(localized: "session.title"))
-                .fcFont(.titleEmphasis)
-                .foregroundStyle(FCSemanticColors.textPrimary)
-                .accessibilityAddTraits(.isHeader)
+            // 11/30 use the 22/700 title; the inline back matches every other secondary page
+            // (owner 2026-10-10).
+            FCPageHeader(title: String(localized: "session.title"), back: .init(), titleStyle: .titleEmphasis)
             HStack(alignment: .firstTextBaseline) {
                 Text(TodayRowPresentation.nameAndFocus(studentName, viewModel.session?.trainingFocus ?? []))
                     .fcFont(.headline)

@@ -54,6 +54,7 @@ public struct FCPageHeader: View {
     private let subtitle: String?
     private let trailingAction: TrailingAction?
     private let back: BackAction?
+    private let titleStyle: FCTextStyle
 
     @Environment(\.dismiss) private var dismiss
 
@@ -61,8 +62,10 @@ public struct FCPageHeader: View {
         title: String,
         subtitle: String? = nil,
         back: BackAction? = nil,
-        trailingAction: TrailingAction? = nil
+        trailingAction: TrailingAction? = nil,
+        titleStyle: FCTextStyle = .titleLarge
     ) {
+        self.titleStyle = titleStyle
         self.title = title
         self.subtitle = subtitle
         self.back = back
@@ -82,7 +85,7 @@ public struct FCPageHeader: View {
                         Spacer(minLength: 0)
                     } else {
                         Text(title)
-                            .fcFont(.titleLarge)
+                            .fcFont(titleStyle)
                             .foregroundStyle(FCSemanticColors.textPrimary)
                             .fixedSize(horizontal: false, vertical: true)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -102,6 +105,9 @@ public struct FCPageHeader: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        // Breathing room under the status bar; also keeps the 44pt back hit area clear of it
+        // (components.md DS-PAGE-HEADER 页头位置, owner 2026-10-10).
+        .padding(.top, FCPrimitives.space2)
     }
 
     private func backControl(_ back: BackAction) -> some View {
