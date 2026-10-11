@@ -205,3 +205,24 @@ G4 已于 2026-08-30 通过。R1 已实现并验收。下一步唯一允许：�
 | 信息：删除时后续步骤失败，界面仍显示内存中的档案 | 可重试完成；下次启动 janitor 清理。登记，不修 |
 
 **只能在真机 / 正式环境确认（留给 T070）**：文件保护等级与备份排除的真机读回；`Documents/Inbox` 是否进入 iCloud / 设备备份；文件选择器或分享面板打开时 App 切换器截图；系统是否提示保存档案密码（D-12）；64 MiB 上限档案导入时的内存。
+
+## M2 个人训练档案：验证分区（T068，2026-10-11）
+
+### 自动门（模拟器 iPhone 17，iOS 26）
+
+| 门 | 结果 |
+|---|---|
+| `xcodebuild build -scheme FineCoach` | 通过 |
+| `FineCoachTests` | 450 个，1 个有意跳过（`ContrastHarnessTests.testTextDisabledOnSurfacePageIsWCAGExempt`），0 失败 |
+| `FineCoachIntegrationTests` | 154 个，0 失败 |
+
+数字为 `dac2609`（含已合并的 M1-B 扣课修复）上的结果。界面测试只改了首次启动步骤，未运行，不在验收门内。
+
+### 模拟器走查
+
+- 核心页面 L3：M2-02 导出（T038）2026-10-10 通过；M2-11 查看首页（T053）2026-10-11 通过。
+- 集中走查（T069）：待进行，清单见 `design/m2-hifi/implementation-map.md` §7.7。
+
+### 物理设备（iPhone XS Max）
+
+- T070：待进行（quickstart §4，D-1～D-12），另含 T066 列出的只能在真机确认的事项。
