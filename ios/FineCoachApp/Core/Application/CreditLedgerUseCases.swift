@@ -282,10 +282,12 @@ public enum SessionCreditOutcome: Equatable, Sendable {
 public struct SessionCreditSettlement: Sendable {
     private let appointments: AppointmentUseCases
     private let credits: CreditLedgerUseCases
+    private let history: HistoryUseCases
 
-    public init(appointments: AppointmentUseCases, credits: CreditLedgerUseCases) {
+    public init(appointments: AppointmentUseCases, credits: CreditLedgerUseCases, history: HistoryUseCases) {
         self.appointments = appointments
         self.credits = credits
+        self.history = history
     }
 
     /// Call right after `ActiveSessionUseCases.finish()` succeeded. A Session
@@ -298,7 +300,12 @@ public struct SessionCreditSettlement: Sendable {
         }
         let linked = try await linkedAppointment(for: session)
         if let linked, linked.status == .inProgress {
-            _ = try await appointments.completeSession(appointmentID: linked.id)
+            do {
+                _ = try await appointments.completeSession(appointmentID: linked.id)
+            } catch DomainError.invalidState {
+                // Already completed by a concurrent launch repair; the debit
+                // below is keyed, so settling again stays at most once.
+            }
         }
         guard let package = try await credits.activePackage(studentID: session.studentID) else {
             return .noActivePackage
@@ -336,6 +343,42 @@ public struct SessionCreditSettlement: Sendable {
             return
         }
         _ = try await appointments.abandonEmptySession(appointmentID: linked.id)
+    }
+
+    /// Launch repair for the crash window between the Session finish write
+    /// and the settlement above: an Appointment still `inProgress` whose
+    /// linked Session is already completed gets the same settlement as a
+    /// normal finish (complete + at most one keyed debit, no prompt); one whose
+    /// Session was abandoned returns to `scheduled`. Settled Appointments are
+    /// no longer `inProgress`, so they are never touched again. Ad-hoc
+    /// Sessions have no Appointment and are left alone (no debit). Returns the
+    /// number of Appointments repaired; a failure on one does not stop the rest.
+    @discardableResult
+    public func repairInterruptedLinkedSessions() async -> Int {
+        guard let pending = try? await appointments.inProgressLinkedAppointments() else {
+            return 0
+        }
+        var repaired = 0
+        for appointment in pending {
+            guard let sessionID = appointment.linkedSessionID,
+                let session = try? await history.fullSession(id: sessionID)
+            else {
+                continue
+            }
+            switch session.state {
+            case .completed:
+                if (try? await settleFinishedSession(session)) != nil {
+                    repaired += 1
+                }
+            case .abandonedEmpty:
+                if (try? await settleAbandonedSession(session)) != nil {
+                    repaired += 1
+                }
+            case .inProgress:
+                continue
+            }
+        }
+        return repaired
     }
 
     public func activePackage(studentID: StableUUID) async throws -> CoursePackage? {

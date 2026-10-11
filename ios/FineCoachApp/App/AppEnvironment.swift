@@ -112,10 +112,14 @@ public final class AppEnvironment: ObservableObject {
 
     /// Session finish → linked Appointment + credit ledger (M1B-FR-013/014).
     var sessionCreditSettlement: SessionCreditSettlement? {
-        guard let appointmentUseCases, let creditLedgerUseCases else {
+        guard let appointmentUseCases, let creditLedgerUseCases, let historyUseCases else {
             return nil
         }
-        return SessionCreditSettlement(appointments: appointmentUseCases, credits: creditLedgerUseCases)
+        return SessionCreditSettlement(
+            appointments: appointmentUseCases,
+            credits: creditLedgerUseCases,
+            history: historyUseCases
+        )
     }
 
     func requireTemplateUseCases() -> TemplateUseCases {

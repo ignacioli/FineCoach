@@ -38,8 +38,9 @@
                 ids: TestIDGenerator(ids: [studentUUID])
             ).create(draft: StudentDraft(displayName: "林青", sex: .female))
 
+            let sessionRepository = CoreDataSessionRepository(writer: controller.writer)
             let sessions = ActiveSessionUseCases(
-                sessionRepository: CoreDataSessionRepository(writer: controller.writer),
+                sessionRepository: sessionRepository,
                 studentRepository: studentRepository,
                 exerciseRepository: CoreDataExerciseRepository(writer: controller.writer),
                 sectionRepository: CoreDataSessionSectionRepository(writer: controller.writer),
@@ -75,7 +76,11 @@
                 sessions: sessions,
                 appointments: appointments,
                 credits: credits,
-                settlement: SessionCreditSettlement(appointments: appointments, credits: credits)
+                settlement: SessionCreditSettlement(
+                    appointments: appointments,
+                    credits: credits,
+                    history: HistoryUseCases(sessionRepository: sessionRepository, clock: clock, ids: ids)
+                )
             )
         }
 
@@ -332,6 +337,62 @@
             XCTAssertEqual(balance, 0)
             let trail = try await env.credits.adjustments(packageID: package.id)
             XCTAssertEqual(trail.map(\.reasonKind), [.manualCorrection])
+            try await env.controller.shutdownForTesting()
+        }
+
+        // MARK: - Launch repair (crash between finish and settlement)
+
+        func testLaunchRepairSettlesAnInterruptedLinkedFinishExactlyOnce() async throws {
+            let env = try await makeEnvironment()
+            let package = try await makePackage(env, totalCredits: 5)
+            let appointment = try await startFromAppointment(env)
+            // The process "died" right after the finish write: no settlement ran.
+            let finished = try await recordAndFinish(env)
+            let stuck = try await env.appointments.appointment(id: appointment.id)
+            XCTAssertEqual(stuck.status, .inProgress)
+
+            let firstRepair = await env.settlement.repairInterruptedLinkedSessions()
+            XCTAssertEqual(firstRepair, 1)
+            let repaired = try await env.appointments.appointment(id: appointment.id)
+            XCTAssertEqual(repaired.status, .completed)
+            let secondRepair = await env.settlement.repairInterruptedLinkedSessions()
+            XCTAssertEqual(secondRepair, 0, "a repaired Appointment is no longer in progress")
+
+            let balance = try await env.credits.balance(packageID: package.id)
+            XCTAssertEqual(balance, 4)
+            let trail = try await env.credits.adjustments(packageID: package.id)
+            XCTAssertEqual(trail.map(\.sourceEventKey), [CreditLedger.sourceEventKey(sessionComplete: finished.id)])
+            try await env.controller.shutdownForTesting()
+        }
+
+        func testLaunchRepairLeavesSettledLinkedAndUnansweredAdhocSessionsUntouched() async throws {
+            let env = try await makeEnvironment()
+            let package = try await makePackage(env, totalCredits: 5)
+            _ = try await startFromAppointment(env)
+            let linked = try await recordAndFinish(env)
+            _ = try await env.settlement.settleFinishedSession(linked)
+            // Ad-hoc finish whose question was never answered: no debit at launch.
+            _ = try await recordAndFinish(env)
+
+            let repairs = await env.settlement.repairInterruptedLinkedSessions()
+            XCTAssertEqual(repairs, 0)
+            let balance = try await env.credits.balance(packageID: package.id)
+            XCTAssertEqual(balance, 4)
+            let trail = try await env.credits.adjustments(packageID: package.id)
+            XCTAssertEqual(trail.map(\.reasonKind), [.sessionComplete])
+            try await env.controller.shutdownForTesting()
+        }
+
+        func testLaunchRepairReturnsAnInterruptedAbandonToScheduled() async throws {
+            let env = try await makeEnvironment()
+            let appointment = try await startFromAppointment(env)
+            _ = try await env.sessions.abandonEmpty()
+
+            let repairs = await env.settlement.repairInterruptedLinkedSessions()
+            XCTAssertEqual(repairs, 1)
+            let restored = try await env.appointments.appointment(id: appointment.id)
+            XCTAssertEqual(restored.status, .scheduled)
+            XCTAssertNil(restored.linkedSessionID)
             try await env.controller.shutdownForTesting()
         }
 

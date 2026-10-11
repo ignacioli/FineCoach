@@ -495,6 +495,13 @@ public struct AppointmentUseCases: Sendable {
         try await appointmentRepository.appointment(id: id)
     }
 
+    /// Appointments whose training was started and not yet settled (any
+    /// Student) -- input to `SessionCreditSettlement`'s launch repair.
+    public func inProgressLinkedAppointments() async throws -> [Appointment] {
+        try await appointmentRepository.activeAppointments(excluding: nil)
+            .filter { $0.status == .inProgress && $0.linkedSessionID != nil }
+    }
+
     public func appointments(studentID: StableUUID) async throws -> [Appointment] {
         try await appointmentRepository.appointments(studentID: studentID)
     }
