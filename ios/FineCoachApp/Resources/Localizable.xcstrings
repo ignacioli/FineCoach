@@ -7732,7 +7732,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "FineCoach 不会自动识别文字里的敏感内容，请逐条检查后再继续。"
+            "value": "精练教练不会自动识别文字里的敏感内容，请逐条检查后再继续。"
           }
         }
       }
@@ -7809,7 +7809,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "文件交出并被接收后，你和 FineCoach 都无法撤回。"
+            "value": "文件交出并被接收后，你和精练教练都无法撤回。"
           }
         }
       }
@@ -8084,7 +8084,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "在系统面板中可以存到「文件」或发给其他 App。FineCoach 不托管文件，也不生成公开链接。"
+            "value": "在系统面板中可以存到「文件」或发给其他 App。精练教练不托管文件，也不生成公开链接。"
           }
         }
       }
