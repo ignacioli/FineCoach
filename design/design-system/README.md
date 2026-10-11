@@ -327,6 +327,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 
 | 资产 | 文件 | 来源核验 |
 |---|---|---|
+| App 图标 | `assets/app-icon-{light,dark,tinted}.png`，1024×1024 | 见 §9.2 |
 | 吉祥物（空态） | `assets/mascot-empty-state.jpeg`，1024×1024 | 与 Penpot 内嵌原图 `inset-warm2.jpeg` 逐字节一致（276383 字节，SHA-256 `aca587ee…d87395b`） |
 
 吉祥物只用于空态插图，画稿显示尺寸为 220×220。例外：28 分享设置页隐私说明与 M2 首次说明页 W-01b 使用 `mascot-avatar` 头像（装饰），分别为 44×44（`radius.md`）与 64×64（`radius.lg`）；M2-07 首次启动二选一使用全身吉祥物 220×220（见 `m2-hifi/welcome-redesign.md` §2）。
@@ -338,6 +339,16 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 - 着色：主练部位 `action.primary`；次要部位 `text.disabled`（`#A8A39A`）；其余 `surface.subtle` 填充。所有区块 1pt `border.control` 描边。图下方用两个 10pt 圆点加 `caption` 文字做图例（「主练 · …」「次要 · …」）。
 - 数据：由本次训练各动作的主练部位与次要部位汇总，不新增数据；自定义动作没有部位信息，不参与着色。
 - 细分肌群图不在本次范围（specs 仓 `ideas.md` §9.31）。
+
+### 9.2 App 图标（2026-10-11 批准）
+
+- 来源：产品负责人以 `mascot-avatar.png` 为参考，用 ChatGPT image 生成 light / dark 两张 1254×1254 位图（吉祥物胸像，无道具、无文字），在本仓用 CoreGraphics 缩放为 1024×1024；tinted 版由 dark 版去饱和得到。
+- 文件：`assets/app-icon-light.png`（米色底约 `#FAF6F0`，SHA-256 `0ba2995b…5fab091a`）、`assets/app-icon-dark.png`（暖炭黑底约 `#2A2622`，`092724bd…787b3c11`）、`assets/app-icon-tinted.png`（灰度，`47a949d2…a08e0f0f`）。均为满版方形、无透明通道、无圆角，圆角由 iOS 遮罩。工程内副本在 `Assets.xcassets/AppIcon.appiconset`（单张 1024 universal + dark + tinted 外观）。
+- 构图约束：耳尖与脸部在 iOS 圆角遮罩（边长 22.37% 圆角）内；60pt 下只保留兔子轮廓与眼睛，不放徽章、记事本等小道具。
+- 吉祥物插图内的橙色（§2.3）在图标中保留，仍不得用于界面元素。
+- dark / tinted 只是 iOS 18 主屏图标外观，随用户在主屏「自定」中的选择切换；App 界面本身仍未适配深色模式，不因此引入界面深色主题。
+- Penpot：「M1-B G5 Design」Foundations 页画板「AppIcon options (2026-10-11) — REJECTED A / B / C」底部已放入批准的三张图（`AppIcon / approved / {light,dark,tinted}`），上方几何兔头 / 「练」字标 / 哑铃片三案为否决方案（辨识度与格调不足），保留作记录。
+- 验收：2026-10-11 产品负责人在 iPhone Air 模拟器主屏确认 light / dark 外观，Icon Review 通过。
 
 ## 10. 来源冲突裁决记录
 
