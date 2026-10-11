@@ -9001,6 +9001,127 @@
           }
         }
       }
+    },
+    "archive.viewer.exercises.subtitleFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本档案出现的 %lld 个动作 · 只有文字，不含图片"
+          }
+        }
+      }
+    },
+    "archive.viewer.exercises.primaryFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "主：%@"
+          }
+        }
+      }
+    },
+    "archive.viewer.exercises.secondaryFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "次：%@"
+          }
+        }
+      }
+    },
+    "archive.viewer.exercises.search": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜索动作名称"
+          }
+        }
+      }
+    },
+    "archive.viewer.exercises.empty": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有符合条件的动作"
+          }
+        }
+      }
+    },
+    "archive.viewer.about.source": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "来源"
+          }
+        }
+      }
+    },
+    "archive.viewer.about.snapshotTime": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "快照时间"
+          }
+        }
+      }
+    },
+    "archive.viewer.about.contents": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "包含内容"
+          }
+        }
+      }
+    },
+    "archive.viewer.about.attribution.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动作资料来源"
+          }
+        }
+      }
+    },
+    "archive.viewer.about.attribution.origin": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本档案中的内置动作资料来自 %@，\n按 %@ 许可证使用："
+          }
+        }
+      }
+    },
+    "archive.viewer.about.attribution.custom": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自定义动作和仅本次动作由教练填写，不在此列。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

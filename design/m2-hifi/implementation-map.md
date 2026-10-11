@@ -296,6 +296,25 @@ M2-06b → 「完成」→ archiveExport.done → 是（leave() 并返回学员�
 
 **实现时的自定文案与判断（待集中走查时确认）**：「删除失败」/「本机档案没有删除完成，请重试。」；「当前档案暂时无法读取，没有进行替换。」；替换中断显示「替换没有完成。当前档案没有改变。」（首次导入中断不提示，替换中断改为提示，避免点了「替换为新档案」后无声返回）；替换成功后直接回到查看首页并重新载入，没有成功摘要页。
 
+### 7.6 US-5 动作资料与署名（tasks T061–T064）与隐私自查（T065，2026-10-11）
+
+自动门全绿（数字见提交说明）。**未经人工目视**：M2-16、M2-17 留到 T069 集中走查。
+
+| 页面 | 控件 | 标识 | 写数据 | 宽度 |
+|---|---|---|---|---|
+| M2-11 | 动作资料行（含动作资料时可点，否则不可用态） | `archiveHome.exercises` | 否（push M2-16） | `FCHubRow`（`ArchiveHomeView.swift:96`） |
+| M2-11 | 关于本档案行 | `archiveHome.about` | 否（push M2-17） | `FCHubRow`（`:105`） |
+| M2-16 | 页头 `‹` | `archiveExercises.back` | 否 | `FCPageHeader`（`ArchiveExercisesView.swift:24`） |
+| M2-16 | 搜索框 | `archiveExercises.search` | 否（内存筛选） | `FCSearchField`（`:29`） |
+| M2-16 | 动作行（不可点，无 `›`） | `archiveExercises.row.N` | 否 | `FCListRow`，根 VStack `maxWidth`（`:42`、`:56`） |
+| M2-17 | 页头 `‹` | `archiveAbout.back` | 否 | `FCPageHeader`（`ArchiveAboutView.swift:14`） |
+| M2-17 | 来源 / 快照时间 / 包含内容 | — | 否 | `FCLabelValueRow`（`:20,24,28`） |
+| M2-17 | 许可证链接 | `archiveAbout.licenseLink` | 否（系统打开固定的 creativecommons.org 地址，不用档案内的文字作为链接目标） | `FCLinkButton`，VStack `maxWidth`（`:60`、`:67`） |
+
+**实现时的自定与偏差（待 T069 确认）**：搜索无结果「没有符合条件的动作」；PNG 中许可证网址是普通说明文字，实现为可点链接；许可证名「CC-BY-SA-3.0」显示为「CC-BY-SA 3.0」并用不换行字符保持整体；含动作资料但没有内置动作时不显示「动作资料来源」区段。
+
+**T065 引出的修正**：M2-15 的「辅助器械 · 配重下降 = 进步」原先只用警示色文字表达状态，不符合 NFR-005；改为与 M1 训练趋势共用同一个胶囊徽标 `AssistedLoadBadge`（`Features/Trends/TrendLineChart.swift`），两边外观一致。
+
 ## 8. 待产品负责人确认的问题
 
 1. ~~M2-09 的进入路径~~：**已定（R4）**，支持系统打开档案文件，spec D-010 已修订。

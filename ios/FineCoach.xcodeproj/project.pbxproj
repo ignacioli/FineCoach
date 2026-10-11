@@ -13,6 +13,8 @@
 		D989F09B2BA9E8B709C087F8 /* ArchiveBodyDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E78DCEB0FFCF305A79E809 /* ArchiveBodyDataView.swift */; };
 		77DFB32B6012A4BAA04EFA04 /* ArchiveTrendsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568FA1215475B370C3A90E3A /* ArchiveTrendsView.swift */; };
 		DCE58066353129B7CA835152 /* ArchiveSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA2A13009BE69FED37CB9CD0 /* ArchiveSettingsView.swift */; };
+		7D63EE0581A531BADCF854A5 /* ArchiveAboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59524275D220BF0B2A70C04E /* ArchiveAboutView.swift */; };
+		BDB5525B09C9D3EAABCE0F30 /* ArchiveExercisesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C743FCD4337E6E77595ADD /* ArchiveExercisesView.swift */; };
 		5E3346DB77E3644B92203359 /* ArchiveViewerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B7CEEEF9EA22FAE3724F69 /* ArchiveViewerModel.swift */; };
 		45E5E3BFA0F02A20EFEB1348 /* ArchiveViewerPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A25769FC06425F1830C50B8 /* ArchiveViewerPresentation.swift */; };
 		17BB4594FB165EE5AFD93137 /* TrendLineChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80744E8BACE34CCF8281ACDB /* TrendLineChart.swift */; };
@@ -292,6 +294,7 @@
 		B500 /* VisionHarnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A501 /* VisionHarnessTests.swift */; };
 		AD5F02 /* CapabilityManifestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5F01 /* CapabilityManifestTests.swift */; };
 		AD5F12 /* LogSurfaceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5F11 /* LogSurfaceTests.swift */; };
+		FF8D9EBECC4D6070F1FC54DA /* ArchivePrivacyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01194BC815492A688C282A24 /* ArchivePrivacyTests.swift */; };
 		AD5F22 /* PrivacyCoverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5F21 /* PrivacyCoverTests.swift */; };
 		AD5F42 /* TouchTargetComponentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5F41 /* TouchTargetComponentTests.swift */; };
 		62EC3C824E401E4C5E09C3CD /* M2ComponentContractTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 748962A31B5656501D5FB6D4 /* M2ComponentContractTests.swift */; };
@@ -332,6 +335,7 @@
 		80767B234DEBABF5598A510D /* ArchiveImportIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739AFF177606FF32EC4EDAF7 /* ArchiveImportIntegrationTests.swift */; };
 		B80077D9B966AB499B3B15B7 /* ArchiveDeleteIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EC08854D77F42FF5DBC8C71 /* ArchiveDeleteIntegrationTests.swift */; };
 		44EE45B2F1E70DB8CA2453E2 /* ArchiveReplaceIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B895809CA1129C2780BE99 /* ArchiveReplaceIntegrationTests.swift */; };
+		6CE83FF9C910E4E3B8C9AB4E /* ArchiveExerciseInfoIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D3B60730AF2820A48873778 /* ArchiveExerciseInfoIntegrationTests.swift */; };
 		8FE54578732674057F095EBA /* ArchiveExportFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C064C982C9D5E5968959CB /* ArchiveExportFixtures.swift */; };
 		83C0625A76E06855F0309F7F /* ArchiveExportFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C064C982C9D5E5968959CB /* ArchiveExportFixtures.swift */; };
 		DF5BBDD59FF71E4042E1A2FA /* ArchiveExclusionNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41004E3E69D3A5C1D18FAB46 /* ArchiveExclusionNote.swift */; };
@@ -379,6 +383,8 @@
 		27E78DCEB0FFCF305A79E809 /* ArchiveBodyDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveBodyDataView.swift; sourceTree = "<group>"; };
 		568FA1215475B370C3A90E3A /* ArchiveTrendsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveTrendsView.swift; sourceTree = "<group>"; };
 		CA2A13009BE69FED37CB9CD0 /* ArchiveSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveSettingsView.swift; sourceTree = "<group>"; };
+		59524275D220BF0B2A70C04E /* ArchiveAboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveAboutView.swift; sourceTree = "<group>"; };
+		E9C743FCD4337E6E77595ADD /* ArchiveExercisesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExercisesView.swift; sourceTree = "<group>"; };
 		30B7CEEEF9EA22FAE3724F69 /* ArchiveViewerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveViewerModel.swift; sourceTree = "<group>"; };
 		8A25769FC06425F1830C50B8 /* ArchiveViewerPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveViewerPresentation.swift; sourceTree = "<group>"; };
 		80744E8BACE34CCF8281ACDB /* TrendLineChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendLineChart.swift; sourceTree = "<group>"; };
@@ -601,6 +607,7 @@
 		A501 /* VisionHarnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionHarnessTests.swift; sourceTree = "<group>"; };
 		AD5F01 /* CapabilityManifestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapabilityManifestTests.swift; sourceTree = "<group>"; };
 		AD5F11 /* LogSurfaceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogSurfaceTests.swift; sourceTree = "<group>"; };
+		01194BC815492A688C282A24 /* ArchivePrivacyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchivePrivacyTests.swift; sourceTree = "<group>"; };
 		AD5F21 /* PrivacyCoverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyCoverTests.swift; sourceTree = "<group>"; };
 		AD5F41 /* TouchTargetComponentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchTargetComponentTests.swift; sourceTree = "<group>"; };
 		748962A31B5656501D5FB6D4 /* M2ComponentContractTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M2ComponentContractTests.swift; sourceTree = "<group>"; };
@@ -689,6 +696,7 @@
 		739AFF177606FF32EC4EDAF7 /* ArchiveImportIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveImportIntegrationTests.swift; sourceTree = "<group>"; };
 		9EC08854D77F42FF5DBC8C71 /* ArchiveDeleteIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveDeleteIntegrationTests.swift; sourceTree = "<group>"; };
 		D7B895809CA1129C2780BE99 /* ArchiveReplaceIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveReplaceIntegrationTests.swift; sourceTree = "<group>"; };
+		5D3B60730AF2820A48873778 /* ArchiveExerciseInfoIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExerciseInfoIntegrationTests.swift; sourceTree = "<group>"; };
 		32C064C982C9D5E5968959CB /* ArchiveExportFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportFixtures.swift; sourceTree = "<group>"; };
 		41004E3E69D3A5C1D18FAB46 /* ArchiveExclusionNote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExclusionNote.swift; sourceTree = "<group>"; };
 		436AE4578E63E75F016B4A4C /* ArchiveExportFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportFlowView.swift; sourceTree = "<group>"; };
@@ -1526,6 +1534,7 @@
 			children = (
 				AD5F01 /* CapabilityManifestTests.swift */,
 				AD5F11 /* LogSurfaceTests.swift */,
+				01194BC815492A688C282A24 /* ArchivePrivacyTests.swift */,
 				AD5F21 /* PrivacyCoverTests.swift */,
 			);
 			path = Privacy;
@@ -1710,6 +1719,8 @@
 				27E78DCEB0FFCF305A79E809 /* ArchiveBodyDataView.swift */,
 				568FA1215475B370C3A90E3A /* ArchiveTrendsView.swift */,
 				CA2A13009BE69FED37CB9CD0 /* ArchiveSettingsView.swift */,
+				59524275D220BF0B2A70C04E /* ArchiveAboutView.swift */,
+				E9C743FCD4337E6E77595ADD /* ArchiveExercisesView.swift */,
 				30B7CEEEF9EA22FAE3724F69 /* ArchiveViewerModel.swift */,
 				8A25769FC06425F1830C50B8 /* ArchiveViewerPresentation.swift */,
 				BAF8E7D172A3DF3760358667 /* ArchiveViewerRoot.swift */,
@@ -1739,6 +1750,7 @@
 				739AFF177606FF32EC4EDAF7 /* ArchiveImportIntegrationTests.swift */,
 				9EC08854D77F42FF5DBC8C71 /* ArchiveDeleteIntegrationTests.swift */,
 				D7B895809CA1129C2780BE99 /* ArchiveReplaceIntegrationTests.swift */,
+				5D3B60730AF2820A48873778 /* ArchiveExerciseInfoIntegrationTests.swift */,
 				EE017497F4CAFFE91103028B /* ArchiveFoundationIntegrationTests.swift */,
 			);
 			path = Archive;
@@ -1940,6 +1952,8 @@
 				D989F09B2BA9E8B709C087F8 /* ArchiveBodyDataView.swift in Sources */,
 				77DFB32B6012A4BAA04EFA04 /* ArchiveTrendsView.swift in Sources */,
 				DCE58066353129B7CA835152 /* ArchiveSettingsView.swift in Sources */,
+				7D63EE0581A531BADCF854A5 /* ArchiveAboutView.swift in Sources */,
+				BDB5525B09C9D3EAABCE0F30 /* ArchiveExercisesView.swift in Sources */,
 				5E3346DB77E3644B92203359 /* ArchiveViewerModel.swift in Sources */,
 				45E5E3BFA0F02A20EFEB1348 /* ArchiveViewerPresentation.swift in Sources */,
 				17BB4594FB165EE5AFD93137 /* TrendLineChart.swift in Sources */,
@@ -2188,6 +2202,7 @@
 				62EC3C824E401E4C5E09C3CD /* M2ComponentContractTests.swift in Sources */,
 				AD5F02 /* CapabilityManifestTests.swift in Sources */,
 				AD5F12 /* LogSurfaceTests.swift in Sources */,
+				FF8D9EBECC4D6070F1FC54DA /* ArchivePrivacyTests.swift in Sources */,
 				AD5F22 /* PrivacyCoverTests.swift in Sources */,
 				B963 /* FCStepperTests.swift in Sources */,
 				AC0C02 /* ComponentCatalogTests.swift in Sources */,
@@ -2221,6 +2236,7 @@
 				80767B234DEBABF5598A510D /* ArchiveImportIntegrationTests.swift in Sources */,
 				B80077D9B966AB499B3B15B7 /* ArchiveDeleteIntegrationTests.swift in Sources */,
 				44EE45B2F1E70DB8CA2453E2 /* ArchiveReplaceIntegrationTests.swift in Sources */,
+				6CE83FF9C910E4E3B8C9AB4E /* ArchiveExerciseInfoIntegrationTests.swift in Sources */,
 				4C5E5DF530413B0D0088237A /* FictitiousFixtures.swift in Sources */,
 				4C5E5DF630413B0D0088237A /* TestClock.swift in Sources */,
 				4C5E5DF730413B0D0088237A /* TestIDGenerator.swift in Sources */,

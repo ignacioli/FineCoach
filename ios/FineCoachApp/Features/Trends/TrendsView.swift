@@ -224,7 +224,7 @@ struct TrendsView: View {
             HStack(spacing: FCPrimitives.space2) {
                 sectionTitle(String(localized: "trends.exerciseTrendTitle"))
                 if viewModel.isAssistedForSelectedExercise {
-                    assistedBadge
+                    AssistedLoadBadge()
                 }
             }
             let points = viewModel.exerciseTrend()
@@ -422,16 +422,6 @@ struct TrendsView: View {
         }
     }
 
-    private var assistedBadge: some View {
-        Text(String(localized: "trends.assistedBadge"))
-            .fcFont(.sectionLabel)
-            .padding(.horizontal, FCPrimitives.space2)
-            .padding(.vertical, FCPrimitives.space1)
-            .background(FCSemanticColors.surfaceSelected)
-            .foregroundStyle(FCSemanticColors.statusWarning)
-            .clipShape(Capsule())
-            .accessibilityIdentifier(FCAccessibilityID.trendsAssistedBadge)
-    }
 
     private func tabHint(_ text: String) -> some View {
         Text(text)

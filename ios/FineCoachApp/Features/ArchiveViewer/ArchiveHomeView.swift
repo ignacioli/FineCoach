@@ -5,8 +5,8 @@ import SwiftUI
 /// archive does not hold are unavailable rows, not hidden. Core page: first human walkthrough
 /// is T053.
 ///
-/// 动作资料 and 关于本档案 are shown as plain rows until their pages exist (T062, US-5); they
-/// carry no `›` and no action rather than leading nowhere.
+/// 动作资料 (M2-16) opens only when the archive holds exercise info, otherwise it is an
+/// unavailable row; 关于本档案 (M2-17) is always available (T062).
 struct ArchiveHomeView: View {
     let content: ArchiveViewerContent
     let open: (ArchiveViewerDestination) -> Void
@@ -93,7 +93,7 @@ struct ArchiveHomeView: View {
         FCHubRow(
             icon: .symbol("book"),
             title: String(localized: "archive.export.item.exerciseInfo"),
-            mode: content.hasExerciseInfo ? .informational : notIncluded
+            mode: content.hasExerciseInfo ? .action { open(.exercises) } : notIncluded
         )
         .accessibilityIdentifier(FCAccessibilityID.archiveHomeExercises)
     }
@@ -102,7 +102,7 @@ struct ArchiveHomeView: View {
         FCHubRow(
             icon: .symbol("info.circle"),
             title: String(localized: "archive.viewer.home.about"),
-            mode: .informational
+            mode: .action { open(.about) }
         )
         .accessibilityIdentifier(FCAccessibilityID.archiveHomeAbout)
     }

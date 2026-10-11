@@ -34,6 +34,65 @@ enum ArchiveViewerPresentation {
         return parts.joined(separator: " · ")
     }
 
+    /// M2-16 row meta: 「主：胸 · 次：肩、臂 · 杠铃」. Custom and session-only exercises carry no
+    /// muscles or equipment, so they read 「自定义动作」 / 「仅本次动作」 instead. `nil` when the
+    /// archive holds no exercise info.
+    static func exerciseMeta(_ entry: ArchiveExerciseEntry) -> String? {
+        switch entry.kind {
+        case .custom: return String(localized: "archive.export.exercise.custom")
+        case .oneOff: return String(localized: "archive.export.exercise.oneOff")
+        case .builtIn: break
+        }
+        guard let info = entry.info else { return nil }
+        let separator = String(localized: "archive.export.list.separator")
+        var parts: [String] = []
+        if !info.primaryMuscles.isEmpty {
+            parts.append(String(
+                format: String(localized: "archive.viewer.exercises.primaryFormat"),
+                info.primaryMuscles.joined(separator: separator)))
+        }
+        if !info.secondaryMuscles.isEmpty {
+            parts.append(String(
+                format: String(localized: "archive.viewer.exercises.secondaryFormat"),
+                info.secondaryMuscles.joined(separator: separator)))
+        }
+        if !info.equipment.isEmpty {
+            parts.append(info.equipment)
+        }
+        return parts.isEmpty ? nil : parts.joined(separator: " · ")
+    }
+
+    /// 「CC-BY-SA-3.0 / CC-BY-SA-4.0」 shown as 「CC-BY-SA 3.0 / CC-BY-SA 4.0」 with the licence
+    /// names kept in one piece: the version is joined by a no-break space and the hyphens are
+    /// non-breaking, so a line break can only fall at the ` / ` between two licences (M2-17).
+    static func licenseDisplayName(_ raw: String) -> String {
+        raw.components(separatedBy: " / ").map { name in
+            var shown = ""
+            let characters = Array(name)
+            for (index, character) in characters.enumerated() {
+                if character == "-" {
+                    let nextIsDigit = index + 1 < characters.count && characters[index + 1].isNumber
+                    shown.append(nextIsDigit ? "\u{00A0}" : "\u{2011}")
+                } else if character == " " {
+                    shown.append("\u{00A0}")
+                } else {
+                    shown.append(character)
+                }
+            }
+            return shown
+        }.joined(separator: " / ")
+    }
+
+    /// The Creative Commons page shown under the attribution (M2-17). Fixed in the app, never
+    /// taken from the archive file: an imported archive cannot choose where the link goes.
+    static let licenseLinkText = "creativecommons.org/licenses/by-sa"
+    static let licenseLinkURL = URL(string: "https://creativecommons.org/licenses/by-sa/")
+
+    /// Whether the licence link applies: only to the CC-BY-SA licences the built-in catalog uses.
+    static func showsLicenseLink(_ attribution: ArchiveAttribution) -> Bool {
+        attribution.licenseName.uppercased().contains("BY-SA")
+    }
+
     /// 「个人训练档案」 title row of the home page.
     static func homeTitle(_ content: ArchiveViewerContent) -> String {
         if let name = content.studentDisplayName, !name.isEmpty {

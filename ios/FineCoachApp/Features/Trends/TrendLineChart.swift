@@ -47,3 +47,18 @@ struct TrendLineChart: View {
         return "\(text)\(unit)"
     }
 }
+
+/// The 「辅助器械 · 配重下降 = 进步」 capsule shown above an assisted-load exercise's trend
+/// (M1B-FR-028). M1 训练趋势 and the archive viewer's M2-15 share it so both look the same.
+struct AssistedLoadBadge: View {
+    var body: some View {
+        Text(String(localized: "trends.assistedBadge"))
+            .fcFont(.sectionLabel)
+            .padding(.horizontal, FCPrimitives.space2)
+            .padding(.vertical, FCPrimitives.space1)
+            .background(FCSemanticColors.surfaceSelected)
+            .foregroundStyle(FCSemanticColors.statusWarning)
+            .clipShape(Capsule())
+            .accessibilityIdentifier(FCAccessibilityID.trendsAssistedBadge)
+    }
+}

@@ -8,6 +8,8 @@ enum ArchiveViewerDestination: Hashable {
     case bodyData
     case metricHistory(String)
     case trends
+    case exercises
+    case about
     case settings
     case replace
 }
@@ -86,6 +88,10 @@ struct ArchiveViewerRoot: View {
                 ArchiveMetricHistoryView(content: content, metricKey: key, model: model)
             case .trends:
                 ArchiveTrendsView(content: content, model: model)
+            case .exercises:
+                ArchiveExercisesView(content: content, model: model)
+            case .about:
+                ArchiveAboutView(content: content)
             case .settings:
                 ArchiveSettingsView(
                     model: model,

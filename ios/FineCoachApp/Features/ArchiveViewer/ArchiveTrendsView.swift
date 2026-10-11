@@ -102,9 +102,7 @@ struct ArchiveTrendsView: View {
         let converter = model.converter
         VStack(alignment: .leading, spacing: FCPrimitives.space2) {
             if entry.isAssisted {
-                Text(String(localized: "trends.assistedBadge"))
-                    .fcFont(.caption)
-                    .foregroundStyle(FCSemanticColors.statusWarning)
+                AssistedLoadBadge()
             }
             if mode == .weightReps {
                 FCSegmentedSwitch(
