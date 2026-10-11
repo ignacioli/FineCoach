@@ -1,6 +1,6 @@
 # 首次说明页（Coach 欢迎页）重设计：设计说明
 
-> 状态：**r2，方案 B、第 3 条要点改写与入场动画已获产品负责人同意；返回导航待定（§8-4）**（2026-10-10 起草；同日产品负责人选定方案 B，要求删除要点下方小字、说明移入链接，并请 Agent 评估入场动画，见 §3、§10）。本文按 [`components.md`](../design-system/components.md) §1.5 / §6 的格式记录，只写本页自己的内容；数值以 [`README.md`](../design-system/README.md) 为准，共享组件结构以 `components.md` 为准。
+> 状态：**r3，方案 B、第 3 条要点改写、入场动画、返回 M2-07、品牌名统一均已获产品负责人同意（2026-10-10）；待批准代码实现**（2026-10-10 起草；同日产品负责人选定方案 B，要求删除要点下方小字、说明移入链接，并请 Agent 评估入场动画，见 §3、§10）。本文按 [`components.md`](../design-system/components.md) §1.5 / §6 的格式记录，只写本页自己的内容；数值以 [`README.md`](../design-system/README.md) 为准，共享组件结构以 `components.md` 为准。
 > 起因：产品负责人 2026-10-10 反馈，现有首次说明页（`ios/FineCoachApp/Features/Students/Onboarding/OnboardingView.swift`）「工程味重，像本科课程作业，不像成熟 App」：系统字体导航标题「精练教练」、「首次打开 · 无账号」小字、三段长说明、深色「开始使用」、系统蓝色「稍后添加学员」。要求长文案收成一个小字链接，页面像主流 App 的欢迎页：简洁、有情绪、友好。
 
 ## 1. 设计来源
@@ -8,8 +8,8 @@
 | 项 | 位置 |
 |---|---|
 | Penpot 文件 | 「M1-B G5 Design」→ 页面「M2 G7 Design」，画板放在 M2 画板下方一行（y = 3720） |
-| 画板 | `W-01b 首次说明 · 方案 B 要点清单（已选定 r2）`、`W-02 首次说明 · 数据说明面板（从链接打开，r2）`；`W-01a 首次说明 · 方案 A 插画欢迎（未采用）`保留作记录 |
-| Penpot 快照 | 绘制前 `before-welcome-redesign 2026-10-10`（revn 253）→ `welcome-redesign-draft 2026-10-10 (W-01a/W-01b/W-02, pending owner review)`（revn 263）→ `before-welcome-B-r2 2026-10-10` → `welcome-B-r2 2026-10-10 (B selected; point subtitles moved to sheet; lock icon; pending owner review)`（revn 265）。每次 `File.validate()` 0 个错误 |
+| 画板 | `W-01b 首次说明 · 方案 B 要点清单（已选定 r3）`、`W-02 首次说明 · 数据说明面板（从链接打开，r3）`；`W-01a 首次说明 · 方案 A 插画欢迎（未采用）`保留作记录 |
+| Penpot 快照 | 绘制前 `before-welcome-redesign 2026-10-10`（revn 253）→ `welcome-redesign-draft 2026-10-10 (W-01a/W-01b/W-02, pending owner review)`（revn 263）→ `before-welcome-B-r2 2026-10-10` → `welcome-B-r2 2026-10-10 (B selected; point subtitles moved to sheet; lock icon; pending owner review)`（revn 265）→ `before-welcome-r3-brand 2026-10-10` → `welcome-r3-brand 2026-10-10 (W-01b back to M2-07; UI brand FineCoach->精练教练 on M2-03/04/06a-d/07/09, W-02)`（revn 266）。每次 `File.validate()` 0 个错误 |
 | 导出图 | 未导出。绘制时用 MCP `export_shape`（1 倍）只做排版自查，不作为验收图；批准后由产品负责人按 2 倍预设导出到 `design/m2-hifi/screens/` |
 | 行为权威 | `[specs] 001-m1-a-core-session/spec.md` M1A-FR-001、M1A-FR-002、AC-001、M1A-FR-037；`[specs] 002-m1-b-coach-operations/spec.md` M1B-FR-009、M1B-FR-030；`[specs] 003-m2-personal-training-archive/spec.md` M2-FR-025、tasks T039 |
 
@@ -17,7 +17,7 @@
 
 ```text
 新安装 → M2-07 首次启动二选一（全身吉祥物 220×220）
-          ├─ 「Coach 使用」→ W-01 首次说明（本页）
+          ├─ 「Coach 使用」→ W-01 首次说明（本页；左上 ‹ 返回 M2-07 重新选择）
           │      ├─ 「了解数据怎样保存和分享」→ W-02 数据说明面板（关闭后回到 W-01）
           │      ├─ 「添加第一位学员」→ 新建学员（first create，同现状）
           │      └─ 「稍后再添加」→ 空学员列表（16，同现状 skip）
@@ -65,7 +65,7 @@ r2 改动（产品负责人 2026-10-10）：删除三行要点下方的 `caption
 W-02 面板（r2，前三行与要点一一对应，图标相同）：
 
 - 标题：你的数据怎样保存
-- 副标题：FineCoach 不需要账号，也没有服务器。
+- 副标题：精练教练不需要账号，也没有服务器。
 - 没网也能记：训练中每一组都随手记下，没有网络也能完整保存。
 - 资料只在这台手机：不用注册登录，学员资料和训练记录默认只存在本机，不会上传。卸载 App 或丢失手机时会一起丢失，可在「设置 → 备份与恢复」手动备份。
 - 私人信息不会分享出去：给学员发训练报告时，由你挑选包含哪些内容。性别、身体数据、伤病、电话、微信和你的私人备注永远不会进入报告。（M1A-FR-037、M1B-FR-030）
@@ -99,7 +99,7 @@ M1A-FR-001：「首次启动 MUST 在创建第一名 Student 前说明数据默�
 
 ## 7. 批准后的代码改动（本轮不做）
 
-1. 重写 `OnboardingView` 的 body：隐藏导航栏；按方案 B r2 用 `.fcFont` / `FCSemanticColors` / `FCPrimitives` 拼装；`Image("mascot-avatar")`（xcassets 已有）；`FCButton`「添加第一位学员」→ `path.append(.editor(.firstCreate))`；`FCLinkButton`「稍后再添加」→ `viewModel.skip()`；`FCLinkButton` 链接 → `.fcBottomSheet` 打开 W-02；按 §10 加入场动画（`@Environment(\.accessibilityReduceMotion)` 分支）。要点图标用 SF Symbols（`doc.text`、`iphone`、`lock`；面板另用 `person`、`bell`），`action.primary`，不新增图片资源。ViewModel 与导航逻辑不变。
+1. 重写 `OnboardingView` 的 body：导航栏只保留系统返回 `‹`（返回 M2-07，由 T039 的导航结构提供），不显示标题；按方案 B r2 用 `.fcFont` / `FCSemanticColors` / `FCPrimitives` 拼装；`Image("mascot-avatar")`（xcassets 已有）；`FCButton`「添加第一位学员」→ `path.append(.editor(.firstCreate))`；`FCLinkButton`「稍后再添加」→ `viewModel.skip()`；`FCLinkButton` 链接 → `.fcBottomSheet` 打开 W-02；按 §10 加入场动画（`@Environment(\.accessibilityReduceMotion)` 分支）。要点图标用 SF Symbols（`doc.text`、`iphone`、`lock`；面板另用 `person`、`bell`），`action.primary`，不新增图片资源。ViewModel 与导航逻辑不变。
 2. W-02 行用 `FCHubRow` 不可点变体（M2 Phase 0 组件；若尚未合入，按 `components.md` §4.7 的规格等它合入后再接）。
 3. `Localizable.xcstrings`：替换 `onboarding.kicker / lead / local / share / operator / start / skip` 的文案，新增链接与面板文案键；删除不再使用的键。
 4. `FCAccessibilityID`：保留 `onboardingTitle / Start / Skip`；`onboardingLead` 指向副标题；新增链接与面板的 identifier；`onboardingLocalRule / ShareRule` 移到面板对应行。仓库中没有 UI 测试依赖这些 identifier（2026-10-10 `grep`）。
@@ -111,7 +111,8 @@ M1A-FR-001：「首次启动 MUST 在创建第一名 Student 前说明数据默�
 1. ~~选方案 A 还是 B~~：**已定**（2026-10-10，方案 B，删除要点小字）。
 2. ~~第 3 条要点标题改为「私人信息不会分享出去」~~：**已同意**（产品负责人 2026-10-10）。
 3. ~~入场动画按 §10 的克制方案~~：**已同意**（产品负责人 2026-10-10）。
-4. 从 W-01 能否返回 M2-07 重新选择（此时还没有任何 Coach 数据）。画板没有画返回按钮；这属于 T039 的导航行为，需确认后由 T039 实现。
+4. ~~从 W-01 能否返回 M2-07~~：**要**（产品负责人 2026-10-10）。W-01b 左上加系统返回 `‹`（`DS-SYMBOL` back，x=16，与二级页一致；页面内没有页头标题）。行为约束（T039 实现时保证）：在点「添加第一位学员」或「稍后再添加」之前，不写入任何会使安装状态判定为 Coach 模式的数据或 setting；返回后 M2-07 两个选项都可再选。从新建学员返回 W-01 时同理。
+5. ~~品牌名~~：**统一**（产品负责人 2026-10-10）：学员只读导入是「精练教练」App 的子功能；中文界面文案一律写「精练教练」（= 主屏幕显示名 `CFBundleDisplayName`），不写 FineCoach。M2 已批准画板中的 7 处文案同步改写，见 `implementation-map.md` §1.1 R7。
 
 ## 9. 执行记录（`components.md` §1.5）
 
