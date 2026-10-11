@@ -47,6 +47,8 @@ final class HistoryListViewModel: ObservableObject {
     @Published private(set) var comparisonSelection: [StableUUID] = []
     @Published var isSelectingForComparison = false
     @Published var assistedExerciseIDs: Set<StableExerciseID> = []
+    /// Coach-only billing annotations (「未扣课 · 无有效课包」); never exported.
+    @Published var creditNotes: [StableUUID: SessionCreditSettlementNote] = [:]
     @Published var errorMessage: String?
 
     let studentID: StableUUID
@@ -89,6 +91,7 @@ final class HistoryListViewModel: ObservableObject {
     func load() async {
         do {
             allSessions = try await useCases.listHistory(studentID: studentID)
+            creditNotes = (try? await useCases.creditSettlementNotes(studentID: studentID)) ?? [:]
             if studentName.isEmpty, let studentUseCases {
                 studentName = (try? await studentUseCases.student(id: studentID).displayName.value) ?? ""
             }
@@ -573,6 +576,12 @@ struct HistoryListView: View {
                                     Text(HistoryPresentation.summary(session))
                                         .fcFont(.caption)
                                         .foregroundStyle(FCSemanticColors.textSecondary)
+                                    if viewModel.creditNotes[session.id] == .noActivePackage {
+                                        Text(String(localized: "history.creditNote.noActivePackage"))
+                                            .fcFont(.caption)
+                                            .foregroundStyle(FCSemanticColors.textSecondary)
+                                            .accessibilityIdentifier(FCAccessibilityID.historyCreditNote(index))
+                                    }
                                 }
                                 Spacer(minLength: FCPrimitives.space2)
                                 if !viewModel.isSelectingForComparison {

@@ -1,3 +1,4 @@
+import CoreData
 import Foundation
 
 public struct CoreDataSessionRepository: Sendable {
@@ -34,6 +35,45 @@ public struct CoreDataSessionRepository: Sendable {
                 }
             }
             return try SessionManagedObjectMapping.upsertAggregate(session, in: context)
+        }
+    }
+
+    // MARK: - Credit settlement note (coach-only; see SessionCreditSettlementNote)
+
+    public func recordCreditSettlementNote(_ note: SessionCreditSettlementNote, sessionID: StableUUID) async throws {
+        try await writer.transaction { context in
+            let object = try SessionManagedObjectMapping.requireSession(id: sessionID.rawValue, in: context)
+            object.setValue(note.rawValue, forKey: SessionManagedObjectMapping.creditSettlementNoteKey)
+        }
+    }
+
+    public func creditSettlementNotes(studentID: StableUUID) async throws -> [StableUUID: SessionCreditSettlementNote] {
+        try await writer.read { context in
+            let request = NSFetchRequest<NSManagedObject>(entityName: SessionManagedObjectMapping.sessionEntityName)
+            request.predicate = NSPredicate(
+                format: "studentID == %@ AND %K != nil",
+                studentID.rawValue as CVarArg,
+                SessionManagedObjectMapping.creditSettlementNoteKey
+            )
+            var notes: [StableUUID: SessionCreditSettlementNote] = [:]
+            for object in try context.fetch(request) {
+                guard let id = object.value(forKey: "id") as? UUID,
+                    let raw = object.value(forKey: SessionManagedObjectMapping.creditSettlementNoteKey) as? String,
+                    let note = SessionCreditSettlementNote(rawValue: raw)
+                else {
+                    continue
+                }
+                notes[StableUUID(id)] = note
+            }
+            return notes
+        }
+    }
+
+    public func creditSettlementNote(sessionID: StableUUID) async throws -> SessionCreditSettlementNote? {
+        try await writer.read { context in
+            let object = try SessionManagedObjectMapping.requireSession(id: sessionID.rawValue, in: context)
+            return (object.value(forKey: SessionManagedObjectMapping.creditSettlementNoteKey) as? String)
+                .flatMap(SessionCreditSettlementNote.init(rawValue:))
         }
     }
 

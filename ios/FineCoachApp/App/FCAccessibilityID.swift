@@ -441,6 +441,10 @@ public enum FCAccessibilityID {
     public static let sessionDetailGenerateReport = "sessionDetail.generateReport"
     public static let sessionDetailReportStale = "sessionDetail.reportStale"
     public static let sessionDetailHandedToSystem = "sessionDetail.handedToSystem"
+    public static let sessionDetailCreditNote = "sessionDetail.creditNote"
+    public static func historyCreditNote(_ index: Int) -> String {
+        "history.creditNote.\(index)"
+    }
     public static let sessionDetailReadonly = "sessionDetail.readonly"
     public static let sessionDetailSaveAsTemplate = "sessionDetail.saveAsTemplate"
     public static let sessionDetailSaveAsTemplateName = "sessionDetail.saveAsTemplateName"

@@ -145,6 +145,7 @@ struct RootNavigation: View {
                                     useCases: environment.requireSessionUseCases(),
                                     templateUseCases: environment.templateUseCases,
                                     studentUseCases: environment.requireUseCases(),
+                                    creditSettlement: environment.sessionCreditSettlement,
                                     path: $path
                                 )
                             case .exerciseLibrary:

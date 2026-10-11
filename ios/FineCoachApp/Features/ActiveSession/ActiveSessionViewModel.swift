@@ -18,6 +18,24 @@ enum ActiveSessionSheet: Identifiable, Equatable {
     }
 }
 
+/// The coach-facing credit question or notice shown after a Session
+/// finishes (M1B-FR-013/014). Appointment-linked debits need no prompt.
+enum SessionCreditPrompt: Equatable {
+    /// Ad-hoc Session: debit the current active package or not.
+    case adhocChoice(CoursePackage, balance: Int)
+    /// Expired or zero balance: nothing debited; skip or adjust manually.
+    case unusable(CoursePackage, SessionCreditUnusableReason)
+    /// The automatic settlement failed; nothing more was debited.
+    case failed(CoursePackage)
+
+    var package: CoursePackage {
+        switch self {
+        case .adhocChoice(let package, _), .unusable(let package, _), .failed(let package):
+            return package
+        }
+    }
+}
+
 @MainActor
 final class ActiveSessionViewModel: ObservableObject {
     @Published var session: Session?
@@ -49,10 +67,14 @@ final class ActiveSessionViewModel: ObservableObject {
     /// explicit id addressing -- at most one row may be expanded at a
     /// time; setting this to a different id auto-collapses the other).
     @Published var editingSetID: StableUUID?
+    /// Set after finishing when the coach must answer a credit question;
+    /// the summary page is pushed only once this is resolved.
+    @Published var creditPrompt: SessionCreditPrompt?
 
     let studentID: StableUUID
     let useCases: ActiveSessionUseCases
     let templateUseCases: TemplateUseCases?
+    private let creditSettlement: SessionCreditSettlement?
     private let signposts: PerformanceSignposts
     private var catalogSearchGeneration = 0
     private var catalogSearchTask: Task<Void, Never>?
@@ -65,11 +87,13 @@ final class ActiveSessionViewModel: ObservableObject {
         studentID: StableUUID,
         useCases: ActiveSessionUseCases,
         templateUseCases: TemplateUseCases? = nil,
+        creditSettlement: SessionCreditSettlement? = nil,
         signposts: PerformanceSignposts = .shared
     ) {
         self.studentID = studentID
         self.useCases = useCases
         self.templateUseCases = templateUseCases
+        self.creditSettlement = creditSettlement
         self.signposts = signposts
     }
 
@@ -481,9 +505,13 @@ final class ActiveSessionViewModel: ObservableObject {
     func abandon() async {
         presentedSheet = nil
         await run {
-            self.session = try await self.signposts.measureSessionFinish {
+            let abandoned = try await self.signposts.measureSessionFinish {
                 try await self.useCases.abandonEmpty()
             }
+            // The Session is already abandoned; a failed Appointment update
+            // must not turn that into a visible failure.
+            try? await self.creditSettlement?.settleAbandonedSession(abandoned)
+            self.session = abandoned
         }
     }
 
@@ -508,9 +536,67 @@ final class ActiveSessionViewModel: ObservableObject {
     }
 
     private func finishNowThrowing() async throws {
-        session = try await signposts.measureSessionFinish {
+        let finished = try await signposts.measureSessionFinish {
             try await self.useCases.finish()
         }
+        // Set before `session` so the view holds the summary push until the
+        // coach has answered (M1B-FR-013/014).
+        creditPrompt = await settleCredits(for: finished)
+        session = finished
+    }
+
+    /// The Session is already completed when this runs, so a settlement
+    /// failure never undoes the finish; it is surfaced as a notice instead.
+    private func settleCredits(for finished: Session) async -> SessionCreditPrompt? {
+        guard let creditSettlement else {
+            return nil
+        }
+        do {
+            switch try await creditSettlement.settleFinishedSession(finished) {
+            case .noActivePackage, .debited:
+                return nil
+            case .adhocChoiceRequired(let package, let balance):
+                return .adhocChoice(package, balance: balance)
+            case .packageUnusable(let package, let reason):
+                return .unusable(package, reason)
+            }
+        } catch {
+            return await failurePrompt(studentID: finished.studentID, creditSettlement: creditSettlement)
+        }
+    }
+
+    private func failurePrompt(
+        studentID: StableUUID,
+        creditSettlement: SessionCreditSettlement
+    ) async -> SessionCreditPrompt? {
+        guard let package = try? await creditSettlement.activePackage(studentID: studentID) else {
+            return nil
+        }
+        return .failed(package)
+    }
+
+    /// "扣 1 课时" on the ad-hoc question. Returns whether the prompt is
+    /// resolved; on failure the prompt turns into the matching notice.
+    func debitAdhocSession() async -> Bool {
+        guard case .adhocChoice(let package, _) = creditPrompt, let session, let creditSettlement else {
+            creditPrompt = nil
+            return true
+        }
+        do {
+            try await creditSettlement.debitAdhocSession(packageID: package.id, sessionID: session.id)
+            creditPrompt = nil
+            return true
+        } catch DomainError.invalidState {
+            creditPrompt = .unusable(package, .insufficientBalance)
+        } catch {
+            creditPrompt = .failed(package)
+        }
+        return false
+    }
+
+    /// "不扣课" / scrim tap: nothing is written to the ledger.
+    func skipCreditDebit() {
+        creditPrompt = nil
     }
 
     private func copy(sourceID: StableUUID) async {

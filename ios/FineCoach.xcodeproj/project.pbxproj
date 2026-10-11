@@ -151,9 +151,11 @@
 		B210 /* FoundationIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A210 /* FoundationIntegrationTests.swift */; };
 		B516 /* AppointmentPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A515 /* AppointmentPersistenceTests.swift */; };
 		B543 /* CreditLedgerRestartTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A543 /* CreditLedgerRestartTests.swift */; };
+		B9F1 /* SessionCreditSettlementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9F1 /* SessionCreditSettlementTests.swift */; };
 		B700 /* CoursePackageEditorViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A700 /* CoursePackageEditorViewModelTests.swift */; };
 		B507 /* V1ToV2MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A505 /* V1ToV2MigrationTests.swift */; };
 		B945 /* V2ToV3MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A945 /* V2ToV3MigrationTests.swift */; };
+		B9F2 /* V3ToV4MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9F2 /* V3ToV4MigrationTests.swift */; };
 		B220 /* SetupSmokeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A220 /* SetupSmokeUITests.swift */; };
 		BF01 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F001 /* Foundation.framework */; };
 		BF02 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F002 /* SwiftUI.framework */; };
@@ -243,6 +245,7 @@
 		B537 /* ManualCreditAdjustmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A537 /* ManualCreditAdjustmentView.swift */; };
 		B538 /* CreditAdjustmentTrailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A538 /* CreditAdjustmentTrailView.swift */; };
 		B540 /* CreditLedgerIdempotencyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A540 /* CreditLedgerIdempotencyTests.swift */; };
+		B9F3 /* CreditSettlementNoteIsolationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9F3 /* CreditSettlementNoteIsolationTests.swift */; };
 		B518 /* NotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A518 /* NotificationScheduler.swift */; };
 		B515 /* AppointmentUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A514 /* AppointmentUseCases.swift */; };
 		B14A /* HistoryReportManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A14A /* HistoryReportManagedObject+Mapping.swift */; };
@@ -492,9 +495,11 @@
 		A210 /* FoundationIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationIntegrationTests.swift; sourceTree = "<group>"; };
 		A515 /* AppointmentPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentPersistenceTests.swift; sourceTree = "<group>"; };
 		A543 /* CreditLedgerRestartTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CreditLedgerRestartTests.swift"; sourceTree = "<group>"; };
+		A9F1 /* SessionCreditSettlementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SessionCreditSettlementTests.swift"; sourceTree = "<group>"; };
 		A700 /* CoursePackageEditorViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoursePackageEditorViewModelTests.swift"; sourceTree = "<group>"; };
 		A505 /* V1ToV2MigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V1ToV2MigrationTests.swift; sourceTree = "<group>"; };
 		A945 /* V2ToV3MigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2ToV3MigrationTests.swift; sourceTree = "<group>"; };
+		A9F2 /* V3ToV4MigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V3ToV4MigrationTests.swift; sourceTree = "<group>"; };
 		A220 /* SetupSmokeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupSmokeUITests.swift; sourceTree = "<group>"; };
 		F001 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		F002 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -576,6 +581,7 @@
 		A537 /* ManualCreditAdjustmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualCreditAdjustmentView.swift"; sourceTree = "<group>"; };
 		A538 /* CreditAdjustmentTrailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CreditAdjustmentTrailView.swift"; sourceTree = "<group>"; };
 		A540 /* CreditLedgerIdempotencyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CreditLedgerIdempotencyTests.swift"; sourceTree = "<group>"; };
+		A9F3 /* CreditSettlementNoteIsolationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditSettlementNoteIsolationTests.swift; sourceTree = "<group>"; };
 		A518 /* NotificationScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationScheduler.swift; sourceTree = "<group>"; };
 		A514 /* AppointmentUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentUseCases.swift; sourceTree = "<group>"; };
 		A14A /* HistoryReportManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HistoryReportManagedObject+Mapping.swift"; sourceTree = "<group>"; };
@@ -1201,6 +1207,7 @@
 				A210 /* FoundationIntegrationTests.swift */,
 				A505 /* V1ToV2MigrationTests.swift */,
 				A945 /* V2ToV3MigrationTests.swift */,
+				A9F2 /* V3ToV4MigrationTests.swift */,
 			);
 			path = Foundation;
 			sourceTree = "<group>";
@@ -1225,6 +1232,7 @@
 			isa = PBXGroup;
 			children = (
 				A543 /* CreditLedgerRestartTests.swift */,
+				A9F1 /* SessionCreditSettlementTests.swift */,
 				A700 /* CoursePackageEditorViewModelTests.swift */,
 			);
 			path = CoursePackages;
@@ -1400,6 +1408,7 @@
 			isa = PBXGroup;
 			children = (
 				A540 /* CreditLedgerIdempotencyTests.swift */,
+				A9F3 /* CreditSettlementNoteIsolationTests.swift */,
 			);
 			path = CoursePackages;
 			sourceTree = "<group>";
@@ -2176,6 +2185,7 @@
 				B526 /* NotificationRedactionTests.swift in Sources */,
 				B522 /* TodayOrderingPolicyTests.swift in Sources */,
 				B540 /* CreditLedgerIdempotencyTests.swift in Sources */,
+				B9F3 /* CreditSettlementNoteIsolationTests.swift in Sources */,
 				B554 /* TemplateSnapshotSectionTests.swift in Sources */,
 				B612 /* BodyMeasurementComparisonTests.swift in Sources */,
 				B613 /* BodyDataReportExclusionTests.swift in Sources */,
@@ -2249,9 +2259,11 @@
 				B210 /* FoundationIntegrationTests.swift in Sources */,
 				B516 /* AppointmentPersistenceTests.swift in Sources */,
 				B543 /* CreditLedgerRestartTests.swift in Sources */,
+				B9F1 /* SessionCreditSettlementTests.swift in Sources */,
 				B700 /* CoursePackageEditorViewModelTests.swift in Sources */,
 				B507 /* V1ToV2MigrationTests.swift in Sources */,
 				B945 /* V2ToV3MigrationTests.swift in Sources */,
+				B9F2 /* V3ToV4MigrationTests.swift in Sources */,
 				B231 /* StudentPersistenceTests.swift in Sources */,
 				B233 /* ActiveSessionPersistenceTests.swift in Sources */,
 				B710 /* ActiveSessionSetRowInteractionTests.swift in Sources */,

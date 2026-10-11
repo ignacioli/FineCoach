@@ -12,6 +12,9 @@ public final class AppLifecycleCoordinator: ObservableObject {
         _ = try? await PerformanceSignposts.shared.measureRecovery {
             try await useCases.reconcileOnLaunch()
         }
+        // Settles a linked finish interrupted before its Appointment and
+        // credit were written (idempotent; settled ones are skipped).
+        await environment.sessionCreditSettlement?.repairInterruptedLinkedSessions()
     }
 
     public func sceneWillResignActive(environment: AppEnvironment) async {

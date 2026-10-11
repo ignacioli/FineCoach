@@ -39,6 +39,7 @@ struct ActiveSessionView: View {
         useCases: ActiveSessionUseCases,
         templateUseCases: TemplateUseCases? = nil,
         studentUseCases: StudentUseCases? = nil,
+        creditSettlement: SessionCreditSettlement? = nil,
         path: Binding<[RootDestination]>
     ) {
         self.sessionUseCases = useCases
@@ -48,7 +49,8 @@ struct ActiveSessionView: View {
             wrappedValue: ActiveSessionViewModel(
                 studentID: studentID,
                 useCases: useCases,
-                templateUseCases: templateUseCases
+                templateUseCases: templateUseCases,
+                creditSettlement: creditSettlement
             )
         )
         _path = path
@@ -156,12 +158,11 @@ struct ActiveSessionView: View {
                 Task { await viewModel.deleteSection(section, disposition: .deleteWithExercises) }
             }
         }
-        .onChange(of: viewModel.session?.state) { _, state in
-            guard state == .completed, !didPushSummary, let sessionID = viewModel.session?.id else {
-                return
-            }
-            didPushSummary = true
-            path.append(.sessionSummary(sessionID.rawValue))
+        .onChange(of: viewModel.session?.state) { _, _ in
+            pushSummaryIfReady()
+        }
+        .fcConfirmationDialog(isPresented: creditPromptPresented) {
+            creditDialog(viewModel.creditPrompt)
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.activeSessionRoot)
@@ -201,6 +202,90 @@ struct ActiveSessionView: View {
                 }
             }
             .fcPrivacyCovered()
+        }
+    }
+
+    /// The summary is pushed once the Session is completed and any credit
+    /// question (M1B-FR-013/014) has been answered.
+    private func pushSummaryIfReady(then next: RootDestination? = nil) {
+        guard viewModel.session?.state == .completed, viewModel.creditPrompt == nil, !didPushSummary,
+            let sessionID = viewModel.session?.id
+        else {
+            return
+        }
+        didPushSummary = true
+        path.append(.sessionSummary(sessionID.rawValue))
+        if let next {
+            path.append(next)
+        }
+    }
+
+    /// Tapping the scrim is the same as "不扣课": nothing is written.
+    private var creditPromptPresented: Binding<Bool> {
+        Binding(
+            get: { viewModel.creditPrompt != nil },
+            set: { isPresented in
+                guard !isPresented else { return }
+                viewModel.skipCreditDebit()
+                pushSummaryIfReady()
+            }
+        )
+    }
+
+    private func creditDialog(_ prompt: SessionCreditPrompt?) -> FCConfirmationDialog {
+        let skip = FCConfirmationDialog.Action(title: String(localized: "sessionCredit.skip")) {
+            viewModel.skipCreditDebit()
+            pushSummaryIfReady()
+        }
+        guard let prompt else {
+            return FCConfirmationDialog(title: "", message: "", cancelAction: skip, confirmAction: skip)
+        }
+        let packageName = prompt.package.displayName
+        let noticeMessage = String(format: String(localized: "sessionCredit.notice.messageFormat"), packageName)
+        let adjust = FCConfirmationDialog.Action(title: String(localized: "sessionCredit.adjust")) {
+            let packageID = prompt.package.id
+            viewModel.skipCreditDebit()
+            pushSummaryIfReady(then: .manualCreditAdjustment(packageID.rawValue))
+        }
+        switch prompt {
+        case .adhocChoice(_, let balance):
+            return FCConfirmationDialog(
+                title: String(localized: "sessionCredit.adhoc.title"),
+                message: String(
+                    format: String(localized: "sessionCredit.adhoc.messageFormat"),
+                    packageName,
+                    "\(balance)"
+                ),
+                cancelAction: skip,
+                confirmAction: .init(title: String(localized: "sessionCredit.adhoc.debit")) {
+                    Task {
+                        if await viewModel.debitAdhocSession() {
+                            pushSummaryIfReady()
+                        }
+                    }
+                }
+            )
+        case .unusable(_, .expired):
+            return FCConfirmationDialog(
+                title: String(localized: "sessionCredit.expired.title"),
+                message: noticeMessage,
+                cancelAction: skip,
+                confirmAction: adjust
+            )
+        case .unusable(_, .insufficientBalance):
+            return FCConfirmationDialog(
+                title: String(localized: "sessionCredit.insufficient.title"),
+                message: noticeMessage,
+                cancelAction: skip,
+                confirmAction: adjust
+            )
+        case .failed:
+            return FCConfirmationDialog(
+                title: String(localized: "sessionCredit.failed.title"),
+                message: noticeMessage,
+                cancelAction: skip,
+                confirmAction: adjust
+            )
         }
     }
 

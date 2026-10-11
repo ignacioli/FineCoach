@@ -7,6 +7,8 @@ final class SessionDetailViewModel: ObservableObject {
     /// owner 2026-09-28: the page must read like 29, not a data table).
     /// This view model only feeds the on-screen page; nothing is exported.
     @Published var record: ShareReportDTO?
+    /// Coach-only billing annotation, shown outside the report card.
+    @Published var creditNote: SessionCreditSettlementNote?
     @Published var errorMessage: String?
     @Published var isSavingAsTemplate = false
     @Published var saveAsTemplateName = ""
@@ -29,6 +31,7 @@ final class SessionDetailViewModel: ObservableObject {
             let loaded = try await useCases.detail(sessionID: sessionID)
             completed = loaded
             record = try ShareReportPolicy.makeDTO(from: loaded, modules: .privacySafeDefaults)
+            creditNote = (try? await useCases.creditSettlementNote(sessionID: sessionID)) ?? nil
             errorMessage = nil
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? String(localized: "student.error.generic")
@@ -97,6 +100,14 @@ struct SessionDetailView: View {
 
                 if let record = viewModel.record {
                     ShareReportCardView(dto: record, style: .page)
+                }
+
+                if viewModel.creditNote == .noActivePackage {
+                    Text(String(localized: "history.creditNote.noActivePackage"))
+                        .fcFont(.caption)
+                        .foregroundStyle(FCSemanticColors.textSecondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .accessibilityIdentifier(FCAccessibilityID.sessionDetailCreditNote)
                 }
 
                 if let report = viewModel.completed?.latestReport,
