@@ -203,7 +203,8 @@ feature 专有组件见 §4。共享组件的新增 / 扩展条目写在 `compon
 影响范围：新增 Features/ArchiveExport/（M2-02～06 单一 push 页面，页面由 ArchiveExportFlow.state 决定）、feature 专有 ArchiveFactRow（M2-FACT-ROW）、ArchiveExclusionNote（M2-EXCLUSION-NOTE）、ArchivePasswordField（唯一密码输入配置）；StudentDetailView 加 M2-01 行；RootDestination.archiveExport；DEBUG 种子 ArchiveExportDebugSeed。无新设计系统组件。
 设计决定：文案在 PNG 与本文不一致处以已审定 PNG 为准（M2-05 规则与占位、M2-06b 说明）；交付失败 / 取消只保留单一「交给系统…」按钮作为重试入口（M2-06c/06d 画稿），不另加重试链接；M2-EXCLUSION-NOTE 的「查看全部」实现为只展开 / 收起文字清单的 Button（不改数据）。自拟文案待 T038 确认：密码过短「密码至少需要 8 个字符」、意外错误「操作没有完成」、清单前缀「永远不会导出：…」、展开后「收起」、「N / M 项指标」「X（自定义）」。
 实施与验证：ArchiveExportPolicyTests、ArchiveExportScreenTests（12 项：密码配置唯一、排除说明无开关、离开流程调用 leave()、入口为 FCActionRow 无 contextMenu、本地化键齐全、事实行顺序、预览原文与排除值）、ArchiveExportIntegrationTests；PrivacyCoverTests、DesignValueScanTests、LogSurfaceTests 通过。L3：核心页面 M2-02 首次实现，T038 请产品负责人对照 M2-02a/02b 看一次。
-结果：PASS（自动门）。xcodebuild build 成功；FineCoachTests 396 项 0 失败、1 项跳过（既有 WCAG 豁免）；FineCoachIntegrationTests 112 项 0 失败。T038 人工查看结论待记录。M2-02～06 **未经人工视觉检查**；密码框不出现钥匙串保存 / 强密码建议、真实分享面板取消后临时文件清理均为设备检查项，未验证。
+结果：PASS（自动门）。xcodebuild build 成功；FineCoachTests 396 项 0 失败、1 项跳过（既有 WCAG 豁免）；FineCoachIntegrationTests 112 项 0 失败。
+T038 L3 走查（产品负责人 2026-10-10，模拟器 iPhone 17 Pro Max，虚构数据）：M2-02、M2-03、M2-06 功能通过（含密码不一致、密码过短）；生成阶段出错经 DEBUG 参数 -FineCoachSimulateArchiveGenerationFailure 模拟，通过（首次失败进入 M2-06d，「交给系统…」重试成功）。UX/UI 不通过，三项缺陷：①二级页返回键为系统导航栏按钮、标题另起一行，与画稿「‹ 与标题同一行、紧凑」不符（M1 二级页同样，DS-PAGE-SECONDARY 规格须改）；②勾选圈 ✓ 为 SF Symbol，与画稿 Noto Sans SC 字形不符（README §7.2 须改）；③分组行 / 子行左侧多缩进 16、行高 44 小于画稿约 53，观感「压扁」（字体本身已确认为 Noto Sans SC）。产品负责人拍板：「查看全部」保留现做法；重试只保留「交给系统…」；自拟文案通过；生成失败沿用 M2-06d 文案。缺陷修复后 M2-02 需再看一次。M2-02～06 **未经人工视觉检查**；密码框不出现钥匙串保存 / 强密码建议、真实分享面板取消后临时文件清理均为设备检查项，未验证。
 ```
 
 入口与布局清单（`components.md` §1.4）：

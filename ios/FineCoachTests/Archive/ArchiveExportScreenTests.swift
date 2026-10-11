@@ -241,8 +241,7 @@ final class ArchiveExportScreenTests: XCTestCase {
         let seeded = await ArchiveExportDebugSeed.seed(in: environment)
         XCTAssertTrue(seeded)
         let students = try await XCTUnwrap(environment.studentUseCases).searchActive(query: "")
-        let student = try XCTUnwrap(students.first)
-        XCTAssertEqual(student.displayName.value, "王小明")
+        let student = try XCTUnwrap(students.first { $0.displayName.value == "王小明" })
         let source = try await ArchiveExportSourceReader(writer: XCTUnwrap(environment.persistenceWriter))
             .read(studentID: student.id)
         let facts = source.availability
@@ -260,5 +259,107 @@ final class ArchiveExportScreenTests: XCTestCase {
         )
         let kinds = Set(snapshot.exercises.map(\.kind))
         XCTAssertEqual(kinds, [.builtIn, .custom, .oneOff])
+    }
+
+    @MainActor
+    func testDebugSeedBuildsTheFullReviewRoster() async throws {
+        let directory = try TemporaryProtectedDirectory()
+        let environment = try AppEnvironment(
+            rootURL: directory.url.appendingPathComponent("roster", isDirectory: true),
+            clock: ArchiveExportDebugSeed.makeClock()
+        )
+        let seeded = await ArchiveExportDebugSeed.seed(in: environment)
+        XCTAssertTrue(seeded, "seed stopped early")
+        let studentUseCases = try XCTUnwrap(environment.studentUseCases)
+        let appointmentUseCases = try XCTUnwrap(environment.appointmentUseCases)
+        let credits = try XCTUnwrap(environment.creditLedgerUseCases)
+        let reader = ArchiveExportSourceReader(writer: try XCTUnwrap(environment.persistenceWriter))
+
+        let active = try await studentUseCases.searchActive(query: "")
+        let archived = try await studentUseCases.listArchived()
+        XCTAssertEqual(active.count, 6)
+        XCTAssertEqual(archived.map(\.displayName.value), ["孙已归档"])
+        let longName = try XCTUnwrap(active.first { $0.displayName.value.hasPrefix("欧阳慕容") })
+        XCTAssertGreaterThan(longName.displayName.value.count, 25)
+        let expectedActive = ["王小明", "李思远", "陈嘉怡", "张浩然", "赵无数"]
+        for name in expectedActive {
+            XCTAssertTrue(active.contains { $0.displayName.value == name }, "missing \(name)")
+        }
+        let undisclosed = try XCTUnwrap(active.first { $0.displayName.value == "赵无数" })
+        XCTAssertEqual(undisclosed.sex, .undisclosed)
+        let nothingInProgress = try await studentUseCases.inProgressTraining()
+        XCTAssertNil(nothingInProgress, "seed must not leave a training in progress")
+
+        func student(_ name: String) throws -> Student {
+            try XCTUnwrap((active + archived).first { $0.displayName.value == name })
+        }
+        func sessionCount(_ name: String) async throws -> Int {
+            try await reader.read(studentID: student(name).id).availability.completedSessionCount
+        }
+        let expectedSessions = [
+            "王小明": 6, "李思远": 5, "陈嘉怡": 3, longName.displayName.value: 1,
+            "张浩然": 4, "赵无数": 0, "孙已归档": 2,
+        ]
+        for (name, count) in expectedSessions {
+            let actual = try await sessionCount(name)
+            XCTAssertEqual(actual, count, "sessions for \(name)")
+        }
+        let haoranFacts = try await reader.read(studentID: student("张浩然").id).availability
+        XCTAssertEqual(haoranFacts.bodyMetrics.count, 4)
+        XCTAssertEqual(haoranFacts.summaryCount, 2, "only non-empty student-facing summaries count")
+
+        func activePackage(_ studentID: StableUUID) async throws -> CoursePackage {
+            let found = try await credits.activePackage(studentID: studentID)
+            return try XCTUnwrap(found)
+        }
+        // Packages: (name, total, balance)
+        let expectedPackages: [(String, Int, Int)] = [
+            ("李思远", 10, 5), ("陈嘉怡", 3, 0), (longName.displayName.value, 5, 4),
+        ]
+        for (name, total, balance) in expectedPackages {
+            let package = try await activePackage(student(name).id)
+            XCTAssertEqual(package.totalCredits, total, name)
+            let actual = try await credits.balance(packageID: package.id)
+            XCTAssertEqual(actual, balance, name)
+        }
+        let siyuanPackage = try await activePackage(student("李思远").id)
+        XCTAssertEqual(siyuanPackage.isBalanceLow(ledgerBalance: 5), false)
+        let jiayiPackage = try await activePackage(student("陈嘉怡").id)
+        XCTAssertTrue(jiayiPackage.isBalanceLow(ledgerBalance: 0))
+        let longPackage = try await activePackage(longName.id)
+        XCTAssertTrue(longPackage.isExpired(asOf: appointmentUseCases.todayLocalDate()))
+        for name in ["王小明", "张浩然", "赵无数"] {
+            let package = try await credits.activePackage(studentID: student(name).id)
+            XCTAssertNil(package, name)
+        }
+
+        // Appointments by state and per student.
+        var all: [Appointment] = []
+        for item in active + archived {
+            all += try await appointmentUseCases.appointments(studentID: item.id)
+        }
+        func count(_ status: AppointmentStatus) -> Int { all.filter { $0.status == status }.count }
+        XCTAssertEqual(count(.completed), 1)
+        XCTAssertEqual(count(.absent), 1)
+        XCTAssertEqual(count(.cancelled), 1)
+        XCTAssertEqual(count(.inProgress), 0)
+        // 6 weekly + 4 every-two-days + today 13:00, 15:30 + in 2 days
+        XCTAssertEqual(count(.scheduled), 13)
+        XCTAssertEqual(all.filter { $0.seriesID != nil }.count, 10)
+        let cancelled = try XCTUnwrap(all.first { $0.status == .cancelled })
+        XCTAssertEqual(cancelled.cancellationReason?.value, "合成测试：学员临时有事")
+        XCTAssertEqual(cancelled.studentID, longName.id)
+        XCTAssertEqual(all.first { $0.status == .absent }?.absentCreditChoice, .notCharged)
+        XCTAssertNotNil(all.first { $0.status == .completed }?.linkedSessionID)
+
+        // Today: completed, absent, cancelled, and three scheduled rows.
+        let today = try await appointmentUseCases.todayOrdering()
+        XCTAssertEqual(today.count, 6)
+        XCTAssertEqual(today.filter { $0.appointment.status == .scheduled }.count, 3)
+        XCTAssertTrue(all.contains { $0.date > appointmentUseCases.todayLocalDate() }, "no future appointments")
+
+        // Templates: one saved from a session, one blank with exercises.
+        let templates = try await XCTUnwrap(environment.templateUseCases).templates()
+        XCTAssertEqual(Set(templates.map(\.name.value)), ["推日·胸肩", "腿日基础"])
     }
 }

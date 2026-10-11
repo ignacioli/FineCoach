@@ -1,6 +1,7 @@
 import Combine
 import CoreData
 import Foundation
+import os
 
 @MainActor
 public final class AppEnvironment: ObservableObject {
@@ -470,7 +471,7 @@ public final class AppEnvironment: ObservableObject {
         if let shareAdapter {
             archiveExportUseCases = ArchiveExportUseCases(
                 sourceReader: ArchiveExportSourceReader(writer: controller.writer),
-                identity: ArchiveIdentityService(writer: controller.writer, ids: idGenerator),
+                identity: Self.archiveExportIdentity(writer: controller.writer, ids: idGenerator),
                 share: shareAdapter,
                 tempRootURL: root,
                 clock: clock,
@@ -594,6 +595,46 @@ public final class AppEnvironment: ObservableObject {
         }
     #endif
 }
+
+extension AppEnvironment {
+    /// The identity step of archive generation. In DEBUG, `-FineCoachSimulateArchiveGenerationFailure`
+    /// makes the first generation after launch fail (M2-06d), so the failure state and the
+    /// 「交给系统…」 retry can be walked through by hand; later attempts succeed.
+    fileprivate static func archiveExportIdentity(
+        writer: PersistenceWriter,
+        ids: any IDGenerator
+    ) -> any ArchiveExportIdentityProviding {
+        let service = ArchiveIdentityService(writer: writer, ids: ids)
+        #if DEBUG
+            if ProcessInfo.processInfo.arguments.contains("-FineCoachSimulateArchiveGenerationFailure") {
+                return FailFirstArchiveIdentity(wrapped: service)
+            }
+        #endif
+        return service
+    }
+}
+
+#if DEBUG
+    private final class FailFirstArchiveIdentity: ArchiveExportIdentityProviding, @unchecked Sendable {
+        private let wrapped: ArchiveIdentityService
+        private let failed = OSAllocatedUnfairLock(initialState: false)
+
+        init(wrapped: ArchiveIdentityService) {
+            self.wrapped = wrapped
+        }
+
+        func ensureIdentity(forStudent studentID: StableUUID) async throws -> ArchiveIdentity {
+            let shouldFail = failed.withLock { alreadyFailed in
+                defer { alreadyFailed = true }
+                return !alreadyFailed
+            }
+            if shouldFail {
+                throw FaultInjectionError.injected(.persistenceWriterSave)
+            }
+            return try await wrapped.ensureIdentity(forStudent: studentID)
+        }
+    }
+#endif
 
 extension AppEnvironment {
     public static var unavailableForPreview: AppEnvironment {
