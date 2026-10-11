@@ -10,7 +10,7 @@
 | Penpot 文件 | 「M1-B G5 Design」→ 页面「M2 G7 Design」，画板放在 M2 画板下方一行（y = 3720） |
 | 画板 | `W-01b 首次说明 · 方案 B 要点清单（已选定 r3）`、`W-02 首次说明 · 数据说明面板（从链接打开，r3）`；`W-01a 首次说明 · 方案 A 插画欢迎（未采用）`保留作记录 |
 | Penpot 快照 | 绘制前 `before-welcome-redesign 2026-10-10`（revn 253）→ `welcome-redesign-draft 2026-10-10 (W-01a/W-01b/W-02, pending owner review)`（revn 263）→ `before-welcome-B-r2 2026-10-10` → `welcome-B-r2 2026-10-10 (B selected; point subtitles moved to sheet; lock icon; pending owner review)`（revn 265）→ `before-welcome-r3-brand 2026-10-10` → `welcome-r3-brand 2026-10-10 (W-01b back to M2-07; UI brand FineCoach->精练教练 on M2-03/04/06a-d/07/09, W-02)`（revn 266）。每次 `File.validate()` 0 个错误 |
-| 导出图 | 未导出。绘制时用 MCP `export_shape`（1 倍）只做排版自查，不作为验收图；批准后由产品负责人按 2 倍预设导出到 `design/m2-hifi/screens/` |
+| 导出图 | `design/m2-hifi/screens/W-01b-welcome-points.png`、`W-02-welcome-data-sheet.png`（2 倍，宽 780）。2026-10-10 产品负责人在 Penpot 用 2 倍导出预设（全部画板已统一为单条 PNG 2x）批量导出 r3；绘制期间的 MCP 1 倍导出只用于排版自查 |
 | 行为权威 | `[specs] 001-m1-a-core-session/spec.md` M1A-FR-001、M1A-FR-002、AC-001、M1A-FR-037；`[specs] 002-m1-b-coach-operations/spec.md` M1B-FR-009、M1B-FR-030；`[specs] 003-m2-personal-training-archive/spec.md` M2-FR-025、tasks T039 |
 
 ## 2. 首次启动的页面顺序（与 M2-07 衔接）
