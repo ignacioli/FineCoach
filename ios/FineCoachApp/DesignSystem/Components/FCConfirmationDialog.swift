@@ -77,7 +77,9 @@ public struct FCConfirmationDialog: View {
         }
         .padding(FCPrimitives.space4)
         .frame(maxWidth: .infinity)
-        .frame(maxHeight: maxCardHeight)
+        // A cap, not a fill: `.frame(maxHeight:)` would stretch the card to 80% of the screen
+        // whenever its content is shorter (owner T070 walkthrough, 2026-10-11).
+        .modifier(FCDialogHeightCap(maxHeight: maxCardHeight))
         .background(FCSemanticColors.surfaceElevated)
         .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusLg))
         .frame(maxWidth: 300)
@@ -128,6 +130,38 @@ public struct FCConfirmationDialog: View {
         .buttonStyle(.plain)
         .frame(minHeight: 44)
         .contentShape(Rectangle())
+    }
+}
+
+/// Proposes at most `maxHeight` to the card and reports the card's own height, so the card
+/// hugs its content and only a too-long message (the `ScrollView` branch) reaches the cap.
+private struct FCDialogHeightCap: ViewModifier {
+    let maxHeight: CGFloat
+
+    func body(content: Content) -> some View {
+        HeightCapLayout(maxHeight: maxHeight) { content }
+    }
+
+    private struct HeightCapLayout: Layout {
+        let maxHeight: CGFloat
+
+        func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+            guard let subview = subviews.first else { return .zero }
+            let size = subview.sizeThatFits(capped(proposal))
+            return CGSize(width: size.width, height: min(size.height, maxHeight))
+        }
+
+        func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+            subviews.first?.place(
+                at: CGPoint(x: bounds.minX, y: bounds.minY),
+                anchor: .topLeading,
+                proposal: ProposedViewSize(width: bounds.width, height: bounds.height)
+            )
+        }
+
+        private func capped(_ proposal: ProposedViewSize) -> ProposedViewSize {
+            ProposedViewSize(width: proposal.width, height: min(proposal.height ?? maxHeight, maxHeight))
+        }
     }
 }
 
