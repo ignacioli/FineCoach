@@ -376,10 +376,7 @@ struct HistoryListView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: FCPrimitives.space4) {
                 VStack(alignment: .leading, spacing: FCPrimitives.space2) {
-                    Text(String(localized: "history.title"))
-                        .fcFont(.titleLarge)
-                        .foregroundStyle(FCSemanticColors.textPrimary)
-                        .accessibilityAddTraits(.isHeader)
+                    FCPageHeader(title: String(localized: "history.title"), back: .init())
                     if !viewModel.studentName.isEmpty {
                         Text(viewModel.studentName)
                             .fcFont(.headline)
@@ -405,8 +402,7 @@ struct HistoryListView: View {
             .padding(.bottom, FCPrimitives.space6)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarRole(.editor)
+        .fcSecondaryPage()
         .fcBottomSheet(isPresented: filterPresented) {
             filterSheetContent
         }

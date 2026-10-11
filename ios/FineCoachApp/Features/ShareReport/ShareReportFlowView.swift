@@ -174,10 +174,7 @@ struct ShareReportFlowView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: FCPrimitives.space4) {
                 VStack(alignment: .leading, spacing: FCPrimitives.space2) {
-                    Text(String(localized: "share.title"))
-                        .fcFont(.titleLarge)
-                        .foregroundStyle(FCSemanticColors.textPrimary)
-                        .accessibilityAddTraits(.isHeader)
+                    FCPageHeader(title: String(localized: "share.title"), back: .init())
                     Text(viewModel.subtitle)
                         .fcFont(.callout, weight: .regular)
                         .foregroundStyle(FCSemanticColors.textSecondary)
@@ -209,8 +206,7 @@ struct ShareReportFlowView: View {
             .background(FCSemanticColors.surfacePage)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarRole(.editor)
+        .fcSecondaryPage()
         .navigationDestination(isPresented: $isShowingPreview) {
             ShareReportPreviewPage(viewModel: viewModel)
         }
@@ -411,6 +407,19 @@ struct ShareReportPreviewPage: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: FCPrimitives.space3) {
+                // 29: back and 分享 share the top row; there is no page title.
+                FCPageHeader(
+                    title: "",
+                    back: .init(),
+                    trailingAction: .init(
+                        title: String(localized: "share.shareAction"),
+                        isEnabled: !viewModel.isSharing,
+                        accessibilityIdentifier: FCAccessibilityID.shareReportShare
+                    ) {
+                        Task { await viewModel.share() }
+                    }
+                )
+                .padding(.horizontal, FCPrimitives.space4)
                 if let dto = viewModel.dto {
                     ShareReportCardView(dto: dto)
                         .frame(maxWidth: .infinity)
@@ -422,16 +431,7 @@ struct ShareReportPreviewPage: View {
             .padding(.bottom, FCPrimitives.space6)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarRole(.editor)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                FCLinkButton(title: String(localized: "share.shareAction"), isEnabled: !viewModel.isSharing) {
-                    Task { await viewModel.share() }
-                }
-                .accessibilityIdentifier(FCAccessibilityID.shareReportShare)
-            }
-        }
+        .fcSecondaryPage()
         .onDisappear { viewModel.close() }
     }
 

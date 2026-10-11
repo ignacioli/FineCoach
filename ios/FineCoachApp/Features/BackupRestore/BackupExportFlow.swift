@@ -124,10 +124,7 @@ struct BackupExportFlowView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                Text(String(localized: "backup.title"))
-                    .fcFont(.titleLarge)
-                    .foregroundStyle(FCSemanticColors.textPrimary)
-                    .accessibilityAddTraits(.isHeader)
+                FCPageHeader(title: String(localized: "backup.title"), back: .init())
                 Text(String(localized: "backup.subtitle"))
                     .fcFont(.callout, weight: .regular)
                     .foregroundStyle(FCSemanticColors.textSecondary)
@@ -148,8 +145,7 @@ struct BackupExportFlowView: View {
         }
         .scrollDismissesKeyboard(.interactively)
         .background(FCSemanticColors.surfacePage)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarRole(.editor)
+        .fcSecondaryPage()
         .onDisappear {
             viewModel.cancelInFlight()
         }

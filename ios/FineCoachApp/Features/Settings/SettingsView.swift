@@ -12,10 +12,7 @@ struct SettingsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: FCPrimitives.space4) {
-                Text(String(localized: "settings.title"))
-                    .fcFont(.titleLarge)
-                    .foregroundStyle(FCSemanticColors.textPrimary)
-                    .accessibilityAddTraits(.isHeader)
+                FCPageHeader(title: String(localized: "settings.title"), back: .init())
 
                 VStack(spacing: 0) {
                     FCListRowDivider()
@@ -44,8 +41,7 @@ struct SettingsView: View {
             .accessibilityIdentifier(FCAccessibilityID.settingsRoot)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarRole(.editor)
+        .fcSecondaryPage()
         .task(id: scenePhase) {
             notificationStatus = await SystemNotificationAdapter().currentStatus()
         }

@@ -168,10 +168,7 @@ struct CreditAdjustmentTrailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: FCPrimitives.space4) {
-                Text(viewModel.package?.displayName ?? String(localized: "packageDetail.title"))
-                    .fcFont(.titleLarge)
-                    .foregroundStyle(FCSemanticColors.textPrimary)
-                    .accessibilityAddTraits(.isHeader)
+                FCPageHeader(title: viewModel.package?.displayName ?? String(localized: "packageDetail.title"), back: .init())
 
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
@@ -192,8 +189,7 @@ struct CreditAdjustmentTrailView: View {
             .padding(.bottom, FCPrimitives.space6)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarRole(.editor)
+        .fcSecondaryPage()
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.creditTrailRoot)
         .task { await viewModel.reload() }

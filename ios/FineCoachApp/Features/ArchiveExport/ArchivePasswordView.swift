@@ -11,7 +11,8 @@ struct ArchivePasswordView: View {
         ArchiveExportPage {
             FCPageHeader(
                 title: String(localized: "archive.export.password.title"),
-                subtitle: String(localized: "archive.export.password.subtitle")
+                subtitle: String(localized: "archive.export.password.subtitle"),
+                back: model.headerBack
             )
             VStack(spacing: FCPrimitives.space3) {
                 ArchivePasswordField(String(localized: "archive.export.password.new"), text: $model.password)
@@ -19,7 +20,7 @@ struct ArchivePasswordView: View {
                 ArchivePasswordField(String(localized: "archive.export.password.confirm"), text: $model.confirmation)
                     .accessibilityIdentifier(FCAccessibilityID.archiveExportPasswordConfirm)
             }
-            Text("archive.export.password.rule")
+            Text(String(localized: "archive.export.password.rule"))
                 .fcFont(.caption)
                 .foregroundStyle(FCSemanticColors.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)

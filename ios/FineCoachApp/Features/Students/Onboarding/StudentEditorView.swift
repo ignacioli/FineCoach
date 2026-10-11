@@ -121,10 +121,7 @@ struct StudentEditorView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                Text(viewModel.title)
-                    .fcFont(.titleLarge)
-                    .foregroundStyle(FCSemanticColors.textPrimary)
-                    .accessibilityAddTraits(.isHeader)
+                FCPageHeader(title: viewModel.title, back: .init())
                     .padding(.bottom, FCPrimitives.space4)
                 FCListRowDivider()
 
@@ -237,8 +234,7 @@ struct StudentEditorView: View {
             .background(FCSemanticColors.surfacePage)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarRole(.editor)
+        .fcSecondaryPage()
         .task { await viewModel.loadIfNeeded() }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.editorRoot)

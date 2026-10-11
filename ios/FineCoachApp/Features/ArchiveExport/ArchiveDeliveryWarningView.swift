@@ -10,7 +10,8 @@ struct ArchiveDeliveryWarningView: View {
         ArchiveExportPage {
             FCPageHeader(
                 title: String(localized: "archive.export.warning.title"),
-                subtitle: String(localized: "archive.export.warning.subtitle")
+                subtitle: String(localized: "archive.export.warning.subtitle"),
+                back: model.headerBack
             )
             VStack(alignment: .leading, spacing: 0) {
                 FCListRowDivider()

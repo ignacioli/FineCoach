@@ -166,8 +166,7 @@ struct CalendarView: View {
             .background(FCSemanticColors.surfacePage)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarRole(.editor)
+        .fcSecondaryPage()
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.calendarRoot)
         .courseActionSheet(
@@ -189,11 +188,7 @@ struct CalendarView: View {
 
     private var header: some View {
         HStack(alignment: .center, spacing: FCPrimitives.space2) {
-            Text(String(localized: "calendar.title"))
-                .fcFont(.titleLarge)
-                .foregroundStyle(FCSemanticColors.textPrimary)
-                .accessibilityAddTraits(.isHeader)
-            Spacer(minLength: FCPrimitives.space2)
+            FCPageHeader(title: String(localized: "calendar.title"), back: .init())
             Text(CalendarDatePresentation.yearMonth(viewModel.displayedMonthStart))
                 .fcFont(.headline)
                 .foregroundStyle(FCSemanticColors.textPrimary)

@@ -13,10 +13,7 @@ struct ResourceHubView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: FCPrimitives.space4) {
-                Text(String(localized: "resourceHub.title"))
-                    .fcFont(.titleLarge)
-                    .foregroundStyle(FCSemanticColors.textPrimary)
-                    .accessibilityAddTraits(.isHeader)
+                FCPageHeader(title: String(localized: "resourceHub.title"), back: .init())
 
                 VStack(spacing: 0) {
                     FCListRowDivider()
@@ -46,8 +43,7 @@ struct ResourceHubView: View {
             .padding(.bottom, FCPrimitives.space6)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarRole(.editor)
+        .fcSecondaryPage()
         .task { await loadSummaries() }
     }
 

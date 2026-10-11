@@ -15,7 +15,8 @@ struct ArchiveDeliveryView: View {
         ArchiveExportPage {
             FCPageHeader(
                 title: String(localized: "archive.export.delivery.title"),
-                subtitle: String(format: String(localized: "archive.export.delivery.subtitle"), model.displayName)
+                subtitle: String(format: String(localized: "archive.export.delivery.subtitle"), model.displayName),
+                back: model.headerBack
             )
             result
             if !isHandedOver {
@@ -24,7 +25,7 @@ struct ArchiveDeliveryView: View {
                 }
                 .accessibilityIdentifier(FCAccessibilityID.archiveExportDeliver)
             }
-            Text("archive.export.delivery.caption")
+            Text(String(localized: "archive.export.delivery.caption"))
                 .fcFont(.caption)
                 .foregroundStyle(FCSemanticColors.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)

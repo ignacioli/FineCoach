@@ -63,10 +63,7 @@ struct ManualCreditAdjustmentView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                Text(String(localized: "manualAdjustment.title"))
-                    .fcFont(.titleLarge)
-                    .foregroundStyle(FCSemanticColors.textPrimary)
-                    .accessibilityAddTraits(.isHeader)
+                FCPageHeader(title: String(localized: "manualAdjustment.title"), back: .init())
                     .padding(.bottom, FCPrimitives.space4)
                 FCListRowDivider()
                 editorRow(String(localized: "manualAdjustment.direction")) {
@@ -133,8 +130,7 @@ struct ManualCreditAdjustmentView: View {
             .padding(FCPrimitives.space4)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarRole(.editor)
+        .fcSecondaryPage()
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.manualAdjustmentRoot)
         .onChange(of: viewModel.didSave) { _, saved in

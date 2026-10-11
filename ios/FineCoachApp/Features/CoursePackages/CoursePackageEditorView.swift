@@ -121,10 +121,7 @@ struct CoursePackageEditorView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                Text(String(localized: "coursePackageEditor.title"))
-                    .fcFont(.titleLarge)
-                    .foregroundStyle(FCSemanticColors.textPrimary)
-                    .accessibilityAddTraits(.isHeader)
+                FCPageHeader(title: String(localized: "coursePackageEditor.title"), back: .init())
                     .padding(.bottom, FCPrimitives.space4)
                 FCListRowDivider()
                 editorRow(String(localized: "coursePackageEditor.name")) {
@@ -221,8 +218,7 @@ struct CoursePackageEditorView: View {
             .padding(FCPrimitives.space4)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarRole(.editor)
+        .fcSecondaryPage()
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.coursePackageEditorRoot)
         .task { await viewModel.loadExistingActivePackage() }

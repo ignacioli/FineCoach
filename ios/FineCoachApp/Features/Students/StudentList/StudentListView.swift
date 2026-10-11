@@ -374,10 +374,7 @@ struct StudentListView: View {
     private var archivedBody: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: FCPrimitives.space4) {
-                Text(String(localized: "student.list.archivedTitle"))
-                    .fcFont(.titleLarge)
-                    .foregroundStyle(FCSemanticColors.textPrimary)
-                    .accessibilityAddTraits(.isHeader)
+                FCPageHeader(title: String(localized: "student.list.archivedTitle"), back: .init())
                 Text(String(localized: "student.archived.note"))
                     .fcFont(.callout, weight: .regular)
                     .foregroundStyle(FCSemanticColors.textSecondary)
@@ -414,8 +411,7 @@ struct StudentListView: View {
             .padding(.horizontal, FCPrimitives.space4)
             .padding(.bottom, FCPrimitives.space6)
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarRole(.editor)
+        .fcSecondaryPage()
     }
 
     /// Avatar + name + "归档于 M月d日" + 恢复. The date is the student's last

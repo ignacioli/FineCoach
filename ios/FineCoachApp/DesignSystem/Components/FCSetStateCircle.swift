@@ -29,9 +29,7 @@ public struct FCSetStateCircle: View {
                 )
             case .completed:
                 Circle().fill(FCSemanticColors.actionPrimary)
-                Image(systemName: "checkmark")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(FCSemanticColors.actionOn)
+                FCSymbol(.checkOnFill)
             }
         }
         .frame(width: 22, height: 22)

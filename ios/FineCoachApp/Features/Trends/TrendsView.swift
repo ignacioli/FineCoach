@@ -190,10 +190,7 @@ struct TrendsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: FCPrimitives.space4) {
-                Text(String(localized: "trends.title"))
-                    .fcFont(.titleLarge)
-                    .foregroundStyle(FCSemanticColors.textPrimary)
-                    .accessibilityAddTraits(.isHeader)
+                FCPageHeader(title: String(localized: "trends.title"), back: .init())
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
                         .fcFont(.caption)
@@ -206,8 +203,7 @@ struct TrendsView: View {
             .padding(.bottom, FCPrimitives.space6)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarRole(.editor)
+        .fcSecondaryPage()
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.trendsRoot)
         .task { await viewModel.reload() }

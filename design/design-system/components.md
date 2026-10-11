@@ -105,6 +105,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 适用于所有组件和 feature 页面：
 
 - 颜色、字体、间距、圆角只能使用 `FCSemanticColors` / `FCPrimitives` / `.fcFont(_:)`。feature 源码中出现原始值会让 `DesignValueScanTests` 失败。组件内部的 SF Symbol 字形尺寸可以使用 `.font(.system(size:weight:))`，前提是该尺寸来自 README §7.2（`FCSymbol`、`FCStatusBadge`、`FCSetStateCircle`）。
+- 可见文案用 `Text(String(localized: "key"))`（或 verbatim 字符串），不要写 `Text("key")` 字面量：字面量是 `LocalizedStringKey`，与随包 Noto Sans SC 一起排版时会在「、」后多出约半个字宽的空隙（模拟器实测 16pt，画稿 9.5pt；M2-02 排除说明的症状，2026-10-10）；仅用于无障碍标签的 `Text("key")` 不受影响。
 - 页面底色为 `surface.page` 白色；`surface.canvas` 只用于小面积填充（README §2.2、C4）。页面左右边距为 `space.4`。不使用阴影（§6）。每屏最多一个深色 hero（§2.4）。
 - 状态必须同时用文字和图标表达，不能只靠颜色（§2.4、constitution V）。
 - 所有可交互元素的点击区不小于 44×44；视觉尺寸较小时，向外补足点击区，不放大视觉本身（参见 `FCConfirmationDialog`、`FCFilterChip` 的做法）。
@@ -217,7 +218,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 
 #### `DS-LIST-ROW` 列表行与分割线
 
-- **部件**：左边距 16 → 主文字（`headline` 或 `body`，`text.primary`）→ 可选元信息（`caption` `text.secondary`，在主文字下方，间距 `space.1`）→ 弹性空白 → 可选 `›`（`FCSymbol(.forward)`）。最小高 44。
+- **部件**：主文字（`headline` 或 `body`，`text.primary`；行在页面自己的 16 边距内，不再额外缩进，标题起点 = 分割线起点 x=16）→ 可选元信息（`caption` `text.secondary`，在主文字下方，间距 `space.1`）→ 弹性空白 → 可选 `›`（`FCSymbol(.forward)`）。最小高 52（实测 M2-02a/02b/03：分割线间距 53 = 行 52 + 分割线 1；无对应间距 token，值见 `FCListRowGeometry.minHeight`）。
 - **分割线**：`FCListRowDivider` 是 1pt `surface.divider`，由调用方放在行与行之间，不画在行内部。
 - **不变量**：带 `action` 时整行可点；不可点时合并为一个无障碍元素（可自动）。
 - **复用边界**：见 CG-1。目前 feature 中的列表行都是各自拼装。新的普通列表行优先使用 `FCListRow`；需要头像、图标、状态等额外 slot 时，按「扩展」流程增加 slot，不要在页面里再复制一套。
@@ -302,7 +303,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 
 #### `DS-SYMBOL` 系统图标
 
-- **部件**：README §7.2 列出的 7 种字形（back、forward、minus、plus、check、checkOnFill、collapse），每种都有固定的尺寸、字重和默认颜色；只有画稿给出状态色时才允许覆盖颜色。
+- **部件**：README §7.2 列出的 8 种字形（pageBack、back、forward、minus、plus、check、checkOnFill、collapse），每种都有固定的尺寸、字重和默认颜色；只有画稿给出状态色时才允许覆盖颜色。`‹ › ✓`（pageBack、back、forward、check、checkOnFill）渲染为随包 Noto Sans SC 字形（`FCFont.uiFont`，随动态字体缩放；产品负责人 2026-10-10 否决 SF Symbols 的通用对勾 / 箭头）；`− + ▾` 为 SF Symbol。`FCSetStateCircle`、`FCStatusBadge` 的 ✓ 同样使用该字形。
 - **不变量**：feature 中不手写 `‹ › − + ✓ ▾` 字符，也不自行设置这些符号的尺寸（可自动：扫描 feature 源码）；默认装饰性，可点击时必须放在 ≥ 44 的点击区里，并由调用方提供可访问名称。
 
 #### `DS-EQUIPMENT-ICON` 器材图标
@@ -321,7 +322,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 | ID | anatomy | 画板 | 当前实现 |
 |---|---|---|---|
 | `DS-PAGE-PRIMARY` 一级页 | 顶部 `FCSegmentedSwitch`（今日 / 学员）→ 标题行：`display` 大标题（`action.primary`）+ 右侧 `DS-TITLE-ACTION` → 内容；隐藏系统导航栏。**查看模式变体**（M2，2026-10-09 G7 批准）：没有顶部分段切换，标题行只有设置齿轮，其余相同 | 01/21/40/41；M2-11 | Today、StudentList 各自拼装 |
-| `DS-PAGE-SECONDARY` 二级页 | 系统导航栏只显示返回 `‹`（inline，无标题）→ 页面内 `titleLarge` 标题（`text.primary`，带 header 属性）→ 可选副标题（`callout` 400 `text.secondary`）→ 内容 → 可选底部主按钮 | 23/26/28/36/37/38 | 约 20 个 feature 文件各自拼装；页头部分已有共享组件 `FCPageHeader`（§4.7），StudentDetail 已迁移 |
+| `DS-PAGE-SECONDARY` 二级页 | 隐藏系统导航栏（`.fcSecondaryPage()`，同时保持边缘右滑返回可用）→ 紧贴状态栏下方的页头：小号 `‹`（22/400 `text.secondary`）与页面内 `titleLarge` 标题在同一行、紧靠标题左侧（标题起点 x=32），整体由 `FCPageHeader` 绘制（带 header 属性）→ 可选副标题（`callout` 400 `text.secondary`）→ 内容 → 可选底部主按钮 | 23/26/28/36/37/38 | 约 20 个 feature 文件各自拼装；页头部分已有共享组件 `FCPageHeader`（§4.7），StudentDetail 已迁移 |
 | `DS-HUB-ROW` 入口行 | 24pt 图标（`action.primary`）→ 标题（`headline`）/ 副标题（`caption` `text.secondary`）→ `›`；最小高 64，间距 `space.4` | 19/42/43 | 已提升为共享组件 `FCHubRow`（M2 T002/T010，2026-10-10）；ResourceHub、Settings 已迁移，规格见 §4.7 |
 | `DS-INLINE-RESULT` 就地结果 | 22×22 `FCStatusBadge` → 标题（`callout` 600；失败为 `status.destructive`，成功为 `text.primary`）→ 说明（`caption` `text.secondary`）→ 失败时显示居中「重试」`FCLinkButton` | 38/39 | 已提升为共享组件 `FCInlineResult`（M2 T003/T011，2026-10-10）；BackupRestoreFlow 已迁移，规格见 §4.7 |
 | `DS-EMPTY-STATE` 空态 | 吉祥物 220×220 居中 → 标题（`headline` `action.primary`）→ 说明（`caption` `text.secondary`）→ 底部主按钮 | 16 | StudentList |
@@ -334,11 +335,12 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 
 状态：**已实现**（`FCPageHeader`，`TrailingAction` 描述尾部操作）。把 §4.6 `DS-PAGE-SECONDARY` 的页头部分做成组件，外观不变（C 类）。
 
-- **部件**：系统导航栏只显示返回 `‹`（inline，无标题；由调用页的 `.navigationBarTitleDisplayMode(.inline)` 与 `.toolbarRole(.editor)` 提供，不属于本组件）→ 页面内标题（`titleLarge` `text.primary`，带 `.isHeader`）→ 可选副标题（`callout` 400 `text.secondary`，与标题间距 `space.2`）→ 可选尾部操作（与标题首行同一行右侧，`callout` 600 `action.primary` 文字按钮，例如 26「编辑资料」）。
+- **部件**：可选内联返回 `‹`（`back:`，22/400 `text.secondary`，Noto Sans SC 字形 `FCSymbol(.pageBack)`；与标题首行基线对齐，布局宽 16，所以标题从 x=32 开始，实测 M2-02a/02b/03、M1 26/36 的 PNG：`‹` 墨迹 x 17–21.5、y 74–82.5，标题墨迹 x 32.5–33、y 58；点击区 44×44 以 overlay 方式覆盖在字形周围，不占布局；无障碍名称「返回」（`common.back`），标识由调用方传入；`handler` 为空时执行 `dismiss`，流程内的「上一步」传自己的 handler）。调用页用 `.fcSecondaryPage(swipeBackEnabled:)` 隐藏系统导航栏并保持（或在流程步骤页关闭）边缘右滑返回——系统导航栏隐藏后 `interactivePopGestureRecognizer` 会拒绝开始，所以该修饰符换上自己的 delegate（有上一页即允许），页面消失时恢复。无标题（`title: ""`）时只画返回与尾部操作（29 分享预览）→ 页面内标题（`titleLarge` `text.primary`，带 `.isHeader`）→ 可选副标题（`callout` 400 `text.secondary`，与标题间距 `space.2`）→ 可选尾部操作（与标题首行同一行右侧，`callout` 600 `action.primary` 文字按钮，例如 26「编辑资料」）。
 - **状态**：只有静态内容；尾部操作可禁用（`text.disabled`）。
 - **不变量**：标题带 header 无障碍属性（可自动）；尾部操作点击区 ≥ 44（可自动：`TouchTargetComponentTests` 扩展）；标题与副标题随动态字体换行，不截断（人工，组件引入时看一次）；尾部操作存在时标题宽度让出操作文字，标题换行而不是与操作重叠（人工）。
+- **页头位置**：页头紧贴安全区顶部（无导航栏占位）。画稿标题墨迹顶 y=58（行盒顶约 y=52，位于 59pt 状态栏安全区内），实现以安全区顶为行盒顶，标题墨迹比画稿低约 7–9pt；是否需要上提由产品负责人在设备上定。
 - **复用边界**：所有二级页页头都用它；一级页（今日、学员、查看模式首页）不用，见 `DS-PAGE-PRIMARY`。35 训练记录详情把「训练记录」放在导航栏 inline 标题、页面内是日期与训练标题，这是 35 自己的组合，不属于本组件。
-- **迁移范围（Phase 0）**：M2 新页面全部使用；M1 只迁移 M2 改动的 `StudentDetailView`（26，带尾部操作）。其余约 20 个手工页头不迁移。
+- **迁移范围**：M2 新页面全部使用；2026-10-10 产品负责人走查发现系统导航栏的返回按钮（iOS 26 液态玻璃大圆钮）单独占一行、标题被挤到下一行，与画稿不符，所有 `titleLarge` 二级页（动作库、设置、资料库、日历、课包、课时调整、预约编辑、学员编辑 / 详情 / 已归档、趋势、训练历史、模板、备份、身体数据、分享报告 2 页、M2 导出流程）统一迁移到 `FCPageHeader` + `.fcSecondaryPage()`。仍使用系统导航栏的页面：训练中（`ActiveSessionView`，画稿 11/30 没有返回，标题 22/700；待产品负责人决定）与标题放在导航栏的页面（35 训练记录详情等，返回与居中标题同一行）。
 
 #### `DS-HUB-ROW` 入口行（由组合模式提升为共享组件，CG-8）
 
@@ -366,7 +368,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 
 在 §4.3 现有 anatomy 上增加 slot 与状态（B 类，M2 首次使用；`FCListRow` 目前 0 个消费者，无回归面）：
 
-- **部件**（新增项标「新」）：左边距 16 →（新）可选 leading：24×24 `DS-EQUIPMENT-ICON`，与文字间距 `space.3`；leading slot 启用但该行没有图标时保留空位，使文字对齐 →（新）可选缩进：子行文字左移 `space.4`（x=32）→ 主文字 → 可选元信息（新：允许多行，换行不截断，用于自由文本预览）→ 弹性空白 →（新）可选尾部说明（`caption` `text.secondary`）→ 尾部二选一：`›`，或（新）勾选圈（外观复用 `FCSetStateCircle`：未选为待完成描边、已选为实心 + ✓，与 28/32 一致）。
+- **部件**（新增项标「新」）：左边距 16 →（新）可选 leading：24×24 `DS-EQUIPMENT-ICON`，与文字间距 `space.3`；leading slot 启用但该行没有图标时保留空位，使文字对齐 →（新）可选缩进：子行文字左移 `space.4`（x=32，子行分割线同样从 x=32 开始，`FCListRowGeometry.indent`）→ 主文字 → 可选元信息（新：允许多行，换行不截断，用于自由文本预览）→ 弹性空白 →（新）可选尾部说明（`caption` `text.secondary`）→ 尾部二选一：`›`，或（新）勾选圈（外观复用 `FCSetStateCircle`：未选为待完成描边、已选为实心 + ✓，与 28/32 一致）。
 - **状态**（新）：已选 / 未选（勾选圈变体，整行点击切换，带 `.isSelected`）；**不可用**：主文字 `text.disabled`，尾部说明写原因，不显示勾选圈与 `›`，整行不可点，读作「标题，原因」。
 - **分组变体**（新，M2-02）：主文字 `headline` → 尾部说明 → 展开符号（`FCSymbol(.collapse)`，展开时朝上）→ 三态勾选圈：全选（实心 + ✓）、**部分选中**（`action.primary` 实心 + 白色「−」，复用 `FCSymbol(.minus)` 字形）、全不选（描边）。两个点击区：勾选圈切换整组（≥ 44×44），行的其余部分展开 / 折叠；展开后子行用缩进变体排在分组行下方。无障碍：分组行读作「标题，说明，已全选 / 部分选中 / 未选，已展开 / 已折叠」，提供「切换选择」「展开 / 折叠」两个动作。
 - **不变量**：部分选中只由子项状态推导，不能单独设置（类型保证：分组状态是计算值）；勾选圈变体的整行是一个点击目标（分组变体除外，见上），点击区 ≥ 44（可自动）；已选状态通过 `.isSelected` 读出，不只靠勾选圈外观（可自动）；不可用态没有点击动作（可自动）；`›` 与勾选圈不同时出现（类型保证）。

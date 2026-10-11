@@ -11,7 +11,8 @@ struct ArchiveSelectionView: View {
         ArchiveExportPage {
             FCPageHeader(
                 title: String(localized: "archive.export.selection.title"),
-                subtitle: String(format: String(localized: "archive.export.selection.subtitle"), model.displayName)
+                subtitle: String(format: String(localized: "archive.export.selection.subtitle"), model.displayName),
+                back: model.headerBack
             )
             if let selection = model.selection {
                 VStack(alignment: .leading, spacing: 0) {
@@ -63,7 +64,7 @@ struct ArchiveSelectionView: View {
             if isExpanded {
                 ForEach(selection.items(in: group), id: \.self) { item in
                     FCListRowDivider()
-                        .padding(.leading, FCPrimitives.space4 * 2)
+                        .padding(.leading, FCListRowGeometry.indent)
                     itemRow(item, selection: selection)
                 }
             }

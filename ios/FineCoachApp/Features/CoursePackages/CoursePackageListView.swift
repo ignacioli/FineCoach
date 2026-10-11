@@ -102,10 +102,7 @@ struct CoursePackageListView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: FCPrimitives.space4) {
-                Text(String(localized: "packageDetail.title"))
-                    .fcFont(.titleLarge)
-                    .foregroundStyle(FCSemanticColors.textPrimary)
-                    .accessibilityAddTraits(.isHeader)
+                FCPageHeader(title: String(localized: "packageDetail.title"), back: .init())
 
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
@@ -155,8 +152,7 @@ struct CoursePackageListView: View {
             .background(FCSemanticColors.surfacePage)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarRole(.editor)
+        .fcSecondaryPage()
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.coursePackageListRoot)
         .fcConfirmationDialog(isPresented: $isConfirmingEnd) {

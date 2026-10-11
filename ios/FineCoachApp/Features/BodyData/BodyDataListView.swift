@@ -188,10 +188,7 @@ struct BodyDataListView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                Text(String(localized: "bodyData.title"))
-                    .fcFont(.titleLarge)
-                    .foregroundStyle(FCSemanticColors.textPrimary)
-                    .accessibilityAddTraits(.isHeader)
+                FCPageHeader(title: String(localized: "bodyData.title"), back: .init())
                 if let name = viewModel.studentName {
                     Text(name)
                         .fcFont(.headline)
@@ -235,8 +232,7 @@ struct BodyDataListView: View {
             .background(FCSemanticColors.surfacePage)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarRole(.editor)
+        .fcSecondaryPage()
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.bodyDataListRoot)
         .task { await viewModel.reload() }
