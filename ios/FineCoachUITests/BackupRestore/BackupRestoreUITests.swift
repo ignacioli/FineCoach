@@ -185,6 +185,7 @@ final class BackupRestoreUITests: XCTestCase {
     }
 
     private func skipOnboarding(in app: XCUIApplication) {
+        if app.buttons["firstLaunch.coach"].waitForExistence(timeout: 8) { app.buttons["firstLaunch.coach"].tap() }
         XCTAssertTrue(app.buttons["onboarding.skip"].waitForExistence(timeout: 8))
         app.buttons["onboarding.skip"].tap()
         waitForStudentList(in: app)

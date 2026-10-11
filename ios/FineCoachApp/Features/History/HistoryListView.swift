@@ -752,36 +752,7 @@ struct HistoryListView: View {
                 FCSectionLabel(String(localized: "history.pb.title"))
                 VStack(spacing: 0) {
                     ForEach(rows) { row in
-                        HStack(alignment: .center, spacing: FCPrimitives.space4) {
-                            VStack(alignment: .leading, spacing: FCPrimitives.space1) {
-                                Text(row.name)
-                                    .fcFont(.headline)
-                                    .foregroundStyle(FCSemanticColors.textPrimary)
-                                Text(row.kind)
-                                    .fcFont(.caption)
-                                    .foregroundStyle(FCSemanticColors.textSecondary)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            Text(row.value)
-                                .fcFont(.titleEmphasis)
-                                .foregroundStyle(FCSemanticColors.textPrimary)
-                                .lineLimit(1)
-                            VStack(alignment: .trailing, spacing: FCPrimitives.space1) {
-                                if let day = row.day {
-                                    Text(day)
-                                        .fcFont(.caption)
-                                        .foregroundStyle(FCSemanticColors.textSecondary)
-                                }
-                                if let detail = row.detail {
-                                    Text(detail)
-                                        .fcFont(.caption)
-                                        .foregroundStyle(FCSemanticColors.textSecondary)
-                                }
-                            }
-                            .frame(minWidth: 88, alignment: .trailing)
-                        }
-                        .padding(.vertical, FCPrimitives.space3)
-                        .accessibilityElement(children: .combine)
+                        PersonalBestRowView(name: row.name, kind: row.kind, value: row.value, day: row.day, detail: row.detail)
                         FCListRowDivider()
                     }
                 }

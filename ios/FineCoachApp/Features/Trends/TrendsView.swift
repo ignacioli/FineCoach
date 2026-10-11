@@ -318,39 +318,18 @@ struct TrendsView: View {
 
     private func metricTrendChart(_ points: [Comparison.SetTrendPoint], dashed: Bool) -> some View {
         let metric = selectedTrendMetric
-        return Chart(points, id: \.sessionID) { point in
-            if let raw = metric.value(for: point), let value = Double(raw.canonicalString) {
-                LineMark(
-                    x: .value("date", point.completedAtUTC),
-                    y: .value(metric.label, value)
-                )
-                .foregroundStyle(FCSemanticColors.actionPrimary)
-                .lineStyle(dashed ? StrokeStyle(lineWidth: 2, dash: [4, 4]) : StrokeStyle(lineWidth: 2))
-                PointMark(
-                    x: .value("date", point.completedAtUTC),
-                    y: .value(metric.label, value)
-                )
-                .foregroundStyle(FCSemanticColors.actionPrimary)
-                .annotation(position: .top) {
-                    Text(Self.pointLabel(value, unit: metric.unit))
-                        .fcFont(.caption)
-                        .foregroundStyle(FCSemanticColors.textSecondary)
-                }
-            }
-        }
-        .frame(height: 200)
+        return TrendLineChart(
+            points: points,
+            metricLabel: metric.label,
+            unit: metric.unit,
+            dashed: dashed,
+            value: { point in metric.value(for: point).flatMap { Double($0.canonicalString) } }
+        )
     }
 
-    /// Point-label text for chart annotations: at most 1 decimal place,
-    /// with a whole number never showing a trailing ".0" (e.g. "40kg", not
-    /// "40.0kg", but "40.5kg" stays as-is).
+    /// Point-label text for chart annotations (see `TrendLineChart.pointLabel`).
     static func pointLabel(_ value: Double, unit: String) -> String {
-        let rounded = (value * 10).rounded() / 10
-        var text = String(format: "%.1f", rounded)
-        if text.hasSuffix(".0") {
-            text.removeLast(2)
-        }
-        return "\(text)\(unit)"
+        TrendLineChart.pointLabel(value, unit: unit)
     }
 
     private func trendRows(_ points: [Comparison.SetTrendPoint]) -> some View {

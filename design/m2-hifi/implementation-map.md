@@ -240,6 +240,39 @@ M2-06b → 「完成」→ archiveExport.done → 是（leave() 并返回学员�
 加载错误 / 意外错误 → archiveExport.loadError / archiveExport.actionError → 否 → FCInlineResult（ArchiveExportFlowView.swift:79、:32）
 ```
 
+### 7.4 US-2 首次启动、导入与查看（tasks T039–T052，2026-10-11）
+
+自动门：`xcodebuild build`、`FineCoachTests`、`FineCoachIntegrationTests` 全绿（数字见提交说明）。界面测试只改了首次启动步骤（先点「Coach 使用」），编译通过，未运行。**未经人工目视**；M2-11 的 L3 走查（T053）待产品负责人进行。
+
+**入口与布局清单**（页面 → 控件 → 标识 → 是否写数据 → 撑满宽度的组件）：
+
+| 页面 | 控件 | 标识 | 写数据 | 宽度 |
+|---|---|---|---|---|
+| M2-07 | 「Coach 使用」行 | `firstLaunch.coach` | 否（只切换分支） | `FCHubRow`（`FirstLaunchChoiceView.swift:38`） |
+| M2-07 | 「导入个人训练档案」行 | `firstLaunch.import` | 否（push 导入页） | `FCHubRow`（`:46`） |
+| Onboarding | 页头 `‹`（仅未选择时） | `onboarding.back` | 否（回 M2-07） | `FCPageHeader`（`OnboardingView.swift:38`） |
+| M2-08 | 页头 `‹` | `archiveImport.back` | 否（删 Inbox 副本） | `FCPageHeader`（`ArchiveImportView.swift:19`） |
+| M2-08 | 档案文件行 | `archiveImport.file` | 否（系统文件选择器） | `FCLabelValueRow`（`:29`） |
+| M2-08 | 密码框 | `archiveImport.password` | 否（仅内存） | `FCTextField`（`:33`） |
+| M2-08 | 「导入」 | `archiveImport.submit` | **是**（安装档案；失败不写） | `FCButton`（`:37`） |
+| M2-08b | 失败结果 / 「重试」 | `archiveImport.failure` / `.retry` | 重试 = 再次导入 | `FCInlineResult`（`:90`） |
+| M2-09 | `‹` / 「知道了」 | `archiveBlocked.back` / `.acknowledge` | 否（删 Inbox 副本） | `FCPageHeader` / `FCButton`（`ArchiveImportBlockedView.swift:19,44`） |
+| M2-10 | `‹` / 「开始查看」 | `archiveSummary.back` / `.start` | 否（只重新解析安装状态） | `FCPageHeader` / `FCButton`（`ArchiveImportSummaryView.swift:15,48`） |
+| 替换占位 | `‹` | `archiveImport.back` | 否 | `FCPageHeader`（`ArchiveImportView.swift:110`），T055 接入 |
+| M2-11 | 设置齿轮 | `archiveHome.settings` | 否 | `FCTitleIconButton`（`ArchiveHomeView.swift:28`） |
+| M2-11 | 训练记录 / 身体数据 / 趋势与个人最佳 | `archiveHome.records` / `.body` / `.trends` | 否 | `FCHubRow`（`:70,80,89`） |
+| M2-11 | 动作资料 / 关于本档案 | `archiveHome.exercises` / `.about` | 否（暂不可点，T062 接入） | `FCHubRow`（`:98,107`） |
+| M2-12 | `‹`、搜索、日期范围 / 训练重点胶囊、清除筛选、记录行 | `archiveRecords.back` / `.search` / `.filter.date` / `.filter.focus` / `.filter.clear` / `.row.N` | 否（内存筛选；行 push 详情） | `FCPageHeader` / `FCSearchField` / `FCFilterChip` / `FCListRow`（`ArchiveRecordsView.swift:41–109`） |
+| M2-13 | 系统返回（M1 35 口径） | — | 否 | `ShareReportCardView(.page)` |
+| M2-14 | `‹`、指标行、历史页 `‹` | `archiveBody.back` / `.metric.<key>` / `archiveMetric.back` | 否 | `FCPageHeader` / `BodyMetricValueRow`（`ArchiveBodyDataView.swift:25,64,85`） |
+| M2-15 | `‹`、动作行、重量/次数/容量 | `archiveTrends.back` / `.exercise` / `.metric` | 否 | `FCPageHeader` / `FCLabelValueRow` / `FCSegmentedSwitch`（`ArchiveTrendsView.swift:49,58,116`） |
+| M2-18 | `‹`、重量 / 围度与身高 / 列表密度 | `archiveSettings.back` / `.weight` / `.length` / `.density` | **是**（只写本机显示设置，不写档案） | `FCLabelValueRow` + `FCSegmentedSwitch`（`ArchiveSettingsView.swift:25,34,46`） |
+| M2-18 | 导入较新档案 / 删除本机档案 | `archiveSettings.importNewer` / `.delete` | 否（禁用占位，T055 / T058 接入） | `FCActionRow`（`:68,74`） |
+
+**无写入口清单（SC-005）**：查看模式各页可点控件只有上表所列的返回、push、内存筛选与本机显示设置；没有编辑、添加训练、分享报告、导出、备份、预约、课包入口。`ArchiveViewerScreenTests` 在 `Features/ArchiveViewer` 中禁止 `contextMenu`、`.sheet(`、`.fullScreenCover(`、`swipeActions` 及 Coach / 分享 / 备份 / 导出类型。
+
+**待产品负责人确认（实现时的自定文案与判断）**：「正在导入…」；替换占位「导入较新档案的功能尚未提供。」；「无法读取档案」/「档案文件无法读取，没有任何内容被改动。」；「设置没有保存」/「请稍后再试。」；「近 N 天」以档案快照日为基准而非今天；无训练重点的记录标题沿用 M1 的「训练报告」；列表密度「紧凑」新增 `FCListRow` 的 `fcCompactRows` 环境值（最小高度 44，默认不变，尚未写入 `components.md`）；M2-09 步骤行没有悬挂缩进、序号不是灰色，与 PNG 有出入。
+
 ## 8. 待产品负责人确认的问题
 
 1. ~~M2-09 的进入路径~~：**已定（R4）**，支持系统打开档案文件，spec D-010 已修订。

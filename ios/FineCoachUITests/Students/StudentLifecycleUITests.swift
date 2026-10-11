@@ -8,6 +8,7 @@ final class StudentLifecycleUITests: XCTestCase {
 
     func testFirstLaunchExplainsLocalBoundaryAndAllowsSkipCreate() {
         let app = launchIsolatedApp()
+        if app.buttons["firstLaunch.coach"].waitForExistence(timeout: 8) { app.buttons["firstLaunch.coach"].tap() }
         XCTAssertTrue(app.staticTexts["onboarding.title"].waitForExistence(timeout: 8))
         XCTAssertTrue(app.staticTexts["onboarding.lead"].exists)
         XCTAssertTrue(app.staticTexts["onboarding.local"].exists)
@@ -33,6 +34,7 @@ final class StudentLifecycleUITests: XCTestCase {
         throw XCTSkip("Stale since D6 (T069g): 归档 / 永久删除 moved from 学员详情 to the bottom of 编辑资料; rewrite the flow through 编辑资料 (tracked in tasks.md T081).")
 
         let app = launchIsolatedApp()
+        if app.buttons["firstLaunch.coach"].waitForExistence(timeout: 8) { app.buttons["firstLaunch.coach"].tap() }
         XCTAssertTrue(app.buttons["onboarding.skip"].waitForExistence(timeout: 8))
         app.buttons["onboarding.skip"].tap()
         waitForStudentList(in: app)
@@ -119,7 +121,9 @@ final class StudentLifecycleUITests: XCTestCase {
                 "UICTContentSizeCategoryAccessibilityXL",
             ]
         )
+        if app.buttons["firstLaunch.coach"].waitForExistence(timeout: 8) { app.buttons["firstLaunch.coach"].tap() }
         XCTAssertTrue(app.staticTexts["onboarding.title"].waitForExistence(timeout: 8))
+        if app.buttons["firstLaunch.coach"].waitForExistence(timeout: 8) { app.buttons["firstLaunch.coach"].tap() }
         XCTAssertTrue(app.buttons["onboarding.skip"].waitForExistence(timeout: 5))
         tapVisible(in: app, identifier: "onboarding.skip")
         waitForStudentList(in: app)

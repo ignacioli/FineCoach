@@ -410,14 +410,10 @@ struct BodyMeasurementEntryView: View {
     }
 
     private func historyRow(_ measurement: BodyMeasurement) -> some View {
-        HStack {
-            VStack(alignment: .leading, spacing: FCPrimitives.space2) {
-                Text(measurement.localCalendarDay.canonicalString)
-                    .fcFont(.body)
-                Text(viewModel.displayValue(for: measurement))
-                    .foregroundStyle(FCSemanticColors.textSecondary)
-            }
-            Spacer()
+        BodyMeasurementHistoryRow(
+            dateText: measurement.localCalendarDay.canonicalString,
+            valueText: viewModel.displayValue(for: measurement)
+        ) {
             Button {
                 viewModel.pendingDeleteID = measurement.id
             } label: {
@@ -426,9 +422,6 @@ struct BodyMeasurementEntryView: View {
             }
             .frame(minWidth: 44, minHeight: 44)
         }
-        .padding(FCPrimitives.space4)
-        .background(FCSemanticColors.surfaceElevated)
-        .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusMd))
         .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementRow(measurement.id))
     }
 }

@@ -25,12 +25,21 @@ final class OnboardingViewModel: ObservableObject {
 struct OnboardingView: View {
     @ObservedObject var viewModel: OnboardingViewModel
     let onFinished: () -> Void
+    /// Set while the install is still `unselected`: back to the first-launch choice (M2-07).
+    /// Nothing is written until the coach adds a first student or skips below.
+    var onBack: (() -> Void)?
     @State private var path: [RootDestination] = []
 
     var body: some View {
         NavigationStack(path: $path) {
             ScrollView {
                 VStack(alignment: .leading, spacing: FCPrimitives.space4) {
+                    if let onBack {
+                        FCPageHeader(
+                            title: "",
+                            back: .init(accessibilityIdentifier: FCAccessibilityID.onboardingBack, handler: onBack)
+                        )
+                    }
                     Text(String(localized: "onboarding.kicker"))
                         .fcFont(.callout, weight: .regular)
                         .foregroundStyle(FCSemanticColors.textSecondary)

@@ -166,11 +166,6 @@ final class BodyDataListViewModel: ObservableObject {
 
 struct BodyDataListView: View {
     @StateObject private var viewModel: BodyDataListViewModel
-    /// Value and unit column widths measured from `06-body-data` (values
-    /// start at x=200, units at x=290 of 390), scaled with Dynamic Type so
-    /// the columns stay aligned across rows.
-    @ScaledMetric(relativeTo: .title2) private var valueColumnWidth: CGFloat = 90
-    @ScaledMetric(relativeTo: .footnote) private var unitColumnWidth: CGFloat = 84
     @Binding var path: [RootDestination]
 
     init(
@@ -287,23 +282,7 @@ struct BodyDataListView: View {
             path.append(
                 .bodyMeasurementEntry(studentID: viewModel.studentID.rawValue, metricID: metric.id.rawValue))
         } label: {
-            HStack(alignment: .firstTextBaseline, spacing: 0) {
-                Text(metric.name.value)
-                    .fcFont(.callout, weight: .regular)
-                    .foregroundStyle(FCSemanticColors.textSecondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                Text(display.value)
-                    .fcFont(.numeralLarge)
-                    .foregroundStyle(FCSemanticColors.textPrimary)
-                    .frame(minWidth: valueColumnWidth, alignment: .leading)
-                Text(display.unit)
-                    .fcFont(.caption)
-                    .foregroundStyle(FCSemanticColors.textSecondary)
-                    .frame(minWidth: unitColumnWidth, alignment: .leading)
-            }
-            .padding(.vertical, FCPrimitives.space3)
-            .frame(minHeight: 52)
-            .contentShape(Rectangle())
+            BodyMetricValueRow(name: metric.name.value, value: display.value, unit: display.unit)
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)

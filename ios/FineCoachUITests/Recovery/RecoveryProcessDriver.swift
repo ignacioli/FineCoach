@@ -115,6 +115,7 @@ enum RecoveryProcessDriver {
 
     @MainActor
     static func skipOnboardingIfPresented(in app: XCUIApplication) {
+        if app.buttons["firstLaunch.coach"].waitForExistence(timeout: 8) { app.buttons["firstLaunch.coach"].tap() }
         if app.buttons["onboarding.skip"].waitForExistence(timeout: 3) {
             app.buttons["onboarding.skip"].tap()
             waitForStudentList(in: app)
@@ -254,6 +255,7 @@ enum RecoveryProcessDriver {
 
     @MainActor
     private static func skipOnboarding(in app: XCUIApplication) {
+        if app.buttons["firstLaunch.coach"].waitForExistence(timeout: 8) { app.buttons["firstLaunch.coach"].tap() }
         XCTAssertTrue(app.buttons["onboarding.skip"].waitForExistence(timeout: 8))
         app.buttons["onboarding.skip"].tap()
         waitForStudentList(in: app)

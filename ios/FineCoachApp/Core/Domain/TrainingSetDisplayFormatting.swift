@@ -25,22 +25,25 @@ public protocol TrainingSetDisplayValues {
 /// precise enough and matches the same text format the coach types in.
 /// Storage itself always stays in seconds.
 public enum TrainingSetDisplayFormatting {
-    public static func summary(for values: TrainingSetDisplayValues) -> String {
+    /// - Parameter weightUnit: the unit label printed after weights. Defaults to "kg", what every
+    ///   Coach-side caller shows; the archive viewer passes "lb" when the local display setting
+    ///   asks for it (the values are converted by the caller, not here).
+    public static func summary(for values: TrainingSetDisplayValues, weightUnit: String = "kg") -> String {
         switch values.recordMode {
         case .weightReps:
             let repsText = values.repetitionCount?.canonicalString ?? "-"
             switch values.side {
             case .none:
-                return "\(values.weightValue?.canonicalString ?? "-")kg × \(repsText)次"
+                return "\(values.weightValue?.canonicalString ?? "-")\(weightUnit) × \(repsText)次"
             case .left:
-                return "左 \((values.leftValue ?? values.weightValue)?.canonicalString ?? "-")kg × \(repsText)次"
+                return "左 \((values.leftValue ?? values.weightValue)?.canonicalString ?? "-")\(weightUnit) × \(repsText)次"
             case .right:
-                return "右 \((values.rightValue ?? values.weightValue)?.canonicalString ?? "-")kg × \(repsText)次"
+                return "右 \((values.rightValue ?? values.weightValue)?.canonicalString ?? "-")\(weightUnit) × \(repsText)次"
             case .bilateral:
                 if let leftValue = values.leftValue, let rightValue = values.rightValue {
-                    return "左 \(leftValue.canonicalString)kg / 右 \(rightValue.canonicalString)kg × \(repsText)次"
+                    return "左 \(leftValue.canonicalString)\(weightUnit) / 右 \(rightValue.canonicalString)\(weightUnit) × \(repsText)次"
                 }
-                return "\(values.weightValue?.canonicalString ?? "-")kg（双侧） × \(repsText)次"
+                return "\(values.weightValue?.canonicalString ?? "-")\(weightUnit)（双侧） × \(repsText)次"
             }
         case .reps:
             return "\(values.repetitionCount?.canonicalString ?? "-")次"

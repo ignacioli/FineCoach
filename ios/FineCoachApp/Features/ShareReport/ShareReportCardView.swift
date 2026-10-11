@@ -31,6 +31,9 @@ struct ShareReportCardView: View {
 
     let dto: ShareReportDTO
     var style: Style = .shareCard
+    /// The unit label printed after weights. "kg" everywhere except the archive viewer, whose
+    /// local display setting may ask for "lb" (the DTO values are converted by the caller).
+    var weightUnit: String = "kg"
     /// The blocks to draw; `nil` draws the whole report.
     var blocks: [Block]?
 
@@ -204,7 +207,7 @@ struct ShareReportCardView: View {
                     .foregroundStyle(FCSemanticColors.textPrimary)
             }
             let cells = exercise.confirmedSets.enumerated().map { index, set in
-                (index + 1, TrainingSetDisplayFormatting.summary(for: set))
+                (index + 1, TrainingSetDisplayFormatting.summary(for: set, weightUnit: weightUnit))
             }
             ForEach(Array(stride(from: 0, to: cells.count, by: 3)), id: \.self) { start in
                 HStack(alignment: .firstTextBaseline, spacing: FCPrimitives.space2) {

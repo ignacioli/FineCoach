@@ -63,6 +63,9 @@ struct RootNavigation: View {
     @State private var onboardingCompleted = false
     @State private var didLoadOnboarding = false
     @State private var rootTab: RootTab = .today
+    /// Set by `AppRoot` while the install is `unselected`, so first-launch onboarding can go
+    /// back to the Coach / import choice (M2-07).
+    var onBackToChoice: (() -> Void)?
 
     var body: some View {
         // The app-wide `PrivacyCover` now lives in `AppRoot`, above this branch.
@@ -89,7 +92,8 @@ struct RootNavigation: View {
                         viewModel: OnboardingViewModel(useCases: environment.requireUseCases()),
                         onFinished: {
                             onboardingCompleted = true
-                        }
+                        },
+                        onBack: onBackToChoice
                     )
                 } else {
                     NavigationStack(path: $path) {

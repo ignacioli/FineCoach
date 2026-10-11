@@ -7,6 +7,27 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AE64CD89403A0905A94D02F8 /* ArchiveHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6128566D2A6F0494C3A37F0 /* ArchiveHomeView.swift */; };
+		2EB5C00C6D445150E526AA04 /* ArchiveRecordsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B7A2883C4316AECA3A7CA1B /* ArchiveRecordsView.swift */; };
+		05C2369F4D79432D8D8EC0D9 /* ArchiveSessionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DF82CC5E06E0C132715F455 /* ArchiveSessionDetailView.swift */; };
+		D989F09B2BA9E8B709C087F8 /* ArchiveBodyDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E78DCEB0FFCF305A79E809 /* ArchiveBodyDataView.swift */; };
+		77DFB32B6012A4BAA04EFA04 /* ArchiveTrendsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568FA1215475B370C3A90E3A /* ArchiveTrendsView.swift */; };
+		DCE58066353129B7CA835152 /* ArchiveSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA2A13009BE69FED37CB9CD0 /* ArchiveSettingsView.swift */; };
+		5E3346DB77E3644B92203359 /* ArchiveViewerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B7CEEEF9EA22FAE3724F69 /* ArchiveViewerModel.swift */; };
+		45E5E3BFA0F02A20EFEB1348 /* ArchiveViewerPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A25769FC06425F1830C50B8 /* ArchiveViewerPresentation.swift */; };
+		17BB4594FB165EE5AFD93137 /* TrendLineChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80744E8BACE34CCF8281ACDB /* TrendLineChart.swift */; };
+		A2257614269424520713EB05 /* BodyDataRows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F12AE5E84ACB03D9B4D2EBC /* BodyDataRows.swift */; };
+		61366EB2A919DFC5C81FE2F0 /* PersonalBestRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44BB25E9EB066105A853B567 /* PersonalBestRowView.swift */; };
+		FB060C7486B62C2FDCE174BC /* FirstLaunchChoiceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AFCB65E988DE8F24ACDAB58 /* FirstLaunchChoiceView.swift */; };
+		C3FF02381F22CB242F1BDA61 /* ArchiveViewerDebugSeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4A4A27ED80308ACEA2BE1E5 /* ArchiveViewerDebugSeed.swift */; };
+		6F7339E88145FF74AFC9466C /* ArchiveImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3DD9D8DC2C4BA0630D89613 /* ArchiveImportView.swift */; };
+		4EC2CE440AE6DD6DE08A02D0 /* ArchiveImportBlockedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E818DA7684FA6350AEE87B03 /* ArchiveImportBlockedView.swift */; };
+		E73AD069FD36BB1BBD721025 /* ArchiveImportSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C00906674A997E5D742092 /* ArchiveImportSummaryView.swift */; };
+		32F2DDC4CBE5BD935420EDC8 /* ArchiveImportFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F5D16678F4203E364FE789C /* ArchiveImportFlowView.swift */; };
+		1C7EE5E3CFA0F6574286DE7F /* ArchiveImportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 213B17E0B02E04219FF671D5 /* ArchiveImportViewModel.swift */; };
+		73A3FA545FC87EDDC23AF89F /* ArchiveImportPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BF159DF275C16B25EEF9CE /* ArchiveImportPresentation.swift */; };
+		BE3D885E0D7A5C994B355949 /* ArchiveViewerDebugSeedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09F15FFF9A8FA53D946F4290 /* ArchiveViewerDebugSeedTests.swift */; };
+		C6458F72160E53B9DB76FB06 /* ArchiveViewerScreenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E79D77E7B05B7DD8BD7CA5 /* ArchiveViewerScreenTests.swift */; };
 		5B26357EC039B8C2F8BAE943 /* ArchiveFoundationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE13168A5E0392CB8EBB7549 /* ArchiveFoundationTests.swift */; };
 		C4FDE713157F6853CEFC13F2 /* ArchiveFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87A3055CF641A027271A023C /* ArchiveFixtures.swift */; };
 		A1347A5C9F8EAB6547AD2AC8 /* ArchiveFileCodecTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1BDC9E4D3F6407C74541328 /* ArchiveFileCodecTests.swift */; };
@@ -348,6 +369,27 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C6128566D2A6F0494C3A37F0 /* ArchiveHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveHomeView.swift; sourceTree = "<group>"; };
+		0B7A2883C4316AECA3A7CA1B /* ArchiveRecordsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveRecordsView.swift; sourceTree = "<group>"; };
+		1DF82CC5E06E0C132715F455 /* ArchiveSessionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveSessionDetailView.swift; sourceTree = "<group>"; };
+		27E78DCEB0FFCF305A79E809 /* ArchiveBodyDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveBodyDataView.swift; sourceTree = "<group>"; };
+		568FA1215475B370C3A90E3A /* ArchiveTrendsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveTrendsView.swift; sourceTree = "<group>"; };
+		CA2A13009BE69FED37CB9CD0 /* ArchiveSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveSettingsView.swift; sourceTree = "<group>"; };
+		30B7CEEEF9EA22FAE3724F69 /* ArchiveViewerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveViewerModel.swift; sourceTree = "<group>"; };
+		8A25769FC06425F1830C50B8 /* ArchiveViewerPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveViewerPresentation.swift; sourceTree = "<group>"; };
+		80744E8BACE34CCF8281ACDB /* TrendLineChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendLineChart.swift; sourceTree = "<group>"; };
+		4F12AE5E84ACB03D9B4D2EBC /* BodyDataRows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyDataRows.swift; sourceTree = "<group>"; };
+		44BB25E9EB066105A853B567 /* PersonalBestRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalBestRowView.swift; sourceTree = "<group>"; };
+		3AFCB65E988DE8F24ACDAB58 /* FirstLaunchChoiceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstLaunchChoiceView.swift; sourceTree = "<group>"; };
+		A4A4A27ED80308ACEA2BE1E5 /* ArchiveViewerDebugSeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveViewerDebugSeed.swift; sourceTree = "<group>"; };
+		A3DD9D8DC2C4BA0630D89613 /* ArchiveImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveImportView.swift; sourceTree = "<group>"; };
+		E818DA7684FA6350AEE87B03 /* ArchiveImportBlockedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveImportBlockedView.swift; sourceTree = "<group>"; };
+		D9C00906674A997E5D742092 /* ArchiveImportSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveImportSummaryView.swift; sourceTree = "<group>"; };
+		4F5D16678F4203E364FE789C /* ArchiveImportFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveImportFlowView.swift; sourceTree = "<group>"; };
+		213B17E0B02E04219FF671D5 /* ArchiveImportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveImportViewModel.swift; sourceTree = "<group>"; };
+		31BF159DF275C16B25EEF9CE /* ArchiveImportPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveImportPresentation.swift; sourceTree = "<group>"; };
+		09F15FFF9A8FA53D946F4290 /* ArchiveViewerDebugSeedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveViewerDebugSeedTests.swift; sourceTree = "<group>"; };
+		31E79D77E7B05B7DD8BD7CA5 /* ArchiveViewerScreenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveViewerScreenTests.swift; sourceTree = "<group>"; };
 		CE13168A5E0392CB8EBB7549 /* ArchiveFoundationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveFoundationTests.swift; sourceTree = "<group>"; };
 		87A3055CF641A027271A023C /* ArchiveFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveFixtures.swift; sourceTree = "<group>"; };
 		A1BDC9E4D3F6407C74541328 /* ArchiveFileCodecTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveFileCodecTests.swift; sourceTree = "<group>"; };
@@ -696,6 +738,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7D3FEF9B40201DA58B26C698 /* ArchiveImport */ = {
+			isa = PBXGroup;
+			children = (
+				A3DD9D8DC2C4BA0630D89613 /* ArchiveImportView.swift */,
+				E818DA7684FA6350AEE87B03 /* ArchiveImportBlockedView.swift */,
+				D9C00906674A997E5D742092 /* ArchiveImportSummaryView.swift */,
+				4F5D16678F4203E364FE789C /* ArchiveImportFlowView.swift */,
+				213B17E0B02E04219FF671D5 /* ArchiveImportViewModel.swift */,
+				31BF159DF275C16B25EEF9CE /* ArchiveImportPresentation.swift */,
+			);
+			path = ArchiveImport;
+			sourceTree = "<group>";
+		};
 		4C5E5DFD30413B0D0088237A /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
@@ -839,6 +894,7 @@
 		A610 /* BodyData */ = {
 			isa = PBXGroup;
 			children = (
+				4F12AE5E84ACB03D9B4D2EBC /* BodyDataRows.swift */,
 				A607 /* BodyDataListView.swift */,
 				A608 /* BodyMeasurementEntryView.swift */,
 				A620 /* BodyDataUnitPreferences.swift */,
@@ -849,6 +905,7 @@
 		A611 /* Trends */ = {
 			isa = PBXGroup;
 			children = (
+				80744E8BACE34CCF8281ACDB /* TrendLineChart.swift */,
 				A609 /* TrendsView.swift */,
 			);
 			path = Trends;
@@ -857,6 +914,7 @@
 		A404 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				7D3FEF9B40201DA58B26C698 /* ArchiveImport */,
 				6FAE837533B1926DF296B96A /* ArchiveExport */,
 				A446 /* Students */,
 				A524 /* Today */,
@@ -1015,6 +1073,7 @@
 		A413 /* Platform */ = {
 			isa = PBXGroup;
 			children = (
+				A4A4A27ED80308ACEA2BE1E5 /* ArchiveViewerDebugSeed.swift */,
 				38987A9BE9D66B2A01BC2302 /* ArchiveExportDebugSeed.swift */,
 				A130 /* SystemClock.swift */,
 				A504 /* SystemLocalCalendarProvider.swift */,
@@ -1237,6 +1296,7 @@
 		A443 /* History */ = {
 			isa = PBXGroup;
 			children = (
+				44BB25E9EB066105A853B567 /* PersonalBestRowView.swift */,
 				A360 /* SessionSummaryView.swift */,
 				A361 /* HistoryListView.swift */,
 				A362 /* SessionDetailView.swift */,
@@ -1276,6 +1336,7 @@
 		A470 /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
+				3AFCB65E988DE8F24ACDAB58 /* FirstLaunchChoiceView.swift */,
 				A310 /* OnboardingView.swift */,
 				A311 /* StudentEditorView.swift */,
 			);
@@ -1617,6 +1678,8 @@
 		DC1A5A5B0FFBCD9EE6DA56AB /* Archive */ = {
 			isa = PBXGroup;
 			children = (
+				09F15FFF9A8FA53D946F4290 /* ArchiveViewerDebugSeedTests.swift */,
+				31E79D77E7B05B7DD8BD7CA5 /* ArchiveViewerScreenTests.swift */,
 				359027FF7430F369D5495762 /* ArchiveExportScreenTests.swift */,
 				32C064C982C9D5E5968959CB /* ArchiveExportFixtures.swift */,
 				1B8E4B00F2CA5F5719EC6C2E /* ArchiveExportPolicyTests.swift */,
@@ -1631,6 +1694,14 @@
 		E9E38568DB5C19179EDAE367 /* ArchiveViewer */ = {
 			isa = PBXGroup;
 			children = (
+				C6128566D2A6F0494C3A37F0 /* ArchiveHomeView.swift */,
+				0B7A2883C4316AECA3A7CA1B /* ArchiveRecordsView.swift */,
+				1DF82CC5E06E0C132715F455 /* ArchiveSessionDetailView.swift */,
+				27E78DCEB0FFCF305A79E809 /* ArchiveBodyDataView.swift */,
+				568FA1215475B370C3A90E3A /* ArchiveTrendsView.swift */,
+				CA2A13009BE69FED37CB9CD0 /* ArchiveSettingsView.swift */,
+				30B7CEEEF9EA22FAE3724F69 /* ArchiveViewerModel.swift */,
+				8A25769FC06425F1830C50B8 /* ArchiveViewerPresentation.swift */,
 				BAF8E7D172A3DF3760358667 /* ArchiveViewerRoot.swift */,
 			);
 			path = ArchiveViewer;
@@ -1851,6 +1922,25 @@
 				940979B6D2B408BFEB4C97DF /* ArchiveDeliveryWarningView.swift in Sources */,
 				85D6BC60F08F5208292FDC17 /* ArchivePreviewView.swift in Sources */,
 				6A3ED52750147977D7266356 /* ArchiveSelectionView.swift in Sources */,
+				AE64CD89403A0905A94D02F8 /* ArchiveHomeView.swift in Sources */,
+				2EB5C00C6D445150E526AA04 /* ArchiveRecordsView.swift in Sources */,
+				05C2369F4D79432D8D8EC0D9 /* ArchiveSessionDetailView.swift in Sources */,
+				D989F09B2BA9E8B709C087F8 /* ArchiveBodyDataView.swift in Sources */,
+				77DFB32B6012A4BAA04EFA04 /* ArchiveTrendsView.swift in Sources */,
+				DCE58066353129B7CA835152 /* ArchiveSettingsView.swift in Sources */,
+				5E3346DB77E3644B92203359 /* ArchiveViewerModel.swift in Sources */,
+				45E5E3BFA0F02A20EFEB1348 /* ArchiveViewerPresentation.swift in Sources */,
+				17BB4594FB165EE5AFD93137 /* TrendLineChart.swift in Sources */,
+				A2257614269424520713EB05 /* BodyDataRows.swift in Sources */,
+				61366EB2A919DFC5C81FE2F0 /* PersonalBestRowView.swift in Sources */,
+				FB060C7486B62C2FDCE174BC /* FirstLaunchChoiceView.swift in Sources */,
+				C3FF02381F22CB242F1BDA61 /* ArchiveViewerDebugSeed.swift in Sources */,
+				6F7339E88145FF74AFC9466C /* ArchiveImportView.swift in Sources */,
+				4EC2CE440AE6DD6DE08A02D0 /* ArchiveImportBlockedView.swift in Sources */,
+				E73AD069FD36BB1BBD721025 /* ArchiveImportSummaryView.swift in Sources */,
+				32F2DDC4CBE5BD935420EDC8 /* ArchiveImportFlowView.swift in Sources */,
+				1C7EE5E3CFA0F6574286DE7F /* ArchiveImportViewModel.swift in Sources */,
+				73A3FA545FC87EDDC23AF89F /* ArchiveImportPresentation.swift in Sources */,
 				A9A1CE8D2AA24A41AD6D1471 /* ArchivePasswordField.swift in Sources */,
 				A64B3FED784C16C6C821D8EC /* ArchiveExportViewModel.swift in Sources */,
 				355A8FEE4A93CFE82C8FD939 /* ArchiveExportPresentation.swift in Sources */,
@@ -2050,6 +2140,8 @@
 				8FE54578732674057F095EBA /* ArchiveExportFixtures.swift in Sources */,
 				CB905CFCA28988F304401F0A /* ArchiveExportPolicyTests.swift in Sources */,
 				50AD3DA54B8DCFCF39AD52D9 /* ArchiveViewerQueryTests.swift in Sources */,
+				BE3D885E0D7A5C994B355949 /* ArchiveViewerDebugSeedTests.swift in Sources */,
+				C6458F72160E53B9DB76FB06 /* ArchiveViewerScreenTests.swift in Sources */,
 				B200 /* SetupSmokeTests.swift in Sources */,
 				B230 /* StudentDomainTests.swift in Sources */,
 				B510 /* RecurrenceAppointmentTests.swift in Sources */,

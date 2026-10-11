@@ -7,6 +7,8 @@ import SwiftUI
 /// the same indent.
 enum FCListRowGeometry {
     static let minHeight: CGFloat = 52
+    /// Row height in the archive viewer's 「紧凑」 list density (the 44pt hit-area minimum).
+    static let compactMinHeight: CGFloat = 44
     static let indent: CGFloat = FCPrimitives.space4
 }
 
@@ -25,6 +27,8 @@ enum FCListRowGeometry {
 ///   reason as trailing note, no accessory, no action.
 /// Group rows with a tri-state circle are `FCListGroupRow`.
 public struct FCListRow: View {
+    @Environment(\.fcCompactRows) private var isCompact
+
     public enum TitleStyle {
         case headline
         case body
@@ -178,7 +182,10 @@ public struct FCListRow: View {
             }
         }
         .padding(.leading, isIndented ? FCListRowGeometry.indent : 0)
-        .frame(maxWidth: .infinity, minHeight: FCListRowGeometry.minHeight)
+        .frame(
+            maxWidth: .infinity,
+            minHeight: isCompact ? FCListRowGeometry.compactMinHeight : FCListRowGeometry.minHeight
+        )
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
     }
@@ -555,5 +562,18 @@ public struct FCLabelValueText: View {
         Text(text)
             .fcFont(.body)
             .foregroundStyle(FCSemanticColors.textPrimary)
+    }
+}
+
+private struct FCCompactRowsKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
+extension EnvironmentValues {
+    /// Compact list density (archive viewer 「列表密度 · 紧凑」): `FCListRow` uses its 44pt minimum
+    /// height instead of 52. Off everywhere else.
+    var fcCompactRows: Bool {
+        get { self[FCCompactRowsKey.self] }
+        set { self[FCCompactRowsKey.self] = newValue }
     }
 }
