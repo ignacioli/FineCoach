@@ -75,6 +75,19 @@ public struct HistoryUseCases: Sendable {
         try await sessionRepository.session(id: id)
     }
 
+    /// Coach-only billing annotations for the history list / detail page.
+    public func creditSettlementNotes(studentID: StableUUID) async throws -> [StableUUID: SessionCreditSettlementNote] {
+        try await sessionRepository.creditSettlementNotes(studentID: studentID)
+    }
+
+    public func creditSettlementNote(sessionID: StableUUID) async throws -> SessionCreditSettlementNote? {
+        try await sessionRepository.creditSettlementNote(sessionID: sessionID)
+    }
+
+    public func recordCreditSettlementNote(_ note: SessionCreditSettlementNote, sessionID: StableUUID) async throws {
+        try await sessionRepository.recordCreditSettlementNote(note, sessionID: sessionID)
+    }
+
     public func saveSummaryNotes(
         sessionID: StableUUID,
         trainingFocus: Set<BodyPart>,

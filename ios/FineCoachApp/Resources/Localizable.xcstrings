@@ -8187,6 +8187,17 @@
           }
         }
       }
+    },
+    "history.creditNote.noActivePackage": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未扣课 · 无有效课包"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

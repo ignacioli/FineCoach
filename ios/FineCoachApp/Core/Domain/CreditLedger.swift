@@ -1,5 +1,14 @@
 import Foundation
 
+/// Coach-only billing annotation on a completed Session (owner decision
+/// 2026-10-11): stored on `SessionMO.creditSettlementNote` (model V4) and
+/// deliberately NOT a field of `Session`/`CompletedSession`, so the Share
+/// Report, the archive export and the backup can never read it. Never logged.
+public enum SessionCreditSettlementNote: String, Sendable {
+    /// Finished with no active course package: no debit, no prompt.
+    case noActivePackage
+}
+
 /// Ledger entry direction (data-model §2.4).
 public enum CreditDirection: String, Codable, Sendable {
     case debit

@@ -308,6 +308,8 @@ public struct SessionCreditSettlement: Sendable {
             }
         }
         guard let package = try await credits.activePackage(studentID: session.studentID) else {
+            // Owner decision 2026-10-11: no prompt, but the record says why.
+            try await history.recordCreditSettlementNote(.noActivePackage, sessionID: session.id)
             return .noActivePackage
         }
         if package.isExpired(asOf: appointments.todayLocalDate()) {

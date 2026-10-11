@@ -6,6 +6,9 @@ enum SessionManagedObjectMapping {
     static let exerciseEntityName = "SessionExerciseMO"
     static let setEntityName = "TrainingSetMO"
     static let pointerEntityName = "ActiveSessionPointerMO"
+    /// V4 column read/written only by `CoreDataSessionRepository`'s
+    /// credit-settlement-note methods, never by `apply`/`makeSession`.
+    static let creditSettlementNoteKey = "creditSettlementNote"
 
     static func apply(_ session: Session, to object: NSManagedObject) {
         object.setValue(session.id.rawValue, forKey: "id")

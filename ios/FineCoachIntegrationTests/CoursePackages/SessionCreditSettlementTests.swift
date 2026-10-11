@@ -21,6 +21,7 @@
             let sessions: ActiveSessionUseCases
             let appointments: AppointmentUseCases
             let credits: CreditLedgerUseCases
+            let history: HistoryUseCases
             let settlement: SessionCreditSettlement
         }
 
@@ -69,6 +70,7 @@
                 clock: clock,
                 ids: ids
             )
+            let history = HistoryUseCases(sessionRepository: sessionRepository, clock: clock, ids: ids)
             return Environment(
                 directory: directory,
                 controller: controller,
@@ -76,11 +78,8 @@
                 sessions: sessions,
                 appointments: appointments,
                 credits: credits,
-                settlement: SessionCreditSettlement(
-                    appointments: appointments,
-                    credits: credits,
-                    history: HistoryUseCases(sessionRepository: sessionRepository, clock: clock, ids: ids)
-                )
+                history: history,
+                settlement: SessionCreditSettlement(appointments: appointments, credits: credits, history: history)
             )
         }
 
@@ -192,7 +191,38 @@
             XCTAssertEqual(outcome, .noActivePackage)
             let completed = try await env.appointments.appointment(id: appointment.id)
             XCTAssertEqual(completed.status, .completed)
+            let note = try await env.history.creditSettlementNote(sessionID: finished.id)
+            XCTAssertEqual(note, .noActivePackage)
             try await env.controller.shutdownForTesting()
+        }
+
+        func testNoPackageNoteMarksOnlyTheUndebitedSessionsAndSurvivesRestart() async throws {
+            let env = try await makeEnvironment()
+            // Ad-hoc finish with no package: no prompt, annotated.
+            let unpaid = try await recordAndFinish(env)
+            let unpaidOutcome = try await env.settlement.settleFinishedSession(unpaid)
+            XCTAssertEqual(unpaidOutcome, .noActivePackage)
+            // Linked finish with a package: debited, not annotated.
+            _ = try await makePackage(env, totalCredits: 3)
+            _ = try await startFromAppointment(env)
+            let paid = try await recordAndFinish(env)
+            _ = try await env.settlement.settleFinishedSession(paid)
+            // Ad-hoc finish with a usable package: the coach chooses, not annotated.
+            let asked = try await recordAndFinish(env)
+            _ = try await env.settlement.settleFinishedSession(asked)
+            try await env.controller.shutdownForTesting()
+
+            let reopened = try PersistenceController(
+                storeURL: env.directory.url.appendingPathComponent("generation/FineCoach.sqlite")
+            )
+            let history = HistoryUseCases(
+                sessionRepository: CoreDataSessionRepository(writer: reopened.writer),
+                clock: TestClock(utcDate: now),
+                ids: SystemIDGenerator()
+            )
+            let notes = try await history.creditSettlementNotes(studentID: env.studentID)
+            XCTAssertEqual(notes, [unpaid.id: .noActivePackage])
+            try await reopened.shutdownForTesting()
         }
 
         // MARK: - Ad-hoc finish
