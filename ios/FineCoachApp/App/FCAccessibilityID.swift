@@ -115,6 +115,9 @@ public enum FCAccessibilityID {
     public static let onboardingLead = "onboarding.lead"
     public static let onboardingLocalRule = "onboarding.local"
     public static let onboardingShareRule = "onboarding.share"
+    public static let onboardingDataLink = "onboarding.dataLink"
+    public static let onboardingSheet = "onboarding.sheet"
+    public static let onboardingSheetClose = "onboarding.sheet.close"
     public static let onboardingStart = "onboarding.start"
     public static let onboardingSkip = "onboarding.skip"
 

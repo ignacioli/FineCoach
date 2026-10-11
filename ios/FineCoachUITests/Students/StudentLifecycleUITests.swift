@@ -11,8 +11,12 @@ final class StudentLifecycleUITests: XCTestCase {
         if app.buttons["firstLaunch.coach"].waitForExistence(timeout: 8) { app.buttons["firstLaunch.coach"].tap() }
         XCTAssertTrue(app.staticTexts["onboarding.title"].waitForExistence(timeout: 8))
         XCTAssertTrue(app.staticTexts["onboarding.lead"].exists)
-        XCTAssertTrue(app.staticTexts["onboarding.local"].exists)
-        XCTAssertTrue(app.staticTexts["onboarding.share"].exists)
+        // The full local/share explanation lives in the data sheet opened from the link.
+        app.buttons["onboarding.dataLink"].tap()
+        XCTAssertTrue(app.buttons["onboarding.sheet.close"].waitForExistence(timeout: 5))
+        XCTAssertTrue(element(in: app, identifier: "onboarding.local").exists)
+        XCTAssertTrue(element(in: app, identifier: "onboarding.share").exists)
+        app.buttons["onboarding.sheet.close"].tap()
         XCTAssertFalse(springboard.alerts.element.exists)
 
         app.buttons["onboarding.skip"].tap()
