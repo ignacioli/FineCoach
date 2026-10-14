@@ -340,15 +340,14 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 - 数据：由本次训练各动作的主练部位与次要部位汇总，不新增数据；自定义动作没有部位信息，不参与着色。
 - 细分肌群图不在本次范围（specs 仓 `ideas.md` §9.31）。
 
-### 9.2 App 图标（2026-10-11 批准）
+### 9.2 App 图标（2026-10-11 批准；2026-10-14 改版）
 
-- 来源：产品负责人以 `mascot-avatar.png` 为参考，用 ChatGPT image 生成 light / dark 两张 1254×1254 位图（吉祥物胸像，无道具、无文字），在本仓用 CoreGraphics 缩放为 1024×1024；tinted 版由 dark 版去饱和得到。
-- 文件：`assets/app-icon-light.png`（米色底约 `#FAF6F0`，SHA-256 `0ba2995b…5fab091a`）、`assets/app-icon-dark.png`（暖炭黑底约 `#2A2622`，`092724bd…787b3c11`）、`assets/app-icon-tinted.png`（灰度，`47a949d2…a08e0f0f`）。均为满版方形、无透明通道、无圆角，圆角由 iOS 遮罩。工程内副本在 `Assets.xcassets/AppIcon.appiconset`（单张 1024 universal + dark + tinted 外观）。
-- 构图约束：耳尖与脸部在 iOS 圆角遮罩（边长 22.37% 圆角）内；60pt 下只保留兔子轮廓与眼睛，不放徽章、记事本等小道具。
+- 来源（2026-10-14 修订）：light 版为产品负责人绘制的 `mascot-avatar` 原稿（`app-icon-02-warm.png`，1254×1254，即 `assets/mascot-avatar.png` 的原分辨率版：吉祥物胸像加六边形徽章、记事本与笔），缩放为 1024×1024；dark 版由产品负责人用 ChatGPT image 以 light 版为版式参考重绘（深色底，夹克、徽章、笔加浅灰描边），缩放为 1024×1024；tinted 版由 dark 版去饱和得到。取代 2026-10-11 批准的无道具胸像版（该版问题：单独一只中性兔子看不出 App 用途）。小尺寸下只要求能识别「兔子教练加健身和记录」的意图，不要求看清道具细节。
+- 文件：`assets/app-icon-light.png`（米色底约 `#F8F0E3`，SHA-256 `65f84996…0bd0463`）、`assets/app-icon-dark.png`（暖炭黑底约 `#1E1A17`，`14a3b703…f44f519`）、`assets/app-icon-tinted.png`（灰度，`4029ed42…97eb`）。均为满版方形、无透明通道、无圆角，圆角由 iOS 遮罩。工程内副本在 `Assets.xcassets/AppIcon.appiconset`（单张 1024 universal + dark + tinted 外观）。dark 与 light 的版式有 1–2% 的轻微错位，仅在用户切换外观的瞬间可见，已接受。
 - 吉祥物插图内的橙色（§2.3）在图标中保留，仍不得用于界面元素。
 - dark / tinted 只是 iOS 18 主屏图标外观，随用户在主屏「自定」中的选择切换；App 界面本身仍未适配深色模式，不因此引入界面深色主题。
-- Penpot：「M1-B G5 Design」Foundations 页画板「AppIcon options (2026-10-11) — REJECTED A / B / C」底部已放入批准的三张图（`AppIcon / approved / {light,dark,tinted}`），上方几何兔头 / 「练」字标 / 哑铃片三案为否决方案（辨识度与格调不足），保留作记录。
-- 验收：2026-10-11 产品负责人在 iPhone Air 模拟器主屏确认 light / dark 外观，Icon Review 通过。
+- Penpot：「M1-B G5 Design」Foundations 页的 `AppIcon / approved / {light,dark,tinted}` 仍是 2026-10-11 的旧版，**待回填**新三张图（回填前设计源与代码有差异）。
+- 验收：2026-10-14 产品负责人在 iPhone XS Max 真机主屏确认新图标效果可接受（light 外观）；dark / tinted 外观与 Penpot 回填仍待办。
 
 ## 10. 来源冲突裁决记录
 
