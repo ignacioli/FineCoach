@@ -220,6 +220,8 @@
 		B601 /* BodyMetric.swift in Sources */ = {isa = PBXBuildFile; fileRef = A601 /* BodyMetric.swift */; };
 		B602 /* BodyMeasurement.swift in Sources */ = {isa = PBXBuildFile; fileRef = A602 /* BodyMeasurement.swift */; };
 		B603 /* Comparison.swift in Sources */ = {isa = PBXBuildFile; fileRef = A603 /* Comparison.swift */; };
+		B971 /* SetValueStepping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A971 /* SetValueStepping.swift */; };
+		B970 /* LastExercisePerformance.swift in Sources */ = {isa = PBXBuildFile; fileRef = A970 /* LastExercisePerformance.swift */; };
 		B604 /* BodyDataUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = A604 /* BodyDataUseCases.swift */; };
 		B605 /* BodyMetricManagedObject+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A605 /* BodyMetricManagedObject+Mapping.swift */; };
 		B606 /* CoreDataBodyDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A606 /* CoreDataBodyDataRepository.swift */; };
@@ -266,6 +268,7 @@
 		B341 /* ActiveSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A341 /* ActiveSessionView.swift */; };
 		B342 /* SetEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A342 /* SetEditor.swift */; };
 		B343 /* CopySetFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A343 /* CopySetFlow.swift */; };
+		B972 /* RestTimerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A972 /* RestTimerState.swift */; };
 		B344 /* DeleteExerciseFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A344 /* DeleteExerciseFlow.swift */; };
 		B345 /* FinishSessionFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A345 /* FinishSessionFlow.swift */; };
 		B221 /* StudentLifecycleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A221 /* StudentLifecycleUITests.swift */; };
@@ -277,9 +280,12 @@
 		B232 /* SessionSetDomainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A232 /* SessionSetDomainTests.swift */; };
 		B714 /* DurationTextParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A714 /* DurationTextParserTests.swift */; };
 		B712 /* TrainingSetDisplaySummaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A712 /* TrainingSetDisplaySummaryTests.swift */; };
+		B974 /* SetEntryAssistTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A974 /* SetEntryAssistTests.swift */; };
+		B973 /* LastExercisePerformanceLookupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A973 /* LastExercisePerformanceLookupTests.swift */; };
 		B231 /* StudentPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A231 /* StudentPersistenceTests.swift */; };
 		B233 /* ActiveSessionPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A233 /* ActiveSessionPersistenceTests.swift */; };
 		B710 /* ActiveSessionSetRowInteractionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A710 /* ActiveSessionSetRowInteractionTests.swift */; };
+		B975 /* ActiveSessionSetEntryPrefillTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A975 /* ActiveSessionSetEntryPrefillTests.swift */; };
 		B711 /* ActiveSessionCardioDurationConversionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A711 /* ActiveSessionCardioDurationConversionTests.swift */; };
 		B720 /* BodyDataPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A720 /* BodyDataPersistenceTests.swift */; };
 		B234 /* ActiveSessionRecoveryCodecTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A234 /* ActiveSessionRecoveryCodecTests.swift */; };
@@ -559,6 +565,8 @@
 		A601 /* BodyMetric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BodyMetric.swift"; sourceTree = "<group>"; };
 		A602 /* BodyMeasurement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BodyMeasurement.swift"; sourceTree = "<group>"; };
 		A603 /* Comparison.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Comparison.swift"; sourceTree = "<group>"; };
+		A971 /* SetValueStepping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetValueStepping.swift; sourceTree = "<group>"; };
+		A970 /* LastExercisePerformance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LastExercisePerformance.swift; sourceTree = "<group>"; };
 		A604 /* BodyDataUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BodyDataUseCases.swift"; sourceTree = "<group>"; };
 		A605 /* BodyMetricManagedObject+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BodyMetricManagedObject+Mapping.swift"; sourceTree = "<group>"; };
 		A606 /* CoreDataBodyDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoreDataBodyDataRepository.swift"; sourceTree = "<group>"; };
@@ -661,9 +669,12 @@
 		A232 /* SessionSetDomainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSetDomainTests.swift; sourceTree = "<group>"; };
 		A714 /* DurationTextParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationTextParserTests.swift; sourceTree = "<group>"; };
 		A712 /* TrainingSetDisplaySummaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingSetDisplaySummaryTests.swift; sourceTree = "<group>"; };
+		A974 /* SetEntryAssistTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetEntryAssistTests.swift; sourceTree = "<group>"; };
+		A973 /* LastExercisePerformanceLookupTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LastExercisePerformanceLookupTests.swift; sourceTree = "<group>"; };
 		A231 /* StudentPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentPersistenceTests.swift; sourceTree = "<group>"; };
 		A233 /* ActiveSessionPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionPersistenceTests.swift; sourceTree = "<group>"; };
 		A710 /* ActiveSessionSetRowInteractionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionSetRowInteractionTests.swift; sourceTree = "<group>"; };
+		A975 /* ActiveSessionSetEntryPrefillTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionSetEntryPrefillTests.swift; sourceTree = "<group>"; };
 		A711 /* ActiveSessionCardioDurationConversionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionCardioDurationConversionTests.swift; sourceTree = "<group>"; };
 		A720 /* BodyDataPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyDataPersistenceTests.swift; sourceTree = "<group>"; };
 		A234 /* ActiveSessionRecoveryCodecTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionRecoveryCodecTests.swift; sourceTree = "<group>"; };
@@ -678,6 +689,7 @@
 		A341 /* ActiveSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionView.swift; sourceTree = "<group>"; };
 		A342 /* SetEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetEditor.swift; sourceTree = "<group>"; };
 		A343 /* CopySetFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopySetFlow.swift; sourceTree = "<group>"; };
+		A972 /* RestTimerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestTimerState.swift; sourceTree = "<group>"; };
 		A344 /* DeleteExerciseFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteExerciseFlow.swift; sourceTree = "<group>"; };
 		A345 /* FinishSessionFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinishSessionFlow.swift; sourceTree = "<group>"; };
 		A346 /* SaveStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveStatusView.swift; sourceTree = "<group>"; };
@@ -1066,6 +1078,8 @@
 				A601 /* BodyMetric.swift */,
 				A602 /* BodyMeasurement.swift */,
 				A603 /* Comparison.swift */,
+				A971 /* SetValueStepping.swift */,
+				A970 /* LastExercisePerformance.swift */,
 				A940 /* BodyPart.swift */,
 				DBDF5EB56C78518E6D59ADBB /* Archive */,
 			);
@@ -1311,6 +1325,7 @@
 				A341 /* ActiveSessionView.swift */,
 				A342 /* SetEditor.swift */,
 				A343 /* CopySetFlow.swift */,
+				A972 /* RestTimerState.swift */,
 				A344 /* DeleteExerciseFlow.swift */,
 				A345 /* FinishSessionFlow.swift */,
 				A346 /* SaveStatusView.swift */,
@@ -1453,6 +1468,8 @@
 				A232 /* SessionSetDomainTests.swift */,
 				A714 /* DurationTextParserTests.swift */,
 				A712 /* TrainingSetDisplaySummaryTests.swift */,
+				A974 /* SetEntryAssistTests.swift */,
+				A973 /* LastExercisePerformanceLookupTests.swift */,
 			);
 			path = ActiveSession;
 			sourceTree = "<group>";
@@ -1462,6 +1479,7 @@
 			children = (
 				A233 /* ActiveSessionPersistenceTests.swift */,
 				A710 /* ActiveSessionSetRowInteractionTests.swift */,
+				A975 /* ActiveSessionSetEntryPrefillTests.swift */,
 				A711 /* ActiveSessionCardioDurationConversionTests.swift */,
 			);
 			path = ActiveSession;
@@ -2094,6 +2112,8 @@
 				B601 /* BodyMetric.swift in Sources */,
 				B602 /* BodyMeasurement.swift in Sources */,
 				B603 /* Comparison.swift in Sources */,
+				B971 /* SetValueStepping.swift in Sources */,
+				B970 /* LastExercisePerformance.swift in Sources */,
 				B604 /* BodyDataUseCases.swift in Sources */,
 				B605 /* BodyMetricManagedObject+Mapping.swift in Sources */,
 				B606 /* CoreDataBodyDataRepository.swift in Sources */,
@@ -2148,6 +2168,7 @@
 				B341 /* ActiveSessionView.swift in Sources */,
 				B342 /* SetEditor.swift in Sources */,
 				B343 /* CopySetFlow.swift in Sources */,
+				B972 /* RestTimerState.swift in Sources */,
 				B344 /* DeleteExerciseFlow.swift in Sources */,
 				B345 /* FinishSessionFlow.swift in Sources */,
 				B346 /* SaveStatusView.swift in Sources */,
@@ -2193,6 +2214,8 @@
 				B232 /* SessionSetDomainTests.swift in Sources */,
 				B714 /* DurationTextParserTests.swift in Sources */,
 				B712 /* TrainingSetDisplaySummaryTests.swift in Sources */,
+				B974 /* SetEntryAssistTests.swift in Sources */,
+				B973 /* LastExercisePerformanceLookupTests.swift in Sources */,
 				B234 /* ActiveSessionRecoveryCodecTests.swift in Sources */,
 				B235 /* SessionTimingTests.swift in Sources */,
 				B237 /* ExerciseIdentityTests.swift in Sources */,
@@ -2267,6 +2290,7 @@
 				B231 /* StudentPersistenceTests.swift in Sources */,
 				B233 /* ActiveSessionPersistenceTests.swift in Sources */,
 				B710 /* ActiveSessionSetRowInteractionTests.swift in Sources */,
+				B975 /* ActiveSessionSetEntryPrefillTests.swift in Sources */,
 				B711 /* ActiveSessionCardioDurationConversionTests.swift in Sources */,
 				B720 /* BodyDataPersistenceTests.swift in Sources */,
 				B236 /* RecoveryProjectionTests.swift in Sources */,

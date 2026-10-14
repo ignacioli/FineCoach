@@ -70,12 +70,18 @@ final class ActiveSessionViewModel: ObservableObject {
     /// Set after finishing when the coach must answer a credit question;
     /// the summary page is pushed only once this is resolved.
     @Published var creditPrompt: SessionCreditPrompt?
+    /// "上次" per Exercise for this Student (experience P0-D1). Loaded once
+    /// with the Session; a failed read only hides the reference.
+    @Published private(set) var lastPerformances: LastExercisePerformanceLookup = .empty
+    /// Between-sets rest countdown, started by every confirmed set (P0-D3).
+    @Published var restTimer: RestTimerState?
 
     let studentID: StableUUID
     let useCases: ActiveSessionUseCases
     let templateUseCases: TemplateUseCases?
     private let creditSettlement: SessionCreditSettlement?
     private let signposts: PerformanceSignposts
+    private let now: () -> Date
     private var catalogSearchGeneration = 0
     private var catalogSearchTask: Task<Void, Never>?
     /// The set most recently created via the bottom "add set" form, so
@@ -88,13 +94,15 @@ final class ActiveSessionViewModel: ObservableObject {
         useCases: ActiveSessionUseCases,
         templateUseCases: TemplateUseCases? = nil,
         creditSettlement: SessionCreditSettlement? = nil,
-        signposts: PerformanceSignposts = .shared
+        signposts: PerformanceSignposts = .shared,
+        now: @escaping () -> Date = Date.init
     ) {
         self.studentID = studentID
         self.useCases = useCases
         self.templateUseCases = templateUseCases
         self.creditSettlement = creditSettlement
         self.signposts = signposts
+        self.now = now
     }
 
     var currentExercise: SessionExercise? {
@@ -127,6 +135,10 @@ final class ActiveSessionViewModel: ObservableObject {
             errorMessage = nil
             saveStatus = useCases.saveStatus
             await loadSections()
+            lastPerformances = (try? await useCases.lastPerformances(studentID: studentID)) ?? .empty
+            if editingSetID == nil {
+                prefillSetFields(for: currentExercise)
+            }
         } catch {
             present(error)
         }
@@ -262,9 +274,8 @@ final class ActiveSessionViewModel: ObservableObject {
 
     func selectExercise(_ id: StableUUID) {
         selectedExerciseID = id
-        if let mode = session?.exercises.first(where: { $0.id == id })?.recordModeSnapshot {
-            recordMode = mode
-            resetSetFields(for: mode)
+        if let exercise = session?.exercises.first(where: { $0.id == id }) {
+            prefillSetFields(for: exercise)
         }
     }
 
@@ -351,7 +362,7 @@ final class ActiveSessionViewModel: ObservableObject {
         guard let exercise = currentExercise else {
             return
         }
-        await run {
+        let confirmed = await run {
             let input = self.currentInput(for: exercise)
             let added = try await self.useCases.addSet(exerciseID: exercise.id, input: input)
             guard let newSetID = added.exercises.first(where: { $0.id == exercise.id })?.sets.last?.id else {
@@ -361,19 +372,25 @@ final class ActiveSessionViewModel: ObservableObject {
                 try await self.useCases.confirmSet(setID: newSetID)
             }
         }
+        if confirmed {
+            startRest()
+        }
     }
 
     /// Confirms an explicitly identified set (M1-A fix). MUST NOT fall back
     /// to `exercise.sets.last` -- confirming one draft/pending set out of
     /// order MUST NOT affect any other set's state.
     func confirmSet(setID: StableUUID) async {
-        await run {
+        let confirmed = await run {
             self.session = try await self.signposts.measureSetConfirm {
                 try await self.useCases.confirmSet(setID: setID)
             }
         }
         if errorMessage == nil, activeDraftSetID == setID {
             activeDraftSetID = nil
+        }
+        if confirmed {
+            startRest()
         }
     }
 
@@ -401,7 +418,7 @@ final class ActiveSessionViewModel: ObservableObject {
 
     func cancelEditingSet() {
         editingSetID = nil
-        resetSetFields(for: recordMode)
+        prefillSetFields(for: currentExercise)
     }
 
     /// Saves the inline-editing form's fields onto the explicitly addressed
@@ -420,7 +437,7 @@ final class ActiveSessionViewModel: ObservableObject {
         }
         if errorMessage == nil {
             editingSetID = nil
-            resetSetFields(for: recordMode)
+            prefillSetFields(for: currentExercise)
         }
     }
 
@@ -435,7 +452,7 @@ final class ActiveSessionViewModel: ObservableObject {
         }
         if editingSetID == setID {
             editingSetID = nil
-            resetSetFields(for: recordMode)
+            prefillSetFields(for: currentExercise)
         }
         if activeDraftSetID == setID {
             activeDraftSetID = nil
@@ -644,7 +661,59 @@ final class ActiveSessionViewModel: ObservableObject {
         exerciseNameConflict = nil
         catalogMatches = []
         isAddingExercise = false
+        recordMode = mode
+        prefillSetFields(for: updated.exercises.last)
+    }
+
+    // MARK: - Faster set entry (experience P0, design/experience-p0)
+
+    func lastPerformance(for exercise: SessionExercise) -> LastExercisePerformance? {
+        lastPerformances.performance(for: exercise)
+    }
+
+    /// − / + on the weight or reps field (P0-D4: ±2.5 kg, ±1).
+    func step(_ field: SetValueStepping.Field, up: Bool) {
+        switch field {
+        case .weight: weight = SetValueStepping.stepped(weight, field: .weight, up: up)
+        case .reps: reps = SetValueStepping.stepped(reps, field: .reps, up: up)
+        }
+    }
+
+    func adjustRest(by seconds: TimeInterval) {
+        restTimer?.adjust(by: seconds, now: now())
+    }
+
+    func dismissRest() {
+        restTimer = nil
+    }
+
+    private func startRest() {
+        restTimer = RestTimerState(startedAt: now())
+    }
+
+    /// Fills the bottom form for `exercise` (P0-D1/D2): the latest set
+    /// already recorded in this Session (completed first), else this
+    /// Student's first set of the Exercise last time, else empty. Values
+    /// only become a set when the coach confirms (M1A-FR-022 unchanged).
+    /// Weight/reps modes only; duration and cardio keep starting empty.
+    private func prefillSetFields(for exercise: SessionExercise?) {
+        let mode = exercise?.recordModeSnapshot ?? recordMode
         resetSetFields(for: mode)
+        guard let exercise, mode == .weightReps || mode == .reps else {
+            return
+        }
+        let source =
+            exercise.sets.last(where: \.contributesToStatistics)
+            ?? exercise.sets.last
+            ?? lastPerformances.performance(for: exercise)?.firstSet
+        guard let source else {
+            return
+        }
+        weight = source.weightValue?.canonicalString ?? ""
+        reps = source.repetitionCount?.canonicalString ?? ""
+        side = source.side
+        left = source.leftValue?.canonicalString ?? ""
+        right = source.rightValue?.canonicalString ?? ""
     }
 
     private func resetSetFields(for mode: RecordMode) {
@@ -660,9 +729,11 @@ final class ActiveSessionViewModel: ObservableObject {
         recordMode = mode
     }
 
-    private func run(_ work: @escaping () async throws -> Void) async {
+    /// Returns whether `work` ran and succeeded.
+    @discardableResult
+    private func run(_ work: @escaping () async throws -> Void) async -> Bool {
         guard !isMutationInFlight else {
-            return
+            return false
         }
         isMutationInFlight = true
         saveStatus = .saving
@@ -672,8 +743,10 @@ final class ActiveSessionViewModel: ObservableObject {
             errorMessage = nil
             exerciseNameConflict = nil
             saveStatus = useCases.saveStatus
+            return true
         } catch {
             present(error)
+            return false
         }
     }
 

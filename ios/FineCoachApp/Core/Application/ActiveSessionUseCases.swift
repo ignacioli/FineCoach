@@ -51,6 +51,12 @@ public struct ActiveSessionUseCases: Sendable {
         try await coordinator.checkpointOnBackground()
     }
 
+    /// The Student's completed history indexed for the "上次" reference and
+    /// first-set prefill (experience P0-D1). Read-only.
+    public func lastPerformances(studentID: StableUUID) async throws -> LastExercisePerformanceLookup {
+        LastExercisePerformanceLookup(sessions: try await sessionRepository.listCompleted(studentID: studentID))
+    }
+
     public func startOrOpen(studentID: StableUUID, trainingFocus: Set<BodyPart> = []) async throws -> Session {
         if let active = try await coordinator.workingCopy() {
             return active
