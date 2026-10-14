@@ -28,25 +28,31 @@ public enum TrainingSetDisplayFormatting {
     /// - Parameter weightUnit: the unit label printed after weights. Defaults to "kg", what every
     ///   Coach-side caller shows; the archive viewer passes "lb" when the local display setting
     ///   asks for it (the values are converted by the caller, not here).
+    /// A number and its unit per design-system README §13: one space before
+    /// the unit (N1/N3), except "%" which follows the number directly (N2).
+    public static func quantity(_ number: String, unit: String) -> String {
+        unit == "%" ? "\(number)%" : "\(number) \(unit)"
+    }
+
     public static func summary(for values: TrainingSetDisplayValues, weightUnit: String = "kg") -> String {
         switch values.recordMode {
         case .weightReps:
             let repsText = values.repetitionCount?.canonicalString ?? "-"
             switch values.side {
             case .none:
-                return "\(values.weightValue?.canonicalString ?? "-")\(weightUnit) × \(repsText)次"
+                return "\(values.weightValue?.canonicalString ?? "-") \(weightUnit) × \(repsText)"
             case .left:
-                return "左 \((values.leftValue ?? values.weightValue)?.canonicalString ?? "-")\(weightUnit) × \(repsText)次"
+                return "左 \((values.leftValue ?? values.weightValue)?.canonicalString ?? "-") \(weightUnit) × \(repsText)"
             case .right:
-                return "右 \((values.rightValue ?? values.weightValue)?.canonicalString ?? "-")\(weightUnit) × \(repsText)次"
+                return "右 \((values.rightValue ?? values.weightValue)?.canonicalString ?? "-") \(weightUnit) × \(repsText)"
             case .bilateral:
                 if let leftValue = values.leftValue, let rightValue = values.rightValue {
-                    return "左 \(leftValue.canonicalString)\(weightUnit) / 右 \(rightValue.canonicalString)\(weightUnit) × \(repsText)次"
+                    return "左 \(leftValue.canonicalString) \(weightUnit) / 右 \(rightValue.canonicalString) \(weightUnit) × \(repsText)"
                 }
-                return "\(values.weightValue?.canonicalString ?? "-")\(weightUnit)（双侧） × \(repsText)次"
+                return "\(values.weightValue?.canonicalString ?? "-") \(weightUnit)（双侧） × \(repsText)"
             }
         case .reps:
-            return "\(values.repetitionCount?.canonicalString ?? "-")次"
+            return "\(values.repetitionCount?.canonicalString ?? "-") 次"
         case .duration:
             guard let durationSeconds = values.durationSeconds else { return "-" }
             return DurationTextParser.formatForEditing(secondsText: durationSeconds.canonicalString)
@@ -56,7 +62,7 @@ public enum TrainingSetDisplayFormatting {
                 values.durationSeconds.map { DurationTextParser.formatForEditing(secondsText: $0.canonicalString) }
                     ?? "-"
             )
-            parts.append("\(values.distanceValue?.canonicalString ?? "-")km")
+            parts.append("\(values.distanceValue?.canonicalString ?? "-") km")
             if let speedValue = values.speedValue {
                 parts.append("速度 \(speedValue.canonicalString)")
             }

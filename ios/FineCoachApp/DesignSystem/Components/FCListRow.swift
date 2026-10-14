@@ -371,7 +371,7 @@ struct FCListSelectionCircle: View {
         VStack(spacing: 0) {
             FCListRow(title: "学员资料", showsDisclosure: true) {}
             FCListRowDivider()
-            FCListRow(title: "上次训练", subtitle: "深蹲 5×5，感觉不错。\n下次加重 2.5kg，注意左膝。", note: "3 天前", action: {})
+            FCListRow(title: "上次训练", subtitle: "深蹲 5×5，感觉不错。\n下次加重 2.5 kg，注意左膝。", note: "3 天前", action: {})
             FCListRowDivider()
             FCListRow(
                 title: "杠铃卧推", leading: .equipmentSlot(.barbell), note: "12 次",

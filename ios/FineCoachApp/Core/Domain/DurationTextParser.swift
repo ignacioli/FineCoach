@@ -64,12 +64,12 @@ public enum DurationTextParser {
         let minutes = totalSeconds / 60
         let seconds = totalSeconds % 60
         if minutes > 0, seconds > 0 {
-            return "\(minutes)分\(seconds)秒"
+            return "\(minutes) 分 \(seconds) 秒"
         }
         if minutes > 0 {
-            return "\(minutes)分"
+            return "\(minutes) 分"
         }
-        return "\(seconds)秒"
+        return "\(seconds) 秒"
     }
 
     /// Matches `pattern` against the full `text` and returns up to two

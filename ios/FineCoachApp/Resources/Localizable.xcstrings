@@ -1154,7 +1154,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "时长，如 5分30秒 / 5m30s"
+            "value": "时长，如 5 分 30 秒 / 5m30s"
           }
         }
       }
@@ -1869,7 +1869,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "时长 %@ 秒"
+            "value": "时长 %@"
           }
         }
       }
@@ -4531,7 +4531,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "相比上次：%@kg（%@）"
+            "value": "相比上次：%@ kg（%@）"
           }
         }
       }
@@ -4707,7 +4707,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "训练容量：%@kg vs %@kg"
+            "value": "训练容量：%@ kg vs %@ kg"
           }
         }
       }
@@ -5565,7 +5565,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "课包剩余 %d 次"
+            "value": "课包剩余 %d 课时"
           }
         }
       }
@@ -6676,7 +6676,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ kg × %2$@ 次"
+            "value": "%1$@ kg × %2$@"
           }
         }
       }
@@ -8711,7 +8711,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ %2$@ × %3$@ 次"
+            "value": "%1$@ %2$@ × %3$@"
           }
         }
       }

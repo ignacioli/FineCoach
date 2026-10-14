@@ -50,7 +50,9 @@ final class SessionSummaryViewModel: ObservableObject {
             studentSummary = completed.notes.studentFacingSummary?.value ?? ""
             durationText = String(
                 format: String(localized: "summary.duration.format"),
-                completed.statistics.displayedDurationSeconds.canonicalString
+                HistoryPresentation.duration(
+                    seconds: Double(completed.statistics.displayedDurationSeconds.canonicalString) ?? 0
+                )
             )
             completedSetsText = String(
                 format: String(localized: "summary.sets.format"),
