@@ -375,9 +375,9 @@ struct TrendsView: View {
     private func trendValueText(_ point: Comparison.SetTrendPoint) -> String {
         switch point.recordMode {
         case .weightReps:
-            return point.maxWeight.map { "\($0.canonicalString)kg" } ?? "-"
+            return point.maxWeight.map { "\($0.canonicalString) kg" } ?? "-"
         case .reps:
-            return point.bestReps.map { "\($0.canonicalString)次" } ?? "-"
+            return point.bestReps.map { "\($0.canonicalString) 次" } ?? "-"
         case .duration:
             guard let duration = point.bestDurationSeconds else { return "-" }
             return DurationTextParser.formatForEditing(secondsText: duration.canonicalString)
@@ -387,7 +387,7 @@ struct TrendsView: View {
                 parts.append(DurationTextParser.formatForEditing(secondsText: duration.canonicalString))
             }
             if let distance = point.bestDistance {
-                parts.append("\(distance.canonicalString)km")
+                parts.append("\(distance.canonicalString) km")
             }
             return parts.isEmpty ? "-" : parts.joined(separator: " · ")
         }

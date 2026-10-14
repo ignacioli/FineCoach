@@ -86,8 +86,8 @@
             viewModel.beginEditingSet(set)
 
             XCTAssertEqual(
-                viewModel.duration, "10分",
-                "editing a set stored as 600 seconds must pre-fill the field as \"10分\", not raw 600"
+                viewModel.duration, "10 分",
+                "editing a set stored as 600 seconds must pre-fill the field as \"10 分\", not raw 600"
             )
 
             try await environment.controller.shutdownForTesting()

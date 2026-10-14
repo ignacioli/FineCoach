@@ -44,7 +44,7 @@ struct TrendLineChart: View {
         if text.hasSuffix(".0") {
             text.removeLast(2)
         }
-        return "\(text)\(unit)"
+        return TrainingSetDisplayFormatting.quantity(text, unit: unit)
     }
 }
 

@@ -312,6 +312,7 @@
 		AC0C02 /* ComponentCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0C01 /* ComponentCatalogTests.swift */; };
 		B931 /* TypographyHarnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A931 /* TypographyHarnessTests.swift */; };
 		B932 /* DesignValueScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A932 /* DesignValueScanTests.swift */; };
+		B976 /* NumberFormatScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A976 /* NumberFormatScanTests.swift */; };
 		B933 /* ContrastHarnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A933 /* ContrastHarnessTests.swift */; };
 		B242 /* ShareReportCardRendererTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A242 /* ShareReportCardRendererTests.swift */; };
 		B243 /* TempReportLifecycleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A243 /* TempReportLifecycleTests.swift */; };
@@ -630,6 +631,7 @@
 		AC0C01 /* ComponentCatalogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentCatalogTests.swift; sourceTree = "<group>"; };
 		A931 /* TypographyHarnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypographyHarnessTests.swift; sourceTree = "<group>"; };
 		A932 /* DesignValueScanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignValueScanTests.swift; sourceTree = "<group>"; };
+		A976 /* NumberFormatScanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberFormatScanTests.swift; sourceTree = "<group>"; };
 		A933 /* ContrastHarnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContrastHarnessTests.swift; sourceTree = "<group>"; };
 		A242 /* ShareReportCardRendererTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareReportCardRendererTests.swift; sourceTree = "<group>"; };
 		A243 /* TempReportLifecycleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TempReportLifecycleTests.swift; sourceTree = "<group>"; };
@@ -1579,6 +1581,7 @@
 				AC0C01 /* ComponentCatalogTests.swift */,
 				A931 /* TypographyHarnessTests.swift */,
 				A932 /* DesignValueScanTests.swift */,
+				A976 /* NumberFormatScanTests.swift */,
 				A933 /* ContrastHarnessTests.swift */,
 			);
 			path = DesignSystem;
@@ -2241,6 +2244,7 @@
 				AC0C02 /* ComponentCatalogTests.swift in Sources */,
 				B931 /* TypographyHarnessTests.swift in Sources */,
 				B932 /* DesignValueScanTests.swift in Sources */,
+				B976 /* NumberFormatScanTests.swift in Sources */,
 				B933 /* ContrastHarnessTests.swift in Sources */,
 				B250 /* BackupGoldenVectorTests.swift in Sources */,
 				B251 /* BackupHostileInputTests.swift in Sources */,

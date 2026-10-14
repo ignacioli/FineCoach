@@ -351,7 +351,7 @@ final class ShareReportPolicyTests: XCTestCase {
         let dto = try ShareReportPolicy.makeDTO(from: completed, modules: modules)
         let volume = try XCTUnwrap(dto.trainingVolume)
         let lines = ShareReportPolicy.previewLines(for: dto)
-        XCTAssertTrue(lines.contains("训练容量 \(volume.canonicalString)kg"))
+        XCTAssertTrue(lines.contains("训练容量 \(volume.canonicalString) kg"))
     }
 
     private var finishNow: Date {

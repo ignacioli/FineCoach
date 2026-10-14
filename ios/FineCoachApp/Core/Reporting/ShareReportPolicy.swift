@@ -169,7 +169,7 @@ public enum ShareReportPolicy {
             lines.append("课后总结 \(summary)")
         }
         if let volume = dto.trainingVolume {
-            lines.append("训练容量 \(volume.canonicalString)kg")
+            lines.append("训练容量 \(volume.canonicalString) kg")
         }
         for exercise in dto.exercises {
             lines.append(exercise.displayName)

@@ -92,19 +92,19 @@ final class DurationTextParserTests: XCTestCase {
     // MARK: - formatForEditing
 
     func testFormatForEditingCombinesMinutesAndSeconds() {
-        XCTAssertEqual(DurationTextParser.formatForEditing(secondsText: "330"), "5分30秒")
+        XCTAssertEqual(DurationTextParser.formatForEditing(secondsText: "330"), "5 分 30 秒")
     }
 
     func testFormatForEditingWholeMinutesOmitsSeconds() {
-        XCTAssertEqual(DurationTextParser.formatForEditing(secondsText: "300"), "5分")
+        XCTAssertEqual(DurationTextParser.formatForEditing(secondsText: "300"), "5 分")
     }
 
     func testFormatForEditingUnderAMinuteShowsSecondsOnly() {
-        XCTAssertEqual(DurationTextParser.formatForEditing(secondsText: "45"), "45秒")
+        XCTAssertEqual(DurationTextParser.formatForEditing(secondsText: "45"), "45 秒")
     }
 
     func testFormatForEditingZeroShowsZeroSeconds() {
-        XCTAssertEqual(DurationTextParser.formatForEditing(secondsText: "0"), "0秒")
+        XCTAssertEqual(DurationTextParser.formatForEditing(secondsText: "0"), "0 秒")
     }
 
     func testFormatForEditingNilOrInvalidReturnsEmptyString() {
@@ -116,6 +116,10 @@ final class DurationTextParserTests: XCTestCase {
     func testRoundTripParseThenFormatIsStable() {
         let seconds = DurationTextParser.parseSeconds("5分30秒")
         XCTAssertEqual(seconds, "330")
-        XCTAssertEqual(DurationTextParser.formatForEditing(secondsText: seconds), "5分30秒")
+        XCTAssertEqual(DurationTextParser.formatForEditing(secondsText: seconds), "5 分 30 秒")
+        // README §13 N6: the spaced display text parses back to the same seconds.
+        XCTAssertEqual(DurationTextParser.parseSeconds("5 分 30 秒"), "330")
+        XCTAssertEqual(DurationTextParser.parseSeconds("5 分"), "300")
+        XCTAssertEqual(DurationTextParser.parseSeconds("45 秒"), "45")
     }
 }
