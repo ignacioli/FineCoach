@@ -346,7 +346,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 - 文件：`assets/app-icon-light.png`（米色底约 `#F8F0E3`，SHA-256 `65f84996…0bd0463`）、`assets/app-icon-dark.png`（暖炭黑底约 `#1E1A17`，`14a3b703…f44f519`）、`assets/app-icon-tinted.png`（灰度，`4029ed42…97eb`）。均为满版方形、无透明通道、无圆角，圆角由 iOS 遮罩。工程内副本在 `Assets.xcassets/AppIcon.appiconset`（单张 1024 universal + dark + tinted 外观）。dark 与 light 的版式有 1–2% 的轻微错位，仅在用户切换外观的瞬间可见，已接受。
 - 吉祥物插图内的橙色（§2.3）在图标中保留，仍不得用于界面元素。
 - dark / tinted 只是 iOS 18 主屏图标外观，随用户在主屏「自定」中的选择切换；App 界面本身仍未适配深色模式，不因此引入界面深色主题。
-- Penpot：「M1-B G5 Design」Foundations 页的 `AppIcon / approved / {light,dark,tinted}` 仍是 2026-10-11 的旧版，**待回填**新三张图（回填前设计源与代码有差异）。
+- Penpot：「M1-B G5 Design」Foundations 页画板「AppIcon options (2026-10-11) — REJECTED A / B / C」底部的 `AppIcon / approved / {light,dark,tinted}` 已于 2026-10-14 回填为新三张图（快照 `before-app-icon-v2 2026-10-14` → `app-icon v2 backfill 2026-10-14 (mascot original, light/dark/tinted)`，`File.validate()` 0 个错误），并更新了画板内的「已批准」说明；上方几何兔头 / 「练」字标 / 哑铃片三案为 2026-10-11 否决方案，保留作记录。
 - 验收：2026-10-14 产品负责人在真机体验，反馈审核通过（light / dark / tinted 三个外观）。
 
 ## 10. 来源冲突裁决记录
