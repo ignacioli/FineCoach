@@ -81,7 +81,7 @@ blob-report/
 # omo
 .omo/
 
-# Specs (symlink to the private specs repo; not part of this public repo)
+# local symlink, not part of this repository
 /specs
 
 # local git worktrees
