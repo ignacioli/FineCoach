@@ -326,7 +326,8 @@ public struct FCListGroupRow: View {
         case .partiallySelected: selection = String(localized: "designSystem.listRow.state.partial")
         case .allSelected: selection = String(localized: "designSystem.listRow.state.all")
         }
-        let expansion = isExpanded
+        let expansion =
+            isExpanded
             ? String(localized: "designSystem.listRow.state.expanded")
             : String(localized: "designSystem.listRow.state.collapsed")
         return "\(selection)，\(expansion)"
@@ -483,7 +484,10 @@ public struct FCLabelValueRow<Value: View>: View {
     private let showsDisclosure: Bool
     private let combinesAccessibility: Bool
 
-    private static var labelColumnWidth: CGFloat { 112 - FCPrimitives.space4 }
+    /// Width of the label column. The value column therefore starts at x=112
+    /// once the page's `space.4` margin is included. `FCStepperField` aligns
+    /// its caption to the same inset.
+    static var labelColumnWidth: CGFloat { 112 - FCPrimitives.space4 }
 
     public init(
         label: String,
@@ -491,7 +495,9 @@ public struct FCLabelValueRow<Value: View>: View {
         action: (() -> Void)? = nil,
         @ViewBuilder value: () -> Value
     ) {
-        self.init(label: label, showsDisclosure: showsDisclosure, action: action, combinesAccessibility: false, value: value())
+        self.init(
+            label: label, showsDisclosure: showsDisclosure, action: action, combinesAccessibility: false, value: value()
+        )
     }
 
     fileprivate init(
@@ -537,9 +543,9 @@ public struct FCLabelValueRow<Value: View>: View {
     }
 }
 
-public extension FCLabelValueRow where Value == FCLabelValueText {
+extension FCLabelValueRow where Value == FCLabelValueText {
     /// A row whose value is plain `body` `text.primary` text.
-    init(label: String, value: String, showsDisclosure: Bool? = nil, action: (() -> Void)? = nil) {
+    public init(label: String, value: String, showsDisclosure: Bool? = nil, action: (() -> Void)? = nil) {
         self.init(
             label: label,
             showsDisclosure: showsDisclosure,

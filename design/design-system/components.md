@@ -125,7 +125,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 | `DS-SEGMENTED` | `FCSegmentedSwitch` | §8 顶部分段切换；37；§10 C11 | RootNavigation、Trends、BodyMeasurementEntry、ManualCreditAdjustment | 稳定 |
 | `DS-CHIP` | `FCFilterChip`、`FCBodyPartChip`、`FCBodyPartPicker`、`FCFlowLayout` | §8 筛选胶囊；§8.1 部位多选胶囊 | 筛选胶囊 7 个文件；部位选择 3 个 | 稳定 |
 | `DS-TOGGLE` | `FCToggleStyle` | §8 开关；O7 | 4 个文件 | 稳定 |
-| `DS-STEPPER` | `FCStepper` | §8.1 数字步进器；36/37 | CoursePackageEditor、ManualCreditAdjustment | 稳定 |
+| `DS-STEPPER` | `FCStepper`、`FCStepperField` | §8.1 数字步进器；36/37；P0-a/P0-b 可输入变体 | CoursePackageEditor、ManualCreditAdjustment、ActiveSession | 扩展（可输入变体已实现；README §8.1 与 Penpot 标注待同步） |
 | `DS-TEXT-FIELD` | `FCTextField`、`FCSearchField` | §8 输入框、搜索框 | 输入框 14 个文件；搜索框 2 个 | 稳定 |
 | `DS-LIST-ROW` | `FCListRow`、`FCListGroupRow`、`FCListRowDivider` | §8 列表行；§6 分割线；M2 扩展（§4.7） | 分割线 26 个文件；`FCListRow` 0 个（M2 新页面使用） | 扩展已实现（M2 T004）；其余见 CG-1 |
 | `DS-SECTION` | `FCSectionLabel`、`FCGroupEntryRow` | §8 区段标签；§8.1 列表分组入口行 | 区段标签 14 个文件；分组入口 2 个 | 稳定 |
@@ -203,7 +203,8 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 - **部件**：一个 `surface.canvas` 胶囊（默认字号下 112×36）：`−` → 数值 → `+`。符号使用 `FCSymbol(.minus/.plus)`；数值使用 `numeralLarge` `text.primary`、等宽数字，最小宽 40。
 - **状态**：到达下限或上限时，对应符号改为 `text.disabled` 并禁用。
 - **不变量**：每次只能 ±1，结果限制在范围内（自动：`FCStepperTests`）；VoiceOver 把整体读作一个可调节元素（label + value，上下滑动调节）（可自动）；每个符号的点击区 ≥ 44（自动）；字号放大时胶囊随之加宽，不截断数值（人工）。
-- **复用边界**：取代系统 `Stepper`。所有整数步进都必须用它。
+- **复用边界**：取代系统 `Stepper`。所有整数步进都必须用它。重量和次数的可输入步进用下面的变体，不要在页面里再拼一套「− 输入框 +」。
+- **变体 `FCStepperField`**（P0-a、P0-b，2026-10-14 审核通过）：放在 `DS-LABEL-VALUE-ROW` 的值 slot，只有训练页使用。胶囊高 48、`radius.capsule`、`surface.canvas` 底，宽度填满值列。部件是 `−`、居中的可输入数值（`numeralLarge`）、`+`；符号用 `FCSymbol(.minus/.plus)`，每个点击区 ≥ 44。到达下限时「−」改为 `text.disabled` 并禁用。键盘输入中，胶囊加 1.5pt 内描边 `action.primary`，「− / +」仍可点。步长、下限和文本解析由调用方按 P0-D4 / P0-D6 传入（`SetValueStepping`），组件本身不决定 ±2.5 或 ±1。现有 `FCStepper` 和它的两个消费者不变。
 
 ### 4.2 输入类
 

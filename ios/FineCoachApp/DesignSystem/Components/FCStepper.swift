@@ -67,3 +67,106 @@ public struct FCStepper: View {
         .contentShape(Rectangle())
     }
 }
+
+/// The editable weight/reps stepper (P0-a / P0-b, approved 2026-10-14).
+/// A full-width `surface.canvas` capsule, 48pt tall, holding "−" value "+".
+/// The value is a `numeralLarge` field the coach can type into; "−" / "+"
+/// stay available while the keyboard is up. Focus draws a 1.5pt inner
+/// `action.primary` stroke. Step size and the lower bound stay with the
+/// caller (`SetValueStepping`, P0-D4 / P0-D6) — this view only shows the
+/// disabled "−" the caller reports. The integer `FCStepper` is unchanged.
+public struct FCStepperField: View {
+    private let title: String
+    private let text: Binding<String>
+    private let canDecrement: Bool
+    private let keyboardType: UIKeyboardType
+    private let fieldIdentifier: String
+    private let decrementIdentifier: String
+    private let incrementIdentifier: String
+    private let onDecrement: () -> Void
+    private let onIncrement: () -> Void
+
+    @FocusState private var isEditing: Bool
+
+    /// Leading inset that lines a caption up with this field inside an
+    /// `FCLabelValueRow` (the P0 step hint sits under the value column).
+    public static var valueColumnInset: CGFloat { FCLabelValueRow<Never>.labelColumnWidth }
+
+    public init(
+        _ title: String,
+        text: Binding<String>,
+        canDecrement: Bool,
+        keyboardType: UIKeyboardType,
+        fieldIdentifier: String,
+        decrementIdentifier: String,
+        incrementIdentifier: String,
+        onDecrement: @escaping () -> Void,
+        onIncrement: @escaping () -> Void
+    ) {
+        self.title = title
+        self.text = text
+        self.canDecrement = canDecrement
+        self.keyboardType = keyboardType
+        self.fieldIdentifier = fieldIdentifier
+        self.decrementIdentifier = decrementIdentifier
+        self.incrementIdentifier = incrementIdentifier
+        self.onDecrement = onDecrement
+        self.onIncrement = onIncrement
+    }
+
+    public var body: some View {
+        HStack(spacing: 0) {
+            glyphButton(
+                .minus,
+                isEnabled: canDecrement,
+                identifier: decrementIdentifier,
+                label: String(format: String(localized: "session.stepper.decrementFormat"), title),
+                action: onDecrement
+            )
+            TextField("", text: text)
+                .keyboardType(keyboardType)
+                .fcFont(.numeralLarge)
+                .foregroundStyle(FCSemanticColors.textPrimary)
+                .monospacedDigit()
+                .multilineTextAlignment(.center)
+                .focused($isEditing)
+                .frame(maxWidth: .infinity, minHeight: 44)
+                .accessibilityLabel(Text(title))
+                .accessibilityIdentifier(fieldIdentifier)
+            glyphButton(
+                .plus,
+                isEnabled: true,
+                identifier: incrementIdentifier,
+                label: String(format: String(localized: "session.stepper.incrementFormat"), title),
+                action: onIncrement
+            )
+        }
+        .frame(maxWidth: .infinity, minHeight: 48)
+        .background(Capsule().fill(FCSemanticColors.surfaceCanvas))
+        .overlay {
+            if isEditing {
+                Capsule()
+                    .strokeBorder(FCSemanticColors.actionPrimary, lineWidth: 1.5)
+                    .allowsHitTesting(false)
+            }
+        }
+    }
+
+    private func glyphButton(
+        _ kind: FCSymbol.Kind,
+        isEnabled: Bool,
+        identifier: String,
+        label: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            FCSymbol(kind, color: isEnabled ? FCSemanticColors.textPrimary : FCSemanticColors.textDisabled)
+                .frame(minWidth: 44, minHeight: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .disabled(!isEnabled)
+        .accessibilityLabel(Text(label))
+        .accessibilityIdentifier(identifier)
+    }
+}
