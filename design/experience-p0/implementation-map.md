@@ -160,3 +160,11 @@ agent 按上述决定补充的细节（产品负责人在 P0-a2 画稿上确认�
   - 单侧动作的录入区：「每侧重量 kg」和「左右不同」展开后的「左 kg」「右 kg」；
   - 动作行左滑后的「移入分区」「删除」；
   - 刚确认的组，行尾显示「撤销」。
+- **已画（2026-10-15）**：Penpot「M1-B G5 Design」/ Foundations 页。
+  - `P0-a2`（x=6930，y=3750）：精简后的训练页；第 2 组为「刚确认」状态，行尾显示「撤销」；两组都有铅笔。
+  - `P0-a2b`（x=7370，y=3750）：单侧动作的两种录入状态、动作行左滑、撤销说明。
+  - P0-b 的通知说明已改为「App 在后台时发系统通知（P0-D5）」（Δ11）。
+  - 版本快照：`before-P0-a2-simplify 2026-10-15` → `P0-a2 simplify: confirm only, swipe delete/move, undo on row, unilateral entry 2026-10-15`；`File.validate()` 0 个错误。
+  - 1 倍参考图：`boards/P0-a2-training-simplified@1x.png`、`boards/P0-a2b-partial-states@1x.png`（Penpot MCP 只能导出 1 倍，只作 review 参考，不是正式导出图）。
+  - 核对时发现：已批准的 D8 画板本来就把组行画成一行，代码的两行组行和 `components.md` DS-SET-ROW「上下排列」的写法是偏离，Δ5 按 D8 改回一行，并同步 `components.md`。
+  - 状态：产品负责人授权 agent 直接推进，看过后有问题再反馈（2026-10-15）。
