@@ -298,7 +298,8 @@ public enum PlaceholderExerciseCatalogLoader {
                 loaded[exercise.id] = ExerciseCatalogBrowseFacet(
                     primaryMuscleGroup: muscle,
                     equipmentClass: equipment,
-                    secondaryMuscleGroups: exercise.secondaryMuscleGroups ?? []
+                    secondaryMuscleGroups: exercise.secondaryMuscleGroups ?? [],
+                    isUnilateral: exercise.unilateral ?? false
                 )
             }
             cached = loaded

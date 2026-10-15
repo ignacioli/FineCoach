@@ -32,6 +32,7 @@ enum ExerciseManagedObjectMapping {
         object.setValue(preference.isFavorite, forKey: "isFavorite")
         object.setValue(preference.isHidden, forKey: "isHidden")
         object.setValue(preference.isAssisted, forKey: "isAssisted")
+        object.setValue(preference.isUnilateral, forKey: "isUnilateral")
     }
 
     static func makeCatalogItem(from object: NSManagedObject) throws -> ExerciseCatalogItem {
@@ -117,12 +118,14 @@ enum ExerciseManagedObjectMapping {
         let isFavorite = object.value(forKey: "isFavorite") as? Bool ?? false
         let isHidden = object.value(forKey: "isHidden") as? Bool ?? false
         let isAssisted = object.value(forKey: "isAssisted") as? Bool ?? false
+        let isUnilateral = object.value(forKey: "isUnilateral") as? Bool
         return try ExercisePreference(
             exerciseID: StableExerciseID(exerciseID),
             alias: alias,
             isFavorite: isFavorite,
             isHidden: isHidden,
-            isAssisted: isAssisted
+            isAssisted: isAssisted,
+            isUnilateral: isUnilateral
         )
     }
 

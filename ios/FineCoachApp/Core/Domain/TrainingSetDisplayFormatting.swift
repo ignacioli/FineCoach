@@ -46,6 +46,12 @@ public enum TrainingSetDisplayFormatting {
             case .right:
                 return "右 \((values.rightValue ?? values.weightValue)?.canonicalString ?? "-") \(weightUnit) × \(repsText)"
             case .bilateral:
+                if let leftValue = values.leftValue, let rightValue = values.rightValue,
+                    leftValue.canonicalString == rightValue.canonicalString
+                {
+                    // 「每侧重量」 entry (P0-D8) records the same value on both sides.
+                    return "每侧 \(leftValue.canonicalString) \(weightUnit) × \(repsText)"
+                }
                 if let leftValue = values.leftValue, let rightValue = values.rightValue {
                     return "左 \(leftValue.canonicalString) \(weightUnit) / 右 \(rightValue.canonicalString) \(weightUnit) × \(repsText)"
                 }

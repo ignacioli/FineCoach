@@ -92,6 +92,8 @@ public struct PlaceholderCatalogExercise: Hashable, Codable, Sendable {
     public var equipmentClass: String?
     /// Already present in `provenance.json`; decoded since T069c.
     public var secondaryMuscleGroups: [String]?
+    /// P0-D8: trained one side at a time by default. Absent means `false`.
+    public var unilateral: Bool?
 
     public init(
         id: String,
@@ -100,9 +102,11 @@ public struct PlaceholderCatalogExercise: Hashable, Codable, Sendable {
         provenanceRef: String,
         primaryMuscleGroup: String? = nil,
         equipmentClass: String? = nil,
-        secondaryMuscleGroups: [String]? = nil
+        secondaryMuscleGroups: [String]? = nil,
+        unilateral: Bool? = nil
     ) {
         self.secondaryMuscleGroups = secondaryMuscleGroups
+        self.unilateral = unilateral
         self.id = id
         self.canonicalName = canonicalName
         self.recordMode = recordMode

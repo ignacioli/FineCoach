@@ -80,6 +80,74 @@
             try await environment.controller.shutdownForTesting()
         }
 
+        /// P0-D8: an exercise saved to the library with 「单侧动作」 on gets
+        /// per-side entry. 「每侧重量」 records the same value on both sides;
+        /// 「左右不同」 records each side and keeps the heavier as the weight,
+        /// and the next set reopens in the same mode.
+        func testUnilateralExerciseRecordsPerSideWeights() async throws {
+            let environment = try makeEnvironment()
+            let viewModel = try await startSession(environment, exercises: [])
+            viewModel.exerciseName = "哑铃单臂划船"
+            viewModel.recordMode = .weightReps
+            viewModel.newExerciseIsUnilateral = true
+            await viewModel.saveExerciseToLibrary()
+            XCTAssertFalse(viewModel.newExerciseIsUnilateral, "the toggle resets for the next exercise")
+
+            let exercise = try XCTUnwrap(viewModel.currentExercise)
+            XCTAssertTrue(viewModel.isUnilateral(exercise))
+            XCTAssertTrue(viewModel.usesSideEntry(exercise))
+            XCTAssertFalse(viewModel.splitSides)
+
+            viewModel.weight = "12.5"
+            viewModel.reps = "10"
+            await viewModel.confirmActiveDraftSet()
+            let perSide = try XCTUnwrap(viewModel.currentExercise?.sets.last)
+            XCTAssertEqual(perSide.side, .bilateral)
+            XCTAssertEqual(perSide.leftValue?.canonicalString, "12.5")
+            XCTAssertEqual(perSide.rightValue?.canonicalString, "12.5")
+            XCTAssertEqual(perSide.weightValue?.canonicalString, "12.5")
+            XCTAssertEqual(viewModel.weight, "12.5", "the next set keeps the per-side weight")
+            XCTAssertFalse(viewModel.splitSides)
+
+            viewModel.toggleSplitSides(for: exercise)
+            XCTAssertTrue(viewModel.splitSides)
+            XCTAssertEqual(viewModel.left, "12.5")
+            XCTAssertEqual(viewModel.right, "12.5")
+            viewModel.stepSide(.right, up: true)
+            XCTAssertEqual(viewModel.right, "15")
+            await viewModel.confirmActiveDraftSet()
+            let split = try XCTUnwrap(viewModel.currentExercise?.sets.last)
+            XCTAssertEqual(split.leftValue?.canonicalString, "12.5")
+            XCTAssertEqual(split.rightValue?.canonicalString, "15")
+            XCTAssertEqual(split.weightValue?.canonicalString, "15", "the set's weight is the heavier side")
+            XCTAssertTrue(viewModel.splitSides, "the next set reopens with different sides")
+            XCTAssertEqual(viewModel.right, "15")
+
+            viewModel.toggleSplitSides(for: exercise)
+            XCTAssertFalse(viewModel.splitSides)
+            XCTAssertEqual(viewModel.weight, "15")
+
+            try await environment.controller.shutdownForTesting()
+        }
+
+        func testOrdinaryExerciseHasNoSideEntryAndAssistedKeepsTheLighterSide() async throws {
+            let environment = try makeEnvironment()
+            let viewModel = try await startSession(environment, exercises: ["杠铃深蹲"])
+            let exercise = try XCTUnwrap(viewModel.currentExercise)
+            XCTAssertFalse(viewModel.usesSideEntry(exercise))
+
+            viewModel.weight = "60"
+            viewModel.reps = "5"
+            await viewModel.confirmActiveDraftSet()
+            XCTAssertEqual(viewModel.currentExercise?.sets.last?.side, SetSide.none)
+
+            XCTAssertEqual(ActiveSessionViewModel.recordedWeight("12.5", "15", assisted: false), "15")
+            XCTAssertEqual(ActiveSessionViewModel.recordedWeight("12.5", "15", assisted: true), "12.5")
+            XCTAssertEqual(ActiveSessionViewModel.recordedWeight("12.5", "", assisted: false), "")
+
+            try await environment.controller.shutdownForTesting()
+        }
+
         // MARK: - Environment
 
         private struct Environment {

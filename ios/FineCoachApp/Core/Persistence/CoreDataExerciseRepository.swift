@@ -55,7 +55,8 @@ public struct CoreDataExerciseRepository: Sendable {
                         preference: preference,
                         primaryMuscleGroup: item.kind == .builtIn ? facet?.primaryMuscleGroup : nil,
                         equipmentClass: item.kind == .builtIn ? facet?.equipmentClass : nil,
-                        secondaryMuscleGroups: item.kind == .builtIn ? facet?.secondaryMuscleGroups ?? [] : []
+                        secondaryMuscleGroups: item.kind == .builtIn ? facet?.secondaryMuscleGroups ?? [] : [],
+                        isUnilateralByDefault: item.kind == .builtIn && facet?.isUnilateral == true
                     )
                 )
             }
@@ -166,7 +167,8 @@ public struct CoreDataExerciseRepository: Sendable {
         alias: String?,
         isFavorite: Bool?,
         isHidden: Bool?,
-        isAssisted: Bool? = nil
+        isAssisted: Bool? = nil,
+        isUnilateral: Bool? = nil
     ) async throws -> ExercisePreference {
         try await writer.transaction { context in
             _ = try ExerciseManagedObjectMapping.requireCatalogItem(id: exerciseID.rawValue, in: context)
@@ -192,7 +194,8 @@ public struct CoreDataExerciseRepository: Sendable {
                 alias: aliasUpdate,
                 isFavorite: isFavorite,
                 isHidden: isHidden,
-                isAssisted: isAssisted
+                isAssisted: isAssisted,
+                isUnilateral: isUnilateral
             )
             let object = try ExerciseManagedObjectMapping.upsertPreference(updated, in: context)
             return try ExerciseManagedObjectMapping.makePreference(from: object)

@@ -83,6 +83,14 @@ final class ExerciseLibraryViewModel: ObservableObject {
         }
     }
 
+    func toggleUnilateral(_ entry: ExerciseLibraryEntry) async {
+        let next = !entry.isUnilateral
+        await run {
+            try await self.useCases.setUnilateral(id: entry.id, isUnilateral: next)
+            await self.reload()
+        }
+    }
+
     private func rebuildSections() {
         sections = ExerciseCatalogBrowse.sections(
             from: entries,

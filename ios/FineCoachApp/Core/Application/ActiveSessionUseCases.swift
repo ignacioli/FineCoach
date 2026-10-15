@@ -129,7 +129,21 @@ public struct ActiveSessionUseCases: Sendable {
         }
     }
 
-    public func addCustomToLibraryAndSession(name: String, recordMode: RecordMode) async throws -> Session {
+    /// The library flags the set entry needs (P0-D8): which exercises are
+    /// unilateral, and which of those count a lower load as progress.
+    public func exerciseEntryFlags() async throws -> ExerciseEntryFlags {
+        let entries = try await exerciseRepository.searchActive(query: "", includeHidden: true)
+        return ExerciseEntryFlags(
+            unilateral: Set(entries.filter(\.isUnilateral).map(\.id)),
+            assisted: Set(entries.filter { $0.preference?.isAssisted == true }.map(\.id))
+        )
+    }
+
+    public func addCustomToLibraryAndSession(
+        name: String,
+        recordMode: RecordMode,
+        isUnilateral: Bool = false
+    ) async throws -> Session {
         let item = try await exerciseRepository.createCustom(
             name: name,
             recordMode: recordMode,
@@ -137,6 +151,15 @@ public struct ActiveSessionUseCases: Sendable {
             now: clock.nowUTC()
         )
         do {
+            if isUnilateral {
+                _ = try await exerciseRepository.setPreference(
+                    exerciseID: item.id,
+                    alias: nil,
+                    isFavorite: nil,
+                    isHidden: nil,
+                    isUnilateral: true
+                )
+            }
             return try await mutate { session in
                 try session.addingCatalogExercise(
                     id: StableUUID(ids.makeID()),
@@ -408,5 +431,18 @@ public struct ActiveSessionUseCases: Sendable {
         } catch {
             return
         }
+    }
+}
+
+/// Library flags read by the set entry (P0-D8).
+public struct ExerciseEntryFlags: Equatable, Sendable {
+    public var unilateral: Set<StableExerciseID>
+    public var assisted: Set<StableExerciseID>
+
+    public static let empty = ExerciseEntryFlags(unilateral: [], assisted: [])
+
+    public init(unilateral: Set<StableExerciseID>, assisted: Set<StableExerciseID>) {
+        self.unilateral = unilateral
+        self.assisted = assisted
     }
 }

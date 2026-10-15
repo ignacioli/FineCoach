@@ -84,4 +84,19 @@ final class TrainingSetDisplaySummaryTests: XCTestCase {
         )
         XCTAssertEqual(set.displaySummary, "左 8 kg / 右 9 kg × 10")
     }
+
+    func testEqualSidesDisplayAsPerSideWeight() throws {
+        let set = try makeSet(
+            TrainingSetInput(
+                recordMode: .weightReps,
+                weightValue: "12.5",
+                repetitionCount: "10",
+                unit: .kilograms,
+                side: .bilateral,
+                leftValue: "12.5",
+                rightValue: "12.5"
+            )
+        )
+        XCTAssertEqual(set.displaySummary, "每侧 12.5 kg × 10")
+    }
 }

@@ -328,6 +328,12 @@ public enum FCAccessibilityID {
     public static let activeSessionResistance = "activeSession.resistance"
     public static let activeSessionLeft = "activeSession.left"
     public static let activeSessionRight = "activeSession.right"
+    public static let activeSessionLeftDecrement = "activeSession.left.decrement"
+    public static let activeSessionLeftIncrement = "activeSession.left.increment"
+    public static let activeSessionRightDecrement = "activeSession.right.decrement"
+    public static let activeSessionRightIncrement = "activeSession.right.increment"
+    public static let activeSessionSplitSides = "activeSession.splitSides"
+    public static let activeSessionNewExerciseUnilateral = "activeSession.newExercise.unilateral"
     public static let activeSessionConfirmSet = "activeSession.confirmSet"
     public static let activeSessionSaveSetEdit = "activeSession.saveSetEdit"
     public static let activeSessionCancelSetEdit = "activeSession.cancelSetEdit"
@@ -392,6 +398,10 @@ public enum FCAccessibilityID {
 
     public static func exerciseLibraryAssisted(_ id: StableExerciseID) -> String {
         "exerciseLibrary.assisted.\(id.rawValue)"
+    }
+
+    public static func exerciseLibraryUnilateral(_ id: StableExerciseID) -> String {
+        "exerciseLibrary.unilateral.\(id.rawValue)"
     }
 
     public static func exerciseLibraryRow(_ id: StableExerciseID) -> String {

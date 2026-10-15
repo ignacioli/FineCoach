@@ -46,6 +46,14 @@ agent 按上述决定补充的细节（产品负责人在 P0-a2 画稿上确认�
 - **组行（DS-SET-ROW）**：P0-a 把组行画成一行「第 N 组　数值　状态　铅笔」，现有组件是标题和数值上下两行。按 P0-a 改成一行，标题写「第 N 组」（README §13 N3）。
 - **课内新建动作的单侧选项**：课内快速新建动作的面板里，在记录模式下面加一行「单侧动作」开关；从动作库选的动作直接用库里的标记。
 
+实现时 agent 做的取舍（2026-10-15，代码已按此实现；产品负责人验收时确认，有异议再改）：
+
+- **标记存在哪里**：内置动作的默认值写在 `Resources/ExerciseCatalog/provenance.json` 的 `unilateral` 字段，运行时读取，不写数据库，所以不用升 `metadataVersion`、不用重新导入动作库。教练在动作选项里改过的值存在 `ExercisePreference.isUnilateral`（Core Data V5 新增的可选列；`nil` 表示沿用默认）。备份里这个字段也是可选的（P0-D12）。
+- **训练页按动作库实时判断**：训练记录里不另存「当时是否单侧」。已经记下的组自己带着左右数值，以后改标记不影响历史。代价：选了「仅本次」的课内新建动作，单侧开关只在这次打开训练页期间有效，App 重启后这个动作回到普通录入（已记的组不受影响）。
+- **内置动作默认单侧的 14 个（agent 起草，待产品负责人审）**：绳索侧平举、单臂哑铃划船、哑铃保加利亚分腿蹲、哑铃分腿蹲、单腿腿屈伸、史密斯分腿蹲、手枪深蹲、负重登箱、哑铃俯身后踢、器械臀屈伸、龙门架臀屈伸、哑铃单手提走、帕洛夫推压、龙门架伐木。弓步类（行走弓步、徒手弓步、反向弓步）通常左右交替、按总次数记，没有标。其中手枪深蹲是仅次数模式、哑铃单手提走是计时模式，标记现在不改变它们的录入，留着是为了以后这两种模式也支持左右时不用再标。
+- **组行显示**：左右相同的组显示为「每侧 12.5 kg × 10」；左右不同仍是「左 12.5 kg / 右 15 kg × 10」。
+- **下一组从哪种方式开始**：上一组左右不同，下一组仍展开「左 / 右」并带入两侧数值；上一组左右相同，就回到「每侧重量」。
+
 ## 画稿与现状差异清单（2026-10-15）
 
 对照对象：目标是 P0-a2（待画，见下方「画板说明」），现状是提交 `445f86b` 的训练页。每一条都要落到代码，或者明确写「不改」；画稿上有、清单里没写的差异，实施时要先停下来问，不能自己决定。
@@ -128,7 +136,7 @@ agent 按上述决定补充的细节（产品负责人在 P0-a2 画稿上确认�
 
 ## 入口与布局清单
 
-格式按 `components.md` §1.4。只列本轮新增的交互。确认一组、添加组、复制和撤销是原有入口，不在这里重复。步进改的是输入草稿，点「确认」之前不会变成已完成组。
+格式按 `components.md` §1.4。只列本轮新增的交互。确认一组是原有入口，不在这里重复；「添加组」「复制上一组」「复制上次同动作」、录入区的「撤销」、「上移 / 下移」已在 2026-10-15 去掉（P0-D9、D11）。步进改的是输入草稿，点「确认」之前不会变成已完成组。
 
 ```text
 训练中 → 重量输入（重量 kg）→ activeSession.weight → 改输入草稿 → FCStepperField 与 FCLabelValueRow 都有 .frame(maxWidth: .infinity)
@@ -148,6 +156,24 @@ agent 按上述决定补充的细节（产品负责人在 P0-a2 画稿上确认�
 训练中 → 「关闭」→ activeSession.rest.close → 收起休息条，不写入训练记录 → 按钮按文字宽度；条由 RestTimerChrome 撑满
 系统通知 → 无 App 内控件 → 无 → 否；文案只有「休息结束 / 可以开始下一组了」，不含学员、动作或重量 → 不适用
 ```
+
+2026-10-15 训练页精简新增（代码 `0b4e74a` 及之后）：
+
+```text
+训练中 → 动作行左滑「删除」→ activeSession.deleteExercise → 删除动作；含已完成组时先弹 DeleteExerciseFlow 确认 → 动作行在 List 行内，.listRowInsets(EdgeInsets())，行内 Spacer 撑满
+训练中 → 动作行左滑「移入分区」（这节课有分区时才有）→ activeSession.moveToSection → 打开分区选择；选中后改动作所属分区 → 同上
+训练中 → 分区选择（无分区 / 各分区名）→ 系统 confirmationDialog 按钮，无单独 id → 改动作所属分区 → 系统弹层
+训练中 → 刚确认的组行尾「撤销」（4 秒内）→ activeSession.set.at.<index> 内的 FCLinkButton，读屏动作「撤销」→ 删除这一组、收起休息条、数值带回输入框 → 组行在 List 行内撑满，按钮按文字宽度
+训练中 → 修改组「取消」→ activeSession.cancelSetEdit → 否 → FCLinkButton 按文字宽度，与「保存」同一 HStack
+训练中（单侧动作）→ 每侧重量输入 → activeSession.weight → 改输入草稿 → 同重量输入
+训练中（单侧动作）→ 「左右不同」/「左右相同」→ activeSession.splitSides → 改输入草稿（展开或合并左右）→ FCLinkButton 按文字宽度，左侧缩进到数值列
+训练中（单侧动作）→ 左 kg 输入 / − / + → activeSession.left、activeSession.left.decrement、activeSession.left.increment → 改输入草稿 → FCStepperField 与 FCLabelValueRow 撑满
+训练中（单侧动作）→ 右 kg 输入 / − / + → activeSession.right、activeSession.right.decrement、activeSession.right.increment → 改输入草稿 → 同上
+训练中 → 新建动作面板「单侧动作」开关（重量 × 次数时才有）→ activeSession.newExercise.unilateral → 新建时写入单侧标记 → 行 .frame(maxWidth: .infinity, minHeight: 44)
+动作库 → 动作选项「单侧动作」开关 → exerciseLibrary.unilateral.<id> → 改动作的单侧标记 → toggleRow 的 HStack 内 Spacer 撑满，最小高 52
+```
+
+自动检查：`TrainingEntryScanTests`（录入区和组行没有带文字的系统 `Button`；录入区非编辑状态只有一个 `FCButton`）。`FineCoachUITests/ActiveSession/CoreTrainingUITests.swift` 仍在点已去掉的「复制上一组」「添加组」「上移 / 下移」和左右切换，UI 测试不是本仓库的验收门，本轮没有改它，待之后整体更新。
 
 ## 画板说明
 

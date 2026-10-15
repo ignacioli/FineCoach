@@ -79,6 +79,17 @@ final class ActiveSessionViewModel: ObservableObject {
     /// of its status until `undoWindow` passes (P0-D11).
     @Published private(set) var undoableSetID: StableUUID?
     static let undoWindow: Duration = .seconds(4)
+    /// Unilateral entry (P0-D8): `false` shows one 「每侧重量」 stepper
+    /// bound to `weight`; `true` shows 左 / 右 steppers bound to `left` and
+    /// `right`. Either way the set is recorded with `side = .bilateral`.
+    @Published var splitSides = false
+    /// Quick-create's 「单侧动作」 toggle (P0-D8).
+    @Published var newExerciseIsUnilateral = false
+    /// Library flags for the set entry, loaded with the Session.
+    @Published private(set) var entryFlags: ExerciseEntryFlags = .empty
+    /// Session-only exercises created with 「单侧动作」 on. They have no
+    /// library row, so the flag lives only as long as this view model.
+    private var sessionOnlyUnilateralIDs: Set<StableUUID> = []
 
     let studentID: StableUUID
     let useCases: ActiveSessionUseCases
@@ -145,6 +156,7 @@ final class ActiveSessionViewModel: ObservableObject {
             saveStatus = useCases.saveStatus
             await loadSections()
             lastPerformances = (try? await useCases.lastPerformances(studentID: studentID)) ?? .empty
+            await refreshEntryFlags()
             if editingSetID == nil {
                 prefillSetFields(for: currentExercise)
             }
@@ -246,11 +258,15 @@ final class ActiveSessionViewModel: ObservableObject {
         exerciseNameConflict = nil
         let name = exerciseName
         let mode = recordMode
+        let unilateral = newExerciseIsUnilateral && mode == .weightReps
         await run {
             let updated = try await self.useCases.addSessionOnlyExercise(
                 displayName: name,
                 recordMode: mode
             )
+            if unilateral, let added = updated.exercises.last {
+                self.sessionOnlyUnilateralIDs.insert(added.id)
+            }
             self.applySavedExercise(updated, mode: mode)
         }
     }
@@ -259,11 +275,14 @@ final class ActiveSessionViewModel: ObservableObject {
         exerciseNameConflict = nil
         let name = exerciseName
         let mode = recordMode
+        let unilateral = newExerciseIsUnilateral && mode == .weightReps
         await run {
             let updated = try await self.useCases.addCustomToLibraryAndSession(
                 name: name,
-                recordMode: mode
+                recordMode: mode,
+                isUnilateral: unilateral
             )
+            await self.refreshEntryFlags()
             self.applySavedExercise(updated, mode: mode)
         }
     }
@@ -277,6 +296,7 @@ final class ActiveSessionViewModel: ObservableObject {
         await run {
             let updated = try await self.useCases.addCatalogExercise(itemID: id)
             let mode = updated.exercises.last?.recordModeSnapshot ?? .weightReps
+            await self.refreshEntryFlags()
             self.applySavedExercise(updated, mode: mode)
         }
     }
@@ -414,6 +434,7 @@ final class ActiveSessionViewModel: ObservableObject {
         side = set.side
         left = set.leftValue?.canonicalString ?? ""
         right = set.rightValue?.canonicalString ?? ""
+        splitSides = set.side == .bilateral && left != right
         distance = set.distanceValue?.canonicalString ?? ""
         speed = set.speedValue?.canonicalString ?? ""
         resistance = set.resistanceValue?.canonicalString ?? ""
@@ -624,6 +645,9 @@ final class ActiveSessionViewModel: ObservableObject {
         case .weightReps, .reps:
             durationSecondsText = duration
         }
+        if usesSideEntry(exercise) {
+            return sideEntryInput(for: exercise)
+        }
         return TrainingSetInput(
             recordMode: exercise.recordModeSnapshot,
             weightValue: weight,
@@ -637,6 +661,37 @@ final class ActiveSessionViewModel: ObservableObject {
             speedValue: speed,
             resistanceValue: resistance
         )
+    }
+
+    /// Unilateral entry (P0-D8) records `side = .bilateral`: 「每侧重量」
+    /// puts the same value on both sides; 「左右不同」 records each side and
+    /// keeps the heavier one as the set's weight (the lighter one for an
+    /// assisted exercise, where less load is progress), so trends and
+    /// records keep reading `weightValue`.
+    private func sideEntryInput(for exercise: SessionExercise) -> TrainingSetInput {
+        let leftText = splitSides ? left : weight
+        let rightText = splitSides ? right : weight
+        return TrainingSetInput(
+            recordMode: .weightReps,
+            weightValue: splitSides ? Self.recordedWeight(leftText, rightText, assisted: isAssisted(exercise)) : weight,
+            repetitionCount: reps,
+            unit: .kilograms,
+            side: .bilateral,
+            leftValue: leftText,
+            rightValue: rightText
+        )
+    }
+
+    /// The heavier side, or the lighter one when `assisted`. A side that is
+    /// not a number yet leaves the weight empty, so validation names it.
+    static func recordedWeight(_ left: String, _ right: String, assisted: Bool) -> String {
+        guard let leftValue = try? DecimalValue(left.trimmingCharacters(in: .whitespacesAndNewlines)),
+            let rightValue = try? DecimalValue(right.trimmingCharacters(in: .whitespacesAndNewlines))
+        else {
+            return ""
+        }
+        let leftWins = assisted ? leftValue.decimal <= rightValue.decimal : leftValue.decimal >= rightValue.decimal
+        return (leftWins ? leftValue : rightValue).canonicalString
     }
 
     private func unit(for mode: RecordMode) -> MeasurementUnit {
@@ -653,6 +708,7 @@ final class ActiveSessionViewModel: ObservableObject {
         selectedExerciseID = updated.exercises.last?.id
         exerciseName = ""
         exerciseNameConflict = nil
+        newExerciseIsUnilateral = false
         catalogMatches = []
         isAddingExercise = false
         recordMode = mode
@@ -661,9 +717,57 @@ final class ActiveSessionViewModel: ObservableObject {
 
     // MARK: - Faster set entry (experience P0, design/experience-p0)
 
-    /// Whether left/right entry applies to this exercise (P0-D8).
+    /// Whether left/right entry applies to this exercise (P0-D8): the
+    /// library flag, or quick-create's toggle for a session-only exercise.
     func isUnilateral(_ exercise: SessionExercise) -> Bool {
-        false
+        if let sourceID = exercise.sourceID {
+            return entryFlags.unilateral.contains(sourceID)
+        }
+        return sessionOnlyUnilateralIDs.contains(exercise.id)
+    }
+
+    /// Whether the entry shows 「每侧重量」/「左右不同」 instead of one weight:
+    /// weight × reps on a unilateral exercise, or editing a set that was
+    /// already recorded per side.
+    func usesSideEntry(_ exercise: SessionExercise) -> Bool {
+        guard exercise.recordModeSnapshot == .weightReps else {
+            return false
+        }
+        return side == .bilateral || (side == .none && isUnilateral(exercise))
+    }
+
+    private func isAssisted(_ exercise: SessionExercise) -> Bool {
+        exercise.sourceID.map { entryFlags.assisted.contains($0) } ?? false
+    }
+
+    /// 「左右不同」 / 「左右相同」. Splitting starts both sides at the shared
+    /// weight; joining keeps the recorded weight (heavier side).
+    func toggleSplitSides(for exercise: SessionExercise) {
+        if splitSides {
+            weight = Self.recordedWeight(left, right, assisted: isAssisted(exercise))
+            left = ""
+            right = ""
+            splitSides = false
+        } else {
+            left = weight
+            right = weight
+            splitSides = true
+        }
+    }
+
+    /// − / + on the 左 or 右 field (P0-D4 weight step).
+    func stepSide(_ which: SetSide, up: Bool) {
+        switch which {
+        case .left: left = SetValueStepping.stepped(left, field: .weight, up: up)
+        case .right: right = SetValueStepping.stepped(right, field: .weight, up: up)
+        case .none, .bilateral: break
+        }
+    }
+
+    private func refreshEntryFlags() async {
+        if let flags = try? await useCases.exerciseEntryFlags() {
+            entryFlags = flags
+        }
     }
 
     func lastPerformance(for exercise: SessionExercise) -> LastExercisePerformance? {
@@ -750,20 +854,29 @@ final class ActiveSessionViewModel: ObservableObject {
             return
         }
         fillSetFields(from: source)
-        if !isUnilateral(exercise) {
-            // Sides only show for exercises marked unilateral (P0-D8).
-            side = .none
+        // Sides only show for exercises marked unilateral (P0-D8); a new set
+        // always starts from the exercise's flag, not the source's side.
+        side = .none
+        if !isUnilateral(exercise) || !splitSides {
+            splitSides = false
             left = ""
             right = ""
         }
     }
 
+    /// Copies a set's values into the form; a per-side set with different
+    /// sides reopens 「左右不同」, one with equal sides shows 「每侧重量」.
     private func fillSetFields(from source: TrainingSet) {
-        weight = source.weightValue?.canonicalString ?? ""
         reps = source.repetitionCount?.canonicalString ?? ""
         side = source.side
         left = source.leftValue?.canonicalString ?? ""
         right = source.rightValue?.canonicalString ?? ""
+        splitSides = source.side == .bilateral && left != right
+        if source.side == .bilateral, !splitSides, !left.isEmpty {
+            weight = left
+        } else {
+            weight = source.weightValue?.canonicalString ?? ""
+        }
     }
 
     private func resetSetFields(for mode: RecordMode) {
@@ -773,6 +886,7 @@ final class ActiveSessionViewModel: ObservableObject {
         side = .none
         left = ""
         right = ""
+        splitSides = false
         distance = ""
         speed = ""
         resistance = ""
