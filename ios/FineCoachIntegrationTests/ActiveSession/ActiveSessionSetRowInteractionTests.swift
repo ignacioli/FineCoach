@@ -122,6 +122,52 @@
             try await environment.controller.shutdownForTesting()
         }
 
+        /// P0-D11: the entry area only confirms; the just-recorded row offers
+        /// 「撤销」, which deletes that set, ends the rest and puts its values
+        /// back into the form.
+        func testUndoRemovesTheJustConfirmedSetAndRestoresItsValues() async throws {
+            let environment = try makeEnvironment()
+            let viewModel = try await makeLoadedViewModel(environment: environment)
+
+            viewModel.weight = "40"
+            viewModel.reps = "10"
+            await viewModel.confirmActiveDraftSet()
+
+            let recorded = try XCTUnwrap(viewModel.session?.exercises.first(where: { $0.id == exerciseID })?.sets.last)
+            XCTAssertEqual(recorded.state, .completed)
+            XCTAssertEqual(viewModel.undoableSetID, recorded.id)
+            XCTAssertNotNil(viewModel.restTimer)
+
+            viewModel.weight = ""
+            viewModel.reps = ""
+            await viewModel.undoRecentSet()
+
+            let afterUndo = try XCTUnwrap(viewModel.session?.exercises.first(where: { $0.id == exerciseID }))
+            XCTAssertTrue(afterUndo.sets.isEmpty, "undo must delete the just-recorded set")
+            XCTAssertNil(viewModel.undoableSetID)
+            XCTAssertNil(viewModel.restTimer, "undo must end the rest the set started")
+            XCTAssertEqual(viewModel.weight, "40")
+            XCTAssertEqual(viewModel.reps, "10")
+
+            try await environment.controller.shutdownForTesting()
+        }
+
+        func testDeletingTheUndoableSetWithdrawsTheUndo() async throws {
+            let environment = try makeEnvironment()
+            let viewModel = try await makeLoadedViewModel(environment: environment)
+
+            viewModel.weight = "40"
+            viewModel.reps = "10"
+            await viewModel.confirmActiveDraftSet()
+            let recorded = try XCTUnwrap(viewModel.undoableSetID)
+
+            await viewModel.removeSet(setID: recorded)
+
+            XCTAssertNil(viewModel.undoableSetID)
+
+            try await environment.controller.shutdownForTesting()
+        }
+
         // MARK: - Environment
 
         private struct Environment {

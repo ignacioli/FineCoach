@@ -31,7 +31,10 @@ struct ActiveSessionView: View {
     /// one). The scaled values below are only the first-frame fallback for
     /// a row not yet measured.
     @State private var measuredSetRowHeights: [StableUUID: CGFloat] = [:]
-    @ScaledMetric private var setRowHeight: CGFloat = 76
+    @ScaledMetric private var setRowHeight: CGFloat = 52
+    @ScaledMetric private var exerciseHeaderHeight: CGFloat = 52
+    /// The exercise whose row swipe asked to move it to a section (P0-D13).
+    @State private var movingExerciseID: StableUUID?
     @ScaledMetric private var setEditorExtraHeight: CGFloat = 460
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -173,6 +176,23 @@ struct ActiveSessionView: View {
                 Task { await viewModel.deleteSection(section, disposition: .deleteWithExercises) }
             }
         }
+        .confirmationDialog(
+            String(localized: "activeSession.moveToSection"),
+            isPresented: Binding(
+                get: { movingExerciseID != nil },
+                set: { if !$0 { movingExerciseID = nil } }
+            ),
+            presenting: movingExerciseID
+        ) { exerciseID in
+            Button(String(localized: "activeSession.unsectioned")) {
+                Task { await viewModel.moveExercise(exerciseID, toSectionID: nil) }
+            }
+            ForEach(viewModel.orderedSections) { section in
+                Button(section.name.value) {
+                    Task { await viewModel.moveExercise(exerciseID, toSectionID: section.id) }
+                }
+            }
+        }
         .onChange(of: viewModel.session?.state) { _, _ in
             pushSummaryIfReady()
         }
@@ -306,106 +326,102 @@ struct ActiveSessionView: View {
 
     private func exerciseCard(_ exercise: SessionExercise, index: Int) -> some View {
         VStack(alignment: .leading, spacing: FCPrimitives.space2) {
-            Button {
-                viewModel.selectExercise(exercise.id)
-            } label: {
-                HStack(spacing: FCPrimitives.space2) {
-                    // T065 / §7.1: 24×24, name starts 8pt after it; none for
-                    // custom exercises or unmapped equipment.
-                    if let icon = exercise.sourceID.flatMap({ FCEquipmentIcon.icon(forExerciseID: $0.rawValue) }) {
-                        FCEquipmentIconView(icon)
+            // The header and the sets share one non-scrolling `List` so the
+            // header can carry the row swipe (P0-D10, P0-D13): delete and
+            // move-to-section replace the old always-visible action row.
+            List {
+                exerciseHeader(exercise, index: index)
+                    .listRowInsets(EdgeInsets())
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(FCSemanticColors.surfacePage)
+                    .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { height in
+                        measuredSetRowHeights[exercise.id] = height
                     }
-                    Text(exercise.displayNameSnapshot.value)
-                        .fcFont(.exerciseTitle)
-                        .foregroundStyle(FCSemanticColors.textPrimary)
-                    Spacer(minLength: FCPrimitives.space2)
-                    exerciseTrailingCaption(exercise, index: index)
-                    if viewModel.selectedExerciseID == exercise.id {
-                        FCSymbol(.check)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        exerciseSwipeActions(exercise)
                     }
-                }
-                .frame(minHeight: 44)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier(FCAccessibilityID.exerciseAt(index))
-            .accessibilityLabel(
-                "\(exercise.displayNameSnapshot.value)，\(exerciseTrailingTitle(exercise))"
-            )
-            .accessibilityAddTraits(
-                viewModel.selectedExerciseID == exercise.id ? [.isSelected] : []
-            )
-
-            if !exercise.sets.isEmpty {
-                List {
-                    ForEach(Array(exercise.sets.enumerated()), id: \.element.id) { setIndex, trainingSet in
-                        setRow(trainingSet, index: setIndex, in: exercise)
-                            .listRowInsets(EdgeInsets())
-                            .listRowSeparator(.hidden)
-                            .listRowBackground(FCSemanticColors.surfacePage)
-                            .swipeActions(
-                                edge: .trailing,
-                                allowsFullSwipe: trainingSet.state != .completed
-                            ) {
-                                Button(role: .destructive) {
-                                    Task { await viewModel.removeSet(setID: trainingSet.id) }
-                                } label: {
-                                    Label(String(localized: "session.action.deleteSet"), systemImage: "trash")
-                                }
-                                .accessibilityIdentifier(FCAccessibilityID.setDeleteAt(setIndex))
+                ForEach(Array(exercise.sets.enumerated()), id: \.element.id) { setIndex, trainingSet in
+                    setRow(trainingSet, index: setIndex, in: exercise)
+                        .listRowInsets(EdgeInsets())
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(FCSemanticColors.surfacePage)
+                        .swipeActions(
+                            edge: .trailing,
+                            allowsFullSwipe: trainingSet.state != .completed
+                        ) {
+                            Button(role: .destructive) {
+                                Task { await viewModel.removeSet(setID: trainingSet.id) }
+                            } label: {
+                                Label(String(localized: "session.action.deleteSet"), systemImage: "trash")
                             }
-                    }
+                            .accessibilityIdentifier(FCAccessibilityID.setDeleteAt(setIndex))
+                        }
                 }
-                .listStyle(.plain)
-                .scrollDisabled(true)
-                .scrollContentBackground(.hidden)
-                .environment(\.defaultMinListRowHeight, 44)
-                .frame(height: setsListHeight(for: exercise))
             }
+            .listStyle(.plain)
+            .scrollDisabled(true)
+            .scrollContentBackground(.hidden)
+            .environment(\.defaultMinListRowHeight, 44)
+            .frame(height: listHeight(for: exercise))
 
             if viewModel.selectedExerciseID == exercise.id, viewModel.session?.state == .inProgress {
-                HStack(spacing: FCPrimitives.space4) {
-                    FCLinkButton(title: String(localized: "session.action.moveUp")) {
-                        Task { await viewModel.moveExercise(offset: -1) }
-                    }
-                    .accessibilityIdentifier(FCAccessibilityID.activeSessionMoveUp)
-
-                    FCLinkButton(title: String(localized: "session.action.moveDown")) {
-                        Task { await viewModel.moveExercise(offset: 1) }
-                    }
-                    .accessibilityIdentifier(FCAccessibilityID.activeSessionMoveDown)
-
-                    Button {
-                        viewModel.requestDeleteExercise()
-                    } label: {
-                        Text(String(localized: "session.action.deleteExercise"))
-                            .fcFont(.callout, weight: .semibold)
-                            .foregroundStyle(FCSemanticColors.statusDestructive)
-                            .frame(minHeight: 44)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier(FCAccessibilityID.activeSessionDeleteExercise)
-
-                    Menu {
-                        Button(String(localized: "activeSession.unsectioned")) {
-                            Task { await viewModel.moveExercise(exercise.id, toSectionID: nil) }
-                        }
-                        ForEach(viewModel.orderedSections) { section in
-                            Button(section.name.value) {
-                                Task { await viewModel.moveExercise(exercise.id, toSectionID: section.id) }
-                            }
-                        }
-                    } label: {
-                        Text(String(localized: "activeSession.moveToSection"))
-                            .fcFont(.callout, weight: .semibold)
-                            .foregroundStyle(FCSemanticColors.actionPrimary)
-                            .frame(minHeight: 44)
-                    }
-                }
                 SetEditor(viewModel: viewModel, exercise: exercise)
             }
             FCListRowDivider()
         }
+    }
+
+    @ViewBuilder
+    private func exerciseSwipeActions(_ exercise: SessionExercise) -> some View {
+        if viewModel.session?.state == .inProgress {
+            Button(role: .destructive) {
+                viewModel.requestDeleteExercise(exercise.id)
+            } label: {
+                Label(String(localized: "session.action.deleteExercise"), systemImage: "trash")
+            }
+            .accessibilityIdentifier(FCAccessibilityID.activeSessionDeleteExercise)
+            if !viewModel.orderedSections.isEmpty {
+                Button {
+                    movingExerciseID = exercise.id
+                } label: {
+                    Label(String(localized: "activeSession.moveToSection"), systemImage: "folder")
+                }
+                .tint(FCSemanticColors.textSecondary)
+                .accessibilityIdentifier(FCAccessibilityID.activeSessionMoveToSection)
+            }
+        }
+    }
+
+    private func exerciseHeader(_ exercise: SessionExercise, index: Int) -> some View {
+        Button {
+            viewModel.selectExercise(exercise.id)
+        } label: {
+            HStack(spacing: FCPrimitives.space2) {
+                // T065 / §7.1: 24×24, name starts 8pt after it; none for
+                // custom exercises or unmapped equipment.
+                if let icon = exercise.sourceID.flatMap({ FCEquipmentIcon.icon(forExerciseID: $0.rawValue) }) {
+                    FCEquipmentIconView(icon)
+                }
+                Text(exercise.displayNameSnapshot.value)
+                    .fcFont(.exerciseTitle)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                Spacer(minLength: FCPrimitives.space2)
+                exerciseTrailingCaption(exercise, index: index)
+                if viewModel.selectedExerciseID == exercise.id {
+                    FCSymbol(.check)
+                }
+            }
+            .frame(minHeight: 44)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier(FCAccessibilityID.exerciseAt(index))
+        .accessibilityLabel(
+            "\(exercise.displayNameSnapshot.value)，\(exerciseTrailingTitle(exercise))"
+        )
+        .accessibilityAddTraits(
+            viewModel.selectedExerciseID == exercise.id ? [.isSelected] : []
+        )
     }
 
     /// Shows a Section header immediately before the first Exercise that
@@ -557,7 +573,10 @@ struct ActiveSessionView: View {
                 onConfirm: trainingSet.state == .completed
                     ? nil
                     : { Task { await viewModel.confirmSet(setID: trainingSet.id) } },
-                onEdit: { viewModel.beginEditingSet(trainingSet) }
+                onEdit: { viewModel.beginEditingSet(trainingSet) },
+                onUndo: viewModel.undoableSetID == trainingSet.id
+                    ? { Task { await viewModel.undoRecentSet() } }
+                    : nil
             )
             .accessibilityIdentifier(FCAccessibilityID.setAt(index))
             .accessibilityAddTraits(.updatesFrequently)
@@ -578,10 +597,12 @@ struct ActiveSessionView: View {
         }
     }
 
-    /// Sum of the measured row heights (see `measuredSetRowHeights`); a
-    /// row not measured yet falls back to the scaled estimate.
-    private func setsListHeight(for exercise: SessionExercise) -> CGFloat {
-        exercise.sets.reduce(0) { total, trainingSet in
+    /// Header plus the sum of the measured set-row heights (see
+    /// `measuredSetRowHeights`); a row not measured yet falls back to the
+    /// scaled estimate.
+    private func listHeight(for exercise: SessionExercise) -> CGFloat {
+        let header = measuredSetRowHeights[exercise.id] ?? exerciseHeaderHeight
+        return exercise.sets.reduce(header) { total, trainingSet in
             if let measured = measuredSetRowHeights[trainingSet.id] {
                 return total + measured
             }
@@ -599,7 +620,7 @@ struct ActiveSessionView: View {
     }
 
     private func setTitle(_ set: TrainingSet, index: Int) -> String {
-        "\(String(localized: "session.set.label")) \(index + 1)"
+        String(format: String(localized: "session.set.ordinal"), index + 1)
     }
 
     private func setValue(_ set: TrainingSet) -> String {

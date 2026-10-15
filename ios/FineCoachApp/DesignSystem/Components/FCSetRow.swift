@@ -19,19 +19,22 @@ public struct FCSetRow: View {
     private let state: State
     private let onConfirm: (() -> Void)?
     private let onEdit: (() -> Void)?
+    private let onUndo: (() -> Void)?
 
     public init(
         title: String,
         value: String,
         state: State,
         onConfirm: (() -> Void)? = nil,
-        onEdit: (() -> Void)? = nil
+        onEdit: (() -> Void)? = nil,
+        onUndo: (() -> Void)? = nil
     ) {
         self.title = title
         self.value = value
         self.state = state
         self.onConfirm = onConfirm
         self.onEdit = onEdit
+        self.onUndo = onUndo
     }
 
     public var body: some View {
@@ -43,21 +46,35 @@ public struct FCSetRow: View {
             // steal their tap gestures (classic SwiftUI parent-gesture-wins
             // conflict), which is exactly what made both buttons dead on a
             // real device despite compiling and unit-testing fine.
-            VStack(alignment: .leading, spacing: FCPrimitives.space2) {
+            // One line, as D8 / P0-a draw it: title, then the value pushed
+            // toward the trailing status (experience P0 Δ5).
+            HStack(alignment: .firstTextBaseline, spacing: FCPrimitives.space2) {
                 Text(title)
                     .fcFont(.body)
                     .foregroundStyle(
-                        state == .completed ? FCSemanticColors.textPrimary : FCSemanticColors.textSecondary)
-                Text(value).fcFont(.callout, weight: .regular).foregroundStyle(FCSemanticColors.textSecondary)
+                        state == .completed ? FCSemanticColors.textPrimary : FCSemanticColors.textSecondary
+                    )
+                    .fixedSize()
+                Spacer(minLength: FCPrimitives.space2)
+                Text(value)
+                    .fcFont(.body)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
             .contentShape(Rectangle())
             .onLongPressGesture(minimumDuration: 0.5) {
                 onEdit?()
             }
-            Spacer(minLength: FCPrimitives.space2)
-            Text(state.rawValue)
-                .fcFont(.callout, weight: .regular)
-                .foregroundStyle(FCSemanticColors.textSecondary)
+            // A just-confirmed set offers undo in place of its status for a
+            // few seconds (P0-D11).
+            if let onUndo {
+                FCLinkButton(title: String(localized: "session.action.undo"), action: onUndo)
+            } else {
+                Text(state.rawValue)
+                    .fcFont(.callout, weight: .regular)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
+            }
             editControl
         }
         .padding(.vertical, FCPrimitives.space2)
@@ -70,6 +87,11 @@ public struct FCSetRow: View {
         }
         .accessibilityAction(named: Text(String(localized: "session.set.editAction"))) {
             onEdit?()
+        }
+        .accessibilityActions {
+            if let onUndo {
+                Button(String(localized: "session.action.undo"), action: onUndo)
+            }
         }
         .sensoryFeedback(.success, trigger: state) { old, new in
             new == .completed && old != .completed

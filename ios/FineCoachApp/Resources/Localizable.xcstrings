@@ -1346,35 +1346,13 @@
         }
       }
     },
-    "session.side.none": {
+    "session.set.ordinal": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "不区分左右"
-          }
-        }
-      }
-    },
-    "session.side.bilateral": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "左右侧"
-          }
-        }
-      }
-    },
-    "session.set.label": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "组"
+            "value": "第 %lld 组"
           }
         }
       }
@@ -1423,17 +1401,6 @@
         }
       }
     },
-    "session.action.addSet": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "添加组"
-          }
-        }
-      }
-    },
     "session.action.confirmSet": {
       "extractionState": "manual",
       "localizations": {
@@ -1445,28 +1412,6 @@
         }
       }
     },
-    "session.action.copyPrevious": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "复制上一组"
-          }
-        }
-      }
-    },
-    "session.action.copyLastSame": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "复制上次同动作"
-          }
-        }
-      }
-    },
     "session.action.undo": {
       "extractionState": "manual",
       "localizations": {
@@ -1474,28 +1419,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "撤销"
-          }
-        }
-      }
-    },
-    "session.action.moveUp": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "上移"
-          }
-        }
-      }
-    },
-    "session.action.moveDown": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "下移"
           }
         }
       }
