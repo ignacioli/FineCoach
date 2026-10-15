@@ -46,7 +46,8 @@ public struct FCSetRow: View {
             VStack(alignment: .leading, spacing: FCPrimitives.space2) {
                 Text(title)
                     .fcFont(.body)
-                    .foregroundStyle(state == .completed ? FCSemanticColors.textPrimary : FCSemanticColors.textSecondary)
+                    .foregroundStyle(
+                        state == .completed ? FCSemanticColors.textPrimary : FCSemanticColors.textSecondary)
                 Text(value).fcFont(.callout, weight: .regular).foregroundStyle(FCSemanticColors.textSecondary)
             }
             .contentShape(Rectangle())
@@ -70,27 +71,29 @@ public struct FCSetRow: View {
         .accessibilityAction(named: Text(String(localized: "session.set.editAction"))) {
             onEdit?()
         }
+        .sensoryFeedback(.success, trigger: state) { old, new in
+            new == .completed && old != .completed
+        }
     }
 
-    @ViewBuilder
+    /// The circle stays in one place so the 0.2s stroke-to-check transition
+    /// can run. The clear button is only there while the set can still be
+    /// confirmed.
     private var confirmControl: some View {
-        // Visual only: swapped the plain SF Symbol circle for the design
-        // system's FCSetStateCircle (§6), which distinguishes draft (dashed)
-        // from pending (solid stroke) — the confirm button wiring,
-        // accessibility hiding, and hit-area frame are unchanged.
-        if state.isConfirmable {
-            Button {
-                onConfirm?()
-            } label: {
-                FCSetStateCircle(circleState)
-                    .frame(minWidth: 44, minHeight: 44)
-            }
-            .accessibilityHidden(true)
-        } else {
+        ZStack {
             FCSetStateCircle(circleState)
-                .frame(minWidth: 44, minHeight: 44)
+            if state.isConfirmable {
+                Button {
+                    onConfirm?()
+                } label: {
+                    Color.clear
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(Rectangle())
+                }
                 .accessibilityHidden(true)
+            }
         }
+        .frame(minWidth: 44, minHeight: 44)
     }
 
     private var circleState: FCSetStateCircle.State {

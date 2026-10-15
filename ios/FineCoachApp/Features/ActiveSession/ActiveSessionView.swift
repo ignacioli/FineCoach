@@ -33,6 +33,7 @@ struct ActiveSessionView: View {
     @State private var measuredSetRowHeights: [StableUUID: CGFloat] = [:]
     @ScaledMetric private var setRowHeight: CGFloat = 76
     @ScaledMetric private var setEditorExtraHeight: CGFloat = 460
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     init(
         studentID: StableUUID,
@@ -120,6 +121,7 @@ struct ActiveSessionView: View {
                             onSkip: { viewModel.dismissRest() },
                             onDismiss: { viewModel.dismissRest() }
                         )
+                        .transition(restBarTransition)
                     }
                     FCButton(
                         title: String(localized: "session.action.finish"),
@@ -137,6 +139,7 @@ struct ActiveSessionView: View {
                 }
                 .padding(.horizontal, FCPrimitives.space4)
                 .padding(.vertical, FCPrimitives.space2)
+                .animation(.easeInOut(duration: 0.25), value: viewModel.restTimer != nil)
                 .background(FCSemanticColors.surfacePage)
             }
         }
@@ -603,18 +606,33 @@ struct ActiveSessionView: View {
         set.displaySummary
     }
 
+    /// P0 motion table: slide up on appear, fade on dismiss. Reduce Motion
+    /// keeps the fade and drops the slide.
+    private var restBarTransition: AnyTransition {
+        if reduceMotion {
+            return .opacity
+        }
+        return .asymmetric(
+            insertion: .move(edge: .bottom).combined(with: .opacity),
+            removal: .opacity
+        )
+    }
+
 }
 
 /// The between-sets rest bar (P0-a / P0-b, feature-owned `DS-REST-TIMER`).
 /// Sits above 结束训练. Running: caption, countdown, −15 / +15 / 跳过.
 /// Finished: "✓ 休息结束，可以开始下一组" and 关闭, then it dismisses itself
-/// `finishedHold` seconds after `endsAt`. Slide, fade and haptics are a
-/// later pass; the system notification is a later pass too.
+/// `finishedHold` seconds after `endsAt`. One `.warning` haptic when it
+/// finishes. The countdown rolls with `.numericText` unless Reduce Motion
+/// is on.
 struct RestTimerBar: View {
     let timer: RestTimerState
     let onAdjust: (TimeInterval) -> Void
     let onSkip: () -> Void
     let onDismiss: () -> Void
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 1)) { context in
@@ -625,6 +643,9 @@ struct RestTimerBar: View {
                 } else {
                     running(seconds: timer.remainingSeconds(at: context.date))
                 }
+            }
+            .sensoryFeedback(.warning, trigger: finished) { _, isFinished in
+                isFinished
             }
         }
         .task(id: timer.endsAt) {
@@ -651,6 +672,8 @@ struct RestTimerBar: View {
                     .fcFont(.numeralLarge)
                     .foregroundStyle(FCSemanticColors.textPrimary)
                     .monospacedDigit()
+                    .contentTransition(reduceMotion ? .identity : .numericText(countsDown: true))
+                    .animation(reduceMotion ? nil : .default, value: seconds)
                     .accessibilityLabel(Text(String(localized: "session.rest.title")))
                     .accessibilityValue(Text(RestTimerState.text(seconds: seconds)))
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionRestRemaining)
