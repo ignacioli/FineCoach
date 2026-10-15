@@ -6,6 +6,8 @@ import Foundation
 struct RestTimerState: Equatable {
     static let defaultDuration: TimeInterval = 120
     static let adjustmentStep: TimeInterval = 15
+    /// How long the ended state stays up before the bar dismisses itself (P0-b).
+    static let finishedHold: TimeInterval = 3
 
     private(set) var endsAt: Date
 
@@ -30,5 +32,11 @@ struct RestTimerState: Equatable {
     /// "1:45" / "0:07".
     static func text(seconds: Int) -> String {
         String(format: "%d:%02d", seconds / 60, seconds % 60)
+    }
+
+    /// Seconds from `now` until the bar should dismiss: the time still left,
+    /// plus `finishedHold` after `endsAt`. Already past the hold returns 0.
+    func autoDismissDelay(at now: Date) -> TimeInterval {
+        max(0, endsAt.addingTimeInterval(Self.finishedHold).timeIntervalSince(now))
     }
 }

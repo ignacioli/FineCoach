@@ -110,22 +110,32 @@ struct ActiveSessionView: View {
         }
         .safeAreaInset(edge: .bottom) {
             if viewModel.session?.state == .inProgress {
-                FCButton(
-                    title: String(localized: "session.action.finish"),
-                    isEnabled: viewModel.canCompleteSession
-                ) {
-                    UIApplication.shared.sendAction(
-                        #selector(UIResponder.resignFirstResponder),
-                        to: nil,
-                        from: nil,
-                        for: nil
-                    )
-                    viewModel.requestFinish()
+                VStack(spacing: FCPrimitives.space2) {
+                    if let restTimer = viewModel.restTimer {
+                        RestTimerBar(
+                            timer: restTimer,
+                            onAdjust: { viewModel.adjustRest(by: $0) },
+                            onSkip: { viewModel.dismissRest() },
+                            onDismiss: { viewModel.dismissRest() }
+                        )
+                    }
+                    FCButton(
+                        title: String(localized: "session.action.finish"),
+                        isEnabled: viewModel.canCompleteSession
+                    ) {
+                        UIApplication.shared.sendAction(
+                            #selector(UIResponder.resignFirstResponder),
+                            to: nil,
+                            from: nil,
+                            for: nil
+                        )
+                        viewModel.requestFinish()
+                    }
+                    .accessibilityIdentifier(FCAccessibilityID.activeSessionFinish)
                 }
                 .padding(.horizontal, FCPrimitives.space4)
                 .padding(.vertical, FCPrimitives.space2)
                 .background(FCSemanticColors.surfacePage)
-                .accessibilityIdentifier(FCAccessibilityID.activeSessionFinish)
             }
         }
         .scrollDismissesKeyboard(.interactively)
@@ -401,7 +411,9 @@ struct ActiveSessionView: View {
     /// already sorted by the unified `orderIndex` axis, so this only needs
     /// to detect the boundary where `sectionID` changes).
     @ViewBuilder
-    private func sectionHeaderIfNeeded(before exercise: SessionExercise, in session: Session, at index: Int) -> some View {
+    private func sectionHeaderIfNeeded(before exercise: SessionExercise, in session: Session, at index: Int)
+        -> some View
+    {
         let previousSectionID = index > 0 ? session.exercises[index - 1].sectionID : nil
         if let sectionID = exercise.sectionID, sectionID != previousSectionID,
             let section = viewModel.sections.first(where: { $0.id == sectionID })
@@ -461,10 +473,13 @@ struct ActiveSessionView: View {
             VStack(alignment: .leading, spacing: FCPrimitives.space3) {
                 if templateUseCases != nil {
                     HStack(spacing: FCPrimitives.space2) {
-                        FCFilterChip(title: String(localized: "session.add.tabLibrary"), isSelected: addTab == .library) {
+                        FCFilterChip(title: String(localized: "session.add.tabLibrary"), isSelected: addTab == .library)
+                        {
                             addTab = .library
                         }
-                        FCFilterChip(title: String(localized: "session.add.tabTemplate"), isSelected: addTab == .template) {
+                        FCFilterChip(
+                            title: String(localized: "session.add.tabTemplate"), isSelected: addTab == .template
+                        ) {
                             addTab = .template
                         }
                         .accessibilityIdentifier(FCAccessibilityID.activeSessionApplyTemplate)
@@ -571,6 +586,107 @@ struct ActiveSessionView: View {
         set.displaySummary
     }
 
+}
+
+/// The between-sets rest bar (P0-a / P0-b, feature-owned `DS-REST-TIMER`).
+/// Sits above 结束训练. Running: caption, countdown, −15 / +15 / 跳过.
+/// Finished: "✓ 休息结束，可以开始下一组" and 关闭, then it dismisses itself
+/// `finishedHold` seconds after `endsAt`. Slide, fade and haptics are a
+/// later pass; the system notification is a later pass too.
+struct RestTimerBar: View {
+    let timer: RestTimerState
+    let onAdjust: (TimeInterval) -> Void
+    let onSkip: () -> Void
+    let onDismiss: () -> Void
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 1)) { context in
+            let finished = timer.isFinished(at: context.date)
+            Group {
+                if finished {
+                    ended
+                } else {
+                    running(seconds: timer.remainingSeconds(at: context.date))
+                }
+            }
+        }
+        .task(id: timer.endsAt) {
+            let delay = timer.autoDismissDelay(at: Date())
+            if delay > 0 {
+                do {
+                    try await Task.sleep(for: .seconds(delay))
+                } catch {
+                    return
+                }
+            }
+            guard !Task.isCancelled else { return }
+            onDismiss()
+        }
+    }
+
+    private func running(seconds: Int) -> some View {
+        HStack(alignment: .center, spacing: FCPrimitives.space2) {
+            VStack(alignment: .leading, spacing: 0) {
+                Text(String(localized: "session.rest.title"))
+                    .fcFont(.caption)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
+                Text(RestTimerState.text(seconds: seconds))
+                    .fcFont(.numeralLarge)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                    .monospacedDigit()
+                    .accessibilityLabel(Text(String(localized: "session.rest.title")))
+                    .accessibilityValue(Text(RestTimerState.text(seconds: seconds)))
+                    .accessibilityIdentifier(FCAccessibilityID.activeSessionRestRemaining)
+            }
+            Spacer(minLength: FCPrimitives.space2)
+            FCLinkButton(title: String(localized: "session.rest.minus")) {
+                onAdjust(-RestTimerState.adjustmentStep)
+            }
+            .accessibilityIdentifier(FCAccessibilityID.activeSessionRestMinus)
+            FCLinkButton(title: String(localized: "session.rest.plus")) {
+                onAdjust(RestTimerState.adjustmentStep)
+            }
+            .accessibilityIdentifier(FCAccessibilityID.activeSessionRestPlus)
+            FCLinkButton(title: String(localized: "session.rest.skip")) {
+                onSkip()
+            }
+            .accessibilityIdentifier(FCAccessibilityID.activeSessionRestSkip)
+        }
+        .modifier(RestTimerChrome())
+        .accessibilityIdentifier(FCAccessibilityID.activeSessionRest)
+    }
+
+    private var ended: some View {
+        HStack(alignment: .center, spacing: FCPrimitives.space3) {
+            FCSymbol(.check)
+            Text(String(localized: "session.rest.ended"))
+                .fcFont(.headline)
+                .foregroundStyle(FCSemanticColors.textPrimary)
+                .lineLimit(2)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityIdentifier(FCAccessibilityID.activeSessionRestEnded)
+            FCLinkButton(title: String(localized: "session.rest.close")) {
+                onDismiss()
+            }
+            .accessibilityIdentifier(FCAccessibilityID.activeSessionRestClose)
+        }
+        .modifier(RestTimerChrome())
+        .accessibilityIdentifier(FCAccessibilityID.activeSessionRest)
+    }
+}
+
+/// Shared chrome for both rest-bar states: `surface.canvas`, `radius.lg`,
+/// height at least 64, inset `space.4`.
+private struct RestTimerChrome: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .padding(.horizontal, FCPrimitives.space4)
+            .frame(maxWidth: .infinity, minHeight: 64)
+            .background(
+                RoundedRectangle(cornerRadius: FCPrimitives.radiusLg)
+                    .fill(FCSemanticColors.surfaceCanvas)
+            )
+    }
 }
 
 /// "32:00" / "1:02:03" since the session started (display only; the

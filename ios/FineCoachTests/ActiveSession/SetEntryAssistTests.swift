@@ -1,5 +1,6 @@
-@testable import FineCoach
 import XCTest
+
+@testable import FineCoach
 
 /// Experience P0-D3/D4: weight steps ±2.5 kg and reps ±1 without leaving the
 /// valid range, and the rest countdown starts at 120 s, adjusts by 15 s and
@@ -64,5 +65,33 @@ final class SetEntryAssistTests: XCTestCase {
         XCTAssertEqual(RestTimerState.text(seconds: 105), "1:45")
         XCTAssertEqual(RestTimerState.text(seconds: 7), "0:07")
         XCTAssertEqual(RestTimerState.text(seconds: 120), "2:00")
+    }
+
+    func testStaysUpForThreeSecondsAfterItEnds() {
+        let timer = RestTimerState(startedAt: start)
+        XCTAssertEqual(timer.autoDismissDelay(at: start), 123, accuracy: 0.001)
+        let end = start.addingTimeInterval(RestTimerState.defaultDuration)
+        XCTAssertEqual(timer.autoDismissDelay(at: end), RestTimerState.finishedHold, accuracy: 0.001)
+        XCTAssertEqual(timer.autoDismissDelay(at: end.addingTimeInterval(1)), 2, accuracy: 0.001)
+        XCTAssertEqual(timer.autoDismissDelay(at: end.addingTimeInterval(3)), 0, accuracy: 0.001)
+        XCTAssertEqual(timer.autoDismissDelay(at: end.addingTimeInterval(10)), 0, accuracy: 0.001)
+    }
+
+    func testTrainingScreenPlacesTheRestBarAboveFinish() throws {
+        let url = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("FineCoachApp/Features/ActiveSession/ActiveSessionView.swift")
+        let source = try String(contentsOf: url, encoding: .utf8)
+        XCTAssertTrue(source.contains("RestTimerBar("))
+        XCTAssertTrue(source.contains("activeSessionRestMinus"))
+        XCTAssertTrue(source.contains("activeSessionRestPlus"))
+        XCTAssertTrue(source.contains("activeSessionRestSkip"))
+        XCTAssertTrue(source.contains("activeSessionRestClose"))
+        XCTAssertTrue(source.contains("session.rest.ended"))
+        let bar = try XCTUnwrap(source.range(of: "RestTimerBar("))
+        let finish = try XCTUnwrap(source.range(of: "session.action.finish"))
+        XCTAssertLessThan(bar.lowerBound, finish.lowerBound)
     }
 }

@@ -1159,6 +1159,72 @@
         }
       }
     },
+    "session.rest.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "组间休息"
+          }
+        }
+      }
+    },
+    "session.rest.minus": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "−15 秒"
+          }
+        }
+      }
+    },
+    "session.rest.plus": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+15 秒"
+          }
+        }
+      }
+    },
+    "session.rest.skip": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跳过"
+          }
+        }
+      }
+    },
+    "session.rest.ended": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "休息结束，可以开始下一组"
+          }
+        }
+      }
+    },
+    "session.rest.close": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭"
+          }
+        }
+      }
+    },
     "session.field.reps": {
       "extractionState": "manual",
       "localizations": {
