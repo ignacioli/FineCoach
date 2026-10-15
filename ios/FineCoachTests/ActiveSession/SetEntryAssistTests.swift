@@ -130,6 +130,43 @@ final class SetEntryAssistTests: XCTestCase {
         let removed = await center.removed
         XCTAssertEqual(removed, [[RestEndNotification.identifier], [RestEndNotification.identifier]])
     }
+
+    /// P0 motion table. The views are not rendered here; this pins the
+    /// moments, the two durations, and Reduce Motion to the approved table.
+    func testMotionTableIsWiredAtTheApprovedMoments() throws {
+        let circle = try source("FineCoachApp/DesignSystem/Components/FCSetStateCircle.swift")
+        XCTAssertTrue(circle.contains("accessibilityReduceMotion"))
+        XCTAssertTrue(circle.contains(".easeInOut(duration: 0.2)"))
+
+        let row = try source("FineCoachApp/DesignSystem/Components/FCSetRow.swift")
+        XCTAssertTrue(row.contains(".sensoryFeedback(.success, trigger: state)"))
+        XCTAssertTrue(row.contains("new == .completed && old != .completed"))
+
+        let stepper = try source("FineCoachApp/DesignSystem/Components/FCStepper.swift")
+        let fieldStart = try XCTUnwrap(stepper.range(of: "struct FCStepperField"))
+        XCTAssertFalse(stepper[..<fieldStart.lowerBound].contains("sensoryFeedback"))
+        let field = stepper[fieldStart.lowerBound...]
+        XCTAssertTrue(field.contains(".sensoryFeedback(.selection, trigger: selectionTick)"))
+        XCTAssertTrue(field.contains(".numericText(countsDown: true)"))
+        XCTAssertTrue(field.contains("accessibilityReduceMotion"))
+
+        let session = try source("FineCoachApp/Features/ActiveSession/ActiveSessionView.swift")
+        XCTAssertTrue(session.contains(".move(edge: .bottom).combined(with: .opacity)"))
+        XCTAssertTrue(session.contains("removal: .opacity"))
+        XCTAssertTrue(session.contains(".easeInOut(duration: 0.25)"))
+        XCTAssertTrue(session.contains(".sensoryFeedback(.warning, trigger: finished)"))
+        XCTAssertTrue(session.contains(".numericText(countsDown: true)"))
+        XCTAssertTrue(session.contains("accessibilityReduceMotion"))
+    }
+
+    private func source(_ relativePath: String) throws -> String {
+        let url = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent(relativePath)
+        return try String(contentsOf: url, encoding: .utf8)
+    }
 }
 
 private actor RecordingNotificationCenter: LocalNotificationScheduling {

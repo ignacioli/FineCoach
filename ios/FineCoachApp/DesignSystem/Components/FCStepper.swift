@@ -87,6 +87,8 @@ public struct FCStepperField: View {
     private let onIncrement: () -> Void
 
     @FocusState private var isEditing: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var selectionTick = 0
 
     /// Leading inset that lines a caption up with this field inside an
     /// `FCLabelValueRow` (the P0 step hint sits under the value column).
@@ -121,26 +123,46 @@ public struct FCStepperField: View {
                 isEnabled: canDecrement,
                 identifier: decrementIdentifier,
                 label: String(format: String(localized: "session.stepper.decrementFormat"), title),
-                action: onDecrement
+                action: {
+                    selectionTick += 1
+                    onDecrement()
+                }
             )
-            TextField("", text: text)
-                .keyboardType(keyboardType)
-                .fcFont(.numeralLarge)
-                .foregroundStyle(FCSemanticColors.textPrimary)
-                .monospacedDigit()
-                .multilineTextAlignment(.center)
-                .focused($isEditing)
-                .frame(maxWidth: .infinity, minHeight: 44)
-                .accessibilityLabel(Text(title))
-                .accessibilityIdentifier(fieldIdentifier)
+            ZStack {
+                Text(text.wrappedValue)
+                    .fcFont(.numeralLarge)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                    .monospacedDigit()
+                    .contentTransition(reduceMotion ? .identity : .numericText(countsDown: true))
+                    .animation(reduceMotion ? nil : .default, value: selectionTick)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .opacity(isEditing ? 0 : 1)
+                    .accessibilityHidden(true)
+                    .allowsHitTesting(false)
+                TextField("", text: text)
+                    .keyboardType(keyboardType)
+                    .fcFont(.numeralLarge)
+                    .foregroundStyle(isEditing ? FCSemanticColors.textPrimary : Color.clear)
+                    .monospacedDigit()
+                    .multilineTextAlignment(.center)
+                    .focused($isEditing)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .accessibilityLabel(Text(title))
+                    .accessibilityIdentifier(fieldIdentifier)
+            }
+            .frame(maxWidth: .infinity, minHeight: 44)
             glyphButton(
                 .plus,
                 isEnabled: true,
                 identifier: incrementIdentifier,
                 label: String(format: String(localized: "session.stepper.incrementFormat"), title),
-                action: onIncrement
+                action: {
+                    selectionTick += 1
+                    onIncrement()
+                }
             )
         }
+        .sensoryFeedback(.selection, trigger: selectionTick)
         .frame(maxWidth: .infinity, minHeight: 48)
         .background(Capsule().fill(FCSemanticColors.surfaceCanvas))
         .overlay {
