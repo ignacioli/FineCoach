@@ -94,4 +94,58 @@ final class SetEntryAssistTests: XCTestCase {
         let finish = try XCTUnwrap(source.range(of: "session.action.finish"))
         XCTAssertLessThan(bar.lowerBound, finish.lowerBound)
     }
+
+    func testRestEndNotificationIsGenericAndTracksTheEnd() {
+        XCTAssertNil(RestEndNotification.scheduler(arguments: ["-FineCoachUITesting"]))
+        XCTAssertNotNil(RestEndNotification.scheduler(arguments: []))
+
+        XCTAssertEqual(RestEndNotification.plan(endsAt: nil, now: start), .remove)
+        let ended = start.addingTimeInterval(120)
+        XCTAssertEqual(RestEndNotification.plan(endsAt: ended, now: ended), .remove)
+
+        let plan = RestEndNotification.plan(endsAt: ended, now: start)
+        guard case .schedule(let descriptor) = plan else {
+            return XCTFail("expected a scheduled notification")
+        }
+        XCTAssertEqual(descriptor.identifier, RestEndNotification.identifier)
+        XCTAssertEqual(descriptor.fireDate, ended)
+        XCTAssertEqual(descriptor.title, String(localized: "session.rest.notificationTitle"))
+        XCTAssertEqual(descriptor.body, String(localized: "session.rest.notificationBody"))
+        XCTAssertFalse(descriptor.title.contains("%"))
+        XCTAssertFalse(descriptor.body.contains("%"))
+        XCTAssertFalse(descriptor.identifier.localizedCaseInsensitiveContains("student"))
+    }
+
+    func testRestEndNotificationReplacesThenRemoves() async {
+        let center = RecordingNotificationCenter()
+        let fire = start.addingTimeInterval(120)
+        let plan = RestEndNotification.plan(endsAt: fire, now: start)
+        await RestEndNotification.apply(plan, with: center)
+        let scheduled = await center.scheduled
+        let authorizationRequests = await center.authorizationRequests
+        XCTAssertEqual(scheduled.map(\.fireDate), [fire])
+        XCTAssertEqual(authorizationRequests, 1)
+
+        await RestEndNotification.apply(.remove, with: center)
+        let removed = await center.removed
+        XCTAssertEqual(removed, [[RestEndNotification.identifier], [RestEndNotification.identifier]])
+    }
+}
+
+private actor RecordingNotificationCenter: LocalNotificationScheduling {
+    private(set) var authorizationRequests = 0
+    private(set) var scheduled: [NotificationRequestDescriptor] = []
+    private(set) var removed: [[String]] = []
+
+    func requestAuthorizationIfNeeded() async {
+        authorizationRequests += 1
+    }
+
+    func schedule(_ descriptor: NotificationRequestDescriptor) async throws {
+        scheduled.append(descriptor)
+    }
+
+    func removePending(identifiers: [String]) async {
+        removed.append(identifiers)
+    }
 }

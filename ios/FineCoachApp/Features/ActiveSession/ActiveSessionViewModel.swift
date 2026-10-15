@@ -81,7 +81,9 @@ final class ActiveSessionViewModel: ObservableObject {
     let templateUseCases: TemplateUseCases?
     private let creditSettlement: SessionCreditSettlement?
     private let signposts: PerformanceSignposts
+    private let notifications: (any LocalNotificationScheduling)?
     private let now: () -> Date
+    private var restNotificationTask: Task<Void, Never>?
     private var catalogSearchGeneration = 0
     private var catalogSearchTask: Task<Void, Never>?
     /// The set most recently created via the bottom "add set" form, so
@@ -95,6 +97,7 @@ final class ActiveSessionViewModel: ObservableObject {
         templateUseCases: TemplateUseCases? = nil,
         creditSettlement: SessionCreditSettlement? = nil,
         signposts: PerformanceSignposts = .shared,
+        notifications: (any LocalNotificationScheduling)? = nil,
         now: @escaping () -> Date = Date.init
     ) {
         self.studentID = studentID
@@ -102,6 +105,7 @@ final class ActiveSessionViewModel: ObservableObject {
         self.templateUseCases = templateUseCases
         self.creditSettlement = creditSettlement
         self.signposts = signposts
+        self.notifications = notifications
         self.now = now
     }
 
@@ -529,6 +533,7 @@ final class ActiveSessionViewModel: ObservableObject {
             // must not turn that into a visible failure.
             try? await self.creditSettlement?.settleAbandonedSession(abandoned)
             self.session = abandoned
+            self.clearRest()
         }
     }
 
@@ -560,6 +565,7 @@ final class ActiveSessionViewModel: ObservableObject {
         // coach has answered (M1B-FR-013/014).
         creditPrompt = await settleCredits(for: finished)
         session = finished
+        clearRest()
     }
 
     /// The Session is already completed when this runs, so a settlement
@@ -681,14 +687,37 @@ final class ActiveSessionViewModel: ObservableObject {
 
     func adjustRest(by seconds: TimeInterval) {
         restTimer?.adjust(by: seconds, now: now())
+        syncRestNotification()
     }
 
     func dismissRest() {
-        restTimer = nil
+        clearRest()
     }
 
     private func startRest() {
         restTimer = RestTimerState(startedAt: now())
+        syncRestNotification()
+    }
+
+    /// Drops the in-app bar and the pending end notification together.
+    private func clearRest() {
+        restTimer = nil
+        syncRestNotification()
+    }
+
+    /// P0-D5: one generic local notification at the rest end. +15 / −15
+    /// replace it; skip, dismiss, abandon, and finish remove it. Requests
+    /// permission only through the existing not-yet-determined path.
+    private func syncRestNotification() {
+        guard let notifications else {
+            return
+        }
+        let plan = RestEndNotification.plan(endsAt: restTimer?.endsAt, now: now())
+        let previous = restNotificationTask
+        restNotificationTask = Task { @MainActor in
+            _ = await previous?.value
+            await RestEndNotification.apply(plan, with: notifications)
+        }
     }
 
     /// Fills the bottom form for `exercise` (P0-D1/D2): the latest set
