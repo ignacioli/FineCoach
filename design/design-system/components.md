@@ -125,7 +125,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 | `DS-SEGMENTED` | `FCSegmentedSwitch` | §8 顶部分段切换；37；§10 C11 | RootNavigation、Trends、BodyMeasurementEntry、ManualCreditAdjustment | 稳定 |
 | `DS-CHIP` | `FCFilterChip`、`FCBodyPartChip`、`FCBodyPartPicker`、`FCFlowLayout` | §8 筛选胶囊；§8.1 部位多选胶囊 | 筛选胶囊 7 个文件；部位选择 3 个 | 稳定 |
 | `DS-TOGGLE` | `FCToggleStyle` | §8 开关；O7 | 4 个文件 | 稳定 |
-| `DS-STEPPER` | `FCStepper`、`FCStepperField` | §8.1 数字步进器；36/37；P0-a/P0-b 可输入变体 | CoursePackageEditor、ManualCreditAdjustment、ActiveSession | 扩展（可输入变体已实现；README §8.1 与 Penpot 标注待同步） |
+| `DS-STEPPER` | `FCStepper`、`FCStepperField` | §8.1 数字步进器；36/37；P0-a/P0-b 可输入变体 | CoursePackageEditor、ManualCreditAdjustment、ActiveSession | 稳定（可输入变体已回填 README §8.1；Penpot P0-a/P0-b 2026-10-14 已批准） |
 | `DS-TEXT-FIELD` | `FCTextField`、`FCSearchField` | §8 输入框、搜索框 | 输入框 14 个文件；搜索框 2 个 | 稳定 |
 | `DS-LIST-ROW` | `FCListRow`、`FCListGroupRow`、`FCListRowDivider` | §8 列表行；§6 分割线；M2 扩展（§4.7） | 分割线 26 个文件；`FCListRow` 0 个（M2 新页面使用） | 扩展已实现（M2 T004）；其余见 CG-1 |
 | `DS-SECTION` | `FCSectionLabel`、`FCGroupEntryRow` | §8 区段标签；§8.1 列表分组入口行 | 区段标签 14 个文件；分组入口 2 个 | 稳定 |
