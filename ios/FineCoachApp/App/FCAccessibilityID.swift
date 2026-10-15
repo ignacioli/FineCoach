@@ -418,6 +418,14 @@ public enum FCAccessibilityID {
         "activeSession.exercise.at.\(index)"
     }
 
+    public static func exerciseLastReference(_ index: Int) -> String {
+        "activeSession.exercise.last.\(index)"
+    }
+
+    public static func exerciseMode(_ index: Int) -> String {
+        "activeSession.exercise.mode.\(index)"
+    }
+
     public static func setAt(_ index: Int) -> String {
         "activeSession.set.at.\(index)"
     }

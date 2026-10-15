@@ -11,6 +11,18 @@ public struct LastExercisePerformance: Hashable, Sendable {
     public let sets: [TrainingSet]
 
     public var firstSet: TrainingSet { sets[0] }
+
+    /// P0-a / P0-b trailing caption: "上次 120 kg × 8 · 4 组". The first
+    /// completed set uses the shared set summary; the count is every
+    /// completed set in that session. Matching stays in the lookup.
+    public var referenceText: String {
+        String(
+            format: String(localized: "session.lastReferenceFormat"),
+            locale: Locale(identifier: "en_US_POSIX"),
+            firstSet.displaySummary,
+            sets.count
+        )
+    }
 }
 
 /// Indexes a Student's completed history once so the active Session can look

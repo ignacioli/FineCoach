@@ -1236,6 +1236,17 @@
         }
       }
     },
+    "session.lastReferenceFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上次 %@ · %d 组"
+          }
+        }
+      }
+    },
     "session.rest.notificationBody": {
       "extractionState": "manual",
       "localizations": {
