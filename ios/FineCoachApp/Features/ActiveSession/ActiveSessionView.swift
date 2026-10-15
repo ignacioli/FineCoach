@@ -148,6 +148,17 @@ struct ActiveSessionView: View {
         }
         .scrollDismissesKeyboard(.interactively)
         .background(FCSemanticColors.surfacePage)
+        .overlay(alignment: .top) {
+            // Δ7: with the navigation bar hidden nothing backs the status
+            // bar, so scrolled content showed under the time and signal.
+            // A zero-height strip that ignores the top safe area grows to
+            // exactly the status bar and covers it with the page color.
+            FCSemanticColors.surfacePage
+                .frame(height: 0)
+                .ignoresSafeArea(edges: .top)
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+        }
         .fcSecondaryPage()
         .fcBottomSheet(isPresented: $viewModel.isAddingExercise) {
             addExerciseSheet

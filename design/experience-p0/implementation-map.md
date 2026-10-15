@@ -66,7 +66,7 @@ agent 按上述决定补充的细节（产品负责人在 P0-a2 画稿上确认�
 | Δ4 | 动作操作行 | 选中动作下面一行「上移 / 下移 / 删除动作 / 移入分区」 | 去掉整行；删除和移入分区放进动作行左滑 | P0-D9、D10、D13 | 改 |
 | Δ5 | 组行 | 两行：「组 1」上、「17.5 kg × 12」下 | 一行：「第 1 组　17.5 kg × 12　已完成　铅笔」 | P0-a | 改 |
 | Δ6 | 修改组时的「取消」 | 系统蓝色 `Button` | `FCLinkButton` | README 色板（不允许系统蓝） | 改 |
-| Δ7 | 页面顶部 | 内容滚到状态栏下面，和时间、信号叠在一起 | 状态栏区域用页面底色遮住 | 人工验收截图 | 改（查清原因后修） |
+| Δ7 | 页面顶部 | 内容滚到状态栏下面，和时间、信号叠在一起 | 状态栏区域用页面底色遮住 | 人工验收截图 | 已改：原因是 `fcSecondaryPage()` 隐藏了导航栏，状态栏下面没有底色；训练页加一条页面底色的条带盖住状态栏。其余 28 个用 `fcSecondaryPage()` 的页面有同样问题，部分顶部是深色卡片，统一修法记入 T2 |
 | Δ8 | 分区标题的「删除分区」 | 红色小字常驻 | 不变 | P0-a 未画分区；属于 T2 收敛 | 不改，记入 T2 |
 | Δ9 | 时长、有氧模式的输入 | 文本输入框 | 不变 | 本轮只改重量 × 次数和仅次数 | 不改 |
 | Δ10 | 动作行右侧、组状态圆圈、休息条、结束训练 | 已按 P0-a/P0-b 实现 | 不变 | P0-a、P0-b | 不改 |
@@ -114,7 +114,7 @@ agent 按上述决定补充的细节（产品负责人在 P0-a2 画稿上确认�
 影响范围：DS-STEPPER 扩展（新变体 FCStepperField；现有的 FCStepper 和它的两个消费者不变）；新增 DS-REST-TIMER（feature 专有，只有 ActiveSession 使用）；动作行右侧的「上次」文字由 feature 拼装，用 caption 字号和 text.secondary 颜色，不新增组件。需要同步的文件：components.md §3/§4、README §8.1、Penpot、导出图。
 设计决定：沿用 D8 的布局和 DS-BUTTON；DS-SET-ROW 改为一行（Δ5）。新的决定是 P0-D1–D13 加上述补充细节。2026-10-15 人工验收发现第一轮实现只加不减，按「训练页精简」决定和差异清单返工。Review 状态：产品负责人 2026-10-14 审核通过 P0-a、P0-b，并新增 P0-D5（系统通知）、P0-D6（下限）、P0-D7（「上次」的匹配规则）。
 实施与验证：逻辑层已实现（LastExercisePerformanceLookup、SetValueStepping、RestTimerState、ActiveSessionUseCases.lastPerformances、ActiveSessionViewModel 的带入、步进、休息计时）。测试：LastExercisePerformanceLookupTests 6 个、SetEntryAssistTests、ActiveSessionSetEntryPrefillTests 3 个。界面：`FCStepperField` 已接到重量和次数（P0-D4 / P0-D6）。休息条 `RestTimerBar` 已放在「结束训练」上方（P0-D3）。休息结束系统通知已接上（P0-D5）。动作行右侧在有上次记录时显示「上次 {第一组} · {组数} 组」（P0-D1，匹配仍是 P0-D7，没有改规则）；没有上次记录时仍显示记录模式。动效和触感已接上动效表：确认一组 0.2 秒加 `.success`；步进 `.numericText` 加 `.selection`；休息条滑入、淡出 0.25 秒；倒计时 `.numericText`；休息结束一次 `.warning`。减弱动态效果时数字和圆圈直接切换，休息条只淡入淡出。README §8.1 与 Penpot 已同步（P0-a、P0-b 标题改为已批准，图层写入 plugin data；快照见 README §1.5）。入口与布局清单见下文。
-结果：逻辑层 PASS（2026-10-14 全量测试：FineCoachTests 465、FineCoachIntegrationTests 157，iPhone Air 模拟器）。`FCStepperField`、休息条、休息结束通知、「上次」文字和动效触感已实现。2026-10-15 人工验收：FAIL（按钮过多、路径过多、系统蓝色文字），按差异清单 Δ1–Δ11 返工中。Penpot 回填见 README §1.5，`File.validate()` 0 个错误。
+结果：逻辑层 PASS（2026-10-14 全量测试：FineCoachTests 465、FineCoachIntegrationTests 157，iPhone Air 模拟器）。`FCStepperField`、休息条、休息结束通知、「上次」文字和动效触感已实现。2026-10-15 人工验收：FAIL（按钮过多、路径过多、系统蓝色文字），按差异清单 Δ1–Δ11 返工。返工后（2026-10-15，`0b4e74a`、`0e27b22` 及 Δ7 提交）：FineCoachTests 481（1 个按设计跳过）、FineCoachIntegrationTests 162 全部通过，iPhone Air 模拟器；Δ1–Δ7 已改，Δ11 已在 Penpot 改。待人工验收。Penpot 回填见 README §1.5，`File.validate()` 0 个错误。
 ```
 
 ## Feature 专有组件
