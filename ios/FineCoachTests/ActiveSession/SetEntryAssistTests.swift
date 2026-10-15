@@ -159,6 +159,46 @@ final class SetEntryAssistTests: XCTestCase {
         XCTAssertTrue(session.contains("accessibilityReduceMotion"))
     }
 
+    /// The entry map has to name the real identifiers. A control that exists
+    /// only in the view, or only in the map, is the defect this list exists
+    /// to catch.
+    func testEntryMapNamesTheNewControls() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let map = try String(
+            contentsOf: root.appendingPathComponent("design/experience-p0/implementation-map.md"),
+            encoding: .utf8
+        )
+        let identifiers = try String(
+            contentsOf: root.appendingPathComponent("ios/FineCoachApp/App/FCAccessibilityID.swift"),
+            encoding: .utf8
+        )
+        let keys = [
+            "activeSession.weight",
+            "activeSession.weight.decrement",
+            "activeSession.weight.increment",
+            "activeSession.reps",
+            "activeSession.reps.decrement",
+            "activeSession.reps.increment",
+            "activeSession.weightStepHint",
+            "activeSession.exercise.last.",
+            "activeSession.exercise.mode.",
+            "activeSession.rest",
+            "activeSession.rest.minus",
+            "activeSession.rest.plus",
+            "activeSession.rest.skip",
+            "activeSession.rest.ended",
+            "activeSession.rest.close",
+        ]
+        for key in keys {
+            XCTAssertTrue(map.contains(key), "map missing \(key)")
+            XCTAssertTrue(identifiers.contains(key), "identifier missing \(key)")
+        }
+    }
+
     private func source(_ relativePath: String) throws -> String {
         let url = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()

@@ -58,7 +58,7 @@ P0-a、P0-b 画稿：产品负责人 2026-10-14 审核通过。
 分类与依据：B 类（修订已批准的 30-training-v2 / Penpot「D8 训练中」）。新增 DS-REST-TIMER，并给 DS-STEPPER 增加可输入的变体，这两项属于 A 类小组件。修订稿是 Penpot「M1-B G5 Design」/ Foundations 页上的 P0-a、P0-b 画板（x=6050 / 6490，y=3750）。
 影响范围：DS-STEPPER 扩展（新变体 FCStepperField；现有的 FCStepper 和它的两个消费者不变）；新增 DS-REST-TIMER（feature 专有，只有 ActiveSession 使用）；动作行右侧的「上次」文字由 feature 拼装，用 caption 字号和 text.secondary 颜色，不新增组件。需要同步的文件：components.md §3/§4、README §8.1、Penpot、导出图。
 设计决定：沿用 D8 的布局和 DS-SET-ROW、DS-BUTTON。新的决定是 P0-D1–D7 加上述补充细节。Review 状态：产品负责人 2026-10-14 审核通过 P0-a、P0-b，并新增 P0-D5（系统通知）、P0-D6（下限）、P0-D7（「上次」的匹配规则）。
-实施与验证：逻辑层已实现（LastExercisePerformanceLookup、SetValueStepping、RestTimerState、ActiveSessionUseCases.lastPerformances、ActiveSessionViewModel 的带入、步进、休息计时）。测试：LastExercisePerformanceLookupTests 6 个、SetEntryAssistTests、ActiveSessionSetEntryPrefillTests 3 个。界面：`FCStepperField` 已接到重量和次数（P0-D4 / P0-D6）。休息条 `RestTimerBar` 已放在「结束训练」上方（P0-D3）。休息结束系统通知已接上（P0-D5）。动作行右侧在有上次记录时显示「上次 {第一组} · {组数} 组」（P0-D1，匹配仍是 P0-D7，没有改规则）；没有上次记录时仍显示记录模式。动效和触感已接上动效表：确认一组 0.2 秒加 `.success`；步进 `.numericText` 加 `.selection`；休息条滑入、淡出 0.25 秒；倒计时 `.numericText`；休息结束一次 `.warning`。减弱动态效果时数字和圆圈直接切换，休息条只淡入淡出。README §8.1 与 Penpot 已同步（P0-a、P0-b 标题改为已批准，图层写入 plugin data；快照见 README §1.5）。entry 和 layout map 还没做。
+实施与验证：逻辑层已实现（LastExercisePerformanceLookup、SetValueStepping、RestTimerState、ActiveSessionUseCases.lastPerformances、ActiveSessionViewModel 的带入、步进、休息计时）。测试：LastExercisePerformanceLookupTests 6 个、SetEntryAssistTests、ActiveSessionSetEntryPrefillTests 3 个。界面：`FCStepperField` 已接到重量和次数（P0-D4 / P0-D6）。休息条 `RestTimerBar` 已放在「结束训练」上方（P0-D3）。休息结束系统通知已接上（P0-D5）。动作行右侧在有上次记录时显示「上次 {第一组} · {组数} 组」（P0-D1，匹配仍是 P0-D7，没有改规则）；没有上次记录时仍显示记录模式。动效和触感已接上动效表：确认一组 0.2 秒加 `.success`；步进 `.numericText` 加 `.selection`；休息条滑入、淡出 0.25 秒；倒计时 `.numericText`；休息结束一次 `.warning`。减弱动态效果时数字和圆圈直接切换，休息条只淡入淡出。README §8.1 与 Penpot 已同步（P0-a、P0-b 标题改为已批准，图层写入 plugin data；快照见 README §1.5）。入口与布局清单见下文。
 结果：逻辑层 PASS（2026-10-14 全量测试：FineCoachTests 465、FineCoachIntegrationTests 157，iPhone Air 模拟器）。`FCStepperField`、休息条、休息结束通知、「上次」文字和动效触感已实现，定向测试见当次提交；还没有人看过界面。Penpot 回填见 README §1.5，`File.validate()` 0 个错误。
 ```
 
@@ -78,6 +78,29 @@ P0-a、P0-b 画稿：产品负责人 2026-10-14 审核通过。
 ### `DS-LAST-REF` 上次参考
 
 不是独立组件。动作行右侧用 `caption`、`text.secondary` 拼一行。有上次记录时为「上次 {第一组} · {组数} 组」；没有时仍显示记录模式。匹配规则是 P0-D7，不在这里改。
+
+## 入口与布局清单
+
+格式按 `components.md` §1.4。只列本轮新增的交互。确认一组、添加组、复制和撤销是原有入口，不在这里重复。步进改的是输入草稿，点「确认」之前不会变成已完成组。
+
+```text
+训练中 → 重量输入（重量 kg）→ activeSession.weight → 改输入草稿 → FCStepperField 与 FCLabelValueRow 都有 .frame(maxWidth: .infinity)
+训练中 → 重量「−」→ activeSession.weight.decrement → 改输入草稿 → 点击区 44；行宽由 FCStepperField 撑满
+训练中 → 重量「+」→ activeSession.weight.increment → 改输入草稿 → 点击区 44；行宽由 FCStepperField 撑满
+训练中 → 次数输入 → activeSession.reps → 改输入草稿 → FCStepperField 与 FCLabelValueRow 都有 .frame(maxWidth: .infinity)；仅次数模式用同一入口，没有步进说明
+训练中 → 次数「−」→ activeSession.reps.decrement → 改输入草稿 → 点击区 44；行宽由 FCStepperField 撑满
+训练中 → 次数「+」→ activeSession.reps.increment → 改输入草稿 → 点击区 44；行宽由 FCStepperField 撑满
+训练中 → 步进说明「每次 ±2.5 kg · 点数字可直接输入」→ activeSession.weightStepHint → 否 → 说明自身 .frame(maxWidth: .infinity)；只在重量 × 次数时出现
+训练中 → 动作行右侧「上次 …」→ activeSession.exercise.last.<index> → 否 → 页面内容 .frame(maxWidth: .infinity)，行内 Spacer 把文字留在右侧
+训练中 → 动作行右侧记录模式（没有上次记录时）→ activeSession.exercise.mode.<index> → 否 → 与上一行同一个容器
+训练中 → 组间休息条 → activeSession.rest → 否（容器）→ RestTimerChrome .frame(maxWidth: .infinity, minHeight: 64)
+训练中 → 「−15 秒」→ activeSession.rest.minus → 改休息结束时间，不写入训练记录 → 按钮按文字宽度；条由 RestTimerChrome 撑满
+训练中 → 「+15 秒」→ activeSession.rest.plus → 改休息结束时间，不写入训练记录 → 按钮按文字宽度；条由 RestTimerChrome 撑满
+训练中 → 「跳过」→ activeSession.rest.skip → 收起休息条，不写入训练记录 → 按钮按文字宽度；条由 RestTimerChrome 撑满
+训练中 → 「休息结束，可以开始下一组」→ activeSession.rest.ended → 否 → 文字自身 .frame(maxWidth: .infinity)
+训练中 → 「关闭」→ activeSession.rest.close → 收起休息条，不写入训练记录 → 按钮按文字宽度；条由 RestTimerChrome 撑满
+系统通知 → 无 App 内控件 → 无 → 否；文案只有「休息结束 / 可以开始下一组了」，不含学员、动作或重量 → 不适用
+```
 
 ## 画板说明
 
