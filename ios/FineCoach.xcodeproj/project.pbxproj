@@ -86,6 +86,7 @@
 		B237 /* ExerciseIdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A237 /* ExerciseIdentityTests.swift */; };
 		B238 /* ExerciseProvenanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A238 /* ExerciseProvenanceTests.swift */; };
 		B723 /* ExercisePreferenceAssistedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A723 /* ExercisePreferenceAssistedTests.swift */; };
+		B979 /* ExercisePreferenceUnilateralTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A979 /* ExercisePreferenceUnilateralTests.swift */; };
 		B730 /* TrendsViewPointLabelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A730 /* TrendsViewPointLabelTests.swift */; };
 		B190 /* ActiveSessionRecoverySnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A190 /* ActiveSessionRecoverySnapshot.swift */; };
 		B191 /* ActiveSessionRecoveryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A191 /* ActiveSessionRecoveryStore.swift */; };
@@ -156,6 +157,7 @@
 		B507 /* V1ToV2MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A505 /* V1ToV2MigrationTests.swift */; };
 		B945 /* V2ToV3MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A945 /* V2ToV3MigrationTests.swift */; };
 		B9F2 /* V3ToV4MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9F2 /* V3ToV4MigrationTests.swift */; };
+		B978 /* V4ToV5MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A978 /* V4ToV5MigrationTests.swift */; };
 		B220 /* SetupSmokeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A220 /* SetupSmokeUITests.swift */; };
 		BF01 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F001 /* Foundation.framework */; };
 		BF02 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F002 /* SwiftUI.framework */; };
@@ -507,6 +509,7 @@
 		A505 /* V1ToV2MigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V1ToV2MigrationTests.swift; sourceTree = "<group>"; };
 		A945 /* V2ToV3MigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V2ToV3MigrationTests.swift; sourceTree = "<group>"; };
 		A9F2 /* V3ToV4MigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V3ToV4MigrationTests.swift; sourceTree = "<group>"; };
+		A978 /* V4ToV5MigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V4ToV5MigrationTests.swift; sourceTree = "<group>"; };
 		A220 /* SetupSmokeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupSmokeUITests.swift; sourceTree = "<group>"; };
 		F001 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		F002 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -611,6 +614,7 @@
 		A237 /* ExerciseIdentityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseIdentityTests.swift; sourceTree = "<group>"; };
 		A238 /* ExerciseProvenanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseProvenanceTests.swift; sourceTree = "<group>"; };
 		A723 /* ExercisePreferenceAssistedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExercisePreferenceAssistedTests.swift; sourceTree = "<group>"; };
+		A979 /* ExercisePreferenceUnilateralTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExercisePreferenceUnilateralTests.swift; sourceTree = "<group>"; };
 		A730 /* TrendsViewPointLabelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendsViewPointLabelTests.swift; sourceTree = "<group>"; };
 		A226 /* HistoryShareUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryShareUITests.swift; sourceTree = "<group>"; };
 		A227 /* BackupRestoreUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRestoreUITests.swift; sourceTree = "<group>"; };
@@ -1224,6 +1228,7 @@
 				A505 /* V1ToV2MigrationTests.swift */,
 				A945 /* V2ToV3MigrationTests.swift */,
 				A9F2 /* V3ToV4MigrationTests.swift */,
+				A978 /* V4ToV5MigrationTests.swift */,
 			);
 			path = Foundation;
 			sourceTree = "<group>";
@@ -1509,6 +1514,7 @@
 				A237 /* ExerciseIdentityTests.swift */,
 				A238 /* ExerciseProvenanceTests.swift */,
 				A723 /* ExercisePreferenceAssistedTests.swift */,
+				A979 /* ExercisePreferenceUnilateralTests.swift */,
 			);
 			path = ExerciseLibrary;
 			sourceTree = "<group>";
@@ -2223,6 +2229,7 @@
 				B237 /* ExerciseIdentityTests.swift in Sources */,
 				B238 /* ExerciseProvenanceTests.swift in Sources */,
 				B723 /* ExercisePreferenceAssistedTests.swift in Sources */,
+				B979 /* ExercisePreferenceUnilateralTests.swift in Sources */,
 				B730 /* TrendsViewPointLabelTests.swift in Sources */,
 				B240 /* HistoryReportDomainTests.swift in Sources */,
 				B944 /* HistoryFilterCriteriaTests.swift in Sources */,
@@ -2291,6 +2298,7 @@
 				B507 /* V1ToV2MigrationTests.swift in Sources */,
 				B945 /* V2ToV3MigrationTests.swift in Sources */,
 				B9F2 /* V3ToV4MigrationTests.swift in Sources */,
+				B978 /* V4ToV5MigrationTests.swift in Sources */,
 				B231 /* StudentPersistenceTests.swift in Sources */,
 				B233 /* ActiveSessionPersistenceTests.swift in Sources */,
 				B710 /* ActiveSessionSetRowInteractionTests.swift in Sources */,

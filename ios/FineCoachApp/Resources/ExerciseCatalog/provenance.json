@@ -442,7 +442,8 @@
       "primaryMuscleGroup": "肩",
       "secondaryMuscleGroups": [],
       "equipmentClass": "龙门架",
-      "sourceEnglishName": "Cable Lateral Raises (Single Arm)"
+      "sourceEnglishName": "Cable Lateral Raises (Single Arm)",
+      "unilateral": true
     },
     {
       "id": "be9dfe16-9fc3-463d-a9cd-7aade27ef571",
@@ -575,7 +576,8 @@
         "臂"
       ],
       "equipmentClass": "哑铃",
-      "sourceEnglishName": "One-Arm Heavy Row"
+      "sourceEnglishName": "One-Arm Heavy Row",
+      "unilateral": true
     },
     {
       "id": "94a5c406-7bcd-47f3-9687-bdf92a763932",
@@ -903,7 +905,8 @@
         "臀"
       ],
       "equipmentClass": "哑铃",
-      "sourceEnglishName": "Bulgarian Squat with Dumbbells"
+      "sourceEnglishName": "Bulgarian Squat with Dumbbells",
+      "unilateral": true
     },
     {
       "id": "8a3e08ab-4e97-4aee-897a-60d8693b9b43",
@@ -915,7 +918,8 @@
         "臀"
       ],
       "equipmentClass": "哑铃",
-      "sourceEnglishName": "Dumbbell Split Squat"
+      "sourceEnglishName": "Dumbbell Split Squat",
+      "unilateral": true
     },
     {
       "id": "dcc6e237-a8bb-4eca-bbc5-7fb852636f6a",
@@ -960,7 +964,8 @@
       "primaryMuscleGroup": "大腿",
       "secondaryMuscleGroups": [],
       "equipmentClass": "固定器械",
-      "sourceEnglishName": "Single Leg Extension"
+      "sourceEnglishName": "Single Leg Extension",
+      "unilateral": true
     },
     {
       "id": "f462df26-3264-48c2-b5aa-2374d0670c24",
@@ -1046,7 +1051,8 @@
         "臀"
       ],
       "equipmentClass": "史密斯机",
-      "sourceEnglishName": "Smith Machine Split Squat"
+      "sourceEnglishName": "Smith Machine Split Squat",
+      "unilateral": true
     },
     {
       "id": "f3ef220b-a070-449c-a463-876d30cd9b14",
@@ -1119,7 +1125,8 @@
         "核心"
       ],
       "equipmentClass": "徒手",
-      "sourceEnglishName": "Pistol Squat"
+      "sourceEnglishName": "Pistol Squat",
+      "unilateral": true
     },
     {
       "id": "46ee5805-512a-43a2-944c-97f7744b0078",
@@ -1143,7 +1150,8 @@
         "臀"
       ],
       "equipmentClass": "其他",
-      "sourceEnglishName": "Weighted Step-ups"
+      "sourceEnglishName": "Weighted Step-ups",
+      "unilateral": true
     },
     {
       "id": "95a9cc46-270e-45f2-8a17-5665a23ff70b",
@@ -1237,7 +1245,8 @@
       "primaryMuscleGroup": "臂",
       "secondaryMuscleGroups": [],
       "equipmentClass": "哑铃",
-      "sourceEnglishName": "Tricep Dumbbell Kickback"
+      "sourceEnglishName": "Tricep Dumbbell Kickback",
+      "unilateral": true
     },
     {
       "id": "1ae6a28d-10e7-4ecf-af4f-905f8193e2c6",
@@ -1429,7 +1438,8 @@
         "大腿"
       ],
       "equipmentClass": "固定器械",
-      "sourceEnglishName": "Glute Kickback (Machine)"
+      "sourceEnglishName": "Glute Kickback (Machine)",
+      "unilateral": true
     },
     {
       "id": "b5726562-82ed-451a-89d8-8c8b13c5019a",
@@ -1453,7 +1463,8 @@
         "大腿"
       ],
       "equipmentClass": "龙门架",
-      "sourceEnglishName": "Cable glute extension"
+      "sourceEnglishName": "Cable glute extension",
+      "unilateral": true
     },
     {
       "id": "821e289e-bd39-4410-b436-6f2a43bc3649",
@@ -1527,7 +1538,8 @@
         "背"
       ],
       "equipmentClass": "哑铃",
-      "sourceEnglishName": "Suitcase Carry"
+      "sourceEnglishName": "Suitcase Carry",
+      "unilateral": true
     },
     {
       "id": "401989e0-64c3-459d-bc47-2c171ab4f41d",
@@ -1567,7 +1579,8 @@
       "primaryMuscleGroup": "核心",
       "secondaryMuscleGroups": [],
       "equipmentClass": "龙门架",
-      "sourceEnglishName": "Pallof Press"
+      "sourceEnglishName": "Pallof Press",
+      "unilateral": true
     },
     {
       "id": "c867836d-2929-4977-b23c-014bc21ec08d",
@@ -1579,7 +1592,8 @@
         "肩"
       ],
       "equipmentClass": "龙门架",
-      "sourceEnglishName": "Cable Woodchoppers"
+      "sourceEnglishName": "Cable Woodchoppers",
+      "unilateral": true
     },
     {
       "id": "29175281-afaf-4ffd-85e8-cfc38493e304",

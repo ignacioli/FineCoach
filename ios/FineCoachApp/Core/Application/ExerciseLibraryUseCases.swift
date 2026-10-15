@@ -74,4 +74,15 @@ public struct ExerciseLibraryUseCases: Sendable {
             isAssisted: isAssisted
         )
     }
+
+    /// P0-D8: the coach's override of the library's unilateral default.
+    public func setUnilateral(id: StableExerciseID, isUnilateral: Bool) async throws {
+        _ = try await repository.setPreference(
+            exerciseID: id,
+            alias: nil,
+            isFavorite: nil,
+            isHidden: nil,
+            isUnilateral: isUnilateral
+        )
+    }
 }

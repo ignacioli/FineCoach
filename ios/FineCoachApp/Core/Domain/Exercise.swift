@@ -218,33 +218,43 @@ public struct ExercisePreference: Hashable, Codable, Sendable {
     /// `weightValue` represents progress rather than a higher one. Purely a
     /// display/interpretation flag -- never changes how a value is stored.
     public let isAssisted: Bool
+    /// P0-D8: the coach's override of whether this exercise is trained one
+    /// side at a time, which makes the set entry offer per-side weights.
+    /// `nil` keeps the library default (`ExerciseLibraryEntry
+    /// .isUnilateralByDefault`). Optional so a backup written before this
+    /// field decodes unchanged (P0-D12, payloadSchemaVersion stays 3).
+    public let isUnilateral: Bool?
 
     public init(
         exerciseID: StableExerciseID,
         alias: NormalizedName? = nil,
         isFavorite: Bool = false,
         isHidden: Bool = false,
-        isAssisted: Bool = false
+        isAssisted: Bool = false,
+        isUnilateral: Bool? = nil
     ) {
         self.exerciseID = exerciseID
         self.alias = alias
         self.isFavorite = isFavorite
         self.isHidden = isHidden
         self.isAssisted = isAssisted
+        self.isUnilateral = isUnilateral
     }
 
     public func updating(
         alias: NormalizedName?? = nil,
         isFavorite: Bool? = nil,
         isHidden: Bool? = nil,
-        isAssisted: Bool? = nil
+        isAssisted: Bool? = nil,
+        isUnilateral: Bool? = nil
     ) -> ExercisePreference {
         ExercisePreference(
             exerciseID: exerciseID,
             alias: alias ?? self.alias,
             isFavorite: isFavorite ?? self.isFavorite,
             isHidden: isHidden ?? self.isHidden,
-            isAssisted: isAssisted ?? self.isAssisted
+            isAssisted: isAssisted ?? self.isAssisted,
+            isUnilateral: isUnilateral ?? self.isUnilateral
         )
     }
 }
@@ -256,8 +266,16 @@ public struct ExerciseLibraryEntry: Hashable, Codable, Sendable, Identifiable {
     public let equipmentClass: String?
     /// Catalog secondary parts ("次要：肩、臂", 20 artwork); empty for custom.
     public let secondaryMuscleGroups: [String]
+    /// The built-in catalog's `unilateral` flag; `false` for custom
+    /// exercises, whose flag lives only in the preference.
+    public let isUnilateralByDefault: Bool
 
     public var id: StableExerciseID { item.id }
+
+    /// P0-D8: whether the set entry offers per-side weights.
+    public var isUnilateral: Bool {
+        preference?.isUnilateral ?? isUnilateralByDefault
+    }
 
     public var displayedName: String {
         if let alias = preference?.alias?.value, !alias.isEmpty {
@@ -271,13 +289,15 @@ public struct ExerciseLibraryEntry: Hashable, Codable, Sendable, Identifiable {
         preference: ExercisePreference?,
         primaryMuscleGroup: String? = nil,
         equipmentClass: String? = nil,
-        secondaryMuscleGroups: [String] = []
+        secondaryMuscleGroups: [String] = [],
+        isUnilateralByDefault: Bool = false
     ) {
         self.item = item
         self.preference = preference
         self.primaryMuscleGroup = primaryMuscleGroup
         self.equipmentClass = equipmentClass
         self.secondaryMuscleGroups = secondaryMuscleGroups
+        self.isUnilateralByDefault = isUnilateralByDefault
     }
 }
 
@@ -285,11 +305,19 @@ public struct ExerciseCatalogBrowseFacet: Hashable, Sendable {
     public let primaryMuscleGroup: String
     public let equipmentClass: String
     public let secondaryMuscleGroups: [String]
+    /// `provenance.json` `unilateral` (P0-D8); absent means `false`.
+    public let isUnilateral: Bool
 
-    public init(primaryMuscleGroup: String, equipmentClass: String, secondaryMuscleGroups: [String] = []) {
+    public init(
+        primaryMuscleGroup: String,
+        equipmentClass: String,
+        secondaryMuscleGroups: [String] = [],
+        isUnilateral: Bool = false
+    ) {
         self.primaryMuscleGroup = primaryMuscleGroup
         self.equipmentClass = equipmentClass
         self.secondaryMuscleGroups = secondaryMuscleGroups
+        self.isUnilateral = isUnilateral
     }
 }
 

@@ -54,6 +54,24 @@ struct QuickCreateExerciseFlow: View {
                     id: FCAccessibilityID.activeSessionModeCardio
                 )
             }
+            if viewModel.recordMode == .weightReps {
+                // P0-D8: chosen when the exercise is added; the set entry
+                // then offers per-side weights.
+                HStack {
+                    Text(String(localized: "session.field.unilateralExercise"))
+                        .fcFont(.body)
+                        .foregroundStyle(FCSemanticColors.textPrimary)
+                    Spacer(minLength: FCPrimitives.space2)
+                    Toggle(
+                        String(localized: "session.field.unilateralExercise"),
+                        isOn: $viewModel.newExerciseIsUnilateral
+                    )
+                    .toggleStyle(FCToggleStyle())
+                    .labelsHidden()
+                }
+                .frame(maxWidth: .infinity, minHeight: 44)
+                .accessibilityIdentifier(FCAccessibilityID.activeSessionNewExerciseUnilateral)
+            }
             if let exerciseNameConflict = viewModel.exerciseNameConflict {
                 Text(exerciseNameConflict)
                     .fcFont(.caption)

@@ -9408,6 +9408,83 @@
           }
         }
       }
+    },
+    "session.field.perSideWeight": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每侧重量 kg"
+          }
+        }
+      }
+    },
+    "session.field.leftWeight": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "左 kg"
+          }
+        }
+      }
+    },
+    "session.field.rightWeight": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "右 kg"
+          }
+        }
+      }
+    },
+    "session.action.sidesDiffer": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "左右不同"
+          }
+        }
+      }
+    },
+    "session.action.sidesEqual": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "左右相同"
+          }
+        }
+      }
+    },
+    "session.field.unilateralExercise": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "单侧动作"
+          }
+        }
+      }
+    },
+    "exercise.library.unilateral": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "单侧动作"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

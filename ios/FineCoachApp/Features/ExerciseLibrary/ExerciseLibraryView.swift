@@ -304,6 +304,15 @@ struct ExerciseLibraryView: View {
                     )
                 )
                 .accessibilityIdentifier(FCAccessibilityID.exerciseLibraryAssisted(entry.id))
+                FCListRowDivider()
+                toggleRow(
+                    String(localized: "exercise.library.unilateral"),
+                    isOn: Binding(
+                        get: { entry.isUnilateral },
+                        set: { _ in Task { await viewModel.toggleUnilateral(entry) } }
+                    )
+                )
+                .accessibilityIdentifier(FCAccessibilityID.exerciseLibraryUnilateral(entry.id))
                 if entry.item.kind == .custom {
                     FCListRowDivider()
                     FCActionRow(title: String(localized: "exercise.library.editCustom")) {
