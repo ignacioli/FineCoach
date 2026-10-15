@@ -267,7 +267,6 @@
 		B340 /* ActiveSessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A340 /* ActiveSessionViewModel.swift */; };
 		B341 /* ActiveSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A341 /* ActiveSessionView.swift */; };
 		B342 /* SetEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A342 /* SetEditor.swift */; };
-		B343 /* CopySetFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A343 /* CopySetFlow.swift */; };
 		B972 /* RestTimerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A972 /* RestTimerState.swift */; };
 		B344 /* DeleteExerciseFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A344 /* DeleteExerciseFlow.swift */; };
 		B345 /* FinishSessionFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A345 /* FinishSessionFlow.swift */; };
@@ -313,6 +312,7 @@
 		B931 /* TypographyHarnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A931 /* TypographyHarnessTests.swift */; };
 		B932 /* DesignValueScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A932 /* DesignValueScanTests.swift */; };
 		B976 /* NumberFormatScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A976 /* NumberFormatScanTests.swift */; };
+		B977 /* TrainingEntryScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A977 /* TrainingEntryScanTests.swift */; };
 		B933 /* ContrastHarnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A933 /* ContrastHarnessTests.swift */; };
 		B242 /* ShareReportCardRendererTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A242 /* ShareReportCardRendererTests.swift */; };
 		B243 /* TempReportLifecycleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A243 /* TempReportLifecycleTests.swift */; };
@@ -632,6 +632,7 @@
 		A931 /* TypographyHarnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypographyHarnessTests.swift; sourceTree = "<group>"; };
 		A932 /* DesignValueScanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignValueScanTests.swift; sourceTree = "<group>"; };
 		A976 /* NumberFormatScanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberFormatScanTests.swift; sourceTree = "<group>"; };
+		A977 /* TrainingEntryScanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingEntryScanTests.swift; sourceTree = "<group>"; };
 		A933 /* ContrastHarnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContrastHarnessTests.swift; sourceTree = "<group>"; };
 		A242 /* ShareReportCardRendererTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareReportCardRendererTests.swift; sourceTree = "<group>"; };
 		A243 /* TempReportLifecycleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TempReportLifecycleTests.swift; sourceTree = "<group>"; };
@@ -690,7 +691,6 @@
 		A340 /* ActiveSessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionViewModel.swift; sourceTree = "<group>"; };
 		A341 /* ActiveSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionView.swift; sourceTree = "<group>"; };
 		A342 /* SetEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetEditor.swift; sourceTree = "<group>"; };
-		A343 /* CopySetFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopySetFlow.swift; sourceTree = "<group>"; };
 		A972 /* RestTimerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestTimerState.swift; sourceTree = "<group>"; };
 		A344 /* DeleteExerciseFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteExerciseFlow.swift; sourceTree = "<group>"; };
 		A345 /* FinishSessionFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinishSessionFlow.swift; sourceTree = "<group>"; };
@@ -1326,7 +1326,6 @@
 				A340 /* ActiveSessionViewModel.swift */,
 				A341 /* ActiveSessionView.swift */,
 				A342 /* SetEditor.swift */,
-				A343 /* CopySetFlow.swift */,
 				A972 /* RestTimerState.swift */,
 				A344 /* DeleteExerciseFlow.swift */,
 				A345 /* FinishSessionFlow.swift */,
@@ -1582,6 +1581,7 @@
 				A931 /* TypographyHarnessTests.swift */,
 				A932 /* DesignValueScanTests.swift */,
 				A976 /* NumberFormatScanTests.swift */,
+				A977 /* TrainingEntryScanTests.swift */,
 				A933 /* ContrastHarnessTests.swift */,
 			);
 			path = DesignSystem;
@@ -2170,7 +2170,6 @@
 				B340 /* ActiveSessionViewModel.swift in Sources */,
 				B341 /* ActiveSessionView.swift in Sources */,
 				B342 /* SetEditor.swift in Sources */,
-				B343 /* CopySetFlow.swift in Sources */,
 				B972 /* RestTimerState.swift in Sources */,
 				B344 /* DeleteExerciseFlow.swift in Sources */,
 				B345 /* FinishSessionFlow.swift in Sources */,
@@ -2245,6 +2244,7 @@
 				B931 /* TypographyHarnessTests.swift in Sources */,
 				B932 /* DesignValueScanTests.swift in Sources */,
 				B976 /* NumberFormatScanTests.swift in Sources */,
+				B977 /* TrainingEntryScanTests.swift in Sources */,
 				B933 /* ContrastHarnessTests.swift in Sources */,
 				B250 /* BackupGoldenVectorTests.swift in Sources */,
 				B251 /* BackupHostileInputTests.swift in Sources */,

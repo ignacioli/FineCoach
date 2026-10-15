@@ -75,6 +75,10 @@ final class ActiveSessionViewModel: ObservableObject {
     @Published private(set) var lastPerformances: LastExercisePerformanceLookup = .empty
     /// Between-sets rest countdown, started by every confirmed set (P0-D3).
     @Published var restTimer: RestTimerState?
+    /// The set the bottom form just recorded; its row offers undo instead
+    /// of its status until `undoWindow` passes (P0-D11).
+    @Published private(set) var undoableSetID: StableUUID?
+    static let undoWindow: Duration = .seconds(4)
 
     let studentID: StableUUID
     let useCases: ActiveSessionUseCases
@@ -84,6 +88,7 @@ final class ActiveSessionViewModel: ObservableObject {
     private let notifications: (any LocalNotificationScheduling)?
     private let now: () -> Date
     private var restNotificationTask: Task<Void, Never>?
+    private var undoExpiryTask: Task<Void, Never>?
     private var catalogSearchGeneration = 0
     private var catalogSearchTask: Task<Void, Never>?
     /// The set most recently created via the bottom "add set" form, so
@@ -283,28 +288,10 @@ final class ActiveSessionViewModel: ObservableObject {
         }
     }
 
-    func moveExercise(offset: Int) async {
-        guard let session, let current = currentExercise else {
-            return
-        }
-        var ids = session.exercises.map(\.id)
-        guard let index = ids.firstIndex(of: current.id) else {
-            return
-        }
-        let destination = index + offset
-        guard ids.indices.contains(destination) else {
-            return
-        }
-        ids.swapAt(index, destination)
-        await run {
-            self.session = try await self.signposts.measureExerciseReorder {
-                try await self.useCases.reorderExercises(orderedIDs: ids)
-            }
-        }
-    }
-
-    func requestDeleteExercise() {
-        guard let exercise = currentExercise else {
+    /// Deletes an exercise from its row swipe (P0-D10). One with a
+    /// completed set asks for confirmation first.
+    func requestDeleteExercise(_ exerciseID: StableUUID) {
+        guard let exercise = session?.exercises.first(where: { $0.id == exerciseID }) else {
             return
         }
         if exercise.hasCompletedSet {
@@ -317,7 +304,7 @@ final class ActiveSessionViewModel: ObservableObject {
                     exerciseID: exercise.id,
                     confirmedIfCompleted: false
                 )
-                self.selectedExerciseID = self.session?.exercises.last?.id
+                self.reselectAfterRemoving(exercise.id)
             }
         }
     }
@@ -332,7 +319,18 @@ final class ActiveSessionViewModel: ObservableObject {
                 exerciseID: exerciseID,
                 confirmedIfCompleted: true
             )
-            self.selectedExerciseID = self.session?.exercises.last?.id
+            self.reselectAfterRemoving(exerciseID)
+        }
+    }
+
+    /// Keeps the selection unless the removed exercise was the selected one.
+    private func reselectAfterRemoving(_ exerciseID: StableUUID) {
+        guard selectedExerciseID == exerciseID || selectedExerciseID == nil else {
+            return
+        }
+        selectedExerciseID = session?.exercises.last?.id
+        if let exercise = currentExercise {
+            prefillSetFields(for: exercise)
         }
     }
 
@@ -375,6 +373,7 @@ final class ActiveSessionViewModel: ObservableObject {
             self.session = try await self.signposts.measureSetConfirm {
                 try await self.useCases.confirmSet(setID: newSetID)
             }
+            self.offerUndo(for: newSetID)
         }
         if confirmed {
             startRest()
@@ -461,37 +460,32 @@ final class ActiveSessionViewModel: ObservableObject {
         if activeDraftSetID == setID {
             activeDraftSetID = nil
         }
+        if undoableSetID == setID {
+            withdrawUndo()
+        }
+    }
+
+    /// Undoes the set the bottom form just recorded (P0-D11): the set is
+    /// removed, the rest bar closes, and its values go back into the form.
+    func undoRecentSet() async {
+        guard let setID = undoableSetID,
+            let recorded = exercise(containingSetID: setID)?.sets.first(where: { $0.id == setID })
+        else {
+            return
+        }
+        let undone = await run {
+            self.session = try await self.useCases.deleteSet(setID: setID)
+        }
+        guard undone else {
+            return
+        }
+        withdrawUndo()
+        clearRest()
+        fillSetFields(from: recorded)
     }
 
     private func exercise(containingSetID setID: StableUUID) -> SessionExercise? {
         session?.exercises.first { $0.sets.contains { $0.id == setID } }
-    }
-
-    func copyPrevious() async {
-        guard let exercise = currentExercise,
-            let source = CopySetFlow.previousSet(in: exercise)
-        else {
-            return
-        }
-        await copy(sourceID: source.id)
-    }
-
-    func copyLastSame() async {
-        guard let exercise = currentExercise,
-            let source = CopySetFlow.lastCompletedSet(in: exercise)
-        else {
-            return
-        }
-        await copy(sourceID: source.id)
-    }
-
-    func undoLastSet() async {
-        guard let setID = currentExercise?.sets.last?.id else {
-            return
-        }
-        await run {
-            self.session = try await self.useCases.undoSet(setID: setID)
-        }
     }
 
     func requestFinish() {
@@ -622,12 +616,6 @@ final class ActiveSessionViewModel: ObservableObject {
         creditPrompt = nil
     }
 
-    private func copy(sourceID: StableUUID) async {
-        await run {
-            self.session = try await self.useCases.copySet(sourceSetID: sourceID)
-        }
-    }
-
     private func currentInput(for exercise: SessionExercise) -> TrainingSetInput {
         let durationSecondsText: String
         switch exercise.recordModeSnapshot {
@@ -673,6 +661,11 @@ final class ActiveSessionViewModel: ObservableObject {
 
     // MARK: - Faster set entry (experience P0, design/experience-p0)
 
+    /// Whether left/right entry applies to this exercise (P0-D8).
+    func isUnilateral(_ exercise: SessionExercise) -> Bool {
+        false
+    }
+
     func lastPerformance(for exercise: SessionExercise) -> LastExercisePerformance? {
         lastPerformances.performance(for: exercise)
     }
@@ -692,6 +685,24 @@ final class ActiveSessionViewModel: ObservableObject {
 
     func dismissRest() {
         clearRest()
+    }
+
+    private func offerUndo(for setID: StableUUID) {
+        undoableSetID = setID
+        undoExpiryTask?.cancel()
+        undoExpiryTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(for: Self.undoWindow)
+            guard !Task.isCancelled, self?.undoableSetID == setID else {
+                return
+            }
+            self?.undoableSetID = nil
+        }
+    }
+
+    private func withdrawUndo() {
+        undoExpiryTask?.cancel()
+        undoExpiryTask = nil
+        undoableSetID = nil
     }
 
     private func startRest() {
@@ -738,6 +749,16 @@ final class ActiveSessionViewModel: ObservableObject {
         guard let source else {
             return
         }
+        fillSetFields(from: source)
+        if !isUnilateral(exercise) {
+            // Sides only show for exercises marked unilateral (P0-D8).
+            side = .none
+            left = ""
+            right = ""
+        }
+    }
+
+    private func fillSetFields(from source: TrainingSet) {
         weight = source.weightValue?.canonicalString ?? ""
         reps = source.repetitionCount?.canonicalString ?? ""
         side = source.side

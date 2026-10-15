@@ -68,8 +68,9 @@ agent 按上述决定补充的细节（产品负责人在 P0-a2 画稿上确认�
 
 自动检查（随实施一起加，防止回退）：
 
-- `Features/` 里不允许出现不带样式的系统 `Button(String(localized:…))`，必须用 `FCButton`、`FCLinkButton` 或明确的 `.buttonStyle(.plain)` 加设计系统字体颜色（防 Δ2、Δ6 再次出现）。
-- 录入区在非编辑状态下只能有一个 `FCButton`（防 Δ1）。
+- 录入区（`SetEditor`）和组行（`FCSetRow`）里不允许出现带文字标题的系统 `Button("…")` / `Button(String(localized:…))`，必须用 `FCButton`、`FCLinkButton`，或自己设置设计系统颜色的 `Button(action:) { … }`；`.accessibilityActions` 不渲染，除外（防 Δ2、Δ6 再次出现）。
+- 录入区在非编辑状态下只能有一个 `FCButton`；编辑状态是「保存」`FCButton` 加「取消」`FCLinkButton`（防 Δ1）。
+- 实现：`ios/FineCoachTests/DesignSystem/TrainingEntryScanTests.swift`。范围收窄的原因（2026-10-15，AI 判断）：`Features/` 其余 28 处系统 `Button` 都在 confirmationDialog、alert、toolbar、Menu 里，属于系统界面，全量禁止会误报。
 
 由 agent 补充、尚待产品负责人在画稿 review 时确认的细节：
 

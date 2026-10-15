@@ -69,20 +69,10 @@ struct SetEditor: View {
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionDuration)
             }
 
-            HStack(spacing: FCPrimitives.space2) {
-                sideButton(
-                    title: String(localized: "session.side.none"),
-                    identifier: FCAccessibilityID.activeSessionSideNone,
-                    value: .none
-                )
-                sideButton(
-                    title: String(localized: "session.side.bilateral"),
-                    identifier: FCAccessibilityID.activeSessionSideBilateral,
-                    value: .bilateral
-                )
-            }
-
-            if viewModel.side == .bilateral {
+            // Left/right entry has no toggle of its own any more (P0-D8);
+            // a set already recorded with sides keeps showing them when it
+            // is edited, so no data is hidden.
+            if viewModel.side != .none {
                 FCTextField(String(localized: "session.field.left"), text: $viewModel.left)
                     .keyboardType(.decimalPad)
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionLeft)
@@ -98,42 +88,18 @@ struct SetEditor: View {
                     }
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionSaveSetEdit)
 
-                    Button(String(localized: "session.action.cancelSetEdit")) {
+                    FCLinkButton(title: String(localized: "session.action.cancelSetEdit")) {
                         viewModel.cancelEditingSet()
                     }
-                    .frame(minHeight: 44)
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionCancelSetEdit)
                 }
             } else {
-                FCButton(title: String(localized: "session.action.addSet")) {
-                    Task { await viewModel.addDraftSet() }
-                }
-                .accessibilityIdentifier(FCAccessibilityID.activeSessionAddSet)
-
+                // The only primary action (P0-D11): prefill and kept values
+                // replace add / copy, and undo lives on the recorded row.
                 FCButton(title: String(localized: "session.action.confirmSet")) {
                     Task { await viewModel.confirmActiveDraftSet() }
                 }
                 .accessibilityIdentifier(FCAccessibilityID.activeSessionConfirmSet)
-
-                HStack(spacing: FCPrimitives.space2) {
-                    Button(String(localized: "session.action.copyPrevious")) {
-                        Task { await viewModel.copyPrevious() }
-                    }
-                    .frame(minHeight: 44)
-                    .accessibilityIdentifier(FCAccessibilityID.activeSessionCopyPrevious)
-
-                    Button(String(localized: "session.action.copyLastSame")) {
-                        Task { await viewModel.copyLastSame() }
-                    }
-                    .frame(minHeight: 44)
-                    .accessibilityIdentifier(FCAccessibilityID.activeSessionCopyLastSame)
-
-                    Button(String(localized: "session.action.undo")) {
-                        Task { await viewModel.undoLastSet() }
-                    }
-                    .frame(minHeight: 44)
-                    .accessibilityIdentifier(FCAccessibilityID.activeSessionUndoSet)
-                }
             }
         }
     }
@@ -160,22 +126,5 @@ struct SetEditor: View {
                 onIncrement: { viewModel.step(field, up: true) }
             )
         }
-    }
-
-    private func sideButton(title: String, identifier: String, value: SetSide) -> some View {
-        Button(title) {
-            viewModel.side = value
-        }
-        .frame(minHeight: 44)
-        .padding(.horizontal, FCPrimitives.space2)
-        .background(
-            viewModel.side == value ? FCSemanticColors.textPrimary : FCSemanticColors.surfaceElevated
-        )
-        .foregroundStyle(
-            viewModel.side == value ? FCSemanticColors.surfaceElevated : FCSemanticColors.textPrimary
-        )
-        .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSm))
-        .accessibilityIdentifier(identifier)
-        .accessibilityAddTraits(viewModel.side == value ? [.isSelected] : [])
     }
 }
