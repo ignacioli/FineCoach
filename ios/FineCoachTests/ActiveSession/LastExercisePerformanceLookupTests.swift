@@ -1,5 +1,6 @@
-@testable import FineCoach
 import XCTest
+
+@testable import FineCoach
 
 /// Experience P0-D1: the "上次" reference and first-set prefill must come from
 /// the newest completed Session that has completed sets of the same Exercise
@@ -13,7 +14,8 @@ final class LastExercisePerformanceLookupTests: XCTestCase {
 
     func testPicksNewestSessionRegardlessOfArrayOrder() throws {
         let older = try makeSession(days: 0, exercises: [(squat, nil, .weightReps, [("100", .completed)])])
-        let newer = try makeSession(days: 7, exercises: [(squat, nil, .weightReps, [("110", .completed), ("115", .completed)])])
+        let newer = try makeSession(
+            days: 7, exercises: [(squat, nil, .weightReps, [("110", .completed), ("115", .completed)])])
 
         for order in [[older, newer], [newer, older]] {
             let performance = try XCTUnwrap(
@@ -78,6 +80,26 @@ final class LastExercisePerformanceLookupTests: XCTestCase {
 
     func testEmptyHistoryHasNoPerformance() throws {
         XCTAssertNil(LastExercisePerformanceLookup.empty.performance(for: try current(squat)))
+    }
+
+    func testReferenceTextUsesTheFirstSetAndTheCompletedCount() throws {
+        let session = try makeSession(
+            days: 0,
+            exercises: [(squat, nil, .weightReps, [("120", .completed), ("122.5", .completed)])]
+        )
+        let performance = try XCTUnwrap(
+            LastExercisePerformanceLookup(sessions: [session]).performance(for: try current(squat))
+        )
+        XCTAssertEqual(performance.firstSet.displaySummary, "120 kg × 8")
+        XCTAssertEqual(
+            performance.referenceText,
+            String(
+                format: String(localized: "session.lastReferenceFormat"),
+                locale: Locale(identifier: "en_US_POSIX"),
+                "120 kg × 8",
+                2
+            )
+        )
     }
 
     // MARK: - Fixtures

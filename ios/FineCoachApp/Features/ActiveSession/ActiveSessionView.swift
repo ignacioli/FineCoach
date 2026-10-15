@@ -316,9 +316,7 @@ struct ActiveSessionView: View {
                         .fcFont(.exerciseTitle)
                         .foregroundStyle(FCSemanticColors.textPrimary)
                     Spacer(minLength: FCPrimitives.space2)
-                    Text(modeTitle(exercise.recordModeSnapshot))
-                        .fcFont(.caption)
-                        .foregroundStyle(FCSemanticColors.textSecondary)
+                    exerciseTrailingCaption(exercise, index: index)
                     if viewModel.selectedExerciseID == exercise.id {
                         FCSymbol(.check)
                     }
@@ -329,7 +327,7 @@ struct ActiveSessionView: View {
             .buttonStyle(.plain)
             .accessibilityIdentifier(FCAccessibilityID.exerciseAt(index))
             .accessibilityLabel(
-                "\(exercise.displayNameSnapshot.value)，\(modeTitle(exercise.recordModeSnapshot))"
+                "\(exercise.displayNameSnapshot.value)，\(exerciseTrailingTitle(exercise))"
             )
             .accessibilityAddTraits(
                 viewModel.selectedExerciseID == exercise.id ? [.isSelected] : []
@@ -518,6 +516,23 @@ struct ActiveSessionView: View {
                 }
             }
         }
+    }
+
+    private func exerciseTrailingCaption(_ exercise: SessionExercise, index: Int) -> some View {
+        let last = viewModel.lastPerformance(for: exercise)
+        return Text(last?.referenceText ?? modeTitle(exercise.recordModeSnapshot))
+            .fcFont(.caption)
+            .foregroundStyle(FCSemanticColors.textSecondary)
+            .lineLimit(1)
+            .accessibilityIdentifier(
+                last == nil
+                    ? FCAccessibilityID.exerciseMode(index)
+                    : FCAccessibilityID.exerciseLastReference(index)
+            )
+    }
+
+    private func exerciseTrailingTitle(_ exercise: SessionExercise) -> String {
+        viewModel.lastPerformance(for: exercise)?.referenceText ?? modeTitle(exercise.recordModeSnapshot)
     }
 
     private func modeTitle(_ mode: RecordMode) -> String {
