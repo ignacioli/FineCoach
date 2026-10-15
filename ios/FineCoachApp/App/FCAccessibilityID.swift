@@ -333,6 +333,7 @@ public enum FCAccessibilityID {
     public static let activeSessionRightDecrement = "activeSession.right.decrement"
     public static let activeSessionRightIncrement = "activeSession.right.increment"
     public static let activeSessionSplitSides = "activeSession.splitSides"
+    public static let activeSessionKeyboardDone = "activeSession.keyboardDone"
     public static let activeSessionNewExerciseUnilateral = "activeSession.newExercise.unilateral"
     public static let activeSessionConfirmSet = "activeSession.confirmSet"
     public static let activeSessionSaveSetEdit = "activeSession.saveSetEdit"

@@ -86,11 +86,13 @@ struct SetEditor: View {
             if isEditMode {
                 HStack(spacing: FCPrimitives.space2) {
                     FCButton(title: String(localized: "session.action.saveSetEdit")) {
+                        UIApplication.shared.fcDismissKeyboard()
                         Task { await viewModel.saveEditingSet() }
                     }
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionSaveSetEdit)
 
                     FCLinkButton(title: String(localized: "session.action.cancelSetEdit")) {
+                        UIApplication.shared.fcDismissKeyboard()
                         viewModel.cancelEditingSet()
                     }
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionCancelSetEdit)
@@ -99,6 +101,10 @@ struct SetEditor: View {
                 // The only primary action (P0-D11): prefill and kept values
                 // replace add / copy, and undo lives on the recorded row.
                 FCButton(title: String(localized: "session.action.confirmSet")) {
+                    // The number pads have no return key; the set is done, so
+                    // the keyboard goes away (owner device walkthrough
+                    // 2026-10-15: it stayed up across exercises).
+                    UIApplication.shared.fcDismissKeyboard()
                     Task { await viewModel.confirmActiveDraftSet() }
                 }
                 .accessibilityIdentifier(FCAccessibilityID.activeSessionConfirmSet)
@@ -186,5 +192,12 @@ struct SetEditor: View {
                 onIncrement: { viewModel.step(field, up: true) }
             )
         }
+    }
+}
+
+extension UIApplication {
+    /// Ends editing in whichever field has focus.
+    func fcDismissKeyboard() {
+        sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
