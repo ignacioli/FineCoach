@@ -66,7 +66,7 @@ agent 按上述决定补充的细节（产品负责人在 P0-a2 画稿上确认�
 | Δ4 | 动作操作行 | 选中动作下面一行「上移 / 下移 / 删除动作 / 移入分区」 | 去掉整行；删除和移入分区放进动作行左滑 | P0-D9、D10、D13 | 改 |
 | Δ5 | 组行 | 两行：「组 1」上、「17.5 kg × 12」下 | 一行：「第 1 组　17.5 kg × 12　已完成　铅笔」 | P0-a | 改 |
 | Δ6 | 修改组时的「取消」 | 系统蓝色 `Button` | `FCLinkButton` | README 色板（不允许系统蓝） | 改 |
-| Δ7 | 页面顶部 | 内容滚到状态栏下面，和时间、信号叠在一起 | 状态栏区域用页面底色遮住 | 人工验收截图 | 已改：原因是 `fcSecondaryPage()` 隐藏了导航栏，状态栏下面没有底色；训练页加一条页面底色的条带盖住状态栏。其余 28 个用 `fcSecondaryPage()` 的页面有同样问题，部分顶部是深色卡片，统一修法记入 T2 |
+| Δ7 | 页面顶部 | 内容滚到状态栏下面，和时间、信号叠在一起 | 状态栏区域用页面底色遮住 | 人工验收截图 | 已改：原因是 `fcSecondaryPage()` 隐藏了导航栏，状态栏下面没有底色；训练页用高度为 0 的顶部 `safeAreaInset`，把它的页面底色延伸到状态栏下面（第一次用 overlay 的写法在真机上没生效）。其余 28 个用 `fcSecondaryPage()` 的页面有同样问题，部分顶部是深色卡片，统一修法记入 T2 |
 | Δ8 | 分区标题的「删除分区」 | 红色小字常驻 | 不变 | P0-a 未画分区；属于 T2 收敛 | 不改，记入 T2 |
 | Δ9 | 时长、有氧模式的输入 | 文本输入框 | 不变 | 本轮只改重量 × 次数和仅次数 | 不改 |
 | Δ10 | 动作行右侧、组状态圆圈、休息条、结束训练 | 已按 P0-a/P0-b 实现 | 不变 | P0-a、P0-b | 不改 |
@@ -169,6 +169,7 @@ agent 按上述决定补充的细节（产品负责人在 P0-a2 画稿上确认�
 训练中（单侧动作）→ 「左右不同」/「左右相同」→ activeSession.splitSides → 改输入草稿（展开或合并左右）→ FCLinkButton 按文字宽度，左侧缩进到数值列
 训练中（单侧动作）→ 左 kg 输入 / − / + → activeSession.left、activeSession.left.decrement、activeSession.left.increment → 改输入草稿 → FCStepperField 与 FCLabelValueRow 撑满
 训练中（单侧动作）→ 右 kg 输入 / − / + → activeSession.right、activeSession.right.decrement、activeSession.right.increment → 改输入草稿 → 同上
+训练中 → 数字键盘上方「完成」→ activeSession.keyboardDone → 否（收起键盘）→ 键盘工具栏，按文字宽度；确认、保存、取消和切换动作时也会收起键盘（2026-10-15 真机验收）
 训练中 → 新建动作面板「单侧动作」开关（重量 × 次数时才有）→ activeSession.newExercise.unilateral → 新建时写入单侧标记 → 行 .frame(maxWidth: .infinity, minHeight: 44)
 动作库 → 动作选项「单侧动作」开关 → exerciseLibrary.unilateral.<id> → 改动作的单侧标记 → toggleRow 的 HStack 内 Spacer 撑满，最小高 52
 ```

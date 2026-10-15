@@ -22,15 +22,15 @@ struct ActiveSessionView: View {
     private let sessionUseCases: ActiveSessionUseCases
     private let templateUseCases: TemplateUseCases?
     private let studentUseCases: StudentUseCases?
-    /// The per-Exercise sets live in a non-scrolling `List` (native
-    /// `.swipeActions` only works inside a `List`), and a `List` nested in a
-    /// `ScrollView` needs an explicit height. Each row reports its measured
-    /// height here (including an open set editor), and the list is sized to
-    /// their sum, so there is no blank gap after an edited set (owner
-    /// walkthrough 2026-09-27; the old fixed +460pt editor estimate left
-    /// one). The scaled values below are only the first-frame fallback for
-    /// a row not yet measured.
-    @State private var measuredSetRowHeights: [StableUUID: CGFloat] = [:]
+    /// Each Exercise's header and sets live in a non-scrolling `List`
+    /// (native `.swipeActions` only works inside a `List`), and a `List`
+    /// nested in a `ScrollView` needs an explicit height. The list reports
+    /// its own content height here, which includes an open set editor and
+    /// whatever margins `List` adds itself; summing the rows' own heights
+    /// missed those margins and clipped the last row (owner walkthrough
+    /// 2026-10-15). The scaled values below are only the first-frame
+    /// estimate before the list has laid out.
+    @State private var listContentHeights: [StableUUID: CGFloat] = [:]
     @ScaledMetric private var setRowHeight: CGFloat = 52
     @ScaledMetric private var exerciseHeaderHeight: CGFloat = 52
     /// The exercise whose row swipe asked to move it to a section (P0-D13).
@@ -130,12 +130,7 @@ struct ActiveSessionView: View {
                         title: String(localized: "session.action.finish"),
                         isEnabled: viewModel.canCompleteSession
                     ) {
-                        UIApplication.shared.sendAction(
-                            #selector(UIResponder.resignFirstResponder),
-                            to: nil,
-                            from: nil,
-                            for: nil
-                        )
+                        UIApplication.shared.fcDismissKeyboard()
                         viewModel.requestFinish()
                     }
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionFinish)
@@ -147,16 +142,26 @@ struct ActiveSessionView: View {
             }
         }
         .scrollDismissesKeyboard(.interactively)
+        .toolbar {
+            // The weight and reps pads have no return key (2026-10-15).
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                FCLinkButton(title: String(localized: "session.keyboard.done")) {
+                    UIApplication.shared.fcDismissKeyboard()
+                }
+                .accessibilityIdentifier(FCAccessibilityID.activeSessionKeyboardDone)
+            }
+        }
         .background(FCSemanticColors.surfacePage)
-        .overlay(alignment: .top) {
+        .safeAreaInset(edge: .top, spacing: 0) {
             // Δ7: with the navigation bar hidden nothing backs the status
-            // bar, so scrolled content showed under the time and signal.
-            // A zero-height strip that ignores the top safe area grows to
-            // exactly the status bar and covers it with the page color.
-            FCSemanticColors.surfacePage
+            // bar, so scrolled content showed under the time and signal. A
+            // zero-height top inset whose background extends into the top
+            // safe area covers the status bar with the page color (a plain
+            // zero-height overlay did not reach it on device, 2026-10-15).
+            Color.clear
                 .frame(height: 0)
-                .ignoresSafeArea(edges: .top)
-                .allowsHitTesting(false)
+                .background(FCSemanticColors.surfacePage, ignoresSafeAreaEdges: .top)
                 .accessibilityHidden(true)
         }
         .fcSecondaryPage()
@@ -345,9 +350,6 @@ struct ActiveSessionView: View {
                     .listRowInsets(EdgeInsets())
                     .listRowSeparator(.hidden)
                     .listRowBackground(FCSemanticColors.surfacePage)
-                    .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { height in
-                        measuredSetRowHeights[exercise.id] = height
-                    }
                     .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                         exerciseSwipeActions(exercise)
                     }
@@ -373,9 +375,25 @@ struct ActiveSessionView: View {
             .scrollDisabled(true)
             .scrollContentBackground(.hidden)
             .environment(\.defaultMinListRowHeight, 44)
-            .frame(height: listHeight(for: exercise))
+            .onScrollGeometryChange(
+                for: CGFloat.self,
+                of: { $0.contentSize.height + $0.contentInsets.top + $0.contentInsets.bottom }
+            ) { _, height in
+                // Before its first layout the list reports an empty content
+                // size; keeping the estimate until then avoids a zero frame
+                // that would never lay the rows out.
+                guard height >= 1 else {
+                    return
+                }
+                listContentHeights[exercise.id] = height
+            }
+            .frame(height: listContentHeights[exercise.id] ?? estimatedListHeight(for: exercise))
 
-            if viewModel.selectedExerciseID == exercise.id, viewModel.session?.state == .inProgress {
+            // The inline row editor and this form share the view model's
+            // draft fields, so only one shows at a time (2026-10-15).
+            if viewModel.selectedExerciseID == exercise.id, viewModel.session?.state == .inProgress,
+                viewModel.editingSetID == nil
+            {
                 SetEditor(viewModel: viewModel, exercise: exercise)
             }
             FCListRowDivider()
@@ -405,6 +423,7 @@ struct ActiveSessionView: View {
 
     private func exerciseHeader(_ exercise: SessionExercise, index: Int) -> some View {
         Button {
+            UIApplication.shared.fcDismissKeyboard()
             viewModel.selectExercise(exercise.id)
         } label: {
             HStack(spacing: FCPrimitives.space2) {
@@ -603,20 +622,11 @@ struct ActiveSessionView: View {
                     .padding(.bottom, FCPrimitives.space2)
             }
         }
-        .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { height in
-            measuredSetRowHeights[trainingSet.id] = height
-        }
     }
 
-    /// Header plus the sum of the measured set-row heights (see
-    /// `measuredSetRowHeights`); a row not measured yet falls back to the
-    /// scaled estimate.
-    private func listHeight(for exercise: SessionExercise) -> CGFloat {
-        let header = measuredSetRowHeights[exercise.id] ?? exerciseHeaderHeight
-        return exercise.sets.reduce(header) { total, trainingSet in
-            if let measured = measuredSetRowHeights[trainingSet.id] {
-                return total + measured
-            }
+    /// First-frame estimate before the list reports its content height.
+    private func estimatedListHeight(for exercise: SessionExercise) -> CGFloat {
+        exercise.sets.reduce(exerciseHeaderHeight) { total, trainingSet in
             let isEditing = trainingSet.id == viewModel.editingSetID
             return total + setRowHeight + (isEditing ? setEditorExtraHeight : 0)
         }
