@@ -295,12 +295,21 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
         return replacingExercise(at: index, with: exercise.replacingSets(exercise.sets + [trainingSet]), now: now)
     }
 
+    /// Saves new values onto a set. A completed set stays completed: the
+    /// coach's 「保存」 is itself the explicit confirmation, the same as
+    /// `editingCompletedSet` in history (experience P0-D14, owner decision
+    /// 2026-10-15). Invalid values throw and leave the set as it was. Draft
+    /// and pending sets keep their old behavior.
     public func editingSet(setID: StableUUID, input: TrainingSetInput, now: Date) throws -> Session {
         try mutateSet(setID, now: now) { trainingSet in
             guard input.recordMode == trainingSet.recordMode else {
                 throw DomainError.invalidMode
             }
-            return try trainingSet.updating(input: input, now: now)
+            let updated = try trainingSet.updating(input: input, now: now)
+            guard trainingSet.state == .completed else {
+                return updated
+            }
+            return try updated.confirmed(now: now, completedAtUTC: trainingSet.completedAtUTC ?? now)
         }
     }
 

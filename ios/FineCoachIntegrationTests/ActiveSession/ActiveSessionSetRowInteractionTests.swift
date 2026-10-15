@@ -122,6 +122,34 @@
             try await environment.controller.shutdownForTesting()
         }
 
+        /// P0-D14: 「保存」 on a completed set is its confirmation; the set
+        /// stays completed and no rest starts.
+        func testSavingAnEditedCompletedSetKeepsItCompletedWithoutRest() async throws {
+            let environment = try makeEnvironment()
+            let viewModel = try await makeLoadedViewModel(environment: environment)
+
+            viewModel.weight = "40"
+            viewModel.reps = "10"
+            await viewModel.confirmActiveDraftSet()
+            let recorded = try XCTUnwrap(viewModel.session?.exercises.first(where: { $0.id == exerciseID })?.sets.last)
+            viewModel.dismissRest()
+
+            viewModel.beginEditingSet(recorded)
+            viewModel.weight = "42.5"
+            await viewModel.saveEditingSet()
+
+            let saved = try XCTUnwrap(
+                viewModel.session?.exercises.first(where: { $0.id == exerciseID })?.sets.first { $0.id == recorded.id }
+            )
+            XCTAssertEqual(saved.state, .completed)
+            XCTAssertEqual(saved.weightValue?.canonicalString, "42.5")
+            XCTAssertEqual(viewModel.session?.completedSetCount, 1)
+            XCTAssertNil(viewModel.restTimer, "saving an edit must not start a rest")
+            XCTAssertNil(viewModel.editingSetID)
+
+            try await environment.controller.shutdownForTesting()
+        }
+
         /// P0-D11: the entry area only confirms; the just-recorded row offers
         /// 「撤销」, which deletes that set, ends the rest and puts its values
         /// back into the form.

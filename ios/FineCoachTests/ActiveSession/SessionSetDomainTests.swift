@@ -252,6 +252,60 @@ final class SessionSetDomainTests: XCTestCase {
         XCTAssertEqual(try pendingCopy.updating(input: changedInput, now: now).state, .draft)
     }
 
+    /// P0-D14: saving new values onto a completed set keeps it completed and
+    /// keeps its completion time; invalid values change nothing.
+    func testEditingACompletedSetKeepsItCompleted() throws {
+        var session = Session.start(id: sessionID, studentID: studentID, now: now)
+        session = try session.addingSessionOnlyExercise(
+            id: squatID,
+            displayName: "杠铃深蹲",
+            recordMode: .weightReps,
+            now: now
+        )
+        session = try session.addingSet(
+            exerciseID: squatID,
+            setID: firstSetID,
+            input: TrainingSetInput(
+                recordMode: .weightReps,
+                weightValue: "60",
+                repetitionCount: "8",
+                unit: .kilograms
+            ),
+            now: now
+        )
+        session = try session.confirmingSet(setID: firstSetID, now: now)
+        let later = now.addingTimeInterval(300)
+
+        let edited = try session.editingSet(
+            setID: firstSetID,
+            input: TrainingSetInput(
+                recordMode: .weightReps,
+                weightValue: "62.5",
+                repetitionCount: "8",
+                unit: .kilograms
+            ),
+            now: later
+        )
+        let editedSet = try set(in: edited, id: firstSetID)
+        XCTAssertEqual(editedSet.state, .completed)
+        XCTAssertEqual(editedSet.completedAtUTC, now, "the set was done when it was first confirmed")
+        XCTAssertEqual(editedSet.weightValue?.canonicalString, "62.5")
+        XCTAssertEqual(edited.completedSetCount, 1)
+
+        XCTAssertThrowsError(
+            try session.editingSet(
+                setID: firstSetID,
+                input: TrainingSetInput(
+                    recordMode: .weightReps,
+                    weightValue: "62.5",
+                    repetitionCount: "0",
+                    unit: .kilograms
+                ),
+                now: later
+            )
+        )
+    }
+
     func testUndoEditDeleteAndExerciseReorderAndDangerousDelete() throws {
         var session = Session.start(id: sessionID, studentID: studentID, now: now)
         session = try session.addingSessionOnlyExercise(
