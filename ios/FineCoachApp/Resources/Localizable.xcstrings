@@ -1121,7 +1121,40 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "重量"
+            "value": "重量 kg"
+          }
+        }
+      }
+    },
+    "session.field.weightStepHint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每次 ±2.5 kg · 点数字可直接输入"
+          }
+        }
+      }
+    },
+    "session.stepper.decrementFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "减少%@"
+          }
+        }
+      }
+    },
+    "session.stepper.incrementFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "增加%@"
           }
         }
       }

@@ -14,16 +14,42 @@ struct SetEditor: View {
     var body: some View {
         VStack(alignment: .leading, spacing: FCPrimitives.space2) {
             if exercise.recordModeSnapshot == .weightReps {
-                FCTextField(String(localized: "session.field.weight"), text: $viewModel.weight)
-                    .keyboardType(.decimalPad)
-                    .accessibilityIdentifier(FCAccessibilityID.activeSessionWeight)
-                FCTextField(String(localized: "session.field.reps"), text: $viewModel.reps)
-                    .keyboardType(.numberPad)
-                    .accessibilityIdentifier(FCAccessibilityID.activeSessionReps)
+                VStack(alignment: .leading, spacing: FCPrimitives.space3) {
+                    stepperField(
+                        title: String(localized: "session.field.weight"),
+                        text: $viewModel.weight,
+                        field: .weight,
+                        keyboardType: .decimalPad,
+                        fieldIdentifier: FCAccessibilityID.activeSessionWeight,
+                        decrementIdentifier: FCAccessibilityID.activeSessionWeightDecrement,
+                        incrementIdentifier: FCAccessibilityID.activeSessionWeightIncrement
+                    )
+                    stepperField(
+                        title: String(localized: "session.field.reps"),
+                        text: $viewModel.reps,
+                        field: .reps,
+                        keyboardType: .numberPad,
+                        fieldIdentifier: FCAccessibilityID.activeSessionReps,
+                        decrementIdentifier: FCAccessibilityID.activeSessionRepsDecrement,
+                        incrementIdentifier: FCAccessibilityID.activeSessionRepsIncrement
+                    )
+                }
+                Text(String(localized: "session.field.weightStepHint"))
+                    .fcFont(.caption)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading, FCStepperField.valueColumnInset)
+                    .accessibilityIdentifier(FCAccessibilityID.activeSessionWeightStepHint)
             } else if exercise.recordModeSnapshot == .reps {
-                FCTextField(String(localized: "session.field.reps"), text: $viewModel.reps)
-                    .keyboardType(.numberPad)
-                    .accessibilityIdentifier(FCAccessibilityID.activeSessionReps)
+                stepperField(
+                    title: String(localized: "session.field.reps"),
+                    text: $viewModel.reps,
+                    field: .reps,
+                    keyboardType: .numberPad,
+                    fieldIdentifier: FCAccessibilityID.activeSessionReps,
+                    decrementIdentifier: FCAccessibilityID.activeSessionRepsDecrement,
+                    incrementIdentifier: FCAccessibilityID.activeSessionRepsIncrement
+                )
             } else if exercise.recordModeSnapshot == .cardio {
                 FCTextField(String(localized: "session.field.durationFlexible"), text: $viewModel.duration)
                     .keyboardType(.default)
@@ -109,6 +135,30 @@ struct SetEditor: View {
                     .accessibilityIdentifier(FCAccessibilityID.activeSessionUndoSet)
                 }
             }
+        }
+    }
+
+    private func stepperField(
+        title: String,
+        text: Binding<String>,
+        field: SetValueStepping.Field,
+        keyboardType: UIKeyboardType,
+        fieldIdentifier: String,
+        decrementIdentifier: String,
+        incrementIdentifier: String
+    ) -> some View {
+        FCLabelValueRow(label: title) {
+            FCStepperField(
+                title,
+                text: text,
+                canDecrement: SetValueStepping.canStepDown(text.wrappedValue, field: field),
+                keyboardType: keyboardType,
+                fieldIdentifier: fieldIdentifier,
+                decrementIdentifier: decrementIdentifier,
+                incrementIdentifier: incrementIdentifier,
+                onDecrement: { viewModel.step(field, up: false) },
+                onIncrement: { viewModel.step(field, up: true) }
+            )
         }
     }
 
