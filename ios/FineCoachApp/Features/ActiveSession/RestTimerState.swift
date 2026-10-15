@@ -1,8 +1,9 @@
 import Foundation
 
 /// The between-sets rest countdown (experience P0-D3: starts after a set is
-/// confirmed, 120 s). In-memory display aid only: nothing is persisted, no
-/// notification is scheduled, and killing the app simply drops it.
+/// confirmed, 120 s). The countdown itself is not persisted. The generic
+/// end notification (P0-D5) is a separate pending request and can still
+/// fire if the process is killed.
 struct RestTimerState: Equatable {
     static let defaultDuration: TimeInterval = 120
     static let adjustmentStep: TimeInterval = 15
@@ -38,5 +39,49 @@ struct RestTimerState: Equatable {
     /// plus `finishedHold` after `endsAt`. Already past the hold returns 0.
     func autoDismissDelay(at now: Date) -> TimeInterval {
         max(0, endsAt.addingTimeInterval(Self.finishedHold).timeIntervalSince(now))
+    }
+}
+
+/// The one pending "rest ended" notification (P0-D5). Copy is generic on
+/// purpose: a locked phone must not show a student name, exercise, or weight.
+enum RestEndNotification {
+    static let identifier = "active-session.rest-ended"
+
+    enum Plan: Equatable {
+        case remove
+        case schedule(NotificationRequestDescriptor)
+    }
+
+    /// Remove when there is no future end. Otherwise schedule at `endsAt`.
+    static func plan(endsAt: Date?, now: Date) -> Plan {
+        guard let endsAt, endsAt > now else {
+            return .remove
+        }
+        return .schedule(
+            NotificationRequestDescriptor(
+                identifier: identifier,
+                title: String(localized: "session.rest.notificationTitle"),
+                body: String(localized: "session.rest.notificationBody"),
+                fireDate: endsAt
+            )
+        )
+    }
+
+    static func apply(_ plan: Plan, with notifications: any LocalNotificationScheduling) async {
+        switch plan {
+        case .remove:
+            await notifications.removePending(identifiers: [identifier])
+        case .schedule(let descriptor):
+            await notifications.requestAuthorizationIfNeeded()
+            await notifications.removePending(identifiers: [identifier])
+            try? await notifications.schedule(descriptor)
+        }
+    }
+
+    /// UI tests must not raise the system permission alert. Production uses
+    /// the same adapter as appointment reminders.
+    static func scheduler(arguments: [String] = ProcessInfo.processInfo.arguments) -> (any LocalNotificationScheduling)?
+    {
+        arguments.contains("-FineCoachUITesting") ? nil : SystemNotificationAdapter()
     }
 }

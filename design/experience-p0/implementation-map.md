@@ -58,8 +58,8 @@ P0-a、P0-b 画稿：产品负责人 2026-10-14 审核通过。
 分类与依据：B 类（修订已批准的 30-training-v2 / Penpot「D8 训练中」）。新增 DS-REST-TIMER，并给 DS-STEPPER 增加可输入的变体，这两项属于 A 类小组件。修订稿是 Penpot「M1-B G5 Design」/ Foundations 页上的 P0-a、P0-b 画板（x=6050 / 6490，y=3750）。
 影响范围：DS-STEPPER 扩展（新变体 FCStepperField；现有的 FCStepper 和它的两个消费者不变）；新增 DS-REST-TIMER（feature 专有，只有 ActiveSession 使用）；动作行右侧的「上次」文字由 feature 拼装，用 caption 字号和 text.secondary 颜色，不新增组件。需要同步的文件：components.md §3/§4、README §8.1、Penpot、导出图。
 设计决定：沿用 D8 的布局和 DS-SET-ROW、DS-BUTTON。新的决定是 P0-D1–D7 加上述补充细节。Review 状态：产品负责人 2026-10-14 审核通过 P0-a、P0-b，并新增 P0-D5（系统通知）、P0-D6（下限）、P0-D7（「上次」的匹配规则）。
-实施与验证：逻辑层已实现（LastExercisePerformanceLookup、SetValueStepping、RestTimerState、ActiveSessionUseCases.lastPerformances、ActiveSessionViewModel 的带入、步进、休息计时）。测试：LastExercisePerformanceLookupTests 6 个、SetEntryAssistTests、ActiveSessionSetEntryPrefillTests 3 个。界面：`FCStepperField` 已接到重量和次数（P0-D4 / P0-D6）。休息条 `RestTimerBar` 已放在「结束训练」上方（P0-D3，P0-a / P0-b）：进行中显示倒计时和 −15 / +15 / 跳过，结束后显示「休息结束，可以开始下一组」和「关闭」，并在结束 3 秒后收起。系统通知、动效和触感还没做。「上次」文字、README §8.1 与 Penpot 同步、entry 和 layout map 还没做。
-结果：逻辑层 PASS（2026-10-14 全量测试：FineCoachTests 465、FineCoachIntegrationTests 157，iPhone Air 模拟器）。`FCStepperField` 和休息条已实现，定向测试见当次提交；还没有人看过界面。
+实施与验证：逻辑层已实现（LastExercisePerformanceLookup、SetValueStepping、RestTimerState、ActiveSessionUseCases.lastPerformances、ActiveSessionViewModel 的带入、步进、休息计时）。测试：LastExercisePerformanceLookupTests 6 个、SetEntryAssistTests、ActiveSessionSetEntryPrefillTests 3 个。界面：`FCStepperField` 已接到重量和次数（P0-D4 / P0-D6）。休息条 `RestTimerBar` 已放在「结束训练」上方（P0-D3）。休息结束系统通知已接上（P0-D5）：开始休息时按结束时间排一条通用本地通知（标题「休息结束」，正文「可以开始下一组了」）；±15 秒重排；跳过、收起、放弃和结束训练时撤销。权限沿用「尚未决定才申请」，被拒绝时只有 App 内休息条。动效和触感还没做。「上次」文字、README §8.1 与 Penpot 同步、entry 和 layout map 还没做。
+结果：逻辑层 PASS（2026-10-14 全量测试：FineCoachTests 465、FineCoachIntegrationTests 157，iPhone Air 模拟器）。`FCStepperField`、休息条和休息结束通知已实现，定向测试见当次提交；还没有人看过界面。
 ```
 
 ## 画板说明

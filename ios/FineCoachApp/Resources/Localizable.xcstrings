@@ -1225,6 +1225,28 @@
         }
       }
     },
+    "session.rest.notificationTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "休息结束"
+          }
+        }
+      }
+    },
+    "session.rest.notificationBody": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "可以开始下一组了"
+          }
+        }
+      }
+    },
     "session.field.reps": {
       "extractionState": "manual",
       "localizations": {

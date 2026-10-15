@@ -40,6 +40,7 @@ struct ActiveSessionView: View {
         templateUseCases: TemplateUseCases? = nil,
         studentUseCases: StudentUseCases? = nil,
         creditSettlement: SessionCreditSettlement? = nil,
+        notifications: (any LocalNotificationScheduling)? = RestEndNotification.scheduler(),
         path: Binding<[RootDestination]>
     ) {
         self.sessionUseCases = useCases
@@ -50,7 +51,8 @@ struct ActiveSessionView: View {
                 studentID: studentID,
                 useCases: useCases,
                 templateUseCases: templateUseCases,
-                creditSettlement: creditSettlement
+                creditSettlement: creditSettlement,
+                notifications: notifications
             )
         )
         _path = path
