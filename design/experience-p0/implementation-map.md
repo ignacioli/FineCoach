@@ -10,12 +10,32 @@
 | P0-D2 | 重复一组怎么做到一次点击 | 确认一组后输入框保留刚才的数值，不再清空。下一组直接点「确认」。已有的组状态规则不变 |
 | P0-D3 | 组间休息计时 | 确认一组后自动开始，倒计时 120 秒 |
 | P0-D4 | 加减步长 | 重量每次 ±2.5 kg，次数每次 ±1 |
+| P0-D5 | 休息结束是否发系统通知 | 发。App 在前台时只用 App 内的休息条和触感；App 在后台或锁屏时，到点由系统通知提醒（产品负责人 2026-10-14，推翻了下面原先「只在 App 内」的补充） |
+| P0-D6 | 步进下限 | 重量不低于 0，次数不低于 1（产品负责人 2026-10-14 同意下面的补充） |
+| P0-D7 | 「上次」取哪一次的数据 | 按下面的匹配规则（产品负责人 2026-10-14 同意）。动作行的「上次」文字和第一组的自动带入都用它 |
+
+P0-D7 匹配规则（必须遵守；改动要先经产品负责人同意）：
+
+1. **同一学员**：只看当前学员自己的记录。
+2. **同一动作**：动作库里的动作按 `sourceID` 匹配，不按名称，所以改名后历史仍然接得上。没有 `sourceID` 的课内临时动作按名称（`NormalizedName`）匹配，而且只和其他临时动作匹配，不和动作库里的动作匹配。
+3. **同一记录模式**：记录模式不同就不算同一个动作（例如上次「仅次数」，这次「重量 × 次数」），不显示，也不带入。
+4. **只算已完成**：只看已结束的课，只取其中已确认完成的组。如果最近一节课里这个动作没有已完成的组，就继续往前找。
+5. **取最近一节**：按课的结束时间取最新的一节，不依赖列表顺序。
+6. 规则和趋势页认定「同一动作」的方式一致。实现在 `Core/Domain/LastExercisePerformance.swift`，由 `LastExercisePerformanceLookupTests` 覆盖；本节课里已经有组时，带入以本节课为准（见下方「带入顺序」）。
+
+P0-a、P0-b 画稿：产品负责人 2026-10-14 审核通过。
 
 由 agent 补充、尚待产品负责人在画稿 review 时确认的细节：
 
-- **休息计时只在 App 内**：P0-D3 没有提到后台通知，所以不新增系统通知，不扩大通知内容的隐私面。结束时一次触感提醒，并显示「休息结束」，3 秒后收起。
+- ~~休息计时只在 App 内，不新增系统通知~~：已被 P0-D5 取代。App 内的表现不变：结束时一次触感提醒，并显示「休息结束」，3 秒后收起。
+- **P0-D5 的实现细节**（agent 按现有通知规则补充，走查时请产品负责人确认）：
+  - 复用 `LocalNotificationScheduling`（`Core/Platform/NotificationAdapter.swift`）。开始休息时按结束时间排一条本地通知；+15 秒、−15 秒时重排；跳过、收起、结束训练时撤销。
+  - 文案只写通用内容，例如标题「休息结束」、正文「可以开始下一组了」。不写学员姓名、动作名或重量（README §8 通知预览的规则，以及 CLAUDE.md 的隐私要求）。
+  - App 目前没有设置 `willPresent` 代理，App 在前台时系统通知不弹横幅，所以不会和 App 内的休息条重复提醒。
+  - 通知权限沿用现有的申请流程。被拒绝时只有 App 内提醒，不在训练页另外弹权限提示。
+  - 计时仍不写入数据库。杀掉进程后，已经排好的那条通知仍会按时出现，这是可以接受的。
 - 休息计时可以 −15 秒、+15 秒或跳过。计时不写入数据库：杀掉进程后计时消失，训练数据不受影响。
-- **「上次」的匹配规则**与趋势页相同：同一学员、已完成的课、同一个 `sourceID` 并且记录模式相同，取最近的一节。没有 `sourceID` 的课内临时动作按名称匹配。
+- 「上次」的匹配规则：已定为 P0-D7，见上。
 - 本轮只改「重量 × 次数」和「仅次数」两种模式。时长和有氧模式的输入保持不变。
 - 步进的下限：重量不低于 0，次数不低于 1。输入框为空时只能按「+」，重量从 2.5 开始，次数从 1 开始。
 - 代码核对后的事实（2026-10-14）：底部表单点「确认」后本来就不会清空。会清空的只有三种情况：切换动作、新加动作、编辑完某一组之后。P0-D2 改的是这三处：清空改为重新带入。带入顺序依次是：本节课这个动作最近一组（已完成的组优先），学员上次第一组，都没有则留空。
@@ -37,9 +57,9 @@
 ```text
 分类与依据：B 类（修订已批准的 30-training-v2 / Penpot「D8 训练中」）。新增 DS-REST-TIMER，并给 DS-STEPPER 增加可输入的变体，这两项属于 A 类小组件。修订稿是 Penpot「M1-B G5 Design」/ Foundations 页上的 P0-a、P0-b 画板（x=6050 / 6490，y=3750）。
 影响范围：DS-STEPPER 扩展（新变体 FCStepperField；现有的 FCStepper 和它的两个消费者不变）；新增 DS-REST-TIMER（feature 专有，只有 ActiveSession 使用）；动作行右侧的「上次」文字由 feature 拼装，用 caption 字号和 text.secondary 颜色，不新增组件。需要同步的文件：components.md §3/§4、README §8.1、Penpot、导出图。
-设计决定：沿用 D8 的布局和 DS-SET-ROW、DS-BUTTON。新的决定是 P0-D1–D4 加上述补充细节。Review 状态：待产品负责人在 Penpot 审阅。
+设计决定：沿用 D8 的布局和 DS-SET-ROW、DS-BUTTON。新的决定是 P0-D1–D7 加上述补充细节。Review 状态：产品负责人 2026-10-14 审核通过 P0-a、P0-b，并新增 P0-D5（系统通知）、P0-D6（下限）、P0-D7（「上次」的匹配规则）。
 实施与验证：不依赖画稿的逻辑层已先实现（AGENTS.md「不依赖答案的工作继续做」）：LastExercisePerformanceLookup（Core/Domain）、SetValueStepping（Core/Domain）、RestTimerState（ActiveSession）、ActiveSessionUseCases.lastPerformances、ActiveSessionViewModel 的带入、步进、休息计时。测试：FineCoachTests 中的 LastExercisePerformanceLookupTests 6 个、SetEntryAssistTests 7 个；FineCoachIntegrationTests 中的 ActiveSessionSetEntryPrefillTests 3 个。界面部分（FCStepperField、休息条、「上次」文字、动效和触感）等画稿 review 通过后再做。
-结果：逻辑层 PASS（定向测试 2026-10-14，iPhone Air 模拟器）；界面 BLOCKED，等待 L3-1 画稿 review。
+结果：逻辑层 PASS（2026-10-14 全量测试：FineCoachTests 465、FineCoachIntegrationTests 157，iPhone Air 模拟器）；画稿 review 已通过，界面待实现（含 P0-D5 系统通知）。
 ```
 
 ## 画板说明
