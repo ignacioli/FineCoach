@@ -134,6 +134,8 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 | `DS-HUB-ROW` | `FCHubRow` | §4.7；19/42/43 | ResourceHub、Settings（M2 新页面使用） | 已实现（M2 T002），人工项待首次走查 |
 | `DS-INLINE-RESULT` | `FCInlineResult` | §4.7；38/39 | BackupRestoreFlow | 已实现（M2 T003），信息变体待 M2 页面首次使用 |
 | `DS-ACTION-ROW` | `FCActionRow` | §8.1 操作行；18/24；destructive 图标（§4.7） | 10 个文件 | 稳定；destructive 图标已实现（M2 T005） |
+| `DS-UNDO-ROW` | 待 B2 新增：FCUndoRow | §8.1 删除后撤销行；B-b（2026-10-16 已批准） | ActiveSession（删组）、BodyMeasurementEntry（删单条测量） | 规格已定（§4.8），代码待 B2 |
+| `DS-MORE-MENU` | 待 B2 新增：FCMoreMenu | §8.1 标题行「…」菜单；B-a / B-b（2026-10-16 已批准） | ActiveSession、TemplateEditor（分区标题）；BodyMeasurementEntry（页头，B2 迁移） | 规格已定（§4.8），代码待 B2 |
 | `DS-SET-ROW` | `FCSetRow`、`FCSetStateCircle` | §6 组圆圈；11/30 | ActiveSession；圆圈另用于 ShareReport、History | 见 CG-4 |
 | `DS-HERO-CARD` | `FCHeroCard` | §8 深色 hero 卡；01/18 | Today、StudentDetail | 见 CG-6 |
 | `DS-HINT-BAR` | `FCHintBar`、`FCActiveSessionBar` | §8 提示条；§8.1 训练中提示条；21 | StudentDetail、StudentList | 稳定 |
@@ -240,7 +242,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 #### `DS-ACTION-ROW` 操作行
 
 - **部件**：标题（无副标题时为 `body`，有副标题时为 `headline`）→ 可选副标题（`caption` `text.secondary`）→ 弹性空白 → 可选说明（`caption` `text.secondary`）→ `›`（仅普通操作行）。最小高 52；有副标题时上下内边距 `space.3`。
-- **变体**：`normal`；`destructive`（`status.destructive` 字、**没有** `›`）；禁用（文字和 `›` 都改为 `text.disabled`）。
+- **变体**：`normal`；`destructive`（`status.destructive` 字、**没有** `›`）；禁用（文字和 `›` 都改为 `text.disabled`）。destructive 行暂不可用时用禁用变体，并在说明 slot 写原因，整行不可点（B-c「删除指标」，2026-10-16 已批准）。
 - **不变量**：destructive 行自身不执行破坏性操作，调用方必须在 `action` 中弹出 `DS-CONFIRM-DIALOG`（§8.1，可自动：可以扫描调用方源码）；整行可点。
 - **复用边界**：放在底部面板和编辑页的操作区。普通内容浏览列表使用 `DS-LIST-ROW`。
 
@@ -396,6 +398,29 @@ C 类，只补规则，默认字号下外观不变：
 - 标题、说明换行不截断。
 - 两个按钮文字在动态字体放大后任一放不下一行时，按钮行改为上下堆叠：确认在上、取消在下，各自占满卡片内宽，视觉高度随文字增长，最小点击区仍为 44。
 - **不变量**：上述规则在组件内实现，调用方不传尺寸（可自动：源码扫描调用方没有 `.frame(width:)`）；堆叠时的视觉在组件修改时看一次（人工）。
+
+### 4.8 阶段 B 交互收敛（2026-10-16 已批准）
+
+来源：Penpot「M1-B G5 Design」/ Foundations 页 B-a、B-b、B-c，快照 `B boards approved 2026-10-16`；参考图 `design/experience-t2/boards/*@1x.png`；决定 `design/experience-t2/decisions.md` B-D1–B-D8。分类 B（改已批准的交互），画稿已审。
+
+#### 左滑删除（页面组合规则，无共享代码）
+
+- **规则**：列表里的单项（训练组、训练中的动作行、单条测量、模板动作行）用系统 `.swipeActions(edge: .trailing)` 删除，按钮「删除」`.tint(FCSemanticColors.statusDestructive)`。已完成的组 `allowsFullSwipe: false`，其余单项可以一滑到底。
+- **不变量**：每个左滑删除都有 accessibility identifier（可自动：静态扫描）；左滑不是唯一入口时，其他入口保持不变（如动作行的「移入分区」）。
+- **复用边界**：整个对象（模板、自定义指标、某指标的全部测量、本机档案）不用左滑，用页面底部 `DS-ACTION-ROW` destructive + `DS-CONFIRM-DIALOG`（B-D2 ②）。
+
+#### `DS-UNDO-ROW` 删除后撤销行
+
+- **部件**：说明文字（`body` `text.secondary`，单行，「<对象>已删除」）→ 弹性空白 → 「撤销」（`FCLinkButton`）。行高和分割线同被删的行，放在被删项原来的位置。
+- **状态**：只有一个可见状态；窗口结束后整行移除。
+- **不变量**：窗口时长只来自一个常量，与 P0-D11 的 `ActiveSessionViewModel.undoWindow`（4 秒）是同一个值（可自动）；撤销把对象放回原位置并恢复原状态，已完成的组撤销后仍是已完成，不再确认（可自动：view model 测试）；整行读作说明文字，提供「撤销」动作（可自动）；没有确认弹窗（B-D4、B-D8）。
+- **复用边界**：只用于左滑删除的单项。刚确认的组在 4 秒内显示的「撤销」属于 `DS-SET-ROW` 的状态文字，不用本组件。
+
+#### `DS-MORE-MENU` 「…」菜单
+
+- **部件**：`ellipsis` 线性图标（尺寸按 README §7.2 标题行图标），`text.secondary`，点击区 ≥ 44×44，包一个系统 `Menu`。破坏性菜单项用 `role: .destructive`，点了只弹 `DS-CONFIRM-DIALOG`，不直接执行。
+- **不变量**：图标有无障碍标签「更多操作」和 accessibility identifier（可自动）；菜单项本身不执行破坏性操作（可自动：扫描调用方）。
+- **复用边界**：分区标题行（训练中、模板编辑）只有「删除分区」一项（B-D3）；指标记录页右上角只留「停用指标 / 恢复指标」（Δ4）。普通的下一级导航不用菜单。
 
 ## 5. 缺口与偏差登记
 
