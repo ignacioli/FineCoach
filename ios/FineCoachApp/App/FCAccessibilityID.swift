@@ -124,6 +124,7 @@ public enum FCAccessibilityID {
     public static let calendarRoot = "calendar.root"
     public static let appointmentEditorRoot = "appointmentEditor.root"
     public static let appointmentEditorSave = "appointmentEditor.save"
+    public static let appointmentEditorConflictOverride = "appointmentEditor.conflictOverride"
     public static let calendarPreviousMonth = "calendar.previousMonth"
     public static let calendarNextMonth = "calendar.nextMonth"
     public static let calendarAdd = "calendar.add"
@@ -248,6 +249,7 @@ public enum FCAccessibilityID {
     }
 
     public static let bodyMeasurementDeleteConfirm = "bodyMeasurementEntry.deleteConfirm"
+    public static let bodyMeasurementDeleteMetricConfirm = "bodyMeasurementEntry.deleteMetricConfirm"
     public static let bodyMeasurementDeleteAll = "bodyMeasurementEntry.deleteAll"
     public static let bodyMeasurementDeleteAllConfirm = "bodyMeasurementEntry.deleteAllConfirm"
 
@@ -267,6 +269,7 @@ public enum FCAccessibilityID {
     public static let coursePackageEditorName = "coursePackageEditor.name"
     public static let coursePackageEditorTotalCredits = "coursePackageEditor.totalCredits"
     public static let coursePackageEditorSave = "coursePackageEditor.save"
+    public static let coursePackageEditorConfirmEndActive = "coursePackageEditor.confirmEndActive"
 
     public static let manualAdjustmentRoot = "manualAdjustment.root"
     public static let manualAdjustmentDirection = "manualAdjustment.direction"

@@ -571,19 +571,20 @@ struct AppointmentEditorView: View {
                 dismiss()
             }
         }
-        .confirmationDialog(
-            String(localized: "appointmentEditor.conflictTitle"),
-            isPresented: conflictPresented,
-            titleVisibility: .visible
-        ) {
-            Button(String(localized: "appointmentEditor.conflictOverride"), role: .destructive) {
-                Task { await viewModel.confirmOverrideAndSave() }
-            }
-            Button(String(localized: "appointmentEditor.conflictCancel"), role: .cancel) {
-                viewModel.dismissConflict()
-            }
-        } message: {
-            Text(viewModel.conflictMessage)
+        .fcConfirmationDialog(isPresented: conflictPresented) {
+            FCConfirmationDialog(
+                title: String(localized: "appointmentEditor.conflictTitle"),
+                message: viewModel.conflictMessage,
+                cancelAction: .init(title: String(localized: "appointmentEditor.conflictCancel")) {
+                    viewModel.dismissConflict()
+                },
+                confirmAction: .init(
+                    title: String(localized: "appointmentEditor.conflictOverride"),
+                    accessibilityIdentifier: FCAccessibilityID.appointmentEditorConflictOverride
+                ) {
+                    Task { await viewModel.confirmOverrideAndSave() }
+                }
+            )
         }
     }
 
