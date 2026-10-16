@@ -189,6 +189,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
   - `FCBodyPartChip`：高 28、最小宽 48、水平内边距 `space.4`；`FCBodyPartPicker` 按 `BodyPart.allCases` 的 spec 顺序排出 8 个，通过 `FCFlowLayout` 自动换行。
 - **状态**：未选中 `surface.selected` 底 + `text.primary` 字；选中 `action.primary` 底 + `action.on` 字，并带 `.isSelected` 属性。
 - **不变量**：视觉高度保持 28/30，点击区补足到 ≥ 44（自动）；`FCBodyPartPicker` 胶囊之间的视觉行距为 8，通过负的布局行距抵消 44pt 点击区（`space.2 - (44 - 28)`，可自动）；部位顺序与 spec 一致（可自动）。
+- **可访问性标识扩展**：`FCBodyPartPicker` 可选接收 `BodyPart -> String` identifier factory，默认 `nil`；非 `nil` 时将结果赋给对应的真实 `FCBodyPartChip` Button，`nil` 时不设置 identifier。该扩展只增加自动化定位能力，不改变视觉、布局或默认消费者行为。
 - **复用边界**：多选与单选共用同一套外观；是单选还是多选由调用方的绑定决定。不要新造第三种胶囊尺寸；确实需要时按「扩展」流程处理。
 
 #### `DS-TOGGLE` 开关

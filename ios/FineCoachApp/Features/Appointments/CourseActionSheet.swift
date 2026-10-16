@@ -89,7 +89,10 @@ private struct CourseActionSheetModifier: ViewModifier {
                     cancelAction: .init(title: String(localized: "today.cancelConfirm.keep")) {
                         isConfirmingCancel = false
                     },
-                    confirmAction: .init(title: String(localized: "today.cancelConfirm.confirm")) {
+                    confirmAction: .init(
+                        title: String(localized: "today.cancelConfirm.confirm"),
+                        accessibilityIdentifier: FCAccessibilityID.todayCancelConfirm
+                    ) {
                         let target = appointment
                         isConfirmingCancel = false
                         close()
@@ -167,6 +170,7 @@ private struct CourseActionSheetModifier: ViewModifier {
                     }
                 }
             }
+            .accessibilityIdentifier(FCAccessibilityID.todayStartTraining)
             .padding(.bottom, FCPrimitives.space2)
             FCActionRow(
                 title: String(localized: "today.action.markAbsent"),
@@ -187,6 +191,7 @@ private struct CourseActionSheetModifier: ViewModifier {
             ) {
                 isConfirmingCancel = true
             }
+            .accessibilityIdentifier(FCAccessibilityID.todayCancelCourse)
         }
     }
 
@@ -202,11 +207,13 @@ private struct CourseActionSheetModifier: ViewModifier {
                 close()
                 perform { try await actions.markAbsent(appointment, creditChoice: .notCharged) }
             }
+            .accessibilityIdentifier(FCAccessibilityID.todayAbsentNotCharged)
             FCListRowDivider()
             FCActionRow(title: String(localized: "today.action.markAbsentCharged")) {
                 close()
                 perform { try await actions.markAbsent(appointment, creditChoice: .charged) }
             }
+            .accessibilityIdentifier(FCAccessibilityID.todayAbsentCharged)
             FCListRowDivider()
             FCLinkButton(title: String(localized: "today.sheet.back")) {
                 isChoosingAbsence = false

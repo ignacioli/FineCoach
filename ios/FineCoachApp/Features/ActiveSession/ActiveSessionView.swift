@@ -188,9 +188,11 @@ struct ActiveSessionView: View {
             Button(String(localized: "templateEditor.deleteSection.moveOut")) {
                 Task { await viewModel.deleteSection(section, disposition: .moveExercisesTo(sectionID: nil)) }
             }
+            .accessibilityIdentifier(FCAccessibilityID.activeSessionDeleteSectionMoveOut)
             Button(String(localized: "templateEditor.deleteSection.deleteExercises"), role: .destructive) {
                 Task { await viewModel.deleteSection(section, disposition: .deleteWithExercises) }
             }
+            .accessibilityIdentifier(FCAccessibilityID.activeSessionDeleteSectionDeleteExercises)
         }
         .confirmationDialog(
             String(localized: "activeSession.moveToSection"),
@@ -203,10 +205,12 @@ struct ActiveSessionView: View {
             Button(String(localized: "activeSession.unsectioned")) {
                 Task { await viewModel.moveExercise(exerciseID, toSectionID: nil) }
             }
+            .accessibilityIdentifier(FCAccessibilityID.activeSessionMoveToUnsectioned)
             ForEach(viewModel.orderedSections) { section in
                 Button(section.name.value) {
                     Task { await viewModel.moveExercise(exerciseID, toSectionID: section.id) }
                 }
+                .accessibilityIdentifier(FCAccessibilityID.activeSessionMoveToSectionChoice(section.id))
             }
         }
         .onChange(of: viewModel.session?.state) { _, _ in
@@ -308,7 +312,10 @@ struct ActiveSessionView: View {
                     "\(balance)"
                 ),
                 cancelAction: skip,
-                confirmAction: .init(title: String(localized: "sessionCredit.adhoc.debit")) {
+                confirmAction: .init(
+                    title: String(localized: "sessionCredit.adhoc.debit"),
+                    accessibilityIdentifier: FCAccessibilityID.activeSessionCreditDebitConfirm
+                ) {
                     Task {
                         if await viewModel.debitAdhocSession() {
                             pushSummaryIfReady()
@@ -480,6 +487,7 @@ struct ActiveSessionView: View {
                             .frame(minHeight: 44)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityIdentifier(FCAccessibilityID.activeSessionDeleteSection(section.id))
                 }
             }
             .accessibilityIdentifier(FCAccessibilityID.activeSessionSectionHeader(section.id))
@@ -563,6 +571,7 @@ struct ActiveSessionView: View {
                         isCreatingSection = false
                     }
                 }
+                .accessibilityIdentifier(FCAccessibilityID.activeSessionCreateSectionSubmit)
             }
         }
     }

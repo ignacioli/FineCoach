@@ -7,6 +7,17 @@ import SwiftUI
 struct BodyPartMultiSelectView: View {
     let title: String
     @Binding var selection: Set<BodyPart>
+    let chipAccessibilityIdentifier: ((BodyPart) -> String)?
+
+    init(
+        title: String,
+        selection: Binding<Set<BodyPart>>,
+        chipAccessibilityIdentifier: ((BodyPart) -> String)? = nil
+    ) {
+        self.title = title
+        self._selection = selection
+        self.chipAccessibilityIdentifier = chipAccessibilityIdentifier
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: FCPrimitives.space2) {
@@ -14,7 +25,10 @@ struct BodyPartMultiSelectView: View {
                 .fcFont(.callout, weight: .regular)
                 .foregroundStyle(FCSemanticColors.textSecondary)
                 .accessibilityAddTraits(.isHeader)
-            FCBodyPartPicker(selection: $selection)
+            FCBodyPartPicker(
+                selection: $selection,
+                accessibilityIdentifier: chipAccessibilityIdentifier
+            )
         }
         .accessibilityElement(children: .contain)
     }
