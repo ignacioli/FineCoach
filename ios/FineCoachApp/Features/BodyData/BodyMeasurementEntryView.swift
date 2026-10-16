@@ -406,9 +406,15 @@ struct BodyMeasurementEntryView: View {
             ) {
                 Task { await viewModel.toggleArchive() }
             }
+            .accessibilityIdentifier(
+                viewModel.metric?.lifecycle == .archived
+                    ? FCAccessibilityID.bodyMeasurementRestore
+                    : FCAccessibilityID.bodyMeasurementArchive
+            )
             Button(String(localized: "bodyData.delete"), role: .destructive) {
                 viewModel.showingDeleteMetricConfirm = true
             }
+            .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementDeleteMetric)
         } label: {
             Image(systemName: "ellipsis")
                 .foregroundStyle(FCSemanticColors.textSecondary)
@@ -430,6 +436,7 @@ struct BodyMeasurementEntryView: View {
                     .foregroundStyle(FCSemanticColors.statusDestructive)
             }
             .frame(minWidth: 44, minHeight: 44)
+            .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementDeleteMeasurement(measurement.id))
         }
         .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementRow(measurement.id))
     }

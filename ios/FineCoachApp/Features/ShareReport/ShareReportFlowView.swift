@@ -290,13 +290,20 @@ struct ShareReportFlowView: View {
             FCListRowDivider()
             checkRow(
                 String(localized: "share.module.record"), note: String(localized: "share.module.recordNote"),
-                isOn: $viewModel.includeRecord)
+                isOn: $viewModel.includeRecord,
+                accessibilityIdentifier: FCAccessibilityID.shareReportRecordToggle)
             FCListRowDivider()
             checkRow(
                 String(localized: "share.module.exercises"), note: String(localized: "share.module.exercisesNote"),
-                isOn: $viewModel.includeExercises)
+                isOn: $viewModel.includeExercises,
+                accessibilityIdentifier: FCAccessibilityID.shareReportExercisesToggle)
             FCListRowDivider()
-            checkRow(String(localized: "share.module.summary"), note: nil, isOn: $viewModel.includeSummary)
+            checkRow(
+                String(localized: "share.module.summary"),
+                note: nil,
+                isOn: $viewModel.includeSummary,
+                accessibilityIdentifier: FCAccessibilityID.shareReportSummaryToggle
+            )
             FCListRowDivider()
             toggleRow(
                 String(localized: "history.pb.title"),
@@ -323,7 +330,12 @@ struct ShareReportFlowView: View {
         .accessibilityIdentifier(FCAccessibilityID.shareReportModules)
     }
 
-    private func checkRow(_ title: String, note: String?, isOn: Binding<Bool>) -> some View {
+    private func checkRow(
+        _ title: String,
+        note: String?,
+        isOn: Binding<Bool>,
+        accessibilityIdentifier: String
+    ) -> some View {
         Button {
             isOn.wrappedValue.toggle()
             viewModel.refreshPreview()
@@ -348,6 +360,7 @@ struct ShareReportFlowView: View {
         .buttonStyle(.plain)
         .sensoryFeedback(.selection, trigger: isOn.wrappedValue)
         .accessibilityAddTraits(isOn.wrappedValue ? .isSelected : [])
+        .accessibilityIdentifier(accessibilityIdentifier)
     }
 
     private func toggleRow(

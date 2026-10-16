@@ -448,6 +448,7 @@ struct StudentListView: View {
                 Task { await viewModel.restore(student) }
             }
             .accessibilityLabel(Text("\(String(localized: "student.archived.restore")) \(student.displayName.value)"))
+            .accessibilityIdentifier(FCAccessibilityID.studentListRestore(student.id))
         }
         .padding(.vertical, FCPrimitives.space3)
     }

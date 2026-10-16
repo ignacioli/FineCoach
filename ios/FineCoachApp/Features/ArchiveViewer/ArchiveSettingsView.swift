@@ -112,7 +112,10 @@ struct ArchiveSettingsView: View {
                 cancelAction: .init(title: String(localized: "archive.settings.deleteConfirm.cancel")) {
                     isConfirmingDelete = false
                 },
-                confirmAction: .init(title: String(localized: "archive.settings.deleteConfirm.confirm")) {
+                confirmAction: .init(
+                    title: String(localized: "archive.settings.deleteConfirm.confirm"),
+                    accessibilityIdentifier: FCAccessibilityID.archiveSettingsDeleteConfirm
+                ) {
                     isConfirmingDelete = false
                     deleteConfirmed()
                 }

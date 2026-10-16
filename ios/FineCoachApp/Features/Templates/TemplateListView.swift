@@ -133,6 +133,7 @@ struct TemplateListView: View {
                             }
                         }
                     }
+                    .accessibilityIdentifier(FCAccessibilityID.templateListCreate)
                 }
             }
         }

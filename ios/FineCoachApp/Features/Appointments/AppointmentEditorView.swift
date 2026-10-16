@@ -767,6 +767,7 @@ struct AppointmentEditorView: View {
                 ) {
                     Task { await viewModel.apply(scope: .thisInstanceOnly) }
                 }
+                .accessibilityIdentifier(FCAccessibilityID.appointmentEditorScopeThisOnly)
                 FCListRowDivider()
                 FCActionRow(
                     title: String(localized: "appointmentEditor.scope.thisAndFuture"),
@@ -775,6 +776,7 @@ struct AppointmentEditorView: View {
                 ) {
                     Task { await viewModel.apply(scope: .thisAndFuture) }
                 }
+                .accessibilityIdentifier(FCAccessibilityID.appointmentEditorScopeThisAndFuture)
                 FCListRowDivider()
                 FCLinkButton(title: String(localized: "appointmentEditor.scope.cancel")) {
                     viewModel.isScopeSheetPresented = false

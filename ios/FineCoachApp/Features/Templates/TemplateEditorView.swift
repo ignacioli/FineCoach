@@ -180,7 +180,9 @@ struct TemplateEditorView: View {
                         Task { await viewModel.rename(newValue) }
                     }
                 BodyPartMultiSelectView(
-                    title: String(localized: "templateEditor.trainingFocus"), selection: $trainingFocus
+                    title: String(localized: "templateEditor.trainingFocus"),
+                    selection: $trainingFocus,
+                    chipAccessibilityIdentifier: FCAccessibilityID.templateEditorTrainingFocus
                 )
                 .onChange(of: trainingFocus) { _, newValue in
                     Task { await viewModel.updateTrainingFocus(newValue) }
@@ -231,7 +233,10 @@ struct TemplateEditorView: View {
                 cancelAction: .init(title: String(localized: "templateEditor.deleteTemplate.keep")) {
                     isConfirmingDelete = false
                 },
-                confirmAction: .init(title: String(localized: "templateEditor.deleteTemplate.confirm")) {
+                confirmAction: .init(
+                    title: String(localized: "templateEditor.deleteTemplate.confirm"),
+                    accessibilityIdentifier: FCAccessibilityID.templateEditorDeleteConfirm
+                ) {
                     isConfirmingDelete = false
                     Task {
                         if await viewModel.deleteTemplate() {
@@ -257,9 +262,11 @@ struct TemplateEditorView: View {
             Button(String(localized: "templateEditor.deleteSection.moveOut")) {
                 Task { await viewModel.deleteSection(section, disposition: .moveExercisesTo(sectionID: nil)) }
             }
+            .accessibilityIdentifier(FCAccessibilityID.templateEditorDeleteSectionMoveOut)
             Button(String(localized: "templateEditor.deleteSection.deleteExercises"), role: .destructive) {
                 Task { await viewModel.deleteSection(section, disposition: .deleteWithExercises) }
             }
+            .accessibilityIdentifier(FCAccessibilityID.templateEditorDeleteSectionDeleteExercises)
         }
     }
 
@@ -272,10 +279,12 @@ struct TemplateEditorView: View {
                 Button(String(localized: "templateEditor.unsectioned")) {
                     Task { await viewModel.moveExercise(exercise.id, toSectionID: nil) }
                 }
+                .accessibilityIdentifier(FCAccessibilityID.templateEditorMoveToUnsectioned)
                 ForEach(viewModel.orderedSections) { section in
                     Button(section.name.value) {
                         Task { await viewModel.moveExercise(exercise.id, toSectionID: section.id) }
                     }
+                    .accessibilityIdentifier(FCAccessibilityID.templateEditorMoveToSection(section.id))
                 }
             }
             .frame(minHeight: 44)
@@ -284,6 +293,7 @@ struct TemplateEditorView: View {
             }
             .frame(minHeight: 44)
             .foregroundStyle(FCSemanticColors.statusDestructive)
+            .accessibilityIdentifier(FCAccessibilityID.templateEditorRemoveExercise(exercise.id))
         }
         .padding(FCPrimitives.space2)
         .background(FCSemanticColors.surfaceElevated)
@@ -303,6 +313,7 @@ struct TemplateEditorView: View {
                 }
                 .frame(minHeight: 44)
                 .foregroundStyle(FCSemanticColors.statusDestructive)
+                .accessibilityIdentifier(FCAccessibilityID.templateEditorDeleteSection(section.id))
             }
             .accessibilityIdentifier(FCAccessibilityID.templateSectionRow(section.id))
             ForEach(viewModel.exercises(in: section)) { exercise in

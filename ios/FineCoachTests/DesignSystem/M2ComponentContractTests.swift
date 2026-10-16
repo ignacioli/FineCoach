@@ -251,6 +251,22 @@ final class M2ComponentContractTests: XCTestCase {
             source.contains("showsTrashIcon: Bool = false"), "default keeps the 10 existing consumers unchanged")
     }
 
+    // MARK: - DS-CHIP
+
+    func testBodyPartChipIdentifierFactoryTargetsTheFinalButtonAndDefaultsToNil() throws {
+        let chip = try componentSource("FCBodyPartChip.swift")
+        XCTAssertTrue(chip.contains("accessibilityIdentifier: String? = nil"))
+        XCTAssertTrue(chip.contains("if let accessibilityIdentifier"))
+        XCTAssertTrue(chip.contains("button.accessibilityIdentifier(accessibilityIdentifier)"))
+        XCTAssertTrue(chip.contains("FCBodyPartChip("))
+
+        let picker = try componentSource("FCBodyPartChip.swift")
+        XCTAssertTrue(picker.contains("private let accessibilityIdentifier: ((BodyPart) -> String)?"))
+        XCTAssertTrue(picker.contains("accessibilityIdentifier: ((BodyPart) -> String)? = nil"))
+        XCTAssertTrue(picker.contains("accessibilityIdentifier: accessibilityIdentifier?(part)"))
+
+    }
+
     // MARK: - DS-CONFIRM-DIALOG
 
     func testConfirmationDialogActionSupportsOptionalIdentifierAndPassesItToButton() throws {

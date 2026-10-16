@@ -252,6 +252,7 @@ struct BodyDataListView: View {
             FCButton(title: String(localized: "bodyData.newCustomMetric.save")) {
                 Task { await viewModel.createCustomMetric() }
             }
+            .accessibilityIdentifier(FCAccessibilityID.bodyDataNewCustomMetricSave)
             Button(String(localized: "bodyData.newCustomMetric.cancel")) {
                 viewModel.cancelNewCustomMetric()
             }
