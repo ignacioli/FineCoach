@@ -1,0 +1,9 @@
+---
+description: 始终生效。项目约束只有一个来源：仓库根目录的 AGENTS.md。
+alwaysApply: true
+---
+
+# 先读 AGENTS.md
+
+- 改被跟踪文件之前先读仓库根目录的 `AGENTS.md`。产品范围、领域语言、隐私、验收、Git 和「Operational constraints」都以它为准，这里不重复。
+- 下面几个按文件类型生效的规则文件只放 `AGENTS.md` 没写、且只在改对应文件时才需要的细节。要新增跨工具都适用的约束，改 `AGENTS.md`，不要写进这里。

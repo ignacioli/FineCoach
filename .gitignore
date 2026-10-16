@@ -54,8 +54,9 @@ blob-report/
 !.specify/memory
 !.specify/memory/constitution.md
 
-# cursor
-.cursor/
+# cursor: only the shared project rules are tracked
+.cursor/*
+!.cursor/rules/
 
 # claude
 .claude

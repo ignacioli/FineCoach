@@ -19,7 +19,8 @@ in this repository. See `AGENTS.md` §Change Workflow.
 ## Protected primary branch
 
 Do not modify tracked files, stage, or commit on `main` or `master` in
-this repository. This repo currently has no remote. Before any
+this repository. The remote `origin` is the public GitHub repository;
+do not push without product-owner approval. Before any
 tracked-file edit, create or switch into a topic branch — prefer a
 dedicated `git worktree` — and run the `ig-worktree-gate` skill before
 editing. Gitignored or untracked local state on the primary checkout is
