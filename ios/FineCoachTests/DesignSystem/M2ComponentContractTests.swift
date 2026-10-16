@@ -253,6 +253,25 @@ final class M2ComponentContractTests: XCTestCase {
 
     // MARK: - DS-CONFIRM-DIALOG
 
+    func testConfirmationDialogActionSupportsOptionalIdentifierAndPassesItToButton() throws {
+        let defaultAction = FCConfirmationDialog.Action(title: "Cancel") {}
+        XCTAssertNil(defaultAction.accessibilityIdentifier, "existing trailing-closure calls keep the default nil")
+
+        let identifiedAction = FCConfirmationDialog.Action(
+            title: "Confirm",
+            accessibilityIdentifier: "confirm-action"
+        ) {}
+        XCTAssertEqual(identifiedAction.accessibilityIdentifier, "confirm-action")
+
+        let dialog = try componentSource("FCConfirmationDialog.swift")
+        XCTAssertTrue(dialog.contains("public let accessibilityIdentifier: String?"))
+        XCTAssertTrue(dialog.contains("accessibilityIdentifier: String? = nil"))
+        XCTAssertTrue(dialog.contains("if let accessibilityIdentifier = action.accessibilityIdentifier"))
+        XCTAssertTrue(dialog.contains("button.accessibilityIdentifier(accessibilityIdentifier)"))
+        XCTAssertTrue(
+            dialog.contains("} else {\n            button"), "nil keeps the button free of an empty identifier")
+    }
+
     func testConfirmationDialogOwnsItsSizeAndCallersPassNone() throws {
         let dialog = try componentSource("FCConfirmationDialog.swift")
         XCTAssertFalse(dialog.contains(".frame(width: 300)"), "width is a maximum, not a fixed frame")
