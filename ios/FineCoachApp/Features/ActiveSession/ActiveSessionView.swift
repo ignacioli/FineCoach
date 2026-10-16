@@ -153,17 +153,6 @@ struct ActiveSessionView: View {
             }
         }
         .background(FCSemanticColors.surfacePage)
-        .safeAreaInset(edge: .top, spacing: 0) {
-            // Δ7: with the navigation bar hidden nothing backs the status
-            // bar, so scrolled content showed under the time and signal. A
-            // zero-height top inset whose background extends into the top
-            // safe area covers the status bar with the page color (a plain
-            // zero-height overlay did not reach it on device, 2026-10-15).
-            Color.clear
-                .frame(height: 0)
-                .background(FCSemanticColors.surfacePage, ignoresSafeAreaEdges: .top)
-                .accessibilityHidden(true)
-        }
         .fcSecondaryPage()
         .fcBottomSheet(isPresented: $viewModel.isAddingExercise) {
             addExerciseSheet

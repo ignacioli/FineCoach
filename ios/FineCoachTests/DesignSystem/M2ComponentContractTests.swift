@@ -37,6 +37,15 @@ final class M2ComponentContractTests: XCTestCase {
     /// Left on the system bar on purpose: only the nav-title pages whose title sits in the bar
     /// (ActiveSessionView moved to the inline back, owner 2026-10-10).
     func testEverySecondaryPageUsesTheInlineBack() throws {
+        let chrome = try componentSource("FCPageHeader.swift")
+        let chromeStart = try XCTUnwrap(chrome.range(of: "public func fcSecondaryPage("))
+        let chromeEnd = try XCTUnwrap(
+            chrome.range(of: "/// Re-enables", range: chromeStart.upperBound..<chrome.endIndex))
+        let secondaryPage = chrome[chromeStart.lowerBound..<chromeEnd.lowerBound]
+        XCTAssertTrue(secondaryPage.contains(".safeAreaInset(edge: .top, spacing: 0)"))
+        XCTAssertTrue(secondaryPage.contains(".frame(height: 0)"))
+        let topCover = ".background(FCSemanticColors.surfacePage, ignoresSafeAreaEdges: .top)"
+        XCTAssertTrue(secondaryPage.contains(topCover), "the shared chrome backs the status bar with the page surface")
         let features = appRoot().appendingPathComponent("Features")
         let enumerator = try XCTUnwrap(FileManager.default.enumerator(at: features, includingPropertiesForKeys: nil))
         let systemBackAllowed: Set<String> = []
@@ -44,6 +53,7 @@ final class M2ComponentContractTests: XCTestCase {
         for case let url as URL in enumerator where url.pathExtension == "swift" {
             let name = url.lastPathComponent
             let source = try String(contentsOf: url, encoding: .utf8)
+            XCTAssertFalse(source.contains(topCover), "\(name) duplicates the shared secondary-page status-bar cover")
             if source.contains(".toolbarRole(.editor)") {
                 XCTAssertTrue(systemBackAllowed.contains(name), "\(name) still uses the system back row")
             }

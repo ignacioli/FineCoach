@@ -202,6 +202,14 @@ extension View {
     public func fcSecondaryPage(swipeBackEnabled: Bool = true) -> some View {
         toolbar(.hidden, for: .navigationBar)
             .background(FCSwipeBackEnabler(isEnabled: swipeBackEnabled).frame(width: 0, height: 0))
+            .safeAreaInset(edge: .top, spacing: 0) {
+                // The hidden navigation bar leaves the status bar without a backing surface.
+                // Keep the zero-height inset while extending its page background into the safe area.
+                Color.clear
+                    .frame(height: 0)
+                    .background(FCSemanticColors.surfacePage, ignoresSafeAreaEdges: .top)
+                    .accessibilityHidden(true)
+            }
     }
 }
 
