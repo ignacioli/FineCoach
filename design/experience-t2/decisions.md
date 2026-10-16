@@ -39,7 +39,7 @@
 3. B2 代码：Δ1、Δ10 不依赖画稿，可以和第 2 步同时做；其余等画稿通过。
 4. B3 文案（Δ11）：B1 合并后再做，避免和 B1 同时改同一批页面文件。
 
-## 画稿（2026-10-15，待产品负责人审）
+## 画稿（2026-10-15 画，2026-10-16 产品负责人通过）
 
 Penpot「M1-B G5 Design」/ Foundations 页，P0-a2b 右侧：
 
@@ -47,12 +47,12 @@ Penpot「M1-B G5 Design」/ Foundations 页，P0-a2b 右侧：
 - `B-b`（x=8250，y=3750）：局部状态。分区菜单只有「删除分区」；已完成组左滑和删除后 4 秒撤销；单条测量左滑和删除后 4 秒撤销；模板动作行左滑（Δ8、Δ9、Δ3、Δ2）。
 - `B-c`（x=8690，y=3750）：指标记录页的历史记录和「管理」区。「清空全部记录」「删除指标」两个红色操作行，有记录时「删除指标」置灰（Δ3、Δ4、Δ5）。
 
-版本快照：`before-B-boards 2026-10-15` → `B boards (pending approval) 2026-10-15: …`；`File.validate()` 0 个错误。三个画板的 plugin data `status` 标为 `draft`。
+版本快照：`before-B-boards 2026-10-15` → `B boards (pending approval) 2026-10-15: …` → `before-B-approved 2026-10-16` → `B boards approved 2026-10-16: …`；`File.validate()` 0 个错误。三个画板的 plugin data `status` 改为 `approved`，画板名改为「2026-10-16 已通过」，并设置了 2 倍 PNG 导出预设。1 倍参考图：`boards/B-a-section-menu-confirm@1x.png`、`boards/B-b-partial-states@1x.png`、`boards/B-c-metric-history-manage@1x.png`（Penpot MCP 只能导出 1 倍，只作参考）。规格已同步到 `design-system/README.md` §8.1 和 `components.md` §4.8（`DS-UNDO-ROW`、`DS-MORE-MENU`、左滑删除规则、`DS-ACTION-ROW` 禁用说明）。
 
-画稿里 agent 补充、需要产品负责人确认的细节：
+画稿里 agent 补充的细节，随画稿一起通过：
 
 1. 删除后的占位行写「第 1 组已删除」「10月12日 68.5 kg 已删除」，行尾是「撤销」文字按钮。
 2. 撤销把已完成的组恢复成「已完成」，不需要重新确认。
 3. 有记录时「删除指标」置灰，旁边写「先清空记录才能删除」（现有规则：只有没有记录的指标能删除）。
 4. 确认框里的说明文字是「分区里的 2 个动作会移到『无分区』」。
-5. 新画板的删除红色用 `status.destructive` `#D4442A`。P0-a2b 上原有的左滑「删除」还是旧值 `#D9563E`，属于画稿漂移，留到审核通过时一起改。
+5. 新画板的删除红色用 `status.destructive` `#D4442A`。P0-a2b 上原有的左滑「删除」还是旧值 `#D9563E`，属于画稿漂移，2026-10-16 已改为 `#D4442A`，`experience-p0/boards/P0-a2b-partial-states@1x.png` 已重新导出。
