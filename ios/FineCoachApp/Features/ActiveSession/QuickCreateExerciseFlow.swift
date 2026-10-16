@@ -17,7 +17,9 @@ struct QuickCreateExerciseFlow: View {
                             Task { await viewModel.addCatalogMatch(entry.id) }
                         } label: {
                             HStack(spacing: FCPrimitives.space2) {
-                                if let icon = FCEquipmentIcon.icon(equipmentClass: entry.equipmentClass, primaryMuscleGroup: entry.primaryMuscleGroup) {
+                                if let icon = FCEquipmentIcon.icon(
+                                    equipmentClass: entry.equipmentClass, primaryMuscleGroup: entry.primaryMuscleGroup)
+                                {
                                     FCEquipmentIconView(icon)
                                 }
                                 Text(entry.displayedName)

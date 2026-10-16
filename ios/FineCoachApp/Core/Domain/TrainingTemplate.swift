@@ -301,7 +301,8 @@ extension TrainingTemplate {
         let existingOrderIndices = session.exercises.map(\.orderIndex) + existingSessionSections.map(\.orderIndex)
         var nextOrder: UInt32 = (existingOrderIndices.max().map { $0 + 1 }) ?? 0
 
-        let combined = (templateSections.map(TemplateAxisEntry.section)
+        let combined =
+            (templateSections.map(TemplateAxisEntry.section)
             + templateExercises.map(TemplateAxisEntry.exercise))
             .sorted { $0.orderIndex < $1.orderIndex }
 

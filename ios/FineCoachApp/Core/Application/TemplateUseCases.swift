@@ -275,7 +275,8 @@ public struct TemplateUseCases: Sendable {
             existingSections: existingSections
         )
 
-        let survivingExercises = existingExercises
+        let survivingExercises =
+            existingExercises
             .filter { !resolution.exerciseIDsToDelete.contains($0.id) }
             .map { exercise -> TemplateExercise in
                 guard memberIDs.contains(exercise.id) else {

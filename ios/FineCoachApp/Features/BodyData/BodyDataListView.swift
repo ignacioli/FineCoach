@@ -175,7 +175,8 @@ struct BodyDataListView: View {
         path: Binding<[RootDestination]>
     ) {
         _viewModel = StateObject(
-            wrappedValue: BodyDataListViewModel(studentID: studentID, useCases: useCases, studentUseCases: studentUseCases)
+            wrappedValue: BodyDataListViewModel(
+                studentID: studentID, useCases: useCases, studentUseCases: studentUseCases)
         )
         _path = path
     }

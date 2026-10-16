@@ -297,7 +297,8 @@ struct TodayView: View {
                     viewModel.isResolvedExpanded.toggle()
                 }
                 .accessibilityIdentifier(FCAccessibilityID.todayResolvedFold)
-                .accessibilityValue(Text(viewModel.isResolvedExpanded ? "today.resolved.expanded" : "today.resolved.collapsed"))
+                .accessibilityValue(
+                    Text(viewModel.isResolvedExpanded ? "today.resolved.expanded" : "today.resolved.collapsed"))
                 if viewModel.isResolvedExpanded {
                     FCListRowDivider()
                     ForEach(viewModel.resolvedRows, id: \.appointment.id) { row in
@@ -355,10 +356,13 @@ struct TodayView: View {
                     .fcFont(.callout, weight: .semibold)
                     .foregroundStyle(FCSemanticColors.textPrimary)
                 VStack(alignment: .leading, spacing: FCPrimitives.space1) {
-                    Text(TodayRowPresentation.nameAndFocus(viewModel.displayName(for: appointment.studentID), appointment.trainingFocus))
-                        .fcFont(.body)
-                        .foregroundStyle(FCSemanticColors.textPrimary)
-                        .lineLimit(1)
+                    Text(
+                        TodayRowPresentation.nameAndFocus(
+                            viewModel.displayName(for: appointment.studentID), appointment.trainingFocus)
+                    )
+                    .fcFont(.body)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                    .lineLimit(1)
                     if viewModel.packageAlertStudentIDs.contains(appointment.studentID) {
                         FCStatusLabel(.coursePackageInvalid)
                     }

@@ -48,7 +48,8 @@ final class DesignValueScanTests: XCTestCase {
     private static let rules: [ScanRule] = [
         ScanRule(
             name: "colorLiteral",
-            pattern: #"Color\(red:|Color\(hex:|UIColor\(|Color\.(red|blue|green|gray|yellow|orange|purple|pink|black|white|secondary|primary|accentColor)\b|\.foregroundStyle\(\.(secondary|primary|red|blue|green|gray|yellow|orange|purple|pink|black|white)\)|\.foregroundColor\(\.(secondary|primary|red|blue|green|gray|yellow|orange|purple|pink|black|white)\)"#
+            pattern:
+                #"Color\(red:|Color\(hex:|UIColor\(|Color\.(red|blue|green|gray|yellow|orange|purple|pink|black|white|secondary|primary|accentColor)\b|\.foregroundStyle\(\.(secondary|primary|red|blue|green|gray|yellow|orange|purple|pink|black|white)\)|\.foregroundColor\(\.(secondary|primary|red|blue|green|gray|yellow|orange|purple|pink|black|white)\)"#
         ),
         ScanRule(
             name: "systemFont",
@@ -82,8 +83,8 @@ final class DesignValueScanTests: XCTestCase {
 
         XCTAssertEqual(
             violations.count, 0,
-            "feature source bypasses design-system tokens; use FCPrimitives / " +
-            "FCSemanticColors / .fcFont(_:) instead (see the printed list)"
+            "feature source bypasses design-system tokens; use FCPrimitives / "
+                + "FCSemanticColors / .fcFont(_:) instead (see the printed list)"
         )
     }
 
@@ -122,9 +123,9 @@ final class DesignValueScanTests: XCTestCase {
     /// `BodyMeasurementComparisonTests.codeLines(of:)`).
     private func featureAppDirectory() throws -> URL {
         let iosRoot = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent() // DesignSystem/
-            .deletingLastPathComponent() // FineCoachTests/
-            .deletingLastPathComponent() // ios/
+            .deletingLastPathComponent()  // DesignSystem/
+            .deletingLastPathComponent()  // FineCoachTests/
+            .deletingLastPathComponent()  // ios/
         let appDir = iosRoot.appendingPathComponent("FineCoachApp")
         guard FileManager.default.fileExists(atPath: appDir.path) else {
             throw XCTSkip("cannot resolve ios/FineCoachApp from #filePath in this environment: \(appDir.path)")
@@ -133,11 +134,13 @@ final class DesignValueScanTests: XCTestCase {
     }
 
     private func enumerateSwiftFiles(under directory: URL) throws -> [URL] {
-        guard let enumerator = FileManager.default.enumerator(
-            at: directory,
-            includingPropertiesForKeys: [.isRegularFileKey],
-            options: [.skipsHiddenFiles]
-        ) else {
+        guard
+            let enumerator = FileManager.default.enumerator(
+                at: directory,
+                includingPropertiesForKeys: [.isRegularFileKey],
+                options: [.skipsHiddenFiles]
+            )
+        else {
             return []
         }
         var result: [URL] = []

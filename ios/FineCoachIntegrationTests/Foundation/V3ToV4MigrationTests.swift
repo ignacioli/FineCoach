@@ -65,7 +65,8 @@
                 at: storeURL.deletingLastPathComponent(),
                 withIntermediateDirectories: true
             )
-            try coordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: storeURL, options: nil)
+            try coordinator.addPersistentStore(
+                ofType: NSSQLiteStoreType, configurationName: nil, at: storeURL, options: nil)
             let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
             context.persistentStoreCoordinator = coordinator
 

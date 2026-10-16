@@ -283,7 +283,8 @@ public enum Comparison {
                     }
                     if let duration = set.durationSeconds {
                         if longestDuration == nil || duration > longestDuration!.1
-                            || (duration == longestDuration!.1 && session.completedAtUTC > (durationRecordAt ?? .distantPast))
+                            || (duration == longestDuration!.1
+                                && session.completedAtUTC > (durationRecordAt ?? .distantPast))
                         {
                             longestDuration = (session.id, duration)
                             durationRecordAt = session.completedAtUTC
@@ -291,7 +292,8 @@ public enum Comparison {
                     }
                     if recordMode == .cardio, let distance = set.distanceValue {
                         if longestDistance == nil || distance > longestDistance!.1
-                            || (distance == longestDistance!.1 && session.completedAtUTC > (distanceRecordAt ?? .distantPast))
+                            || (distance == longestDistance!.1
+                                && session.completedAtUTC > (distanceRecordAt ?? .distantPast))
                         {
                             longestDistance = (session.id, distance)
                             distanceRecordAt = session.completedAtUTC

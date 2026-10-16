@@ -5,11 +5,13 @@ import Foundation
 enum ArchiveViewerPresentation {
     /// 「动作 N」 when the archive has no exercise info, else the exported name.
     static func exerciseName(_ exercise: ArchiveExercise) -> String {
-        exercise.info?.name ?? String(format: String(localized: "archive.viewer.exercise.placeholder"), exercise.placeholderNumber)
+        exercise.info?.name
+            ?? String(format: String(localized: "archive.viewer.exercise.placeholder"), exercise.placeholderNumber)
     }
 
     static func exerciseName(_ entry: ArchiveExerciseEntry) -> String {
-        entry.info?.name ?? String(format: String(localized: "archive.viewer.exercise.placeholder"), entry.placeholderNumber)
+        entry.info?.name
+            ?? String(format: String(localized: "archive.viewer.exercise.placeholder"), entry.placeholderNumber)
     }
 
     /// 「9月25日 周四」 for the coach's calendar day of the session.
@@ -47,14 +49,16 @@ enum ArchiveViewerPresentation {
         let separator = String(localized: "archive.export.list.separator")
         var parts: [String] = []
         if !info.primaryMuscles.isEmpty {
-            parts.append(String(
-                format: String(localized: "archive.viewer.exercises.primaryFormat"),
-                info.primaryMuscles.joined(separator: separator)))
+            parts.append(
+                String(
+                    format: String(localized: "archive.viewer.exercises.primaryFormat"),
+                    info.primaryMuscles.joined(separator: separator)))
         }
         if !info.secondaryMuscles.isEmpty {
-            parts.append(String(
-                format: String(localized: "archive.viewer.exercises.secondaryFormat"),
-                info.secondaryMuscles.joined(separator: separator)))
+            parts.append(
+                String(
+                    format: String(localized: "archive.viewer.exercises.secondaryFormat"),
+                    info.secondaryMuscles.joined(separator: separator)))
         }
         if !info.equipment.isEmpty {
             parts.append(info.equipment)
@@ -178,12 +182,15 @@ enum ArchiveSessionRecord {
         let exercises: [ShareReportExerciseDTO] = session.sections.flatMap(\.exercises).map { entry in
             let archived = content.exercise(key: entry.exerciseKey)
             let info = archived?.info
-            let name = archived.map(ArchiveViewerPresentation.exerciseName)
+            let name =
+                archived.map(ArchiveViewerPresentation.exerciseName)
                 ?? String(format: String(localized: "archive.viewer.exercise.placeholder"), 0)
             let icon = info.flatMap {
                 FCEquipmentIcon.icon(equipmentClass: $0.equipment, primaryMuscleGroup: $0.primaryMuscles.first)
             }
-            let parts = info.map { ExerciseBodyParts(catalogPrimary: $0.primaryMuscles.first, catalogSecondary: $0.secondaryMuscles) }
+            let parts = info.map {
+                ExerciseBodyParts(catalogPrimary: $0.primaryMuscles.first, catalogSecondary: $0.secondaryMuscles)
+            }
             return ShareReportExerciseDTO(
                 displayName: name,
                 confirmedSets: entry.sets.enumerated().map { index, set in
@@ -194,7 +201,8 @@ enum ArchiveSessionRecord {
                 secondaryBodyParts: parts?.secondary ?? []
             )
         }
-        let summaryText = ((try? content.summaries(forSessionKey: session.key)) ?? []).map(\.text).joined(separator: "\n")
+        let summaryText = ((try? content.summaries(forSessionKey: session.key)) ?? []).map(\.text).joined(
+            separator: "\n")
         let noon = session.localDate.startOfDay(calendar: calendar).addingTimeInterval(12 * 3600)
         return ShareReportDTO(
             schemaVersion: ShareReportPolicy.schemaVersion,

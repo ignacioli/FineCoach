@@ -16,7 +16,8 @@ final class LogSurfaceTests: XCTestCase {
         let token = try NSRegularExpression(pattern: "^[A-Za-z][A-Za-z0-9_]*(\\.[a-z][a-z0-9_]*)?$")
         for identifier in identifiers {
             let range = NSRange(identifier.startIndex..., in: identifier)
-            XCTAssertNotNil(token.firstMatch(in: identifier, range: range), "\(identifier) is not a fixed identifier token")
+            XCTAssertNotNil(
+                token.firstMatch(in: identifier, range: range), "\(identifier) is not a fixed identifier token")
         }
         XCTAssertEqual(Set(identifiers).count, identifiers.count, "log identifiers must be unique")
     }
@@ -28,9 +29,9 @@ final class LogSurfaceTests: XCTestCase {
         let allowed: Set<String> = ["AppLogger.swift", "T116PerformanceHarness.swift"]
         let sinks = ["Logger(", "os_log", "NSLog", "print(", "debugPrint(", "dump(", "fputs(", "standardError"]
         let appRoot = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent() // Privacy/
-            .deletingLastPathComponent() // FineCoachTests/
-            .deletingLastPathComponent() // ios/
+            .deletingLastPathComponent()  // Privacy/
+            .deletingLastPathComponent()  // FineCoachTests/
+            .deletingLastPathComponent()  // ios/
             .appendingPathComponent("FineCoachApp")
         let enumerator = try XCTUnwrap(FileManager.default.enumerator(at: appRoot, includingPropertiesForKeys: nil))
         var violations: [String] = []
@@ -56,7 +57,8 @@ final class LogSurfaceTests: XCTestCase {
         for piece in interpolations {
             let expression = piece.prefix { $0 != ")" }
             XCTAssertTrue(
-                expression.hasSuffix("rawValue, privacy: .public") || expression.hasSuffix(".rawValue, privacy: .public"),
+                expression.hasSuffix("rawValue, privacy: .public")
+                    || expression.hasSuffix(".rawValue, privacy: .public"),
                 "AppLogger interpolates something other than an enum rawValue: \(expression)"
             )
         }

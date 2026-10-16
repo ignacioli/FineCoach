@@ -120,9 +120,11 @@ final class BodyMeasurementComparisonTests: XCTestCase {
         // 70 kg ~= 154.32 lb.
         XCTAssertEqual(
             NSDecimalNumber(decimal: displayedInPounds.decimal)
-                .rounding(accordingToBehavior: NSDecimalNumberHandler(
-                    roundingMode: .plain, scale: 1, raiseOnExactness: false, raiseOnOverflow: false,
-                    raiseOnUnderflow: false, raiseOnDivideByZero: false))
+                .rounding(
+                    accordingToBehavior: NSDecimalNumberHandler(
+                        roundingMode: .plain, scale: 1, raiseOnExactness: false, raiseOnOverflow: false,
+                        raiseOnUnderflow: false, raiseOnDivideByZero: false)
+                )
                 .stringValue,
             "154.3"
         )
@@ -142,13 +144,16 @@ final class BodyMeasurementComparisonTests: XCTestCase {
     func testCanonicalLengthConvertsToDisplayedInchesAndBackWithoutMutation() throws {
         let canonicalCm = try DecimalValue("180")
 
-        let displayedInInches = try BuiltInUnitConversion.length(canonicalCentimeters: canonicalCm, displayedAs: .inches)
+        let displayedInInches = try BuiltInUnitConversion.length(
+            canonicalCentimeters: canonicalCm, displayedAs: .inches)
         // 180 cm ~= 70.87 in.
         XCTAssertEqual(
             NSDecimalNumber(decimal: displayedInInches.decimal)
-                .rounding(accordingToBehavior: NSDecimalNumberHandler(
-                    roundingMode: .plain, scale: 1, raiseOnExactness: false, raiseOnOverflow: false,
-                    raiseOnUnderflow: false, raiseOnDivideByZero: false))
+                .rounding(
+                    accordingToBehavior: NSDecimalNumberHandler(
+                        roundingMode: .plain, scale: 1, raiseOnExactness: false, raiseOnOverflow: false,
+                        raiseOnUnderflow: false, raiseOnDivideByZero: false)
+                )
                 .stringValue,
             "70.9"
         )

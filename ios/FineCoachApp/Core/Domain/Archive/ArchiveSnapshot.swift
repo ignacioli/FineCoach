@@ -649,9 +649,10 @@ public struct ArchiveSnapshot: Hashable, Codable, Sendable {
 
     public var totalSetCount: Int {
         sessions.reduce(0) { total, session in
-            total + session.sections.reduce(0) { sectionTotal, section in
-                sectionTotal + section.exercises.reduce(0) { $0 + $1.sets.count }
-            }
+            total
+                + session.sections.reduce(0) { sectionTotal, section in
+                    sectionTotal + section.exercises.reduce(0) { $0 + $1.sets.count }
+                }
         }
     }
 

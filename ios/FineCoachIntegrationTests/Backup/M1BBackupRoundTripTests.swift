@@ -305,7 +305,8 @@
             )
             _ = try await harness.sessionUseCases.addSet(
                 exerciseID: squatExerciseID,
-                input: TrainingSetInput(recordMode: .weightReps, weightValue: "40", repetitionCount: "8", unit: .kilograms)
+                input: TrainingSetInput(
+                    recordMode: .weightReps, weightValue: "40", repetitionCount: "8", unit: .kilograms)
             )
             _ = try await harness.sessionUseCases.confirmSet(setID: squatSetID)
             let section = try await harness.sessionUseCases.createSection(name: "热身区")
@@ -461,7 +462,9 @@
                 sourceID: nil,
                 displayNameSnapshot: try NormalizedName("引体向上"),
                 recordModeSnapshot: .reps,
-                plannedSets: [TemplatePlannedSet(recordMode: .reps, repetitionCount: try DecimalValue("6"), unit: .repetitions)]
+                plannedSets: [
+                    TemplatePlannedSet(recordMode: .reps, repetitionCount: try DecimalValue("6"), unit: .repetitions)
+                ]
             )
             try await harness.templateRepository.replaceExercises(
                 templateID: templateID,
@@ -575,14 +578,16 @@
                 templateExercises.first?.plannedSets.first?.weightValue?.canonicalString,
                 try DecimalValue("20").canonicalString
             )
-            let templateSections = try await harness.sectionRepository.sections(ownerKind: .template, ownerID: templateID)
+            let templateSections = try await harness.sectionRepository.sections(
+                ownerKind: .template, ownerID: templateID)
             XCTAssertEqual(templateSections.map(\.id), [templateSectionID])
 
             // Custom BodyMetricDefinition + BodyMeasurement.
             let metrics = try await harness.bodyDataRepository.customMetrics(studentID: studentID)
             XCTAssertEqual(metrics.map(\.id), [bodyMetricID])
             XCTAssertEqual(metrics.first?.name.value, "臂围")
-            let measurements = try await harness.bodyDataRepository.history(studentID: studentID, metricID: bodyMetricID)
+            let measurements = try await harness.bodyDataRepository.history(
+                studentID: studentID, metricID: bodyMetricID)
             XCTAssertEqual(measurements.map(\.id), [bodyMeasurementID])
             XCTAssertEqual(measurements.first?.value.canonicalString, try DecimalValue("32.5").canonicalString)
         }

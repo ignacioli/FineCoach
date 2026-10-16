@@ -428,10 +428,12 @@ struct StudentListView: View {
                         Text(student.displayName.value)
                             .fcFont(.headline)
                             .foregroundStyle(FCSemanticColors.textPrimary)
-                        Text(String(
-                            format: String(localized: "student.archived.archivedOnFormat"),
-                            StudentListPresentation.monthDay(student.updatedAtUTC)
-                        ))
+                        Text(
+                            String(
+                                format: String(localized: "student.archived.archivedOnFormat"),
+                                StudentListPresentation.monthDay(student.updatedAtUTC)
+                            )
+                        )
                         .fcFont(.caption)
                         .foregroundStyle(FCSemanticColors.textSecondary)
                     }

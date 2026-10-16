@@ -347,7 +347,9 @@ import os
         }
 
         @MainActor
-        private static func recordSets(_ session: Session, base: Int, using sessions: ActiveSessionUseCases) async throws {
+        private static func recordSets(_ session: Session, base: Int, using sessions: ActiveSessionUseCases)
+            async throws
+        {
             guard let exerciseID = session.exercises.last?.id else {
                 return
             }

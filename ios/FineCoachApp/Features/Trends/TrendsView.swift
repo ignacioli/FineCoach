@@ -86,12 +86,14 @@ final class TrendsViewModel: ObservableObject {
 
     func exerciseTrend() -> [Comparison.SetTrendPoint] {
         guard let (id, mode) = selectedTrendOption() else { return [] }
-        return Comparison.exerciseTrend(exerciseID: id, recordMode: mode, across: allSessions, loadDirection: loadDirection)
+        return Comparison.exerciseTrend(
+            exerciseID: id, recordMode: mode, across: allSessions, loadDirection: loadDirection)
     }
 
     func personalRecords() -> Comparison.PersonalRecordSet? {
         guard let (id, mode) = selectedTrendOption() else { return nil }
-        return Comparison.personalRecords(exerciseID: id, recordMode: mode, across: allSessions, loadDirection: loadDirection)
+        return Comparison.personalRecords(
+            exerciseID: id, recordMode: mode, across: allSessions, loadDirection: loadDirection)
     }
 
     /// Sets the trend/PR exercise selection (shared by both the "动作趋势"
@@ -421,7 +423,6 @@ struct TrendsView: View {
             }
         }
     }
-
 
     private func tabHint(_ text: String) -> some View {
         Text(text)

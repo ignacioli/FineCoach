@@ -172,7 +172,8 @@ struct TemplatePickList: View {
     }
 
     private func subtitle(_ template: TrainingTemplate) -> String {
-        let count = String(format: String(localized: "templates.exerciseCount"), viewModel.exerciseCounts[template.id] ?? 0)
+        let count = String(
+            format: String(localized: "templates.exerciseCount"), viewModel.exerciseCounts[template.id] ?? 0)
         guard let parts = BodyPart.joinedDisplayNames(for: template.trainingFocus, separator: "、") else {
             return count
         }

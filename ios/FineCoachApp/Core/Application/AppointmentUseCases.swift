@@ -207,7 +207,8 @@ public struct AppointmentUseCases: Sendable {
             let active = try await appointmentRepository.activeAppointments(excluding: nil)
             var allConflicts: [AppointmentConflict] = []
             for appointment in appointments {
-                allConflicts.append(contentsOf: try await conflicts(for: appointment, against: active, calendar: calendar))
+                allConflicts.append(
+                    contentsOf: try await conflicts(for: appointment, against: active, calendar: calendar))
             }
             guard allConflicts.isEmpty else {
                 throw DomainError.conflict
@@ -423,7 +424,8 @@ public struct AppointmentUseCases: Sendable {
         return saved
     }
 
-    public func updateTrainingFocus(appointmentID: StableUUID, trainingFocus: Set<BodyPart>) async throws -> Appointment {
+    public func updateTrainingFocus(appointmentID: StableUUID, trainingFocus: Set<BodyPart>) async throws -> Appointment
+    {
         let current = try await appointmentRepository.appointment(id: appointmentID)
         let updated = try current.updatingTrainingFocus(trainingFocus, now: clock.nowUTC())
         return try await appointmentRepository.update(updated)

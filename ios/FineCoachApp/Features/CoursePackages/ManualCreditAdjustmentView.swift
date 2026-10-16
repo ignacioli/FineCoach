@@ -42,7 +42,8 @@ final class ManualCreditAdjustmentViewModel: ObservableObject {
         } catch DomainError.invalidState {
             errorMessage = String(localized: "manualAdjustment.wouldGoNegative")
         } catch {
-            errorMessage = (error as? LocalizedError)?.errorDescription
+            errorMessage =
+                (error as? LocalizedError)?.errorDescription
                 ?? String(localized: "manualAdjustment.saveFailed")
         }
     }
@@ -101,15 +102,17 @@ struct ManualCreditAdjustmentView: View {
                     .fcFont(.callout, weight: .regular)
                     .foregroundStyle(FCSemanticColors.textSecondary)
                     .padding(.top, FCPrimitives.space4)
-                TextField(String(localized: "manualAdjustment.reasonPlaceholder"), text: $viewModel.reason, axis: .vertical)
-                    .lineLimit(3, reservesSpace: true)
-                    .fcFont(.body)
-                    .foregroundStyle(FCSemanticColors.textPrimary)
-                    .padding(.horizontal, FCPrimitives.space4)
-                    .padding(.vertical, FCPrimitives.space3)
-                    .background(FCSemanticColors.surfaceCanvas)
-                    .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSm))
-                    .accessibilityIdentifier(FCAccessibilityID.manualAdjustmentReason)
+                TextField(
+                    String(localized: "manualAdjustment.reasonPlaceholder"), text: $viewModel.reason, axis: .vertical
+                )
+                .lineLimit(3, reservesSpace: true)
+                .fcFont(.body)
+                .foregroundStyle(FCSemanticColors.textPrimary)
+                .padding(.horizontal, FCPrimitives.space4)
+                .padding(.vertical, FCPrimitives.space3)
+                .background(FCSemanticColors.surfaceCanvas)
+                .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSm))
+                .accessibilityIdentifier(FCAccessibilityID.manualAdjustmentReason)
 
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)

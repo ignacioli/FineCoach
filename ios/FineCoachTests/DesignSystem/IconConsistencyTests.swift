@@ -1,6 +1,7 @@
-@testable import FineCoach
 import UIKit
 import XCTest
+
+@testable import FineCoach
 
 /// T046 (plan §9-6): the 18 equipment icons in `Assets.xcassets` are
 /// byte-identical to `design/m1-b-hifi/icons/*.svg`, use viewBox 24, stroke
@@ -26,7 +27,8 @@ final class IconConsistencyTests: XCTestCase {
             let imported = try Data(
                 contentsOf: assets.appendingPathComponent("\(icon.assetName).imageset/\(icon.rawValue).svg")
             )
-            XCTAssertEqual(imported, original, "\(icon.assetName) differs from design/m1-b-hifi/icons/\(icon.rawValue).svg")
+            XCTAssertEqual(
+                imported, original, "\(icon.assetName) differs from design/m1-b-hifi/icons/\(icon.rawValue).svg")
         }
     }
 
@@ -45,7 +47,8 @@ final class IconConsistencyTests: XCTestCase {
     func testAssetsRenderAsTemplatesAndLoadFromTheAppBundle() throws {
         let assets = try assetCatalogDirectory()
         for icon in FCEquipmentIcon.allCases {
-            let contents = try Data(contentsOf: assets.appendingPathComponent("\(icon.assetName).imageset/Contents.json"))
+            let contents = try Data(
+                contentsOf: assets.appendingPathComponent("\(icon.assetName).imageset/Contents.json"))
             let json = try XCTUnwrap(JSONSerialization.jsonObject(with: contents) as? [String: Any])
             let properties = try XCTUnwrap(json["properties"] as? [String: Any], icon.assetName)
             XCTAssertEqual(properties["template-rendering-intent"] as? String, "template", icon.assetName)
@@ -111,9 +114,9 @@ final class IconConsistencyTests: XCTestCase {
     /// skips — when unresolvable, because this is the T046 acceptance gate.
     private func iosRoot() throws -> URL {
         let root = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent() // DesignSystem/
-            .deletingLastPathComponent() // FineCoachTests/
-            .deletingLastPathComponent() // ios/
+            .deletingLastPathComponent()  // DesignSystem/
+            .deletingLastPathComponent()  // FineCoachTests/
+            .deletingLastPathComponent()  // ios/
         guard FileManager.default.fileExists(atPath: root.appendingPathComponent("FineCoachApp").path) else {
             XCTFail("cannot resolve ios/ from #filePath: \(root.path)")
             throw CocoaError(.fileNoSuchFile)

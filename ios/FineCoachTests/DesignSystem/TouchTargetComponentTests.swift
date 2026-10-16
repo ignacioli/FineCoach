@@ -1,5 +1,6 @@
-@testable import FineCoach
 import XCTest
+
+@testable import FineCoach
 
 /// T047 (NFR-004): every interactive design-system component declares a
 /// ≥ 44 × 44 pt hit area. The rule is enforced where the controls are built,
@@ -14,9 +15,9 @@ final class TouchTargetComponentTests: XCTestCase {
             "FCCalendarDayCell.swift",
         ]
         let directory = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent() // DesignSystem/
-            .deletingLastPathComponent() // FineCoachTests/
-            .deletingLastPathComponent() // ios/
+            .deletingLastPathComponent()  // DesignSystem/
+            .deletingLastPathComponent()  // FineCoachTests/
+            .deletingLastPathComponent()  // ios/
             .appendingPathComponent("FineCoachApp/DesignSystem/Components")
         for name in components {
             let source = try String(contentsOf: directory.appendingPathComponent(name), encoding: .utf8)
@@ -42,9 +43,9 @@ final class TouchTargetComponentTests: XCTestCase {
     /// M2 Phase 1 (T009): the hit areas added by the §4.7 components.
     func testM2ComponentsDeclareTheirHitAreas() throws {
         let directory = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent() // DesignSystem/
-            .deletingLastPathComponent() // FineCoachTests/
-            .deletingLastPathComponent() // ios/
+            .deletingLastPathComponent()  // DesignSystem/
+            .deletingLastPathComponent()  // FineCoachTests/
+            .deletingLastPathComponent()  // ios/
             .appendingPathComponent("FineCoachApp/DesignSystem/Components")
         func source(_ name: String) throws -> String {
             try String(contentsOf: directory.appendingPathComponent(name), encoding: .utf8)
@@ -58,7 +59,8 @@ final class TouchTargetComponentTests: XCTestCase {
         XCTAssertTrue(try source("FCInlineResult.swift").contains("FCLinkButton("))
         // Group row: the selection circle is its own 44x44 target; the rest of the row is >= 44 tall.
         let list = try source("FCListRow.swift")
-        XCTAssertTrue(list.contains(".frame(minWidth: 44, minHeight: FCListRowGeometry.minHeight, alignment: .trailing)"))
+        XCTAssertTrue(
+            list.contains(".frame(minWidth: 44, minHeight: FCListRowGeometry.minHeight, alignment: .trailing)"))
         XCTAssertGreaterThanOrEqual(list.components(separatedBy: "minHeight: FCListRowGeometry.minHeight").count - 1, 3)
         XCTAssertGreaterThanOrEqual(FCListRowGeometry.minHeight, 44)
         // Page header back: 44x44 hit area drawn over the 16pt glyph.

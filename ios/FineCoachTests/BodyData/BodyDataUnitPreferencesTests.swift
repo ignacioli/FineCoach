@@ -26,7 +26,9 @@ final class BodyDataUnitPreferencesTests: XCTestCase {
         first.weightUnit = .pounds
 
         let second = BodyDataUnitPreferences(defaults: defaults)
-        XCTAssertEqual(second.weightUnit, .pounds, "the choice must survive as a real UserDefaults write, not just in-memory state")
+        XCTAssertEqual(
+            second.weightUnit, .pounds, "the choice must survive as a real UserDefaults write, not just in-memory state"
+        )
     }
 
     func testLengthUnitChoicePersistsAcrossInstances() {
@@ -44,6 +46,7 @@ final class BodyDataUnitPreferencesTests: XCTestCase {
         preferences.weightUnit = .pounds
 
         XCTAssertEqual(preferences.weightUnit, .pounds)
-        XCTAssertEqual(preferences.lengthUnit, .centimeters, "changing weight unit must not affect the length preference")
+        XCTAssertEqual(
+            preferences.lengthUnit, .centimeters, "changing weight unit must not affect the length preference")
     }
 }

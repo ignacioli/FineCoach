@@ -39,7 +39,9 @@ public protocol LocalNotificationScheduling: Sendable {
 
 /// UNUserNotificationCenter itself is not Sendable, but Apple documents it as safe
 /// to call from any thread/queue.
-public struct SystemNotificationAdapter: LocalNotificationScheduling, NotificationAuthorizationProvider, @unchecked Sendable {
+public struct SystemNotificationAdapter: LocalNotificationScheduling, NotificationAuthorizationProvider,
+    @unchecked Sendable
+{
     private let center: UNUserNotificationCenter
 
     public init(center: UNUserNotificationCenter = .current()) {

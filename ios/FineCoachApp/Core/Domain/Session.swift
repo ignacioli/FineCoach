@@ -162,7 +162,8 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
         guard !additional.isEmpty else {
             return self
         }
-        return replacing(trainingFocus: .some(trainingFocus.union(additional)), revision: nextRevision, updatedAtUTC: now)
+        return replacing(
+            trainingFocus: .some(trainingFocus.union(additional)), revision: nextRevision, updatedAtUTC: now)
     }
 
     public func addingSessionOnlyExercise(

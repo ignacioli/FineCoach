@@ -38,6 +38,6 @@ public struct FCToggleStyle: ToggleStyle {
     }
 }
 
-public extension ToggleStyle where Self == FCToggleStyle {
-    static var fc: FCToggleStyle { FCToggleStyle() }
+extension ToggleStyle where Self == FCToggleStyle {
+    public static var fc: FCToggleStyle { FCToggleStyle() }
 }

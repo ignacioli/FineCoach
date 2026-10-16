@@ -85,7 +85,8 @@
             XCTAssertEqual(created.id.rawValue, appointmentID)
             try await env.controller.shutdownForTesting()
 
-            let reopened = try PersistenceController(storeURL: env.directory.url.appendingPathComponent("generation/FineCoach.sqlite"))
+            let reopened = try PersistenceController(
+                storeURL: env.directory.url.appendingPathComponent("generation/FineCoach.sqlite"))
             let repository = CoreDataAppointmentRepository(writer: reopened.writer)
             let fetched = try await repository.appointment(id: StableUUID(appointmentID))
             XCTAssertEqual(fetched.status, .scheduled)
@@ -114,7 +115,8 @@
             XCTAssertTrue(created.allSatisfy { $0.seriesID == seriesID })
 
             try await env.controller.shutdownForTesting()
-            let reopened = try PersistenceController(storeURL: env.directory.url.appendingPathComponent("generation/FineCoach.sqlite"))
+            let reopened = try PersistenceController(
+                storeURL: env.directory.url.appendingPathComponent("generation/FineCoach.sqlite"))
             let repository = CoreDataAppointmentRepository(writer: reopened.writer)
             let persisted = try await repository.appointments(seriesID: seriesID)
             XCTAssertEqual(persisted.count, 4)
@@ -134,7 +136,8 @@
                 clock: TestClock(utcDate: now),
                 ids: secondStudentIDGen
             )
-            let secondStudent = try await secondStudentUseCases.create(draft: StudentDraft(displayName: "王强", sex: .male))
+            let secondStudent = try await secondStudentUseCases.create(
+                draft: StudentDraft(displayName: "王强", sex: .male))
 
             _ = try await env.appointmentUseCases.createSingle(
                 studentID: env.studentID,
@@ -235,7 +238,8 @@
             XCTAssertTrue(replaced.allSatisfy { $0.startTime == newStartTime })
 
             try await env.controller.shutdownForTesting()
-            let reopened = try PersistenceController(storeURL: env.directory.url.appendingPathComponent("generation/FineCoach.sqlite"))
+            let reopened = try PersistenceController(
+                storeURL: env.directory.url.appendingPathComponent("generation/FineCoach.sqlite"))
             let repository = CoreDataAppointmentRepository(writer: reopened.writer)
 
             let oldSeries = try await repository.series(id: oldSeriesID)
@@ -270,8 +274,10 @@
 
             let seriesID = try XCTUnwrap(created.first?.seriesID)
             try await env.controller.shutdownForTesting()
-            let reopened = try PersistenceController(storeURL: env.directory.url.appendingPathComponent("generation/FineCoach.sqlite"))
-            let persisted = try await CoreDataAppointmentRepository(writer: reopened.writer).appointments(seriesID: seriesID)
+            let reopened = try PersistenceController(
+                storeURL: env.directory.url.appendingPathComponent("generation/FineCoach.sqlite"))
+            let persisted = try await CoreDataAppointmentRepository(writer: reopened.writer).appointments(
+                seriesID: seriesID)
             XCTAssertEqual(persisted.count, 3)
             XCTAssertTrue(persisted.allSatisfy { $0.trainingFocus == [.thighs, .glutes] })
             try await reopened.shutdownForTesting()
@@ -293,7 +299,8 @@
                 ),
                 overrideConflict: false
             )
-            _ = try await env.appointmentUseCases.updateTrainingFocus(appointmentID: created[2].id, trainingFocus: [.back])
+            _ = try await env.appointmentUseCases.updateTrainingFocus(
+                appointmentID: created[2].id, trainingFocus: [.back])
 
             let newStartTime = try LocalTime(hour: 10, minute: 0)
             let replaced = try await env.appointmentUseCases.applyThisAndFuture(
@@ -380,7 +387,8 @@
             )
 
             try await env.controller.shutdownForTesting()
-            let reopened = try PersistenceController(storeURL: env.directory.url.appendingPathComponent("generation/FineCoach.sqlite"))
+            let reopened = try PersistenceController(
+                storeURL: env.directory.url.appendingPathComponent("generation/FineCoach.sqlite"))
             let repository = CoreDataAppointmentRepository(writer: reopened.writer)
 
             let countSeries = try await repository.series(id: countSeriesID)

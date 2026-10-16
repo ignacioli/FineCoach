@@ -274,9 +274,10 @@ struct ShareReportFlowView: View {
 
     private func thumbnailParts(_ dto: ShareReportDTO) -> String? {
         guard !dto.exercises.isEmpty else { return nil }
-        let summary = TrainedBodyPartsSummary(exercises: dto.exercises.map {
-            ExerciseBodyParts(primary: $0.primaryBodyPart, secondary: $0.secondaryBodyParts)
-        })
+        let summary = TrainedBodyPartsSummary(
+            exercises: dto.exercises.map {
+                ExerciseBodyParts(primary: $0.primaryBodyPart, secondary: $0.secondaryBodyParts)
+            })
         return BodyPart.joinedDisplayNames(for: summary.primary, separator: "、")
     }
 
@@ -287,9 +288,13 @@ struct ShareReportFlowView: View {
             FCSectionLabel(String(localized: "share.modules"))
                 .padding(.bottom, FCPrimitives.space2)
             FCListRowDivider()
-            checkRow(String(localized: "share.module.record"), note: String(localized: "share.module.recordNote"), isOn: $viewModel.includeRecord)
+            checkRow(
+                String(localized: "share.module.record"), note: String(localized: "share.module.recordNote"),
+                isOn: $viewModel.includeRecord)
             FCListRowDivider()
-            checkRow(String(localized: "share.module.exercises"), note: String(localized: "share.module.exercisesNote"), isOn: $viewModel.includeExercises)
+            checkRow(
+                String(localized: "share.module.exercises"), note: String(localized: "share.module.exercisesNote"),
+                isOn: $viewModel.includeExercises)
             FCListRowDivider()
             checkRow(String(localized: "share.module.summary"), note: nil, isOn: $viewModel.includeSummary)
             FCListRowDivider()
@@ -360,13 +365,16 @@ struct ShareReportFlowView: View {
             Text(note)
                 .fcFont(.caption, weight: emphasizedNote ? .semibold : nil)
                 .foregroundStyle(emphasizedNote ? FCSemanticColors.actionPrimary : FCSemanticColors.textSecondary)
-            Toggle(title, isOn: Binding(
-                get: { isOn.wrappedValue },
-                set: { value in
-                    isOn.wrappedValue = value
-                    viewModel.refreshPreview()
-                }
-            ))
+            Toggle(
+                title,
+                isOn: Binding(
+                    get: { isOn.wrappedValue },
+                    set: { value in
+                        isOn.wrappedValue = value
+                        viewModel.refreshPreview()
+                    }
+                )
+            )
             .toggleStyle(FCToggleStyle())
             .labelsHidden()
             .disabled(!isEnabled)

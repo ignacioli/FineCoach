@@ -111,7 +111,8 @@ struct SessionDetailView: View {
                 }
 
                 if let report = viewModel.completed?.latestReport,
-                   report.freshness == .stale || report.handedToSystemAtUTC != nil {
+                    report.freshness == .stale || report.handedToSystemAtUTC != nil
+                {
                     VStack(alignment: .leading, spacing: FCPrimitives.space2) {
                         if report.freshness == .stale {
                             FCStatusLabel(text: String(localized: "detail.reportStale"), symbolName: "exclamationmark")

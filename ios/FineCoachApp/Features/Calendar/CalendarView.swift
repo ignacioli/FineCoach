@@ -240,7 +240,8 @@ struct CalendarView: View {
     }
 
     private func dayCell(_ day: Int) -> some View {
-        let date = try? LocalDate(year: viewModel.displayedMonthStart.year, month: viewModel.displayedMonthStart.month, day: day)
+        let date = try? LocalDate(
+            year: viewModel.displayedMonthStart.year, month: viewModel.displayedMonthStart.month, day: day)
         let hasAppointments = date.map { !(viewModel.appointmentsByDate[$0] ?? []).isEmpty } ?? false
         return FCCalendarDayCell(
             day: day,
@@ -291,14 +292,20 @@ struct CalendarView: View {
                 Text(appointment.startTime.canonicalString)
                     .fcFont(.callout, weight: .semibold)
                     .foregroundStyle(FCSemanticColors.textPrimary)
-                Text(TodayRowPresentation.nameAndFocus(viewModel.displayName(for: appointment.studentID), appointment.trainingFocus))
-                    .fcFont(.body)
-                    .foregroundStyle(FCSemanticColors.textPrimary)
-                    .lineLimit(1)
+                Text(
+                    TodayRowPresentation.nameAndFocus(
+                        viewModel.displayName(for: appointment.studentID), appointment.trainingFocus)
+                )
+                .fcFont(.body)
+                .foregroundStyle(FCSemanticColors.textPrimary)
+                .lineLimit(1)
                 Spacer(minLength: FCPrimitives.space2)
-                Text(TodayRowStatusPresentation.title(for: TodayOrderedAppointment(appointment: appointment, section: .remainingToday)))
-                    .fcFont(.caption)
-                    .foregroundStyle(FCSemanticColors.textSecondary)
+                Text(
+                    TodayRowStatusPresentation.title(
+                        for: TodayOrderedAppointment(appointment: appointment, section: .remainingToday))
+                )
+                .fcFont(.caption)
+                .foregroundStyle(FCSemanticColors.textSecondary)
                 if isActionable {
                     FCSymbol(.forward)
                 }

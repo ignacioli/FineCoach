@@ -93,7 +93,8 @@ public enum ArchiveExportPolicy {
             let selected = Set(selection.effectiveBodyMetricIDs)
             for metric in source.bodyMetrics where selected.contains(metric.id) {
                 let key = "m\(bodyMetrics.count + 1)"
-                bodyMetrics.append(try ArchiveBodyMetric(key: key, kind: metric.kind, name: metric.name, unit: metric.unit))
+                bodyMetrics.append(
+                    try ArchiveBodyMetric(key: key, kind: metric.kind, name: metric.name, unit: metric.unit))
                 for measurement in metric.measurements {
                     bodyMeasurements.append(
                         ArchiveBodyMeasurement(
@@ -149,7 +150,9 @@ public enum ArchiveExportPolicy {
 
     // MARK: Student
 
-    private static func makeStudent(_ student: ArchiveExportSource.Student, modules: ArchiveModuleSet) -> ArchiveStudent? {
+    private static func makeStudent(_ student: ArchiveExportSource.Student, modules: ArchiveModuleSet)
+        -> ArchiveStudent?
+    {
         guard modules.displayName || modules.sex else {
             return nil
         }

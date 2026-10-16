@@ -104,7 +104,8 @@
 
             await viewModel.loadExistingActivePackage()
             let loadedActive = await viewModel.existingActivePackage
-            XCTAssertEqual(loadedActive?.id, firstPackage.id, "loadExistingActivePackage must find the Student's active package")
+            XCTAssertEqual(
+                loadedActive?.id, firstPackage.id, "loadExistingActivePackage must find the Student's active package")
             let loadedBalance = await viewModel.existingActivePackageBalance
             XCTAssertEqual(loadedBalance, 8, "balance shown must be the ledger-derived balance, not a stale cache")
 
@@ -170,7 +171,9 @@
 
             await viewModel.loadExistingActivePackage()
             let loadedBalance = await viewModel.existingActivePackageBalance
-            XCTAssertEqual(loadedBalance, 5, "the expired package still has credits left -- expiry, not balance, is why no dialog is needed")
+            XCTAssertEqual(
+                loadedBalance, 5,
+                "the expired package still has credits left -- expiry, not balance, is why no dialog is needed")
 
             await viewModel.save()
 

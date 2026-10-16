@@ -24,7 +24,8 @@ final class ArchiveExportScreenTests: XCTestCase {
 
     private func swiftSources(under relativePath: String) throws -> [(name: String, text: String)] {
         let enumerator = try XCTUnwrap(
-            FileManager.default.enumerator(at: appRoot.appendingPathComponent(relativePath), includingPropertiesForKeys: nil)
+            FileManager.default.enumerator(
+                at: appRoot.appendingPathComponent(relativePath), includingPropertiesForKeys: nil)
         )
         var result: [(String, String)] = []
         for case let url as URL in enumerator where url.pathExtension == "swift" {
@@ -40,10 +41,14 @@ final class ArchiveExportScreenTests: XCTestCase {
         var securePresenters: [String] = []
         // The export screens and the later archive import screens (M2-08, M2-19) live here.
         for file in try swiftSources(under: "Features/ArchiveExport") + swiftSources(under: "Features/ArchiveViewer") {
-            let stripped = file.text.components(separatedBy: "\n").filter { !$0.trimmingCharacters(in: .whitespaces).hasPrefix("//") }
-                .joined(separator: "\n")
-            XCTAssertFalse(stripped.contains("textContentType(.password"), "\(file.name) declares a password content type")
-            XCTAssertFalse(stripped.contains("textContentType(.newPassword"), "\(file.name) declares a password content type")
+            let stripped = file.text.components(separatedBy: "\n").filter {
+                !$0.trimmingCharacters(in: .whitespaces).hasPrefix("//")
+            }
+            .joined(separator: "\n")
+            XCTAssertFalse(
+                stripped.contains("textContentType(.password"), "\(file.name) declares a password content type")
+            XCTAssertFalse(
+                stripped.contains("textContentType(.newPassword"), "\(file.name) declares a password content type")
             if stripped.contains(".textContentType(") && file.text.contains("archivePasswordEntry") {
                 configuring.append(file.name)
             }
@@ -52,7 +57,8 @@ final class ArchiveExportScreenTests: XCTestCase {
             }
         }
         XCTAssertEqual(configuring, ["ArchivePasswordField.swift"])
-        XCTAssertEqual(securePresenters, ["ArchivePasswordField.swift"], "masked fields must go through ArchivePasswordField")
+        XCTAssertEqual(
+            securePresenters, ["ArchivePasswordField.swift"], "masked fields must go through ArchivePasswordField")
         let field = try source("Features/ArchiveExport/ArchivePasswordField.swift")
         XCTAssertTrue(field.contains(".autocorrectionDisabled(true)"))
         XCTAssertTrue(field.contains(".textInputAutocapitalization(.never)"))
@@ -91,7 +97,9 @@ final class ArchiveExportScreenTests: XCTestCase {
         for file in try swiftSources(under: "Features/ArchiveExport") {
             let presentsModal = file.text.contains(".sheet(") || file.text.contains(".fullScreenCover(")
             if presentsModal {
-                XCTAssertTrue(file.text.contains(".fcPrivacyCovered()"), "\(file.name) presents a modal without the privacy cover")
+                XCTAssertTrue(
+                    file.text.contains(".fcPrivacyCovered()"), "\(file.name) presents a modal without the privacy cover"
+                )
             }
         }
         let navigation = try source("App/RootNavigation.swift")
@@ -108,7 +116,8 @@ final class ArchiveExportScreenTests: XCTestCase {
         let pattern = try NSRegularExpression(pattern: "(?<![A-Za-z])Text\\(\"archive\\.export\\.[A-Za-z.]+\"\\)")
         for file in try swiftSources(under: "Features/ArchiveExport") {
             let range = NSRange(file.text.startIndex..., in: file.text)
-            XCTAssertEqual(pattern.numberOfMatches(in: file.text, range: range), 0, "\(file.name) has a literal-key Text")
+            XCTAssertEqual(
+                pattern.numberOfMatches(in: file.text, range: range), 0, "\(file.name) has a literal-key Text")
         }
     }
 
@@ -122,11 +131,13 @@ final class ArchiveExportScreenTests: XCTestCase {
     // MARK: Localization
 
     func testEveryExportLocalizationKeyUsedBySourceExists() throws {
-        let catalog = try JSONSerialization.jsonObject(
-            with: Data(contentsOf: appRoot.appendingPathComponent("Resources/Localizable.xcstrings"))
-        ) as? [String: Any]
+        let catalog =
+            try JSONSerialization.jsonObject(
+                with: Data(contentsOf: appRoot.appendingPathComponent("Resources/Localizable.xcstrings"))
+            ) as? [String: Any]
         let strings = try XCTUnwrap(catalog?["strings"] as? [String: Any])
-        let pattern = try NSRegularExpression(pattern: "\"((?:archive\\.export|student\\.detail\\.exportArchive)[A-Za-z.]*)\"")
+        let pattern = try NSRegularExpression(
+            pattern: "\"((?:archive\\.export|student\\.detail\\.exportArchive)[A-Za-z.]*)\"")
         var used = Set<String>()
         for file in try swiftSources(under: "Features/ArchiveExport") {
             let range = NSRange(file.text.startIndex..., in: file.text)
@@ -199,7 +210,8 @@ final class ArchiveExportScreenTests: XCTestCase {
         let source = try await seededSource()
         let all = X.selection(for: source, keeping: Set(source.availability.allItems))
         let preview = ArchivePreviewModel(
-            snapshot: try ArchiveExportPolicy.makeSnapshot(source: source, selection: all, identity: X.identity, now: X.now)
+            snapshot: try ArchiveExportPolicy.makeSnapshot(
+                source: source, selection: all, identity: X.identity, now: X.now)
         )
         XCTAssertEqual(preview.displayName, X.studentName)
         let customNames = preview.customExercises.map(\.text)
@@ -209,7 +221,8 @@ final class ArchiveExportScreenTests: XCTestCase {
         }
         XCTAssertEqual(Set(preview.summaries.map(\.text)), Set(X.summaries))
         XCTAssertTrue(preview.metrics.contains { $0.isCustom && $0.title == X.customMetricName })
-        let shown = ([preview.displayName ?? ""] + customNames + preview.summaries.map(\.text) + preview.metrics.map(\.title)
+        let shown =
+            ([preview.displayName ?? ""] + customNames + preview.summaries.map(\.text) + preview.metrics.map(\.title)
             + preview.metrics.map(\.detail)).joined(separator: "\n")
         for excluded in X.excludedValues {
             XCTAssertFalse(shown.contains(excluded), "preview leaks \(excluded)")
@@ -240,7 +253,10 @@ final class ArchiveExportScreenTests: XCTestCase {
                     primaryMuscles: ["胸"], secondaryMuscles: [], equipment: "杠铃", sourceName: "wger.de",
                     licenseName: "CC-BY-SA-3.0", licenseText: "示例许可文本"),
                 recordMode: .weightReps,
-                sets: [ArchiveSet(weightValue: try! DecimalValue("40"), repetitionCount: try! DecimalValue("8"), unit: .kilograms)])
+                sets: [
+                    ArchiveSet(
+                        weightValue: try! DecimalValue("40"), repetitionCount: try! DecimalValue("8"), unit: .kilograms)
+                ])
         }
         func session(day: Int, _ names: [String?]) -> ArchiveExportSource.Session {
             .init(
@@ -257,7 +273,8 @@ final class ArchiveExportScreenTests: XCTestCase {
             ],
             bodyMetrics: [])
         let all = X.selection(for: source, keeping: Set(source.availability.allItems))
-        let snapshot = try ArchiveExportPolicy.makeSnapshot(source: source, selection: all, identity: X.identity, now: X.now)
+        let snapshot = try ArchiveExportPolicy.makeSnapshot(
+            source: source, selection: all, identity: X.identity, now: X.now)
 
         let exported = try JSONDecoder().decode(ArchiveSnapshot.self, from: JSONEncoder().encode(snapshot))
         var seen = Set<String>()

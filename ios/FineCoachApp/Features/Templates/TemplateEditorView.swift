@@ -179,10 +179,12 @@ struct TemplateEditorView: View {
                     .onChange(of: name) { _, newValue in
                         Task { await viewModel.rename(newValue) }
                     }
-                BodyPartMultiSelectView(title: String(localized: "templateEditor.trainingFocus"), selection: $trainingFocus)
-                    .onChange(of: trainingFocus) { _, newValue in
-                        Task { await viewModel.updateTrainingFocus(newValue) }
-                    }
+                BodyPartMultiSelectView(
+                    title: String(localized: "templateEditor.trainingFocus"), selection: $trainingFocus
+                )
+                .onChange(of: trainingFocus) { _, newValue in
+                    Task { await viewModel.updateTrainingFocus(newValue) }
+                }
 
                 FCListRowDivider()
 
