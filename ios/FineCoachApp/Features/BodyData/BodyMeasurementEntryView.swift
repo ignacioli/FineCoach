@@ -339,54 +339,59 @@ struct BodyMeasurementEntryView: View {
                 dismiss()
             }
         }
-        .confirmationDialog(
-            String(localized: "bodyData.deleteConfirmTitle"),
-            isPresented: $viewModel.showingDeleteMetricConfirm,
-            titleVisibility: .visible
-        ) {
-            Button(String(localized: "bodyData.delete"), role: .destructive) {
-                Task { await viewModel.confirmDeleteMetric() }
-            }
-            Button(String(localized: "bodyData.deleteCancel"), role: .cancel) {
-                viewModel.showingDeleteMetricConfirm = false
-            }
-        } message: {
-            Text(String(localized: "bodyData.deleteConfirmMessage"))
+        .fcConfirmationDialog(isPresented: $viewModel.showingDeleteMetricConfirm) {
+            FCConfirmationDialog(
+                title: String(localized: "bodyData.deleteConfirmTitle"),
+                message: String(localized: "bodyData.deleteConfirmMessage"),
+                cancelAction: .init(title: String(localized: "bodyData.deleteCancel")) {
+                    viewModel.showingDeleteMetricConfirm = false
+                },
+                confirmAction: .init(
+                    title: String(localized: "bodyData.delete"),
+                    accessibilityIdentifier: FCAccessibilityID.bodyMeasurementDeleteMetricConfirm
+                ) {
+                    viewModel.showingDeleteMetricConfirm = false
+                    Task { await viewModel.confirmDeleteMetric() }
+                }
+            )
         }
-        .confirmationDialog(
-            String(localized: "bodyMeasurementEntry.deleteConfirmTitle"),
+        .fcConfirmationDialog(
             isPresented: Binding(
                 get: { viewModel.pendingDeleteID != nil },
                 set: { if !$0 { viewModel.pendingDeleteID = nil } }
-            ),
-            titleVisibility: .visible
+            )
         ) {
-            Button(String(localized: "bodyMeasurementEntry.delete"), role: .destructive) {
-                if let id = viewModel.pendingDeleteID {
+            FCConfirmationDialog(
+                title: String(localized: "bodyMeasurementEntry.deleteConfirmTitle"),
+                message: String(localized: "bodyMeasurementEntry.deleteConfirmMessage"),
+                cancelAction: .init(title: String(localized: "bodyMeasurementEntry.cancel")) {
+                    viewModel.pendingDeleteID = nil
+                },
+                confirmAction: .init(
+                    title: String(localized: "bodyMeasurementEntry.delete"),
+                    accessibilityIdentifier: FCAccessibilityID.bodyMeasurementDeleteConfirm
+                ) {
+                    guard let id = viewModel.pendingDeleteID else { return }
+                    viewModel.pendingDeleteID = nil
                     Task { await viewModel.confirmDelete(id) }
                 }
-            }
-            .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementDeleteConfirm)
-            Button(String(localized: "bodyMeasurementEntry.cancel"), role: .cancel) {
-                viewModel.pendingDeleteID = nil
-            }
-        } message: {
-            Text(String(localized: "bodyMeasurementEntry.deleteConfirmMessage"))
+            )
         }
-        .confirmationDialog(
-            String(localized: "bodyMeasurementEntry.deleteAllConfirmTitle"),
-            isPresented: $viewModel.showingDeleteAllConfirm,
-            titleVisibility: .visible
-        ) {
-            Button(String(localized: "bodyMeasurementEntry.deleteAll"), role: .destructive) {
-                Task { await viewModel.confirmDeleteAll() }
-            }
-            .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementDeleteAllConfirm)
-            Button(String(localized: "bodyMeasurementEntry.cancel"), role: .cancel) {
-                viewModel.showingDeleteAllConfirm = false
-            }
-        } message: {
-            Text(String(localized: "bodyMeasurementEntry.deleteAllConfirmMessage"))
+        .fcConfirmationDialog(isPresented: $viewModel.showingDeleteAllConfirm) {
+            FCConfirmationDialog(
+                title: String(localized: "bodyMeasurementEntry.deleteAllConfirmTitle"),
+                message: String(localized: "bodyMeasurementEntry.deleteAllConfirmMessage"),
+                cancelAction: .init(title: String(localized: "bodyMeasurementEntry.cancel")) {
+                    viewModel.showingDeleteAllConfirm = false
+                },
+                confirmAction: .init(
+                    title: String(localized: "bodyMeasurementEntry.deleteAll"),
+                    accessibilityIdentifier: FCAccessibilityID.bodyMeasurementDeleteAllConfirm
+                ) {
+                    viewModel.showingDeleteAllConfirm = false
+                    Task { await viewModel.confirmDeleteAll() }
+                }
+            )
         }
     }
 

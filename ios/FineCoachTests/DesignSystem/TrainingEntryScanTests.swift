@@ -53,6 +53,32 @@ final class TrainingEntryScanTests: XCTestCase {
         )
     }
 
+    /// These three system confirmation dialogs remain until the product owner decides how
+    /// their multi-option flows map to DS-CONFIRM-DIALOG: 待产品负责人决定，见 audit.md §3.4。
+    func testOnlyDeferredSystemConfirmationDialogsRemain() throws {
+        let expected: Set<String> = [
+            #"Features/ActiveSession/ActiveSessionView.swift|String(localized: "activeSession.deleteSection")"#,
+            #"Features/ActiveSession/ActiveSessionView.swift|String(localized: "activeSession.moveToSection")"#,
+            #"Features/Templates/TemplateEditorView.swift|String(localized: "templateEditor.deleteSection")"#,
+        ]
+        let features = appRoot().appendingPathComponent("Features")
+        let enumerator = try XCTUnwrap(FileManager.default.enumerator(at: features, includingPropertiesForKeys: nil))
+        var matches: [String] = []
+        for case let url as URL in enumerator where url.pathExtension == "swift" {
+            let lines = try String(contentsOf: url, encoding: .utf8).components(separatedBy: "\n")
+            let relativePath = url.path.replacingOccurrences(of: features.path + "/", with: "Features/")
+            for (index, line) in lines.enumerated() where line.contains(".confirmationDialog(") {
+                let titleLine = index + 1 < lines.count ? lines[index + 1].trimmingCharacters(in: .whitespaces) : ""
+                let title = titleLine.hasSuffix(",") ? String(titleLine.dropLast()) : titleLine
+                let match = "\(relativePath)|\(title)"
+                matches.append(match)
+                XCTAssertTrue(expected.contains(match), "unexpected system confirmation dialog at \(match)")
+            }
+        }
+        XCTAssertEqual(matches.count, expected.count)
+        XCTAssertEqual(Set(matches), expected)
+    }
+
     // MARK: - Helpers
 
     /// A system `Button` with a text title (`Button("…")`,
@@ -66,6 +92,14 @@ final class TrainingEntryScanTests: XCTestCase {
 
     private func occurrences(of needle: String, in text: Substring) -> Int {
         text.components(separatedBy: needle).count - 1
+    }
+
+    private func appRoot() -> URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()  // DesignSystem/
+            .deletingLastPathComponent()  // FineCoachTests/
+            .deletingLastPathComponent()  // ios/
+            .appendingPathComponent("FineCoachApp")
     }
 
     /// Lines of a file under `ios/FineCoachApp`, resolved from this file's
