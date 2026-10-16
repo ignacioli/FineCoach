@@ -1,5 +1,6 @@
-@testable import FineCoach
 import XCTest
+
+@testable import FineCoach
 
 final class HistoryReportDomainTests: XCTestCase {
     private let now = Date(timeIntervalSince1970: 1_700_000_000)

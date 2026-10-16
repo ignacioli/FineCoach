@@ -132,7 +132,8 @@ final class TemplateSnapshotSectionTests: XCTestCase {
         let copiedSquat = try XCTUnwrap(exercises.first { $0.displayNameSnapshot.value == "深蹲" })
         XCTAssertEqual(copiedSquat.plannedSets.count, 1)
         XCTAssertEqual(copiedSquat.plannedSets[0].weightValue?.canonicalString, try DecimalValue("60").canonicalString)
-        XCTAssertEqual(copiedSquat.plannedSets[0].repetitionCount?.canonicalString, try DecimalValue("5").canonicalString)
+        XCTAssertEqual(
+            copiedSquat.plannedSets[0].repetitionCount?.canonicalString, try DecimalValue("5").canonicalString)
         XCTAssertNotNil(copiedSquat.sectionID)
         XCTAssertEqual(sections.count, 1)
         XCTAssertEqual(sections.first?.name.value, "热身")

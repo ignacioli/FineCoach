@@ -26,10 +26,13 @@ public struct FCBodyDiagram: View {
 
             HStack(spacing: FCPrimitives.space6) {
                 if let primaryText = BodyPart.joinedDisplayNames(for: summary.primary, separator: "、") {
-                    legendItem(color: FCSemanticColors.actionPrimary, title: "bodyDiagram.legend.primary", parts: primaryText)
+                    legendItem(
+                        color: FCSemanticColors.actionPrimary, title: "bodyDiagram.legend.primary", parts: primaryText)
                 }
                 if let secondaryText = BodyPart.joinedDisplayNames(for: summary.secondary, separator: "、") {
-                    legendItem(color: FCSemanticColors.textDisabled, title: "bodyDiagram.legend.secondary", parts: secondaryText)
+                    legendItem(
+                        color: FCSemanticColors.textDisabled, title: "bodyDiagram.legend.secondary",
+                        parts: secondaryText)
                 }
             }
         }
@@ -123,7 +126,9 @@ enum FCBodyDiagramGeometry {
     /// On-screen figure width in the artwork (≈103pt).
     static let figureWidth: CGFloat = 104
 
-    private static func block(_ x: CGFloat, _ y: CGFloat, _ w: CGFloat, _ h: CGFloat, _ shape: Shape, _ part: BodyPart?) -> Block {
+    private static func block(_ x: CGFloat, _ y: CGFloat, _ w: CGFloat, _ h: CGFloat, _ shape: Shape, _ part: BodyPart?)
+        -> Block
+    {
         Block(rect: CGRect(x: x, y: y, width: w, height: h), shape: shape, part: part)
     }
 
@@ -146,15 +151,17 @@ enum FCBodyDiagramGeometry {
     ]
 
     /// Front: shoulders, arms, chest, core, thighs, calves (+ head, pelvis).
-    static let front: [Block] = [head] + shoulders + arms + [
-        block(43, 62, 101, 64, .rounded(14), .chest),
-        block(47, 134, 94, 84, .rounded(12), .core),
-        block(50, 225, 87, 24, .capsule, nil),
-    ] + thighs + calves
+    static let front: [Block] =
+        [head] + shoulders + arms + [
+            block(43, 62, 101, 64, .rounded(14), .chest),
+            block(47, 134, 94, 84, .rounded(12), .core),
+            block(50, 225, 87, 24, .capsule, nil),
+        ] + thighs + calves
 
     /// Back: shoulders, arms, back, glutes, thighs, calves (+ head).
-    static let back: [Block] = [head] + shoulders + arms + [
-        block(43, 62, 102, 130, .rounded(16), .back),
-        block(47, 200, 94, 54, .rounded(24), .glutes),
-    ] + thighs + calves
+    static let back: [Block] =
+        [head] + shoulders + arms + [
+            block(43, 62, 102, 130, .rounded(16), .back),
+            block(47, 200, 94, 54, .rounded(24), .glutes),
+        ] + thighs + calves
 }

@@ -295,7 +295,9 @@ enum BackupInventoryMapper {
         let recurrenceSeries = try recurrenceSeriesObjects.map {
             try RecurrenceSeriesManagedObjectMapping.makeSeries(from: $0)
         }
-        let coursePackages = try coursePackageObjects.map { try CoursePackageManagedObjectMapping.makePackage(from: $0) }
+        let coursePackages = try coursePackageObjects.map {
+            try CoursePackageManagedObjectMapping.makePackage(from: $0)
+        }
         let creditAdjustments = try creditAdjustmentObjects.map {
             try CoursePackageManagedObjectMapping.makeAdjustment(from: $0)
         }
@@ -310,7 +312,9 @@ enum BackupInventoryMapper {
                 .sorted { $0.orderIndex < $1.orderIndex }
             return BackupTemplateRecord(template: template, exercises: exercises)
         }
-        let sessionSections = try sessionSectionObjects.map { try SessionSectionManagedObjectMapping.makeSection(from: $0) }
+        let sessionSections = try sessionSectionObjects.map {
+            try SessionSectionManagedObjectMapping.makeSection(from: $0)
+        }
         let bodyMetrics = try bodyMetricObjects.map { try BodyMetricManagedObjectMapping.makeMetric(from: $0) }
         let bodyMeasurements = try bodyMeasurementObjects.map {
             try BodyMetricManagedObjectMapping.makeMeasurement(from: $0)

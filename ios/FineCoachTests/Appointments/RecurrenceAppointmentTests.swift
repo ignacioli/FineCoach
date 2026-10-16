@@ -235,7 +235,8 @@ final class RecurrenceAppointmentTests: XCTestCase {
     // MARK: - Deletion boundary
 
     func testOnlyNeverStartedFutureAppointmentCanBePermanentlyDeleted() throws {
-        let farFuture = try makeAppointment(hour: 9, minute: 0, durationMinutes: 60, date: try LocalDate(year: 2099, month: 1, day: 1))
+        let farFuture = try makeAppointment(
+            hour: 9, minute: 0, durationMinutes: 60, date: try LocalDate(year: 2099, month: 1, day: 1))
         XCTAssertTrue(farFuture.canPermanentlyDelete(now: now, calendar: utc))
 
         let started = try farFuture.startingTraining(sessionID: StableUUID(UUID()), now: now)

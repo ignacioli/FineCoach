@@ -182,9 +182,10 @@ struct ShareReportCardView: View {
 
     private static func trainedParts(_ dto: ShareReportDTO) -> TrainedBodyPartsSummary? {
         guard !dto.exercises.isEmpty else { return nil }
-        return TrainedBodyPartsSummary(exercises: dto.exercises.map {
-            ExerciseBodyParts(primary: $0.primaryBodyPart, secondary: $0.secondaryBodyParts)
-        })
+        return TrainedBodyPartsSummary(
+            exercises: dto.exercises.map {
+                ExerciseBodyParts(primary: $0.primaryBodyPart, secondary: $0.secondaryBodyParts)
+            })
     }
 
     private func section<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {

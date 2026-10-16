@@ -186,7 +186,8 @@ enum ArchiveFixtures {
             try! ArchiveBodyMetric(key: "m2", kind: .custom, name: "颈围（示例）", unit: "cm"),
         ]
         let measurements = [
-            ArchiveBodyMeasurement(metricKey: "m1", localDay: day(2026, 9, 1), value: decimal("70.5"), enteredUnit: "kg"),
+            ArchiveBodyMeasurement(
+                metricKey: "m1", localDay: day(2026, 9, 1), value: decimal("70.5"), enteredUnit: "kg"),
             ArchiveBodyMeasurement(metricKey: "m1", localDay: day(2026, 9, 8), value: decimal("70"), enteredUnit: "kg"),
             ArchiveBodyMeasurement(metricKey: "m2", localDay: day(2026, 9, 8), value: decimal("34"), enteredUnit: "cm"),
         ]

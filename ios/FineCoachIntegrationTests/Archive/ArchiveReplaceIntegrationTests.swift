@@ -20,7 +20,11 @@
         private final class SpyReader: ArchiveFileReading, @unchecked Sendable {
             private let lock = NSLock()
             private var reads = 0
-            var readCount: Int { lock.lock(); defer { lock.unlock() }; return reads }
+            var readCount: Int {
+                lock.lock()
+                defer { lock.unlock() }
+                return reads
+            }
 
             func readArchive(at url: URL) throws -> Data {
                 lock.lock()
@@ -112,8 +116,9 @@
         private func tree(_ h: Harness) -> [String: Data] {
             var result: [String: Data] = [:]
             let root = h.viewerRoot.resolvingSymlinksInPath().path
-            guard let items = FileManager.default.enumerator(
-                at: h.viewerRoot, includingPropertiesForKeys: [.isRegularFileKey])
+            guard
+                let items = FileManager.default.enumerator(
+                    at: h.viewerRoot, includingPropertiesForKeys: [.isRegularFileKey])
             else { return result }
             for case let url as URL in items {
                 guard (try? url.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true else { continue }
@@ -242,7 +247,8 @@
                 h, file: try file(try candidate(at: Self.newerAt, source: Self.otherID), named: "src.fcarchive", in: h),
                 .differentSource, "another source")
             try await assertRejected(
-                h, file: try file(try candidate(at: Self.newerAt, student: Self.otherID), named: "stu.fcarchive", in: h),
+                h,
+                file: try file(try candidate(at: Self.newerAt, student: Self.otherID), named: "stu.fcarchive", in: h),
                 .differentStudent, "another student of the same source")
             XCTAssertEqual(
                 h.logger.events,

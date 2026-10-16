@@ -25,7 +25,8 @@ struct ArchiveBodyDataView: View {
                     back: .init(accessibilityIdentifier: FCAccessibilityID.archiveBodyBack)
                 )
                 section(String(localized: "bodyData.basicSection"), builtIns([.weight, .bodyFatPercent, .height]))
-                section(String(localized: "bodyData.girthSection"), builtIns([.chest, .waist, .hip, .upperArm, .thigh]))
+                section(
+                    String(localized: "bodyData.girthSection"), builtIns([.chest, .waist, .hip, .upperArm, .thigh]))
                 section(String(localized: "bodyData.customSection"), metrics.filter { $0.kind == .custom })
                 Text(
                     String(
@@ -55,7 +56,9 @@ struct ArchiveBodyDataView: View {
             FCListRowDivider()
             ForEach(items, id: \.key) { metric in
                 let display = ArchiveBodyPresentation.latest(metric, content: content, converter: model.converter)
-                Button { openMetric(metric.key) } label: {
+                Button {
+                    openMetric(metric.key)
+                } label: {
                     BodyMetricValueRow(
                         name: ArchiveBodyPresentation.name(metric), value: display.value, unit: display.unit)
                 }

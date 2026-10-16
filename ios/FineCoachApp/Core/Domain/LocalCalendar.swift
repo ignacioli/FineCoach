@@ -81,7 +81,8 @@ public struct LocalDate: Hashable, Codable, Sendable, Comparable {
     }
 
     public func addingDays(_ days: Int, calendar: Calendar) -> LocalDate {
-        let date = calendar.date(byAdding: .day, value: days, to: startOfDay(calendar: calendar))
+        let date =
+            calendar.date(byAdding: .day, value: days, to: startOfDay(calendar: calendar))
             ?? startOfDay(calendar: calendar)
         return LocalDate(date: date, calendar: calendar)
     }

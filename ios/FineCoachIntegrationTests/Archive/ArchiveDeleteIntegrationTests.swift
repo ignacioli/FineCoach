@@ -112,7 +112,9 @@
 
         // MARK: Interruption
 
-        func testTerminationBetweenPointerRemovalAndDirectoryRemovalResolvesUnselectedAndTheJanitorCleansUp() async throws {
+        func testTerminationBetweenPointerRemovalAndDirectoryRemovalResolvesUnselectedAndTheJanitorCleansUp()
+            async throws
+        {
             let h = try await makeInstalledHarness()
             let faulty = ArchiveSnapshotStore(
                 rootURL: h.root,

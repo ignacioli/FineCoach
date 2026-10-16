@@ -58,7 +58,9 @@ final class CreditLedgerIdempotencyTests: XCTestCase {
             CreditLedger.sourceEventKey(adhocSession: sessionID),
             CreditLedger.sourceEventKey(appointmentAbsent: appointmentID),
         ]
-        XCTAssertEqual(Set(allKeys).count, allKeys.count, "each event kind must produce a distinct key even for the same underlying id")
+        XCTAssertEqual(
+            Set(allKeys).count, allKeys.count,
+            "each event kind must produce a distinct key even for the same underlying id")
     }
 
     func testManualCorrectionKeysAreUniquePerAdjustmentID() {

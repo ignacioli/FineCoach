@@ -168,7 +168,9 @@ struct ExerciseLibraryView: View {
             optionsEntryID = entry.id
         } label: {
             HStack(spacing: FCPrimitives.space4) {
-                if let icon = FCEquipmentIcon.icon(equipmentClass: entry.equipmentClass, primaryMuscleGroup: entry.primaryMuscleGroup) {
+                if let icon = FCEquipmentIcon.icon(
+                    equipmentClass: entry.equipmentClass, primaryMuscleGroup: entry.primaryMuscleGroup)
+                {
                     FCEquipmentIconView(icon)
                 }
                 VStack(alignment: .leading, spacing: FCPrimitives.space1) {
@@ -201,12 +203,14 @@ struct ExerciseLibraryView: View {
         if entry.item.kind == .custom {
             parts.append(String(localized: "exercise.kind.custom"))
         } else {
-            parts.append(entry.equipmentClass.flatMap { $0.isEmpty ? nil : $0 } ?? String(localized: "exercise.kind.builtIn"))
+            parts.append(
+                entry.equipmentClass.flatMap { $0.isEmpty ? nil : $0 } ?? String(localized: "exercise.kind.builtIn"))
             if !entry.secondaryMuscleGroups.isEmpty {
-                parts.append(String(
-                    format: String(localized: "exercise.library.secondaryFormat"),
-                    entry.secondaryMuscleGroups.joined(separator: "、")
-                ))
+                parts.append(
+                    String(
+                        format: String(localized: "exercise.library.secondaryFormat"),
+                        entry.secondaryMuscleGroups.joined(separator: "、")
+                    ))
             }
         }
         if entry.preference?.isHidden == true {

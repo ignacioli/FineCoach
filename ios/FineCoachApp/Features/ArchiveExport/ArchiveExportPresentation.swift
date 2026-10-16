@@ -41,7 +41,8 @@ enum ArchiveExportPresentation {
         case .displayName, .sex:
             return nil
         case .trainingRecords:
-            return String(format: String(localized: "archive.export.note.trainingRecords"), availability.completedSessionCount)
+            return String(
+                format: String(localized: "archive.export.note.trainingRecords"), availability.completedSessionCount)
         case .trends:
             return String(localized: "archive.export.note.trends")
         case .summaries:
@@ -68,7 +69,8 @@ enum ArchiveExportPresentation {
         let selectable = selection.items(in: group).filter { selection.state(of: $0).isSelectable }
         switch group {
         case .basicProfile:
-            return selectable
+            return
+                selectable
                 .map { itemTitle($0, availability: availability) }
                 .joined(separator: String(localized: "archive.export.list.separator"))
         case .trainingContent:

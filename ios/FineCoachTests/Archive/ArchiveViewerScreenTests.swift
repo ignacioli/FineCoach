@@ -57,8 +57,10 @@ final class ArchiveViewerScreenTests: XCTestCase {
         let data = try Data(contentsOf: appRoot.appendingPathComponent("Resources/Localizable.xcstrings"))
         let strings = try XCTUnwrap(
             (try JSONSerialization.jsonObject(with: data) as? [String: Any])?["strings"] as? [String: Any])
-        for (key, value) in strings where key.hasPrefix("archive.viewer.") || key.hasPrefix("archive.import.")
-            || key.hasPrefix("archive.settings.") || key.hasPrefix("archive.firstLaunch.") || key.hasPrefix("archive.blocked.")
+        for (key, value) in strings
+        where key.hasPrefix("archive.viewer.") || key.hasPrefix("archive.import.")
+            || key.hasPrefix("archive.settings.") || key.hasPrefix("archive.firstLaunch.")
+            || key.hasPrefix("archive.blocked.")
             || key.hasPrefix("archive.summary.")
         {
             let text =
@@ -108,7 +110,8 @@ final class ArchiveViewerScreenTests: XCTestCase {
         var settings = ArchiveDisplaySettings.defaults
         settings.weightUnit = .lb
         let dto = try XCTUnwrap(
-            ArchiveSessionRecord.dto(session: first, content: content, converter: ArchiveDisplayConverter(settings: settings)))
+            ArchiveSessionRecord.dto(
+                session: first, content: content, converter: ArchiveDisplayConverter(settings: settings)))
         XCTAssertEqual(dto.exercises.first?.displayName, "杠铃卧推")
         XCTAssertNotNil(dto.exercises.first?.equipmentIcon)
         XCTAssertTrue(ShareReportCardView.blocks(for: dto, style: .page).contains(.trainedParts))
@@ -231,7 +234,8 @@ final class ArchiveViewerScreenTests: XCTestCase {
         await model.submit()
         guard case .confirm(let preview) = model.phase else { return XCTFail("expected the confirmation facts") }
         XCTAssertEqual(preview.candidate.snapshotAtUTC, newer.manifest.snapshotAtUTC)
-        XCTAssertEqual(try store.load(), ArchiveFixtures.summariesOnlySnapshot(), "nothing is written before the confirmation")
+        XCTAssertEqual(
+            try store.load(), ArchiveFixtures.summariesOnlySnapshot(), "nothing is written before the confirmation")
 
         await model.backToForm()
         XCTAssertEqual(model.phase, .form)

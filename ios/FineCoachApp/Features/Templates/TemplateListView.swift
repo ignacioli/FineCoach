@@ -151,10 +151,12 @@ struct TemplateListView: View {
                     Text(template.name.value)
                         .fcFont(.headline)
                         .foregroundStyle(FCSemanticColors.textPrimary)
-                    Text(TemplateListPresentation.subtitle(
-                        focus: template.trainingFocus,
-                        exerciseCount: viewModel.exerciseCounts[template.id] ?? 0
-                    ))
+                    Text(
+                        TemplateListPresentation.subtitle(
+                            focus: template.trainingFocus,
+                            exerciseCount: viewModel.exerciseCounts[template.id] ?? 0
+                        )
+                    )
                     .fcFont(.caption)
                     .foregroundStyle(FCSemanticColors.textSecondary)
                 }

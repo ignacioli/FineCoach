@@ -119,7 +119,8 @@
             let exerciseID = try XCTUnwrap(withExercise.exercises.last?.id)
             let withSet = try await env.sessions.addSet(
                 exerciseID: exerciseID,
-                input: TrainingSetInput(recordMode: .weightReps, weightValue: "40", repetitionCount: "8", unit: .kilograms)
+                input: TrainingSetInput(
+                    recordMode: .weightReps, weightValue: "40", repetitionCount: "8", unit: .kilograms)
             )
             _ = try await env.sessions.confirmSet(setID: try XCTUnwrap(withSet.exercises.last?.sets.last?.id))
             return try await env.sessions.finish()
@@ -451,7 +452,8 @@
             let exerciseID = try XCTUnwrap(active.exercises.last?.id)
             let withSet = try await env.sessions.addSet(
                 exerciseID: exerciseID,
-                input: TrainingSetInput(recordMode: .weightReps, weightValue: "40", repetitionCount: "8", unit: .kilograms)
+                input: TrainingSetInput(
+                    recordMode: .weightReps, weightValue: "40", repetitionCount: "8", unit: .kilograms)
             )
             _ = try await env.sessions.confirmSet(setID: try XCTUnwrap(withSet.exercises.last?.sets.last?.id))
             await viewModel.load()

@@ -1,5 +1,6 @@
-@testable import FineCoach
 import XCTest
+
+@testable import FineCoach
 
 /// T078: the body-part summary behind the share-preview diagram (design
 /// system §9.1) — primary = union of exercises' primary parts; secondary =

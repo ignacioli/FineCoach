@@ -213,7 +213,8 @@ public struct ArchiveExportSourceReader: ArchiveExportSourceReading {
         let sessionObjects = try context.fetch(sessionRequest)
 
         // Exercises and confirmed sets of this student's completed sessions, one fetch each.
-        let exerciseRequest = NSFetchRequest<NSManagedObject>(entityName: SessionManagedObjectMapping.exerciseEntityName)
+        let exerciseRequest = NSFetchRequest<NSManagedObject>(
+            entityName: SessionManagedObjectMapping.exerciseEntityName)
         exerciseRequest.predicate = NSPredicate(
             format: "session.studentID == %@ AND session.state == %@",
             studentID as CVarArg,

@@ -41,7 +41,8 @@ enum ArchiveImportPresentation {
         let name = url.lastPathComponent
         if let range = name.range(of: #"-(\d{4})(\d{2})(\d{2})-\d{4}"#, options: .regularExpression) {
             let digits = name[range].filter(\.isNumber)
-            if digits.count == 12, let month = Int(digits.dropFirst(4).prefix(2)), let day = Int(digits.dropFirst(6).prefix(2)),
+            if digits.count == 12, let month = Int(digits.dropFirst(4).prefix(2)),
+                let day = Int(digits.dropFirst(6).prefix(2)),
                 (1...12).contains(month), (1...31).contains(day)
             {
                 return String(format: String(localized: "archive.import.file.nameFormat"), month, day)

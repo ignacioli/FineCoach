@@ -48,7 +48,8 @@ final class CoursePackageEditorViewModel: ObservableObject {
             return
         }
         existingActivePackage = active
-        existingActivePackageBalance = (try? await useCases.balance(packageID: active.id)) ?? active.remainingCreditsCache
+        existingActivePackageBalance =
+            (try? await useCases.balance(packageID: active.id)) ?? active.remainingCreditsCache
     }
 
     /// When the Student already has an active package that is STILL in
@@ -95,7 +96,8 @@ final class CoursePackageEditorViewModel: ObservableObject {
             )
             didSave = true
         } catch {
-            errorMessage = (error as? LocalizedError)?.errorDescription
+            errorMessage =
+                (error as? LocalizedError)?.errorDescription
                 ?? String(localized: "coursePackageEditor.saveFailed")
         }
     }

@@ -93,7 +93,8 @@ struct SessionSummaryView: View {
         path: Binding<[RootDestination]>
     ) {
         _viewModel = StateObject(
-            wrappedValue: SessionSummaryViewModel(sessionID: sessionID, useCases: useCases, templateUseCases: templateUseCases)
+            wrappedValue: SessionSummaryViewModel(
+                sessionID: sessionID, useCases: useCases, templateUseCases: templateUseCases)
         )
         _path = path
     }
@@ -174,8 +175,10 @@ struct SessionSummaryView: View {
                 subtitle: String(localized: "summary.saveAsTemplateNote")
             ) {
                 VStack(spacing: FCPrimitives.space3) {
-                    FCTextField(String(localized: "activeSession.saveAsTemplateNamePrompt"), text: $viewModel.templateName)
-                        .accessibilityIdentifier(FCAccessibilityID.activeSessionSaveAsTemplateName)
+                    FCTextField(
+                        String(localized: "activeSession.saveAsTemplateNamePrompt"), text: $viewModel.templateName
+                    )
+                    .accessibilityIdentifier(FCAccessibilityID.activeSessionSaveAsTemplateName)
                     FCButton(
                         title: String(localized: "activeSession.saveAsTemplateConfirm"),
                         isEnabled: !viewModel.templateName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty

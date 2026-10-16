@@ -9,9 +9,9 @@ import XCTest
 final class PrivacyCoverTests: XCTestCase {
     private var appRoot: URL {
         URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent() // Privacy/
-            .deletingLastPathComponent() // FineCoachTests/
-            .deletingLastPathComponent() // ios/
+            .deletingLastPathComponent()  // Privacy/
+            .deletingLastPathComponent()  // FineCoachTests/
+            .deletingLastPathComponent()  // ios/
             .appendingPathComponent("FineCoachApp")
     }
 
@@ -38,7 +38,8 @@ final class PrivacyCoverTests: XCTestCase {
         var constructors: [String: [String]] = [:]
         for case let url as URL in enumerator where url.pathExtension == "swift" {
             let text = try String(contentsOf: url, encoding: .utf8)
-            for branch in ["ArchiveViewerRoot(", "RootNavigation(", "AppRoot()"] where text.contains(branch) && !text.contains("struct \(branch.dropLast())") {
+            for branch in ["ArchiveViewerRoot(", "RootNavigation(", "AppRoot()"]
+            where text.contains(branch) && !text.contains("struct \(branch.dropLast())") {
                 constructors[branch, default: []].append(url.lastPathComponent)
             }
         }
@@ -83,12 +84,14 @@ final class PrivacyCoverTests: XCTestCase {
         XCTAssertTrue(app.contains("case .inactive:"))
         XCTAssertTrue(app.contains("case .background:"))
         XCTAssertTrue(app.contains("@unknown default:"))
-        XCTAssertGreaterThanOrEqual(app.components(separatedBy: "privacyCoordinator.sceneWillResignActive()").count - 1, 3)
+        XCTAssertGreaterThanOrEqual(
+            app.components(separatedBy: "privacyCoordinator.sceneWillResignActive()").count - 1, 3)
     }
 
     func testEveryFeatureFileThatPresentsAModalCoversItsContent() throws {
         let enumerator = try XCTUnwrap(
-            FileManager.default.enumerator(at: appRoot.appendingPathComponent("Features"), includingPropertiesForKeys: nil)
+            FileManager.default.enumerator(
+                at: appRoot.appendingPathComponent("Features"), includingPropertiesForKeys: nil)
         )
         var uncovered: [String] = []
         var presenters = 0

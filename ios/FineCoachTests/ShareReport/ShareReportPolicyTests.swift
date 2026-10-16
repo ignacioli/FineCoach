@@ -130,7 +130,9 @@ final class ShareReportPolicyTests: XCTestCase {
 
         let optedIn = try ShareReportPolicy.makeDTO(
             from: completed,
-            personalBests: [ShareReportPersonalBestDTO(displayName: "杠铃深蹲", kind: .highestWeight, weightValue: DecimalValue("40"))]
+            personalBests: [
+                ShareReportPersonalBestDTO(displayName: "杠铃深蹲", kind: .highestWeight, weightValue: DecimalValue("40"))
+            ]
         )
         XCTAssertEqual(optedIn.personalBests.map(\.displayName), ["杠铃深蹲"])
     }

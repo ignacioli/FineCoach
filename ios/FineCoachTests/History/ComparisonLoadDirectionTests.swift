@@ -1,5 +1,6 @@
-@testable import FineCoach
 import XCTest
+
+@testable import FineCoach
 
 /// M1B-FR-028: `Comparison.exerciseTrend`/`personalRecords` must let a
 /// caller supply `.decreaseIsImprovement` for assisted-load exercises and
@@ -140,11 +141,14 @@ final class ComparisonLoadDirectionTests: XCTestCase {
 
     // MARK: - Fixtures
 
-    private func makeSession(idSuffix: String, sets setValues: [(weight: String, reps: String)], daysOffset: Int) throws -> CompletedSession {
+    private func makeSession(idSuffix: String, sets setValues: [(weight: String, reps: String)], daysOffset: Int) throws
+        -> CompletedSession
+    {
         let base = try makeSession(idSuffix: idSuffix, weight: setValues[0].weight, daysOffset: daysOffset)
         let exercise = base.exercises[0]
         let sets = try setValues.enumerated().map { index, value in
-            try makeSet(orderIndex: UInt32(index), weight: value.weight, reps: value.reps, sessionExerciseID: exercise.id)
+            try makeSet(
+                orderIndex: UInt32(index), weight: value.weight, reps: value.reps, sessionExerciseID: exercise.id)
         }
         let rebuilt = try SessionExercise(
             id: exercise.id,
@@ -269,7 +273,9 @@ final class ComparisonLoadDirectionTests: XCTestCase {
         XCTAssertEqual(sufficientPoints.count, 3)
     }
 
-    private func makeSet(orderIndex: UInt32, weight: String, reps: String = "8", sessionExerciseID: StableUUID) throws -> TrainingSet {
+    private func makeSet(orderIndex: UInt32, weight: String, reps: String = "8", sessionExerciseID: StableUUID) throws
+        -> TrainingSet
+    {
         try TrainingSet(
             id: StableUUID(UUID()),
             sessionExerciseID: sessionExerciseID,

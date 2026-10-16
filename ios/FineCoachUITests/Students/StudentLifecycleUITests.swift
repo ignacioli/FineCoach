@@ -35,7 +35,9 @@ final class StudentLifecycleUITests: XCTestCase {
     }
 
     func testSearchArchiveRestoreAndConfirmedDelete() throws {
-        throw XCTSkip("Stale since D6 (T069g): 归档 / 永久删除 moved from 学员详情 to the bottom of 编辑资料; rewrite the flow through 编辑资料 (tracked in tasks.md T081).")
+        throw XCTSkip(
+            "Stale since D6 (T069g): 归档 / 永久删除 moved from 学员详情 to the bottom of 编辑资料; rewrite the flow through 编辑资料 (tracked in tasks.md T081)."
+        )
 
         let app = launchIsolatedApp()
         if app.buttons["firstLaunch.coach"].waitForExistence(timeout: 8) { app.buttons["firstLaunch.coach"].tap() }
@@ -104,7 +106,9 @@ final class StudentLifecycleUITests: XCTestCase {
     }
 
     func testInProgressSessionBlocksPermanentDelete() throws {
-        throw XCTSkip("Stale since D6 (T069g): 归档 / 永久删除 moved from 学员详情 to the bottom of 编辑资料; rewrite the flow through 编辑资料 (tracked in tasks.md T081).")
+        throw XCTSkip(
+            "Stale since D6 (T069g): 归档 / 永久删除 moved from 学员详情 to the bottom of 编辑资料; rewrite the flow through 编辑资料 (tracked in tasks.md T081)."
+        )
 
         let app = launchIsolatedApp(extraArguments: ["-FineCoachSeedInProgressSession"])
         openStudentsTab(in: app)

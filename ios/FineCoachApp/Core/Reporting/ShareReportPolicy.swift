@@ -67,7 +67,9 @@ public enum ShareReportPolicy {
         let exercises: [ShareReportExerciseDTO]
         if modules.includeExercisesAndSets {
             exercises = completed.exercises.map { exercise in
-                let facet = exercise.sourceID.flatMap { PlaceholderExerciseCatalogLoader.facet(forExerciseID: $0.rawValue) }
+                let facet = exercise.sourceID.flatMap {
+                    PlaceholderExerciseCatalogLoader.facet(forExerciseID: $0.rawValue)
+                }
                 let parts = ExerciseBodyParts(
                     catalogPrimary: facet?.primaryMuscleGroup,
                     catalogSecondary: facet?.secondaryMuscleGroups ?? []
@@ -91,7 +93,8 @@ public enum ShareReportPolicy {
                         )
                     },
                     equipmentIcon: facet.flatMap {
-                        FCEquipmentIcon.icon(equipmentClass: $0.equipmentClass, primaryMuscleGroup: $0.primaryMuscleGroup)?.rawValue
+                        FCEquipmentIcon.icon(
+                            equipmentClass: $0.equipmentClass, primaryMuscleGroup: $0.primaryMuscleGroup)?.rawValue
                     },
                     primaryBodyPart: parts.primary,
                     secondaryBodyParts: parts.secondary
@@ -139,8 +142,11 @@ public enum ShareReportPolicy {
             )
             let name = exercise.displayNameSnapshot.value
             if let best = records.mostRepsAtWeight, best.sessionID == completed.id {
-                result.append(.init(displayName: name, kind: .highestWeight, weightValue: best.weight, repetitionCount: best.reps))
-            } else if records.mostRepsAtWeight == nil, let best = records.highestWeight, best.sessionID == completed.id {
+                result.append(
+                    .init(displayName: name, kind: .highestWeight, weightValue: best.weight, repetitionCount: best.reps)
+                )
+            } else if records.mostRepsAtWeight == nil, let best = records.highestWeight, best.sessionID == completed.id
+            {
                 result.append(.init(displayName: name, kind: .highestWeight, weightValue: best.weight))
             } else if let best = records.longestDuration, best.sessionID == completed.id {
                 result.append(.init(displayName: name, kind: .longestDuration, durationSeconds: best.seconds))

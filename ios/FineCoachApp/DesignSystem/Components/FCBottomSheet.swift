@@ -81,14 +81,15 @@ public struct FCBottomSheet<Accessory: View, Content: View>: View {
     }
 }
 
-public extension FCBottomSheet where Accessory == EmptyView {
-    init(
+extension FCBottomSheet where Accessory == EmptyView {
+    public init(
         title: String? = nil,
         titleStyle: TitleStyle = .headline,
         subtitle: String? = nil,
         @ViewBuilder content: () -> Content
     ) {
-        self.init(title: title, titleStyle: titleStyle, subtitle: subtitle, accessory: { EmptyView() }, content: content)
+        self.init(
+            title: title, titleStyle: titleStyle, subtitle: subtitle, accessory: { EmptyView() }, content: content)
     }
 }
 
@@ -135,9 +136,9 @@ private struct FCBottomSheetModifier<SheetContent: View>: ViewModifier {
     }
 }
 
-public extension View {
+extension View {
     /// Presents a design-system bottom sheet over `overlay.scrim` (§8.1).
-    func fcBottomSheet<SheetContent: View>(
+    public func fcBottomSheet<SheetContent: View>(
         isPresented: Binding<Bool>,
         @ViewBuilder content: @escaping () -> SheetContent
     ) -> some View {

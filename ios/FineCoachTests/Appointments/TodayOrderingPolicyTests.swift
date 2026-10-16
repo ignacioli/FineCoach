@@ -56,12 +56,16 @@ final class TodayOrderingPolicyTests: XCTestCase {
             calendar: utc
         )
 
-        XCTAssertEqual(ordered.map(\.appointment.id), [
-            inProgress.id, overdue.id, nextUp.id, laterToday.id, completed.id,
-        ])
-        XCTAssertEqual(ordered.map(\.section), [
-            .inProgress, .overdue, .nextUp, .remainingToday, .resolved,
-        ])
+        XCTAssertEqual(
+            ordered.map(\.appointment.id),
+            [
+                inProgress.id, overdue.id, nextUp.id, laterToday.id, completed.id,
+            ])
+        XCTAssertEqual(
+            ordered.map(\.section),
+            [
+                .inProgress, .overdue, .nextUp, .remainingToday, .resolved,
+            ])
         XCTAssertFalse(ordered.contains { $0.appointment.id == tomorrow.id })
     }
 

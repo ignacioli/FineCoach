@@ -193,13 +193,13 @@ public struct FCPageHeader: View {
 
 // MARK: - Secondary page chrome
 
-public extension View {
+extension View {
     /// The secondary-page chrome (`DS-PAGE-SECONDARY`): hides the system
     /// navigation bar (the back control is `FCPageHeader`'s inline `‹`) and
     /// keeps the interactive edge swipe-back working, which SwiftUI/UIKit
     /// disable once the bar is hidden. Pass `swipeBackEnabled: false` on a
     /// page whose back is a step inside a flow (M2-03 to M2-05).
-    func fcSecondaryPage(swipeBackEnabled: Bool = true) -> some View {
+    public func fcSecondaryPage(swipeBackEnabled: Bool = true) -> some View {
         toolbar(.hidden, for: .navigationBar)
             .background(FCSwipeBackEnabler(isEnabled: swipeBackEnabled).frame(width: 0, height: 0))
     }

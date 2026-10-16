@@ -142,14 +142,15 @@ private struct CourseActionSheetModifier: ViewModifier {
                 Text(String(localized: "today.status.pending"))
                     .fcFont(.caption)
                     .foregroundStyle(FCSemanticColors.textSecondary)
+            },
+            content: {
+                if isChoosingAbsence {
+                    absenceChoices(appointment)
+                } else {
+                    mainActions(appointment)
+                }
             }
-        ) {
-            if isChoosingAbsence {
-                absenceChoices(appointment)
-            } else {
-                mainActions(appointment)
-            }
-        }
+        )
     }
 
     private func mainActions(_ appointment: Appointment) -> some View {
@@ -225,13 +226,14 @@ extension View {
         onChanged: @escaping () async -> Void,
         onError: @escaping (String) -> Void
     ) -> some View {
-        modifier(CourseActionSheetModifier(
-            appointment: appointment,
-            path: path,
-            actions: actions,
-            studentName: studentName,
-            onChanged: onChanged,
-            onError: onError
-        ))
+        modifier(
+            CourseActionSheetModifier(
+                appointment: appointment,
+                path: path,
+                actions: actions,
+                studentName: studentName,
+                onChanged: onChanged,
+                onError: onError
+            ))
     }
 }

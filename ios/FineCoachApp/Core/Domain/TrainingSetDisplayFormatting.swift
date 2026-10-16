@@ -42,9 +42,11 @@ public enum TrainingSetDisplayFormatting {
             case .none:
                 return "\(values.weightValue?.canonicalString ?? "-") \(weightUnit) × \(repsText)"
             case .left:
-                return "左 \((values.leftValue ?? values.weightValue)?.canonicalString ?? "-") \(weightUnit) × \(repsText)"
+                return
+                    "左 \((values.leftValue ?? values.weightValue)?.canonicalString ?? "-") \(weightUnit) × \(repsText)"
             case .right:
-                return "右 \((values.rightValue ?? values.weightValue)?.canonicalString ?? "-") \(weightUnit) × \(repsText)"
+                return
+                    "右 \((values.rightValue ?? values.weightValue)?.canonicalString ?? "-") \(weightUnit) × \(repsText)"
             case .bilateral:
                 if let leftValue = values.leftValue, let rightValue = values.rightValue,
                     leftValue.canonicalString == rightValue.canonicalString
@@ -53,7 +55,8 @@ public enum TrainingSetDisplayFormatting {
                     return "每侧 \(leftValue.canonicalString) \(weightUnit) × \(repsText)"
                 }
                 if let leftValue = values.leftValue, let rightValue = values.rightValue {
-                    return "左 \(leftValue.canonicalString) \(weightUnit) / 右 \(rightValue.canonicalString) \(weightUnit) × \(repsText)"
+                    return
+                        "左 \(leftValue.canonicalString) \(weightUnit) / 右 \(rightValue.canonicalString) \(weightUnit) × \(repsText)"
                 }
                 return "\(values.weightValue?.canonicalString ?? "-") \(weightUnit)（双侧） × \(repsText)"
             }

@@ -24,7 +24,11 @@
         private final class SpyReader: ArchiveFileReading, @unchecked Sendable {
             private let lock = NSLock()
             private var reads = 0
-            var readCount: Int { lock.lock(); defer { lock.unlock() }; return reads }
+            var readCount: Int {
+                lock.lock()
+                defer { lock.unlock() }
+                return reads
+            }
 
             func readArchive(at url: URL) throws -> Data {
                 lock.lock()
@@ -102,7 +106,8 @@
             XCTAssertEqual(
                 listing(h.viewerRoot.appendingPathComponent("staging")), [], "staging \(message)", line: line)
             // No file anywhere under the viewer root can hold plaintext.
-            let files = FileManager.default.enumerator(at: h.viewerRoot, includingPropertiesForKeys: [.isRegularFileKey])?
+            let files =
+                FileManager.default.enumerator(at: h.viewerRoot, includingPropertiesForKeys: [.isRegularFileKey])?
                 .compactMap { $0 as? URL }.filter {
                     (try? $0.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true
                 } ?? []

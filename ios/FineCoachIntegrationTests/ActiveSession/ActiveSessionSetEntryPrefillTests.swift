@@ -214,11 +214,14 @@
             _ = try await environment.sessionUseCases.finish()
         }
 
-        private func startSession(_ environment: Environment, exercises: [String]) async throws -> ActiveSessionViewModel {
+        private func startSession(_ environment: Environment, exercises: [String]) async throws
+            -> ActiveSessionViewModel
+        {
             try await ensureStudent(environment)
             _ = try await environment.sessionUseCases.startOrOpen(studentID: studentID)
             for name in exercises {
-                _ = try await environment.sessionUseCases.addSessionOnlyExercise(displayName: name, recordMode: .weightReps)
+                _ = try await environment.sessionUseCases.addSessionOnlyExercise(
+                    displayName: name, recordMode: .weightReps)
             }
             let viewModel = ActiveSessionViewModel(
                 studentID: studentID,

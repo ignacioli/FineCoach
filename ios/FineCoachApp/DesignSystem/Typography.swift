@@ -175,11 +175,11 @@ public enum FCTextStyle: CaseIterable {
     }
 }
 
-private extension DynamicTypeSize {
+extension DynamicTypeSize {
     /// Maps SwiftUI's Dynamic Type environment value to the `UIContentSizeCategory`
     /// `UIFontMetrics` needs, so the current view's `dynamicTypeSize` environment
     /// (which may be locally overridden, not just the system-wide setting) is honored.
-    var uiContentSizeCategory: UIContentSizeCategory {
+    fileprivate var uiContentSizeCategory: UIContentSizeCategory {
         switch self {
         case .xSmall: return .extraSmall
         case .small: return .small
@@ -227,7 +227,7 @@ private struct FCFontModifier: ViewModifier {
     }
 }
 
-public extension View {
+extension View {
     /// Applies the design system's Noto Sans SC typography (`design/design-system/README.md`
     /// §3) for `style`, including Dynamic Type scaling and the documented line height.
     /// Letter spacing is always 0 (§3.1) — this modifier never sets tracking/kerning,
@@ -236,12 +236,12 @@ public extension View {
     /// - Parameter weight: An optional documented weight variant. Only `callout` and
     ///   `compact` (§3.2/§3.3) have one; passing a variant for any other style asserts
     ///   in DEBUG and is ignored in release.
-    func fcFont(_ style: FCTextStyle, weight: FCFontWeightVariant? = nil) -> some View {
+    public func fcFont(_ style: FCTextStyle, weight: FCFontWeightVariant? = nil) -> some View {
         modifier(FCFontModifier(style: style, variant: weight))
     }
 }
 
-public extension Text {
+extension Text {
     /// A `Text`-scoped variant of `View.fcFont(_:weight:)`, needed only where a SwiftUI
     /// API requires a `Text` value directly rather than an arbitrary `View` (e.g.
     /// `TextField`'s `prompt:` parameter). Because a `Text` is built outside a view's
@@ -250,7 +250,7 @@ public extension Text {
     /// category instead of honoring a local `.dynamicTypeSize()` override — and it does
     /// not apply the style's line spacing (`Text` alone has no line-wrapping geometry to
     /// space). Prefer `View.fcFont` wherever the call site is not constrained to `Text`.
-    func fcFont(_ style: FCTextStyle, weight: FCFontWeightVariant? = nil) -> Text {
+    public func fcFont(_ style: FCTextStyle, weight: FCFontWeightVariant? = nil) -> Text {
         let resolvedWeight = style.effectiveWeight(variant: weight)
         let baseFont = FCFont.uiFont(size: style.size, weight: resolvedWeight)
         let scaledFont = UIFontMetrics(forTextStyle: style.scalingBase).scaledFont(for: baseFont)

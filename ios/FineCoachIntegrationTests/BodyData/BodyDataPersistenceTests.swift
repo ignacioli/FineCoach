@@ -60,7 +60,8 @@
         // MARK: - List screen (T069k, 06 artwork)
 
         func testListGroupsBuiltInsPerArtworkAndShowsDashWithUnitWhenUnrecorded() async throws {
-            let env = try await makeEnvironment(ids: (0..<3).map { UUID(uuidString: "33333333-3333-4333-8333-33333333333\($0)")! })
+            let env = try await makeEnvironment(
+                ids: (0..<3).map { UUID(uuidString: "33333333-3333-4333-8333-33333333333\($0)")! })
             let defaults = try XCTUnwrap(UserDefaults(suiteName: "T069k-\(UUID().uuidString)"))
             let preferences = await BodyDataUnitPreferences(defaults: defaults)
             _ = try await env.useCases.recordMeasurement(
@@ -74,13 +75,17 @@
 
             let basic = await viewModel.basicMetrics
             let girth = await viewModel.girthMetrics
-            XCTAssertEqual(basic.map(\.id), [
-                BuiltInBodyMetric.weight.id, BuiltInBodyMetric.bodyFatPercent.id, BuiltInBodyMetric.height.id,
-            ])
-            XCTAssertEqual(girth.map(\.id), [
-                BuiltInBodyMetric.chest.id, BuiltInBodyMetric.waist.id, BuiltInBodyMetric.hip.id,
-                BuiltInBodyMetric.upperArm.id, BuiltInBodyMetric.thigh.id,
-            ])
+            XCTAssertEqual(
+                basic.map(\.id),
+                [
+                    BuiltInBodyMetric.weight.id, BuiltInBodyMetric.bodyFatPercent.id, BuiltInBodyMetric.height.id,
+                ])
+            XCTAssertEqual(
+                girth.map(\.id),
+                [
+                    BuiltInBodyMetric.chest.id, BuiltInBodyMetric.waist.id, BuiltInBodyMetric.hip.id,
+                    BuiltInBodyMetric.upperArm.id, BuiltInBodyMetric.thigh.id,
+                ])
 
             let weight = await viewModel.latestDisplay(for: basic[0])
             XCTAssertEqual(weight.value, "68.5")
@@ -95,7 +100,8 @@
         // MARK: - Batch "latest per metric" query
 
         func testLatestMeasurementsReturnsNewestDayPerMetricInOneBatchCall() async throws {
-            let env = try await makeEnvironment(ids: (0..<5).map { UUID(uuidString: "11111111-1111-4111-8111-11111111111\($0)")! })
+            let env = try await makeEnvironment(
+                ids: (0..<5).map { UUID(uuidString: "11111111-1111-4111-8111-11111111111\($0)")! })
             let weightID = BuiltInBodyMetric.weight.id
             let heightID = BuiltInBodyMetric.height.id
 

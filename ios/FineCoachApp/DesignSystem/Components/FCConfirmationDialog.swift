@@ -88,7 +88,11 @@ public struct FCConfirmationDialog: View {
             // Measures 80% of the container height without affecting layout.
             Color.clear
                 .containerRelativeFrame(.vertical) { length, _ in length * 0.8 }
-                .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { maxCardHeight = $0 }
+                .onGeometryChange(for: CGFloat.self) {
+                    $0.size.height
+                } action: {
+                    maxCardHeight = $0
+                }
         }
     }
 
@@ -228,8 +232,8 @@ private struct FCConfirmationDialogModifier: ViewModifier {
     }
 }
 
-public extension View {
-    func fcConfirmationDialog(
+extension View {
+    public func fcConfirmationDialog(
         isPresented: Binding<Bool>,
         dialog: @escaping () -> FCConfirmationDialog
     ) -> some View {

@@ -248,9 +248,10 @@ final class ArchiveFoundationTests: XCTestCase {
         XCTAssertEqual(entries(root), ["current.json", "generations"])
         XCTAssertEqual(entries(root.appendingPathComponent("generations")).count, 1)
 
-        let pointer = try JSONSerialization.jsonObject(
-            with: Data(contentsOf: root.appendingPathComponent("current.json"))
-        ) as? [String: Any]
+        let pointer =
+            try JSONSerialization.jsonObject(
+                with: Data(contentsOf: root.appendingPathComponent("current.json"))
+            ) as? [String: Any]
         XCTAssertEqual(pointer?["snapshotSchemaVersion"] as? Int, ArchiveSnapshotStore.currentSnapshotSchemaVersion)
         XCTAssertNotNil(UUID(uuidString: pointer?["generation"] as? String ?? ""))
         XCTAssertEqual(Set(pointer?.keys.map { $0 } ?? []), ["generation", "snapshotSchemaVersion"])
@@ -288,7 +289,8 @@ final class ArchiveFoundationTests: XCTestCase {
         XCTAssertThrowsError(try store.writeDisplaySettings(.defaults)) {
             XCTAssertEqual($0 as? ArchiveSnapshotStoreError, .noArchive)
         }
-        XCTAssertFalse(FileManager.default.fileExists(atPath: root.appendingPathComponent("display-settings.json").path))
+        XCTAssertFalse(
+            FileManager.default.fileExists(atPath: root.appendingPathComponent("display-settings.json").path))
     }
 
     func testDeleteAllRemovesEverythingIncludingDisplaySettings() throws {
@@ -333,7 +335,8 @@ final class ArchiveFoundationTests: XCTestCase {
         let orphan = generations.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: orphan, withIntermediateDirectories: true)
         try Data("x".utf8).write(to: orphan.appendingPathComponent("snapshot.bin"))
-        try FileManager.default.createDirectory(at: generations.appendingPathComponent("not-a-uuid"), withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(
+            at: generations.appendingPathComponent("not-a-uuid"), withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: store.stagingURL, withIntermediateDirectories: true)
         try Data("x".utf8).write(to: store.stagingURL.appendingPathComponent("partial"))
 
@@ -675,8 +678,10 @@ final class ArchiveFoundationTests: XCTestCase {
         }
 
         func testFaultPointRawValuesAreTheNamedContractPoints() {
-            XCTAssertEqual(FaultInjectionPoint.archiveStoreAfterGenerationWritten.rawValue, "archive.store.afterGenerationWritten")
-            XCTAssertEqual(FaultInjectionPoint.archiveStoreAfterPointerRemoved.rawValue, "archive.store.afterPointerRemoved")
+            XCTAssertEqual(
+                FaultInjectionPoint.archiveStoreAfterGenerationWritten.rawValue, "archive.store.afterGenerationWritten")
+            XCTAssertEqual(
+                FaultInjectionPoint.archiveStoreAfterPointerRemoved.rawValue, "archive.store.afterPointerRemoved")
         }
     #endif
 }

@@ -81,12 +81,14 @@ final class BodyMeasurementEntryViewModel: ObservableObject {
         switch metric.unitRuleKind {
         case .weight:
             let converted =
-                (try? BuiltInUnitConversion.weight(canonicalKilograms: measurement.value, displayedAs: weightDisplayUnit))
+                (try? BuiltInUnitConversion.weight(
+                    canonicalKilograms: measurement.value, displayedAs: weightDisplayUnit))
                 ?? measurement.value
             return "\(converted.canonicalString) \(weightDisplayUnit.rawValue)"
         case .length:
             let converted =
-                (try? BuiltInUnitConversion.length(canonicalCentimeters: measurement.value, displayedAs: lengthDisplayUnit))
+                (try? BuiltInUnitConversion.length(
+                    canonicalCentimeters: measurement.value, displayedAs: lengthDisplayUnit))
                 ?? measurement.value
             return "\(converted.canonicalString) \(lengthDisplayUnit.rawValue)"
         case .percent, .customUnit:
@@ -106,11 +108,13 @@ final class BodyMeasurementEntryViewModel: ObservableObject {
         switch metric.unitRuleKind {
         case .weight:
             let entered = try DecimalValue(valueText)
-            let canonical = try BuiltInUnitConversion.canonicalKilograms(fromDisplayed: entered, unit: weightDisplayUnit)
+            let canonical = try BuiltInUnitConversion.canonicalKilograms(
+                fromDisplayed: entered, unit: weightDisplayUnit)
             return (canonical.canonicalString, metric.currentUnit)
         case .length:
             let entered = try DecimalValue(valueText)
-            let canonical = try BuiltInUnitConversion.canonicalCentimeters(fromDisplayed: entered, unit: lengthDisplayUnit)
+            let canonical = try BuiltInUnitConversion.canonicalCentimeters(
+                fromDisplayed: entered, unit: lengthDisplayUnit)
             return (canonical.canonicalString, metric.currentUnit)
         case .percent, .customUnit:
             return (valueText, unitText)

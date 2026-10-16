@@ -62,7 +62,8 @@
 
             let file = try XCTUnwrap(share.presentedData.first ?? nil)
             let snapshot = try ArchiveFileCodec.decode(file: file, password: try ArchivePassword(importing: password))
-            return Exported(snapshot: snapshot, frames: try Self.frames(of: snapshot), plaintext: try Self.plaintext(of: snapshot))
+            return Exported(
+                snapshot: snapshot, frames: try Self.frames(of: snapshot), plaintext: try Self.plaintext(of: snapshot))
         }
 
         private static func plaintext(of snapshot: ArchiveSnapshot) throws -> String {
@@ -196,7 +197,10 @@
             XCTAssertFalse(without.hasExerciseInfo)
             let placeholders = try without.exercises().map(ArchiveViewerPresentation.exerciseName)
             XCTAssertTrue(placeholders.allSatisfy { $0.hasPrefix("动作 ") }, "\(placeholders)")
-            XCTAssertTrue(try without.exercises().allSatisfy { ArchiveViewerPresentation.exerciseMeta($0) == nil || $0.kind != .builtIn })
+            XCTAssertTrue(
+                try without.exercises().allSatisfy {
+                    ArchiveViewerPresentation.exerciseMeta($0) == nil || $0.kind != .builtIn
+                })
         }
     }
 #endif

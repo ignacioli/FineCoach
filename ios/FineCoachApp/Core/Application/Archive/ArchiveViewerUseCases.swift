@@ -345,14 +345,17 @@ public struct ArchiveDisplayConverter: Equatable, Sendable {
 
     /// A body measurement. Built-in metrics convert from their canonical unit; custom metrics
     /// and percentages are returned exactly as entered.
-    public func measurement(_ measurement: ArchiveBodyMeasurement, of metric: ArchiveBodyMetric) -> ArchiveDisplayQuantity {
+    public func measurement(_ measurement: ArchiveBodyMeasurement, of metric: ArchiveBodyMetric)
+        -> ArchiveDisplayQuantity
+    {
         guard case .builtIn(let builtIn) = metric.kind, measurement.enteredUnit == builtIn.canonicalUnit else {
             return ArchiveDisplayQuantity(value: measurement.value, unit: measurement.enteredUnit)
         }
         switch builtIn.unitRuleKind {
         case .weight: return convertKilograms(measurement.value)
         case .length: return convertCentimeters(measurement.value)
-        case .percent, .customUnit: return ArchiveDisplayQuantity(value: measurement.value, unit: measurement.enteredUnit)
+        case .percent, .customUnit:
+            return ArchiveDisplayQuantity(value: measurement.value, unit: measurement.enteredUnit)
         }
     }
 
@@ -361,7 +364,8 @@ public struct ArchiveDisplayConverter: Equatable, Sendable {
         case .kg:
             return ArchiveDisplayQuantity(value: value, unit: "kg")
         case .lb:
-            let converted = (try? BuiltInUnitConversion.weight(canonicalKilograms: value, displayedAs: .pounds)) ?? value
+            let converted =
+                (try? BuiltInUnitConversion.weight(canonicalKilograms: value, displayedAs: .pounds)) ?? value
             return ArchiveDisplayQuantity(value: converted, unit: "lb")
         }
     }
@@ -382,7 +386,8 @@ public struct ArchiveDisplayConverter: Equatable, Sendable {
         case .cm:
             return ArchiveDisplayQuantity(value: value, unit: "cm")
         case .inch:
-            let converted = (try? BuiltInUnitConversion.length(canonicalCentimeters: value, displayedAs: .inches)) ?? value
+            let converted =
+                (try? BuiltInUnitConversion.length(canonicalCentimeters: value, displayedAs: .inches)) ?? value
             return ArchiveDisplayQuantity(value: converted, unit: "in")
         }
     }
