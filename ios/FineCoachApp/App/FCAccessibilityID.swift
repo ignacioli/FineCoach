@@ -1,6 +1,7 @@
 import Foundation
 
 public enum FCAccessibilityID {
+    public static let bodyMeasurementMore = "bodyMeasurementEntry.more"
     public static func setUndoAt(_ index: Int) -> String {
         "activeSession.set.undo.at.\(index)"
     }

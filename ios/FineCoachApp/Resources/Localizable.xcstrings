@@ -9628,6 +9628,28 @@
           }
         }
       }
+    },
+    "bodyMeasurementEntry.deleteMetric": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除指标"
+          }
+        }
+      }
+    },
+    "bodyMeasurementEntry.deleteMetricBlocked": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "先清空记录才能删除"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
