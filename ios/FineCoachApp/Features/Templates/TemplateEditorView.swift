@@ -251,22 +251,30 @@ struct TemplateEditorView: View {
             name = viewModel.template?.name.value ?? name
             trainingFocus = viewModel.template?.trainingFocus ?? []
         }
-        .confirmationDialog(
-            String(localized: "templateEditor.deleteSection"),
+        .fcConfirmationDialog(
             isPresented: Binding(
                 get: { viewModel.pendingSectionDeletion != nil },
                 set: { if !$0 { viewModel.pendingSectionDeletion = nil } }
-            ),
-            presenting: viewModel.pendingSectionDeletion
-        ) { section in
-            Button(String(localized: "templateEditor.deleteSection.moveOut")) {
-                Task { await viewModel.deleteSection(section, disposition: .moveExercisesTo(sectionID: nil)) }
+            )
+        ) {
+            if let section = viewModel.pendingSectionDeletion {
+                FCConfirmationDialog(
+                    title: String(format: String(localized: "section.delete.title"), section.name.value),
+                    message: String(
+                        format: String(localized: "section.delete.message"),
+                        viewModel.exercises(in: section).count
+                    ),
+                    cancelAction: .init(title: String(localized: "section.delete.cancel")) {
+                        viewModel.pendingSectionDeletion = nil
+                    },
+                    confirmAction: .init(
+                        title: String(localized: "templateEditor.deleteSection"),
+                        accessibilityIdentifier: FCAccessibilityID.templateEditorDeleteSectionMoveOut
+                    ) {
+                        Task { await viewModel.deleteSection(section, disposition: .moveExercisesTo(sectionID: nil)) }
+                    }
+                )
             }
-            .accessibilityIdentifier(FCAccessibilityID.templateEditorDeleteSectionMoveOut)
-            Button(String(localized: "templateEditor.deleteSection.deleteExercises"), role: .destructive) {
-                Task { await viewModel.deleteSection(section, disposition: .deleteWithExercises) }
-            }
-            .accessibilityIdentifier(FCAccessibilityID.templateEditorDeleteSectionDeleteExercises)
         }
     }
 

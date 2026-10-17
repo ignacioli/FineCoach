@@ -53,13 +53,10 @@ final class TrainingEntryScanTests: XCTestCase {
         )
     }
 
-    /// These three system confirmation dialogs remain until the product owner decides how
-    /// their multi-option flows map to DS-CONFIRM-DIALOG: 待产品负责人决定，见 audit.md §3.4。
-    func testOnlyDeferredSystemConfirmationDialogsRemain() throws {
+    /// Section deletion uses shared confirmation; move-to-section remains a choice menu.
+    func testOnlyMoveSectionSystemDialogRemains() throws {
         let expected: Set<String> = [
-            #"Features/ActiveSession/ActiveSessionView.swift|String(localized: "activeSession.deleteSection")"#,
-            #"Features/ActiveSession/ActiveSessionView.swift|String(localized: "activeSession.moveToSection")"#,
-            #"Features/Templates/TemplateEditorView.swift|String(localized: "templateEditor.deleteSection")"#,
+            #"Features/ActiveSession/ActiveSessionView.swift|String(localized: "activeSession.moveToSection")"#
         ]
         let features = appRoot().appendingPathComponent("Features")
         let enumerator = try XCTUnwrap(FileManager.default.enumerator(at: features, includingPropertiesForKeys: nil))
@@ -77,6 +74,17 @@ final class TrainingEntryScanTests: XCTestCase {
         }
         XCTAssertEqual(matches.count, expected.count)
         XCTAssertEqual(Set(matches), expected)
+    }
+
+    func testSectionDeleteConfirmationOnlyMovesExercisesOut() throws {
+        for path in ["Features/ActiveSession/ActiveSessionView.swift", "Features/Templates/TemplateEditorView.swift"] {
+            let text = try source(path).joined(separator: "\n")
+            XCTAssertTrue(text.contains("section.delete.title"))
+            XCTAssertTrue(text.contains("section.delete.message"))
+            XCTAssertTrue(text.contains(".moveExercisesTo(sectionID: nil)"))
+            XCTAssertFalse(text.contains("DeleteSectionDeleteExercises"))
+            XCTAssertFalse(text.contains("templateEditor.deleteSection.deleteExercises"))
+        }
     }
 
     // MARK: - Helpers

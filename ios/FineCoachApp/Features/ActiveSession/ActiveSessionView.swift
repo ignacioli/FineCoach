@@ -37,6 +37,7 @@ struct ActiveSessionView: View {
     @State private var movingExerciseID: StableUUID?
     @ScaledMetric private var setEditorExtraHeight: CGFloat = 460
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.scenePhase) private var scenePhase
 
     init(
         studentID: StableUUID,
@@ -166,22 +167,39 @@ struct ActiveSessionView: View {
                 studentName = student.displayName.value
             }
         }
-        .confirmationDialog(
-            String(localized: "activeSession.deleteSection"),
+        .onChange(of: scenePhase) { _, phase in
+            guard phase == .active else {
+                viewModel.expireDeletedSetUndo()
+                return
+            }
+        }
+        .onDisappear {
+            viewModel.expireDeletedSetUndo()
+        }
+        .fcConfirmationDialog(
             isPresented: Binding(
                 get: { viewModel.pendingSectionDeletion != nil },
                 set: { if !$0 { viewModel.pendingSectionDeletion = nil } }
-            ),
-            presenting: viewModel.pendingSectionDeletion
-        ) { section in
-            Button(String(localized: "templateEditor.deleteSection.moveOut")) {
-                Task { await viewModel.deleteSection(section, disposition: .moveExercisesTo(sectionID: nil)) }
+            )
+        ) {
+            if let section = viewModel.pendingSectionDeletion {
+                FCConfirmationDialog(
+                    title: String(format: String(localized: "section.delete.title"), section.name.value),
+                    message: String(
+                        format: String(localized: "section.delete.message"),
+                        viewModel.session?.exercises.filter { $0.sectionID == section.id }.count ?? 0
+                    ),
+                    cancelAction: .init(title: String(localized: "section.delete.cancel")) {
+                        viewModel.pendingSectionDeletion = nil
+                    },
+                    confirmAction: .init(
+                        title: String(localized: "activeSession.deleteSection"),
+                        accessibilityIdentifier: FCAccessibilityID.activeSessionDeleteSectionMoveOut
+                    ) {
+                        Task { await viewModel.deleteSection(section, disposition: .moveExercisesTo(sectionID: nil)) }
+                    }
+                )
             }
-            .accessibilityIdentifier(FCAccessibilityID.activeSessionDeleteSectionMoveOut)
-            Button(String(localized: "templateEditor.deleteSection.deleteExercises"), role: .destructive) {
-                Task { await viewModel.deleteSection(section, disposition: .deleteWithExercises) }
-            }
-            .accessibilityIdentifier(FCAccessibilityID.activeSessionDeleteSectionDeleteExercises)
         }
         .confirmationDialog(
             String(localized: "activeSession.moveToSection"),
@@ -349,23 +367,7 @@ struct ActiveSessionView: View {
                     .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                         exerciseSwipeActions(exercise)
                     }
-                ForEach(Array(exercise.sets.enumerated()), id: \.element.id) { setIndex, trainingSet in
-                    setRow(trainingSet, index: setIndex, in: exercise)
-                        .listRowInsets(EdgeInsets())
-                        .listRowSeparator(.hidden)
-                        .listRowBackground(FCSemanticColors.surfacePage)
-                        .swipeActions(
-                            edge: .trailing,
-                            allowsFullSwipe: trainingSet.state != .completed
-                        ) {
-                            Button(role: .destructive) {
-                                Task { await viewModel.removeSet(setID: trainingSet.id) }
-                            } label: {
-                                Label(String(localized: "session.action.deleteSet"), systemImage: "trash")
-                            }
-                            .accessibilityIdentifier(FCAccessibilityID.setDeleteAt(setIndex))
-                        }
-                }
+                setRows(for: exercise)
             }
             .listStyle(.plain)
             .scrollDisabled(true)
@@ -393,6 +395,53 @@ struct ActiveSessionView: View {
                 SetEditor(viewModel: viewModel, exercise: exercise)
             }
             FCListRowDivider()
+        }
+    }
+
+    @ViewBuilder
+    private func setRows(for exercise: SessionExercise) -> some View {
+        let deletedUndo: DeletedSetUndo?
+        if viewModel.deletedSetUndo?.set.sessionExerciseID == exercise.id {
+            deletedUndo = viewModel.deletedSetUndo
+        } else {
+            deletedUndo = nil
+        }
+        let placeholderIndex = min(deletedUndo?.originalIndex ?? exercise.sets.count, exercise.sets.count)
+        let rowCount = exercise.sets.count + (deletedUndo == nil ? 0 : 1)
+
+        ForEach(Array(0..<rowCount), id: \.self) { slot in
+            if let deletedUndo, slot == placeholderIndex {
+                FCUndoRow(
+                    message: String(
+                        format: String(localized: "session.set.deleted"),
+                        deletedUndo.originalIndex + 1
+                    ),
+                    accessibilityIdentifier: FCAccessibilityID.setUndoAt(deletedUndo.originalIndex)
+                ) {
+                    Task { await viewModel.undoDeletedSet() }
+                }
+                .listRowInsets(EdgeInsets())
+                .listRowSeparator(.hidden)
+                .listRowBackground(FCSemanticColors.surfacePage)
+            } else {
+                let setIndex = deletedUndo != nil && slot > placeholderIndex ? slot - 1 : slot
+                let trainingSet = exercise.sets[setIndex]
+                setRow(trainingSet, index: setIndex, in: exercise)
+                    .listRowInsets(EdgeInsets())
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(FCSemanticColors.surfacePage)
+                    .swipeActions(
+                        edge: .trailing,
+                        allowsFullSwipe: trainingSet.state != .completed
+                    ) {
+                        Button(role: .destructive) {
+                            Task { await viewModel.removeSet(setID: trainingSet.id) }
+                        } label: {
+                            Label(String(localized: "session.action.deleteSet"), systemImage: "trash")
+                        }
+                        .accessibilityIdentifier(FCAccessibilityID.setDeleteAt(setIndex))
+                    }
+            }
         }
     }
 
