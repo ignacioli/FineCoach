@@ -179,27 +179,9 @@ struct ActiveSessionView: View {
             isPresented: Binding(
                 get: { viewModel.pendingSectionDeletion != nil },
                 set: { if !$0 { viewModel.pendingSectionDeletion = nil } }
-            )
-        ) {
-            if let section = viewModel.pendingSectionDeletion {
-                FCConfirmationDialog(
-                    title: String(format: String(localized: "section.delete.title"), section.name.value),
-                    message: String(
-                        format: String(localized: "section.delete.message"),
-                        viewModel.session?.exercises.filter { $0.sectionID == section.id }.count ?? 0
-                    ),
-                    cancelAction: .init(title: String(localized: "section.delete.cancel")) {
-                        viewModel.pendingSectionDeletion = nil
-                    },
-                    confirmAction: .init(
-                        title: String(localized: "activeSession.deleteSection"),
-                        accessibilityIdentifier: FCAccessibilityID.activeSessionDeleteSectionMoveOut
-                    ) {
-                        Task { await viewModel.deleteSection(section, disposition: .moveExercisesTo(sectionID: nil)) }
-                    }
-                )
-            }
-        }
+            ),
+            dialog: sectionDeletionDialog
+        )
         .confirmationDialog(
             String(localized: "activeSession.moveToSection"),
             isPresented: Binding(
@@ -279,6 +261,30 @@ struct ActiveSessionView: View {
         if let next {
             path.append(next)
         }
+    }
+
+    /// `fcConfirmationDialog` requires a dialog on every path. It is presented
+    /// only while a section deletion is pending.
+    private func sectionDeletionDialog() -> FCConfirmationDialog {
+        let section = viewModel.pendingSectionDeletion
+        let memberCount =
+            section.flatMap { pending in
+                viewModel.session?.exercises.filter { $0.sectionID == pending.id }.count
+            } ?? 0
+        return FCConfirmationDialog(
+            title: String(format: String(localized: "section.delete.title"), section?.name.value ?? ""),
+            message: String(format: String(localized: "section.delete.message"), memberCount),
+            cancelAction: .init(title: String(localized: "section.delete.cancel")) {
+                viewModel.pendingSectionDeletion = nil
+            },
+            confirmAction: .init(
+                title: String(localized: "activeSession.deleteSection"),
+                accessibilityIdentifier: FCAccessibilityID.activeSessionDeleteSectionMoveOut
+            ) {
+                guard let section else { return }
+                Task { await viewModel.deleteSection(section, disposition: .moveExercisesTo(sectionID: nil)) }
+            }
+        )
     }
 
     /// Tapping the scrim is the same as "不扣课": nothing is written.
