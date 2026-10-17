@@ -122,10 +122,52 @@ final class TrainingEntryScanTests: XCTestCase {
         XCTAssertTrue(list.contains(".tint(FCSemanticColors.statusDestructive)"))
         XCTAssertTrue(list.contains("FCAccessibilityID.templateEditorRemoveExercise(exercise.id)"))
         XCTAssertTrue(list.contains("viewModel.removeExercise(exercise.id)"))
-        XCTAssertTrue(list.contains("templateEditor.removeExercise"))
+        XCTAssertTrue(list.contains("templateEditor.deleteExercise"))
 
         XCTAssertFalse(list.contains("Button(String(localized: \"templateEditor.removeExercise\"))"))
         XCTAssertTrue(text.contains("templateEditor.moveToUnsectioned"), "the move menu remains available")
+    }
+
+    /// B-D2 keeps the pre-existing full-screen typed-name student deletion;
+    /// every other destructive action row must first set its shared-dialog binding.
+    func testDestructiveActionRowsOnlyPresentTheirConfirmation() throws {
+        let features = appRoot().appendingPathComponent("Features")
+        let enumerator = try XCTUnwrap(FileManager.default.enumerator(at: features, includingPropertiesForKeys: nil))
+        let pattern = try NSRegularExpression(
+            pattern: #"FCActionRow\([^{}]*?role:\s*\.destructive[^{}]*?\)\s*\{([^}]+)\}"#
+        )
+        var count = 0
+        for case let url as URL in enumerator where url.pathExtension == "swift" {
+            let text = try String(contentsOf: url, encoding: .utf8)
+            for match in pattern.matches(in: text, range: NSRange(text.startIndex..., in: text)) {
+                let actionRange = try XCTUnwrap(Range(match.range(at: 1), in: text))
+                let action = text[actionRange].trimmingCharacters(in: .whitespacesAndNewlines)
+                if url.lastPathComponent == "StudentEditorView.swift" {
+                    XCTAssertEqual(action, "cover = .delete")
+                    XCTAssertTrue(text.contains("DeleteStudentFlow"))
+                } else {
+                    XCTAssertTrue(action.hasSuffix(" = true"), "\(url.lastPathComponent): \(action)")
+                    let binding = String(action.dropLast(" = true".count))
+                    XCTAssertTrue(
+                        text.contains(".fcConfirmationDialog(isPresented: $\(binding))"),
+                        "\(url.lastPathComponent) must present the shared dialog bound to \(binding)"
+                    )
+                }
+                count += 1
+            }
+        }
+        XCTAssertEqual(count, 7, "audit new destructive rows rather than silently allowing them")
+    }
+
+    func testBodyHistoryKeepsUndoVisibleAndUsesDestructiveSwipes() throws {
+        let text = try source("Features/BodyData/BodyMeasurementEntryView.swift").joined(separator: "\n")
+        XCTAssertTrue(text.contains("FCUndoRow("))
+        XCTAssertTrue(text.contains("bodyMeasurementUndo(pending.measurement.id)"))
+        XCTAssertTrue(text.contains(".swipeActions(edge: .trailing"))
+        XCTAssertTrue(text.contains(".tint(FCSemanticColors.statusDestructive)"))
+        XCTAssertFalse(text.contains("bodyMeasurementDeleteConfirm"))
+        XCTAssertFalse(text.contains("pendingDeleteID"))
+        XCTAssertTrue(text.contains("FCMoreMenu(accessibilityIdentifier: FCAccessibilityID.bodyMeasurementMore)"))
     }
 
     // MARK: - Helpers
