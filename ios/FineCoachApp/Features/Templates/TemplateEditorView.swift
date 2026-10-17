@@ -316,12 +316,12 @@ struct TemplateEditorView: View {
                     .fcFont(.sectionLabel)
                     .foregroundStyle(FCSemanticColors.textSecondary)
                 Spacer()
-                Button(String(localized: "templateEditor.deleteSection")) {
-                    viewModel.requestDeleteSection(section)
+                FCMoreMenu(accessibilityIdentifier: FCAccessibilityID.templateEditorSectionMore(section.id)) {
+                    Button(String(localized: "templateEditor.deleteSection"), role: .destructive) {
+                        viewModel.requestDeleteSection(section)
+                    }
+                    .accessibilityIdentifier(FCAccessibilityID.templateEditorDeleteSection(section.id))
                 }
-                .frame(minHeight: 44)
-                .foregroundStyle(FCSemanticColors.statusDestructive)
-                .accessibilityIdentifier(FCAccessibilityID.templateEditorDeleteSection(section.id))
             }
             .accessibilityIdentifier(FCAccessibilityID.templateSectionRow(section.id))
             ForEach(viewModel.exercises(in: section)) { exercise in

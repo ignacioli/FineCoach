@@ -168,9 +168,8 @@ struct ActiveSessionView: View {
             }
         }
         .onChange(of: scenePhase) { _, phase in
-            guard phase == .active else {
+            if phase == .background {
                 viewModel.expireDeletedSetUndo()
-                return
             }
         }
         .onDisappear {
@@ -516,16 +515,12 @@ struct ActiveSessionView: View {
                 FCSectionLabel(section.name.value)
                 Spacer()
                 if viewModel.session?.state == .inProgress {
-                    Button {
-                        viewModel.requestDeleteSection(section)
-                    } label: {
-                        Text(String(localized: "activeSession.deleteSection"))
-                            .fcFont(.caption)
-                            .foregroundStyle(FCSemanticColors.statusDestructive)
-                            .frame(minHeight: 44)
+                    FCMoreMenu(accessibilityIdentifier: FCAccessibilityID.activeSessionSectionMore(section.id)) {
+                        Button(String(localized: "activeSession.deleteSection"), role: .destructive) {
+                            viewModel.requestDeleteSection(section)
+                        }
+                        .accessibilityIdentifier(FCAccessibilityID.activeSessionDeleteSection(section.id))
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier(FCAccessibilityID.activeSessionDeleteSection(section.id))
                 }
             }
             .accessibilityIdentifier(FCAccessibilityID.activeSessionSectionHeader(section.id))
@@ -673,7 +668,8 @@ struct ActiveSessionView: View {
 
     /// First-frame estimate before the list reports its content height.
     private func estimatedListHeight(for exercise: SessionExercise) -> CGFloat {
-        exercise.sets.reduce(exerciseHeaderHeight) { total, trainingSet in
+        let deletedUndoHeight = viewModel.deletedSetUndo?.set.sessionExerciseID == exercise.id ? setRowHeight : 0
+        return exercise.sets.reduce(exerciseHeaderHeight + deletedUndoHeight) { total, trainingSet in
             let isEditing = trainingSet.id == viewModel.editingSetID
             return total + setRowHeight + (isEditing ? setEditorExtraHeight : 0)
         }
