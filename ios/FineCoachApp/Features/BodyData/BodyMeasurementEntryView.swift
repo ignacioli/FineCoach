@@ -373,14 +373,6 @@ struct BodyMeasurementEntryView: View {
                         .fcFont(.sectionLabel)
                         .foregroundStyle(FCSemanticColors.textSecondary)
                     Spacer()
-                    if !viewModel.history.isEmpty {
-                        Button(String(localized: "bodyMeasurementEntry.deleteAll"), role: .destructive) {
-                            viewModel.showingDeleteAllConfirm = true
-                        }
-                        .fcFont(.caption)
-                        .frame(minHeight: 44)
-                        .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementDeleteAll)
-                    }
                 }
 
                 if viewModel.history.isEmpty {
@@ -390,20 +382,39 @@ struct BodyMeasurementEntryView: View {
                     historyList
                 }
 
-                if viewModel.isCustomMetric {
-                    let canDeleteMetric = viewModel.history.isEmpty && viewModel.pendingDeletion == nil
-                    FCActionRow(
-                        title: String(localized: "bodyMeasurementEntry.deleteMetric"),
-                        subtitle: canDeleteMetric
-                            ? nil
-                            : String(localized: "bodyMeasurementEntry.deleteMetricBlocked"),
-                        role: .destructive,
-                        isEnabled: canDeleteMetric,
-                        showsTrashIcon: true
-                    ) {
-                        viewModel.showingDeleteMetricConfirm = true
+                if !viewModel.history.isEmpty || viewModel.isCustomMetric {
+                    FCListRowDivider()
+                    Text(String(localized: "bodyMeasurementEntry.management"))
+                        .fcFont(.sectionLabel)
+                        .foregroundStyle(FCSemanticColors.textSecondary)
+
+                    if !viewModel.history.isEmpty {
+                        FCActionRow(
+                            title: String(localized: "bodyMeasurementEntry.deleteAll"),
+                            note: String(localized: "bodyMeasurementEntry.deleteAllNote"),
+                            role: .destructive
+                        ) {
+                            viewModel.showingDeleteAllConfirm = true
+                        }
+                        .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementDeleteAll)
+                        FCListRowDivider()
                     }
-                    .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementDeleteMetric)
+
+                    if viewModel.isCustomMetric {
+                        let canDeleteMetric = viewModel.history.isEmpty && viewModel.pendingDeletion == nil
+                        FCActionRow(
+                            title: String(localized: "bodyMeasurementEntry.deleteMetric"),
+                            note: canDeleteMetric
+                                ? nil
+                                : String(localized: "bodyMeasurementEntry.deleteMetricBlocked"),
+                            role: .destructive,
+                            isEnabled: canDeleteMetric
+                        ) {
+                            viewModel.showingDeleteMetricConfirm = true
+                        }
+                        .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementDeleteMetric)
+                        FCListRowDivider()
+                    }
                 }
 
             }

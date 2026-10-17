@@ -4239,6 +4239,17 @@
         }
       }
     },
+    "bodyMeasurementEntry.management": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "管理"
+          }
+        }
+      }
+    },
     "bodyMeasurementEntry.empty": {
       "extractionState": "manual",
       "localizations": {
@@ -4290,6 +4301,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "清空全部记录"
+          }
+        }
+      }
+    },
+    "bodyMeasurementEntry.deleteAllNote": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除这个指标的所有记录，需二次确认"
           }
         }
       }
