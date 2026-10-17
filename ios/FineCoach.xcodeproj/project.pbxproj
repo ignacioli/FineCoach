@@ -111,6 +111,8 @@
 		6DFE845FB27C1F6C1609B9C5 /* FCInlineResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A6AFABC349B7FD5D1B3F29 /* FCInlineResult.swift */; };
 		5F21772D9C8C226454B34246 /* FCHubRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4724C9B83F97BD6324CEE69 /* FCHubRow.swift */; };
 		66E40901340314406459ABC4 /* FCPageHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1555EA92BF1009B5B3EDFF1F /* FCPageHeader.swift */; };
+		8CE2B39A44D01CC9A1C72AD4 /* FCUndoRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D607F53F845BCEB0D7B8A2F /* FCUndoRow.swift */; };
+		4C2C6D7B2A1E49F087D31C5E /* FCMoreMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBC038A5D7E21C4E6A04B7D /* FCMoreMenu.swift */; };
 		B914 /* FCAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A914 /* FCAvatar.swift */; };
 		B915 /* FCHintBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A915 /* FCHintBar.swift */; };
 		B961 /* ShareReportCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A961 /* ShareReportCardView.swift */; };
@@ -464,6 +466,8 @@
 		18A6AFABC349B7FD5D1B3F29 /* FCInlineResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCInlineResult.swift; sourceTree = "<group>"; };
 		D4724C9B83F97BD6324CEE69 /* FCHubRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCHubRow.swift; sourceTree = "<group>"; };
 		1555EA92BF1009B5B3EDFF1F /* FCPageHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCPageHeader.swift; sourceTree = "<group>"; };
+		7D607F53F845BCEB0D7B8A2F /* FCUndoRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCUndoRow.swift; sourceTree = "<group>"; };
+		9FBC038A5D7E21C4E6A04B7D /* FCMoreMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCMoreMenu.swift; sourceTree = "<group>"; };
 		A914 /* FCAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCAvatar.swift; sourceTree = "<group>"; };
 		A915 /* FCHintBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCHintBar.swift; sourceTree = "<group>"; };
 		A961 /* ShareReportCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareReportCardView.swift; sourceTree = "<group>"; };
@@ -1288,6 +1292,8 @@
 				18A6AFABC349B7FD5D1B3F29 /* FCInlineResult.swift */,
 				D4724C9B83F97BD6324CEE69 /* FCHubRow.swift */,
 				1555EA92BF1009B5B3EDFF1F /* FCPageHeader.swift */,
+				7D607F53F845BCEB0D7B8A2F /* FCUndoRow.swift */,
+				9FBC038A5D7E21C4E6A04B7D /* FCMoreMenu.swift */,
 				A914 /* FCAvatar.swift */,
 				A915 /* FCHintBar.swift */,
 				A957 /* FCSymbol.swift */,
@@ -2148,6 +2154,8 @@
 				6DFE845FB27C1F6C1609B9C5 /* FCInlineResult.swift in Sources */,
 				5F21772D9C8C226454B34246 /* FCHubRow.swift in Sources */,
 				66E40901340314406459ABC4 /* FCPageHeader.swift in Sources */,
+				8CE2B39A44D01CC9A1C72AD4 /* FCUndoRow.swift in Sources */,
+				4C2C6D7B2A1E49F087D31C5E /* FCMoreMenu.swift in Sources */,
 				B914 /* FCAvatar.swift in Sources */,
 				B915 /* FCHintBar.swift in Sources */,
 				B957 /* FCSymbol.swift in Sources */,

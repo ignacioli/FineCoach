@@ -78,7 +78,7 @@ final class ActiveSessionViewModel: ObservableObject {
     /// The set the bottom form just recorded; its row offers undo instead
     /// of its status until `undoWindow` passes (P0-D11).
     @Published private(set) var undoableSetID: StableUUID?
-    static let undoWindow: Duration = .seconds(4)
+    static let undoWindow: Duration = FCUndoRow.undoWindow
     /// Unilateral entry (P0-D8): `false` shows one 「每侧重量」 stepper
     /// bound to `weight`; `true` shows 左 / 右 steppers bound to `left` and
     /// `right`. Either way the set is recorded with `side = .bilateral`.
