@@ -390,6 +390,22 @@ struct BodyMeasurementEntryView: View {
                     historyList
                 }
 
+                if viewModel.isCustomMetric {
+                    let canDeleteMetric = viewModel.history.isEmpty && viewModel.pendingDeletion == nil
+                    FCActionRow(
+                        title: String(localized: "bodyMeasurementEntry.deleteMetric"),
+                        subtitle: canDeleteMetric
+                            ? nil
+                            : String(localized: "bodyMeasurementEntry.deleteMetricBlocked"),
+                        role: .destructive,
+                        isEnabled: canDeleteMetric,
+                        showsTrashIcon: true
+                    ) {
+                        viewModel.showingDeleteMetricConfirm = true
+                    }
+                    .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementDeleteMetric)
+                }
+
             }
             .padding(FCPrimitives.space4)
         }
@@ -455,7 +471,7 @@ struct BodyMeasurementEntryView: View {
     /// Visible "…" menu for a custom metric's lifecycle actions (CLAUDE.md
     /// "Discoverable affordances": never long-press only).
     private var metricActionsMenu: some View {
-        Menu {
+        FCMoreMenu(accessibilityIdentifier: FCAccessibilityID.bodyMeasurementMore) {
             Button(
                 viewModel.metric?.lifecycle == .archived
                     ? String(localized: "bodyData.restore")
@@ -468,17 +484,7 @@ struct BodyMeasurementEntryView: View {
                     ? FCAccessibilityID.bodyMeasurementRestore
                     : FCAccessibilityID.bodyMeasurementArchive
             )
-            Button(String(localized: "bodyData.delete"), role: .destructive) {
-                viewModel.showingDeleteMetricConfirm = true
-            }
-            .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementDeleteMetric)
-        } label: {
-            Image(systemName: "ellipsis")
-                .foregroundStyle(FCSemanticColors.textSecondary)
-                .frame(minWidth: 44, minHeight: 44)
-                .contentShape(Rectangle())
         }
-        .accessibilityLabel(String(localized: "bodyData.moreActions"))
     }
 
     private var historyList: some View {
