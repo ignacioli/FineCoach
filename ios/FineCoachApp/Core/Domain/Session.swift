@@ -340,6 +340,21 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
         return replacingExercise(at: index, with: exercise.replacingSets(remaining), now: now)
     }
 
+    /// Restores one previously deleted set at its original position. The
+    /// current session is used as the base so edits made after deletion are
+    /// preserved; only the deleted set is reinserted.
+    public func restoringSet(_ set: TrainingSet, at originalIndex: Int, now: Date) throws -> Session {
+        try ensureInProgress()
+        let (index, exercise) = try requireExercise(set.sessionExerciseID)
+        guard !exercise.sets.contains(where: { $0.id == set.id }) else {
+            return self
+        }
+        var sets = exercise.sets
+        let insertionIndex = min(max(originalIndex, 0), sets.count)
+        sets.insert(set, at: insertionIndex)
+        return replacingExercise(at: index, with: exercise.replacingSets(sets), now: now)
+    }
+
     public func discardingUnresolvedSets(now: Date) throws -> Session {
         try ensureInProgress()
         let cleaned = exercises.map { exercise in

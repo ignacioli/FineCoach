@@ -18,6 +18,11 @@ enum ActiveSessionSheet: Identifiable, Equatable {
     }
 }
 
+struct DeletedSetUndo: Equatable {
+    let set: TrainingSet
+    let originalIndex: Int
+}
+
 /// The coach-facing credit question or notice shown after a Session
 /// finishes (M1B-FR-013/014). Appointment-linked debits need no prompt.
 enum SessionCreditPrompt: Equatable {
@@ -78,6 +83,9 @@ final class ActiveSessionViewModel: ObservableObject {
     /// The set the bottom form just recorded; its row offers undo instead
     /// of its status until `undoWindow` passes (P0-D11).
     @Published private(set) var undoableSetID: StableUUID?
+    /// The most recently deleted completed set, retained only for the shared
+    /// undo window so the row can be restored at its original position.
+    @Published private(set) var deletedSetUndo: DeletedSetUndo?
     static let undoWindow: Duration = FCUndoRow.undoWindow
     /// Unilateral entry (P0-D8): `false` shows one 「每侧重量」 stepper
     /// bound to `weight`; `true` shows 左 / 右 steppers bound to `left` and
@@ -100,6 +108,7 @@ final class ActiveSessionViewModel: ObservableObject {
     private let now: () -> Date
     private var restNotificationTask: Task<Void, Never>?
     private var undoExpiryTask: Task<Void, Never>?
+    private var deletedSetUndoExpiryTask: Task<Void, Never>?
     private var catalogSearchGeneration = 0
     private var catalogSearchTask: Task<Void, Never>?
     /// The set most recently created via the bottom "add set" form, so
@@ -468,6 +477,35 @@ final class ActiveSessionViewModel: ObservableObject {
     /// Removes an explicitly identified set (M1-A fix). Used by the per-row
     /// swipe-to-delete action; MUST NOT rely on array order.
     func removeSet(setID: StableUUID) async {
+        guard let exercise = exercise(containingSetID: setID),
+            let setIndex = exercise.sets.firstIndex(where: { $0.id == setID }),
+            exercise.sets.indices.contains(setIndex)
+        else {
+            return
+        }
+        let set = exercise.sets[setIndex]
+
+        if set.state == .completed {
+            let removed = await run {
+                self.session = try await self.useCases.deleteSet(setID: setID)
+            }
+            guard removed else {
+                return
+            }
+            if editingSetID == setID {
+                editingSetID = nil
+                prefillSetFields(for: currentExercise)
+            }
+            if activeDraftSetID == setID {
+                activeDraftSetID = nil
+            }
+            if undoableSetID == setID {
+                withdrawUndo()
+            }
+            offerDeletedSetUndo(DeletedSetUndo(set: set, originalIndex: setIndex))
+            return
+        }
+
         await run {
             self.session = try await self.useCases.deleteSet(setID: setID)
         }
@@ -484,6 +522,31 @@ final class ActiveSessionViewModel: ObservableObject {
         if undoableSetID == setID {
             withdrawUndo()
         }
+    }
+
+    /// Restores the deleted completed set without replacing the current
+    /// session snapshot, preserving edits made during the undo window.
+    func undoDeletedSet() async {
+        guard let deletedSetUndo else {
+            return
+        }
+        let restored = await run {
+            self.session = try await self.useCases.restoreDeletedSet(
+                deletedSetUndo.set,
+                at: deletedSetUndo.originalIndex
+            )
+        }
+        guard restored else {
+            return
+        }
+        withdrawDeletedSetUndo()
+    }
+
+    /// The deletion is already durable. Clearing this state removes only the
+    /// temporary undo affordance, for example when leaving the page or going
+    /// into the background.
+    func expireDeletedSetUndo() {
+        withdrawDeletedSetUndo()
     }
 
     /// Undoes the set the bottom form just recorded (P0-D11): the set is
@@ -548,6 +611,7 @@ final class ActiveSessionViewModel: ObservableObject {
             // must not turn that into a visible failure.
             try? await self.creditSettlement?.settleAbandonedSession(abandoned)
             self.session = abandoned
+            self.expireDeletedSetUndo()
             self.clearRest()
         }
     }
@@ -580,6 +644,7 @@ final class ActiveSessionViewModel: ObservableObject {
         // coach has answered (M1B-FR-013/014).
         creditPrompt = await settleCredits(for: finished)
         session = finished
+        expireDeletedSetUndo()
         clearRest()
     }
 
@@ -801,6 +866,24 @@ final class ActiveSessionViewModel: ObservableObject {
             }
             self?.undoableSetID = nil
         }
+    }
+
+    private func offerDeletedSetUndo(_ value: DeletedSetUndo) {
+        deletedSetUndoExpiryTask?.cancel()
+        deletedSetUndo = value
+        deletedSetUndoExpiryTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(for: Self.undoWindow)
+            guard !Task.isCancelled, self?.deletedSetUndo == value else {
+                return
+            }
+            self?.withdrawDeletedSetUndo()
+        }
+    }
+
+    private func withdrawDeletedSetUndo() {
+        deletedSetUndoExpiryTask?.cancel()
+        deletedSetUndoExpiryTask = nil
+        deletedSetUndo = nil
     }
 
     private func withdrawUndo() {
