@@ -17,9 +17,7 @@ final class BodyMeasurementEntryViewModel: ObservableObject {
     @Published var unitText = ""
     @Published var errorMessage: String?
     @Published private(set) var pendingDeletion: PendingDeletion?
-    /// Confirmation gate for "clear all records" (a full-history delete for
-    /// this metric) -- mirrors `pendingDeleteID`'s single-row confirmation
-    /// pattern, just at metric scope.
+    /// Confirmation gate for clearing every record of this metric.
     @Published var showingDeleteAllConfirm = false
     /// Confirmation gate for permanently deleting this custom metric (T069k:
     /// moved here from a long-press-only menu on the list row, now behind a
@@ -544,6 +542,7 @@ struct BodyMeasurementEntryView: View {
             } label: {
                 Label(String(localized: "bodyMeasurementEntry.delete"), systemImage: "trash")
             }
+            .tint(FCSemanticColors.statusDestructive)
             .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementDeleteMeasurement(measurement.id))
         }
         .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementRow(measurement.id))
