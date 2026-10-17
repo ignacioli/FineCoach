@@ -203,6 +203,25 @@
         }
 
         @MainActor
+        func testRestoreRequestDoesNotStartUntilConfirmation() async throws {
+            let harness = try makeHarness(
+                generationUUID: destinationGenerationID,
+                ids: inventoryIDs(includeInProgress: false)
+            )
+            let viewModel = BackupRestoreFlowViewModel(coordinator: makeCoordinator(harness: harness, ids: []))
+
+            viewModel.pickedFileURL = URL(fileURLWithPath: "/tmp/not-restored.fcbackup")
+            viewModel.password = exportPasswordText
+            viewModel.requestRestore()
+
+            XCTAssertTrue(viewModel.isConfirmingRestore)
+            XCTAssertFalse(viewModel.isRestoring)
+            XCTAssertFalse(viewModel.succeeded)
+            XCTAssertFalse(viewModel.failed)
+            try await harness.controller.shutdownForTesting()
+        }
+
+        @MainActor
         private static func restoreThroughPage(
             rootURL: URL,
             clock: TestClock,
