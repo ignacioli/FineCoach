@@ -122,6 +122,69 @@
             try await environment.controller.shutdownForTesting()
         }
 
+        /// B2 Δ9: deleting a completed set is immediately durable, while the
+        /// original slot remains available for a four-second undo. Restoring
+        /// must preserve the completed state and the other set's position.
+        func testDeletingCompletedSetOffersUndoAtOriginalSlot() async throws {
+            let environment = try makeEnvironment()
+            let viewModel = try await makeLoadedViewModel(environment: environment)
+
+            viewModel.weight = "40"
+            viewModel.reps = "10"
+            await viewModel.confirmActiveDraftSet()
+            viewModel.dismissRest()
+            let firstSet = try XCTUnwrap(
+                viewModel.session?.exercises.first(where: { $0.id == exerciseID })?.sets.first
+            )
+
+            viewModel.weight = "60"
+            viewModel.reps = "8"
+            await viewModel.confirmActiveDraftSet()
+            viewModel.dismissRest()
+            let secondSet = try XCTUnwrap(
+                viewModel.session?.exercises.first(where: { $0.id == exerciseID })?.sets.last
+            )
+
+            await viewModel.removeSet(setID: firstSet.id)
+
+            let afterDelete = try XCTUnwrap(
+                viewModel.session?.exercises.first(where: { $0.id == exerciseID })
+            )
+            XCTAssertEqual(afterDelete.sets.map(\.id), [secondSet.id])
+            XCTAssertEqual(viewModel.deletedSetUndo?.originalIndex, 0)
+
+            viewModel.beginEditingSet(secondSet)
+            viewModel.weight = "65"
+            await viewModel.saveEditingSet()
+
+            await viewModel.undoDeletedSet()
+
+            let afterUndo = try XCTUnwrap(
+                viewModel.session?.exercises.first(where: { $0.id == exerciseID })
+            )
+            XCTAssertEqual(afterUndo.sets.map(\.id), [firstSet.id, secondSet.id])
+            XCTAssertEqual(afterUndo.sets.first?.state, .completed)
+            XCTAssertEqual(afterUndo.sets.first?.completedAtUTC, firstSet.completedAtUTC)
+            XCTAssertEqual(afterUndo.sets.last?.weightValue?.canonicalString, "65")
+            XCTAssertNil(viewModel.deletedSetUndo)
+
+            await viewModel.removeSet(setID: firstSet.id)
+            viewModel.expireDeletedSetUndo()
+            await viewModel.undoDeletedSet()
+
+            let afterExpiry = try XCTUnwrap(
+                viewModel.session?.exercises.first(where: { $0.id == exerciseID })
+            )
+            XCTAssertEqual(afterExpiry.sets.map(\.id), [secondSet.id])
+            XCTAssertNil(viewModel.deletedSetUndo)
+
+            let persisted = try await environment.sessionUseCases.loadActive()
+            XCTAssertEqual(persisted?.exercises.first?.sets.map(\.id), [secondSet.id])
+            XCTAssertEqual(persisted?.exercises.first?.sets.first?.weightValue?.canonicalString, "65")
+
+            try await environment.controller.shutdownForTesting()
+        }
+
         /// P0-D14: 「保存」 on a completed set is its confirmation; the set
         /// stays completed and no rest starts.
         func testSavingAnEditedCompletedSetKeepsItCompletedWithoutRest() async throws {

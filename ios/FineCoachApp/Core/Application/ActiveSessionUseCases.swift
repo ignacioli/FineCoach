@@ -232,6 +232,12 @@ public struct ActiveSessionUseCases: Sendable {
         try await mutate { try $0.deletingSet(setID: setID, now: clock.nowUTC()) }
     }
 
+    public func restoreDeletedSet(_ set: TrainingSet, at originalIndex: Int) async throws -> Session {
+        try await mutate {
+            try $0.restoringSet(set, at: originalIndex, now: clock.nowUTC())
+        }
+    }
+
     public func discardUnresolved() async throws -> Session {
         try await mutate { try $0.discardingUnresolvedSets(now: clock.nowUTC()) }
     }

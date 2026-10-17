@@ -399,12 +399,9 @@ struct ActiveSessionView: View {
 
     @ViewBuilder
     private func setRows(for exercise: SessionExercise) -> some View {
-        let deletedUndo: DeletedSetUndo?
-        if viewModel.deletedSetUndo?.set.sessionExerciseID == exercise.id {
-            deletedUndo = viewModel.deletedSetUndo
-        } else {
-            deletedUndo = nil
-        }
+        let deletedUndo =
+            viewModel.deletedSetUndo?.set.sessionExerciseID == exercise.id
+            ? viewModel.deletedSetUndo : nil
         let placeholderIndex = min(deletedUndo?.originalIndex ?? exercise.sets.count, exercise.sets.count)
         let rowCount = exercise.sets.count + (deletedUndo == nil ? 0 : 1)
 
