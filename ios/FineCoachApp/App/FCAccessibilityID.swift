@@ -565,6 +565,8 @@ public enum FCAccessibilityID {
     public static let restoreWarning = "restore.warning"
     public static let restoreSuggestBackup = "restore.suggestBackup"
     public static let restorePassword = "restore.password"
+    public static let restoreReplaceCancel = "restore.replaceConfirm.cancel"
+    public static let restoreReplaceConfirm = "restore.replaceConfirm.confirm"
     public static let restoreConfirm = "restore.confirm"
     public static let restoreRetry = "restore.retry"
     public static let restoreFailed = "restore.failed"
