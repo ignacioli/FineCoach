@@ -106,6 +106,28 @@ final class TrainingEntryScanTests: XCTestCase {
         }
     }
 
+    /// Template exercises are list items: deletion is exposed by the native
+    /// trailing swipe action, while the move-to-section menu remains visible.
+    func testTemplateExerciseRowsUseDestructiveSwipeDelete() throws {
+        let text = try source("Features/Templates/TemplateEditorView.swift").joined(separator: "\n")
+        let start = try XCTUnwrap(text.range(of: "private func exerciseList(")).lowerBound
+        let end =
+            text.range(
+                of: "\n    private func estimatedExerciseListHeight", range: start..<text.endIndex
+            )?.lowerBound ?? text.endIndex
+        let list = text[start..<end]
+
+        XCTAssertTrue(list.contains(".swipeActions(edge: .trailing, allowsFullSwipe: true)"))
+        XCTAssertTrue(list.contains("Button(role: .destructive)"))
+        XCTAssertTrue(list.contains(".tint(FCSemanticColors.statusDestructive)"))
+        XCTAssertTrue(list.contains("FCAccessibilityID.templateEditorRemoveExercise(exercise.id)"))
+        XCTAssertTrue(list.contains("viewModel.removeExercise(exercise.id)"))
+        XCTAssertTrue(list.contains("templateEditor.removeExercise"))
+
+        XCTAssertFalse(list.contains("Button(String(localized: \"templateEditor.removeExercise\"))"))
+        XCTAssertTrue(text.contains("templateEditor.moveToUnsectioned"), "the move menu remains available")
+    }
+
     // MARK: - Helpers
 
     /// A system `Button` with a text title (`Button("…")`,
