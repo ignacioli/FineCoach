@@ -228,11 +228,10 @@ final class BodyMeasurementEntryViewModel: ObservableObject {
     }
 
     private func historyWithPendingDeletion(from loadedHistory: [BodyMeasurement]) -> [BodyMeasurement] {
-        guard let pending = pendingDeletion else { return loadedHistory }
+        guard let pendingDeletion else { return loadedHistory }
         // The pending object is rendered by the caller as an in-place
         // `FCUndoRow`; keep it out of the fetched list until it is restored.
-        _ = pending
-        return loadedHistory.filter { $0.id != pending.measurement.id }
+        return loadedHistory.filter { $0.id != pendingDeletion.measurement.id }
     }
 
     private func insert(_ measurement: BodyMeasurement, at index: Int) {
@@ -540,7 +539,7 @@ struct BodyMeasurementEntryView: View {
                 pending.measurement.localCalendarDay.canonicalString,
                 viewModel.displayValue(for: pending.measurement)
             ),
-            accessibilityIdentifier: FCAccessibilityID.bodyMeasurementRow(pending.measurement.id),
+            accessibilityIdentifier: FCAccessibilityID.bodyMeasurementUndo(pending.measurement.id),
             onUndo: { viewModel.undoPendingDeletion() }
         )
         .listRowInsets(EdgeInsets())
