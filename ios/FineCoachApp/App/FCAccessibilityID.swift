@@ -1,6 +1,12 @@
 import Foundation
 
 public enum FCAccessibilityID {
+    public static func activeSessionSectionMore(_ id: StableUUID) -> String {
+        "activeSession.section.more.\(id.rawValue.uuidString.lowercased())"
+    }
+    public static func templateEditorSectionMore(_ id: StableUUID) -> String {
+        "templateEditor.section.more.\(id.rawValue.uuidString.lowercased())"
+    }
     public static let privacyCover = "privacy.cover"
 
     public static let archiveViewerRoot = "archive.viewer.root"

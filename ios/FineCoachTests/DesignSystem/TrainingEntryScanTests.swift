@@ -87,6 +87,25 @@ final class TrainingEntryScanTests: XCTestCase {
         }
     }
 
+    func testSectionHeadersOfferDeletionOnlyInsideMoreMenu() throws {
+        for (path, function, identifier) in [
+            (
+                "Features/ActiveSession/ActiveSessionView.swift", "private func sectionHeaderIfNeeded",
+                "activeSessionSectionMore"
+            ),
+            ("Features/Templates/TemplateEditorView.swift", "private func sectionBlock", "templateEditorSectionMore"),
+        ] {
+            let text = try source(path).joined(separator: "\n")
+            let start = try XCTUnwrap(text.range(of: function)).lowerBound
+            let end = text.range(of: "\n    private ", range: start..<text.endIndex)?.lowerBound ?? text.endIndex
+            let header = text[start..<end]
+            XCTAssertTrue(header.contains("FCMoreMenu(accessibilityIdentifier: FCAccessibilityID.\(identifier)"))
+            XCTAssertTrue(header.contains("role: .destructive"))
+            XCTAssertTrue(header.contains("viewModel.requestDeleteSection(section)"))
+            XCTAssertFalse(header.contains("foregroundStyle(FCSemanticColors.statusDestructive)"))
+        }
+    }
+
     // MARK: - Helpers
 
     /// A system `Button` with a text title (`Button("…")`,
