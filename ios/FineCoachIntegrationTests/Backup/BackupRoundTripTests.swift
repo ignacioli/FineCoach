@@ -204,21 +204,37 @@
 
         @MainActor
         func testRestoreRequestDoesNotStartUntilConfirmation() async throws {
-            let harness = try makeHarness(
-                generationUUID: destinationGenerationID,
-                ids: inventoryIDs(includeInProgress: false)
+            let root = try TemporaryProtectedDirectory()
+            let clock = TestClock(utcDate: now)
+            let environment = try AppEnvironment(
+                rootURL: root.url,
+                clock: clock,
+                idGenerator: TestIDGenerator(ids: [destinationGenerationID])
             )
-            let viewModel = BackupRestoreFlowViewModel(coordinator: makeCoordinator(harness: harness, ids: []))
+            let viewModel = BackupRestoreFlowViewModel(coordinator: try environment.requireBackupCoordinator())
 
             viewModel.pickedFileURL = URL(fileURLWithPath: "/tmp/not-restored.fcbackup")
             viewModel.password = exportPasswordText
+            viewModel.confirmRestore(using: environment)
+            for _ in 0..<3 {
+                await Task.yield()
+            }
+
+            XCTAssertFalse(viewModel.isConfirmingRestore)
+            XCTAssertFalse(viewModel.isRestoring)
+            XCTAssertFalse(viewModel.succeeded)
+            XCTAssertFalse(viewModel.failed)
+
             viewModel.requestRestore()
+            for _ in 0..<3 {
+                await Task.yield()
+            }
 
             XCTAssertTrue(viewModel.isConfirmingRestore)
             XCTAssertFalse(viewModel.isRestoring)
             XCTAssertFalse(viewModel.succeeded)
             XCTAssertFalse(viewModel.failed)
-            try await harness.controller.shutdownForTesting()
+            viewModel.cancelInFlight()
         }
 
         @MainActor
