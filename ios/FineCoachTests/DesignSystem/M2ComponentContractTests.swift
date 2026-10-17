@@ -319,6 +319,38 @@ final class M2ComponentContractTests: XCTestCase {
         XCTAssertGreaterThan(callers, 0, "found no dialog callers; scan path is wrong")
     }
 
+    // MARK: - DS-UNDO-ROW / DS-MORE-MENU
+
+    func testUndoRowOwnsTheSharedFourSecondWindowAndUndoControl() throws {
+        XCTAssertEqual(FCUndoRow.undoWindow, .seconds(4))
+        let undo = try componentSource("FCUndoRow.swift")
+        XCTAssertTrue(undo.contains("public static let undoWindow: Duration = .seconds(4)"))
+        XCTAssertTrue(undo.contains("FCLinkButton("), "undo must reuse the link-button hit target")
+        XCTAssertTrue(undo.contains("designSystem.undo"), "the undo label must be localized")
+        XCTAssertTrue(undo.contains(".frame(maxWidth: .infinity, minHeight: 52)"))
+        XCTAssertTrue(undo.contains(".accessibilityElement(children: .contain)"))
+        XCTAssertTrue(undo.contains(".accessibilityLabel(Text(message))"))
+        XCTAssertTrue(undo.contains(".accessibilityAction(named: Text(\"designSystem.undo\"), onUndo)"))
+        XCTAssertTrue(undo.contains("button.accessibilityIdentifier(accessibilityIdentifier)"))
+
+        let viewModel = try String(
+            contentsOf: appRoot().appendingPathComponent("Features/ActiveSession/ActiveSessionViewModel.swift"),
+            encoding: .utf8
+        )
+        XCTAssertTrue(viewModel.contains("static let undoWindow: Duration = FCUndoRow.undoWindow"))
+    }
+
+    func testMoreMenuUsesAnAccessibleEllipsisHitTargetAndSystemMenu() throws {
+        let menu = try componentSource("FCMoreMenu.swift")
+        XCTAssertTrue(menu.contains("public struct FCMoreMenu<MenuContent: View>"))
+        XCTAssertTrue(menu.contains("Menu {"), "the component must wrap a system Menu")
+        XCTAssertTrue(menu.contains("Image(systemName: \"ellipsis\")"))
+        XCTAssertTrue(menu.contains(".frame(minWidth: 44, minHeight: 44)"))
+        XCTAssertTrue(menu.contains("designSystem.moreActions"), "the label must be localized")
+        XCTAssertTrue(menu.contains("accessibilityIdentifier: String"))
+        XCTAssertTrue(menu.contains("menu.accessibilityIdentifier(accessibilityIdentifier)"))
+    }
+
     // MARK: - Sources
 
     private func appRoot() -> URL {

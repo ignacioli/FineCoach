@@ -134,8 +134,8 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 | `DS-HUB-ROW` | `FCHubRow` | §4.7；19/42/43 | ResourceHub、Settings（M2 新页面使用） | 已实现（M2 T002），人工项待首次走查 |
 | `DS-INLINE-RESULT` | `FCInlineResult` | §4.7；38/39 | BackupRestoreFlow | 已实现（M2 T003），信息变体待 M2 页面首次使用 |
 | `DS-ACTION-ROW` | `FCActionRow` | §8.1 操作行；18/24；destructive 图标（§4.7） | 10 个文件 | 稳定；destructive 图标已实现（M2 T005） |
-| `DS-UNDO-ROW` | 待 B2 新增：FCUndoRow | §8.1 删除后撤销行；B-b（2026-10-16 已批准） | ActiveSession（删组）、BodyMeasurementEntry（删单条测量） | 规格已定（§4.8），代码待 B2 |
-| `DS-MORE-MENU` | 待 B2 新增：FCMoreMenu | §8.1 标题行「…」菜单；B-a / B-b（2026-10-16 已批准） | ActiveSession、TemplateEditor（分区标题）；BodyMeasurementEntry（页头，B2 迁移） | 规格已定（§4.8），代码待 B2 |
+| `DS-UNDO-ROW` | `FCUndoRow` | §8.1 删除后撤销行；B-b（2026-10-16 已批准） | ActiveSession（删组）、BodyMeasurementEntry（删单条测量） | 规格已定（§4.8），代码待 B2 |
+| `DS-MORE-MENU` | `FCMoreMenu` | §8.1 标题行「…」菜单；B-a / B-b（2026-10-16 已批准） | ActiveSession、TemplateEditor（分区标题）；BodyMeasurementEntry（页头，B2 迁移） | 规格已定（§4.8），代码待 B2 |
 | `DS-SET-ROW` | `FCSetRow`、`FCSetStateCircle` | §6 组圆圈；11/30 | ActiveSession；圆圈另用于 ShareReport、History | 见 CG-4 |
 | `DS-HERO-CARD` | `FCHeroCard` | §8 深色 hero 卡；01/18 | Today、StudentDetail | 见 CG-6 |
 | `DS-HINT-BAR` | `FCHintBar`、`FCActiveSessionBar` | §8 提示条；§8.1 训练中提示条；21 | StudentDetail、StudentList | 稳定 |
