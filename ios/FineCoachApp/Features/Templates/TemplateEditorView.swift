@@ -162,6 +162,11 @@ struct TemplateEditorView: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var isConfirmingDelete = false
+    /// Native `.swipeActions` are only available on `List` rows. Each list is
+    /// non-scrolling and measured before its height is fixed so the page keeps
+    /// one outer scroll surface (the same pattern as ActiveSession).
+    @State private var listContentHeights: [StableUUID: CGFloat] = [:]
+    @ScaledMetric private var exerciseRowHeight: CGFloat = 52
 
     init(templateID: StableUUID, useCases: TemplateUseCases) {
         _viewModel = StateObject(wrappedValue: TemplateEditorViewModel(templateID: templateID, useCases: useCases))
@@ -190,8 +195,8 @@ struct TemplateEditorView: View {
 
                 FCListRowDivider()
 
-                ForEach(viewModel.unsectionedExercises) { exercise in
-                    exerciseRow(exercise)
+                if !viewModel.unsectionedExercises.isEmpty {
+                    exerciseList(viewModel.unsectionedExercises, listID: viewModel.templateID)
                 }
 
                 ForEach(viewModel.orderedSections) { section in
@@ -296,17 +301,50 @@ struct TemplateEditorView: View {
                 }
             }
             .frame(minHeight: 44)
-            Button(String(localized: "templateEditor.removeExercise")) {
-                Task { await viewModel.removeExercise(exercise.id) }
-            }
-            .frame(minHeight: 44)
-            .foregroundStyle(FCSemanticColors.statusDestructive)
-            .accessibilityIdentifier(FCAccessibilityID.templateEditorRemoveExercise(exercise.id))
         }
         .padding(FCPrimitives.space2)
         .background(FCSemanticColors.surfaceElevated)
         .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSm))
         .accessibilityIdentifier(FCAccessibilityID.templateExerciseRow(exercise.id))
+    }
+
+    @ViewBuilder
+    private func exerciseList(_ exercises: [TemplateExercise], listID: StableUUID) -> some View {
+        List {
+            ForEach(exercises) { exercise in
+                exerciseRow(exercise)
+                    .listRowInsets(EdgeInsets())
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(FCSemanticColors.surfacePage)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            Task { await viewModel.removeExercise(exercise.id) }
+                        } label: {
+                            Label(String(localized: "templateEditor.deleteExercise"), systemImage: "trash")
+                        }
+                        .tint(FCSemanticColors.statusDestructive)
+                        .accessibilityIdentifier(FCAccessibilityID.templateEditorRemoveExercise(exercise.id))
+                    }
+            }
+        }
+        .listStyle(.plain)
+        .scrollDisabled(true)
+        .scrollContentBackground(.hidden)
+        .environment(\.defaultMinListRowHeight, 44)
+        .onScrollGeometryChange(
+            for: CGFloat.self,
+            of: { $0.contentSize.height + $0.contentInsets.top + $0.contentInsets.bottom }
+        ) { _, height in
+            guard height >= 1 else {
+                return
+            }
+            listContentHeights[listID] = height
+        }
+        .frame(height: listContentHeights[listID] ?? estimatedExerciseListHeight(for: exercises.count))
+    }
+
+    private func estimatedExerciseListHeight(for count: Int) -> CGFloat {
+        max(44, CGFloat(count) * exerciseRowHeight)
     }
 
     private func sectionBlock(_ section: SessionSection) -> some View {
@@ -324,8 +362,9 @@ struct TemplateEditorView: View {
                 }
             }
             .accessibilityIdentifier(FCAccessibilityID.templateSectionRow(section.id))
-            ForEach(viewModel.exercises(in: section)) { exercise in
-                exerciseRow(exercise)
+            let exercises = viewModel.exercises(in: section)
+            if !exercises.isEmpty {
+                exerciseList(exercises, listID: section.id)
             }
         }
         .padding(FCPrimitives.space2)

@@ -9617,6 +9617,17 @@
           }
         }
       }
+    },
+    "templateEditor.deleteExercise": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
