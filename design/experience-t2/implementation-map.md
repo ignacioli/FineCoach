@@ -126,3 +126,66 @@
 - 5 个确认弹窗由系统底部面板变为共享居中卡片：AppointmentEditor 冲突覆盖、CoursePackageEditor 结束旧包，以及 BodyMeasurementEntry 删除指标 / 删除单条 / 清空全部。需人工看实际组合，未作视觉验收。
 - 34 个 `fcSecondaryPage()` 调用点的状态栏区域与滚动遮盖。训练页以外的页面本轮均没有真机查看；本轮自动测试也不能证明所有页面视觉正确。
 - 上述“待核实”中的键盘、确认按钮与休息条重叠，以及它是否影响实际点击和完成训练。第 5 项因此保持 BLOCKED，UI 文件未提交，等待核实后再决定后续工作。
+
+# B2 交互改动执行记录
+
+当前结果：**PASS**。Δ1–Δ5、Δ8–Δ10 与第 0 项组件已提交。全量 App build、FineCoachTests、FineCoachIntegrationTests 和全仓 lint 通过。未改、未运行 `FineCoachUITests`。未做人工视觉验证。
+
+## 执行记录（components.md §1.5）
+
+分类与依据：B（实现已批准的交互修订）。依据为 `design/experience-t2/decisions.md` B-D1–B-D8 与差异清单 Δ1–Δ5、Δ8–Δ10，`design/design-system/components.md` §4.1 / §4.7 / §4.8，以及已通过画稿 B-a、B-b、B-c。本轮没有新的产品决定。  
+影响范围：新增 `FCUndoRow`、`FCMoreMenu`；训练中与模板编辑的分区菜单和删除确认；已完成组与单条测量的左滑撤销；模板动作行左滑删除；指标记录页底部「清空全部记录」「删除指标」；恢复前的替换确认。未做 Δ11 文案扫尾，也未处理休息计时条盖住「确认」按钮。  
+设计决定：沿用已通过画稿和 B-D1–B-D8。删除分区只提供「移到无分区」；空分区仍直接删除。撤销窗口只用 `FCUndoRow.undoWindow`（4 秒）。B-c 两行用 `FCActionRow` 的说明 slot，不传 `showsTrashIcon`（§4.7：M1 页面的 destructive 行不补图标）。「删除指标」仅自定义指标显示，有记录或撤销窗口未结束时禁用。文案遵守 B-D7。  
+实施与验证：先由 Codex 提交第 0 项和 Δ1、Δ2、Δ3、Δ4、Δ8、Δ9、Δ10。Cursor 收尾：两处 Δ1 确认闭包改为始终返回对话框，完成 Δ5 并补上本地化 key，锁定扫描测试，给单条测量左滑补上批准的 destructive tint。系统 `.confirmationDialog` 白名单只剩训练中「移到分区」。destructive `FCActionRow` 扫描期望 7，与 Features 里 7 处调用一致（课包结束、取消课程、学员删除、模板删除、清空全部记录、删除指标、删除本机档案），没有为通过测试改数字。入口与布局清单如下。L3 留给新组件第一次出现、两处撤销行和 B-c 底部两行；未做人工视觉验证。  
+结果：PASS。Codex：`d6f8c97`（第 0 项）、`f1bce23`（Δ1）、`952000b` 与 `4645fed`（Δ3）、`78477e3`（Δ2）、`aa740ae`（Δ4）、`e4f3a24`（Δ8）、`56bd243`（Δ9）、`160796f` 与 `c8ce973`（Δ10）。Cursor：`e0cb7f4` 与 `496bec3`（Δ1 编译）、`f589fe0`（Δ5）、`2c40605`（扫描）、`66d70b5`（Δ3 左滑 tint）。App build PASS；FineCoachTests 492 项（1 项既有 skip：`ContrastHarnessTests.testTextDisabledOnSurfacePageIsWCAGExempt`，0 失败）；FineCoachIntegrationTests 167 项（0 失败）；全仓 lint PASS。证据见文末。没有 BLOCKED 项。
+
+## 入口与布局清单（components.md §1.4）
+
+范围是 Δ1–Δ5、Δ8–Δ10 的新交互。常量来自 `ios/FineCoachApp/App/FCAccessibilityID.swift`。
+
+| 页面 | 控件 | accessibilityIdentifier | 是否改数据 | 宽度 owner / 代码位置 |
+|---|---|---|---|---|
+| ActiveSession | 分区标题「…」（Δ8） | `activeSessionSectionMore(section.id)` | 否（打开菜单） | `FCMoreMenu` 最小 44×44，位于分区标题 `HStack`；`HStack` 填满内容列；`ios/FineCoachApp/Features/ActiveSession/ActiveSessionView.swift:521` |
+| ActiveSession | 菜单「删除分区」（Δ8、Δ1） | `activeSessionDeleteSection(section.id)` | 是（打开确认；空分区直接删除） | 系统 `Menu` 项；`ActiveSessionView.swift:525` |
+| ActiveSession | 确认「删除分区」（Δ1） | `activeSessionDeleteSectionMoveOut` | 是（动作移到无分区） | `FCConfirmationDialog` 内按钮，卡片宽 300、居中；`ActiveSessionView.swift:282` |
+| ActiveSession | 已完成组左滑「删除」（Δ9） | `setDeleteAt(setIndex)` | 是（进入 4 秒撤销窗口） | 系统 `.swipeActions`，行在该动作的 `List` 内；`ActiveSessionView.swift:444` |
+| ActiveSession | 「第 N 组已删除」撤销（Δ9） | `setUndoAt(deletedUndo.originalIndex)` | 是（组回到原位，仍为已完成） | `FCUndoRow` `.frame(maxWidth: .infinity)`；`ActiveSessionView.swift:421` |
+| TemplateEditor | 分区标题「…」（Δ8） | `templateEditorSectionMore(section.id)` | 否（打开菜单） | `FCMoreMenu` 最小 44×44，位于分区标题 `HStack`；`TemplateEditorView.swift:362` |
+| TemplateEditor | 菜单「删除分区」（Δ8、Δ1） | `templateEditorDeleteSection(section.id)` | 是（打开确认；空分区直接删除） | 系统 `Menu` 项；`TemplateEditorView.swift:366` |
+| TemplateEditor | 确认「删除分区」（Δ1） | `templateEditorDeleteSectionMoveOut` | 是（动作移到无分区） | `FCConfirmationDialog` 内按钮，卡片宽 300、居中；`TemplateEditorView.swift:283` |
+| TemplateEditor | 动作行左滑「删除」（Δ2） | `templateEditorRemoveExercise(exercise.id)` | 是（立即移除，无撤销、无确认） | 系统 `.swipeActions`，行在动作 `List` 内；`TemplateEditorView.swift:331` |
+| BodyMeasurementEntry | 历史行左滑「删除」（Δ3） | `bodyMeasurementDeleteMeasurement(measurement.id)` | 是（进入 4 秒撤销窗口） | 系统 `.swipeActions`，行在历史 `List` 内；`BodyMeasurementEntryView.swift:546` |
+| BodyMeasurementEntry | 测量撤销行（Δ3） | `bodyMeasurementUndo(pending.measurement.id)` | 是（记录回到原位） | `FCUndoRow` `.frame(maxWidth: .infinity)`；`BodyMeasurementEntryView.swift:558` |
+| BodyMeasurementEntry | 右上角「…」（Δ4） | `bodyMeasurementMore` | 否（打开菜单） | `FCMoreMenu` 在导航栏 trailing；`BodyMeasurementEntryView.swift:483` |
+| BodyMeasurementEntry | 「停用指标」/「恢复指标」（Δ4） | `bodyMeasurementArchive` / `bodyMeasurementRestore` | 是 | 系统 `Menu` 项；`BodyMeasurementEntryView.swift:493` |
+| BodyMeasurementEntry | 「删除指标」（Δ4） | `bodyMeasurementDeleteMetric` | 是（打开确认；有记录或撤销未结束时禁用，不改数据） | `FCActionRow` `.frame(maxWidth: .infinity)`，在页面内容 `VStack`；`BodyMeasurementEntryView.swift:413` |
+| BodyMeasurementEntry | 删除指标确认（Δ4） | `bodyMeasurementDeleteMetricConfirm` | 是 | `FCConfirmationDialog` 内按钮，卡片宽 300、居中；`BodyMeasurementEntryView.swift:455` |
+| BodyMeasurementEntry | 「清空全部记录」（Δ5） | `bodyMeasurementDeleteAll` | 是（打开确认；无记录时不显示） | `FCActionRow` `.frame(maxWidth: .infinity)`，在「管理」区段下；`BodyMeasurementEntryView.swift:397` |
+| BodyMeasurementEntry | 清空全部确认（Δ5） | `bodyMeasurementDeleteAllConfirm` | 是 | `FCConfirmationDialog` 内按钮，卡片宽 300、居中；`BodyMeasurementEntryView.swift:471` |
+| BackupRestore | 「恢复」（Δ10） | `restoreConfirm` | 是（只打开确认，不直接恢复） | `FCButton` `.frame(maxWidth: .infinity)`，在恢复页 `VStack`；`BackupRestoreFlow.swift:142` |
+| BackupRestore | 确认「替换」（Δ10） | `restoreReplaceConfirm` | 是 | `FCConfirmationDialog` 内按钮，卡片宽 300、居中；`BackupRestoreFlow.swift:167` |
+
+## L3 待人工看的项
+
+未做人工视觉验证，也不能把下面任何一项写成已验证。
+
+- `FCUndoRow`、`FCMoreMenu` 第一次出现。
+- Δ9 训练中已完成组的撤销行，Δ3 单条测量的撤销行。
+- B-c 底部「清空全部记录」「删除指标」两行（有记录时第二行置灰，说明在行尾）。
+
+## FineCoachUITests 里的已删 identifier
+
+已删除的 identifier：`activeSessionDeleteSectionDeleteExercises`（`activeSession.deleteSection.deleteExercises`）、`templateEditorDeleteSectionDeleteExercises`（`templateEditor.deleteSection.deleteExercises`）、`bodyMeasurementDeleteConfirm`（`bodyMeasurementEntry.deleteConfirm`）。在 `ios/FineCoachUITests` 中按符号名和字符串值搜索，没有引用。本轮没有改这些测试。
+
+## 闸门
+
+模拟器是两台 iPhone 17：单元 `EFE2D5A0-4877-4682-BE79-7460C0C1E8C8`，集成 `4DD81BE1-C2EA-4B71-90B0-2A7247934A60`。没有使用 `BC454E2A-9374-43ED-AB81-4523C3D6167A`。App build 是 Debug iphoneos、`CODE_SIGNING_ALLOWED=NO`，不是真机验收。证据在 worktree 的 `DerivedData/B2/evidence/`，被 Git 忽略。
+
+| 闸门 | 结果 | 证据 |
+|---|---|---|
+| App build | PASS | `DerivedData/B2/evidence/b2-final-build-2.log` |
+| FineCoachTests | PASS：492 项，1 项既有 skip，0 失败 | `DerivedData/B2/evidence/b2-final-unit-2.log` / `b2-final-unit-2.xcresult` |
+| FineCoachIntegrationTests | PASS：167 项，0 失败 | `DerivedData/B2/evidence/b2-final-integration-2.log` / `b2-final-integration-2.xcresult` |
+| 全仓严格 lint | PASS；日志为空 | `DerivedData/B2/evidence/b2-final-lint-2.log` |
+
+收尾前的失败已修掉，不计入最终结果：第一次 build / 两套测试停在 Δ1 确认闭包不返回对话框（`TemplateEditorView`，随后是 `ActiveSessionView`）；补上之后单元测试只失败 `TrainingEntryScanTests.testBodyHistoryKeepsUndoVisibleAndUsesDestructiveSwipes`（测量左滑缺少 tint，注释仍写出已删除的确认字段名）。
