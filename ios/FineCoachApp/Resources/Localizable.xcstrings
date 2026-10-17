@@ -9518,6 +9518,39 @@
           }
         }
       }
+    },
+    "section.delete.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除分区「%@」？"
+          }
+        }
+      }
+    },
+    "section.delete.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分区里的 %ld 个动作会移到「无分区」"
+          }
+        }
+      }
+    },
+    "section.delete.cancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
