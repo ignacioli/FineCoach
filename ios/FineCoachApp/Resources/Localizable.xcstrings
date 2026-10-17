@@ -9595,6 +9595,28 @@
           }
         }
       }
+    },
+    "session.set.deleted": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %ld 组已删除"
+          }
+        }
+      }
+    },
+    "bodyMeasurementEntry.deletedFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ %@ 已删除"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

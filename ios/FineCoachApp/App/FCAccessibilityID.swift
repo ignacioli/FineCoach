@@ -1,6 +1,12 @@
 import Foundation
 
 public enum FCAccessibilityID {
+    public static func setUndoAt(_ index: Int) -> String {
+        "activeSession.set.undo.at.\(index)"
+    }
+    public static func bodyMeasurementUndo(_ id: StableUUID) -> String {
+        "bodyMeasurementEntry.undo.\(id.rawValue.uuidString.lowercased())"
+    }
     public static func activeSessionSectionMore(_ id: StableUUID) -> String {
         "activeSession.section.more.\(id.rawValue.uuidString.lowercased())"
     }
@@ -299,7 +305,6 @@ public enum FCAccessibilityID {
         "bodyMeasurementEntry.row.\(id.rawValue.uuidString)"
     }
 
-    public static let bodyMeasurementDeleteConfirm = "bodyMeasurementEntry.deleteConfirm"
     public static let bodyMeasurementDeleteMetricConfirm = "bodyMeasurementEntry.deleteMetricConfirm"
     public static let bodyMeasurementDeleteMetric = "bodyMeasurementEntry.deleteMetric"
     public static let bodyMeasurementDeleteAll = "bodyMeasurementEntry.deleteAll"
