@@ -260,27 +260,32 @@ struct TemplateEditorView: View {
             isPresented: Binding(
                 get: { viewModel.pendingSectionDeletion != nil },
                 set: { if !$0 { viewModel.pendingSectionDeletion = nil } }
-            )
-        ) {
-            if let section = viewModel.pendingSectionDeletion {
-                FCConfirmationDialog(
-                    title: String(format: String(localized: "section.delete.title"), section.name.value),
-                    message: String(
-                        format: String(localized: "section.delete.message"),
-                        viewModel.exercises(in: section).count
-                    ),
-                    cancelAction: .init(title: String(localized: "section.delete.cancel")) {
-                        viewModel.pendingSectionDeletion = nil
-                    },
-                    confirmAction: .init(
-                        title: String(localized: "templateEditor.deleteSection"),
-                        accessibilityIdentifier: FCAccessibilityID.templateEditorDeleteSectionMoveOut
-                    ) {
-                        Task { await viewModel.deleteSection(section, disposition: .moveExercisesTo(sectionID: nil)) }
-                    }
-                )
+            ),
+            dialog: sectionDeletionDialog
+        )
+    }
+
+    /// The closure passed to `fcConfirmationDialog` must return a dialog on
+    /// every path. The dialog is only presented while a section is pending.
+    private func sectionDeletionDialog() -> FCConfirmationDialog {
+        let section = viewModel.pendingSectionDeletion
+        return FCConfirmationDialog(
+            title: String(format: String(localized: "section.delete.title"), section?.name.value ?? ""),
+            message: String(
+                format: String(localized: "section.delete.message"),
+                section.map { viewModel.exercises(in: $0).count } ?? 0
+            ),
+            cancelAction: .init(title: String(localized: "section.delete.cancel")) {
+                viewModel.pendingSectionDeletion = nil
+            },
+            confirmAction: .init(
+                title: String(localized: "templateEditor.deleteSection"),
+                accessibilityIdentifier: FCAccessibilityID.templateEditorDeleteSectionMoveOut
+            ) {
+                guard let section else { return }
+                Task { await viewModel.deleteSection(section, disposition: .moveExercisesTo(sectionID: nil)) }
             }
-        }
+        )
     }
 
     private func exerciseRow(_ exercise: TemplateExercise) -> some View {
