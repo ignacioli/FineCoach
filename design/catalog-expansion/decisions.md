@@ -79,7 +79,7 @@
 - `ios/FineCoachApp/Core/Persistence/CoreDataExerciseRepository.swift:11`：先计数，100…150 条时直接返回，发生在加载 bundle JSON 之前；146 条的旧存储不会读取新增条目和改名，不比较 `metadataVersion` / `contentVersion`。该路径不是逐启动按 JSON 同步，也不只是绝对意义上的首次安装写入；条数不在区间时会重建。
 - 同文件 `:251` 固定范围 100…150；`:272` 对新 JSON 仍做同一条数限制。只扩充 JSON 会使新安装拒绝初始化；只放宽范围又会令 146 条旧存储继续提前返回。
 - 同文件 `:301` 的 `removeBuiltInCatalog` 删除内置条目及其名称 claim 和 preference（`:310–314`）。不能沿用此重建路径来满足单侧、辅助、收藏、隐藏、别名偏好保留要求。
-- `ios/FineCoachApp/Core/Persistence/ExerciseManagedObject+Mapping.swift:9` 写入已有 `metadataVersion`；`:209` 的 upsert 按 id 查找再 apply，没有版本比较、retired 同步或升级编排。`:235` 的统一名称 claim 已被其他 owner 占用时抛 `DomainError.conflict`；需覆盖新内置名与用户自定义名冲突，而不能自行更名、覆盖或吞错。
+- `ios/FineCoachApp/Core/Persistence/ExerciseManagedObject+Mapping.swift:9` 写入已有 `metadataVersion`；`:212` 的 upsert 按 id 查找再 apply，没有版本比较、retired 同步或升级编排。`:235` 的统一名称 claim 已被其他 owner 占用时抛 `DomainError.conflict`；需覆盖新内置名与用户自定义名冲突，而不能自行更名、覆盖或吞错。
 - `ios/FineCoachApp/Core/Application/ExerciseProvenanceValidator.swift:228` 从 bundle 解码 JSON；`:275` 的 facet cache 只把 JSON 分类映射给已有行，不插入存储行、不更新存储显示名，不构成升级机制。
 - `ios/FineCoachApp/Core/Persistence/SessionManagedObject+Mapping.swift:41` 独立持久化 `displayNameSnapshot`，`:123` 读取；后续升级方案必须完全不写 Session 及其 snapshot。
 
