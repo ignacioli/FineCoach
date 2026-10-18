@@ -6,7 +6,7 @@ final class CoreTrainingUITests: XCTestCase {
         continueAfterFailure = false
     }
 
-    func testStartTrainingRecordsModesCopyAndPendingExcludedFromStats() {
+    func testStartTrainingRecordsModesAndUnconfirmedInputDoesNotCount() {
         let app = launchIsolatedApp()
         skipOnboarding(in: app)
         addStudentLinQing(in: app)
@@ -16,24 +16,31 @@ final class CoreTrainingUITests: XCTestCase {
 
         addExercise(in: app, name: "杠铃深蹲", modeIdentifier: "activeSession.mode.weightReps")
         tapVisible(in: app, identifier: "activeSession.exercise.at.0")
+        XCTAssertFalse(
+            element(in: app, identifier: "activeSession.splitSides").exists,
+            "ordinary exercises must not show unilateral side controls (P0-D8)"
+        )
         addConfirmedWeightRepsSet(in: app, weight: "0", reps: "5")
         XCTAssertTrue(element(in: app, identifier: "activeSession.set.at.0").waitForExistence(timeout: 8))
         XCTAssertTrue(element(in: app, identifier: "activeSession.setState.completed").waitForExistence(timeout: 8))
 
-        tapControl(in: app, identifier: "activeSession.copyPrevious", label: "复制上一组")
-        XCTAssertTrue(element(in: app, identifier: "activeSession.set.at.1").waitForExistence(timeout: 8))
-        XCTAssertTrue(element(in: app, identifier: "activeSession.setState.pending").waitForExistence(timeout: 8))
-
         let stats = element(in: app, identifier: "activeSession.stats")
         XCTAssertTrue(stats.waitForExistence(timeout: 8))
-        let statsText = resolvedText(of: stats)
-        XCTAssertTrue(
-            statsText.contains("1"),
-            "pending copy must not count as completed; stats=\(statsText)"
+        XCTAssertTrue(element(in: app, identifier: "activeSession.rest").waitForExistence(timeout: 8))
+        let statsBeforeUnconfirmedInput = resolvedText(of: stats)
+        typeInto(in: app, identifier: "activeSession.weight", text: "40")
+        typeInto(in: app, identifier: "activeSession.reps", text: "6")
+        XCTAssertTrue(app.keyboards.firstMatch.exists)
+        XCTAssertTrue(element(in: app, identifier: "activeSession.rest").waitForNonExistence(timeout: 3))
+        XCTAssertTrue(app.buttons["activeSession.finish"].isHittable, "B-D9 keeps finish available with the keyboard")
+        XCTAssertEqual(
+            resolvedText(of: stats),
+            statsBeforeUnconfirmedInput,
+            "unconfirmed input must not change completed stats (P0-D11)"
         )
         XCTAssertFalse(
-            statsText.contains("2"),
-            "pending copy must not raise completed count to 2; stats=\(statsText)"
+            element(in: app, identifier: "activeSession.setState.draft").exists,
+            "unconfirmed input is not a persisted draft row"
         )
         XCTAssertEqual(
             app.descendants(matching: .any).matching(identifier: "activeSession.setState.completed").count,
@@ -42,29 +49,27 @@ final class CoreTrainingUITests: XCTestCase {
 
         addExercise(in: app, name: "引体向上", modeIdentifier: "activeSession.mode.reps")
         tapVisible(in: app, identifier: "activeSession.exercise.at.1")
-        tapControl(in: app, identifier: "activeSession.addSet", label: "添加组")
         typeInto(in: app, identifier: "activeSession.reps", text: "8")
         tapControl(in: app, identifier: "activeSession.confirmSet", label: "确认")
         XCTAssertTrue(element(in: app, identifier: "activeSession.setState.completed").waitForExistence(timeout: 8))
 
         addExercise(in: app, name: "平板支撑", modeIdentifier: "activeSession.mode.duration")
         tapExerciseNamed(in: app, "平板支撑", fallbackIdentifier: "activeSession.exercise.at.2")
-        tapControl(in: app, identifier: "activeSession.addSet", label: "添加组")
         typeInto(in: app, identifier: "activeSession.duration", text: "30")
         tapControl(in: app, identifier: "activeSession.confirmSet", label: "确认")
 
-        tapVisible(in: app, identifier: "activeSession.exercise.at.0")
-        tapControl(in: app, identifier: "activeSession.addSet", label: "添加组")
-        typeInto(in: app, identifier: "activeSession.weight", text: "0")
-        typeInto(in: app, identifier: "activeSession.reps", text: "5")
-        tapVisible(in: app, identifier: "activeSession.sideBilateral")
+        addUnilateralExercise(in: app, name: "单侧测试动作")
+        tapExerciseNamed(in: app, "单侧测试动作", fallbackIdentifier: "activeSession.exercise.at.3")
+        XCTAssertTrue(element(in: app, identifier: "activeSession.splitSides").waitForExistence(timeout: 8))
+        tapControl(in: app, identifier: "activeSession.splitSides", label: nil)
         typeInto(in: app, identifier: "activeSession.left", text: "20")
         typeInto(in: app, identifier: "activeSession.right", text: "22")
+        typeInto(in: app, identifier: "activeSession.reps", text: "8")
         tapControl(in: app, identifier: "activeSession.confirmSet", label: "确认")
         XCTAssertTrue(element(in: app, identifier: "activeSession.setState.completed").waitForExistence(timeout: 8))
     }
 
-    func testContinueTrainingReorderDeleteAndUndo() {
+    func testContinueTrainingDeleteAndUndo() {
         let app = launchIsolatedApp()
         skipOnboarding(in: app)
         addStudentLinQing(in: app)
@@ -87,24 +92,19 @@ final class CoreTrainingUITests: XCTestCase {
 
         addExercise(in: app, name: "平板支撑", modeIdentifier: "activeSession.mode.duration")
         tapVisible(in: app, identifier: "activeSession.exercise.at.1")
-        tapControl(in: app, identifier: "activeSession.addSet", label: "添加组")
         typeInto(in: app, identifier: "activeSession.duration", text: "30")
         tapControl(in: app, identifier: "activeSession.confirmSet", label: "确认")
 
-        let firstBefore = element(in: app, identifier: "activeSession.exercise.at.0")
-        XCTAssertTrue(firstBefore.waitForExistence(timeout: 8))
-        let labelBefore = firstBefore.label
-        tapVisible(in: app, identifier: "activeSession.exercise.at.0")
-        tapVisible(in: app, identifier: "activeSession.moveDown")
-        var labelAfter = element(in: app, identifier: "activeSession.exercise.at.0").label
-        if labelAfter == labelBefore {
-            tapVisible(in: app, identifier: "activeSession.exercise.at.1")
-            tapVisible(in: app, identifier: "activeSession.moveUp")
-            labelAfter = element(in: app, identifier: "activeSession.exercise.at.0").label
-        }
-        XCTAssertNotEqual(labelAfter, labelBefore)
+        XCTAssertEqual(
+            exerciseNames(in: app),
+            ["杠铃深蹲", "平板支撑"],
+            "exercises remain in add order (P0-D9)"
+        )
 
         tapExerciseNamed(in: app, "杠铃深蹲", fallbackIdentifier: "activeSession.exercise.at.0")
+        let deleteRow = element(in: app, identifier: "activeSession.exercise.at.0")
+        XCTAssertTrue(deleteRow.waitForExistence(timeout: 8))
+        deleteRow.swipeLeft()
         tapControl(in: app, identifier: "activeSession.deleteExercise", label: nil)
         XCTAssertTrue(
             element(in: app, identifier: "activeSession.deleteExerciseConfirm").waitForExistence(timeout: 8),
@@ -115,19 +115,71 @@ final class CoreTrainingUITests: XCTestCase {
         assertExerciseListed(in: app, name: "平板支撑")
         XCTAssertFalse(app.staticTexts["杠铃深蹲"].exists)
 
+        let remainingStats = element(in: app, identifier: "activeSession.stats")
+        XCTAssertTrue(remainingStats.waitForExistence(timeout: 8))
+        let statsBeforeUndo = resolvedText(of: remainingStats)
         tapVisible(in: app, identifier: "activeSession.exercise.at.0")
-        if element(in: app, identifier: "activeSession.set.at.0").waitForExistence(timeout: 8) {
-            tapVisible(in: app, identifier: "activeSession.set.at.0")
-        }
-        tapControl(in: app, identifier: "activeSession.undoSet", label: "撤销")
+        typeInto(in: app, identifier: "activeSession.duration", text: "45")
+        tapControl(in: app, identifier: "activeSession.confirmSet", label: "确认")
+        let undoRow = element(in: app, identifier: "activeSession.set.at.1")
+        XCTAssertTrue(undoRow.waitForExistence(timeout: 8))
+        let statsAfterConfirm = resolvedText(of: remainingStats)
+        XCTAssertNotEqual(statsAfterConfirm, statsBeforeUndo)
+        tapUndo(row: undoRow)
         XCTAssertTrue(
-            element(in: app, identifier: "activeSession.setState.pending").waitForExistence(timeout: 8)
-                || element(in: app, identifier: "activeSession.setState.draft").waitForExistence(timeout: 2)
+            undoRow.waitForNonExistence(timeout: 8),
+            "undo removes the just-confirmed group (P0-D11)"
         )
-        XCTAssertFalse(element(in: app, identifier: "activeSession.setState.completed").exists)
+        XCTAssertEqual(
+            resolvedText(of: remainingStats),
+            statsBeforeUndo,
+            "undo removes the group from completed stats"
+        )
+        XCTAssertTrue(
+            resolvedText(of: element(in: app, identifier: "activeSession.duration")).contains("45"),
+            "undo returns the removed value to the input form"
+        )
+
+        let completedRow = element(in: app, identifier: "activeSession.set.at.0")
+        completedRow.swipeLeft()
+        tapVisible(in: app, identifier: "activeSession.set.delete.at.0")
+        let deletionUndo = app.buttons["activeSession.set.undo.at.0"]
+        XCTAssertTrue(deletionUndo.waitForExistence(timeout: 3), "B2 deletion must expose FCUndoRow")
+        deletionUndo.tap()
+        XCTAssertTrue(completedRow.waitForExistence(timeout: 8))
+        XCTAssertEqual(resolvedText(of: remainingStats), statsBeforeUndo, "undo restores the completed group")
+
+        app.revealLowerContent()
+        tapControl(in: app, identifier: "activeSession.createSection", label: nil)
+        typeInto(in: app, identifier: "activeSession.sectionName", text: "B1分区")
+        tapControl(in: app, identifier: "activeSession.createSection.submit", label: nil)
+
+        tapExerciseNamed(in: app, "平板支撑", fallbackIdentifier: "activeSession.exercise.at.0")
+        let moveRow = element(in: app, identifier: "activeSession.exercise.at.0")
+        XCTAssertTrue(moveRow.waitForExistence(timeout: 8))
+        moveRow.swipeLeft()
+        tapControl(in: app, identifier: "activeSession.moveToSection", label: nil)
+        let sectionChoice = app.buttons["B1分区"]
+        XCTAssertTrue(sectionChoice.waitForExistence(timeout: 8))
+        sectionChoice.tap()
+        XCTAssertTrue(
+            app.staticTexts["B1分区"].waitForExistence(timeout: 8),
+            "moved exercise must render under the created section (P0-D13)"
+        )
+
+        let sectionMenu = app.buttons["更多操作"]
+        XCTAssertTrue(sectionMenu.waitForExistence(timeout: 8))
+        sectionMenu.tap()
+        let deleteSection = app.buttons["删除分区"]
+        XCTAssertTrue(deleteSection.waitForExistence(timeout: 8))
+        deleteSection.tap()
+        tapVisible(in: app, identifier: "activeSession.deleteSection.moveOut")
+        XCTAssertTrue(app.staticTexts["B1分区"].waitForNonExistence(timeout: 8))
+        assertExerciseListed(in: app, name: "平板支撑")
+        XCTAssertTrue(completedRow.exists, "deleting a section must keep its exercise and completed group")
     }
 
-    func testEmptySessionAbandonAndDraftFinishGate() {
+    func testEmptySessionAbandonAndUnconfirmedInputDoesNotBlockFinish() {
         let app = launchIsolatedApp()
         skipOnboarding(in: app)
         addStudentLinQing(in: app)
@@ -158,43 +210,18 @@ final class CoreTrainingUITests: XCTestCase {
         addConfirmedWeightRepsSet(in: app, weight: "0", reps: "5")
         XCTAssertTrue(element(in: app, identifier: "activeSession.setState.completed").waitForExistence(timeout: 8))
 
-        tapControl(in: app, identifier: "activeSession.addSet", label: "添加组")
+        let stats = element(in: app, identifier: "activeSession.stats")
+        XCTAssertTrue(stats.waitForExistence(timeout: 8))
+        let statsBeforeUnconfirmedInput = resolvedText(of: stats)
         typeInto(in: app, identifier: "activeSession.weight", text: "40")
-        XCTAssertTrue(
-            element(in: app, identifier: "activeSession.setState.draft").waitForExistence(timeout: 8)
-                || element(in: app, identifier: "activeSession.weight").exists
-        )
+        XCTAssertFalse(element(in: app, identifier: "activeSession.setState.draft").exists)
+        XCTAssertTrue(element(in: app, identifier: "activeSession.weight").exists)
+        XCTAssertEqual(resolvedText(of: stats), statsBeforeUnconfirmedInput)
 
         tapControl(in: app, identifier: "activeSession.finish", label: "结束训练")
-        let discard = element(in: app, identifier: "activeSession.discardDrafts")
-        let returnToDrafts = element(in: app, identifier: "activeSession.returnToDrafts")
         XCTAssertTrue(
-            discard.waitForExistence(timeout: 8) || returnToDrafts.waitForExistence(timeout: 2),
-            "unfinished drafts must block finish until discard or return"
-        )
-        XCTAssertFalse(element(in: app, identifier: "activeSession.completedStatus").exists)
-
-        if !discard.exists, returnToDrafts.exists {
-            tapControl(in: app, identifier: "activeSession.returnToDrafts", label: "返回处理")
-            XCTAssertTrue(element(in: app, identifier: "activeSession.root").waitForExistence(timeout: 8))
-            tapControl(in: app, identifier: "activeSession.finish", label: "结束训练")
-        }
-        XCTAssertTrue(element(in: app, identifier: "activeSession.discardDrafts").waitForExistence(timeout: 8))
-        XCTAssertFalse(element(in: app, identifier: "activeSession.completedStatus").exists)
-        tapControl(in: app, identifier: "activeSession.discardDrafts", label: "丢弃未完成")
-
-        if element(in: app, identifier: "activeSession.root").waitForExistence(timeout: 2),
-            element(in: app, identifier: "activeSession.finish").exists
-        {
-            tapControl(in: app, identifier: "activeSession.finish", label: "结束训练")
-        }
-
-        XCTAssertTrue(
-            element(in: app, identifier: "sessionSummary.root").waitForExistence(timeout: 8)
-                || element(in: app, identifier: "activeSession.completedStatus").waitForExistence(timeout: 2)
-                || app.buttons["studentDetail.startTraining"].waitForExistence(timeout: 2)
-                || element(in: app, identifier: "studentDetail.root").waitForExistence(timeout: 2),
-            "discard-and-finish must land on US5 session summary or another completed-session surface"
+            element(in: app, identifier: "sessionSummary.root").waitForExistence(timeout: 8),
+            "unconfirmed input must not create a draft gate; finish reaches the summary"
         )
         XCTAssertFalse(element(in: app, identifier: "studentList.inProgress").exists)
         XCTAssertFalse(element(in: app, identifier: "studentDetail.continueTraining").exists)
@@ -232,11 +259,19 @@ final class CoreTrainingUITests: XCTestCase {
 
     private func waitForStudentList(in app: XCUIApplication) {
         let addByID = app.buttons["studentList.add"]
+        let emptyAddByID = app.buttons["studentList.emptyAdd"]
         let addByLabel = app.buttons["添加学员"]
         let empty = app.staticTexts["还没有学员"]
         let nav = app.navigationBars["学员"]
+        if !addByID.exists, !emptyAddByID.exists, !addByLabel.exists, !empty.exists {
+            let studentsTab = app.buttons["学员"]
+            if studentsTab.waitForExistence(timeout: 2) {
+                studentsTab.tap()
+            }
+        }
         XCTAssertTrue(
-            addByID.waitForExistence(timeout: 8)
+            emptyAddByID.waitForExistence(timeout: 2)
+                || addByID.waitForExistence(timeout: 8)
                 || addByLabel.waitForExistence(timeout: 2)
                 || empty.waitForExistence(timeout: 2)
                 || nav.waitForExistence(timeout: 2)
@@ -285,8 +320,14 @@ final class CoreTrainingUITests: XCTestCase {
     }
 
     private func addStudentLinQing(in app: XCUIApplication) {
-        XCTAssertTrue(app.buttons["studentList.add"].waitForExistence(timeout: 8))
-        app.buttons["studentList.add"].tap()
+        let emptyAdd = app.buttons["studentList.emptyAdd"]
+        let add = app.buttons["studentList.add"]
+        if emptyAdd.waitForExistence(timeout: 2) {
+            emptyAdd.tap()
+        } else {
+            XCTAssertTrue(add.waitForExistence(timeout: 8))
+            add.tap()
+        }
         XCTAssertTrue(element(in: app, identifier: "studentEditor.root").waitForExistence(timeout: 8))
         fillEditor(in: app, name: "林青", sexIdentifier: "studentEditor.sex.female")
         dismissKeyboard(in: app)
@@ -338,8 +379,8 @@ final class CoreTrainingUITests: XCTestCase {
                 waitForStudentList(in: app)
                 return
             }
-            let back = app.navigationBars.buttons.element(boundBy: 0)
-            if back.exists {
+            let back = app.buttons["返回"]
+            if back.waitForExistence(timeout: 2) {
                 back.tap()
             } else {
                 break
@@ -383,6 +424,19 @@ final class CoreTrainingUITests: XCTestCase {
         assertExerciseListed(in: app, name: name)
     }
 
+    private func addUnilateralExercise(in app: XCUIApplication, name: String) {
+        tapControl(in: app, identifier: "activeSession.addExercise", label: "添加动作")
+        typeInto(in: app, identifier: "activeSession.exerciseName", text: name)
+        tapVisible(in: app, identifier: "activeSession.mode.weightReps")
+        let unilateralRow = element(in: app, identifier: "activeSession.newExercise.unilateral")
+        XCTAssertTrue(unilateralRow.waitForExistence(timeout: 8))
+        let unilateralToggle = app.switches.firstMatch
+        XCTAssertTrue(unilateralToggle.waitForExistence(timeout: 8))
+        unilateralToggle.tap()
+        tapControl(in: app, identifier: "activeSession.saveExercise", label: "保存动作")
+        assertExerciseListed(in: app, name: name)
+    }
+
     private func assertExerciseListed(in app: XCUIApplication, name: String) {
         app.revealLowerContent()
         let byText = app.staticTexts[name]
@@ -395,11 +449,29 @@ final class CoreTrainingUITests: XCTestCase {
         )
     }
 
+    private func exerciseNames(in app: XCUIApplication) -> [String] {
+        XCTAssertFalse(
+            element(in: app, identifier: "activeSession.exercise.at.2").exists, "expected exactly two exercises")
+        // Use the same exact identifier matcher as tapVisible for each
+        // expected index, preserving both the name and order assertions.
+        return (0..<2).map { index in
+            let header = element(in: app, identifier: "activeSession.exercise.at.\(index)")
+            XCTAssertTrue(header.waitForExistence(timeout: 8), "missing exercise at index \(index)")
+            return String(header.label.split(separator: "，", maxSplits: 1, omittingEmptySubsequences: true).first ?? "")
+        }
+    }
+
     private func addConfirmedWeightRepsSet(in app: XCUIApplication, weight: String, reps: String) {
-        tapControl(in: app, identifier: "activeSession.addSet", label: "添加组")
         typeInto(in: app, identifier: "activeSession.weight", text: weight)
         typeInto(in: app, identifier: "activeSession.reps", text: reps)
         tapControl(in: app, identifier: "activeSession.confirmSet", label: "确认")
+    }
+
+    private func tapUndo(row: XCUIElement) {
+        XCTAssertTrue(row.waitForExistence(timeout: 8))
+        let undoButton = row.buttons["撤销"]
+        XCTAssertTrue(undoButton.waitForExistence(timeout: 3), "the row undo must be a visible control")
+        undoButton.tap()
     }
 
     private func tapExerciseNamed(in app: XCUIApplication, _ name: String, fallbackIdentifier: String) {
@@ -445,6 +517,9 @@ final class CoreTrainingUITests: XCTestCase {
             app.revealLowerContent()
         }
         target.tap()
+        // P0-D1/D2 auto-fill the previous values. Backspace the complete
+        // field before typing so this helper never appends to the prefill.
+        target.typeText(String(repeating: "\u{8}", count: 32))
         target.typeText(text)
     }
 

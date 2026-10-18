@@ -1,6 +1,6 @@
 # B1 交互收敛执行记录
 
-当前结果：**BLOCKED（第 5 项）**。第 1–4 项已分别提交，定向测试与全仓 lint 通过；全量 App build、Unit、Integration 和最终 lint 通过。第 5 项存在训练输入后控件重叠的待核实问题，按产品负责人后续指令停止，UI 测试修改保留未提交；本轮没有完成 B1 验收。
+当前结果：**BLOCKED（第 5 项；最新续作见文末「Δ12 + B1 第 5 项」）**。B-D9 / Δ12 已在 `237078d` 实现，非 UI 闸门全部通过；CoreTrainingUITests 两轮均在同一用例的动作顺序查询失败，原因未明，按阈值停止，没有整类 PASS。UI 测试对齐改动随本轮记录单独提交；原 B1 worktree 草稿保持未提交且未改动。下列原 B1 轮验证和重叠证据保留为历史，本轮没有完成 B1 验收。
 
 ## 执行记录（components.md §1.5）
 
@@ -8,7 +8,7 @@
 影响范围：扩展 `DS-CONFIRM-DIALOG` 的可选 Action identifier、`DS-CHIP` 的可选 identifier 传递（默认消费者不变）、`DS-PAGE-SECONDARY` 的统一顶部遮盖；复用已有确认卡片用于 5 个两选项确认；M01–M34 消费者见入口清单；同步了 `components.md` §4.1 / §4.4 / §4.6 与 P0 implementation map Δ7。  
 设计决定：沿用既定组件和 P0-D8～D14；5 处确认保持文案、message 和业务回调；3 处多选系统分区 dialogs 保留，白名单注明“待产品负责人决定，见 audit.md §3.4”；顶部遮盖仅用 `FCSemanticColors.surfacePage`。无新产品决定，未改 Penpot；顶部颜色与原页面底色一致，本轮任务明确无需改画稿。  
 实施与验证：新增/更新组件合同和静态扫描不变量（Action identifier、chip 的最终 Button 传递、3 处系统确认白名单、统一顶部遮盖及无 Feature 副本）；第 1–4 项分别通过 16 / 19 / 23 / 20 项定向测试及 lint。入口与布局清单如下；底部 inset、Onboarding、ArchiveExportFlow 的顶部冲突仅静态检查。L3 留给下列 5 个确认卡片、34 个二级页面遮盖及键盘重叠疑点；未做人工视觉验证。  
-结果：第 1–4 项 PASS（`cdcb1ed`、`9a56ecb`、`97b44ef`、`842a840`）；第 5 项 BLOCKED，未提交。全量 build PASS，FineCoachTests 485 项（1 项既有 skip，0 失败），FineCoachIntegrationTests 163 项（0 失败），最终 lint PASS；证据与历史 FAIL 见文末。不能将测试强制收键盘后的局部通过视为 App 问题已解决或 UI 整类通过。  
+结果（原 B1 轮历史）：第 1–4 项 PASS（`cdcb1ed`、`9a56ecb`、`97b44ef`、`842a840`）；第 5 项当时 BLOCKED，未提交。全量 build PASS，FineCoachTests 485 项（1 项既有 skip，0 失败），FineCoachIntegrationTests 163 项（0 失败），最终 lint PASS；证据与历史 FAIL 见下文。不能将测试强制收键盘后的局部通过视为 App 问题已解决或 UI 整类通过。
 
 ## 分项结果
 
@@ -19,7 +19,7 @@
 | 2. 共享确认 | 指定 5 处两选项确认改用共享卡片；2 个既有 identifier 保留；3 处系统确认精确白名单扫描 | PASS；`9a56ecb` |
 | 3. M01–M34 | 补齐消费者标识；M28 按生命周期区分，M34 三个内容选择各自独立；chip 参数传到最终 Button | PASS；`97b44ef` |
 | 4. 状态栏遮盖 | 顶部零高度 inset 下沉到 `fcSecondaryPage()`；删除训练页副本；更新组件规格与 Δ7 | PASS；`842a840` |
-| 5. CoreTrainingUITests | 6 个旧 identifier、内联返回、左滑删除等更新仍为未提交草稿；第三轮观察到键盘/确认/休息条重叠，App 原因待核实；按负责人指令停止，没有整类 PASS | **BLOCKED；未提交** |
+| 5. CoreTrainingUITests | 本轮应用原草稿并对齐 B2 撤销行、分区菜单和共享确认；Δ12 已实现。两轮同例失败（动作顺序查询 / 第 0 个动作缺失），原因未明，按阈值停止。原 B1 草稿未改 | **BLOCKED；本轮 UI 对齐与记录单独提交，见文末** |
 
 ## 入口与布局清单（components.md §1.4）
 
@@ -125,7 +125,7 @@
 
 - 5 个确认弹窗由系统底部面板变为共享居中卡片：AppointmentEditor 冲突覆盖、CoursePackageEditor 结束旧包，以及 BodyMeasurementEntry 删除指标 / 删除单条 / 清空全部。需人工看实际组合，未作视觉验收。
 - 34 个 `fcSecondaryPage()` 调用点的状态栏区域与滚动遮盖。训练页以外的页面本轮均没有真机查看；本轮自动测试也不能证明所有页面视觉正确。
-- 上述“待核实”中的键盘、确认按钮与休息条重叠，以及它是否影响实际点击和完成训练。第 5 项因此保持 BLOCKED，UI 文件未提交，等待核实后再决定后续工作。
+- 上述“待核实”中的键盘、确认按钮与休息条重叠，以及它是否影响实际点击和完成训练。原 B1 轮因此保持 BLOCKED，UI 文件当时未提交。后续 B-D9 已授权 Δ12；最新实施和本轮 UI BLOCKED 原因见文末，不能由自动测试推定该视觉疑点已获人工验证。
 
 # B2 交互改动执行记录
 
@@ -189,3 +189,43 @@
 | 全仓严格 lint | PASS；日志为空 | `DerivedData/B2/evidence/b2-final-lint-2.log` |
 
 收尾前的失败已修掉，不计入最终结果：第一次 build / 两套测试停在 Δ1 确认闭包不返回对话框（`TemplateEditorView`，随后是 `ActiveSessionView`）；补上之后单元测试只失败 `TrainingEntryScanTests.testBodyHistoryKeepsUndoVisibleAndUsesDestructiveSwipes`（测量左滑缺少 tint，注释仍写出已删除的确认字段名）。
+
+# Δ12 + B1 第 5 项
+
+当前结果：**Δ12 PASS；B1 第 5 项 BLOCKED**。Δ12 提交 `237078d`；B1 UI 对齐与本记录为后续单独提交（本提交）。独立 worktree 为 `.worktrees/d12-rest-bar-keyboard`，分支 `fix/d12-rest-bar-keyboard`，起点为本地 `main` 的 `dd54eef`。开始时 primary 与新 worktree 的 tracked modification、untracked file、staged content 均为空；bootstrap 和 worktree gate PASS。B1 worktree 仅导出该 UI 测试文件的 diff，原草稿保持原样（导出 patch 与原 worktree 当前 diff 的 SHA-256 一致）。
+
+## 执行记录（components.md §1.5）
+
+分类与依据：B（实现已批准的交互修订），B1 测试为 D（跟上既定交互）；依据是 B-D9 / Δ12、P0-D5 / P0-D11、B1 / B2 执行记录。B-D9 明确本项不出画稿，休息条 anatomy、外观和已有动效不变。
+影响范围：扩展 feature 专有 `DS-REST-TIMER` 的键盘显示条件；复用 `DS-BUTTON`、`DS-UNDO-ROW`、`DS-MORE-MENU`、`DS-CONFIRM-DIALOG`。仅 ActiveSession、静态扫描、CoreTrainingUITests 及两个 implementation map；共享组件接口、Core Data、project.pbxproj 未改。
+设计决定：沿用 B-D9，键盘弹起时隐藏休息条，收起后只恢复收起时尚未结束的 timer；删除原来不区分键盘的显示条件，保留「结束训练」、计时、P0-D5 通知、跳过及加减时长。用户在本轮另行明确授权现有 `-FineCoachResetStore` 仅用于指定 iPhone 17 模拟器的 `FineCoachUITesting` 测试目录；不用于真机或正式数据目录。
+实施与验证：页面本地状态接收系统 keyboard show/hide 通知；收起时保存时间快照，避免已结束的休息条重现，同时保留正常显示时的结束提示与 3 秒收起。显示与隐藏继续使用 `restBarTransition`，Reduce Motion 为 opacity。`TrainingEntryScanTests` 增加显示条件、时间快照、finish 分支及通知 handler 不清 timer 的静态断言；原计时和通知测试随全量回归运行。UI 草稿通过三路 patch 应用，补 B2 已完成组左滑后的 `FCUndoRow`、分区「…」菜单与共享确认，并断言键盘出现后休息条隐藏而结束训练可用。入口与布局清单如下；L3 待人工看。
+结果：Δ12 PASS，提交 `237078d`；本轮 App build、FineCoachTests 493 项（1 项既有 skip，0 失败）、FineCoachIntegrationTests 167 项（0 失败）、全仓 strict lint PASS。B1 第 5 项 BLOCKED，UI 对齐与记录为本提交；同一用例两次断言失败、0 个通过，均未完成整类。第二轮另一个用例取消（result summary 为 total 2 / failed 2 / passed 0 / skipped 0，包含 canceled）。`testContinueTrainingDeleteAndUndo` 第二次仍找不到第 0 个动作，原因未明，按同例两次不明失败阈值停止，不做第 3 轮；未完成或取消的用例不能计为 PASS。未做人工视觉验证。
+
+## 入口与布局清单（components.md §1.4）
+
+无新入口。训练中 → 已有底部休息条 → `activeSession.rest` → 键盘通知只改页面显示状态、不改数据 → `ActiveSessionView.swift:129` 的 bottom `safeAreaInset` / `VStack` 撑满内容列，`!isKeyboardVisible`、非空 timer 及 `!restTimer.isFinished(at: keyboardDismissedAt)` 共同控制显示；同列「结束训练」保持在该条件之外。B1 / B2 入口清单仍适用。
+
+## L3 待人工看
+
+键盘弹起和收起时休息条的消失与出现，以及 Reduce Motion 下的淡入淡出。**未做人工视觉验证**；本轮不做截图比较修改循环，没有真机验收。
+
+## 验证结果
+
+本机证据统一保存于本 worktree 的 `DerivedData/D12/evidence/`（Git ignored）。App build 为 Debug iphoneos、`CODE_SIGNING_ALLOWED=NO`；运行测试使用指定 iPhone 17 模拟器。没有使用 `BC454E2A-9374-43ED-AB81-4523C3D6167A`。
+
+| 检查 | 最终结果 | 证据（相对 evidence 目录） |
+|---|---|---|
+| App Debug build | PASS | `d12-app-debug-final.log` |
+| FineCoachTests 全量 | PASS：493 项，1 项既有 skip，0 失败；skip 为 `ContrastHarnessTests.testTextDisabledOnSurfacePageIsWCAGExempt` | `d12-unit-final-2.log` / 同名 `.xcresult` |
+| FineCoachIntegrationTests 全量 | PASS：167 项，0 失败 | `d12-integration-final-2.log` / 同名 `.xcresult` |
+| 全仓 strict lint | PASS，AGENTS.md 五目录命令，最终 UI 修改后再跑仍通过，日志为空 | `d12-lint-final-2.log`、`d12-lint-closeout.log` |
+| CoreTrainingUITests | BLOCKED：两轮同例失败，未完成整类；无整类 PASS | `d12-ui-final-1.log`、`d12-ui-final-2.log`；中止结果包可用性见下文 |
+
+失败历史保留：补齐已过期 timer 不重现的边界后，第一次最终 Unit 编译 FAIL（`d12-unit-final.log` / `.xcresult`，exit 65）：静态测试误用不存在的 `XCTAssertLess`。修正为 `XCTAssertLessThan` 后以上最终 Unit PASS。较早的 `d12-unit.log`（493 / 1 skip / 0 失败）和 `d12-integration.log`（167 / 0 失败）只代表该边界修复前版本。另做的 Release build 与生产 hook exclusion PASS，见 `d12-app-release-final.log`、`d12-production-hook-exclusion-release-final.log`；这些不是人工视觉或真机证据。
+
+UI 第 1 轮：FAIL 后中止，未整类完成。`testContinueTrainingDeleteAndUndo` 约 90.6 秒，在动作顺序断言得到 `[]`，期望为 `["杠铃深蹲", "平板支撑"]`（`d12-ui-final-1.log`）；当轮下一用例只开始 setup，没有完成结果。Ctrl-C 后外层 PTY exit 130。此前 exact identifier taps 能找到动作，而单属性 prefix predicate 返回空；下一轮改用 XCTest 的 exact identifier matcher 读取第 0、1 个动作并断言第 2 个不存在，保留顺序和数量要求。分区动态控件使用源码和本地化中既定的可见 Button 名称查询，没有坐标点击、强制滚动/收键盘绕过重叠或放宽断言。第 1 轮 `.xcresult` 缺 Info.plist，不可读，不能把目录存在写成可用结果包；原日志保留。
+
+UI 第 2 轮：FAIL 后按阈值停止，`TEST INTERRUPTED`，总计约 148.896 秒（`d12-ui-final-2.log` / 可读 `.xcresult`）。同一用例在 exact 查询 `activeSession.exercise.at.0` 的存在断言失败；`testEmptySessionAbandonAndUnconfirmedInputDoesNotBlockFinish` 为 canceled。因此“只是 prefix helper”的推断未获证实，不能将其写成根因或已修复。导出的 `ui-final-2-all-attachments/` 中 8 个对应 hierarchy 附件只有 query chain、没有匹配元素；日志还有 `Invalid frame dimension (negative or non-finite)` warning，两者都不足以解释根因。没有走到本轮新增的 B2 组删除撤销与分区菜单步骤；也没有证实 Δ12 修复后原确认按钮问题已通过运行回归。需后续授权调查 accessibility / List 布局等原因；本轮不自行扩大到其他 App 布局修订。
+
+两轮均只选择 `FineCoachUITests/CoreTrainingUITests`，每轮上限 900 秒、无自动重试；每轮前用 `simctl shutdown / boot / bootstatus` 重启 `EFE2D5A0-4877-4682-BE79-7460C0C1E8C8`（iPhone 17 / iOS 26.5）。停止后确认本轮 xcodebuild、UI runner、XCTRunner 均无残留。没有第 3 轮。
