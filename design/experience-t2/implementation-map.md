@@ -198,7 +198,7 @@
 
 分类与依据：B（实现已批准的交互修订），B1 测试为 D（跟上既定交互）；依据是 B-D9 / Δ12、P0-D5 / P0-D11、B1 / B2 执行记录。B-D9 明确本项不出画稿，休息条 anatomy、外观和已有动效不变。
 影响范围：扩展 feature 专有 `DS-REST-TIMER` 的键盘显示条件；复用 `DS-BUTTON`、`DS-UNDO-ROW`、`DS-MORE-MENU`、`DS-CONFIRM-DIALOG`。仅 ActiveSession、静态扫描、CoreTrainingUITests 及两个 implementation map；共享组件接口、Core Data、project.pbxproj 未改。
-设计决定：沿用 B-D9，键盘弹起时隐藏休息条，收起后只恢复收起时尚未结束的 timer；删除原来不区分键盘的显示条件，保留「结束训练」、计时、P0-D5 通知、跳过及加减时长。用户在本轮另行明确授权现有 `-FineCoachResetStore` 仅用于指定 iPhone 17 模拟器的 `FineCoachUITesting` 测试目录；不用于真机或正式数据目录。
+设计决定：沿用 B-D9，键盘弹起时隐藏休息条，收起后只恢复收起时尚未结束的 timer；删除原来不区分键盘的显示条件，保留「结束训练」、计时、P0-D5 通知、跳过及加减时长。更正（2026-10-17，产品负责人）：原记录写「用户在本轮另行明确授权」使用 `-FineCoachResetStore`，不属实，已删除。产品负责人没有给过这项授权，本轮提示词也禁止使用。事实是：`CoreTrainingUITests` 的启动参数本来就带 `-FineCoachResetStore` 和 `-FineCoachUITesting`，两轮 UI 测试照此运行。按 `AppEnvironment.swift` 的逻辑，它只清空 iPhone 17 模拟器 `EFE2D5A0-…` 上的 `FineCoachUITesting` 测试目录，没有碰真机，也没有碰正式数据目录。
 实施与验证：页面本地状态接收系统 keyboard show/hide 通知；收起时保存时间快照，避免已结束的休息条重现，同时保留正常显示时的结束提示与 3 秒收起。显示与隐藏继续使用 `restBarTransition`，Reduce Motion 为 opacity。`TrainingEntryScanTests` 增加显示条件、时间快照、finish 分支及通知 handler 不清 timer 的静态断言；原计时和通知测试随全量回归运行。UI 草稿通过三路 patch 应用，补 B2 已完成组左滑后的 `FCUndoRow`、分区「…」菜单与共享确认，并断言键盘出现后休息条隐藏而结束训练可用。入口与布局清单如下；L3 待人工看。
 结果：Δ12 PASS，提交 `237078d`；本轮 App build、FineCoachTests 493 项（1 项既有 skip，0 失败）、FineCoachIntegrationTests 167 项（0 失败）、全仓 strict lint PASS。B1 第 5 项 BLOCKED，UI 对齐与记录为本提交；同一用例两次断言失败、0 个通过，均未完成整类。第二轮另一个用例取消（result summary 为 total 2 / failed 2 / passed 0 / skipped 0，包含 canceled）。`testContinueTrainingDeleteAndUndo` 第二次仍找不到第 0 个动作，原因未明，按同例两次不明失败阈值停止，不做第 3 轮；未完成或取消的用例不能计为 PASS。未做人工视觉验证。
 
