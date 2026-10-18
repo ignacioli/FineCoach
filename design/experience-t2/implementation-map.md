@@ -255,8 +255,8 @@ UI 第 2 轮：FAIL 后按阈值停止，`TEST INTERRUPTED`，总计约 148.896 
 | key（或 Swift 文件:行） | 原文 | 新文 | 规则（您 / 请 / 操作失败 / 语气词 / 你） | 备注 |
 |---|---|---|---|---|
 | student.error.generic | 操作失败，请重试。 | 没有完成，再试一次。 | 请 / 操作失败 | 保留事实和边界，仅调整称呼与语气 |
-| student.editor.nameRequired | 请填写显示名称 | 填写显示名称 | 请 | 保留事实和边界，仅调整称呼与语气 |
-| student.editor.sexRequired | 请选择性别 | 选择性别 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| student.editor.nameRequired | 请填写显示名称 | 还没填写显示名称 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| student.editor.sexRequired | 请选择性别 | 还没选择性别 | 请 | 保留事实和边界，仅调整称呼与语气 |
 | student.editor.contactHint | 电话与微信由教练手输。不读取系统通讯录，不请求联系人权限。 | 电话与微信由教练手输。不读取系统通讯录，不询问联系人权限。 | 请 | 保留事实和边界，仅调整称呼与语气 |
 | student.list.emptyBody | 开始记录第一堂课吧 | 开始记录第一堂课 | 语气词 | 保留事实和边界，仅调整称呼与语气 |
 | student.delete.boundary | 删除后无法从本页恢复。已分享的旧图片和你保存的备份不会被远程改写或删除。 | 删除后无法从本页恢复。已分享的旧图片和自行保存的备份不会被远程改写或删除。 | 你 | 保留事实和边界，仅调整称呼与语气 |
@@ -266,13 +266,13 @@ UI 第 2 轮：FAIL 后按阈值停止，`TEST INTERRUPTED`，总计约 148.896 
 | backup.password.hint | 口令不可恢复，也无法找回。请自行妥善保存，应用不会记住口令。 | 口令不可恢复，也无法找回。自行妥善保存，应用不会记住口令。 | 请 | 保留事实和边界，仅调整称呼与语气 |
 | backup.restore.needFile | 请先选择备份文件。 | 先选择备份文件。 | 请 | 保留事实和边界，仅调整称呼与语气 |
 | manualAdjustment.reasonPlaceholder | 请说明本次调整的原因 | 说明本次调整的原因 | 请 | 保留事实和边界，仅调整称呼与语气 |
-| manualAdjustment.reasonRequired | 请填写调整原因。 | 填写调整原因。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| manualAdjustment.reasonRequired | 请填写调整原因。 | 还没填写调整原因。 | 请 | 保留事实和边界，仅调整称呼与语气 |
 | manualAdjustment.wouldGoNegative | 扣减后余额将为负，请检查课时数。 | 扣减后余额将为负，检查课时数。 | 请 | 保留事实和边界，仅调整称呼与语气 |
 | archive.export.error.message | 档案尚未生成。请返回后重试。 | 档案尚未生成。返回后再试一次。 | 请 | 保留事实和边界，仅调整称呼与语气 |
 | archive.export.preview.freeTextNotice | 精练教练不会自动识别文字里的敏感内容，请逐条检查后再继续。 | 精练教练不会自动识别文字里的敏感内容，逐条检查后再继续。 | 请 | 保留事实和边界，仅调整称呼与语气 |
 | archive.export.warning.subtitle | 请确认以下事实后再设置密码 | 确认以下事实后再设置密码 | 请 | 保留事实和边界，仅调整称呼与语气 |
 | archive.export.fact.notABackup | 档案不是完整备份，不能用来恢复你的数据。 | 档案不是完整备份，不能用来恢复数据。 | 你 | 保留事实和边界，仅调整称呼与语气 |
-| archive.export.fact.studentDeletionDoesNotAffectYou | 学员删除不会影响你的原始数据、已保存的文件或其他副本。 | 学员删除不会影响教练的原始数据、已保存的文件或其他副本。 | 你 | 保留事实和边界，仅调整称呼与语气 |
+| archive.export.fact.studentDeletionDoesNotAffectYou | 学员删除不会影响你的原始数据、已保存的文件或其他副本。 | （不变） | 你 | 复审保留：同一组事实里有「你和精练教练都无法撤回」，改成「教练」会混用称呼 |
 | archive.export.fact.sharePasswordSeparately | 请通过其他方式把密码单独告诉学员，不要和档案一起发送。 | 通过其他方式把密码单独告诉学员，不要和档案一起发送。 | 请 | 保留事实和边界，仅调整称呼与语气 |
 | archive.export.password.rule | 密码不会被保存，也无法找回。请通过其他方式单独告诉学员。 | 密码不会被保存，也无法找回。通过其他方式单独告诉学员。 | 请 | 保留事实和边界，仅调整称呼与语气 |
 | archive.export.password.error.message | 请重新输入。档案尚未生成。 | 重新输入。档案尚未生成。 | 请 | 保留事实和边界，仅调整称呼与语气 |
@@ -282,12 +282,12 @@ UI 第 2 轮：FAIL 后按阈值停止，`TEST INTERRUPTED`，总计约 148.896 
 | archive.settings.saveFailed.message | 请稍后再试。 | 稍后再试一次。 | 请 | 保留事实和边界，仅调整称呼与语气 |
 | archive.settings.deleteFailed.message | 本机档案没有删除完成，请重试。 | 本机档案没有删除完成，再试一次。 | 请 | 保留事实和边界，仅调整称呼与语气 |
 | onboarding.sheet.title | 你的数据怎样保存 | 数据怎样保存 | 你 | 保留事实和边界，仅调整称呼与语气 |
-| onboarding.sheet.private.detail | 给学员发训练报告时，由你挑选包含哪些内容。性别、身体数据、伤病、电话、微信和你的私人备注永远不会进入报告。 | 给学员发训练报告时，由教练挑选包含哪些内容。性别、身体数据、伤病、电话、微信和教练的私人备注永远不会进入报告。 | 你 | 保留事实和边界，仅调整称呼与语气 |
+| onboarding.sheet.private.detail | 给学员发训练报告时，由你挑选包含哪些内容。性别、身体数据、伤病、电话、微信和你的私人备注永远不会进入报告。 | （不变） | 你 | 复审保留：同一张说明卡的标题是「只有你在使用」，改成「教练」会在同一页混用两种称呼 |
 | onboarding.sheet.permission.title | 现在不会请求权限 | 现在不会询问权限 | 请 | 保留事实和边界，仅调整称呼与语气 |
 | onboarding.sheet.permission.detail | 不会弹出通知、通讯录等系统权限。只有你为课程打开提醒时，才会询问通知权限。 | 不会弹出通知、通讯录等系统权限。只有为课程打开提醒时，才会询问通知权限。 | 你 | 保留事实和边界，仅调整称呼与语气 |
 | today.error.generic | 加载今日安排失败，请重试。 | 加载今日安排失败，再试一次。 | 请 | 保留事实和边界，仅调整称呼与语气 |
 | appointmentEditor.studentRequired | 请先选择学员。 | 先选择学员。 | 请 | 保留事实和边界，仅调整称呼与语气 |
-| appointmentEditor.durationInvalid | 请输入有效的预计时长。 | 输入有效的预计时长。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| appointmentEditor.durationInvalid | 请输入有效的预计时长。 | 预计时长无效。 | 请 | 保留事实和边界，仅调整称呼与语气 |
 | appointmentEditor.saveFailed | 保存失败，请重试。 | 保存失败，再试一次。 | 请 | 保留事实和边界，仅调整称呼与语气 |
 | coursePackages.error.generic | 课包信息暂不可用，请重试。 | 课包信息暂不可用，再试一次。 | 请 | 保留事实和边界，仅调整称呼与语气 |
 | coursePackageEditor.saveFailed | 保存失败，请重试。 | 保存失败，再试一次。 | 请 | 保留事实和边界，仅调整称呼与语气 |
@@ -300,8 +300,8 @@ UI 第 2 轮：FAIL 后按阈值停止，`TEST INTERRUPTED`，总计约 148.896 
 | archive.export.fact.irrevocableOnceReceived | 文件交出并被接收后，你和精练教练都无法撤回。 | 文件交出并被接收后，你和精练教练都无法撤回。 | 你 | 刻意保留：明确教练本人和 App 双方都不能撤回；省略主体会丢掉双方的边界。 |
 | onboarding.sheet.operator.title | 只有你在使用 | 只有你在使用 | 你 | 刻意保留：强调当前教练本人是唯一操作者；去掉后缺少主体，改成泛指教练会弱化唯一性。 |
 
-| ios/FineCoachApp/Core/Domain/DomainError.swift:26 | 请输入内容。 | 输入内容。 | 请 | 保留必填提示。 |
-| ios/FineCoachApp/Core/Domain/DomainError.swift:30 | 请输入有效数字。 | 输入有效数字。 | 请 | invalidDecimal / invalidNumber 共用，保留数字校验。 |
+| ios/FineCoachApp/Core/Domain/DomainError.swift:26 | 请输入内容。 | 内容不能为空。 | 请 | 保留必填提示。 |
+| ios/FineCoachApp/Core/Domain/DomainError.swift:30 | 请输入有效数字。 | 不是有效数字。 | 请 | invalidDecimal / invalidNumber 共用，保留数字校验。 |
 | ios/FineCoachApp/Core/Domain/DomainError.swift:44 | 记录已更新，请重试。 | 记录已更新，再试一次。 | 请 | 保留记录版本变化事实。 |
 | ios/FineCoachApp/Core/Domain/DomainError.swift:48 | 本地保存失败，请重试。 | 本地保存没有成功，再试一次。 | 请 | 保留本地保存失败语义。 |
 | ios/FineCoachApp/Core/Domain/DomainError.swift:52 | 本地文件操作失败。 | 本地文件处理没有完成。 | 操作失败 | 共享 invalidFileOperation，保留本地文件范围；调用点见下。 |
@@ -406,3 +406,10 @@ xcrun swift-format lint --configuration .swift-format --recursive --parallel --s
 
 
 既有 skip 为 `ContrastHarnessTests.testTextDisabledOnSurfacePageIsWCAGExempt`（禁用文字的 WCAG 豁免）；没有新增 skip。`TrainingEntryScanTests` 共 12 项全部通过，其中新增 3 项（catalog、Swift literals、parser）；既有 `ArchiveExportScreenTests` 只更新 3 个精确字符串期望，没有删断言或放宽断言。catalog 扫描递归覆盖 stringUnit 与 variations，断言扫描值非空；Swift 扫描不设违规白名单，跳过注释和 `*DebugSeed.swift`。
+
+## 复审修订（2026-10-17，Claude 审查，产品负责人批准）
+
+- **称呼统一**：`onboarding.sheet.private.detail`、`archive.export.fact.studentDeletionDoesNotAffectYou` 回到「你」。理由：同一页另有保留的「你」（「只有你在使用」「你和精练教练都无法撤回」），改成「教练」会在一页里混用两种称呼。「你」保留条数由 2 条变为 4 条。
+- **校验提示写清发生了什么**：只去掉「请」后，「填写显示名称」「选择性别」读起来像字段标签。改为「还没填写显示名称」「还没选择性别」「还没填写调整原因。」「预计时长无效。」「内容不能为空。」「不是有效数字。」。
+- **扫描测试**：语气词改为只匹配句末用法（后面是结尾、空白或标点），避免误伤「哈克机」「哈克深蹲」这类词（C′ 第 2 步的器械筛选会用到）。新增 `testToneParticleScanIgnoresWordsLikeHackMachine`。「请」仍然全文禁止，所以「请求权限」写作「询问权限」。
+- **已知不足**：对照表「备注」列多数是同一句套话，没有逐条写理由；复审已逐条核对过原文和新文。

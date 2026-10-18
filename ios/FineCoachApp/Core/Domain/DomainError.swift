@@ -23,11 +23,11 @@ public enum DomainError: Error, Equatable, LocalizedError, Sendable {
     public var errorDescription: String? {
         switch self {
         case .emptyText:
-            return "输入内容。"
+            return "内容不能为空。"
         case .textTooLong:
             return "内容过长，无法保存。"
         case .invalidDecimal, .invalidNumber:
-            return "输入有效数字。"
+            return "不是有效数字。"
         case .invalidUnit:
             return "单位不受支持。"
         case .invalidMode:
