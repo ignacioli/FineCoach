@@ -8,10 +8,10 @@
 ## 统计
 
 - 输入 `match-audit.csv`：569 行（high 332 / medium 216 / low 21）。
-- **新增条数**：high/medium 合并去重后 **406** 条；low 建议采纳 **6** 条（附录 A，已计入主名单并标 low）。主名单合计 **412** 条。
-- **合并后总条数**：146 + 412 = **558** 条（若 low 建议不被采纳，则 552 条）。
-- **已在库**：132 行，对应现有 92 条条目（附录 B）；**合并掉** 10 行（附录 D）。
-- 校准差异：66 处（附录 C）。疑似重复待确认：17 组（附录 E）。
+- **新增条数**：high/medium 合并去重后 **405** 条；low 建议采纳 **6** 条（附录 A，已计入主名单并标 low）。主名单合计 **411** 条。
+- **合并后总条数**：146 + 411 = **557** 条（若 low 建议不被采纳，则 551 条）。
+- **已在库**：132 行，对应现有 92 条条目（附录 B）；**合并掉** 11 行（附录 D）。
+- 校准差异：66 处（附录 C）。疑似重复待确认：27 组（附录 E）。
 
 ### 主部位条数（主名单，含 low 建议采纳）
 
@@ -23,7 +23,7 @@
 | 大腿 | 70 |
 | 小腿 | 11 |
 | 臂 | 64 |
-| 臀 | 45 |
+| 臀 | 44 |
 | 核心 | 42 |
 
 ### 器械条数（主名单，含 low 建议采纳）
@@ -39,7 +39,7 @@
 | 壶铃 | 3 |
 | 徒手 | 97 |
 | 悍马机 | 25 |
-| 弹力带 | 54 |
+| 弹力带 | 53 |
 | 悬挂带 | 4 |
 | 单杠 | 5 |
 | 其他 | 2 |
@@ -47,13 +47,13 @@
 
 ## 待负责人决定的问题
 
-- Q1 器械待决 3 行：「悬垂带 - 面拉」「悬垂带 - 后束飞鸟」「悬吊带深蹲」的「悬垂带/悬吊带」是不是「悬挂带」笔误？若是，3 行器械改悬挂带（深蹲/面拉的记录方式也要相应改为 reps）。
+- Q1 器械待决 3 行：「悬垂带 - 面拉」「悬垂带 - 后束飞鸟」「悬吊带深蹲」的「悬垂带/悬吊带」是不是「悬挂带」笔误？若是，3 行器械改悬挂带；面拉与后束飞鸟的 recordMode 相应改为 reps（悬吊带深蹲已是 reps）。
 - Q2 弹力带/悬挂带动作的 recordMode：本表把弹力带阻力视为负重、记 weightReps（重量栏填阻力值），悬挂带（TRX）是自重、记 reps；是否认可？
 - Q3 热身类命名：本表统一为「动作 + 热身」并去掉「灵活性」「小幅」等描述词（如 肩胛骨后缩热身、膝关节绕环热身）；是否确认这一约定？
 - Q4 去掉「单腿/单手/单臂」后与现有条目重名，按提示词规则第 6 条当作「已在库」，单侧变式因此不入库：单手俯卧撑→俯卧撑、杠铃单腿硬拉→杠铃硬拉、单腿哑铃硬拉→哑铃硬拉、哑铃轮换弯举→哑铃弯举；另有单腿臀桥、单腿罗马尼亚硬拉改成近似名后仍新增。是否接受，还是给单侧变式保留可区分名字（沿用 CX-D4 的「支撑/分腿」写法）？
 - Q5 「绳索训练器」（上臂:55）不是动作名，映射到 Standing Biceps Cable Curl；是否按「绳索弯举」合并、不单独收录？
 - Q6 哈克机深蹲：腿:35（固定器械）与臀:3（哈克机）是同一动作、器械列又互相矛盾，且都与现有「哈克深蹲」是同一动作；建议两行都按现有「哈克深蹲」处理、不再新增，是否确认？
-- Q7 疑似重复：附录 E 列出机械规则没有判重、但实际是同一动作的候选↔现有配对（如 仰卧杠铃臂屈伸 vs 仰卧臂屈伸(碎颅者)、窄距卧推(靠近/散开) vs 窄距卧推、杠铃碎颅者 vs 仰卧臂屈伸(碎颅者)、哑铃推举 vs 哑铃肩上推举、哑铃划船/哑铃划船(手撑) vs 单臂哑铃划船）；请逐条确认是否按「已在库」处理。
+- Q7 疑似重复：附录 E 列出机械规则没有判重、但实际是同一动作的候选↔现有配对（如 仰卧杠铃臂屈伸 vs 仰卧臂屈伸(碎颅者)、窄距卧推(靠近/散开) vs 窄距卧推、杠铃碎颅者 vs 仰卧臂屈伸(碎颅者)、哑铃推举 vs 哑铃肩上推举、哑铃划船/哑铃划船(手撑) vs 单臂哑铃划船），以及共用同一 wger 条目、但来源表器械/变式不同而按新条目保留的 10 行（如 悍马机侧平举 vs 器械侧平举）；请逐条确认是否按「已在库」处理。
 - Q8 recordMode 拿不准的 4 行：「固定熊爬」按静止支撑记 duration、「平板肘撑转换」按交替动作记 reps、「仰卧交叉腿」按拉伸记 duration、「泡沫轴臀部放松」按泡沫轴放松记 duration；是否认可这 4 个判断？
 - Q9 附录 A 的 21 条 low 行：本表建议采纳 6 条、不采纳 15 条；请逐条确认（采纳的按 CX-D5 记为 FineCoach 自建、MIT 许可）。
 - Q10 来源表器材列不一致：胸表 44-47 行（史密斯机卧推、上斜/下斜史密斯机卧推、史密斯机 V-bar）写「固定器械」，其余表同类动作用「史密斯机」，且现有目录把同类动作归「史密斯机」；建议统一为「史密斯机」，是否确认？
@@ -61,6 +61,8 @@
 ## 完整名单
 
 排序：主部位（胸、肩、背、大腿、小腿、臂、臀、核心）→ 器械（杠铃、哑铃、固定器械、史密斯机、绳索、哈克机、壶铃、徒手、悍马机、弹力带、悬挂带、单杠、其他）。
+
+「已在库」判定：中文名相同，或英文名相同，或 wger UUID 相同。英文名 / wger UUID 命中时还要求器械类别一致（或同属自重类：徒手、单杠、悬挂带、其他），避免把来源表的近似映射（弹力带、品牌器械映射到通用库条目）误判成已在库。改名后与现有条目重名的行按规则当作已在库，列在附录 B。
 
 | # | 主部位 | 次要部位 | 器械 | 中文名 | 原名 | English | 记录方式 | 单侧默认 | 来源 | 许可 | 置信度 | 备注 / 待决 |
 |---:|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -154,15 +156,15 @@
 | 88 | 肩 | 臂 | 壶铃 | 壶铃肩推 | 单臂壶铃肩推 | One-Arm Kettlebell Military Press To The Side | `weightReps` | 是 | free-exercise-db:One-Arm_Kettlebell_Military_Press_To_The_Side | Unlicense | medium |  |
 | 89 | 肩 | 臂 | 徒手 | 靠墙倒立撑 |  | Handstand Push-Ups | `reps` |  | free-exercise-db:Handstand_Push-Ups | Unlicense | medium | 近似映射：与「倒立俯卧撑、自由倒立撑」共用库内条目 fedb:Handstand_Push-Ups |
 | 90 | 肩 | 臂 | 徒手 | 自由倒立撑 |  | Handstand Push-Ups | `reps` |  | free-exercise-db:Handstand_Push-Ups | Unlicense | high | 近似映射：与「倒立俯卧撑、靠墙倒立撑」共用库内条目 fedb:Handstand_Push-Ups |
-| 91 | 肩 | 胸、臂 | 徒手 | 肩内外旋拉伸 | 拉伸 - 肩内外旋 | Round The World Shoulder Stretch | `duration` |  | free-exercise-db:Round_The_World_Shoulder_Stretch | Unlicense | medium |  |
+| 91 | 肩 | 胸、臂 | 徒手 | 肩内外旋拉伸 | 拉伸 - 肩内外旋 | Round The World Shoulder Stretch | `duration` | 是 | free-exercise-db:Round_The_World_Shoulder_Stretch | Unlicense | medium |  |
 | 92 | 肩 |  | 徒手 | 侧转肩拉伸 | 拉伸 - 单臂侧转 | Shoulder Stretch | `duration` | 是 | free-exercise-db:Shoulder_Stretch | Unlicense | high | 名称规范化；近似映射：与「手臂交叉拉伸」共用库内条目 fedb:Shoulder_Stretch |
-| 93 | 肩 |  | 徒手 | 手臂交叉拉伸 | 拉伸 - 手臂交叉 | Shoulder Stretch | `duration` |  | free-exercise-db:Shoulder_Stretch | Unlicense | medium | 近似映射：与「侧转肩拉伸」共用库内条目 fedb:Shoulder_Stretch |
+| 93 | 肩 |  | 徒手 | 手臂交叉拉伸 | 拉伸 - 手臂交叉 | Shoulder Stretch | `duration` | 是 | free-exercise-db:Shoulder_Stretch | Unlicense | medium | 近似映射：与「侧转肩拉伸」共用库内条目 fedb:Shoulder_Stretch |
 | 94 | 肩 | 臂 | 徒手 | 倒立俯卧撑 |  | Handstand Push-Ups | `reps` |  | free-exercise-db:Handstand_Push-Ups | Unlicense | high | 近似映射：与「自由倒立撑、靠墙倒立撑」共用库内条目 fedb:Handstand_Push-Ups |
 | 95 | 肩 | 臂 | 悍马机 | 悍马机坐姿推举 |  | Leverage Shoulder Press | `weightReps` |  | free-exercise-db:Leverage_Shoulder_Press | Unlicense | medium |  |
-| 96 | 肩 |  | 悍马机 | 悍马机侧平举 |  | Machine Side Lateral Raises | `weightReps` |  | wger.de:dc87b735-016c-410b-915c-e3521fea4be7 | CC-BY-SA 4 (© Tierrasverdes) | medium |  |
+| 96 | 肩 |  | 悍马机 | 悍马机侧平举 |  | Machine Side Lateral Raises | `weightReps` |  | wger.de:dc87b735-016c-410b-915c-e3521fea4be7 | CC-BY-SA 4 (© Tierrasverdes) | medium | 近似映射：与现有「器械侧平举」共用 wger 条目 UUID（来源表器械/变式不同，未按已在库处理） |
 | 97 | 肩 |  | 悍马机 | 悍马机半俯身侧平举 | 悍马机半俯身侧 | Reverse Machine Flyes | `weightReps` |  | free-exercise-db:Reverse_Machine_Flyes | Unlicense | medium | 名称规范化；近似映射：与「悍马机开肘俯身飞鸟、蝴蝶机反向飞鸟」共用库内条目 fedb:Reverse_Machine_Flyes |
 | 98 | 肩 |  | 悍马机 | 悍马机开肘俯身飞鸟 | 单手开肘悍马俯 | Reverse Machine Flyes | `weightReps` | 是 | free-exercise-db:Reverse_Machine_Flyes | Unlicense | medium | 名称规范化；原名「单手开肘悍马俯」不完整；近似映射：与「悍马机半俯身侧平举、蝴蝶机反向飞鸟」共用库内条目 fedb:Reverse_Machine_Flyes |
-| 99 | 肩 | 背、臂 | 悍马机 | 悍马机开肘俯身划船 | 开肘悍马俯身划 | Leverage Iso Row | `weightReps` |  | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 名称规范化；近似映射：与「反握式悍马划船、器械划船、器械大剪刀 等 12 条」共用库内条目 fedb:Leverage_Iso_Row |
+| 99 | 肩 | 背、臂 | 悍马机 | 悍马机开肘俯身划船 | 开肘悍马俯身划 | Leverage Iso Row | `weightReps` |  | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 名称规范化；近似映射：另 12 个中文名（反握式悍马划船、器械划船、器械大剪刀 等）共用库内条目 fedb:Leverage_Iso_Row |
 | 100 | 肩 | 背 | 弹力带 | 弹力带面拉 | 弹力带 - 面拉 | Face Pull | `weightReps` |  | free-exercise-db:Face_Pull | Unlicense | medium | 器械按名称拆分：悬挂带 & 弹力带→弹力带；近似映射：与「悬垂带面拉」共用库内条目 fedb:Face_Pull |
 | 101 | 肩 | 臂 | 弹力带 | 弹力带坐姿推举 | 弹力带 - 坐姿推举 | Shoulder Press - With Bands | `weightReps` |  | free-exercise-db:Shoulder_Press_-_With_Bands | Unlicense | medium | 器械按名称拆分：悬挂带 & 弹力带→弹力带；近似映射：与「弹力带站姿推举」共用库内条目 fedb:Shoulder_Press_-_With_Bands |
 | 102 | 肩 | 臂 | 弹力带 | 弹力带站姿推举 | 弹力带 - 站姿推举 | Shoulder Press - With Bands | `weightReps` |  | free-exercise-db:Shoulder_Press_-_With_Bands | Unlicense | high | 器械按名称拆分：悬挂带 & 弹力带→弹力带；近似映射：与「弹力带坐姿推举」共用库内条目 fedb:Shoulder_Press_-_With_Bands |
@@ -192,12 +194,12 @@
 | 126 | 背 | 臂 | 固定器械 | 耸肩器械耸肩 |  | Leverage Shrug | `weightReps` |  | free-exercise-db:Leverage_Shrug | Unlicense | medium | 分类表为「肩」，按肌肉推为「背」；近似映射：与「器械耸肩、硬拉器械耸肩」共用库内条目 fedb:Leverage_Shrug |
 | 127 | 背 |  | 固定器械 | 肩胛引体 |  | Scapular Pull-Up | `weightReps` |  | free-exercise-db:Scapular_Pull-Up | Unlicense | high | 分类表为「肩」，按肌肉推为「背」 |
 | 128 | 背 | 肩、臂 | 固定器械 | 窄距引体向上 |  | V-Bar Pullup | `reps` |  | free-exercise-db:V-Bar_Pullup | Unlicense | medium | 近似映射：与「对握引体向上」共用库内条目 fedb:V-Bar_Pullup |
-| 129 | 背 | 臂 | 固定器械 | 器械划船 |  | Leverage Iso Row | `weightReps` |  | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | Q7：与现有「胸撑器械划船」近似；近似映射：与「反握式悍马划船、器械大剪刀、坐姿悍马机划船 等 12 条」共用库内条目 fedb:Leverage_Iso_Row |
+| 129 | 背 | 臂 | 固定器械 | 器械划船 |  | Leverage Iso Row | `weightReps` |  | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | Q7：与现有「胸撑器械划船」近似；近似映射：另 12 个中文名（反握式悍马划船、器械大剪刀、坐姿悍马机划船 等）共用库内条目 fedb:Leverage_Iso_Row |
 | 130 | 背 | 肩、臂 | 固定器械 | 器械绳索划船 |  | Seated Cable Rows | `weightReps` |  | free-exercise-db:Seated_Cable_Rows | Unlicense | medium | Q7：与现有「坐姿绳索划船」近似；近似映射：与「V把划船、坐姿划船」共用库内条目 fedb:Seated_Cable_Rows |
 | 131 | 背 | 臂 | 固定器械 | 器械下拉 |  | Machine Lat Pulldown | `weightReps` |  | wger.de:e6bf0364-ccce-4053-afe1-eef206a50291 | CC-BY-SA 4 (© wger.de) | medium |  |
 | 132 | 背 | 臂、核心 | 固定器械 | 引体向上(辅助) | 引体向上（辅助） | Band Assisted Pull-Up | `reps` |  | free-exercise-db:Band_Assisted_Pull-Up | Unlicense | medium | 近似映射：与「辅助引体」共用库内条目 fedb:Band_Assisted_Pull-Up |
 | 133 | 背 | 臂 | 固定器械 | 俯卧T杠划船 | 俯卧 T-bar 划船 | Lying T-Bar Row | `weightReps` |  | free-exercise-db:Lying_T-Bar_Row | Unlicense | high |  |
-| 134 | 背 | 臂 | 固定器械 | 器械大剪刀 |  | Leverage Iso Row | `weightReps` |  | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 近似映射：与「反握式悍马划船、器械划船、坐姿悍马机划船 等 12 条」共用库内条目 fedb:Leverage_Iso_Row |
+| 134 | 背 | 臂 | 固定器械 | 器械大剪刀 |  | Leverage Iso Row | `weightReps` |  | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 近似映射：另 12 个中文名（反握式悍马划船、器械划船、坐姿悍马机划船 等）共用库内条目 fedb:Leverage_Iso_Row |
 | 135 | 背 | 大腿、臀 | 固定器械 | 水平山羊挺身 |  | Hyperextensions (Back Extensions) | `weightReps` |  | free-exercise-db:Hyperextensions_Back_Extensions | Unlicense | high | 分类表为「臀」，按肌肉推为「背」；Q7：与现有「山羊挺身」近似 |
 | 136 | 背 | 肩 | 史密斯机 | 史密斯机背后肩 |  | Smith Machine Behind the Back Shrug | `weightReps` |  | free-exercise-db:Smith_Machine_Behind_the_Back_Shrug | Unlicense | high | 分类表为「肩」，按肌肉推为「背」 |
 | 137 | 背 | 肩、臂 | 史密斯机 | 史密斯反手划船 |  | Smith Machine Bent Over Row | `weightReps` |  | free-exercise-db:Smith_Machine_Bent_Over_Row | Unlicense | high |  |
@@ -215,21 +217,21 @@
 | 149 | 背 | 臂 | 绳索 | 绳索分腿站姿下拉 | 绳索分腿站姿单绳 | One Arm Lat Pulldown | `weightReps` | 是 | free-exercise-db:One_Arm_Lat_Pulldown | Unlicense | medium | 名称规范化；原名「绳索分腿站姿单绳」不完整；近似映射：与「弹力带下拉、绳索下拉」共用库内条目 fedb:One_Arm_Lat_Pulldown |
 | 150 | 背 | 臂 | 壶铃 | 壶铃大猩猩划船 | 壶铃 大猩猩划船 | Alternating Kettlebell Row | `weightReps` |  | free-exercise-db:Alternating_Kettlebell_Row | Unlicense | high |  |
 | 151 | 背 | 大腿、臀 | 徒手 | 超人式 |  | Superman | `reps` |  | free-exercise-db:Superman | Unlicense | high | 分类表为「臀」，按肌肉推为「背」 |
-| 152 | 背 | 臀 | 徒手 | 抱膝提拉热身 | 热身 - 交替抱膝提拉 | Hug Knees To Chest | `duration` |  | free-exercise-db:Hug_Knees_To_Chest | Unlicense | medium | 分类表为「臀」，按肌肉推为「背」 |
-| 153 | 背 | 臂 | 悍马机 | 悍马机划船 |  | Leverage Iso Row | `weightReps` |  | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 合并单侧与双侧两行，默认双侧（单侧由教练切换）；近似映射：与「反握式悍马划船、器械划船、器械大剪刀 等 12 条」共用库内条目 fedb:Leverage_Iso_Row；合并 2 行：背:32（悍马机划船）、背:38（单手悍马机划船） |
-| 154 | 背 | 臂 | 悍马机 | 悍马机大剪刀 |  | Leverage Iso Row | `weightReps` |  | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 近似映射：与「反握式悍马划船、器械划船、器械大剪刀 等 12 条」共用库内条目 fedb:Leverage_Iso_Row |
-| 155 | 背 | 臂 | 悍马机 | 轨道划船器划船 |  | Leverage Iso Row | `weightReps` |  | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 近似映射：与「反握式悍马划船、器械划船、器械大剪刀 等 12 条」共用库内条目 fedb:Leverage_Iso_Row |
+| 152 | 背 | 臀 | 徒手 | 抱膝提拉热身 | 热身 - 交替抱膝提拉 | Hug Knees To Chest | `duration` | 是 | free-exercise-db:Hug_Knees_To_Chest | Unlicense | medium | 分类表为「臀」，按肌肉推为「背」 |
+| 153 | 背 | 臂 | 悍马机 | 悍马机划船 |  | Leverage Iso Row | `weightReps` |  | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 合并单侧与双侧两行，默认双侧（单侧由教练切换）；近似映射：另 12 个中文名（反握式悍马划船、器械划船、器械大剪刀 等）共用库内条目 fedb:Leverage_Iso_Row；合并 2 行：背:32（悍马机划船）、背:38（单手悍马机划船） |
+| 154 | 背 | 臂 | 悍马机 | 悍马机大剪刀 |  | Leverage Iso Row | `weightReps` |  | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 近似映射：另 12 个中文名（反握式悍马划船、器械划船、器械大剪刀 等）共用库内条目 fedb:Leverage_Iso_Row |
+| 155 | 背 | 臂 | 悍马机 | 轨道划船器划船 |  | Leverage Iso Row | `weightReps` |  | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 近似映射：另 12 个中文名（反握式悍马划船、器械划船、器械大剪刀 等）共用库内条目 fedb:Leverage_Iso_Row |
 | 156 | 背 |  | 悍马机 | 分动式高位划船 | 分动式高位划 | Leverage High Row | `weightReps` |  | free-exercise-db:Leverage_High_Row | Unlicense | medium | 名称规范化；近似映射：与「悍马机下拉、悍马机高位下拉」共用库内条目 fedb:Leverage_High_Row；合并 2 行：背:36（分动式高位划）、背:42（分动式高位划船） |
 | 157 | 背 |  | 悍马机 | 悍马机下拉 | 单手悍马机下拉 | Leverage High Row | `weightReps` | 是 | free-exercise-db:Leverage_High_Row | Unlicense | medium | 近似映射：与「分动式高位划船、悍马机高位下拉」共用库内条目 fedb:Leverage_High_Row |
-| 158 | 背 | 臂 | 悍马机 | 支撑式悍马划船 | 单手支撑式悍马 | Leverage Iso Row | `weightReps` | 是 | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 名称规范化；原名「单手支撑式悍马」不完整；近似映射：与「反握式悍马划船、器械划船、器械大剪刀 等 12 条」共用库内条目 fedb:Leverage_Iso_Row |
-| 159 | 背 | 臂 | 悍马机 | 反握式悍马划船 |  | Leverage Iso Row | `weightReps` |  | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 近似映射：与「器械划船、器械大剪刀、坐姿悍马机划船 等 12 条」共用库内条目 fedb:Leverage_Iso_Row |
-| 160 | 背 | 臂 | 悍马机 | 支撑式悍马俯身 |  | Leverage Iso Row | `weightReps` |  | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 近似映射：与「反握式悍马划船、器械划船、器械大剪刀 等 12 条」共用库内条目 fedb:Leverage_Iso_Row |
+| 158 | 背 | 臂 | 悍马机 | 支撑式悍马划船 | 单手支撑式悍马 | Leverage Iso Row | `weightReps` | 是 | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 名称规范化；原名「单手支撑式悍马」不完整；近似映射：另 12 个中文名（反握式悍马划船、器械划船、器械大剪刀 等）共用库内条目 fedb:Leverage_Iso_Row |
+| 159 | 背 | 臂 | 悍马机 | 反握式悍马划船 |  | Leverage Iso Row | `weightReps` |  | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 近似映射：另 12 个中文名（器械划船、器械大剪刀、坐姿悍马机划船 等）共用库内条目 fedb:Leverage_Iso_Row |
+| 160 | 背 | 臂 | 悍马机 | 支撑式悍马俯身 |  | Leverage Iso Row | `weightReps` |  | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 近似映射：另 12 个中文名（反握式悍马划船、器械划船、器械大剪刀 等）共用库内条目 fedb:Leverage_Iso_Row |
 | 161 | 背 |  | 悍马机 | 悍马机高位下拉 | 悍马机手下拉 | Leverage High Row | `weightReps` |  | free-exercise-db:Leverage_High_Row | Unlicense | medium | 名称规范化；近似映射：与「分动式高位划船、悍马机下拉」共用库内条目 fedb:Leverage_High_Row |
-| 162 | 背 | 胸、臂 | 悍马机 | 悍马机鹦鹉螺 |  | Pullover Machine | `weightReps` |  | wger.de:ad20ef5e-e360-4859-9110-668ee0c24721 | CC-BY-SA 4 (© Paul@Chemistry) | medium |  |
-| 163 | 背 | 臂 | 悍马机 | 坐姿悍马机划船 | 单手坐悍马机 | Leverage Iso Row | `weightReps` | 是 | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 名称规范化；原名「单手坐悍马机」不完整；近似映射：与「反握式悍马划船、器械划船、器械大剪刀 等 12 条」共用库内条目 fedb:Leverage_Iso_Row |
-| 164 | 背 | 臂 | 悍马机 | 大剪刀划船 | 单边大剪刀划船 | Leverage Iso Row | `weightReps` | 是 | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 近似映射：与「反握式悍马划船、器械划船、器械大剪刀 等 12 条」共用库内条目 fedb:Leverage_Iso_Row |
-| 165 | 背 | 臂 | 悍马机 | 悍马俯身划船 |  | Leverage Iso Row | `weightReps` |  | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 近似映射：与「反握式悍马划船、器械划船、器械大剪刀 等 12 条」共用库内条目 fedb:Leverage_Iso_Row |
-| 166 | 背 | 臂 | 悍马机 | 挂片划船 |  | Leverage Iso Row | `weightReps` |  | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 近似映射：与「反握式悍马划船、器械划船、器械大剪刀 等 12 条」共用库内条目 fedb:Leverage_Iso_Row |
+| 162 | 背 | 胸、臂 | 悍马机 | 悍马机鹦鹉螺 |  | Pullover Machine | `weightReps` |  | wger.de:ad20ef5e-e360-4859-9110-668ee0c24721 | CC-BY-SA 4 (© Paul@Chemistry) | medium | 近似映射：与现有「器械屈臂上拉」共用 wger 条目 UUID（来源表器械/变式不同，未按已在库处理） |
+| 163 | 背 | 臂 | 悍马机 | 坐姿悍马机划船 | 单手坐悍马机 | Leverage Iso Row | `weightReps` | 是 | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 名称规范化；原名「单手坐悍马机」不完整；近似映射：另 12 个中文名（反握式悍马划船、器械划船、器械大剪刀 等）共用库内条目 fedb:Leverage_Iso_Row |
+| 164 | 背 | 臂 | 悍马机 | 大剪刀划船 | 单边大剪刀划船 | Leverage Iso Row | `weightReps` | 是 | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 近似映射：另 12 个中文名（反握式悍马划船、器械划船、器械大剪刀 等）共用库内条目 fedb:Leverage_Iso_Row |
+| 165 | 背 | 臂 | 悍马机 | 悍马俯身划船 |  | Leverage Iso Row | `weightReps` |  | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 近似映射：另 12 个中文名（反握式悍马划船、器械划船、器械大剪刀 等）共用库内条目 fedb:Leverage_Iso_Row |
+| 166 | 背 | 臂 | 悍马机 | 挂片划船 |  | Leverage Iso Row | `weightReps` |  | free-exercise-db:Leverage_Iso_Row | Unlicense | medium | 近似映射：另 12 个中文名（反握式悍马划船、器械划船、器械大剪刀 等）共用库内条目 fedb:Leverage_Iso_Row |
 | 167 | 背 | 肩 | 弹力带 | 弹力带提拉 | 弹力带 - 提拉 | Upright Row - With Bands | `weightReps` |  | free-exercise-db:Upright_Row_-_With_Bands | Unlicense | high | 器械按名称拆分：悬挂带 & 弹力带→弹力带；分类表为「肩」，按肌肉推为「背」；近似映射：与「弹力带坐姿直立划船、弹力带站姿直立划船」共用库内条目 fedb:Upright_Row_-_With_Bands |
 | 168 | 背 |  | 弹力带 | 弹力带耸肩 | 弹力带 - 弹力带耸肩 | - | `weightReps` |  | finecoach-built | MIT | low | 器械按名称拆分：悬挂带 & 弹力带→弹力带；分类表为「肩」，按肌肉推为「背」；low 行，建议采纳（附录 A）；CX-D5 自建条目 |
 | 169 | 背 | 臂 | 弹力带 | 弹力带俯身划船 | 弹力带 俯身划船 | Seated Band Row | `weightReps` |  | wger.de:6b6bd3ce-c40d-486c-9c47-21a3c639626d | CC-BY-SA 4 (© trs1800) | medium | 器械按名称拆分：悬挂带 & 弹力带→弹力带；近似映射：与「弹力带坐姿划船」共用库内条目 wger:2635 |
@@ -291,27 +293,27 @@
 | 225 | 大腿 | 臀 | 徒手 | 自重保加利亚蹲 |  | Bulgarian split squats left | `reps` | 是 | wger.de:7ce489d2-1948-46de-aa80-277b2ca737aa | CC-BY-SA 4 (© wger.de) | medium |  |
 | 226 | 大腿 | 小腿、臀 | 徒手 | 自重腿弯举 |  | Natural Glute Ham Raise | `reps` |  | free-exercise-db:Natural_Glute_Ham_Raise | Unlicense | medium |  |
 | 227 | 大腿 | 小腿、臀 | 徒手 | 侧步深蹲 |  | Side Slides + Squats | `reps` |  | wger.de:cd7bbafc-4092-4194-aa20-e380f1fe45f0 | CC-BY-SA 4 (© Insight) | medium |  |
-| 228 | 大腿 | 臀 | 徒手 | 前后摆腿热身 | 热身 - 腘后摆腿 | Leg Swings (Front-Back) | `duration` |  | wger.de:1fae7d45-0731-4640-8809-94c76b836571 | CC-BY-SA 4 (© Jhonatan) | high | 名称规范化；近似映射：与「侧向摆腿热身」共用库内条目 wger:1670 |
+| 228 | 大腿 | 臀 | 徒手 | 前后摆腿热身 | 热身 - 腘后摆腿 | Leg Swings (Front-Back) | `duration` | 是 | wger.de:1fae7d45-0731-4640-8809-94c76b836571 | CC-BY-SA 4 (© Jhonatan) | high | 名称规范化；近似映射：与「侧向摆腿热身」共用库内条目 wger:1670 |
 | 229 | 大腿 |  | 徒手 | 滑雪式拉伸 | 拉伸 - 滑雪 | - | `duration` |  | finecoach-built | MIT | low | 名称规范化；low 行，建议采纳（附录 A）；CX-D5 自建条目 |
-| 230 | 大腿 | 小腿 | 徒手 | 坐姿腿拉伸 | 拉伸 - 坐姿腿拉 | Seated Floor Hamstring Stretch | `duration` |  | free-exercise-db:Seated_Floor_Hamstring_Stretch | Unlicense | high | 名称规范化 |
+| 230 | 大腿 | 小腿 | 徒手 | 坐姿腿拉伸 | 拉伸 - 坐姿腿拉 | Seated Floor Hamstring Stretch | `duration` | 是 | free-exercise-db:Seated_Floor_Hamstring_Stretch | Unlicense | high | 名称规范化 |
 | 231 | 大腿 | 小腿 | 徒手 | 直腿弯腰拉伸 | 拉伸 - 直腿弯腰 | Standing Toe Touches | `duration` |  | free-exercise-db:Standing_Toe_Touches | Unlicense | high |  |
-| 232 | 大腿 | 臀 | 徒手 | 箭步蹲拉伸 | 拉伸 - 箭步蹲拉 | Runners Lunge Stretch | `duration` |  | wger.de:92cd0459-5cd1-46a0-934d-e7cff8d4ccda | CC-BY-SA 4 (© Davidgj32) | high | 名称规范化 |
-| 233 | 大腿 |  | 徒手 | 仰卧抬腿拉伸 | 拉伸 - 仰卧抬腿 | Leg-Up Hamstring Stretch | `duration` |  | free-exercise-db:Leg-Up_Hamstring_Stretch | Unlicense | high |  |
-| 234 | 大腿 | 小腿 | 徒手 | 站姿腿拉伸 | 拉伸 - 站姿腿拉 | Standing Hamstring and Calf Stretch | `duration` |  | free-exercise-db:Standing_Hamstring_and_Calf_Stretch | Unlicense | high | 名称规范化 |
-| 235 | 大腿 |  | 徒手 | 髋屈肌与股四头肌拉伸 | 拉伸 - 髋屈肌与股四头肌 | Intermediate Hip Flexor and Quad Stretch | `duration` |  | free-exercise-db:Intermediate_Hip_Flexor_and_Quad_Stretch | Unlicense | high |  |
+| 232 | 大腿 | 臀 | 徒手 | 箭步蹲拉伸 | 拉伸 - 箭步蹲拉 | Runners Lunge Stretch | `duration` | 是 | wger.de:92cd0459-5cd1-46a0-934d-e7cff8d4ccda | CC-BY-SA 4 (© Davidgj32) | high | 名称规范化 |
+| 233 | 大腿 |  | 徒手 | 仰卧抬腿拉伸 | 拉伸 - 仰卧抬腿 | Leg-Up Hamstring Stretch | `duration` | 是 | free-exercise-db:Leg-Up_Hamstring_Stretch | Unlicense | high |  |
+| 234 | 大腿 | 小腿 | 徒手 | 站姿腿拉伸 | 拉伸 - 站姿腿拉 | Standing Hamstring and Calf Stretch | `duration` | 是 | free-exercise-db:Standing_Hamstring_and_Calf_Stretch | Unlicense | high | 名称规范化 |
+| 235 | 大腿 |  | 徒手 | 髋屈肌与股四头肌拉伸 | 拉伸 - 髋屈肌与股四头肌 | Intermediate Hip Flexor and Quad Stretch | `duration` | 是 | free-exercise-db:Intermediate_Hip_Flexor_and_Quad_Stretch | Unlicense | high |  |
 | 236 | 大腿 | 背、臀 | 悍马机 | 挂片罗马尼亚硬拉 | 挂片式罗马尼亚 | Romanian Deadlift | `weightReps` |  | free-exercise-db:Romanian_Deadlift | Unlicense | medium | 分类表为「臀」，按肌肉推为「大腿」；名称规范化；原名疑缺「硬拉」；近似映射：与「分腿硬拉」共用库内条目 fedb:Romanian_Deadlift |
 | 237 | 大腿 | 背、臀 | 弹力带 | 弹力带反向早安 | 弹力带 反向早安 | Band Good Morning | `weightReps` |  | free-exercise-db:Band_Good_Morning | Unlicense | medium | 器械按名称拆分：悬挂带 & 弹力带→弹力带；分类表为「背」，按肌肉推为「大腿」；近似映射：与「弹力带早安、弹力带直腿硬拉」共用库内条目 fedb:Band_Good_Morning |
 | 238 | 大腿 | 核心 | 弹力带 | 弹力带提腿 |  | Hip Flexion with Band | `weightReps` | 是 | free-exercise-db:Hip_Flexion_with_Band | Unlicense | medium | 器械按名称拆分：悬挂带 & 弹力带→弹力带 |
-| 239 | 大腿 | 臀 | 弹力带 | 弹力带箭步蹲 |  | Lunges | `weightReps` |  | wger.de:3284fd27-5402-4821-9c32-29066d4e2667 | CC-BY-SA 4 (© wger.de) | medium | 器械按名称拆分：悬挂带 & 弹力带→弹力带 |
+| 239 | 大腿 | 臀 | 弹力带 | 弹力带箭步蹲 |  | Lunges | `weightReps` |  | wger.de:3284fd27-5402-4821-9c32-29066d4e2667 | CC-BY-SA 4 (© wger.de) | medium | 近似映射：与现有「徒手弓步」共用 wger 条目 UUID（来源表器械/变式不同，未按已在库处理）；器械按名称拆分：悬挂带 & 弹力带→弹力带 |
 | 240 | 大腿 | 小腿 | 弹力带 | 弹力带平躺腿弯举 |  | Seated Band Hamstring Curl | `weightReps` |  | free-exercise-db:Seated_Band_Hamstring_Curl | Unlicense | medium | 器械按名称拆分：悬挂带 & 弹力带→弹力带 |
-| 241 | 大腿 | 小腿 | 弹力带 | 弹力带站姿腿弯举 |  | Leg Curls (standing) | `weightReps` |  | wger.de:49189e88-40b6-4c0d-a784-0cc3abbb8e75 | CC-BY-SA 3 (© wger.de) | medium | 器械按名称拆分：悬挂带 & 弹力带→弹力带 |
+| 241 | 大腿 | 小腿 | 弹力带 | 弹力带站姿腿弯举 |  | Leg Curls (standing) | `weightReps` |  | wger.de:49189e88-40b6-4c0d-a784-0cc3abbb8e75 | CC-BY-SA 3 (© wger.de) | medium | 近似映射：与现有「站姿腿弯举」共用 wger 条目 UUID（来源表器械/变式不同，未按已在库处理）；器械按名称拆分：悬挂带 & 弹力带→弹力带 |
 | 242 | 大腿 |  | 弹力带 | 弹力带站姿内收 | 弹力带站姿单腿内收 | Band Hip Adductions | `weightReps` | 是 | free-exercise-db:Band_Hip_Adductions | Unlicense | high | 器械按名称拆分：悬挂带 & 弹力带→弹力带 |
 | 243 | 大腿 | 肩 | 弹力带 | 弹力带登山者 |  | Mountain Climbers | `weightReps` |  | free-exercise-db:Mountain_Climbers | Unlicense | medium | 器械按名称拆分：悬挂带 & 弹力带→弹力带 |
 | 244 | 大腿 | 小腿、臀 | 弹力带 | 弹力带箭步走 |  | Bodyweight Walking Lunge | `weightReps` |  | free-exercise-db:Bodyweight_Walking_Lunge | Unlicense | medium | 器械按名称拆分：悬挂带 & 弹力带→弹力带 |
 | 245 | 大腿 | 背、臀 | 弹力带 | 弹力带深蹲 |  | Squats - With Bands | `weightReps` |  | free-exercise-db:Squats_-_With_Bands | Unlicense | high | 器械按名称拆分：悬挂带 & 弹力带→弹力带；合并单侧与双侧两行，默认双侧（单侧由教练切换）；合并行来源不同：free-exercise-db:Single-Leg_High_Box_Squat、free-exercise-db:Squats_-_With_Bands；合并 2 行：腿:76（弹力带深蹲）、腿:77（弹力带单腿深蹲） |
 | 246 | 大腿 | 背、臀 | 弹力带 | 弹力带直腿硬拉 | 弹力带 - 直腿硬拉 | Band Good Morning | `weightReps` |  | free-exercise-db:Band_Good_Morning | Unlicense | medium | 分类表为「臀」，按肌肉推为「大腿」；近似映射：与「弹力带反向早安、弹力带早安」共用库内条目 fedb:Band_Good_Morning |
 | 247 | 大腿 | 背、臀 | 弹力带 | 弹力带早安 | 弹力带 - 早安 | Band Good Morning | `weightReps` |  | free-exercise-db:Band_Good_Morning | Unlicense | high | 分类表为「臀」，按肌肉推为「大腿」；近似映射：与「弹力带反向早安、弹力带直腿硬拉」共用库内条目 fedb:Band_Good_Morning |
-| 248 | 大腿 | 臀 | 其他 | 保加利亚蹲(负重) | 保加利亚蹲（负重） | Bulgarian Squat with Dumbbells | `weightReps` | 是 | wger.de:60d2c34b-43a1-48a3-b43b-160e4c0157f2 | CC-BY-SA 4 (© AlucardEvil40) | medium | 来源器材为「其他」，按规则保留 |
+| 248 | 大腿 | 臀 | 其他 | 保加利亚蹲(负重) | 保加利亚蹲（负重） | Bulgarian Squat with Dumbbells | `weightReps` | 是 | wger.de:60d2c34b-43a1-48a3-b43b-160e4c0157f2 | CC-BY-SA 4 (© AlucardEvil40) | medium | 近似映射：与现有「哑铃保加利亚分腿蹲」共用 wger 条目 UUID（来源表器械/变式不同，未按已在库处理）；来源器材为「其他」，按规则保留 |
 | 249 | 大腿 | 小腿、臀 | 其他 | 跳箱 |  | Box Jumps | `reps` |  | wger.de:002c6a4f-28ac-4b07-8e94-053e5b05d52b | CC-BY-SA 4 (© tekknokrat@gmx.de) | high | 来源器材为「其他」，按规则保留 |
 | 250 | 大腿 | 臀 | 待决 | 悬吊带深蹲 |  | Bodyweight Squat | `reps` |  | free-exercise-db:Bodyweight_Squat | Unlicense | medium | 器械待决：名称不含弹力带/悬挂带/TRX；近似映射：与「自重深蹲」共用库内条目 fedb:Bodyweight_Squat；器械待决：原名前缀「悬吊带」不在归一规则内（Q1） |
 | 251 | 小腿 |  | 杠铃 | 坐姿杠铃提踵 |  | Barbell Seated Calf Raise | `weightReps` |  | free-exercise-db:Barbell_Seated_Calf_Raise | Unlicense | high |  |
@@ -320,10 +322,10 @@
 | 254 | 小腿 |  | 固定器械 | 坐姿器械提踵 |  | Seated Calf Raise | `weightReps` |  | free-exercise-db:Seated_Calf_Raise | Unlicense | high |  |
 | 255 | 小腿 |  | 史密斯机 | 史密斯机提踵 |  | Smith Machine Calf Raise | `weightReps` |  | free-exercise-db:Smith_Machine_Calf_Raise | Unlicense | high |  |
 | 256 | 小腿 |  | 徒手 | 踝关节绕环热身 | 热身 - 踝关节绕环 | Ankle Circles | `duration` |  | free-exercise-db:Ankle_Circles | Unlicense | high |  |
-| 257 | 小腿 |  | 徒手 | 墙面小腿拉伸(直膝) | 拉伸 - 墙面小腿（直膝） | Calf Stretch Hands Against Wall | `duration` |  | free-exercise-db:Calf_Stretch_Hands_Against_Wall | Unlicense | high |  |
-| 258 | 小腿 |  | 徒手 | 墙面比目鱼肌拉伸(屈膝) | 拉伸 - 墙面比目鱼肌（屈膝） | Standing Soleus And Achilles Stretch | `duration` |  | free-exercise-db:Standing_Soleus_And_Achilles_Stretch | Unlicense | high |  |
-| 259 | 小腿 |  | 徒手 | 坐姿腓骨肌拉伸 | 拉伸 - 坐姿腓骨肌 | Peroneals Stretch | `duration` |  | free-exercise-db:Peroneals_Stretch | Unlicense | high |  |
-| 260 | 小腿 |  | 徒手 | 跪姿胫骨肌拉伸 | 拉伸 - 跪姿胫骨肌 | Anterior Tibialis-SMR | `duration` |  | free-exercise-db:Anterior_Tibialis-SMR | Unlicense | medium |  |
+| 257 | 小腿 |  | 徒手 | 墙面小腿拉伸(直膝) | 拉伸 - 墙面小腿（直膝） | Calf Stretch Hands Against Wall | `duration` | 是 | free-exercise-db:Calf_Stretch_Hands_Against_Wall | Unlicense | high |  |
+| 258 | 小腿 |  | 徒手 | 墙面比目鱼肌拉伸(屈膝) | 拉伸 - 墙面比目鱼肌（屈膝） | Standing Soleus And Achilles Stretch | `duration` | 是 | free-exercise-db:Standing_Soleus_And_Achilles_Stretch | Unlicense | high |  |
+| 259 | 小腿 |  | 徒手 | 坐姿腓骨肌拉伸 | 拉伸 - 坐姿腓骨肌 | Peroneals Stretch | `duration` | 是 | free-exercise-db:Peroneals_Stretch | Unlicense | high |  |
+| 260 | 小腿 |  | 徒手 | 跪姿胫骨肌拉伸 | 拉伸 - 跪姿胫骨肌 | Anterior Tibialis-SMR | `duration` | 是 | free-exercise-db:Anterior_Tibialis-SMR | Unlicense | medium |  |
 | 261 | 小腿 | 大腿 | 徒手 | 膝关节绕环热身 | 热身 - 膝关节小幅环绕 | Knee Circles | `duration` |  | free-exercise-db:Knee_Circles | Unlicense | high | 分类表为「大腿」，按肌肉推为「小腿」；名称规范化 |
 | 262 | 臂 |  | 杠铃 | EZ杠二头弯举 | EZ 杠二头弯举 | EZ-Bar Curl | `weightReps` |  | free-exercise-db:EZ-Bar_Curl | Unlicense | high |  |
 | 263 | 臂 |  | 杠铃 | 仰卧杠铃臂屈伸 |  | Lying Triceps Press | `weightReps` |  | free-exercise-db:Lying_Triceps_Press | Unlicense | medium | Q7：与现有「仰卧臂屈伸(碎颅者)」疑同一动作 |
@@ -377,9 +379,9 @@
 | 311 | 臂 | 胸、肩 | 徒手 | 窄距俯卧撑 |  | Push-Ups - Close Triceps Position | `reps` |  | free-exercise-db:Push-Ups_-_Close_Triceps_Position | Unlicense | high | 近似映射：与「臂屈伸式俯卧撑」共用库内条目 fedb:Push-Ups_-_Close_Triceps_Position |
 | 312 | 臂 | 胸、肩 | 徒手 | 平板臂屈伸 |  | Bench Dips | `reps` |  | free-exercise-db:Bench_Dips | Unlicense | high |  |
 | 313 | 臂 |  | 徒手 | 手腕绕环热身 | 热身 - 手腕绕环 | Wrist Circles | `duration` |  | free-exercise-db:Wrist_Circles | Unlicense | high |  |
-| 314 | 臂 |  | 徒手 | 手腕屈肌拉伸 | 拉伸 - 手腕屈肌 | Kneeling Forearm Stretch | `duration` |  | free-exercise-db:Kneeling_Forearm_Stretch | Unlicense | high |  |
-| 315 | 臂 | 肩 | 徒手 | 手腕伸肌拉伸 | 拉伸 - 手腕伸肌 | Side Wrist Pull | `duration` |  | free-exercise-db:Side_Wrist_Pull | Unlicense | medium |  |
-| 316 | 臂 | 背 | 徒手 | 三头肌拉伸 | 拉伸 - 三头肌 | Overhead Triceps | `duration` |  | free-exercise-db:Overhead_Triceps | Unlicense | high | 分类表为「肩」，按肌肉推为「臂」 |
+| 314 | 臂 |  | 徒手 | 手腕屈肌拉伸 | 拉伸 - 手腕屈肌 | Kneeling Forearm Stretch | `duration` | 是 | free-exercise-db:Kneeling_Forearm_Stretch | Unlicense | high |  |
+| 315 | 臂 | 肩 | 徒手 | 手腕伸肌拉伸 | 拉伸 - 手腕伸肌 | Side Wrist Pull | `duration` | 是 | free-exercise-db:Side_Wrist_Pull | Unlicense | medium |  |
+| 316 | 臂 | 背 | 徒手 | 三头肌拉伸 | 拉伸 - 三头肌 | Overhead Triceps | `duration` | 是 | free-exercise-db:Overhead_Triceps | Unlicense | high | 分类表为「肩」，按肌肉推为「臂」 |
 | 317 | 臂 |  | 弹力带 | 弹力带站姿弯举 | 弹力带二头弯举（站姿） | - | `weightReps` |  | finecoach-built | MIT | low | 器械按名称拆分：悬挂带 & 弹力带→弹力带；名称规范化；low 行，建议采纳（附录 A）；CX-D5 自建条目 |
 | 318 | 臂 |  | 弹力带 | 弹力带集中弯举 |  | Concentration Curls | `weightReps` |  | free-exercise-db:Concentration_Curls | Unlicense | medium | 器械按名称拆分：悬挂带 & 弹力带→弹力带；近似映射：与「集中弯举」共用库内条目 fedb:Concentration_Curls |
 | 319 | 臂 |  | 弹力带 | 弹力带锤式弯举 |  | Hammer Curls | `weightReps` |  | free-exercise-db:Hammer_Curls | Unlicense | medium | 器械按名称拆分：悬挂带 & 弹力带→弹力带 |
@@ -396,9 +398,9 @@
 | 330 | 臀 |  | 固定器械 | 坐姿髋外展 |  | Thigh Abductor | `weightReps` |  | free-exercise-db:Thigh_Abductor | Unlicense | high | 分类表为「大腿」，按肌肉推为「臀」；近似映射：与「悍马机外展、直腿髋外展(坐姿)」共用库内条目 fedb:Thigh_Abductor |
 | 331 | 臀 | 大腿 | 固定器械 | 器械髋冲 |  | Glute Drive | `weightReps` |  | wger.de:ce21d3a2-cdc5-410c-9970-c25029ca3769 | CC-BY-SA 4 (© schweezer) | high | 近似映射：与「悍马机臀冲」共用库内条目 wger:1528 |
 | 332 | 臀 |  | 固定器械 | 直腿髋外展(坐姿) | 直腿髋外展（坐姿） | Thigh Abductor | `weightReps` |  | free-exercise-db:Thigh_Abductor | Unlicense | high | 近似映射：与「坐姿髋外展、悍马机外展」共用库内条目 fedb:Thigh_Abductor |
-| 333 | 臀 | 大腿 | 史密斯机 | 史密斯机上踢 |  | Glute Kickback (Machine) | `weightReps` | 是 | wger.de:66ed6788-a1d8-49a2-af4d-397107fbf5fb | CC-BY-SA 4 (© barry) | medium | 分类表为「大腿」，按肌肉推为「臀」；近似映射：与「史密斯后踢、挂片后摆腿」共用库内条目 wger:1723 |
+| 333 | 臀 | 大腿 | 史密斯机 | 史密斯机上踢 |  | Glute Kickback (Machine) | `weightReps` | 是 | wger.de:66ed6788-a1d8-49a2-af4d-397107fbf5fb | CC-BY-SA 4 (© barry) | medium | 近似映射：与现有「器械臀屈伸」共用 wger 条目 UUID（来源表器械/变式不同，未按已在库处理）；分类表为「大腿」，按肌肉推为「臀」；近似映射：与「史密斯后踢、挂片后摆腿」共用库内条目 wger:1723 |
 | 334 | 臀 | 大腿、小腿 | 史密斯机 | 史密斯臀冲 |  | - | `weightReps` |  | finecoach-built | MIT | low | low 行，建议采纳（附录 A）；CX-D5 自建条目 |
-| 335 | 臀 | 大腿 | 史密斯机 | 史密斯后踢 |  | Glute Kickback (Machine) | `weightReps` | 是 | wger.de:66ed6788-a1d8-49a2-af4d-397107fbf5fb | CC-BY-SA 4 (© barry) | medium | 近似映射：与「史密斯机上踢、挂片后摆腿」共用库内条目 wger:1723 |
+| 335 | 臀 | 大腿 | 史密斯机 | 史密斯后踢 |  | Glute Kickback (Machine) | `weightReps` | 是 | wger.de:66ed6788-a1d8-49a2-af4d-397107fbf5fb | CC-BY-SA 4 (© barry) | medium | 近似映射：与现有「器械臀屈伸」共用 wger 条目 UUID（来源表器械/变式不同，未按已在库处理）；近似映射：与「史密斯机上踢、挂片后摆腿」共用库内条目 wger:1723 |
 | 336 | 臀 | 大腿 | 绳索 | 绳索站姿后踢 |  | One-Legged Cable Kickback | `weightReps` | 是 | free-exercise-db:One-Legged_Cable_Kickback | Unlicense | high | 近似映射：与「俯身驴踢、站姿驴踢」共用库内条目 fedb:One-Legged_Cable_Kickback |
 | 337 | 臀 | 大腿 | 绳索 | 俯身驴踢 |  | One-Legged Cable Kickback | `weightReps` | 是 | free-exercise-db:One-Legged_Cable_Kickback | Unlicense | medium | 近似映射：与「站姿驴踢、绳索站姿后踢」共用库内条目 fedb:One-Legged_Cable_Kickback |
 | 338 | 臀 | 大腿 | 绳索 | 站姿驴踢 |  | One-Legged Cable Kickback | `weightReps` | 是 | free-exercise-db:One-Legged_Cable_Kickback | Unlicense | medium | 近似映射：与「俯身驴踢、绳索站姿后踢」共用库内条目 fedb:One-Legged_Cable_Kickback |
@@ -410,74 +412,73 @@
 | 344 | 臀 | 大腿 | 徒手 | 垫高自重臀冲 |  | Butt Lift (Bridge) | `reps` |  | free-exercise-db:Butt_Lift_Bridge | Unlicense | medium | 近似映射：与「腿后侧臀桥、自重臀冲」共用库内条目 fedb:Butt_Lift_Bridge |
 | 345 | 臀 | 大腿 | 徒手 | 腿后侧臀桥 |  | Butt Lift (Bridge) | `reps` |  | free-exercise-db:Butt_Lift_Bridge | Unlicense | medium | 近似映射：与「垫高自重臀冲、自重臀冲」共用库内条目 fedb:Butt_Lift_Bridge |
 | 346 | 臀 | 核心 | 徒手 | 侧平板蛤壳 |  | Clamshell | `reps` | 是 | wger.de:ca3ca5d0-5231-4420-ad06-fa3d32693a1b | CC-BY-SA 4 (© teus_ergaster) | medium |  |
-| 347 | 臀 |  | 徒手 | 仰卧交叉腿 |  | Lying Crossover | `duration` |  | free-exercise-db:Lying_Crossover | Unlicense | high | Q8：源条目 Lying Crossover 是拉伸，按时长 |
+| 347 | 臀 |  | 徒手 | 仰卧交叉腿 |  | Lying Crossover | `duration` | 是 | free-exercise-db:Lying_Crossover | Unlicense | high | Q8：源条目 Lying Crossover 是拉伸，按时长 |
 | 348 | 臀 | 大腿 | 徒手 | 臀桥 | 单腿臀桥 | Single Leg Glute Bridge | `reps` | 是 | free-exercise-db:Single_Leg_Glute_Bridge | Unlicense | high | Q4：去掉「单腿」后与现有「徒手臀桥」近似，默认单侧 |
-| 349 | 臀 |  | 徒手 | 侧向摆腿热身 | 热身 - 侧向摆腿 | Leg Swings (Front-Back) | `duration` |  | wger.de:1fae7d45-0731-4640-8809-94c76b836571 | CC-BY-SA 4 (© Jhonatan) | medium | 近似映射：与「前后摆腿热身」共用库内条目 wger:1670 |
+| 349 | 臀 |  | 徒手 | 侧向摆腿热身 | 热身 - 侧向摆腿 | Leg Swings (Front-Back) | `duration` | 是 | wger.de:1fae7d45-0731-4640-8809-94c76b836571 | CC-BY-SA 4 (© Jhonatan) | medium | 近似映射：与「前后摆腿热身」共用库内条目 wger:1670 |
 | 350 | 臀 | 大腿 | 徒手 | 摇摆青蛙式热身 | 热身 - 摇摆青蛙式 | Frog Stretch | `duration` |  | wger.de:a37001e9-b4b3-45db-8ee3-046f40350efa | CC-BY-SA 4 (© Croak6728) | high | 近似映射：与「跪姿青蛙拉伸」共用库内条目 wger:1844 |
-| 351 | 臀 |  | 徒手 | 坐姿梨状肌拉伸 | 拉伸 - 坐姿梨状肌 | Seated Piriformis Stretch | `duration` |  | wger.de:ad5653e4-098e-4a84-af5b-a9349b108555 | CC-BY-SA 4 (© Pete-E automation) | high |  |
-| 352 | 臀 |  | 徒手 | 仰卧四字臀肌拉伸 | 拉伸 - 仰卧四字臀肌 | Lying Figure Four Stretch | `duration` |  | wger.de:76b6e798-e484-4606-aa64-8421aea51e88 | CC-BY-SA 4 (© Davidgj32) | high |  |
-| 353 | 臀 |  | 徒手 | 泡沫轴臀部放松 | 拉伸 - 泡沫轴臀冲 | Foam Roller Gluteus | `duration` |  | wger.de:164a31e9-ce70-4339-aee5-4ea7a3bdd246 | CC-BY-SA 4 (© Davidgj32) | medium | 名称规范化；泡沫轴放松，按 CX-D8 收入；不是拉伸 |
-| 354 | 臀 |  | 徒手 | 滚轮腿交叉拉伸 | 拉伸 - 滚轮腿交叉 | Piriformis-SMR | `duration` |  | free-exercise-db:Piriformis-SMR | Unlicense | medium |  |
+| 351 | 臀 |  | 徒手 | 坐姿梨状肌拉伸 | 拉伸 - 坐姿梨状肌 | Seated Piriformis Stretch | `duration` | 是 | wger.de:ad5653e4-098e-4a84-af5b-a9349b108555 | CC-BY-SA 4 (© Pete-E automation) | high |  |
+| 352 | 臀 |  | 徒手 | 仰卧四字臀肌拉伸 | 拉伸 - 仰卧四字臀肌 | Lying Figure Four Stretch | `duration` | 是 | wger.de:76b6e798-e484-4606-aa64-8421aea51e88 | CC-BY-SA 4 (© Davidgj32) | high |  |
+| 353 | 臀 |  | 徒手 | 泡沫轴臀部放松 | 拉伸 - 泡沫轴臀冲 | Foam Roller Gluteus | `duration` | 是 | wger.de:164a31e9-ce70-4339-aee5-4ea7a3bdd246 | CC-BY-SA 4 (© Davidgj32) | medium | 名称规范化；泡沫轴放松，按 CX-D8 收入；不是拉伸；Q8：按泡沫轴放松记时长 |
+| 354 | 臀 |  | 徒手 | 滚轮腿交叉拉伸 | 拉伸 - 滚轮腿交叉 | Piriformis-SMR | `duration` | 是 | free-exercise-db:Piriformis-SMR | Unlicense | medium |  |
 | 355 | 臀 | 大腿 | 悍马机 | 悍马机臀冲 |  | Glute Drive | `weightReps` |  | wger.de:ce21d3a2-cdc5-410c-9970-c25029ca3769 | CC-BY-SA 4 (© schweezer) | medium | 近似映射：与「器械髋冲」共用库内条目 wger:1528 |
 | 356 | 臀 |  | 悍马机 | 悍马机外展 |  | Thigh Abductor | `weightReps` |  | free-exercise-db:Thigh_Abductor | Unlicense | medium | 近似映射：与「坐姿髋外展、直腿髋外展(坐姿)」共用库内条目 fedb:Thigh_Abductor |
-| 357 | 臀 | 大腿 | 悍马机 | 挂片后摆腿 |  | Glute Kickback (Machine) | `weightReps` | 是 | wger.de:66ed6788-a1d8-49a2-af4d-397107fbf5fb | CC-BY-SA 4 (© barry) | medium | 近似映射：与「史密斯后踢、史密斯机上踢」共用库内条目 wger:1723 |
-| 358 | 臀 | 大腿 | 悍马机 | 挂片站姿臀冲 |  | Machine glute extension | `weightReps` |  | wger.de:ab872d04-ca20-4341-b3c9-76763b25ef42 | CC-BY-SA 4 (© Franpol) | medium |  |
+| 357 | 臀 | 大腿 | 悍马机 | 挂片后摆腿 |  | Glute Kickback (Machine) | `weightReps` | 是 | wger.de:66ed6788-a1d8-49a2-af4d-397107fbf5fb | CC-BY-SA 4 (© barry) | medium | 近似映射：与现有「器械臀屈伸」共用 wger 条目 UUID（来源表器械/变式不同，未按已在库处理）；近似映射：与「史密斯后踢、史密斯机上踢」共用库内条目 wger:1723 |
+| 358 | 臀 | 大腿 | 悍马机 | 挂片站姿臀冲 |  | Machine glute extension | `weightReps` |  | wger.de:ab872d04-ca20-4341-b3c9-76763b25ef42 | CC-BY-SA 4 (© Franpol) | medium | 近似映射：与现有「器械臀伸」共用 wger 条目 UUID（来源表器械/变式不同，未按已在库处理） |
 | 359 | 臀 |  | 悍马机 | 站姿髋外展 |  | Abduction while standing | `weightReps` | 是 | wger.de:d015a276-02ad-4c28-9d36-aedfbb431f53 | CC-BY-SA 4 (© tregga) | medium | 近似映射：与「弹力带站姿外展、绳索侧踢」共用库内条目 wger:1096 |
 | 360 | 臀 | 大腿 | 弹力带 | 弹力带站姿踢腿 |  | Hip Extension with Bands | `weightReps` | 是 | free-exercise-db:Hip_Extension_with_Bands | Unlicense | high | 器械按名称拆分：悬挂带 & 弹力带→弹力带；分类表为「大腿」，按肌肉推为「臀」；近似映射：与「弹力带跪姿腿屈伸」共用库内条目 fedb:Hip_Extension_with_Bands |
 | 361 | 臀 |  | 弹力带 | 弹力带站姿外展 | 弹力带站姿单推外展 | Abduction while standing | `weightReps` | 是 | wger.de:d015a276-02ad-4c28-9d36-aedfbb431f53 | CC-BY-SA 4 (© tregga) | medium | 器械按名称拆分：悬挂带 & 弹力带→弹力带；分类表为「大腿」，按肌肉推为「臀」；名称规范化；近似映射：与「站姿髋外展、绳索侧踢」共用库内条目 wger:1096 |
 | 362 | 臀 |  | 弹力带 | 弹力带坐姿腿外展 |  | Seated Hip Abduction | `weightReps` |  | wger.de:b144ac00-ec0c-4c43-898f-b2ac65048d98 | CC-BY-SA 4 (© Iko) | medium | 器械按名称拆分：悬挂带 & 弹力带→弹力带；分类表为「大腿」，按肌肉推为「臀」；合并 2 行：腿:78（弹力带坐姿腿外展）、臀:57（弹力带 - 坐姿腿外展） |
-| 363 | 臀 |  | 弹力带 | 弹力带螃式走 |  | Monster Walk | `weightReps` |  | free-exercise-db:Monster_Walk | Unlicense | high | 器械按名称拆分：悬挂带 & 弹力带→弹力带；分类表为「大腿」，按肌肉推为「臀」；近似映射：与「弹力带螃蟹行走」共用库内条目 fedb:Monster_Walk |
+| 363 | 臀 |  | 弹力带 | 弹力带螃蟹行走 | 弹力带螃式走 | Monster Walk | `weightReps` |  | free-exercise-db:Monster_Walk | Unlicense | high | 器械按名称拆分：悬挂带 & 弹力带→弹力带；分类表为「大腿」，按肌肉推为「臀」；名称规范化；合并 2 行：腿:79（弹力带螃式走）、臀:60（弹力带 - 螃蟹行走） |
 | 364 | 臀 | 大腿 | 弹力带 | 弹力带仰卧腿外展 |  | Supine Hip Abduction | `weightReps` | 是 | wger.de:2fe15ae4-085b-4116-8d73-2a120cc2a231 | CC-BY-SA 4 (© teus_ergaster) | medium | 器械按名称拆分：悬挂带 & 弹力带→弹力带；分类表为「大腿」，按肌肉推为「臀」 |
 | 365 | 臀 | 大腿 | 弹力带 | 弹力带跪姿腿屈伸 | 弹力带 - 跪姿腿屈伸 | Hip Extension with Bands | `weightReps` |  | free-exercise-db:Hip_Extension_with_Bands | Unlicense | high | 近似映射：与「弹力带站姿踢腿」共用库内条目 fedb:Hip_Extension_with_Bands |
 | 366 | 臀 |  | 弹力带 | 弹力带侧躺腿外展 | 弹力带 - 侧躺腿外展 | Side Lying Hip Abduction | `weightReps` | 是 | wger.de:7212cc74-656e-47ce-8292-d211676f2ee1 | CC-BY-SA 4 (© wakanda90) | medium |  |
 | 367 | 臀 |  | 弹力带 | 弹力带蚌式开合 | 弹力带 - 蚌式开合 | Banded Clamshell | `weightReps` | 是 | wger.de:8cc84753-e638-4c43-91c6-51c097813ca4 | CC-BY-SA 4 (© Croak6728) | high |  |
-| 368 | 臀 |  | 弹力带 | 弹力带螃蟹行走 | 弹力带 - 螃蟹行走 | Monster Walk | `weightReps` |  | free-exercise-db:Monster_Walk | Unlicense | high | 近似映射：与「弹力带螃式走」共用库内条目 fedb:Monster_Walk |
-| 369 | 臀 | 大腿、小腿 | 弹力带 | 弹力带跪姿臀冲 | 弹力带 - 跪姿臀冲 | Hip Lift with Band | `weightReps` |  | free-exercise-db:Hip_Lift_with_Band | Unlicense | high |  |
-| 370 | 臀 |  | 弹力带 | 弹力带髋外展 | 弹力带 - 髋外展 | Quadruped Hip Abduction | `weightReps` |  | wger.de:2a1f7c0c-c63d-43f1-9934-a209ed405ff8 | CC-BY-SA 4 (© treder) | high |  |
-| 371 | 核心 | 肩 | 杠铃 | 地雷杆甩 |  | Landmine 180's | `weightReps` |  | free-exercise-db:Landmine_180s | Unlicense | medium |  |
-| 372 | 核心 |  | 杠铃 | 负重下斜卷腹 |  | Decline Crunch | `weightReps` |  | free-exercise-db:Decline_Crunch | Unlicense | medium | 器械归一：杠铃片→杠铃（CX-D7）；近似映射：与「下斜卷腹」共用库内条目 fedb:Decline_Crunch |
-| 373 | 核心 |  | 哑铃 | 哑铃侧弯 |  | Dumbbell Side Bend | `weightReps` |  | free-exercise-db:Dumbbell_Side_Bend | Unlicense | high |  |
-| 374 | 核心 |  | 固定器械 | 器械侧卷腹 |  | Side Bends on Machine | `weightReps` |  | wger.de:919bb48a-42fe-4a11-9078-ea2b5087c49f | CC-BY-SA 3 (© klabautermann) | medium |  |
-| 375 | 核心 |  | 固定器械 | 滑轮器卷腹 |  | Cable Crunch | `weightReps` |  | free-exercise-db:Cable_Crunch | Unlicense | high | Q7：与现有「龙门架卷腹」近似；近似映射：与「绳索跪姿卷腹」共用库内条目 fedb:Cable_Crunch |
-| 376 | 核心 |  | 绳索 | 绳索跪姿卷腹 |  | Cable Crunch | `weightReps` |  | free-exercise-db:Cable_Crunch | Unlicense | high | Q7：与现有「龙门架卷腹」近似；近似映射：与「滑轮器卷腹」共用库内条目 fedb:Cable_Crunch |
-| 377 | 核心 | 背 | 绳索 | 站姿绳索转体 |  | Trunk Rotation With Cable | `weightReps` |  | wger.de:90e9f590-7d68-4afb-9f95-8429246ea4aa | CC-BY-SA 4 (© Robertcoop) | high |  |
-| 378 | 核心 |  | 绳索 | 站姿绳索卷腹 |  | Standing Rope Crunch | `weightReps` |  | free-exercise-db:Standing_Rope_Crunch | Unlicense | high |  |
-| 379 | 核心 | 肩 | 徒手 | 静态侧卧支撑 |  | Side Bridge | `duration` |  | free-exercise-db:Side_Bridge | Unlicense | high |  |
-| 380 | 核心 | 臀 | 徒手 | 平板支撑摆腿 | 平板支撑交替摆 | Plank with Alternating Leg Lift | `duration` |  | wger.de:94f2dea6-b336-41b2-a438-3ab7b13adbf7 | CC-BY-SA 4 (© hpmbala@gmail.com) | medium | 名称规范化 |
-| 381 | 核心 | 肩、大腿、小腿、臂 | 徒手 | 固定熊爬 |  | Bear Walk 2 | `duration` |  | wger.de:b7267f90-8706-442b-b918-507e16092b8e | CC-BY-SA 4 (© nate303303) | medium | Q8：按静止熊爬记时长 |
-| 382 | 核心 |  | 徒手 | 左右摸脚踝 |  | Alternate Heel Touchers | `reps` |  | free-exercise-db:Alternate_Heel_Touchers | Unlicense | high | 近似映射：与「仰卧触脚卷腹」共用库内条目 fedb:Alternate_Heel_Touchers |
-| 383 | 核心 | 肩、臂 | 徒手 | 平板肘撑转换 | 平板交替手肘支 | Plank-to-Elbow Extension | `reps` |  | wger.de:e75629ed-4991-4a48-984c-b297f3f9fb58 | CC-BY-SA 4 (© clafal) | high | 名称规范化；Q8：按交替动作记次数 |
-| 384 | 核心 |  | 徒手 | 坐姿提膝卷腹 | 坐姿交替提膝卷腹 | Seated Knee Tuck | `reps` |  | wger.de:371cfda2-1de6-419a-b40c-fc98fd3f7e41 | CC-BY-SA 4 (© utkb) | high |  |
-| 385 | 核心 |  | 徒手 | 坐姿直腿抬腿 | 坐姿交替直腿抬腿 | Seated Flat Bench Leg Pull-In | `reps` |  | free-exercise-db:Seated_Flat_Bench_Leg_Pull-In | Unlicense | medium |  |
-| 386 | 核心 |  | 徒手 | 坐姿交叉对侧提膝 |  | Seated Corkscrew | `reps` |  | wger.de:e9891a94-b1d4-47f4-a82b-c1aa82121abb | CC-BY-SA 4 (© Moffi) | medium |  |
-| 387 | 核心 |  | 徒手 | 负重俄罗斯转体 |  | Russian Twist | `weightReps` |  | wger.de:10510fb5-6ebd-4ddc-b03e-423b15deceea | CC-BY-SA 4 (© lion) | high |  |
-| 388 | 核心 |  | 徒手 | 负重仰卧起坐 |  | Sit-Up | `weightReps` |  | free-exercise-db:Sit-Up | Unlicense | medium |  |
-| 389 | 核心 |  | 徒手 | 3/4仰卧起坐 |  | 3/4 Sit-Up | `reps` |  | free-exercise-db:3_4_Sit-Up | Unlicense | high |  |
-| 390 | 核心 |  | 徒手 | 蝴蝶收腹 |  | Butterfly Sit Up | `reps` |  | wger.de:1bb3bbaf-2dc2-4651-95db-71faf5304075 | CC-BY-SA 4 (© Moffi) | high | 近似映射：与「平板蝴蝶收腹」共用库内条目 wger:1476 |
-| 391 | 核心 |  | 徒手 | 平板蝴蝶收腹 |  | Butterfly Sit Up | `reps` |  | wger.de:1bb3bbaf-2dc2-4651-95db-71faf5304075 | CC-BY-SA 4 (© Moffi) | medium | 近似映射：与「蝴蝶收腹」共用库内条目 wger:1476 |
-| 392 | 核心 |  | 徒手 | 空中单车 |  | Air Bike | `reps` |  | free-exercise-db:Air_Bike | Unlicense | high | 近似映射：与「空中单车(高难)」共用库内条目 fedb:Air_Bike |
-| 393 | 核心 |  | 徒手 | 空中单车(高难) |  | Air Bike | `reps` |  | free-exercise-db:Air_Bike | Unlicense | medium | 近似映射：与「空中单车」共用库内条目 fedb:Air_Bike |
-| 394 | 核心 |  | 徒手 | 平躺蹬姿转体 |  | Bicycle Crunches | `reps` |  | wger.de:fcf5039b-7784-4f82-830a-b213b597a646 | CC-BY-SA 4 (© hpmbala@gmail.com) | medium |  |
-| 395 | 核心 |  | 徒手 | 上斜卷腹转体 |  | Incline Crunches | `reps` |  | wger.de:7de7b8a8-313d-465f-bb22-8527ae45110a | CC-BY-SA 3 (© wger.de) | medium |  |
-| 396 | 核心 |  | 徒手 | 平躺曲腿旋转拉伸 | 拉伸-平躺曲腿旋转 | Torso rotation stretch | `duration` |  | wger.de:1e9b886f-0dbe-4434-829e-7159bcc40692 | CC-BY-SA 4 (© hpmbala@gmail.com) | medium |  |
-| 397 | 核心 |  | 徒手 | 贴地俯卧撑转体拉伸 | 拉伸-贴地俯卧撑转体 | Push-up rotations | `duration` |  | wger.de:a9633731-1d86-4b4a-996f-33a1dee0b0e1 | CC-BY-SA 4 (© wger.de) | medium |  |
-| 398 | 核心 |  | 徒手 | 抱头侧身拉伸 | 拉伸-单手抱头侧身 | Standing Lateral Stretch | `duration` | 是 | free-exercise-db:Standing_Lateral_Stretch | Unlicense | high |  |
-| 399 | 核心 |  | 徒手 | 反向卷腹 |  | Reverse Crunch | `reps` |  | free-exercise-db:Reverse_Crunch | Unlicense | high |  |
-| 400 | 核心 |  | 徒手 | 仰卧触脚卷腹 | 仰卧交替触脚卷腹 | Alternate Heel Touchers | `reps` |  | free-exercise-db:Alternate_Heel_Touchers | Unlicense | high | 近似映射：与「左右摸脚踝」共用库内条目 fedb:Alternate_Heel_Touchers |
-| 401 | 核心 |  | 徒手 | 45度侧弯 |  | Side bend | `reps` |  | wger.de:d36fdd3c-9a35-4643-a3fd-57db78c866d6 | CC-BY-SA 4 (© wger.de) | medium |  |
-| 402 | 核心 |  | 徒手 | 下斜卷腹 |  | Decline Crunch | `reps` |  | free-exercise-db:Decline_Crunch | Unlicense | high | 近似映射：与「负重下斜卷腹」共用库内条目 fedb:Decline_Crunch |
-| 403 | 核心 |  | 徒手 | 空心摇摆 |  | Hollow Hold | `duration` |  | wger.de:d059c63d-0a81-48a3-912a-44070c0def2e | CC0 | medium | 名字是「摇摆」但源条目是 Hollow Hold 静态支撑，按时长 |
-| 404 | 核心 |  | 徒手 | 仰卧摆脚 |  | Scissor Kick | `reps` |  | free-exercise-db:Scissor_Kick | Unlicense | high |  |
-| 405 | 核心 |  | 徒手 | 蹬腿 |  | Flutter Kicks | `reps` |  | wger.de:fdc550b6-ec58-4023-ba62-b54045e9a10d | CC-BY-SA 4 (© nate303303) | medium |  |
-| 406 | 核心 | 大腿、臂 | 徒手 | L坐 |  | L-sit | `duration` |  | wger.de:16202754-f567-4d23-a866-2c9cc8eba71d | CC-BY-SA 4 (© Croak6728) | high |  |
-| 407 | 核心 |  | 徒手 | 仰卧肘碰膝 |  | Elbow to Knee | `reps` |  | free-exercise-db:Elbow_to_Knee | Unlicense | high |  |
-| 408 | 核心 | 肩 | 徒手 | 龙旗 |  | Dragon-flag | `reps` |  | wger.de:f5ad82a8-adf8-4795-9874-1f6d183c56ed | CC-BY-SA 4 (© clafal) | high |  |
-| 409 | 核心 |  | 弹力带 | 弹力带仰卧卷腹 | 弹力带-仰卧卷腹 | Crunches | `weightReps` |  | free-exercise-db:Crunches | Unlicense | medium |  |
-| 410 | 核心 |  | 单杠 | 悬垂屈膝举腿 |  | Knee Raises | `reps` |  | wger.de:f4991a98-6422-4884-8ad3-43412f91fac1 | CC-BY-SA 4 (© clafal) | high |  |
-| 411 | 核心 |  | 单杠 | 前悬举腿 |  | Hanging Leg Raise | `reps` |  | free-exercise-db:Hanging_Leg_Raise | Unlicense | high |  |
-| 412 | 核心 | 大腿 | 单杠 | 悬垂举腿抬腿 |  | Leg raises pull up bar | `reps` |  | wger.de:b2025776-2397-4de7-a49e-296321169481 | CC-BY-SA 4 (© clafal) | high |  |
+| 368 | 臀 | 大腿、小腿 | 弹力带 | 弹力带跪姿臀冲 | 弹力带 - 跪姿臀冲 | Hip Lift with Band | `weightReps` |  | free-exercise-db:Hip_Lift_with_Band | Unlicense | high |  |
+| 369 | 臀 |  | 弹力带 | 弹力带髋外展 | 弹力带 - 髋外展 | Quadruped Hip Abduction | `weightReps` |  | wger.de:2a1f7c0c-c63d-43f1-9934-a209ed405ff8 | CC-BY-SA 4 (© treder) | high |  |
+| 370 | 核心 | 肩 | 杠铃 | 地雷杆甩 |  | Landmine 180's | `weightReps` |  | free-exercise-db:Landmine_180s | Unlicense | medium |  |
+| 371 | 核心 |  | 杠铃 | 负重下斜卷腹 |  | Decline Crunch | `weightReps` |  | free-exercise-db:Decline_Crunch | Unlicense | medium | 器械归一：杠铃片→杠铃（CX-D7）；近似映射：与「下斜卷腹」共用库内条目 fedb:Decline_Crunch |
+| 372 | 核心 |  | 哑铃 | 哑铃侧弯 |  | Dumbbell Side Bend | `weightReps` |  | free-exercise-db:Dumbbell_Side_Bend | Unlicense | high |  |
+| 373 | 核心 |  | 固定器械 | 器械侧卷腹 |  | Side Bends on Machine | `weightReps` |  | wger.de:919bb48a-42fe-4a11-9078-ea2b5087c49f | CC-BY-SA 3 (© klabautermann) | medium |  |
+| 374 | 核心 |  | 固定器械 | 滑轮器卷腹 |  | Cable Crunch | `weightReps` |  | free-exercise-db:Cable_Crunch | Unlicense | high | Q7：与现有「龙门架卷腹」近似；近似映射：与「绳索跪姿卷腹」共用库内条目 fedb:Cable_Crunch |
+| 375 | 核心 |  | 绳索 | 绳索跪姿卷腹 |  | Cable Crunch | `weightReps` |  | free-exercise-db:Cable_Crunch | Unlicense | high | Q7：与现有「龙门架卷腹」近似；近似映射：与「滑轮器卷腹」共用库内条目 fedb:Cable_Crunch |
+| 376 | 核心 | 背 | 绳索 | 站姿绳索转体 |  | Trunk Rotation With Cable | `weightReps` |  | wger.de:90e9f590-7d68-4afb-9f95-8429246ea4aa | CC-BY-SA 4 (© Robertcoop) | high |  |
+| 377 | 核心 |  | 绳索 | 站姿绳索卷腹 |  | Standing Rope Crunch | `weightReps` |  | free-exercise-db:Standing_Rope_Crunch | Unlicense | high |  |
+| 378 | 核心 | 肩 | 徒手 | 静态侧卧支撑 |  | Side Bridge | `duration` |  | free-exercise-db:Side_Bridge | Unlicense | high |  |
+| 379 | 核心 | 臀 | 徒手 | 平板支撑摆腿 | 平板支撑交替摆 | Plank with Alternating Leg Lift | `duration` |  | wger.de:94f2dea6-b336-41b2-a438-3ab7b13adbf7 | CC-BY-SA 4 (© hpmbala@gmail.com) | medium | 名称规范化 |
+| 380 | 核心 | 肩、大腿、小腿、臂 | 徒手 | 固定熊爬 |  | Bear Walk 2 | `duration` |  | wger.de:b7267f90-8706-442b-b918-507e16092b8e | CC-BY-SA 4 (© nate303303) | medium | Q8：按静止熊爬记时长 |
+| 381 | 核心 |  | 徒手 | 左右摸脚踝 |  | Alternate Heel Touchers | `reps` |  | free-exercise-db:Alternate_Heel_Touchers | Unlicense | high | 近似映射：与「仰卧触脚卷腹」共用库内条目 fedb:Alternate_Heel_Touchers |
+| 382 | 核心 | 肩、臂 | 徒手 | 平板肘撑转换 | 平板交替手肘支 | Plank-to-Elbow Extension | `reps` |  | wger.de:e75629ed-4991-4a48-984c-b297f3f9fb58 | CC-BY-SA 4 (© clafal) | high | 名称规范化；Q8：按交替动作记次数 |
+| 383 | 核心 |  | 徒手 | 坐姿提膝卷腹 | 坐姿交替提膝卷腹 | Seated Knee Tuck | `reps` |  | wger.de:371cfda2-1de6-419a-b40c-fc98fd3f7e41 | CC-BY-SA 4 (© utkb) | high |  |
+| 384 | 核心 |  | 徒手 | 坐姿直腿抬腿 | 坐姿交替直腿抬腿 | Seated Flat Bench Leg Pull-In | `reps` |  | free-exercise-db:Seated_Flat_Bench_Leg_Pull-In | Unlicense | medium |  |
+| 385 | 核心 |  | 徒手 | 坐姿交叉对侧提膝 |  | Seated Corkscrew | `reps` |  | wger.de:e9891a94-b1d4-47f4-a82b-c1aa82121abb | CC-BY-SA 4 (© Moffi) | medium |  |
+| 386 | 核心 |  | 徒手 | 负重俄罗斯转体 |  | Russian Twist | `weightReps` |  | wger.de:10510fb5-6ebd-4ddc-b03e-423b15deceea | CC-BY-SA 4 (© lion) | high | 近似映射：与现有「俄罗斯转体」共用 wger 条目 UUID（来源表器械/变式不同，未按已在库处理） |
+| 387 | 核心 |  | 徒手 | 负重仰卧起坐 |  | Sit-Up | `weightReps` |  | free-exercise-db:Sit-Up | Unlicense | medium |  |
+| 388 | 核心 |  | 徒手 | 3/4仰卧起坐 |  | 3/4 Sit-Up | `reps` |  | free-exercise-db:3_4_Sit-Up | Unlicense | high |  |
+| 389 | 核心 |  | 徒手 | 蝴蝶收腹 |  | Butterfly Sit Up | `reps` |  | wger.de:1bb3bbaf-2dc2-4651-95db-71faf5304075 | CC-BY-SA 4 (© Moffi) | high | 近似映射：与「平板蝴蝶收腹」共用库内条目 wger:1476 |
+| 390 | 核心 |  | 徒手 | 平板蝴蝶收腹 |  | Butterfly Sit Up | `reps` |  | wger.de:1bb3bbaf-2dc2-4651-95db-71faf5304075 | CC-BY-SA 4 (© Moffi) | medium | 近似映射：与「蝴蝶收腹」共用库内条目 wger:1476 |
+| 391 | 核心 |  | 徒手 | 空中单车 |  | Air Bike | `reps` |  | free-exercise-db:Air_Bike | Unlicense | high | 近似映射：与「空中单车(高难)」共用库内条目 fedb:Air_Bike |
+| 392 | 核心 |  | 徒手 | 空中单车(高难) |  | Air Bike | `reps` |  | free-exercise-db:Air_Bike | Unlicense | medium | 近似映射：与「空中单车」共用库内条目 fedb:Air_Bike |
+| 393 | 核心 |  | 徒手 | 平躺蹬姿转体 |  | Bicycle Crunches | `reps` |  | wger.de:fcf5039b-7784-4f82-830a-b213b597a646 | CC-BY-SA 4 (© hpmbala@gmail.com) | medium |  |
+| 394 | 核心 |  | 徒手 | 上斜卷腹转体 |  | Incline Crunches | `reps` |  | wger.de:7de7b8a8-313d-465f-bb22-8527ae45110a | CC-BY-SA 3 (© wger.de) | medium |  |
+| 395 | 核心 |  | 徒手 | 平躺曲腿旋转拉伸 | 拉伸-平躺曲腿旋转 | Torso rotation stretch | `duration` |  | wger.de:1e9b886f-0dbe-4434-829e-7159bcc40692 | CC-BY-SA 4 (© hpmbala@gmail.com) | medium |  |
+| 396 | 核心 |  | 徒手 | 贴地俯卧撑转体拉伸 | 拉伸-贴地俯卧撑转体 | Push-up rotations | `duration` |  | wger.de:a9633731-1d86-4b4a-996f-33a1dee0b0e1 | CC-BY-SA 4 (© wger.de) | medium |  |
+| 397 | 核心 |  | 徒手 | 抱头侧身拉伸 | 拉伸-单手抱头侧身 | Standing Lateral Stretch | `duration` | 是 | free-exercise-db:Standing_Lateral_Stretch | Unlicense | high |  |
+| 398 | 核心 |  | 徒手 | 反向卷腹 |  | Reverse Crunch | `reps` |  | free-exercise-db:Reverse_Crunch | Unlicense | high |  |
+| 399 | 核心 |  | 徒手 | 仰卧触脚卷腹 | 仰卧交替触脚卷腹 | Alternate Heel Touchers | `reps` |  | free-exercise-db:Alternate_Heel_Touchers | Unlicense | high | 近似映射：与「左右摸脚踝」共用库内条目 fedb:Alternate_Heel_Touchers |
+| 400 | 核心 |  | 徒手 | 45度侧弯 |  | Side bend | `reps` |  | wger.de:d36fdd3c-9a35-4643-a3fd-57db78c866d6 | CC-BY-SA 4 (© wger.de) | medium |  |
+| 401 | 核心 |  | 徒手 | 下斜卷腹 |  | Decline Crunch | `reps` |  | free-exercise-db:Decline_Crunch | Unlicense | high | 近似映射：与「负重下斜卷腹」共用库内条目 fedb:Decline_Crunch |
+| 402 | 核心 |  | 徒手 | 空心摇摆 |  | Hollow Hold | `duration` |  | wger.de:d059c63d-0a81-48a3-912a-44070c0def2e | CC0 | medium | 名字是「摇摆」但源条目是 Hollow Hold 静态支撑，按时长 |
+| 403 | 核心 |  | 徒手 | 仰卧摆脚 |  | Scissor Kick | `reps` |  | free-exercise-db:Scissor_Kick | Unlicense | high |  |
+| 404 | 核心 |  | 徒手 | 蹬腿 |  | Flutter Kicks | `reps` |  | wger.de:fdc550b6-ec58-4023-ba62-b54045e9a10d | CC-BY-SA 4 (© nate303303) | medium |  |
+| 405 | 核心 | 大腿、臂 | 徒手 | L坐 |  | L-sit | `duration` |  | wger.de:16202754-f567-4d23-a866-2c9cc8eba71d | CC-BY-SA 4 (© Croak6728) | high |  |
+| 406 | 核心 |  | 徒手 | 仰卧肘碰膝 |  | Elbow to Knee | `reps` |  | free-exercise-db:Elbow_to_Knee | Unlicense | high |  |
+| 407 | 核心 | 肩 | 徒手 | 龙旗 |  | Dragon-flag | `reps` |  | wger.de:f5ad82a8-adf8-4795-9874-1f6d183c56ed | CC-BY-SA 4 (© clafal) | high |  |
+| 408 | 核心 |  | 弹力带 | 弹力带仰卧卷腹 | 弹力带-仰卧卷腹 | Crunches | `weightReps` |  | free-exercise-db:Crunches | Unlicense | medium |  |
+| 409 | 核心 |  | 单杠 | 悬垂屈膝举腿 |  | Knee Raises | `reps` |  | wger.de:f4991a98-6422-4884-8ad3-43412f91fac1 | CC-BY-SA 4 (© clafal) | high |  |
+| 410 | 核心 |  | 单杠 | 前悬举腿 |  | Hanging Leg Raise | `reps` |  | free-exercise-db:Hanging_Leg_Raise | Unlicense | high |  |
+| 411 | 核心 | 大腿 | 单杠 | 悬垂举腿抬腿 |  | Leg raises pull up bar | `reps` |  | wger.de:b2025776-2397-4de7-a49e-296321169481 | CC-BY-SA 4 (© clafal) | high |  |
 
-说明：中文名由来源表动作名按 CX-D3 规范化；原名只在改名时显示。空白的「单侧默认」表示默认双侧；「是」表示默认单侧。来源 `finecoach-built` 的条目按 CX-D5 为 FineCoach 自建，作者 `FineCoach`，许可 `MIT`。
+说明：中文名由来源表动作名按 CX-D3 规范化；原名只在改名时显示。空白的「单侧默认」表示默认双侧；「是」表示默认单侧。拉伸/热身类里一次只练一侧的（如 坐姿梨状肌拉伸、单腿拉伸）默认单侧，两侧同时做的默认双侧。来源 `finecoach-built` 的条目按 CX-D5 为 FineCoach 自建，作者 `FineCoach`，许可 `MIT`。
 
 ## 附录 A：low 行（21 行）采纳建议
 
@@ -500,7 +501,7 @@
 | 不采纳 | 腹:52 | 弹力带 | 弹力带-十字转体 | — | — | — | — | — | — | 「十字转体」名称不通用、动作路线无法确认；旋转/抗旋已由绳索转体、帕洛夫、伐木覆盖。 |
 | 不采纳 | 腿:65 | 无 | 手枪深蹲 (有支撑) | — | — | — | — | — | — | 现有目录已有「手枪深蹲」，支撑版只是同一动作的退阶，CX-D3 又不许名字写「有支撑」，收进来就是重名。 |
 | 不采纳 | 腿:73 | 悬挂带 & 弹力带 | 弹力带仰卧登山者 | — | — | — | — | — | — | 「仰卧登山者」不是通用动作名、动作形式不清；已收录「弹力带登山者」。 |
-| 不采纳 | 腿:80 | 悬挂带 & 弹力带 | 弹力带鸭式前行 | — | — | — | — | — | — | 弹力带鸭步是田径式热身，教练课记录频率低；同类弹力带走类已有「弹力带螃式走」。 |
+| 不采纳 | 腿:80 | 悬挂带 & 弹力带 | 弹力带鸭式前行 | — | — | — | — | — | — | 弹力带鸭步是田径式热身，教练课记录频率低；同类弹力带走类已有「弹力带螃蟹行走」。 |
 | 建议采纳 | 腿:89 | 无 | 拉伸 - 滑雪 | 滑雪式拉伸 | 徒手 | `duration` | 否 | 大腿 | — | 滑雪式（宽距体前屈）是腘绳肌+内收肌的常见静态拉伸；现有「直腿弯腰」是窄距版，覆盖不了内收肌。 |
 | 建议采纳 | 臀:19 | 史密斯机 | 史密斯臀冲 | 史密斯臀冲 | 史密斯机 | `weightReps` | 否 | 臀 | 大腿、小腿 | 史密斯机臀冲是健身房臀冲的主流器械做法，现有目录只有杠铃臀冲和徒手臀桥，史密斯版是真实需要的器械区分。 |
 | 不采纳 | 臀:23 | 史密斯机 | 史密斯机俯卧蛙 | — | — | — | — | — | — | 「俯卧蛙」是青蛙式臀激活的非标准叫法，史密斯机上怎么做无法确认；同类已有哑铃青蛙臀桥、摇摆青蛙式。 |
@@ -569,8 +570,8 @@
 | 背:68 | 单杠 | 反手引体向上 | 反手引体向上 | 反手引体向上 | `87e6abc5-a701-442a-b4fb-bb2a7598a754` | 中文名相同 |  |
 | 背:69 | 无 | 山羊挺身 | 山羊挺身 | 山羊挺身 | `37f6bd56-815a-4975-99af-05e749fae4b2` | 中文名相同 |  |
 | 背:70 | 无 | 平板手肘撑 | 平板手肘撑 | 平板支撑 | `c9e57bbe-e839-44c6-861d-1c8dd2845e36` | 英文名相同 |  |
-| 背:71 | 单杠 | 弹跳引体 | 弹跳引体 | 引体向上 | `8e420408-0682-4ab6-89f5-2681e54c7ce0` | 英文名相同 |  |
-| 背:72 | 单杠 | 引体上拉 | 引体上拉 | 引体向上 | `8e420408-0682-4ab6-89f5-2681e54c7ce0` | 英文名相同 |  |
+| 背:71 | 单杠 | 弹跳引体 | 弹跳引体 | 引体向上 | `8e420408-0682-4ab6-89f5-2681e54c7ce0` | 英文名相同 | 近似映射：来源表映射到通用引体向上条目，弹跳变式不单列 |
+| 背:72 | 单杠 | 引体上拉 | 引体上拉 | 引体向上 | `8e420408-0682-4ab6-89f5-2681e54c7ce0` | 英文名相同 | 近似映射：来源表映射到通用引体向上条目，变式不单列 |
 | 背:88 | 固定器械 | 罗马椅背部伸展 | 山羊挺身 | 山羊挺身 | `37f6bd56-815a-4975-99af-05e749fae4b2` | 中文名相同 |  |
 | 胸:3 | 杠铃 | 杠铃卧推 | 杠铃平板卧推 | 杠铃平板卧推 | `3717d144-7815-4a97-9a56-956fb889c996` | 中文名相同 |  |
 | 胸:5 | 杠铃 | 下斜杠铃卧推 | 杠铃下斜卧推 | 杠铃下斜卧推 | `bcd801f0-9a38-4615-a91c-900153c8c234` | 中文名相同 |  |
@@ -589,7 +590,7 @@
 | 胸:32 | 固定器械 | 蝴蝶机飞鸟 - V2 | 蝴蝶机飞鸟V2 | 蝴蝶机夹胸 | `99449eae-0eae-44ab-a57f-fc094bbdda13` | 英文名相同 |  |
 | 胸:33 | 固定器械 | 蝴蝶机夹胸 V2 | 蝴蝶机夹胸V2 | 蝴蝶机夹胸 | `99449eae-0eae-44ab-a57f-fc094bbdda13` | 英文名相同 |  |
 | 胸:34 | 固定器械 | 器械坐姿夹胸 | 器械坐姿夹胸 | 蝴蝶机夹胸 | `99449eae-0eae-44ab-a57f-fc094bbdda13` | 英文名相同 |  |
-| 胸:39 | 固定器械 | 上斜悍马机飞鸟 | 上斜悍马机飞鸟 | 蝴蝶机夹胸 | `99449eae-0eae-44ab-a57f-fc094bbdda13` | 英文名相同 |  |
+| 胸:39 | 固定器械 | 上斜悍马机飞鸟 | 上斜悍马机飞鸟 | 蝴蝶机夹胸 | `99449eae-0eae-44ab-a57f-fc094bbdda13` | 英文名相同 | 近似映射：来源表映射到通用蝴蝶机夹胸条目，上斜悍马变式不单列 |
 | 胸:48 | 绳索 | 绳索十字夹胸 | 绳索十字夹胸 | 绳索十字夹胸 | `b16e3e5d-8401-4d2b-919c-15b536f9ec5e` | 中文名相同 |  |
 | 胸:49 | 绳索 | 绳索夹胸 | 绳索夹胸 | 绳索十字夹胸 | `b16e3e5d-8401-4d2b-919c-15b536f9ec5e` | 英文名相同 |  |
 | 胸:62 | 无 | 双杠臂屈伸 | 双杠臂屈伸 | 双杠臂屈伸 | `09dd3e3c-e53a-4e2c-a2e3-645d334f53e2` | 中文名相同 |  |
@@ -731,11 +732,22 @@
 | 弹力带深蹲 | 弹力带 | 腿:76（弹力带深蹲）；腿:77（弹力带单腿深蹲） | 合并单侧与双侧两行，默认双侧（单侧由教练切换）；合并行来源不同：free-exercise-db:Single-Leg_High_Box_Squat、free-exercise-db:Squats_-_With_Bands |
 | 哑铃臀冲 | 哑铃 | 臀:24（哑铃臀冲）；臀:25（单腿哑铃臀冲） | 合并单侧与双侧两行，默认双侧（单侧由教练切换）；合并行来源不同：wger.de:7cc24acf-3fc9-4d14-a461-cd00d1d18f0e、wger.de:af77220c-098c-47c2-9f8c-92a651998903 |
 | 弹力带坐姿腿外展 | 弹力带 | 腿:78（弹力带坐姿腿外展）；臀:57（弹力带 - 坐姿腿外展） |  |
+| 弹力带螃蟹行走 | 弹力带 | 腿:79（弹力带螃式走）；臀:60（弹力带 - 螃蟹行走） |  |
 
 ## 附录 E：疑似重复（机械规则没有判重，请确认）
 
 | 候选 | 候选来源 | 对照 | 依据 | 建议 |
 |---|---|---|---|---|
+| 悍马机侧平举 | 肩:47 | 现有「器械侧平举」（`dc87b735-016c-410b-915c-e3521fea4be7`） | 共用 wger 条目 UUID dc87b735-016c-410b-915c-e3521fea4be7，来源表器械/变式不同 | 请确认是否按「已在库」处理 |
+| 悍马机鹦鹉螺 | 背:44 | 现有「器械屈臂上拉」（`ad20ef5e-e360-4859-9110-668ee0c24721`） | 共用 wger 条目 UUID ad20ef5e-e360-4859-9110-668ee0c24721，来源表器械/变式不同 | 请确认是否按「已在库」处理 |
+| 负重俄罗斯转体 | 腹:10 | 现有「俄罗斯转体」（`10510fb5-6ebd-4ddc-b03e-423b15deceea`） | 共用 wger 条目 UUID 10510fb5-6ebd-4ddc-b03e-423b15deceea，来源表器械/变式不同 | 请确认是否按「已在库」处理 |
+| 史密斯机上踢 | 腿:52 | 现有「器械臀屈伸」（`66ed6788-a1d8-49a2-af4d-397107fbf5fb`） | 共用 wger 条目 UUID 66ed6788-a1d8-49a2-af4d-397107fbf5fb，来源表器械/变式不同 | 请确认是否按「已在库」处理 |
+| 弹力带箭步蹲 | 腿:67 | 现有「徒手弓步」（`3284fd27-5402-4821-9c32-29066d4e2667`） | 共用 wger 条目 UUID 3284fd27-5402-4821-9c32-29066d4e2667，来源表器械/变式不同 | 请确认是否按「已在库」处理 |
+| 弹力带站姿腿弯举 | 腿:69 | 现有「站姿腿弯举」（`49189e88-40b6-4c0d-a784-0cc3abbb8e75`） | 共用 wger 条目 UUID 49189e88-40b6-4c0d-a784-0cc3abbb8e75，来源表器械/变式不同 | 请确认是否按「已在库」处理 |
+| 保加利亚蹲(负重) | 腿:83 | 现有「哑铃保加利亚分腿蹲」（`60d2c34b-43a1-48a3-b43b-160e4c0157f2`） | 共用 wger 条目 UUID 60d2c34b-43a1-48a3-b43b-160e4c0157f2，来源表器械/变式不同 | 请确认是否按「已在库」处理 |
+| 史密斯后踢 | 臀:20 | 现有「器械臀屈伸」（`66ed6788-a1d8-49a2-af4d-397107fbf5fb`） | 共用 wger 条目 UUID 66ed6788-a1d8-49a2-af4d-397107fbf5fb，来源表器械/变式不同 | 请确认是否按「已在库」处理 |
+| 挂片后摆腿 | 臀:65 | 现有「器械臀屈伸」（`66ed6788-a1d8-49a2-af4d-397107fbf5fb`） | 共用 wger 条目 UUID 66ed6788-a1d8-49a2-af4d-397107fbf5fb，来源表器械/变式不同 | 请确认是否按「已在库」处理 |
+| 挂片站姿臀冲 | 臀:67 | 现有「器械臀伸」（`ab872d04-ca20-4341-b3c9-76763b25ef42`） | 共用 wger 条目 UUID ab872d04-ca20-4341-b3c9-76763b25ef42，来源表器械/变式不同 | 请确认是否按「已在库」处理 |
 | 仰卧杠铃臂屈伸 | 上臂:28 | 现有「仰卧臂屈伸(碎颅者)」（`8a356e9a-0058-4f60-b8d7-89147c3c371f`） | 同一动作（Lying Triceps Press / Extensions） | 请确认是否按「已在库」处理 |
 | 杠铃碎颅者 | 上臂:37 | 现有「仰卧臂屈伸(碎颅者)」（`8a356e9a-0058-4f60-b8d7-89147c3c371f`） | 同一动作（EZ-Bar Skullcrusher / Lying Triceps Extensions） | 请确认是否按「已在库」处理 |
 | 窄距卧推(靠近) | 上臂:29 | 现有「窄距卧推」（`3db63138-a047-4a4d-b616-1a0b7dfca105`） | 同一动作的肘位变式（Close-Grip Barbell Bench Press） | 请确认是否按「已在库」处理 |

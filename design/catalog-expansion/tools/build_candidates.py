@@ -192,6 +192,7 @@ NAME_OVERRIDES = {
     "背:88": "山羊挺身",
     "胸:15": "仰卧旋转展臂",
     "腿:13": "杠铃保加利亚蹲",
+    "腿:79": "弹力带螃蟹行走",
     "腹:14": "仰卧抬腿",
     "腹:21": "仰卧抬腿",
     "腹:22": "健腹轮",
@@ -228,6 +229,30 @@ UNILATERAL_TRUE = {
     "臀:68",   # 站姿髋外展
     "腿:52",   # 史密斯机上踢 (machine glute kickback, cf. P0-14)
     "腿:81",   # 弹力带仰卧腿外展
+    # One-side-at-a-time stretching / warm-up rows (CX-D6; P0-14 has no stretch
+    # precedent, so this is stated explicitly in the review's notes).
+    "小腿:6",  # 墙面小腿拉伸
+    "小腿:7",  # 墙面比目鱼肌拉伸
+    "小腿:8",  # 坐姿腓骨肌拉伸
+    "小臂:11", # 手腕屈肌拉伸
+    "小臂:12", # 手腕伸肌拉伸
+    "肩:78",   # 肩内外旋拉伸
+    "肩:81",   # 三头肌拉伸
+    "肩:82",   # 手臂交叉拉伸
+    "腿:88",   # 前后摆腿热身
+    "腿:90",   # 坐姿腿拉伸
+    "腿:92",   # 箭步蹲拉伸
+    "腿:94",   # 仰卧抬腿拉伸
+    "腿:95",   # 站姿腿拉伸
+    "腿:97",   # 髋屈肌与股四头肌拉伸
+    "臀:39",   # 仰卧交叉腿
+    "臀:41",   # 侧向摆腿热身
+    "臀:44",   # 坐姿梨状肌拉伸
+    "臀:45",   # 仰卧四字臀肌拉伸
+    "臀:46",   # 泡沫轴臀部放松
+    "臀:47",   # 滚轮腿交叉拉伸
+    "臀:43",   # 抱膝提拉热身（交替单腿）
+    "小腿:9",  # 跪姿胫骨肌拉伸（泡沫轴单侧）
 }
 UNILATERAL_FALSE = set()
 
@@ -250,7 +275,7 @@ ROW_NOTES = {
     "腿:85": "已在库（徒手臀桥）",
     "腿:89": "low 行，建议采纳（附录 A）；CX-D5 自建条目",
     "臀:19": "low 行，建议采纳（附录 A）；CX-D5 自建条目",
-    "臀:46": "泡沫轴放松，按 CX-D8 收入；不是拉伸",
+    "臀:46": "泡沫轴放松，按 CX-D8 收入；不是拉伸；Q8：按泡沫轴放松记时长",
     "臀:66": "原名疑缺「硬拉」",
     "腿:35": "待决 Q6：同一动作在臀:3 器械写哈克机",
     "腿:82": "器械待决：原名前缀「悬吊带」不在归一规则内（Q1）",
@@ -320,7 +345,7 @@ LOW_ROWS = OrderedDict([
     ("腿:73", (False, "", "", "", False, "", [],
                "「仰卧登山者」不是通用动作名、动作形式不清；已收录「弹力带登山者」。")),
     ("腿:80", (False, "", "", "", False, "", [],
-               "弹力带鸭步是田径式热身，教练课记录频率低；同类弹力带走类已有「弹力带螃式走」。")),
+               "弹力带鸭步是田径式热身，教练课记录频率低；同类弹力带走类已有「弹力带螃蟹行走」。")),
     ("腿:89", (True, "滑雪式拉伸", "徒手", "duration", False, "大腿", [],
                "滑雪式（宽距体前屈）是腘绳肌+内收肌的常见静态拉伸；现有「直腿弯腰」是窄距版，覆盖不了内收肌。")),
     ("臀:19", (True, "史密斯臀冲", "史密斯机", "weightReps", False, "臀", ["大腿", "小腿"],
@@ -332,13 +357,13 @@ LOW_ROWS = OrderedDict([
 # Questions the product owner has to decide; each renders as one line in the
 # review header. Referenced from ROW_NOTES / appendix rows.
 QUESTIONS = [
-    "Q1 器械待决 3 行：「悬垂带 - 面拉」「悬垂带 - 后束飞鸟」「悬吊带深蹲」的「悬垂带/悬吊带」是不是「悬挂带」笔误？若是，3 行器械改悬挂带（深蹲/面拉的记录方式也要相应改为 reps）。",
+    "Q1 器械待决 3 行：「悬垂带 - 面拉」「悬垂带 - 后束飞鸟」「悬吊带深蹲」的「悬垂带/悬吊带」是不是「悬挂带」笔误？若是，3 行器械改悬挂带；面拉与后束飞鸟的 recordMode 相应改为 reps（悬吊带深蹲已是 reps）。",
     "Q2 弹力带/悬挂带动作的 recordMode：本表把弹力带阻力视为负重、记 weightReps（重量栏填阻力值），悬挂带（TRX）是自重、记 reps；是否认可？",
     "Q3 热身类命名：本表统一为「动作 + 热身」并去掉「灵活性」「小幅」等描述词（如 肩胛骨后缩热身、膝关节绕环热身）；是否确认这一约定？",
     "Q4 去掉「单腿/单手/单臂」后与现有条目重名，按提示词规则第 6 条当作「已在库」，单侧变式因此不入库：单手俯卧撑→俯卧撑、杠铃单腿硬拉→杠铃硬拉、单腿哑铃硬拉→哑铃硬拉、哑铃轮换弯举→哑铃弯举；另有单腿臀桥、单腿罗马尼亚硬拉改成近似名后仍新增。是否接受，还是给单侧变式保留可区分名字（沿用 CX-D4 的「支撑/分腿」写法）？",
     "Q5 「绳索训练器」（上臂:55）不是动作名，映射到 Standing Biceps Cable Curl；是否按「绳索弯举」合并、不单独收录？",
     "Q6 哈克机深蹲：腿:35（固定器械）与臀:3（哈克机）是同一动作、器械列又互相矛盾，且都与现有「哈克深蹲」是同一动作；建议两行都按现有「哈克深蹲」处理、不再新增，是否确认？",
-    "Q7 疑似重复：附录 E 列出机械规则没有判重、但实际是同一动作的候选↔现有配对（如 仰卧杠铃臂屈伸 vs 仰卧臂屈伸(碎颅者)、窄距卧推(靠近/散开) vs 窄距卧推、杠铃碎颅者 vs 仰卧臂屈伸(碎颅者)、哑铃推举 vs 哑铃肩上推举、哑铃划船/哑铃划船(手撑) vs 单臂哑铃划船）；请逐条确认是否按「已在库」处理。",
+    "Q7 疑似重复：附录 E 列出机械规则没有判重、但实际是同一动作的候选↔现有配对（如 仰卧杠铃臂屈伸 vs 仰卧臂屈伸(碎颅者)、窄距卧推(靠近/散开) vs 窄距卧推、杠铃碎颅者 vs 仰卧臂屈伸(碎颅者)、哑铃推举 vs 哑铃肩上推举、哑铃划船/哑铃划船(手撑) vs 单臂哑铃划船），以及共用同一 wger 条目、但来源表器械/变式不同而按新条目保留的 10 行（如 悍马机侧平举 vs 器械侧平举）；请逐条确认是否按「已在库」处理。",
     "Q8 recordMode 拿不准的 4 行：「固定熊爬」按静止支撑记 duration、「平板肘撑转换」按交替动作记 reps、「仰卧交叉腿」按拉伸记 duration、「泡沫轴臀部放松」按泡沫轴放松记 duration；是否认可这 4 个判断？",
     "Q9 附录 A 的 21 条 low 行：本表建议采纳 6 条、不采纳 15 条；请逐条确认（采纳的按 CX-D5 记为 FineCoach 自建、MIT 许可）。",
     "Q10 来源表器材列不一致：胸表 44-47 行（史密斯机卧推、上斜/下斜史密斯机卧推、史密斯机 V-bar）写「固定器械」，其余表同类动作用「史密斯机」，且现有目录把同类动作归「史密斯机」；建议统一为「史密斯机」，是否确认？",
@@ -655,8 +680,24 @@ def build_entries(rows: list[dict], existing_by_english: dict, existing_by_name:
             entry["existing"] = match
             entry["match_basis"] = match_basis
             entry["notes"].append("已在库（%s）" % match_basis)
+            if key in MATCH_EXTRA_NOTES:
+                entry["notes"].append(MATCH_EXTRA_NOTES[key])
             entries.append(entry)
             continue
+
+        # Same wger entry as an existing catalog exercise, but the source table's
+        # equipment class differs (brand machine / other): keep it as a new
+        # equipment variant and surface the shared source instead of swallowing it.
+        if library.startswith("wger:"):
+            data = wger.get(library[5:])
+            if data:
+                current = existing_by_uuid.get(data["uuid"])
+                if current is not None:
+                    entry["source_collision"] = (current["canonicalName"], current["id"], data["uuid"])
+                    entry["notes"].append(
+                        "近似映射：与现有「%s」共用 wger 条目 UUID（来源表器械/变式不同，未按已在库处理）"
+                        % current["canonicalName"]
+                    )
 
         # Notes: equipment mapping, source-table/category mismatch, rename hints.
         if equipment_note:
@@ -736,15 +777,27 @@ def tag_approximate_mappings(merged: list[dict]) -> None:
         for entry in group:
             others = [name for name in names if name != entry["name"]]
             if len(others) > 3:
-                label = "%s 等 %d 条" % ("、".join(others[:3]), len(others))
+                entry["notes"].append(
+                    "近似映射：另 %d 个中文名（%s 等）共用库内条目 %s"
+                    % (len(others), "、".join(others[:3]), library)
+                )
             else:
-                label = "、".join(others)
-            entry["notes"].append("近似映射：与「%s」共用库内条目 %s" % (label, library))
+                entry["notes"].append(
+                    "近似映射：与「%s」共用库内条目 %s" % ("、".join(others), library)
+                )
 
 
 # Rows whose unilateral wording was removed and whose normalised name then hits
 # an existing bilateral entry (prompt rule 6 / Q4).
 COLLAPSED_UNILATERAL = {"上臂:4", "上臂:54", "胸:77", "背:9", "臀:18", "臀:26"}
+
+# Borderline "already in library" rows where the library entry is more generic
+# than the source row; surfaced in appendix B instead of silently swallowed.
+MATCH_EXTRA_NOTES = {
+    "背:71": "近似映射：来源表映射到通用引体向上条目，弹跳变式不单列",
+    "背:72": "近似映射：来源表映射到通用引体向上条目，变式不单列",
+    "胸:39": "近似映射：来源表映射到通用蝴蝶机夹胸条目，上斜悍马变式不单列",
+}
 
 SEMANTIC_DUPLICATES = [
     ("上臂:28", "仰卧臂屈伸(碎颅者)", "同一动作（Lying Triceps Press / Extensions）"),
@@ -776,6 +829,17 @@ def semantic_duplicates(merged: list[dict], existing: list[dict]) -> list[dict]:
     by_key = {entry["key"]: entry for entry in merged}
     by_name = {current["canonicalName"]: current for current in existing}
     pairs = []
+    for entry in merged:
+        collision = entry.get("source_collision")
+        if collision:
+            name, existing_id, uuid = collision
+            pairs.append({
+                "candidate": entry["name"],
+                "candidate_key": entry["key"],
+                "existing": name,
+                "existing_id": existing_id,
+                "reason": "共用 wger 条目 UUID %s，来源表器械/变式不同" % uuid,
+            })
     for key, existing_name, reason in SEMANTIC_DUPLICATES:
         entry = by_key.get(key)
         current = by_name.get(existing_name)
@@ -866,6 +930,11 @@ def render(data: dict, merged: list[dict], already: list[dict], calibrations: li
     lines.append("")
     lines.append("排序：主部位（%s）→ 器械（%s）。" % ("、".join(PART_ORDER), "、".join(EQUIP_ORDER)))
     lines.append("")
+    lines.append("「已在库」判定：中文名相同，或英文名相同，或 wger UUID 相同。英文名 / wger UUID "
+                 "命中时还要求器械类别一致（或同属自重类：徒手、单杠、悬挂带、其他），"
+                 "避免把来源表的近似映射（弹力带、品牌器械映射到通用库条目）误判成已在库。"
+                 "改名后与现有条目重名的行按规则当作已在库，列在附录 B。")
+    lines.append("")
     lines.append("| # | 主部位 | 次要部位 | 器械 | 中文名 | 原名 | English | 记录方式 | 单侧默认 | 来源 | 许可 | 置信度 | 备注 / 待决 |")
     lines.append("|---:|---|---|---|---|---|---|---|---|---|---|---|---|")
     for number, entry in enumerate(ordered, start=1):
@@ -900,6 +969,8 @@ def render(data: dict, merged: list[dict], already: list[dict], calibrations: li
     lines.append("")
     lines.append("说明：中文名由来源表动作名按 CX-D3 规范化；原名只在改名时显示。"
                  "空白的「单侧默认」表示默认双侧；「是」表示默认单侧。"
+                 "拉伸/热身类里一次只练一侧的（如 坐姿梨状肌拉伸、单腿拉伸）默认单侧，"
+                 "两侧同时做的默认双侧。"
                  "来源 `finecoach-built` 的条目按 CX-D5 为 FineCoach 自建，作者 `FineCoach`，许可 `MIT`。")
     lines.append("")
 
