@@ -38,6 +38,14 @@ struct ActiveSessionView: View {
     @ScaledMetric private var setEditorExtraHeight: CGFloat = 460
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
+    /// B-D9 / Δ12: keep keyboard visibility local to this page so the rest
+    /// timer remains alive while its bottom bar temporarily makes room for
+    /// the keyboard.
+    @State private var isKeyboardVisible = false
+    /// Snapshot used when the keyboard is dismissed. A rest that had already
+    /// ended at that moment must not flash back into view, while an active
+    /// rest keeps the normal ended-state hold when it finishes afterwards.
+    @State private var keyboardDismissedAt = Date.distantPast
 
     init(
         studentID: StableUUID,
@@ -118,7 +126,10 @@ struct ActiveSessionView: View {
         .safeAreaInset(edge: .bottom) {
             if viewModel.session?.state == .inProgress {
                 VStack(spacing: FCPrimitives.space2) {
-                    if let restTimer = viewModel.restTimer {
+                    if !isKeyboardVisible,
+                        let restTimer = viewModel.restTimer,
+                        !restTimer.isFinished(at: keyboardDismissedAt)
+                    {
                         RestTimerBar(
                             timer: restTimer,
                             onAdjust: { viewModel.adjustRest(by: $0) },
@@ -138,7 +149,7 @@ struct ActiveSessionView: View {
                 }
                 .padding(.horizontal, FCPrimitives.space4)
                 .padding(.vertical, FCPrimitives.space2)
-                .animation(.easeInOut(duration: 0.25), value: viewModel.restTimer != nil)
+                .animation(.easeInOut(duration: 0.25), value: restBarVisible)
                 .background(FCSemanticColors.surfacePage)
             }
         }
@@ -171,6 +182,13 @@ struct ActiveSessionView: View {
             if phase == .background {
                 viewModel.expireDeletedSetUndo()
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
+            isKeyboardVisible = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            keyboardDismissedAt = Date()
+            isKeyboardVisible = false
         }
         .onDisappear {
             viewModel.expireDeletedSetUndo()
@@ -704,6 +722,11 @@ struct ActiveSessionView: View {
             insertion: .move(edge: .bottom).combined(with: .opacity),
             removal: .opacity
         )
+    }
+
+    private var restBarVisible: Bool {
+        !isKeyboardVisible
+            && (viewModel.restTimer.map { !$0.isFinished(at: keyboardDismissedAt) } ?? false)
     }
 
 }
