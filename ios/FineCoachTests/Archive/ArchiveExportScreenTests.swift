@@ -311,7 +311,11 @@ final class ArchiveExportScreenTests: XCTestCase {
         let directory = try TemporaryProtectedDirectory()
         let environment = try AppEnvironment(
             rootURL: directory.url.appendingPathComponent("seed", isDirectory: true),
-            clock: ArchiveExportDebugSeed.makeClock()
+            clock: ArchiveExportDebugSeed.makeClock(),
+            // The seed creates appointments with reminders enabled, so the real
+            // notification center would present an authorization prompt that no
+            // automated run can answer. Keep this test off the system prompt.
+            notificationCenter: FakeNotificationScheduling()
         )
         let seeded = await ArchiveExportDebugSeed.seed(in: environment)
         XCTAssertTrue(seeded)
@@ -341,7 +345,11 @@ final class ArchiveExportScreenTests: XCTestCase {
         let directory = try TemporaryProtectedDirectory()
         let environment = try AppEnvironment(
             rootURL: directory.url.appendingPathComponent("roster", isDirectory: true),
-            clock: ArchiveExportDebugSeed.makeClock()
+            clock: ArchiveExportDebugSeed.makeClock(),
+            // The seed creates appointments with reminders enabled, so the real
+            // notification center would present an authorization prompt that no
+            // automated run can answer. Keep this test off the system prompt.
+            notificationCenter: FakeNotificationScheduling()
         )
         let seeded = await ArchiveExportDebugSeed.seed(in: environment)
         XCTAssertTrue(seeded, "seed stopped early")

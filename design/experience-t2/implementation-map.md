@@ -413,3 +413,29 @@ xcrun swift-format lint --configuration .swift-format --recursive --parallel --s
 - **校验提示写清发生了什么**：只去掉「请」后，「填写显示名称」「选择性别」读起来像字段标签。改为「还没填写显示名称」「还没选择性别」「还没填写调整原因。」「预计时长无效。」「内容不能为空。」「不是有效数字。」。
 - **扫描测试**：语气词改为只匹配句末用法（后面是结尾、空白或标点），避免误伤「哈克机」「哈克深蹲」这类词（C′ 第 2 步的器械筛选会用到）。新增 `testToneParticleScanIgnoresWordsLikeHackMachine`。「请」仍然全文禁止，所以「请求权限」写作「询问权限」。
 - **已知不足**：对照表「备注」列多数是同一句套话，没有逐条写理由；复审已逐条核对过原文和新文。
+
+## 测试挂起修复（2026-10-18）
+
+- **现象**：`FineCoachTests/ArchiveExportScreenTests/testDebugSeedBuildsTheFullReviewRoster`（`@MainActor`）一开始执行就挂住，没有断言输出。三次运行都这样（11:43 全量、12:20 全量、12:27 单条，均用模拟器 `4DD81BE1`），日志停在测试开始后的 `CoreData: debug: WAL checkpoint`。
+- **基线对比**：以复审修订之前的 `57fac25` 新建临时 worktree `.worktrees/b3-baseline-check`，用独立 `DerivedData/B3/Baseline` 跑同一条测试：**同样挂住**（2026-10-18 15:53:48 开始，日志 60 秒无增长）。结论：挂起与这批复审修订无关；修订的 5 个文件也没有改 seed、约课或通知路径。
+- **根因**（已复现，不是运行时刻问题）：
+  - `ArchiveExportDebugSeed.seedMoreStudents` 通过 `AppointmentUseCases.createSingle/createRecurring` 建了带提醒的约课：张浩然今天 13:00、赵无数今天 15:30、李思远「每周 6 次」和张浩然「隔两天 4 次」。这些调用没有传 `reminderEnabled`，用的是 `true` / `.sixty` 默认值；seed 里第一次触发授权请求的是李思远那条重复约课。
+  - `AppointmentUseCases` 建完约课会调 `NotificationScheduler.sync`，它再调 `SystemNotificationAdapter.requestAuthorizationIfNeeded()`。当这台模拟器上 app 还没有通知授权决定（`notDetermined`）时，`UNUserNotificationCenter.requestAuthorization` 会弹出系统授权弹窗并等用户选择。
+  - 自动化测试里没人能点这个弹窗，`await` 永不返回；该测试是 `@MainActor`，主 actor 被占住，于是这条测试（以及其后的 `@MainActor` 测试）一直挂住。
+  - 触发条件是「模拟器上是否已有 `com.finecoach.app` 的通知授权记录」，不是运行时刻：`4DD81BE1` 的 `data/Library/BulletinBoard/VersionedSectionInfo.plist` 没有 `com.finecoach.app` → 未决定 → 弹窗（三次挂起与本次基线复现都用它）；`EFE2D5A0` 有 `com.finecoach.app` 记录 → 已决定 → 不弹窗，所以 11:35 那次全量通过（`unit.log` 用 `EFE2D5A0`，`review-*` 三次用 `4DD81BE1`）。「21:00 之后才挂」是换模拟器、两次运行时间又相邻造成的巧合；seed 的 `offsetSeconds` 慢时钟与挂起无关。
+  - 证据：`DerivedData/B3/evidence/baseline.sample-60.txt`（主线程停在 XCTest 异步等待上，其余线程空闲）、`baseline-hang-screen.png`（模拟器上停的正是「精练教练」通知授权弹窗）、`baseline.watchdog.txt`、`baseline-single.log`。
+- **修改内容**：
+  - `ios/FineCoachApp/App/AppEnvironment.swift`：`AppEnvironment` 增加可注入的 `notificationCenter: any LocalNotificationScheduling`（默认 `SystemNotificationAdapter()`），与既有的 `clock` / `idGenerator` 注入并列，并传给 `NotificationScheduler`。产品行为不变：App 正常启动、带 `-FineCoachSeedArchiveExport` 的人工走查仍然使用真实通知中心。
+  - `ios/FineCoachTests/Archive/ArchiveExportScreenTests.swift`：`testDebugSeedBuildsTheReviewStudent` 与 `testDebugSeedBuildsTheFullReviewRoster` 两个 seed 测试在构造 `AppEnvironment` 时传入 TestSupport 里既有的 `FakeNotificationScheduling()`。
+  - 没有改 seed 数据、没有跳过/删除/放宽断言、没有只加超时，也没有改文案、画稿、Penpot、Core Data 模型或 `project.pbxproj`。
+- **修复验证**：在同一个 `4DD81BE1` 上（运行前后 `BulletinBoard` 里仍无 `com.finecoach.app`，即仍是「未决定」），单条 `testDebugSeedBuildsTheFullReviewRoster` 由挂住变为 **1.270 秒 PASS**（`fix-single.log` / `fix-single.xcresult`）。
+- **闸门结果**（全部在 `4DD81BE1`、Xcode 27.1 / iOS 26.5 simulator、2026-10-18 15:59–16:00 实跑）：
+
+| 闸门 | 结果 | 证据 |
+|---|---|---|
+| `swift-format lint --strict` | PASS（exit 0） | `fix-lint.log` |
+| App build（设备 SDK，`CODE_SIGNING_ALLOWED=NO`） | PASS（exit 0） | `fix-app-build.log` |
+| `FineCoachTests` 全量（`-parallel-testing-enabled NO`） | PASS：执行 497 项，0 失败，1 项既有 skip（`ContrastHarnessTests.testTextDisabledOnSurfacePageIsWCAGExempt`），12.5 秒 | `fix-unit.log` / `fix-unit.xcresult` |
+| `FineCoachIntegrationTests` 全量 | PASS：执行 167 项，0 失败，14.2 秒 | `fix-integration.log` / `fix-integration.xcresult` |
+
+- 证据都在 Git 忽略的 `DerivedData/B3/evidence/`，文件名用 `fix-` / `baseline-` 前缀；临时 worktree `.worktrees/b3-baseline-check` 用完已删除。没有运行 `FineCoachUITests`，没有 push 或 merge。测试是 simulator 证据，不是真机或人工验收；本次没有改用户可见 UI。
