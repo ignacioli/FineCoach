@@ -2,7 +2,7 @@
 
 > 这是 finecoach-scoring-optimization 这条主线的**唯一总览**。人和各个 AI 工具开工前先看这里，弄清现在在哪、下一步是什么、谁来做。
 > 细节以各自的权威文件为准：评分方法见 [`11d-experience-scorecard.md`](11d-experience-scorecard.md)，P0 决定见 [`experience-p0/implementation-map.md`](experience-p0/implementation-map.md)，阶段 B 决定见 [`experience-t2/decisions.md`](experience-t2/decisions.md)，C′ 决定见 `design/catalog-expansion/decisions.md`（在 `feat/catalog-expansion` 分支上）。
-> 最后更新：2026-10-17（Δ12 合并之后）。每个阶段收尾时更新本文件的「状态」「决定队列」两节。
+> 最后更新：2026-10-18（B3 合并、C′ 第 1 步交回之后）。每个阶段收尾时更新本文件的「状态」「决定队列」两节。
 
 ## 1. 目标和怎么算赢
 
@@ -20,10 +20,10 @@
 | B1 | 机械收敛：identifier、5 处确认框改共享组件、状态栏遮盖 | 4、10、11 | ⚠️ 第 1–4 项已合并；第 5 项 **BLOCKED，挂起**：UI 测试已对齐 B1、B2 并合并（`23eceb9`），但两轮都找不到 `activeSession.exercise.at.0`，原因未查明。2026-10-17 负责人决定先挂起调查 | `4a47f5f`；`experience-t2/implementation-map.md` 末节 |
 | B 画稿 | B-a、B-b、B-c | 4、11 | ✅ 2026-10-16 通过 | `cf86c13`；Penpot 快照 `B boards approved 2026-10-16` |
 | B2 | 交互改动 Δ1–Δ5、Δ8–Δ10：删分区、左滑删除、4 秒撤销、「…」菜单、恢复前确认 | 4、10、11 | ✅ 已合并；**还没人看过** | `9b2df06`；Codex 做，Cursor 收尾 |
-| B3 | T1 称呼和语气（Δ11）：不用「您」和「请」开头，不用语气词，并加扫描测试 | 11 | 🔄 提示词已就绪，交给 Codex（gpt-6.1-sol） | `.handoff/2026-10-17-codex-b3-copy-prompt.md`；`decisions.md` B-D7 |
+| B3 | T1 称呼和语气（Δ11）：不用「您」和「请」，不用「操作失败」，不用语气词，并加扫描测试 | 11 | ✅ 已合并；**还没人看过**；文案改动还没回填 Penpot | 合并提交 `363beff`；Codex 改写，Claude 复审修订，DeepSeek 修测试挂起；对照表在 `experience-t2/implementation-map.md` 的 B3 一节 |
 | Δ12 | 键盘弹起时，休息条盖住「确认」按钮 | 1、2 | ✅ 已合并（B-D9）；**还没人看过**，也没在 UI 测试里跑到 | 合并提交 `5bd6774`（`237078d`）；Codex gpt-6.1-sol 做 |
 | C | T3 对标素材库：训记、Too、Hevy、Todoist 的关键画面放进 Penpot 并标注 | 11、6 | ⏳ 没开始 | 等负责人截图，并确认「dotolist」就是 Todoist |
-| C′ | 动作库扩充：146 条扩到约 590 条 | 5（间接） | 🔄 第 1 步提示词已就绪，交给其他 agent | `.handoff/2026-10-17-catalog-expansion-step1-prompt.md` |
+| C′ | 动作库扩充：146 条扩到 557 条（候选） | 5（间接） | 🔄 第 1 步已交回并经 Codex 机械核对（可复现、统计自洽）；**等负责人填决定单** | `feat/catalog-expansion` @ `ad363a0`；`.handoff/2026-10-18-cprime-step1-owner-decisions.md`；核对报告 `.handoff/2026-10-18-cprime-step1-audit-report.md` |
 | 维度 5 | 拼音或首字母搜索，常用动作和最近练过的动作排前面 | 5 | ❗ **没排进任何阶段**（评分卡原话：「第 5 维靠搜索和排序解决」） | 建议并入 C′ 第 2 步，见 §4 |
 | D | P1 收获感：破纪录当场提示、课程总结写出进步、里程碑 | 6、4、9 | ⏳ 要先写 spec | 先定规则：什么算个人最佳、有哪些里程碑 |
 | E | P2 洞察：进步停滞、课包快用完、学员很久没约课 | 7 | ⏳ 要先写 spec | 先定展示哪些洞察 |
@@ -37,7 +37,7 @@
 
 | 泳道 | 内容（按顺序） | 写入方 | 和别的泳道冲不冲突 |
 |---|---|---|---|
-| 1 交互和文案（热点） | ~~Δ12~~ 已合并 → B3 文案 →（挂起）B1 第 5 项 UI 测试调查 | 一次只派一个工具 | B3 会改很多页面的文案，期间不要并行改 Feature 页面 |
+| 1 交互和文案（热点） | ~~Δ12~~、~~B3~~ 已合并 →（挂起）B1 第 5 项 UI 测试调查 → D | 一次只派一个工具 | 训练页等 Feature 页面现在空闲；C′ 第 2 步要改动作库页面，开工时这条泳道不要再派动作库相关改动 |
 | 2 动作库数据 | C′ 第 1 步候选清单 → 负责人审核 → 第 2 步：写入、「已停用」标记、新器械图标和筛选、维度 5 的搜索和排序、001 spec C-009 | DeepSeek、OpenCode 或 Cursor | 改 `ExerciseCatalog`、动作库页面和 Core 层，和泳道 1 基本不重叠；第 2 步开工前先确认泳道 1 没在改动作库页面 |
 | 3 负责人 | 真机重签 → 集中走查 → 真人评分 → 素材截图 | 产品负责人 | 不改代码 |
 | 4 spec | D、E、F 的 spec 写在私有 specs 仓：spec → clarify → plan → tasks | Claude 起草，负责人拍板 | 只改 specs 仓，可以随时并行 |
@@ -50,6 +50,7 @@ D 等 B3 合并之后再开工（都要改训练页和课程总结），也要�
 - **新器械的图标和筛选是界面改动。** 新增的哈克机、悍马机、弹力带、悬挂带、单杠要按 `FCEquipmentIcon` 的规则决定用不用图标（现有规则是「没有就不显示，不给兜底图标」），筛选从 8 项变成 13 项。这属于 B 类设计改动，先出 Penpot 画稿。
 - **两种撤销实现并存。** 删组是「立即删除，撤销时插回去」，删测量是「4 秒后才真正删除」。两种都有测试，记为已知差异，以后改撤销逻辑时统一。
 - **UI 测试仍然没跑通。** `FineCoachUITests` 不是验收闸门。`CoreTrainingUITests` 已对齐 B1、B2 并合并，但卡在找不到第 0 个动作，原因未明（identifier 在代码里存在，见 `ActiveSessionView.swift` 的 `exerciseAt`）。调查已挂起；以后重启时，从 accessibility 层级和 List 懒加载查起。
+- **模拟器上的通知授权会让测试挂住。** 2026-10-18 查明：会创建带提醒约课的测试如果走真实的通知中心，在还没做过通知授权决定的模拟器上，会弹出系统授权框，没人点就一直挂着。B3 已经给 `AppEnvironment` 加了通知中心注入点，两条 seed 测试改用 `FakeNotificationScheduling`。以后新写这类测试也照这样注入；跑测试时要设硬时限（见 B3 一节「测试挂起修复」）。
 - **Δ12 的一个边界（不阻塞）。** 休息在键盘弹起期间结束时，休息条没有渲染，所以结束时那一次 `.warning` 触感不会触发，条上的 3 秒自动收起也不会跑，`restTimer` 会留着一个已结束、不显示的值，直到下一次休息覆盖它。用户看不到这个状态。系统通知不受影响。以后改休息条时一并处理。
 
 ## 5. 工具分工
@@ -75,15 +76,15 @@ D 等 B3 合并之后再开工（都要改训练页和课程总结），也要�
 1. ~~真机签名~~：2026-10-17 已用 main `a81a9dd` 重签并覆盖安装（覆盖安装会保留数据，还没打开 App 核实），新签名到 **2026-10-25 10:45（北京时间）**。下次在这之前重签。
 2. ~~Δ12 修法~~：2026-10-17 定为 B-D9，同日实现并合并（`5bd6774`）。
 3. **集中走查加真人评分**。A、B 两个阶段做完了，还没有人看过。这次要看的是：`FCUndoRow`、`FCMoreMenu`、删组和删测量的撤销、指标页底部两行、5 个共享确认框、状态栏遮盖。看完按标准任务打分。
-4. **C′ 候选清单审核**。第 1 步交回以后进行。
+4. **C′ 候选清单审核**：第 1 步已交回。决定单 `.handoff/2026-10-18-cprime-step1-owner-decisions.md` 共 13 题，每题附 Claude 的建议，负责人正在填。
 5. **T3 素材**：4 个 App 的截图，以及确认「dotolist」就是 Todoist。
 6. **D 的规则**：什么算个人最佳、有哪些里程碑、要不要进分享报告（身体数据永远不进）。
 7. **F 的隐私规则**：锁屏和通知里能显示什么。
-8. **push 到 GitHub**：本地 `main` 比 `origin/main` 超前约 62 个提交，仓库是公开的。
-9. **清理 worktree**：下面这些分支已经合并，可以删掉对应的 worktree：`finecoach-experience-p0-ui`、`finecoach-scoring-optimization-77676e`、`docs-shared-project-rules`、`t2-interaction-audit`、`b2-interaction-changes`、`compassionate-gauss-735bc6`（Sonnet 整理会话留下的，内容已过时）、`d12-rest-bar-keyboard`。`b1-interaction-convergence` 里没提交的 UI 草稿已经被 `23eceb9` 吸收，负责人确认后可以一起删。
+8. **push 到 GitHub**：本地 `main` 比 `origin/main` 超前约 70 个提交，仓库是公开的。
+9. **清理 worktree**：下面这些分支已经合并，可以删掉对应的 worktree：`finecoach-experience-p0-ui`、`finecoach-scoring-optimization-77676e`、`docs-shared-project-rules`、`t2-interaction-audit`、`b2-interaction-changes`、`compassionate-gauss-735bc6`（Sonnet 整理会话留下的，内容已过时）、`d12-rest-bar-keyboard`、`b3-copy-tone`。`b1-interaction-convergence` 里没提交的 UI 草稿已经被 `23eceb9` 吸收，负责人确认后可以一起删。
 
 ## 7. 接下来三步
 
-1. Codex（gpt-6.1-sol）：做 B3 文案，提示词在 `.handoff/2026-10-17-codex-b3-copy-prompt.md`。Claude 审结果，并按对照表把文案改动回填进 Penpot；同时可以起草 D 的 spec。
-2. 其他 agent：C′ 第 1 步候选清单，交回后由 Claude 审、负责人拍板。
-3. 负责人：B3 合并以后，做一次集中走查，打第一次真人分，用它决定先做 D 还是 E。
+1. 负责人：填 C′ 决定单；做一次集中走查（A、B、Δ12、B3 都已合并），打第一次真人分，用它决定先做 D 还是 E。
+2. Claude：把 B3 的文案改动回填进 Penpot（对照表里的「画稿差异」）；按决定单写 C′ 第 2 步提示词，其中新器械图标和 13 项筛选要先出 Penpot 画稿；可以并行起草 D 的 spec。
+3. 其他 agent（Codex、OpenCode、Cursor 或 DeepSeek）：C′ 第 2 步实现。每次由 Claude 写提示词，放在主 checkout 的 `.handoff/prompt/`，负责人批准后启动。
