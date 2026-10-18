@@ -26,6 +26,10 @@ public final class AppEnvironment: ObservableObject {
     private let applicationRootURL: URL?
     private let clock: any Clock
     private let idGenerator: any IDGenerator
+    /// Injectable like the clock and ID generator: an automated test that drives the
+    /// debug seed must not reach the real notification center, where requesting
+    /// authorization presents a system prompt nothing can answer and hangs the run.
+    private let notificationCenter: any LocalNotificationScheduling
 
     public var isStorageAvailable: Bool {
         persistenceController != nil && persistenceWriter != nil && studentUseCases != nil
@@ -186,7 +190,8 @@ public final class AppEnvironment: ObservableObject {
     public init(
         rootURL: URL? = nil,
         clock: any Clock = SystemClock(),
-        idGenerator: any IDGenerator = SystemIDGenerator()
+        idGenerator: any IDGenerator = SystemIDGenerator(),
+        notificationCenter: any LocalNotificationScheduling = SystemNotificationAdapter()
     ) throws {
         let fileManager = FileManager.default
         let root: URL
@@ -330,6 +335,7 @@ public final class AppEnvironment: ObservableObject {
         self.applicationRootURL = root
         self.clock = clock
         self.idGenerator = idGenerator
+        self.notificationCenter = notificationCenter
         self.startupErrorDescription = nil
         self.catalogUnavailableMessage = nil
         try bindLiveStack(
@@ -366,6 +372,7 @@ public final class AppEnvironment: ObservableObject {
         self.applicationRootURL = nil
         self.clock = SystemClock()
         self.idGenerator = SystemIDGenerator()
+        self.notificationCenter = SystemNotificationAdapter()
         self.startupErrorDescription = (failure as? LocalizedError)?.errorDescription ?? "本地存储暂不可用。"
         self.catalogUnavailableMessage = nil
     }
@@ -452,7 +459,7 @@ public final class AppEnvironment: ObservableObject {
             studentRepository: repository,
             activeSession: sessionUseCases!,
             notifications: NotificationScheduler(
-                notificationCenter: SystemNotificationAdapter(),
+                notificationCenter: notificationCenter,
                 calendarProvider: SystemLocalCalendarProvider()
             ),
             clock: clock,
