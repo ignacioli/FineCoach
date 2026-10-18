@@ -229,3 +229,180 @@ UI 第 1 轮：FAIL 后中止，未整类完成。`testContinueTrainingDeleteAnd
 UI 第 2 轮：FAIL 后按阈值停止，`TEST INTERRUPTED`，总计约 148.896 秒（`d12-ui-final-2.log` / 可读 `.xcresult`）。同一用例在 exact 查询 `activeSession.exercise.at.0` 的存在断言失败；`testEmptySessionAbandonAndUnconfirmedInputDoesNotBlockFinish` 为 canceled。因此“只是 prefix helper”的推断未获证实，不能将其写成根因或已修复。导出的 `ui-final-2-all-attachments/` 中 8 个对应 hierarchy 附件只有 query chain、没有匹配元素；日志还有 `Invalid frame dimension (negative or non-finite)` warning，两者都不足以解释根因。没有走到本轮新增的 B2 组删除撤销与分区菜单步骤；也没有证实 Δ12 修复后原确认按钮问题已通过运行回归。需后续授权调查 accessibility / List 布局等原因；本轮不自行扩大到其他 App 布局修订。
 
 两轮均只选择 `FineCoachUITests/CoreTrainingUITests`，每轮上限 900 秒、无自动重试；每轮前用 `simctl shutdown / boot / bootstatus` 重启 `EFE2D5A0-4877-4682-BE79-7460C0C1E8C8`（iPhone 17 / iOS 26.5）。停止后确认本轮 xcodebuild、UI runner、XCTRunner 均无残留。没有第 3 轮。
+
+# B3 文案
+
+当前结果：**PASS（实现与自动闸门）**。B-D7 / Δ11 的文案实现与扫描测试；不代表产品负责人文案审查通过。未改、未运行 `FineCoachUITests`。未做人工视觉验证。
+
+## 执行记录（components.md §1.5）
+
+分类与依据：D（依据已批准 B-D7 / Δ11 修复实现文案偏离）；`decisions.md`、`design-system/README.md` §13、`components.md` §4.2 / §4.4 / §4.6 / §4.7；只调整内容参数，不改 anatomy、token 或交互。画稿文本差异按本任务要求仅列出，留待后续回填。
+影响范围：`DS-TEXT-FIELD`、`DS-EMPTY-STATE`、`DS-INLINE-RESULT`、`DS-CONFIRM-DIALOG`、`DS-SAVE-STATUS`、`DS-HINT-BAR` 均复用；全 App 校验、错误、空态、备份恢复、档案交付和首次说明文案；879 个 key 保持不变；无新增/扩展组件。
+设计决定：沿用 B-D7；保留不可恢复、不会远程删除旧图片/备份、密码不保存/无法找回、档案不可撤回、敏感信息不进报告等原有边界；10 条「你」逐条判断，去掉 8 条、保留 2 条，理由见表。没有新增产品决定。
+实施与检查：43 条 xcstrings、7 条 Swift 字面量及既有精确字符串期望更新；新增扫描 catalog zh-Hans 和 App Swift 中文字面量的测试，无违规白名单；无新入口；L3 为小屏最大字号的长文案换行，未做人工视觉验证。
+结果：PASS；xcstrings 提交 `fd45009`、Swift 提交 `89baab3`；扫描测试与本记录同属第三个 `test: guard B-D7 / Δ11 copy tone and record execution` 提交（用 `git log -1 --format=%h -- design/experience-t2/implementation-map.md` 定位）。App build、FineCoachTests 496 项（1 项既有 skip，0 失败）、FineCoachIntegrationTests 167 项（0 失败）、全仓 lint 均 PASS；新增扫描/解析测试 3 项均 PASS。证据 `DerivedData/B3/evidence/`；本轮无实现 BLOCKED，文案对照表待产品负责人审查，画稿/Penpot 待后续回填，L3 未做人工视觉验证。
+
+## 开工状态与重新盘点
+
+主 checkout 和新 worktree 的 `git status --short` / `git diff --stat` 均为空：tracked modification、staged content、untracked file 均无。新分支 `fix/b3-copy-tone` 从本地 `main` `b5bf379` 创建，包含 `5bd6774` / `f995834`。已执行 bootstrap 与 worktree gate PASS。
+
+重新盘点：879 条 zh-Hans，34 条含「请」（13 条以「请」开头）、3 条「操作失败」、1 条「吧」、10 条含「你」；与任务盘点一致。34 条中的「请求联系人权限」「现在不会请求权限」也受无「请」扫描约束，改为「询问」，含义不变。Swift 实际改写 7 条（6 条含「请」、1 条「本地文件操作失败」），与约数盘点一致。`audit.md` 是 T2 审计，未包含独立 T1 章节；本轮 T1 依据为 B-D7 与 Δ11。
+
+## 改写对照表
+
+每行一条；「你」保留项也列出。规则列标明移除项；边界不删除。完整表供产品负责人审查。
+
+| key（或 Swift 文件:行） | 原文 | 新文 | 规则（您 / 请 / 操作失败 / 语气词 / 你） | 备注 |
+|---|---|---|---|---|
+| student.error.generic | 操作失败，请重试。 | 没有完成，再试一次。 | 请 / 操作失败 | 保留事实和边界，仅调整称呼与语气 |
+| student.editor.nameRequired | 请填写显示名称 | 填写显示名称 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| student.editor.sexRequired | 请选择性别 | 选择性别 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| student.editor.contactHint | 电话与微信由教练手输。不读取系统通讯录，不请求联系人权限。 | 电话与微信由教练手输。不读取系统通讯录，不询问联系人权限。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| student.list.emptyBody | 开始记录第一堂课吧 | 开始记录第一堂课 | 语气词 | 保留事实和边界，仅调整称呼与语气 |
+| student.delete.boundary | 删除后无法从本页恢复。已分享的旧图片和你保存的备份不会被远程改写或删除。 | 删除后无法从本页恢复。已分享的旧图片和自行保存的备份不会被远程改写或删除。 | 你 | 保留事实和边界，仅调整称呼与语气 |
+| session.finish.draftsLead | 请返回处理草稿和待完成组，或明确丢弃后再结束。 | 返回处理草稿和待完成组，或明确丢弃后再结束。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| session.duration.reviewLead | 本次中断较长或时钟异常，请确认或修正训练时长后再结束。 | 本次中断较长或时钟异常，确认或修正训练时长后再结束。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| backup.restore.succeeded | 本机数据已替换为备份中的版本。请到学员、课包、模板等页面检查数据是否正确。 | 本机数据已替换为备份中的版本。到学员、课包、模板等页面检查数据是否正确。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| backup.password.hint | 口令不可恢复，也无法找回。请自行妥善保存，应用不会记住口令。 | 口令不可恢复，也无法找回。自行妥善保存，应用不会记住口令。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| backup.restore.needFile | 请先选择备份文件。 | 先选择备份文件。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| manualAdjustment.reasonPlaceholder | 请说明本次调整的原因 | 说明本次调整的原因 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| manualAdjustment.reasonRequired | 请填写调整原因。 | 填写调整原因。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| manualAdjustment.wouldGoNegative | 扣减后余额将为负，请检查课时数。 | 扣减后余额将为负，检查课时数。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| archive.export.error.message | 档案尚未生成。请返回后重试。 | 档案尚未生成。返回后再试一次。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| archive.export.preview.freeTextNotice | 精练教练不会自动识别文字里的敏感内容，请逐条检查后再继续。 | 精练教练不会自动识别文字里的敏感内容，逐条检查后再继续。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| archive.export.warning.subtitle | 请确认以下事实后再设置密码 | 确认以下事实后再设置密码 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| archive.export.fact.notABackup | 档案不是完整备份，不能用来恢复你的数据。 | 档案不是完整备份，不能用来恢复数据。 | 你 | 保留事实和边界，仅调整称呼与语气 |
+| archive.export.fact.studentDeletionDoesNotAffectYou | 学员删除不会影响你的原始数据、已保存的文件或其他副本。 | 学员删除不会影响教练的原始数据、已保存的文件或其他副本。 | 你 | 保留事实和边界，仅调整称呼与语气 |
+| archive.export.fact.sharePasswordSeparately | 请通过其他方式把密码单独告诉学员，不要和档案一起发送。 | 通过其他方式把密码单独告诉学员，不要和档案一起发送。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| archive.export.password.rule | 密码不会被保存，也无法找回。请通过其他方式单独告诉学员。 | 密码不会被保存，也无法找回。通过其他方式单独告诉学员。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| archive.export.password.error.message | 请重新输入。档案尚未生成。 | 重新输入。档案尚未生成。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| archive.firstLaunch.title | 你打算怎样使用精练教练？ | 打算怎样使用精练教练？ | 你 | 保留事实和边界，仅调整称呼与语气 |
+| archive.firstLaunch.import.subtitle | 只读查看教练交给你的档案 | 只读查看教练交付的档案 | 你 | 保留事实和边界，仅调整称呼与语气 |
+| archive.summary.subtitle | 请先确认档案信息 | 先确认档案信息 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| archive.settings.saveFailed.message | 请稍后再试。 | 稍后再试一次。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| archive.settings.deleteFailed.message | 本机档案没有删除完成，请重试。 | 本机档案没有删除完成，再试一次。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| onboarding.sheet.title | 你的数据怎样保存 | 数据怎样保存 | 你 | 保留事实和边界，仅调整称呼与语气 |
+| onboarding.sheet.private.detail | 给学员发训练报告时，由你挑选包含哪些内容。性别、身体数据、伤病、电话、微信和你的私人备注永远不会进入报告。 | 给学员发训练报告时，由教练挑选包含哪些内容。性别、身体数据、伤病、电话、微信和教练的私人备注永远不会进入报告。 | 你 | 保留事实和边界，仅调整称呼与语气 |
+| onboarding.sheet.permission.title | 现在不会请求权限 | 现在不会询问权限 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| onboarding.sheet.permission.detail | 不会弹出通知、通讯录等系统权限。只有你为课程打开提醒时，才会询问通知权限。 | 不会弹出通知、通讯录等系统权限。只有为课程打开提醒时，才会询问通知权限。 | 你 | 保留事实和边界，仅调整称呼与语气 |
+| today.error.generic | 加载今日安排失败，请重试。 | 加载今日安排失败，再试一次。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| appointmentEditor.studentRequired | 请先选择学员。 | 先选择学员。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| appointmentEditor.durationInvalid | 请输入有效的预计时长。 | 输入有效的预计时长。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| appointmentEditor.saveFailed | 保存失败，请重试。 | 保存失败，再试一次。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| coursePackages.error.generic | 课包信息暂不可用，请重试。 | 课包信息暂不可用，再试一次。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| coursePackageEditor.saveFailed | 保存失败，请重试。 | 保存失败，再试一次。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| manualAdjustment.saveFailed | 保存失败，请重试。 | 保存失败，再试一次。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| creditTrail.error.generic | 记录暂不可用，请重试。 | 记录暂不可用，再试一次。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| templates.error.generic | 操作失败，请重试。 | 没有完成，再试一次。 | 请 / 操作失败 | 保留事实和边界，仅调整称呼与语气 |
+| bodyData.error.generic | 操作失败，请重试。 | 没有完成，再试一次。 | 请 / 操作失败 | 保留事实和边界，仅调整称呼与语气 |
+| bodyMeasurementEntry.error.generic | 保存失败，请重试。 | 保存失败，再试一次。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| trends.error.generic | 加载失败，请重试。 | 加载失败，再试一次。 | 请 | 保留事实和边界，仅调整称呼与语气 |
+| archive.export.fact.irrevocableOnceReceived | 文件交出并被接收后，你和精练教练都无法撤回。 | 文件交出并被接收后，你和精练教练都无法撤回。 | 你 | 刻意保留：明确教练本人和 App 双方都不能撤回；省略主体会丢掉双方的边界。 |
+| onboarding.sheet.operator.title | 只有你在使用 | 只有你在使用 | 你 | 刻意保留：强调当前教练本人是唯一操作者；去掉后缺少主体，改成泛指教练会弱化唯一性。 |
+
+| ios/FineCoachApp/Core/Domain/DomainError.swift:26 | 请输入内容。 | 输入内容。 | 请 | 保留必填提示。 |
+| ios/FineCoachApp/Core/Domain/DomainError.swift:30 | 请输入有效数字。 | 输入有效数字。 | 请 | invalidDecimal / invalidNumber 共用，保留数字校验。 |
+| ios/FineCoachApp/Core/Domain/DomainError.swift:44 | 记录已更新，请重试。 | 记录已更新，再试一次。 | 请 | 保留记录版本变化事实。 |
+| ios/FineCoachApp/Core/Domain/DomainError.swift:48 | 本地保存失败，请重试。 | 本地保存没有成功，再试一次。 | 请 | 保留本地保存失败语义。 |
+| ios/FineCoachApp/Core/Domain/DomainError.swift:52 | 本地文件操作失败。 | 本地文件处理没有完成。 | 操作失败 | 共享 invalidFileOperation，保留本地文件范围；调用点见下。 |
+| ios/FineCoachApp/Core/Backup/FineCoachBackupV1.swift:29 | 请设置至少 8 个字符的口令。 | 口令至少需要 8 个字符。 | 请 | 保留 8 个字符最低长度。 |
+| ios/FineCoachApp/DesignSystem/Components/FCInlineResult.swift:144 | 请检查恢复后的学员、课程与训练记录。 | 检查恢复后的学员、课程与训练记录。 | 请 | Preview；不改组件结构。 |
+
+## 共用 fallback key 的调用范围
+
+三个 key 均被不同操作共用，保留 key 和调用结构，统一写「没有完成，再试一次。」。下列是全部生产代码直接引用点（不含 catalog 定义），未改错误分派：
+
+### `student.error.generic`
+
+27 处 fallback：动作库搜索/偏好、自定义动作保存/归档/恢复、训练保存/动作/组修改、历史加载/筛选、总结加载/备注保存、记录编辑加载/保存、分享加载/预览刷新/系统分享、记录详情加载/另存模板、备份导出/恢复、首次跳过创建、学员列表加载/恢复、学员归档/删除流程加载/永久删除、学员详情加载/恢复、学员编辑加载/保存/跳过首次创建。
+
+- `ios/FineCoachApp/Features/ActiveSession/ActiveSessionViewModel.swift:1008`
+- `ios/FineCoachApp/Features/BackupRestore/BackupExportFlow.swift:102`
+- `ios/FineCoachApp/Features/BackupRestore/BackupRestoreFlow.swift:86`
+- `ios/FineCoachApp/Features/ExerciseLibrary/CustomExerciseEditorView.swift:104`
+- `ios/FineCoachApp/Features/ExerciseLibrary/ExerciseLibraryViewModel.swift:117`
+- `ios/FineCoachApp/Features/History/HistoryListView.swift:105,129`
+- `ios/FineCoachApp/Features/History/SessionDetailView.swift:37,67`
+- `ios/FineCoachApp/Features/History/SessionEditView.swift:22,32`
+- `ios/FineCoachApp/Features/History/SessionSummaryView.swift:63,78`
+- `ios/FineCoachApp/Features/ShareReport/ShareReportFlowView.swift:79,93,118`
+- `ios/FineCoachApp/Features/Students/Onboarding/OnboardingView.swift:19`
+- `ios/FineCoachApp/Features/Students/Onboarding/StudentEditorView.swift:48,80,97`
+- `ios/FineCoachApp/Features/Students/StudentDetail/DeleteStudentFlow.swift:40,177,188`
+- `ios/FineCoachApp/Features/Students/StudentDetail/StudentDetailView.swift:70,78`
+- `ios/FineCoachApp/Features/Students/StudentList/StudentListView.swift:57,66`
+
+### `templates.error.generic`
+
+4 处 fallback：模板列表加载/新建/删除（共用 `present`）、应用模板、模板编辑（共用 `present`）、训练总结另存模板。
+
+- `ios/FineCoachApp/Features/History/SessionSummaryView.swift:40`
+- `ios/FineCoachApp/Features/Templates/ApplyTemplateView.swift:58`
+- `ios/FineCoachApp/Features/Templates/TemplateEditorView.swift:154`
+- `ios/FineCoachApp/Features/Templates/TemplateListView.swift:60`
+
+### `bodyData.error.generic`
+
+2 处 fallback：指标列表加载和新建自定义指标。
+
+- `ios/FineCoachApp/Features/BodyData/BodyDataListView.swift:98,150`
+
+### `DomainError.invalidFileOperation`
+
+同一个 error case 覆盖分享图片渲染/测高、档案快照 Application Support 路径获取/文件创建、训练恢复文件清理、性能 harness 的 Application Support 路径获取、动作来源清单读取，无法用一个具体动词准确覆盖，因此写「本地文件处理没有完成。」。7 个抛出点（不含声明和 switch）：
+
+- `ios/FineCoachApp/Features/ShareReport/ShareReportCardView.swift:318,357`
+- `ios/FineCoachApp/Core/Archive/ArchiveSnapshotStore.swift:103,327`
+- `ios/FineCoachApp/Core/Recovery/ActiveSessionRecoveryStore.swift:70`
+- `ios/FineCoachApp/Core/Platform/T116PerformanceHarness.swift:158`
+- `ios/FineCoachApp/Core/Application/ExerciseProvenanceValidator.swift:244`
+
+## 入口与布局清单（components.md §1.4）
+
+无新入口。沿用现有可见控件、identifier 和宽度 owner；无数据 mutation、无结构或布局改动。
+
+## 画稿差异（仅列出，未修改画稿 / Penpot）
+
+对已有 `design/*/screens/*.png` 做文字读取并查看相关画稿。以下列出旧文案所在页与对应 key；新文见完整对照表。Penpot「M1-B G5 Design」的对应页面文本需后续回填；本轮未连接 Penpot，未核验其当前 live 文本，不声称已同步。未变化的「只有你在使用」「你和精练教练都无法撤回」不属于差异。
+
+| 已批准画稿 / 对应页面 | 文案 key（旧 → 新见上表） |
+|---|---|
+| `m1-b-hifi/screens/16-empty-state.png` 学员空态 | `student.list.emptyBody` |
+| `m1-b-hifi/screens/37-manual-adjustment-stepper.png` 人工调整课时 | `manualAdjustment.reasonPlaceholder` |
+| `m1-b-hifi/screens/38-backup-restore-v2.png` 备份与恢复 | `backup.password.hint` |
+| `m1-b-hifi/screens/39-backup-restore-success.png` 恢复成功 | `backup.password.hint`、`backup.restore.succeeded` |
+| `m2-hifi/screens/M2-03-export-preview.png` 预览档案内容 | `archive.export.preview.freeTextNotice` |
+| `m2-hifi/screens/M2-04-delivery-warning.png` 交付前确认 | `archive.export.warning.subtitle`、`archive.export.fact.notABackup`、`archive.export.fact.studentDeletionDoesNotAffectYou`、`archive.export.fact.sharePasswordSeparately` |
+| `m2-hifi/screens/M2-05-archive-password-mismatch.png` 设置档案密码 | `archive.export.password.rule`、`archive.export.password.error.message` |
+| `m2-hifi/screens/M2-07-first-launch-choice.png` 首次启动选择 | `archive.firstLaunch.title`、`archive.firstLaunch.import.subtitle` |
+| `m2-hifi/screens/M2-10-import-summary.png` 档案已导入 | `archive.summary.subtitle` |
+| `m2-hifi/screens/W-02-welcome-data-sheet.png` 数据保存说明 | `onboarding.sheet.title`、`onboarding.sheet.private.detail`、`onboarding.sheet.permission.title`、`onboarding.sheet.permission.detail` |
+
+## L3 待人工看 / 既有 UI 测试挂起
+
+未做人工视觉验证。待看较长的新文案在小屏、最大 Dynamic Type 下换行是否影响可读性：学员删除边界、恢复完成说明、档案交付前确认、首次说明的私人信息与权限段落。没有进行「截图 → 比较 → 修改」循环。
+
+`ios/FineCoachUITests/Students/StudentLifecycleUITests.swift:100` 写死旧的 `student.delete.boundary`；按任务仅列出，未改、未运行。B1 第 5 项的 `CoreTrainingUITests` 仍是既有 BLOCKED，本轮不宣称解决。
+
+## 闸门与证据
+
+| 闸门 | 实际结果 | 证据 |
+|---|---|---|
+| App Debug iphoneos build，`CODE_SIGNING_ALLOWED=NO` | PASS | `DerivedData/B3/evidence/build.log` |
+| `FineCoachTests` | PASS：496 项，1 项既有 skip，0 失败 | `DerivedData/B3/evidence/unit.log` / `unit.xcresult` |
+| `FineCoachIntegrationTests` | PASS：167 项，0 失败 | `DerivedData/B3/evidence/integration.log` / `integration.xcresult` |
+| 全仓严格 swift-format lint | PASS，日志为空 | `DerivedData/B3/evidence/lint.log` |
+
+运行命令（repository root）：
+
+```sh
+xcodebuild -project ios/FineCoach.xcodeproj -scheme FineCoach -configuration Debug -sdk iphoneos -derivedDataPath DerivedData/B3/App CODE_SIGNING_ALLOWED=NO build
+xcodebuild -project ios/FineCoach.xcodeproj -scheme FineCoachTests -configuration Debug -destination 'platform=iOS Simulator,id=EFE2D5A0-4877-4682-BE79-7460C0C1E8C8' -derivedDataPath DerivedData/B3/Unit -resultBundlePath DerivedData/B3/evidence/unit.xcresult -parallel-testing-enabled NO test
+xcodebuild -project ios/FineCoach.xcodeproj -scheme FineCoachIntegrationTests -configuration Debug -destination 'platform=iOS Simulator,id=4DD81BE1-C2EA-4B71-90B0-2A7247934A60' -derivedDataPath DerivedData/B3/Integration -resultBundlePath DerivedData/B3/evidence/integration.xcresult -parallel-testing-enabled NO test
+xcrun swift-format lint --configuration .swift-format --recursive --parallel --strict ios/FineCoachApp ios/FineCoachTests ios/FineCoachIntegrationTests ios/FineCoachUITests ios/TestSupport
+```
+
+两台 simulator 均为既有 iPhone 17 / iOS 26.5；没有使用禁止的 simulator、真机或 `-FineCoachResetStore`。App build 是设备 SDK 编译，测试结果是 simulator 证据，不是真机或人工视觉验收。未运行 `FineCoachUITests`；lint 包含该目录但没有修改它。证据被 Git 忽略。没有 push 或 merge。
+
+
+既有 skip 为 `ContrastHarnessTests.testTextDisabledOnSurfacePageIsWCAGExempt`（禁用文字的 WCAG 豁免）；没有新增 skip。`TrainingEntryScanTests` 共 12 项全部通过，其中新增 3 项（catalog、Swift literals、parser）；既有 `ArchiveExportScreenTests` 只更新 3 个精确字符串期望，没有删断言或放宽断言。catalog 扫描递归覆盖 stringUnit 与 variations，断言扫描值非空；Swift 扫描不设违规白名单，跳过注释和 `*DebugSeed.swift`。

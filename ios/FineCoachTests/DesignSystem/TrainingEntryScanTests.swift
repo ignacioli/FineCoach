@@ -208,7 +208,210 @@ final class TrainingEntryScanTests: XCTestCase {
         XCTAssertTrue(text.contains("FCMoreMenu(accessibilityIdentifier: FCAccessibilityID.bodyMeasurementMore)"))
     }
 
+    /// B-D7 / Δ11: every translated zh-Hans value follows the approved direct,
+    /// specific tone. The catalog is intentionally scanned without a whitelist.
+    func testChineseLocalizationsUseB7Tone() throws {
+        let url = appRoot().appendingPathComponent("Resources/Localizable.xcstrings")
+        let catalog = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any]
+        )
+        let strings = try XCTUnwrap(catalog["strings"] as? [String: Any])
+        var scannedValues = 0
+        for (key, rawEntry) in strings {
+            let entry = try XCTUnwrap(rawEntry as? [String: Any], key)
+            let localizations = try XCTUnwrap(entry["localizations"] as? [String: Any], key)
+            let zhHans = try XCTUnwrap(localizations["zh-Hans"] as? [String: Any], key)
+            let values = Self.localizedValues(in: zhHans)
+            XCTAssertFalse(values.isEmpty, "missing zh-Hans value for \(key)")
+            for value in values {
+                assertB7Tone(value, source: "Localizable.xcstrings:\(key)")
+                scannedValues += 1
+            }
+        }
+        XCTAssertGreaterThan(scannedValues, 0)
+
+    }
+
+    /// B-D7 / Δ11: direct Chinese string literals in the application are
+    /// scanned separately from the catalog. Comments and synthetic DebugSeed
+    /// fixtures are excluded because they are not user-facing copy.
+    func testChineseAppStringLiteralsUseB7Tone() throws {
+        let appDirectory = appRoot()
+        let enumerator = try XCTUnwrap(
+            FileManager.default.enumerator(at: appDirectory, includingPropertiesForKeys: nil)
+        )
+        for case let url as URL in enumerator where url.pathExtension == "swift" {
+            guard !url.lastPathComponent.hasSuffix("DebugSeed.swift") else { continue }
+            var blockCommentDepth = 0
+            let text = try String(contentsOf: url, encoding: .utf8)
+            let literals = Self.extractSwiftStringLiterals(
+                from: text,
+                blockCommentDepth: &blockCommentDepth
+            )
+            XCTAssertEqual(blockCommentDepth, 0, "unclosed block comment in \(url.path)")
+            for literal in literals where literal.range(of: "[一-龥]", options: .regularExpression) != nil {
+                assertB7Tone(literal, source: url.path)
+            }
+        }
+    }
+
+    func testStringLiteralScannerKeepsURLsRawAndMultilineButSkipsComments() {
+        let sample =
+            "// \"请\"\n"
+            + "let url = \"https://example.com/*请*/\"\n"
+            + "let raw = #\"原始 // 请 /* 请 */\"#\n"
+            + "let multiline = \"\"\"\n多行请\n\"\"\"\n"
+            + "let rawMultiline = #\"\"\"原始多行请\"\"\"#\n"
+            + "/* \"请\" */\n"
+        var blockCommentDepth = 0
+        let literals = Self.extractSwiftStringLiterals(
+            from: sample,
+            blockCommentDepth: &blockCommentDepth
+        )
+
+        XCTAssertEqual(blockCommentDepth, 0)
+        XCTAssertTrue(literals.contains("https://example.com/*请*/"))
+        XCTAssertTrue(literals.contains("原始 // 请 /* 请 */"))
+        XCTAssertTrue(literals.contains("\n多行请\n"))
+        XCTAssertTrue(literals.contains("原始多行请"))
+        XCTAssertFalse(literals.contains("请"), "comment text must not be extracted")
+    }
+
     // MARK: - Helpers
+
+    /// Include plural and device variations as well as top-level string units.
+    private static func localizedValues(in node: [String: Any]) -> [String] {
+        var values: [String] = []
+        if let unit = node["stringUnit"] as? [String: Any], let value = unit["value"] as? String {
+            values.append(value)
+        }
+        for (key, child) in node where key != "stringUnit" {
+            if let dictionary = child as? [String: Any] {
+                values += localizedValues(in: dictionary)
+            }
+        }
+        return values
+    }
+
+    private func assertB7Tone(_ value: String, source: String) {
+        let forbidden: [(String, String)] = [
+            ("您", "称呼必须使用「你」或省略人称"),
+            ("请", "避免使用「请」"),
+            ("操作失败", "说明具体失败结果，不使用「操作失败」"),
+            ("！", "避免使用感叹号"),
+            ("!", "避免使用感叹号"),
+            ("吧", "避免语气词"),
+            ("呢", "避免语气词"),
+            ("哦", "避免语气词"),
+            ("啦", "避免语气词"),
+            ("呀", "避免语气词"),
+            ("哈", "避免语气词"),
+        ]
+        for (needle, rule) in forbidden where value.contains(needle) {
+            XCTFail("\(source) contains \(needle): \(rule); value=\(value)")
+        }
+    }
+
+    private static func extractSwiftStringLiterals(
+        from source: String,
+        blockCommentDepth: inout Int
+    ) -> [String] {
+        let characters = Array(source)
+        var literals: [String] = []
+        var index = 0
+
+        while index < characters.count {
+            if blockCommentDepth > 0 {
+                if hasToken("/*", at: index, in: characters) {
+                    blockCommentDepth += 1
+                    index += 2
+                } else if hasToken("*/", at: index, in: characters) {
+                    blockCommentDepth -= 1
+                    index += 2
+                } else {
+                    index += 1
+                }
+                continue
+            }
+
+            if hasToken("//", at: index, in: characters) {
+                while index < characters.count, characters[index] != "\n" {
+                    index += 1
+                }
+                continue
+            }
+            if hasToken("/*", at: index, in: characters) {
+                blockCommentDepth = 1
+                index += 2
+                continue
+            }
+
+            var hashCount = 0
+            while index + hashCount < characters.count, characters[index + hashCount] == "#" {
+                hashCount += 1
+            }
+            let quoteIndex = index + hashCount
+            guard quoteIndex < characters.count, characters[quoteIndex] == "\"" else {
+                index += 1
+                continue
+            }
+
+            let isMultiline = hasToken("\"\"\"", at: quoteIndex, in: characters)
+            let openingLength = isMultiline ? 3 : 1
+            let contentStart = quoteIndex + openingLength
+            var cursor = contentStart
+            var closingIndex: Int?
+            while cursor < characters.count {
+                if isMultiline,
+                    hasToken("\"\"\"", at: cursor, in: characters),
+                    hasHashes(hashCount, at: cursor + 3, in: characters)
+                {
+                    closingIndex = cursor
+                    break
+                }
+                if !isMultiline,
+                    characters[cursor] == "\"",
+                    hasHashes(hashCount, at: cursor + 1, in: characters),
+                    hashCount > 0 || !isEscaped(cursor, in: characters)
+                {
+                    closingIndex = cursor
+                    break
+                }
+                cursor += (characters[cursor] == "\\" && hashCount == 0) ? 2 : 1
+            }
+
+            guard let closingIndex else {
+                literals.append(String(characters[contentStart..<characters.count]))
+                index = characters.count
+                continue
+            }
+            literals.append(String(characters[contentStart..<closingIndex]))
+            index = closingIndex + (isMultiline ? 3 : 1) + hashCount
+        }
+
+        return literals
+    }
+
+    private static func hasToken(_ token: String, at index: Int, in characters: [Character]) -> Bool {
+        let tokenCharacters = Array(token)
+        guard index >= 0, index + tokenCharacters.count <= characters.count else { return false }
+        return tokenCharacters.indices.allSatisfy { characters[index + $0] == tokenCharacters[$0] }
+    }
+
+    private static func hasHashes(_ count: Int, at index: Int, in characters: [Character]) -> Bool {
+        guard index >= 0, index + count <= characters.count else { return false }
+        return (0..<count).allSatisfy { characters[index + $0] == "#" }
+    }
+
+    private static func isEscaped(_ index: Int, in characters: [Character]) -> Bool {
+        var backslashes = 0
+        var cursor = index - 1
+        while cursor >= 0, characters[cursor] == "\\" {
+            backslashes += 1
+            cursor -= 1
+        }
+        return backslashes.isMultiple(of: 2) == false
+    }
 
     /// A system `Button` with a text title (`Button("…")`,
     /// `Button(String(localized:…))`), which renders system blue. `FCButton(`
