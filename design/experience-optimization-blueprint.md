@@ -20,7 +20,7 @@
 | B1 | 机械收敛：identifier、5 处确认框改共享组件、状态栏遮盖 | 4、10、11 | ⚠️ 第 1–4 项已合并；第 5 项 **BLOCKED，挂起**：UI 测试已对齐 B1、B2 并合并（`23eceb9`），但两轮都找不到 `activeSession.exercise.at.0`，原因未查明。2026-10-17 负责人决定先挂起调查 | `4a47f5f`；`experience-t2/implementation-map.md` 末节 |
 | B 画稿 | B-a、B-b、B-c | 4、11 | ✅ 2026-10-16 通过 | `cf86c13`；Penpot 快照 `B boards approved 2026-10-16` |
 | B2 | 交互改动 Δ1–Δ5、Δ8–Δ10：删分区、左滑删除、4 秒撤销、「…」菜单、恢复前确认 | 4、10、11 | ✅ 已合并；**还没人看过** | `9b2df06`；Codex 做，Cursor 收尾 |
-| B3 | T1 称呼和语气（Δ11）：不用「您」和「请」开头，不用语气词，并加扫描测试 | 11 | ⏳ 下一个开工，提示词待写 | `decisions.md` B-D7 |
+| B3 | T1 称呼和语气（Δ11）：不用「您」和「请」开头，不用语气词，并加扫描测试 | 11 | 🔄 提示词已就绪，交给 Codex（gpt-6.1-sol） | `.handoff/2026-10-17-codex-b3-copy-prompt.md`；`decisions.md` B-D7 |
 | Δ12 | 键盘弹起时，休息条盖住「确认」按钮 | 1、2 | ✅ 已合并（B-D9）；**还没人看过**，也没在 UI 测试里跑到 | 合并提交 `5bd6774`（`237078d`）；Codex gpt-6.1-sol 做 |
 | C | T3 对标素材库：训记、Too、Hevy、Todoist 的关键画面放进 Penpot 并标注 | 11、6 | ⏳ 没开始 | 等负责人截图，并确认「dotolist」就是 Todoist |
 | C′ | 动作库扩充：146 条扩到约 590 条 | 5（间接） | 🔄 第 1 步提示词已就绪，交给其他 agent | `.handoff/2026-10-17-catalog-expansion-step1-prompt.md` |
@@ -84,6 +84,6 @@ D 等 B3 合并之后再开工（都要改训练页和课程总结），也要�
 
 ## 7. 接下来三步
 
-1. Claude：写 B3 文案的提示词，交给 Codex（gpt-6.1-sol）；同时可以起草 D 的 spec。
+1. Codex（gpt-6.1-sol）：做 B3 文案，提示词在 `.handoff/2026-10-17-codex-b3-copy-prompt.md`。Claude 审结果，并按对照表把文案改动回填进 Penpot；同时可以起草 D 的 spec。
 2. 其他 agent：C′ 第 1 步候选清单，交回后由 Claude 审、负责人拍板。
 3. 负责人：B3 合并以后，做一次集中走查，打第一次真人分，用它决定先做 D 还是 E。
