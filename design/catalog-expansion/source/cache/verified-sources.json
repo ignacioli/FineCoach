@@ -1,0 +1,4844 @@
+{
+  "cacheManifest": [
+    {
+      "bytes": 1005327,
+      "path": "design/catalog-expansion/source/cache/free-exercise-db/exercises.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "5bb747e3fc658f095a60dcbf6d53c96627acdcc6ffb6fffde86f7e26995d40bf",
+      "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/dist/exercises.json"
+    },
+    {
+      "bytes": 7403,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1080.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "de1cf5ba5a7e1885dd91c0f6cdf1f5f5bb920615b09210b4e81bed7ae1635706",
+      "url": "https://wger.de/api/v2/exerciseinfo/1080/"
+    },
+    {
+      "bytes": 6394,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1096.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "adb26af56b7cb3f300cd5219cc3b0b424edc944c58e01358f313b4487e5dd011",
+      "url": "https://wger.de/api/v2/exerciseinfo/1096/"
+    },
+    {
+      "bytes": 2441,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1105.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "d37391d8b736abc691437a16a0c8f5b65549135c082a20f8c9396d3177792c27",
+      "url": "https://wger.de/api/v2/exerciseinfo/1105/"
+    },
+    {
+      "bytes": 14415,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1113.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "3cc6d37455ab64057b693eb2866190c405bcc2baecb4560179170ee69e2ef015",
+      "url": "https://wger.de/api/v2/exerciseinfo/1113/"
+    },
+    {
+      "bytes": 13457,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1131.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "357f063b01ab3e921286708153c5a981639bb009b1789267122b9db54c853421",
+      "url": "https://wger.de/api/v2/exerciseinfo/1131/"
+    },
+    {
+      "bytes": 4376,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1132.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "a9cff5f9d6751afa0e732715c64793486f0dbd8933016675a340c9fb096c8055",
+      "url": "https://wger.de/api/v2/exerciseinfo/1132/"
+    },
+    {
+      "bytes": 4962,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1188.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "f3687ec8f9129638f57bedbf893d429a74107047eeb2fcf015b82644b77a1e3b",
+      "url": "https://wger.de/api/v2/exerciseinfo/1188/"
+    },
+    {
+      "bytes": 7838,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1193.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "c2a9a3b09f81933132368260bad1b9cc431ead6e3e5186e55ddfffe70da85a83",
+      "url": "https://wger.de/api/v2/exerciseinfo/1193/"
+    },
+    {
+      "bytes": 5850,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1195.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "9f5af65ac3d8e7bc7abd8050eb7006a879b3c422cf0554e0620509de28903d61",
+      "url": "https://wger.de/api/v2/exerciseinfo/1195/"
+    },
+    {
+      "bytes": 4885,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1202.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "c7b07fedda551d63ac9951ee8ec7016e757e64dba8aa8e3cb15b25e6f70bfe15",
+      "url": "https://wger.de/api/v2/exerciseinfo/1202/"
+    },
+    {
+      "bytes": 9249,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1218.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "9eedbd39682bdf3fb98cd5ad310d0f7fd9924613f71619f2b429ab99fd28d5f9",
+      "url": "https://wger.de/api/v2/exerciseinfo/1218/"
+    },
+    {
+      "bytes": 5992,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1234.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "27e86685cc7fa6da6a104052556f93902328507a415b1009963f09ba8f08e2a4",
+      "url": "https://wger.de/api/v2/exerciseinfo/1234/"
+    },
+    {
+      "bytes": 8840,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1266.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "a35c385014239b7f13ef9688c117cab6e7efdd83e2cabd701710bd1cc419c33f",
+      "url": "https://wger.de/api/v2/exerciseinfo/1266/"
+    },
+    {
+      "bytes": 4341,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1348.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "0e02bb2c9b57f8c5045600d525485f02dc9f454e33d7deed919c4a5b5a759bfd",
+      "url": "https://wger.de/api/v2/exerciseinfo/1348/"
+    },
+    {
+      "bytes": 2584,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1373.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "6031dcf65f560c480180ce8d162a501c0daa0c40925e85d8edc728ef93090a61",
+      "url": "https://wger.de/api/v2/exerciseinfo/1373/"
+    },
+    {
+      "bytes": 8326,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1378.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "fe4ecfac958c71ae95cb0885320e83b075b4daf4015e680d8cdb72ed5fd475ca",
+      "url": "https://wger.de/api/v2/exerciseinfo/1378/"
+    },
+    {
+      "bytes": 9601,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1384.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "be2dd50f9bfeea026b6bba32d0eb6cba79de75c1e14dbbad2c824d5bcf712f2e",
+      "url": "https://wger.de/api/v2/exerciseinfo/1384/"
+    },
+    {
+      "bytes": 6639,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1388.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "2676fa5f546bed067c9e317ac985275677c9afc1e391cb5b59f9a8c112840caa",
+      "url": "https://wger.de/api/v2/exerciseinfo/1388/"
+    },
+    {
+      "bytes": 4485,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1406.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "37003f89fb22e8874db4007fff128ab19beec2c5236f991164653f185cdecd63",
+      "url": "https://wger.de/api/v2/exerciseinfo/1406/"
+    },
+    {
+      "bytes": 6219,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1409.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "04f4f7f8cac3bd1f8f63ac8f55b278d285102f0ad4785fff6baf627f8b02ef04",
+      "url": "https://wger.de/api/v2/exerciseinfo/1409/"
+    },
+    {
+      "bytes": 2027,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1410.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "5fe4484f941e18adaf1fe77cce50be6e16274cbf4b3799f37a342c601af42a37",
+      "url": "https://wger.de/api/v2/exerciseinfo/1410/"
+    },
+    {
+      "bytes": 6277,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1412.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "d266df69226549380a49768f21c4f1c2726db221d03a17ef234c2de7926c5051",
+      "url": "https://wger.de/api/v2/exerciseinfo/1412/"
+    },
+    {
+      "bytes": 8785,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1451.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "58330d5970c990f8cb35c1c8a9e4c68b69b9ba6eec26196271ac4dcf8b86c01e",
+      "url": "https://wger.de/api/v2/exerciseinfo/1451/"
+    },
+    {
+      "bytes": 7143,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1476.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "07964a43d416e3152ba8fa9e60d2c23c9f50ea5c948fe6d04c2f9c0084b933ee",
+      "url": "https://wger.de/api/v2/exerciseinfo/1476/"
+    },
+    {
+      "bytes": 7528,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1477.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "c48bfe58696fd09019cd3d51fe414eefd6e042cba07e4de8b8bb1f0a738a2582",
+      "url": "https://wger.de/api/v2/exerciseinfo/1477/"
+    },
+    {
+      "bytes": 1797,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1497.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "2071d9f3276fe21eb4d1974136f1aa0887ac13804f830dc64dee7edd6c68ed8c",
+      "url": "https://wger.de/api/v2/exerciseinfo/1497/"
+    },
+    {
+      "bytes": 1539,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1503.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "9cb777e7c5e143fbe54f7ec12ebd9098c2e69293f5e0c28a7dd482d68cd28a4c",
+      "url": "https://wger.de/api/v2/exerciseinfo/1503/"
+    },
+    {
+      "bytes": 4332,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1528.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "834e246601d349418a6f6f167dac9f546bd954d4c0a8ea092ea209798e6f9ec6",
+      "url": "https://wger.de/api/v2/exerciseinfo/1528/"
+    },
+    {
+      "bytes": 1701,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1546.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "dea6d8be80aead4476b48db944101dc46a5d8bf620d5e5ff99043fcb3a60ced5",
+      "url": "https://wger.de/api/v2/exerciseinfo/1546/"
+    },
+    {
+      "bytes": 9812,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1554.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "cd9abc7bae9bedcd73ca47f6b063a943fcf1a541d9f07694f76cfdc1be0c738d",
+      "url": "https://wger.de/api/v2/exerciseinfo/1554/"
+    },
+    {
+      "bytes": 9228,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1572.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "4205a00223873dcbd5db60239b9eeed213db7977bba191d9647d67856ebdd988",
+      "url": "https://wger.de/api/v2/exerciseinfo/1572/"
+    },
+    {
+      "bytes": 7977,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1593.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "acb0ce2f1346b5166e995556b33997bf1ef5d2a34f94ab095411e5761d36b32f",
+      "url": "https://wger.de/api/v2/exerciseinfo/1593/"
+    },
+    {
+      "bytes": 11482,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-161.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "12c05334a8b4e0ee95dcc5a159158117642bfea18a9933f3f0ca0d8c0fb8d001",
+      "url": "https://wger.de/api/v2/exerciseinfo/161/"
+    },
+    {
+      "bytes": 6296,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1640.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "d113e0ed11d5ec16431252312fb7e9645485cf6ef9a45540f7a8679225f93d91",
+      "url": "https://wger.de/api/v2/exerciseinfo/1640/"
+    },
+    {
+      "bytes": 5550,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1642.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "9b80d73d0927deefe34a96dce35b4df1614c339cec33db1bb2fea6fb7b8c5590",
+      "url": "https://wger.de/api/v2/exerciseinfo/1642/"
+    },
+    {
+      "bytes": 12364,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1652.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "69d0519168ecb58534b66e2059f6bb23852a8d1a124e9acaf3bc587fd06b10a8",
+      "url": "https://wger.de/api/v2/exerciseinfo/1652/"
+    },
+    {
+      "bytes": 13102,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1654.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "5a690d511cd856a980f86a23037a4fb30388f27eff5b2cd1e97a4d5b62a6ebe6",
+      "url": "https://wger.de/api/v2/exerciseinfo/1654/"
+    },
+    {
+      "bytes": 5946,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1670.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "26f2ebfe607d95bab01873216d66574a8cbcf3d7f360b81b53fa40029be55bd8",
+      "url": "https://wger.de/api/v2/exerciseinfo/1670/"
+    },
+    {
+      "bytes": 20706,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1672.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "b9a6c4a7369f875fe12cbf651c1f6b9e8f0be46b013d607d785375a973274fc0",
+      "url": "https://wger.de/api/v2/exerciseinfo/1672/"
+    },
+    {
+      "bytes": 5098,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1684.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "65518306389db8933a3e710ef8457dc71ad2963c4c72264aee199853128c3b67",
+      "url": "https://wger.de/api/v2/exerciseinfo/1684/"
+    },
+    {
+      "bytes": 11996,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1706.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "128baa9f5a172d783f3078787cee1ffa8b4aaa4cc807d49cdc7cdfefd3d48fd9",
+      "url": "https://wger.de/api/v2/exerciseinfo/1706/"
+    },
+    {
+      "bytes": 8940,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-171.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "e452a0f570dbd8ad438558dbb09f53e0190d41a01ff54dfacc0c52fb4be9b210",
+      "url": "https://wger.de/api/v2/exerciseinfo/171/"
+    },
+    {
+      "bytes": 6159,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-172.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "906cbe291abe467fa778dd6b62c23e1da3583f3dcfea6cf5ee6ecf97bf7d9515",
+      "url": "https://wger.de/api/v2/exerciseinfo/172/"
+    },
+    {
+      "bytes": 1489,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1723.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "04ef68b26d03302e6b7dafb7ba00514a9ded9df31e6120b349b9f32af06c4e21",
+      "url": "https://wger.de/api/v2/exerciseinfo/1723/"
+    },
+    {
+      "bytes": 13923,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1736.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "089e99d179ecd7d84bb09d1c837e5f681f13c84a14e95f61d2a4af037e3ff115",
+      "url": "https://wger.de/api/v2/exerciseinfo/1736/"
+    },
+    {
+      "bytes": 19276,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1744.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "556d89a3cdcfbe713b8056500355957b4361d3260d56fcb785fa093cc32b1aa7",
+      "url": "https://wger.de/api/v2/exerciseinfo/1744/"
+    },
+    {
+      "bytes": 4173,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1803.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "6c6a7180e3b95247ea54eddc4924418048182f478c4a3a3e75d5fbbf7f2b1b73",
+      "url": "https://wger.de/api/v2/exerciseinfo/1803/"
+    },
+    {
+      "bytes": 6593,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1823.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "a1e4eaece396658cc6d8d26f6f4280d57c4d947774c52b14340c16f9af297817",
+      "url": "https://wger.de/api/v2/exerciseinfo/1823/"
+    },
+    {
+      "bytes": 7691,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1830.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "7db3558fe934b13ea18943c83cd18564be92b22f4d9ddd6159c0b05869084a94",
+      "url": "https://wger.de/api/v2/exerciseinfo/1830/"
+    },
+    {
+      "bytes": 6581,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1842.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "0226194842f28d3679052df5a4b8ce8d3548e6eca7a4f47ace86b506cb950113",
+      "url": "https://wger.de/api/v2/exerciseinfo/1842/"
+    },
+    {
+      "bytes": 4964,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1844.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "0258a6c832c9ee5ed75c218b64877f9530aed51de3bb69e71e6b4066ffd667ff",
+      "url": "https://wger.de/api/v2/exerciseinfo/1844/"
+    },
+    {
+      "bytes": 6212,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1852.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "f7e97d2c7972fd6f36a2b2b6aa88f1254a92a1878bba02ac2a4971cf772cecd8",
+      "url": "https://wger.de/api/v2/exerciseinfo/1852/"
+    },
+    {
+      "bytes": 2706,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1859.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "955e2ff4e104869f2a0c4b104acf71d7ebd5726156d9372314322de45702f975",
+      "url": "https://wger.de/api/v2/exerciseinfo/1859/"
+    },
+    {
+      "bytes": 1840,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1869.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "e0a3768ff67566b73369729f0aa936ede35a0f5fa3b9dafdc68acc615f2ec740",
+      "url": "https://wger.de/api/v2/exerciseinfo/1869/"
+    },
+    {
+      "bytes": 1836,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1874.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "5bce2e7c2e7b30f1b571ed10bbf8cf833a672e5f943670d97f5a035990226a41",
+      "url": "https://wger.de/api/v2/exerciseinfo/1874/"
+    },
+    {
+      "bytes": 12236,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1886.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "313eb2573f9048d44e4fa3de244a9f54e1cb49969ff624b482e9d4f57cec8087",
+      "url": "https://wger.de/api/v2/exerciseinfo/1886/"
+    },
+    {
+      "bytes": 8052,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1902.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "2994e5ee93550b2ce47b4f0533274ca009d34e3a9b22f33d3bdd65d2ce33f79c",
+      "url": "https://wger.de/api/v2/exerciseinfo/1902/"
+    },
+    {
+      "bytes": 6093,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1915.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "f24ccca5dc85d345a10456757bc6c52638f0320fbef211ef3a49e5d31605a318",
+      "url": "https://wger.de/api/v2/exerciseinfo/1915/"
+    },
+    {
+      "bytes": 6392,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1935.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "ef097361923a6ffb7ba74e9f14ecaf32f9c99cc8777d25db5e849c75ed71c3ac",
+      "url": "https://wger.de/api/v2/exerciseinfo/1935/"
+    },
+    {
+      "bytes": 3480,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-1959.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "0ec71047ee5d86dc79944cac1d28864d9c32b198dfa1077233bcbc072adabc60",
+      "url": "https://wger.de/api/v2/exerciseinfo/1959/"
+    },
+    {
+      "bytes": 14779,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-203.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "024bfa0ba6d4607dac0445cdadbe8df2cc7190bba2de4e38c1ac48b9c7da0bc4",
+      "url": "https://wger.de/api/v2/exerciseinfo/203/"
+    },
+    {
+      "bytes": 11323,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-206.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "a38c7eb3e64862874b22c2f6b3ca67abbcd8d78587ffaa3bf73984f20bf5fe14",
+      "url": "https://wger.de/api/v2/exerciseinfo/206/"
+    },
+    {
+      "bytes": 8910,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-235.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "0a016e33183e913f41ce3396af7a1f70dc04a56e0ba6d5175f15da55455a39be",
+      "url": "https://wger.de/api/v2/exerciseinfo/235/"
+    },
+    {
+      "bytes": 8652,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-2631.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "b1eb81823afde76a962bc8e65aadba1900035d994301542900d1acb6e96100f9",
+      "url": "https://wger.de/api/v2/exerciseinfo/2631/"
+    },
+    {
+      "bytes": 4004,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-2635.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "517f93e001b1c5d15599eaff4674307a7352893a285e6b4d1612fd57748a6c85",
+      "url": "https://wger.de/api/v2/exerciseinfo/2635/"
+    },
+    {
+      "bytes": 12787,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-265.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "a09f3e0075b4142d1463f5ed5dc84184ca4b015877e6d1d73b472654945e0aed",
+      "url": "https://wger.de/api/v2/exerciseinfo/265/"
+    },
+    {
+      "bytes": 3722,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-2662.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "2cd06c742af4451ff19e2b0faafcff581d5142c6673f4714244b49a9dd223923",
+      "url": "https://wger.de/api/v2/exerciseinfo/2662/"
+    },
+    {
+      "bytes": 6177,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-297.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "061fa4fe7acf3ce397e7c532ea6f2f638d2e9fd18a327d485e138573714aa7e8",
+      "url": "https://wger.de/api/v2/exerciseinfo/297/"
+    },
+    {
+      "bytes": 14092,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-331.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "aac41f8c37a8189d67b54bfea99481c198301f163f7e913f1cce936c80196773",
+      "url": "https://wger.de/api/v2/exerciseinfo/331/"
+    },
+    {
+      "bytes": 3020,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-346.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "982c67ef6372af629a6e7318060d93400a94e4431a8f2a0f1bec3417c813f7e0",
+      "url": "https://wger.de/api/v2/exerciseinfo/346/"
+    },
+    {
+      "bytes": 4844,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-367.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "e293f637ae136e5e60d092f08fbc33418b5224737ce1a33b118337eda150a0fa",
+      "url": "https://wger.de/api/v2/exerciseinfo/367/"
+    },
+    {
+      "bytes": 25908,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-376.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "d319d0266f495e793aaab58b0fe770cb1130be76d5033b9bac7cc9bc41aaaa9f",
+      "url": "https://wger.de/api/v2/exerciseinfo/376/"
+    },
+    {
+      "bytes": 12433,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-377.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "85465f9d7c079000ebcae7ceed038681dc34c347e74c3a11220eea7586dd2a30",
+      "url": "https://wger.de/api/v2/exerciseinfo/377/"
+    },
+    {
+      "bytes": 5921,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-445.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "ebefffd1d8a77edcc422e53ac6cc0a87fe57c377865239c9d8a9dd0ec73c0aec",
+      "url": "https://wger.de/api/v2/exerciseinfo/445/"
+    },
+    {
+      "bytes": 21883,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-454.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "955110c6ea91bd3ccb6d5fa0a3226297b72bf5750a942ab0bce9aa47f946a6d3",
+      "url": "https://wger.de/api/v2/exerciseinfo/454/"
+    },
+    {
+      "bytes": 21841,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-456.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "ec497cea3a49904ca6776d5b005d8abda730cdab540788e88dc48791226e5e26",
+      "url": "https://wger.de/api/v2/exerciseinfo/456/"
+    },
+    {
+      "bytes": 1689,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-500.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "024712c45348a45523da0cec3ef1a006913ed62cc62cac5be9872b9391bfc76d",
+      "url": "https://wger.de/api/v2/exerciseinfo/500/"
+    },
+    {
+      "bytes": 2802,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-556.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "ed7233faedde61044349b08120be9d59b26cbcfc7587819172c80f3b8bdc2373",
+      "url": "https://wger.de/api/v2/exerciseinfo/556/"
+    },
+    {
+      "bytes": 10940,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-57.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "b7e408e055ee2ec67745dc7c5daad355046e07c03404774d6118859ad4ded540",
+      "url": "https://wger.de/api/v2/exerciseinfo/57/"
+    },
+    {
+      "bytes": 17123,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-632.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "66cb876915ea8ef941f844abd527826a58896869bdc8b3a01bd54a29f399ea1c",
+      "url": "https://wger.de/api/v2/exerciseinfo/632/"
+    },
+    {
+      "bytes": 4226,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-650.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "6f3603316d7402e92b671b3ab381b1937647cb859cb213430105e3fdfd9a44ee",
+      "url": "https://wger.de/api/v2/exerciseinfo/650/"
+    },
+    {
+      "bytes": 1652,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-672.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "150465bce54199824aa4dd1c314dfe07afd7de0592633b462510c56903fb3083",
+      "url": "https://wger.de/api/v2/exerciseinfo/672/"
+    },
+    {
+      "bytes": 5621,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-910.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "4613f19847f452380be6d766b330e057fd73bb93622b0bba8a712eb8fd67431d",
+      "url": "https://wger.de/api/v2/exerciseinfo/910/"
+    },
+    {
+      "bytes": 7790,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-912.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "041fb8dfc55cb61377518c31e126ef6c630e5f0d137e6a63e3050a546808f16b",
+      "url": "https://wger.de/api/v2/exerciseinfo/912/"
+    },
+    {
+      "bytes": 6916,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-958.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "a362d1250dbdf849b3538b80ed4094a63e5723622137f4569cd4d7b0af6e74b7",
+      "url": "https://wger.de/api/v2/exerciseinfo/958/"
+    },
+    {
+      "bytes": 4523,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-959.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "3921bb30fd777fc40b080d5afc4d9624ef9b31194491b054879c5787dde42894",
+      "url": "https://wger.de/api/v2/exerciseinfo/959/"
+    },
+    {
+      "bytes": 5556,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-978.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "fe25aac26b4b585c787a2cda285e900f8d600531aafa3bc937b27d431d9dc480",
+      "url": "https://wger.de/api/v2/exerciseinfo/978/"
+    },
+    {
+      "bytes": 9227,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-979.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "e870b71162d89437a2081f903b4980da08c4272bae568aae4c8748d92cdf1bda",
+      "url": "https://wger.de/api/v2/exerciseinfo/979/"
+    },
+    {
+      "bytes": 19735,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-984.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "45c1345a35268ec2e0d0619cfdfbda49531494ba039f9e6b38ca62e0ef9db805",
+      "url": "https://wger.de/api/v2/exerciseinfo/984/"
+    },
+    {
+      "bytes": 28367,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-985.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "286e5678cb00f94ea9dc88952925ab932c34fb75acc9ea792c8fc8f101f7000c",
+      "url": "https://wger.de/api/v2/exerciseinfo/985/"
+    },
+    {
+      "bytes": 18579,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-988.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "e630e128974dc2a765594b8a5173acbbd8e772716a9a5e37117e805535b22d02",
+      "url": "https://wger.de/api/v2/exerciseinfo/988/"
+    },
+    {
+      "bytes": 20825,
+      "path": "design/catalog-expansion/source/cache/wger/exerciseinfo-999.json",
+      "retrievedDate": "2026-10-18",
+      "sha256": "43393be35be5064fa453d3991aed876e9bba441855d7d4689778cebaec0eb03d",
+      "url": "https://wger.de/api/v2/exerciseinfo/999/"
+    }
+  ],
+  "checks": {
+    "attributionRows": 92,
+    "auditRows": 569,
+    "fedbExerciseCount": 876,
+    "fedbIdsMissing": [],
+    "fedbIdsReferenced": 298,
+    "fedbSha256MatchesDeclared": true,
+    "wgerAttributionIdsMatchAuditIds": true,
+    "wgerAttributionMismatches": [
+      {
+        "apiValue": "",
+        "attributionValue": "-",
+        "field": "author",
+        "wgerId": 984
+      },
+      {
+        "apiValue": "",
+        "attributionValue": "-",
+        "field": "author",
+        "wgerId": 985
+      },
+      {
+        "apiValue": "",
+        "attributionValue": "-",
+        "field": "author",
+        "wgerId": 988
+      },
+      {
+        "apiValue": "",
+        "attributionValue": "-",
+        "field": "author",
+        "wgerId": 999
+      },
+      {
+        "apiValue": "",
+        "attributionValue": "-",
+        "field": "author",
+        "wgerId": 1188
+      },
+      {
+        "apiValue": "",
+        "attributionValue": "-",
+        "field": "author",
+        "wgerId": 1830
+      },
+      {
+        "apiValue": "",
+        "attributionValue": "-",
+        "field": "author",
+        "wgerId": 1935
+      },
+      {
+        "apiValue": "",
+        "attributionValue": "-",
+        "field": "author",
+        "wgerId": 2631
+      }
+    ],
+    "wgerEnglishNamesMissing": [],
+    "wgerFetchFailed": [],
+    "wgerIdsFetched": 92,
+    "wgerIdsReferenced": 92,
+    "wgerUuidDuplicates": [],
+    "wgerUuidUnique": true
+  },
+  "freeExerciseDB": {
+    "declaredSha256": "5bb747e3fc658f095a60dcbf6d53c96627acdcc6ffb6fffde86f7e26995d40bf",
+    "exerciseCount": 876,
+    "exercises": {
+      "3_4_Sit-Up": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "3/4 Sit-Up",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": []
+      },
+      "Ab_Crunch_Machine": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Ab Crunch Machine",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": []
+      },
+      "Ab_Roller": {
+        "category": "strength",
+        "equipment": "other",
+        "name": "Ab Roller",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": [
+          "shoulders"
+        ]
+      },
+      "Air_Bike": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Air Bike",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": []
+      },
+      "Alternate_Heel_Touchers": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Alternate Heel Touchers",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": []
+      },
+      "Alternating_Kettlebell_Row": {
+        "category": "strength",
+        "equipment": "kettlebells",
+        "name": "Alternating Kettlebell Row",
+        "primaryMuscles": [
+          "middle back"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "lats"
+        ]
+      },
+      "Ankle_Circles": {
+        "category": "stretching",
+        "equipment": null,
+        "name": "Ankle Circles",
+        "primaryMuscles": [
+          "calves"
+        ],
+        "secondaryMuscles": []
+      },
+      "Anterior_Tibialis-SMR": {
+        "category": "stretching",
+        "equipment": "other",
+        "name": "Anterior Tibialis-SMR",
+        "primaryMuscles": [
+          "calves"
+        ],
+        "secondaryMuscles": []
+      },
+      "Arm_Circles": {
+        "category": "stretching",
+        "equipment": null,
+        "name": "Arm Circles",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "traps"
+        ]
+      },
+      "Arnold_Dumbbell_Press": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Arnold Dumbbell Press",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "triceps"
+        ]
+      },
+      "Around_The_Worlds": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Around The Worlds",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders"
+        ]
+      },
+      "Back_Flyes_-_With_Bands": {
+        "category": "strength",
+        "equipment": "bands",
+        "name": "Back Flyes - With Bands",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "middle back",
+          "triceps"
+        ]
+      },
+      "Band_Assisted_Pull-Up": {
+        "category": "strength",
+        "equipment": "other",
+        "name": "Band Assisted Pull-Up",
+        "primaryMuscles": [
+          "lats"
+        ],
+        "secondaryMuscles": [
+          "abdominals",
+          "forearms",
+          "middle back"
+        ]
+      },
+      "Band_Good_Morning": {
+        "category": "powerlifting",
+        "equipment": "bands",
+        "name": "Band Good Morning",
+        "primaryMuscles": [
+          "hamstrings"
+        ],
+        "secondaryMuscles": [
+          "glutes",
+          "lower back"
+        ]
+      },
+      "Band_Hip_Adductions": {
+        "category": "strength",
+        "equipment": "bands",
+        "name": "Band Hip Adductions",
+        "primaryMuscles": [
+          "adductors"
+        ],
+        "secondaryMuscles": []
+      },
+      "Band_Pull_Apart": {
+        "category": "strength",
+        "equipment": "bands",
+        "name": "Band Pull Apart",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "middle back",
+          "traps"
+        ]
+      },
+      "Band_Skull_Crusher": {
+        "category": "strength",
+        "equipment": "bands",
+        "name": "Band Skull Crusher",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Barbell_Bench_Press_-_Medium_Grip": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Barbell Bench Press - Medium Grip",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Barbell_Curl": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Barbell Curl",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": [
+          "forearms"
+        ]
+      },
+      "Barbell_Curls_Lying_Against_An_Incline": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Barbell Curls Lying Against An Incline",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Barbell_Deadlift": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Barbell Deadlift",
+        "primaryMuscles": [
+          "lower back"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "forearms",
+          "glutes",
+          "hamstrings",
+          "lats",
+          "middle back",
+          "quadriceps",
+          "traps"
+        ]
+      },
+      "Barbell_Glute_Bridge": {
+        "category": "powerlifting",
+        "equipment": "barbell",
+        "name": "Barbell Glute Bridge",
+        "primaryMuscles": [
+          "glutes"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "hamstrings"
+        ]
+      },
+      "Barbell_Hack_Squat": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Barbell Hack Squat",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "forearms",
+          "hamstrings"
+        ]
+      },
+      "Barbell_Hip_Thrust": {
+        "category": "powerlifting",
+        "equipment": "barbell",
+        "name": "Barbell Hip Thrust",
+        "primaryMuscles": [
+          "glutes"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "hamstrings"
+        ]
+      },
+      "Barbell_Incline_Bench_Press_-_Medium_Grip": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Barbell Incline Bench Press - Medium Grip",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Barbell_Lunge": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Barbell Lunge",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "glutes",
+          "hamstrings"
+        ]
+      },
+      "Barbell_Rear_Delt_Row": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Barbell Rear Delt Row",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "lats",
+          "middle back"
+        ]
+      },
+      "Barbell_Seated_Calf_Raise": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Barbell Seated Calf Raise",
+        "primaryMuscles": [
+          "calves"
+        ],
+        "secondaryMuscles": []
+      },
+      "Barbell_Shoulder_Press": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Barbell Shoulder Press",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "chest",
+          "triceps"
+        ]
+      },
+      "Barbell_Shrug": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Barbell Shrug",
+        "primaryMuscles": [
+          "traps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Barbell_Squat": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Barbell Squat",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "glutes",
+          "hamstrings",
+          "lower back"
+        ]
+      },
+      "Barbell_Step_Ups": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Barbell Step Ups",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "glutes",
+          "hamstrings",
+          "quadriceps"
+        ]
+      },
+      "Behind_Head_Chest_Stretch": {
+        "category": "stretching",
+        "equipment": "other",
+        "name": "Behind Head Chest Stretch",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders"
+        ]
+      },
+      "Bench_Dips": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Bench Dips",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": [
+          "chest",
+          "shoulders"
+        ]
+      },
+      "Bench_Press_-_With_Bands": {
+        "category": "strength",
+        "equipment": "bands",
+        "name": "Bench Press - With Bands",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Bent-Arm_Dumbbell_Pullover": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Bent-Arm Dumbbell Pullover",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "lats",
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Bent_Over_Barbell_Row": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Bent Over Barbell Row",
+        "primaryMuscles": [
+          "middle back"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "lats",
+          "shoulders"
+        ]
+      },
+      "Bent_Over_Dumbbell_Rear_Delt_Raise_With_Head_On_Bench": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Bent Over Dumbbell Rear Delt Raise With Head On Bench",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": []
+      },
+      "Bent_Over_Low-Pulley_Side_Lateral": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Bent Over Low-Pulley Side Lateral",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "lower back",
+          "middle back",
+          "traps"
+        ]
+      },
+      "Bent_Over_One-Arm_Long_Bar_Row": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Bent Over One-Arm Long Bar Row",
+        "primaryMuscles": [
+          "middle back"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "lats",
+          "lower back",
+          "traps"
+        ]
+      },
+      "Bent_Over_Two-Arm_Long_Bar_Row": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Bent Over Two-Arm Long Bar Row",
+        "primaryMuscles": [
+          "middle back"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "lats"
+        ]
+      },
+      "Bent_Over_Two-Dumbbell_Row": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Bent Over Two-Dumbbell Row",
+        "primaryMuscles": [
+          "middle back"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "lats",
+          "shoulders"
+        ]
+      },
+      "Bodyweight_Flyes": {
+        "category": "strength",
+        "equipment": "e-z curl bar",
+        "name": "Bodyweight Flyes",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "abdominals",
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Bodyweight_Squat": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Bodyweight Squat",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "glutes",
+          "hamstrings"
+        ]
+      },
+      "Bodyweight_Walking_Lunge": {
+        "category": "strength",
+        "equipment": null,
+        "name": "Bodyweight Walking Lunge",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "glutes",
+          "hamstrings"
+        ]
+      },
+      "Box_Squat": {
+        "category": "powerlifting",
+        "equipment": "barbell",
+        "name": "Box Squat",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "adductors",
+          "calves",
+          "glutes",
+          "hamstrings",
+          "lower back"
+        ]
+      },
+      "Butt_Lift_Bridge": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Butt Lift (Bridge)",
+        "primaryMuscles": [
+          "glutes"
+        ],
+        "secondaryMuscles": [
+          "hamstrings"
+        ]
+      },
+      "Butterfly": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Butterfly",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": []
+      },
+      "Cable_Crossover": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Cable Crossover",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders"
+        ]
+      },
+      "Cable_Crunch": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Cable Crunch",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": []
+      },
+      "Cable_Deadlifts": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Cable Deadlifts",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "forearms",
+          "glutes",
+          "hamstrings",
+          "lower back"
+        ]
+      },
+      "Cable_One_Arm_Tricep_Extension": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Cable One Arm Tricep Extension",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Cable_Rear_Delt_Fly": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Cable Rear Delt Fly",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": []
+      },
+      "Cable_Rope_Overhead_Triceps_Extension": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Cable Rope Overhead Triceps Extension",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Cable_Shrugs": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Cable Shrugs",
+        "primaryMuscles": [
+          "traps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Cable_Wrist_Curl": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Cable Wrist Curl",
+        "primaryMuscles": [
+          "forearms"
+        ],
+        "secondaryMuscles": []
+      },
+      "Calf_Press_On_The_Leg_Press_Machine": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Calf Press On The Leg Press Machine",
+        "primaryMuscles": [
+          "calves"
+        ],
+        "secondaryMuscles": []
+      },
+      "Calf_Stretch_Hands_Against_Wall": {
+        "category": "stretching",
+        "equipment": null,
+        "name": "Calf Stretch Hands Against Wall",
+        "primaryMuscles": [
+          "calves"
+        ],
+        "secondaryMuscles": []
+      },
+      "Chest_And_Front_Of_Shoulder_Stretch": {
+        "category": "stretching",
+        "equipment": "other",
+        "name": "Chest And Front Of Shoulder Stretch",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders"
+        ]
+      },
+      "Chin-Up": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Chin-Up",
+        "primaryMuscles": [
+          "lats"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "forearms",
+          "middle back"
+        ]
+      },
+      "Close-Grip_Barbell_Bench_Press": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Close-Grip Barbell Bench Press",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": [
+          "chest",
+          "shoulders"
+        ]
+      },
+      "Close-Grip_Dumbbell_Press": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Close-Grip Dumbbell Press",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": [
+          "chest",
+          "shoulders"
+        ]
+      },
+      "Close-Grip_Front_Lat_Pulldown": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Close-Grip Front Lat Pulldown",
+        "primaryMuscles": [
+          "lats"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "middle back",
+          "shoulders"
+        ]
+      },
+      "Concentration_Curls": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Concentration Curls",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": [
+          "forearms"
+        ]
+      },
+      "Cross_Over_-_With_Bands": {
+        "category": "strength",
+        "equipment": "bands",
+        "name": "Cross Over - With Bands",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "shoulders"
+        ]
+      },
+      "Crunches": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Crunches",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": []
+      },
+      "Cuban_Press": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Cuban Press",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "traps"
+        ]
+      },
+      "Dead_Bug": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Dead Bug",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": []
+      },
+      "Decline_Barbell_Bench_Press": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Decline Barbell Bench Press",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Decline_Crunch": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Decline Crunch",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": []
+      },
+      "Decline_Dumbbell_Bench_Press": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Decline Dumbbell Bench Press",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Decline_Dumbbell_Flyes": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Decline Dumbbell Flyes",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": []
+      },
+      "Decline_Push-Up": {
+        "category": "strength",
+        "equipment": null,
+        "name": "Decline Push-Up",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Dip_Machine": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Dip Machine",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": [
+          "chest",
+          "shoulders"
+        ]
+      },
+      "Dips_-_Chest_Version": {
+        "category": "strength",
+        "equipment": "other",
+        "name": "Dips - Chest Version",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Drag_Curl": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Drag Curl",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": [
+          "forearms"
+        ]
+      },
+      "Dumbbell_Alternate_Bicep_Curl": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Dumbbell Alternate Bicep Curl",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": [
+          "forearms"
+        ]
+      },
+      "Dumbbell_Bench_Press": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Dumbbell Bench Press",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Dumbbell_Bench_Press_with_Neutral_Grip": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Dumbbell Bench Press with Neutral Grip",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Dumbbell_Bicep_Curl": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Dumbbell Bicep Curl",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": [
+          "forearms"
+        ]
+      },
+      "Dumbbell_Floor_Press": {
+        "category": "powerlifting",
+        "equipment": "dumbbell",
+        "name": "Dumbbell Floor Press",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": [
+          "chest",
+          "shoulders"
+        ]
+      },
+      "Dumbbell_Flyes": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Dumbbell Flyes",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": []
+      },
+      "Dumbbell_Incline_Row": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Dumbbell Incline Row",
+        "primaryMuscles": [
+          "middle back"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "forearms",
+          "lats",
+          "shoulders"
+        ]
+      },
+      "Dumbbell_Incline_Shoulder_Raise": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Dumbbell Incline Shoulder Raise",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "triceps"
+        ]
+      },
+      "Dumbbell_Lunges": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Dumbbell Lunges",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "glutes",
+          "hamstrings"
+        ]
+      },
+      "Dumbbell_Rear_Lunge": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Dumbbell Rear Lunge",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "glutes",
+          "hamstrings"
+        ]
+      },
+      "Dumbbell_Shoulder_Press": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Dumbbell Shoulder Press",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "triceps"
+        ]
+      },
+      "Dumbbell_Shrug": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Dumbbell Shrug",
+        "primaryMuscles": [
+          "traps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Dumbbell_Side_Bend": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Dumbbell Side Bend",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": []
+      },
+      "Dumbbell_Squat": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Dumbbell Squat",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "glutes",
+          "hamstrings",
+          "lower back"
+        ]
+      },
+      "Dumbbell_Step_Ups": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Dumbbell Step Ups",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "glutes",
+          "hamstrings"
+        ]
+      },
+      "Dynamic_Chest_Stretch": {
+        "category": "stretching",
+        "equipment": null,
+        "name": "Dynamic Chest Stretch",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "middle back"
+        ]
+      },
+      "EZ-Bar_Curl": {
+        "category": "strength",
+        "equipment": "e-z curl bar",
+        "name": "EZ-Bar Curl",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "EZ-Bar_Skullcrusher": {
+        "category": "strength",
+        "equipment": "e-z curl bar",
+        "name": "EZ-Bar Skullcrusher",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": [
+          "forearms"
+        ]
+      },
+      "Elbow_to_Knee": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Elbow to Knee",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": []
+      },
+      "Elevated_Back_Lunge": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Elevated Back Lunge",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "glutes",
+          "hamstrings"
+        ]
+      },
+      "Face_Pull": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Face Pull",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "middle back"
+        ]
+      },
+      "Flat_Bench_Cable_Flyes": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Flat Bench Cable Flyes",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": []
+      },
+      "Flat_Bench_Lying_Leg_Raise": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Flat Bench Lying Leg Raise",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": []
+      },
+      "Floor_Press": {
+        "category": "powerlifting",
+        "equipment": "barbell",
+        "name": "Floor Press",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": [
+          "chest",
+          "shoulders"
+        ]
+      },
+      "Freehand_Jump_Squat": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Freehand Jump Squat",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "glutes",
+          "hamstrings"
+        ]
+      },
+      "Front_Barbell_Squat": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Front Barbell Squat",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "glutes",
+          "hamstrings"
+        ]
+      },
+      "Front_Cable_Raise": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Front Cable Raise",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": []
+      },
+      "Front_Dumbbell_Raise": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Front Dumbbell Raise",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": []
+      },
+      "Front_Plate_Raise": {
+        "category": "strength",
+        "equipment": "other",
+        "name": "Front Plate Raise",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": []
+      },
+      "Glute_Kickback": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Glute Kickback",
+        "primaryMuscles": [
+          "glutes"
+        ],
+        "secondaryMuscles": [
+          "hamstrings"
+        ]
+      },
+      "Good_Morning": {
+        "category": "powerlifting",
+        "equipment": "barbell",
+        "name": "Good Morning",
+        "primaryMuscles": [
+          "hamstrings"
+        ],
+        "secondaryMuscles": [
+          "abdominals",
+          "glutes",
+          "lower back"
+        ]
+      },
+      "Hack_Squat": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Hack Squat",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "glutes",
+          "hamstrings"
+        ]
+      },
+      "Hammer_Curls": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Hammer Curls",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Handstand_Push-Ups": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Handstand Push-Ups",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "triceps"
+        ]
+      },
+      "Hanging_Leg_Raise": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Hanging Leg Raise",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": []
+      },
+      "High_Cable_Curls": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "High Cable Curls",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Hip_Extension_with_Bands": {
+        "category": "strength",
+        "equipment": "bands",
+        "name": "Hip Extension with Bands",
+        "primaryMuscles": [
+          "glutes"
+        ],
+        "secondaryMuscles": [
+          "hamstrings"
+        ]
+      },
+      "Hip_Flexion_with_Band": {
+        "category": "strength",
+        "equipment": "bands",
+        "name": "Hip Flexion with Band",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Hip_Lift_with_Band": {
+        "category": "powerlifting",
+        "equipment": "bands",
+        "name": "Hip Lift with Band",
+        "primaryMuscles": [
+          "glutes"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "hamstrings"
+        ]
+      },
+      "Hug_Knees_To_Chest": {
+        "category": "stretching",
+        "equipment": null,
+        "name": "Hug Knees To Chest",
+        "primaryMuscles": [
+          "lower back"
+        ],
+        "secondaryMuscles": [
+          "glutes"
+        ]
+      },
+      "Hyperextensions_Back_Extensions": {
+        "category": "strength",
+        "equipment": "other",
+        "name": "Hyperextensions (Back Extensions)",
+        "primaryMuscles": [
+          "lower back"
+        ],
+        "secondaryMuscles": [
+          "glutes",
+          "hamstrings"
+        ]
+      },
+      "Incline_Bench_Pull": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Incline Bench Pull",
+        "primaryMuscles": [
+          "middle back"
+        ],
+        "secondaryMuscles": [
+          "lats",
+          "shoulders"
+        ]
+      },
+      "Incline_Cable_Flye": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Incline Cable Flye",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders"
+        ]
+      },
+      "Incline_Dumbbell_Curl": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Incline Dumbbell Curl",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Incline_Dumbbell_Flyes": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Incline Dumbbell Flyes",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders"
+        ]
+      },
+      "Incline_Dumbbell_Press": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Incline Dumbbell Press",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Incline_Hammer_Curls": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Incline Hammer Curls",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Incline_Push-Up": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Incline Push-Up",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Intermediate_Hip_Flexor_and_Quad_Stretch": {
+        "category": "stretching",
+        "equipment": "other",
+        "name": "Intermediate Hip Flexor and Quad Stretch",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Jefferson_Squats": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Jefferson Squats",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "glutes",
+          "hamstrings",
+          "lower back",
+          "traps"
+        ]
+      },
+      "Knee_Circles": {
+        "category": "stretching",
+        "equipment": "body only",
+        "name": "Knee Circles",
+        "primaryMuscles": [
+          "calves"
+        ],
+        "secondaryMuscles": [
+          "hamstrings",
+          "quadriceps"
+        ]
+      },
+      "Kneeling_Cable_Triceps_Extension": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Kneeling Cable Triceps Extension",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Kneeling_Forearm_Stretch": {
+        "category": "stretching",
+        "equipment": null,
+        "name": "Kneeling Forearm Stretch",
+        "primaryMuscles": [
+          "forearms"
+        ],
+        "secondaryMuscles": []
+      },
+      "Kneeling_High_Pulley_Row": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Kneeling High Pulley Row",
+        "primaryMuscles": [
+          "lats"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "middle back"
+        ]
+      },
+      "Landmine_180s": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Landmine 180's",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": [
+          "glutes",
+          "lower back",
+          "shoulders"
+        ]
+      },
+      "Lateral_Raise_-_With_Bands": {
+        "category": "strength",
+        "equipment": "bands",
+        "name": "Lateral Raise - With Bands",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": []
+      },
+      "Leg-Up_Hamstring_Stretch": {
+        "category": "stretching",
+        "equipment": null,
+        "name": "Leg-Up Hamstring Stretch",
+        "primaryMuscles": [
+          "hamstrings"
+        ],
+        "secondaryMuscles": []
+      },
+      "Leg_Extensions": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Leg Extensions",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Leg_Press": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Leg Press",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "glutes",
+          "hamstrings"
+        ]
+      },
+      "Leverage_Chest_Press": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Leverage Chest Press",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Leverage_Deadlift": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Leverage Deadlift",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "glutes",
+          "hamstrings"
+        ]
+      },
+      "Leverage_Decline_Chest_Press": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Leverage Decline Chest Press",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Leverage_High_Row": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Leverage High Row",
+        "primaryMuscles": [
+          "middle back"
+        ],
+        "secondaryMuscles": [
+          "lats"
+        ]
+      },
+      "Leverage_Incline_Chest_Press": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Leverage Incline Chest Press",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Leverage_Iso_Row": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Leverage Iso Row",
+        "primaryMuscles": [
+          "lats"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "middle back"
+        ]
+      },
+      "Leverage_Shoulder_Press": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Leverage Shoulder Press",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "triceps"
+        ]
+      },
+      "Leverage_Shrug": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Leverage Shrug",
+        "primaryMuscles": [
+          "traps"
+        ],
+        "secondaryMuscles": [
+          "forearms"
+        ]
+      },
+      "Low_Cable_Crossover": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Low Cable Crossover",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders"
+        ]
+      },
+      "Lying_Cambered_Barbell_Row": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Lying Cambered Barbell Row",
+        "primaryMuscles": [
+          "middle back"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "lats",
+          "traps"
+        ]
+      },
+      "Lying_Crossover": {
+        "category": "stretching",
+        "equipment": "body only",
+        "name": "Lying Crossover",
+        "primaryMuscles": [
+          "abductors"
+        ],
+        "secondaryMuscles": []
+      },
+      "Lying_Dumbbell_Tricep_Extension": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Lying Dumbbell Tricep Extension",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": [
+          "chest",
+          "shoulders"
+        ]
+      },
+      "Lying_Leg_Curls": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Lying Leg Curls",
+        "primaryMuscles": [
+          "hamstrings"
+        ],
+        "secondaryMuscles": []
+      },
+      "Lying_Machine_Squat": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Lying Machine Squat",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "glutes",
+          "hamstrings"
+        ]
+      },
+      "Lying_Rear_Delt_Raise": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Lying Rear Delt Raise",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": []
+      },
+      "Lying_Supine_Dumbbell_Curl": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Lying Supine Dumbbell Curl",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Lying_T-Bar_Row": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Lying T-Bar Row",
+        "primaryMuscles": [
+          "middle back"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "lats"
+        ]
+      },
+      "Lying_Triceps_Press": {
+        "category": "strength",
+        "equipment": "e-z curl bar",
+        "name": "Lying Triceps Press",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Machine_Bench_Press": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Machine Bench Press",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Machine_Bicep_Curl": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Machine Bicep Curl",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Machine_Preacher_Curls": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Machine Preacher Curls",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Machine_Shoulder_Military_Press": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Machine Shoulder (Military) Press",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "triceps"
+        ]
+      },
+      "Machine_Triceps_Extension": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Machine Triceps Extension",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Monster_Walk": {
+        "category": "strength",
+        "equipment": "bands",
+        "name": "Monster Walk",
+        "primaryMuscles": [
+          "abductors"
+        ],
+        "secondaryMuscles": []
+      },
+      "Mountain_Climbers": {
+        "category": "plyometrics",
+        "equipment": null,
+        "name": "Mountain Climbers",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "chest",
+          "hamstrings",
+          "shoulders"
+        ]
+      },
+      "Natural_Glute_Ham_Raise": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Natural Glute Ham Raise",
+        "primaryMuscles": [
+          "hamstrings"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "glutes",
+          "lower back"
+        ]
+      },
+      "One-Arm_Dumbbell_Row": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "One-Arm Dumbbell Row",
+        "primaryMuscles": [
+          "middle back"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "lats",
+          "shoulders"
+        ]
+      },
+      "One-Arm_Incline_Lateral_Raise": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "One-Arm Incline Lateral Raise",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": []
+      },
+      "One-Arm_Kettlebell_Military_Press_To_The_Side": {
+        "category": "strength",
+        "equipment": "kettlebells",
+        "name": "One-Arm Kettlebell Military Press To The Side",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "triceps"
+        ]
+      },
+      "One-Legged_Cable_Kickback": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "One-Legged Cable Kickback",
+        "primaryMuscles": [
+          "glutes"
+        ],
+        "secondaryMuscles": [
+          "hamstrings"
+        ]
+      },
+      "One_Arm_Against_Wall": {
+        "category": "stretching",
+        "equipment": null,
+        "name": "One Arm Against Wall",
+        "primaryMuscles": [
+          "lats"
+        ],
+        "secondaryMuscles": []
+      },
+      "One_Arm_Dumbbell_Preacher_Curl": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "One Arm Dumbbell Preacher Curl",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "One_Arm_Lat_Pulldown": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "One Arm Lat Pulldown",
+        "primaryMuscles": [
+          "lats"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "middle back"
+        ]
+      },
+      "Overhead_Cable_Curl": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Overhead Cable Curl",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Overhead_Squat": {
+        "category": "olympic weightlifting",
+        "equipment": "barbell",
+        "name": "Overhead Squat",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "abdominals",
+          "calves",
+          "glutes",
+          "hamstrings",
+          "lower back",
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Overhead_Triceps": {
+        "category": "stretching",
+        "equipment": "body only",
+        "name": "Overhead Triceps",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": [
+          "lats"
+        ]
+      },
+      "Pallof_Press": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Pallof Press",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": [
+          "chest",
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Palms-Down_Dumbbell_Wrist_Curl_Over_A_Bench": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Palms-Down Dumbbell Wrist Curl Over A Bench",
+        "primaryMuscles": [
+          "forearms"
+        ],
+        "secondaryMuscles": []
+      },
+      "Palms-Down_Wrist_Curl_Over_A_Bench": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Palms-Down Wrist Curl Over A Bench",
+        "primaryMuscles": [
+          "forearms"
+        ],
+        "secondaryMuscles": []
+      },
+      "Peroneals_Stretch": {
+        "category": "stretching",
+        "equipment": "other",
+        "name": "Peroneals Stretch",
+        "primaryMuscles": [
+          "calves"
+        ],
+        "secondaryMuscles": []
+      },
+      "Piriformis-SMR": {
+        "category": "stretching",
+        "equipment": "foam roll",
+        "name": "Piriformis-SMR",
+        "primaryMuscles": [
+          "glutes"
+        ],
+        "secondaryMuscles": []
+      },
+      "Plank": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Plank",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": []
+      },
+      "Plate_Twist": {
+        "category": "strength",
+        "equipment": "other",
+        "name": "Plate Twist",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": []
+      },
+      "Plie_Dumbbell_Squat": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Plie Dumbbell Squat",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "abdominals",
+          "calves",
+          "glutes",
+          "hamstrings"
+        ]
+      },
+      "Power_Clean": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Power Clean",
+        "primaryMuscles": [
+          "hamstrings"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "forearms",
+          "glutes",
+          "lower back",
+          "middle back",
+          "quadriceps",
+          "shoulders",
+          "traps",
+          "triceps"
+        ]
+      },
+      "Preacher_Curl": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Preacher Curl",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Preacher_Hammer_Dumbbell_Curl": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Preacher Hammer Dumbbell Curl",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": [
+          "forearms"
+        ]
+      },
+      "Pullups": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Pullups",
+        "primaryMuscles": [
+          "lats"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "middle back"
+        ]
+      },
+      "Push-Up_Wide": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Push-Up Wide",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "abdominals",
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Push-Ups_-_Close_Triceps_Position": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Push-Ups - Close Triceps Position",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": [
+          "chest",
+          "shoulders"
+        ]
+      },
+      "Pushups": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Pushups",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Rack_Pulls": {
+        "category": "powerlifting",
+        "equipment": "barbell",
+        "name": "Rack Pulls",
+        "primaryMuscles": [
+          "lower back"
+        ],
+        "secondaryMuscles": [
+          "forearms",
+          "glutes",
+          "hamstrings",
+          "traps"
+        ]
+      },
+      "Reverse_Barbell_Curl": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Reverse Barbell Curl",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": [
+          "forearms"
+        ]
+      },
+      "Reverse_Cable_Curl": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Reverse Cable Curl",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": [
+          "forearms"
+        ]
+      },
+      "Reverse_Crunch": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Reverse Crunch",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": []
+      },
+      "Reverse_Flyes": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Reverse Flyes",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": []
+      },
+      "Reverse_Grip_Bent-Over_Rows": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Reverse Grip Bent-Over Rows",
+        "primaryMuscles": [
+          "middle back"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "lats",
+          "shoulders"
+        ]
+      },
+      "Reverse_Grip_Triceps_Pushdown": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Reverse Grip Triceps Pushdown",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Reverse_Machine_Flyes": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Reverse Machine Flyes",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": []
+      },
+      "Reverse_Plate_Curls": {
+        "category": "strength",
+        "equipment": "other",
+        "name": "Reverse Plate Curls",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": [
+          "forearms"
+        ]
+      },
+      "Romanian_Deadlift": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Romanian Deadlift",
+        "primaryMuscles": [
+          "hamstrings"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "glutes",
+          "lower back"
+        ]
+      },
+      "Rope_Straight-Arm_Pulldown": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Rope Straight-Arm Pulldown",
+        "primaryMuscles": [
+          "lats"
+        ],
+        "secondaryMuscles": []
+      },
+      "Round_The_World_Shoulder_Stretch": {
+        "category": "stretching",
+        "equipment": "other",
+        "name": "Round The World Shoulder Stretch",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "chest"
+        ]
+      },
+      "Russian_Twist": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Russian Twist",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": [
+          "lower back"
+        ]
+      },
+      "Scapular_Pull-Up": {
+        "category": "strength",
+        "equipment": null,
+        "name": "Scapular Pull-Up",
+        "primaryMuscles": [
+          "traps"
+        ],
+        "secondaryMuscles": [
+          "lats",
+          "middle back"
+        ]
+      },
+      "Scissor_Kick": {
+        "category": "stretching",
+        "equipment": "body only",
+        "name": "Scissor Kick",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": []
+      },
+      "Seated_Band_Hamstring_Curl": {
+        "category": "strength",
+        "equipment": "other",
+        "name": "Seated Band Hamstring Curl",
+        "primaryMuscles": [
+          "hamstrings"
+        ],
+        "secondaryMuscles": []
+      },
+      "Seated_Barbell_Military_Press": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Seated Barbell Military Press",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "triceps"
+        ]
+      },
+      "Seated_Bent-Over_One-Arm_Dumbbell_Triceps_Extension": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Seated Bent-Over One-Arm Dumbbell Triceps Extension",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Seated_Bent-Over_Rear_Delt_Raise": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Seated Bent-Over Rear Delt Raise",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": []
+      },
+      "Seated_Cable_Rows": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Seated Cable Rows",
+        "primaryMuscles": [
+          "middle back"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "lats",
+          "shoulders"
+        ]
+      },
+      "Seated_Calf_Raise": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Seated Calf Raise",
+        "primaryMuscles": [
+          "calves"
+        ],
+        "secondaryMuscles": []
+      },
+      "Seated_Close-Grip_Concentration_Barbell_Curl": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Seated Close-Grip Concentration Barbell Curl",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Seated_Dumbbell_Curl": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Seated Dumbbell Curl",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Seated_Dumbbell_Palms-Down_Wrist_Curl": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Seated Dumbbell Palms-Down Wrist Curl",
+        "primaryMuscles": [
+          "forearms"
+        ],
+        "secondaryMuscles": []
+      },
+      "Seated_Flat_Bench_Leg_Pull-In": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Seated Flat Bench Leg Pull-In",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": []
+      },
+      "Seated_Floor_Hamstring_Stretch": {
+        "category": "stretching",
+        "equipment": null,
+        "name": "Seated Floor Hamstring Stretch",
+        "primaryMuscles": [
+          "hamstrings"
+        ],
+        "secondaryMuscles": [
+          "calves"
+        ]
+      },
+      "Seated_Leg_Curl": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Seated Leg Curl",
+        "primaryMuscles": [
+          "hamstrings"
+        ],
+        "secondaryMuscles": []
+      },
+      "Seated_One-Arm_Dumbbell_Palms-Down_Wrist_Curl": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Seated One-Arm Dumbbell Palms-Down Wrist Curl",
+        "primaryMuscles": [
+          "forearms"
+        ],
+        "secondaryMuscles": []
+      },
+      "Seated_One-Arm_Dumbbell_Palms-Up_Wrist_Curl": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Seated One-Arm Dumbbell Palms-Up Wrist Curl",
+        "primaryMuscles": [
+          "forearms"
+        ],
+        "secondaryMuscles": []
+      },
+      "Seated_One-arm_Cable_Pulley_Rows": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Seated One-arm Cable Pulley Rows",
+        "primaryMuscles": [
+          "middle back"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "lats",
+          "traps"
+        ]
+      },
+      "Seated_Side_Lateral_Raise": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Seated Side Lateral Raise",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": []
+      },
+      "Seated_Triceps_Press": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Seated Triceps Press",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Shotgun_Row": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Shotgun Row",
+        "primaryMuscles": [
+          "lats"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "middle back"
+        ]
+      },
+      "Shoulder_Circles": {
+        "category": "stretching",
+        "equipment": null,
+        "name": "Shoulder Circles",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "traps"
+        ]
+      },
+      "Shoulder_Press_-_With_Bands": {
+        "category": "strength",
+        "equipment": "bands",
+        "name": "Shoulder Press - With Bands",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "triceps"
+        ]
+      },
+      "Shoulder_Stretch": {
+        "category": "stretching",
+        "equipment": null,
+        "name": "Shoulder Stretch",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": []
+      },
+      "Side_Bridge": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Side Bridge",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": [
+          "shoulders"
+        ]
+      },
+      "Side_Lateral_Raise": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Side Lateral Raise",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": []
+      },
+      "Side_Wrist_Pull": {
+        "category": "stretching",
+        "equipment": null,
+        "name": "Side Wrist Pull",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "forearms",
+          "lats"
+        ]
+      },
+      "Single-Arm_Cable_Crossover": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Single-Arm Cable Crossover",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": []
+      },
+      "Single-Arm_Push-Up": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Single-Arm Push-Up",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Single-Leg_High_Box_Squat": {
+        "category": "strength",
+        "equipment": "other",
+        "name": "Single-Leg High Box Squat",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "glutes",
+          "hamstrings"
+        ]
+      },
+      "Single-Leg_Leg_Extension": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Single-Leg Leg Extension",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Single_Leg_Glute_Bridge": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Single Leg Glute Bridge",
+        "primaryMuscles": [
+          "glutes"
+        ],
+        "secondaryMuscles": [
+          "hamstrings"
+        ]
+      },
+      "Sit-Up": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "Sit-Up",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": []
+      },
+      "Smith_Machine_Behind_the_Back_Shrug": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Smith Machine Behind the Back Shrug",
+        "primaryMuscles": [
+          "traps"
+        ],
+        "secondaryMuscles": [
+          "shoulders"
+        ]
+      },
+      "Smith_Machine_Bench_Press": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Smith Machine Bench Press",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Smith_Machine_Bent_Over_Row": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Smith Machine Bent Over Row",
+        "primaryMuscles": [
+          "middle back"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "lats",
+          "shoulders"
+        ]
+      },
+      "Smith_Machine_Calf_Raise": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Smith Machine Calf Raise",
+        "primaryMuscles": [
+          "calves"
+        ],
+        "secondaryMuscles": []
+      },
+      "Smith_Machine_Close-Grip_Bench_Press": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Smith Machine Close-Grip Bench Press",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": [
+          "chest",
+          "shoulders"
+        ]
+      },
+      "Smith_Machine_Decline_Press": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Smith Machine Decline Press",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Smith_Machine_Incline_Bench_Press": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Smith Machine Incline Bench Press",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Smith_Machine_Overhead_Shoulder_Press": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Smith Machine Overhead Shoulder Press",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "triceps"
+        ]
+      },
+      "Smith_Machine_Squat": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Smith Machine Squat",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "glutes",
+          "hamstrings",
+          "lower back"
+        ]
+      },
+      "Smith_Machine_Stiff-Legged_Deadlift": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Smith Machine Stiff-Legged Deadlift",
+        "primaryMuscles": [
+          "hamstrings"
+        ],
+        "secondaryMuscles": [
+          "glutes",
+          "lower back"
+        ]
+      },
+      "Smith_Single-Leg_Split_Squat": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Smith Single-Leg Split Squat",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "glutes",
+          "hamstrings"
+        ]
+      },
+      "Snatch": {
+        "category": "olympic weightlifting",
+        "equipment": "barbell",
+        "name": "Snatch",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "glutes",
+          "hamstrings",
+          "lower back",
+          "shoulders",
+          "traps",
+          "triceps"
+        ]
+      },
+      "Speed_Band_Overhead_Triceps": {
+        "category": "strength",
+        "equipment": "bands",
+        "name": "Speed Band Overhead Triceps",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Spider_Curl": {
+        "category": "strength",
+        "equipment": "e-z curl bar",
+        "name": "Spider Curl",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Squats_-_With_Bands": {
+        "category": "strength",
+        "equipment": "bands",
+        "name": "Squats - With Bands",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "glutes",
+          "hamstrings",
+          "lower back"
+        ]
+      },
+      "Standing_Barbell_Calf_Raise": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Standing Barbell Calf Raise",
+        "primaryMuscles": [
+          "calves"
+        ],
+        "secondaryMuscles": []
+      },
+      "Standing_Biceps_Cable_Curl": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Standing Biceps Cable Curl",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Standing_Bradford_Press": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Standing Bradford Press",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "triceps"
+        ]
+      },
+      "Standing_Calf_Raises": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Standing Calf Raises",
+        "primaryMuscles": [
+          "calves"
+        ],
+        "secondaryMuscles": []
+      },
+      "Standing_Dumbbell_Calf_Raise": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Standing Dumbbell Calf Raise",
+        "primaryMuscles": [
+          "calves"
+        ],
+        "secondaryMuscles": []
+      },
+      "Standing_Dumbbell_Press": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Standing Dumbbell Press",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "triceps"
+        ]
+      },
+      "Standing_Dumbbell_Reverse_Curl": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Standing Dumbbell Reverse Curl",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": [
+          "forearms"
+        ]
+      },
+      "Standing_Dumbbell_Triceps_Extension": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Standing Dumbbell Triceps Extension",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Standing_Dumbbell_Upright_Row": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Standing Dumbbell Upright Row",
+        "primaryMuscles": [
+          "traps"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "shoulders"
+        ]
+      },
+      "Standing_Front_Barbell_Raise_Over_Head": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Standing Front Barbell Raise Over Head",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": []
+      },
+      "Standing_Hamstring_and_Calf_Stretch": {
+        "category": "stretching",
+        "equipment": "other",
+        "name": "Standing Hamstring and Calf Stretch",
+        "primaryMuscles": [
+          "hamstrings"
+        ],
+        "secondaryMuscles": []
+      },
+      "Standing_Lateral_Stretch": {
+        "category": "stretching",
+        "equipment": null,
+        "name": "Standing Lateral Stretch",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": []
+      },
+      "Standing_Leg_Curl": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Standing Leg Curl",
+        "primaryMuscles": [
+          "hamstrings"
+        ],
+        "secondaryMuscles": []
+      },
+      "Standing_Low-Pulley_Deltoid_Raise": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Standing Low-Pulley Deltoid Raise",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "forearms"
+        ]
+      },
+      "Standing_Low-Pulley_One-Arm_Triceps_Extension": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Standing Low-Pulley One-Arm Triceps Extension",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": [
+          "chest",
+          "shoulders"
+        ]
+      },
+      "Standing_Military_Press": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Standing Military Press",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "triceps"
+        ]
+      },
+      "Standing_One-Arm_Cable_Curl": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Standing One-Arm Cable Curl",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Standing_Overhead_Barbell_Triceps_Extension": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Standing Overhead Barbell Triceps Extension",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": [
+          "shoulders"
+        ]
+      },
+      "Standing_Palms-In_Dumbbell_Press": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Standing Palms-In Dumbbell Press",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "triceps"
+        ]
+      },
+      "Standing_Rope_Crunch": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Standing Rope Crunch",
+        "primaryMuscles": [
+          "abdominals"
+        ],
+        "secondaryMuscles": []
+      },
+      "Standing_Soleus_And_Achilles_Stretch": {
+        "category": "stretching",
+        "equipment": null,
+        "name": "Standing Soleus And Achilles Stretch",
+        "primaryMuscles": [
+          "calves"
+        ],
+        "secondaryMuscles": []
+      },
+      "Standing_Toe_Touches": {
+        "category": "stretching",
+        "equipment": null,
+        "name": "Standing Toe Touches",
+        "primaryMuscles": [
+          "hamstrings"
+        ],
+        "secondaryMuscles": [
+          "calves"
+        ]
+      },
+      "Stiff-Legged_Barbell_Deadlift": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Stiff-Legged Barbell Deadlift",
+        "primaryMuscles": [
+          "hamstrings"
+        ],
+        "secondaryMuscles": [
+          "glutes",
+          "lower back"
+        ]
+      },
+      "Stiff-Legged_Dumbbell_Deadlift": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Stiff-Legged Dumbbell Deadlift",
+        "primaryMuscles": [
+          "hamstrings"
+        ],
+        "secondaryMuscles": [
+          "glutes",
+          "lower back"
+        ]
+      },
+      "Straight-Arm_Pulldown": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Straight-Arm Pulldown",
+        "primaryMuscles": [
+          "lats"
+        ],
+        "secondaryMuscles": []
+      },
+      "Sumo_Deadlift": {
+        "category": "powerlifting",
+        "equipment": "barbell",
+        "name": "Sumo Deadlift",
+        "primaryMuscles": [
+          "hamstrings"
+        ],
+        "secondaryMuscles": [
+          "adductors",
+          "forearms",
+          "glutes",
+          "lower back",
+          "middle back",
+          "quadriceps",
+          "traps"
+        ]
+      },
+      "Superman": {
+        "category": "stretching",
+        "equipment": "body only",
+        "name": "Superman",
+        "primaryMuscles": [
+          "lower back"
+        ],
+        "secondaryMuscles": [
+          "glutes",
+          "hamstrings"
+        ]
+      },
+      "Svend_Press": {
+        "category": "strength",
+        "equipment": "other",
+        "name": "Svend Press",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "forearms",
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "T-Bar_Row_with_Handle": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "T-Bar Row with Handle",
+        "primaryMuscles": [
+          "middle back"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "lats"
+        ]
+      },
+      "Tate_Press": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Tate Press",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": [
+          "chest",
+          "shoulders"
+        ]
+      },
+      "Thigh_Abductor": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Thigh Abductor",
+        "primaryMuscles": [
+          "abductors"
+        ],
+        "secondaryMuscles": [
+          "glutes"
+        ]
+      },
+      "Thigh_Adductor": {
+        "category": "strength",
+        "equipment": "machine",
+        "name": "Thigh Adductor",
+        "primaryMuscles": [
+          "adductors"
+        ],
+        "secondaryMuscles": [
+          "glutes",
+          "hamstrings"
+        ]
+      },
+      "Trap_Bar_Deadlift": {
+        "category": "strength",
+        "equipment": "other",
+        "name": "Trap Bar Deadlift",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "glutes",
+          "hamstrings"
+        ]
+      },
+      "Triceps_Pushdown": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Triceps Pushdown",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Triceps_Pushdown_-_Rope_Attachment": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Triceps Pushdown - Rope Attachment",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Triceps_Pushdown_-_V-Bar_Attachment": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Triceps Pushdown - V-Bar Attachment",
+        "primaryMuscles": [
+          "triceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Two-Arm_Dumbbell_Preacher_Curl": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Two-Arm Dumbbell Preacher Curl",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": []
+      },
+      "Two-Arm_Kettlebell_Military_Press": {
+        "category": "strength",
+        "equipment": "kettlebells",
+        "name": "Two-Arm Kettlebell Military Press",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "triceps"
+        ]
+      },
+      "Underhand_Cable_Pulldowns": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Underhand Cable Pulldowns",
+        "primaryMuscles": [
+          "lats"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "middle back",
+          "shoulders"
+        ]
+      },
+      "Upright_Barbell_Row": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Upright Barbell Row",
+        "primaryMuscles": [
+          "shoulders"
+        ],
+        "secondaryMuscles": [
+          "traps"
+        ]
+      },
+      "Upright_Cable_Row": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Upright Cable Row",
+        "primaryMuscles": [
+          "traps"
+        ],
+        "secondaryMuscles": [
+          "shoulders"
+        ]
+      },
+      "Upright_Row_-_With_Bands": {
+        "category": "strength",
+        "equipment": "bands",
+        "name": "Upright Row - With Bands",
+        "primaryMuscles": [
+          "traps"
+        ],
+        "secondaryMuscles": [
+          "shoulders"
+        ]
+      },
+      "V-Bar_Pulldown": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "V-Bar Pulldown",
+        "primaryMuscles": [
+          "lats"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "middle back",
+          "shoulders"
+        ]
+      },
+      "V-Bar_Pullup": {
+        "category": "strength",
+        "equipment": "body only",
+        "name": "V-Bar Pullup",
+        "primaryMuscles": [
+          "lats"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "middle back",
+          "shoulders"
+        ]
+      },
+      "Vertical_Swing": {
+        "category": "plyometrics",
+        "equipment": "dumbbell",
+        "name": "Vertical Swing",
+        "primaryMuscles": [
+          "hamstrings"
+        ],
+        "secondaryMuscles": [
+          "glutes",
+          "quadriceps",
+          "shoulders"
+        ]
+      },
+      "Wide-Grip_Barbell_Bench_Press": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Wide-Grip Barbell Bench Press",
+        "primaryMuscles": [
+          "chest"
+        ],
+        "secondaryMuscles": [
+          "shoulders",
+          "triceps"
+        ]
+      },
+      "Wide-Grip_Lat_Pulldown": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Wide-Grip Lat Pulldown",
+        "primaryMuscles": [
+          "lats"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "middle back",
+          "shoulders"
+        ]
+      },
+      "Wide-Grip_Pulldown_Behind_The_Neck": {
+        "category": "strength",
+        "equipment": "cable",
+        "name": "Wide-Grip Pulldown Behind The Neck",
+        "primaryMuscles": [
+          "lats"
+        ],
+        "secondaryMuscles": [
+          "biceps",
+          "middle back",
+          "shoulders"
+        ]
+      },
+      "Wide_Stance_Barbell_Squat": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Wide Stance Barbell Squat",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "glutes",
+          "hamstrings",
+          "lower back"
+        ]
+      },
+      "Wrist_Circles": {
+        "category": "stretching",
+        "equipment": "body only",
+        "name": "Wrist Circles",
+        "primaryMuscles": [
+          "forearms"
+        ],
+        "secondaryMuscles": []
+      },
+      "Zercher_Squats": {
+        "category": "strength",
+        "equipment": "barbell",
+        "name": "Zercher Squats",
+        "primaryMuscles": [
+          "quadriceps"
+        ],
+        "secondaryMuscles": [
+          "calves",
+          "glutes",
+          "hamstrings"
+        ]
+      },
+      "Zottman_Curl": {
+        "category": "strength",
+        "equipment": "dumbbell",
+        "name": "Zottman Curl",
+        "primaryMuscles": [
+          "biceps"
+        ],
+        "secondaryMuscles": [
+          "forearms"
+        ]
+      }
+    },
+    "idField": "id",
+    "ref": "main",
+    "retrievedDate": "2026-10-18",
+    "sha256": "5bb747e3fc658f095a60dcbf6d53c96627acdcc6ffb6fffde86f7e26995d40bf",
+    "sourceURL": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/dist/exercises.json"
+  },
+  "schemaVersion": 1,
+  "wger": {
+    "entries": {
+      "1080": {
+        "id": 1080,
+        "licenseAuthor": "Imobard",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Hindu Pushups",
+        "uuid": "476c1d96-6590-4f86-98f0-3f12808fab53"
+      },
+      "1096": {
+        "id": 1096,
+        "licenseAuthor": "tregga",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Abduction while standing",
+        "uuid": "d015a276-02ad-4c28-9d36-aedfbb431f53"
+      },
+      "1105": {
+        "id": 1105,
+        "licenseAuthor": "utkb",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Seated Knee Tuck",
+        "uuid": "371cfda2-1de6-419a-b40c-fc98fd3f7e41"
+      },
+      "1113": {
+        "id": 1113,
+        "licenseAuthor": "anon1337",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Push-Ups | Parallettes",
+        "uuid": "bd141adb-b9ad-4038-b11f-1db8665f72bc"
+      },
+      "1131": {
+        "id": 1131,
+        "licenseAuthor": "Franpol",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Cable glute extension",
+        "uuid": "19a9f67b-60f5-4367-9134-b805f3e73956"
+      },
+      "1132": {
+        "id": 1132,
+        "licenseAuthor": "Franpol",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Machine glute extension",
+        "uuid": "ab872d04-ca20-4341-b3c9-76763b25ef42"
+      },
+      "1188": {
+        "id": 1188,
+        "licenseAuthor": "",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Side bend",
+        "uuid": "d36fdd3c-9a35-4643-a3fd-57db78c866d6"
+      },
+      "1193": {
+        "id": 1193,
+        "licenseAuthor": "lion",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Russian Twist",
+        "uuid": "10510fb5-6ebd-4ddc-b03e-423b15deceea"
+      },
+      "1195": {
+        "id": 1195,
+        "licenseAuthor": "Insight",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Side Slides + Squats",
+        "uuid": "cd7bbafc-4092-4194-aa20-e380f1fe45f0"
+      },
+      "1202": {
+        "id": 1202,
+        "licenseAuthor": "wakanda90",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Side Lying Hip Abduction",
+        "uuid": "7212cc74-656e-47ce-8292-d211676f2ee1"
+      },
+      "1218": {
+        "id": 1218,
+        "licenseAuthor": "PaukOne",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "knee push-ups",
+        "uuid": "2b61df61-f71e-4b8f-9f95-6a565238a8ae"
+      },
+      "1234": {
+        "id": 1234,
+        "licenseAuthor": "carlos3c",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Dumbbell Single-leg Hip Thrust",
+        "uuid": "7cc24acf-3fc9-4d14-a461-cd00d1d18f0e"
+      },
+      "1266": {
+        "id": 1266,
+        "licenseAuthor": "cynomops",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "TRX Tricep Extension",
+        "uuid": "de8a3db6-2b05-4c4e-977b-b61342718356"
+      },
+      "1348": {
+        "id": 1348,
+        "licenseAuthor": "Anastasious",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Lower Back Extensions",
+        "uuid": "50a8f1f6-6772-4319-be9d-3bad1374dadf"
+      },
+      "1373": {
+        "id": 1373,
+        "licenseAuthor": "tekknokrat@gmx.de",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "box jumps",
+        "uuid": "002c6a4f-28ac-4b07-8e94-053e5b05d52b"
+      },
+      "1378": {
+        "id": 1378,
+        "licenseAuthor": "carlos3c",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Cable Lateral Raises (Single Arm)",
+        "uuid": "81942f3d-d92c-431c-b9d0-0da12918d1e4"
+      },
+      "1384": {
+        "id": 1384,
+        "licenseAuthor": "Paul@Chemistry",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Pullover Machine",
+        "uuid": "ad20ef5e-e360-4859-9110-668ee0c24721"
+      },
+      "1388": {
+        "id": 1388,
+        "licenseAuthor": "admin",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Single Leg RDL",
+        "uuid": "957ca37c-b6d7-4c30-8ba9-9512b0fa2659"
+      },
+      "1406": {
+        "id": 1406,
+        "licenseAuthor": "clafal",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Plank-to-Elbow Extension",
+        "uuid": "e75629ed-4991-4a48-984c-b297f3f9fb58"
+      },
+      "1409": {
+        "id": 1409,
+        "licenseAuthor": "clafal",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Dragon-flag",
+        "uuid": "f5ad82a8-adf8-4795-9874-1f6d183c56ed"
+      },
+      "1410": {
+        "id": 1410,
+        "licenseAuthor": "hpmbala@gmail.com",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Plank with Alternating Leg Lift",
+        "uuid": "94f2dea6-b336-41b2-a438-3ab7b13adbf7"
+      },
+      "1412": {
+        "id": 1412,
+        "licenseAuthor": "hpmbala@gmail.com",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "bicycle crunches",
+        "uuid": "fcf5039b-7784-4f82-830a-b213b597a646"
+      },
+      "1451": {
+        "id": 1451,
+        "licenseAuthor": "hpmbala@gmail.com",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Torso rotation stretch",
+        "uuid": "1e9b886f-0dbe-4434-829e-7159bcc40692"
+      },
+      "1476": {
+        "id": 1476,
+        "licenseAuthor": "Moffi",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Butterfly Sit Up",
+        "uuid": "1bb3bbaf-2dc2-4651-95db-71faf5304075"
+      },
+      "1477": {
+        "id": 1477,
+        "licenseAuthor": "Moffi",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Seated Corkscrew",
+        "uuid": "e9891a94-b1d4-47f4-a82b-c1aa82121abb"
+      },
+      "1497": {
+        "id": 1497,
+        "licenseAuthor": "JohnPreston",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "DB Underhand bench press",
+        "uuid": "7b40813b-80a3-42cc-8938-0c5199ef7620"
+      },
+      "1503": {
+        "id": 1503,
+        "licenseAuthor": "JohnPreston",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Dumbbell Frog Press",
+        "uuid": "b407768d-d519-47b8-818a-44c9761a8be6"
+      },
+      "1528": {
+        "id": 1528,
+        "licenseAuthor": "schweezer",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Glute Drive",
+        "uuid": "ce21d3a2-cdc5-410c-9970-c25029ca3769"
+      },
+      "1546": {
+        "id": 1546,
+        "licenseAuthor": "Expenses7000",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Larsen Press",
+        "uuid": "87f30f6d-dc8a-4b26-8c4f-640b66ecacf0"
+      },
+      "1554": {
+        "id": 1554,
+        "licenseAuthor": "Settebello",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Clap Push-UP",
+        "uuid": "fdeb0973-121f-494d-8b94-54f1d7ba003f"
+      },
+      "1572": {
+        "id": 1572,
+        "licenseAuthor": "Settebello",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Bird Dog",
+        "uuid": "6349365e-e901-4280-a1b7-65734986f47d"
+      },
+      "1593": {
+        "id": 1593,
+        "licenseAuthor": "workout@rooven.anonaddy.me",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Smith Machine Split Squat",
+        "uuid": "b382dcb2-60a8-412d-b0ee-6afe9c9f36d7"
+      },
+      "161": {
+        "id": 161,
+        "licenseAuthor": "powerade69",
+        "licenseFullName": " Creative Commons Attribution Share Alike 3",
+        "licenseShortName": "CC-BY-SA 3",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+        "name": "Cross-Bench Dumbbell Pullovers",
+        "uuid": "6e00afb6-272d-44a2-8ae3-e7fa41b50f06"
+      },
+      "1640": {
+        "id": 1640,
+        "licenseAuthor": "AlucardEvil40",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Dumbbell Front Squat",
+        "uuid": "4621b41f-0d32-4033-acff-dc079c792606"
+      },
+      "1642": {
+        "id": 1642,
+        "licenseAuthor": "AlucardEvil40",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Dumbbell Hip Thrust",
+        "uuid": "af77220c-098c-47c2-9f8c-92a651998903"
+      },
+      "1652": {
+        "id": 1652,
+        "licenseAuthor": "AlucardEvil40",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Dumbbell Romanian Deadlift",
+        "uuid": "65d12ecf-54b8-466d-a412-e55c396cad69"
+      },
+      "1654": {
+        "id": 1654,
+        "licenseAuthor": "roneydya",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Machine Lateral Raise",
+        "uuid": "3d2adf99-8fe9-45cb-b669-c5b18242e282"
+      },
+      "1670": {
+        "id": 1670,
+        "licenseAuthor": "Jhonatan",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Leg Swings (Front–Back)",
+        "uuid": "1fae7d45-0731-4640-8809-94c76b836571"
+      },
+      "1672": {
+        "id": 1672,
+        "licenseAuthor": "Iko",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Seated Hip Abduction",
+        "uuid": "b144ac00-ec0c-4c43-898f-b2ac65048d98"
+      },
+      "1684": {
+        "id": 1684,
+        "licenseAuthor": "meldun",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Dumbbell Thruster",
+        "uuid": "ae6a522e-db10-45ba-9642-987468d8a4de"
+      },
+      "1706": {
+        "id": 1706,
+        "licenseAuthor": "AlucardEvil40",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Bulgarian Squat with Dumbbells",
+        "uuid": "60d2c34b-43a1-48a3-b43b-160e4c0157f2"
+      },
+      "171": {
+        "id": 171,
+        "licenseAuthor": "wger.de",
+        "licenseFullName": " Creative Commons Attribution Share Alike 3",
+        "licenseShortName": "CC-BY-SA 3",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+        "name": "Incline Crunches",
+        "uuid": "7de7b8a8-313d-465f-bb22-8527ae45110a"
+      },
+      "172": {
+        "id": 172,
+        "licenseAuthor": "wger.de",
+        "licenseFullName": " Creative Commons Attribution Share Alike 3",
+        "licenseShortName": "CC-BY-SA 3",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+        "name": "Crunches on Machine",
+        "uuid": "401989e0-64c3-459d-bc47-2c171ab4f41d"
+      },
+      "1723": {
+        "id": 1723,
+        "licenseAuthor": "barry",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Glute Kickback (Machine)",
+        "uuid": "66ed6788-a1d8-49a2-af4d-397107fbf5fb"
+      },
+      "1736": {
+        "id": 1736,
+        "licenseAuthor": "Tierrasverdes",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Single-Leg Deadlift with Dumbbell",
+        "uuid": "a630de17-9170-434c-b486-96a6b8705506"
+      },
+      "1744": {
+        "id": 1744,
+        "licenseAuthor": "Tierrasverdes",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Machine Side Lateral Raises",
+        "uuid": "dc87b735-016c-410b-915c-e3521fea4be7"
+      },
+      "1803": {
+        "id": 1803,
+        "licenseAuthor": "kmcalderwood",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Trap Bar Squat",
+        "uuid": "d18407c2-75d0-43d8-8bbc-dfbb256b6b2f"
+      },
+      "1823": {
+        "id": 1823,
+        "licenseAuthor": "teus_ergaster",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Clamshell",
+        "uuid": "ca3ca5d0-5231-4420-ad06-fa3d32693a1b"
+      },
+      "1830": {
+        "id": 1830,
+        "licenseAuthor": "",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Barbell Step Back Lunge",
+        "uuid": "928eeae3-d849-4605-a470-048ca259a8c5"
+      },
+      "1842": {
+        "id": 1842,
+        "licenseAuthor": "Croak6728",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Banded Clamshell",
+        "uuid": "8cc84753-e638-4c43-91c6-51c097813ca4"
+      },
+      "1844": {
+        "id": 1844,
+        "licenseAuthor": "Croak6728",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Frog Stretch",
+        "uuid": "a37001e9-b4b3-45db-8ee3-046f40350efa"
+      },
+      "1852": {
+        "id": 1852,
+        "licenseAuthor": "Croak6728",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "L-sit",
+        "uuid": "16202754-f567-4d23-a866-2c9cc8eba71d"
+      },
+      "1859": {
+        "id": 1859,
+        "licenseAuthor": "Davidgj32",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Foam Roller Gluteus",
+        "uuid": "164a31e9-ce70-4339-aee5-4ea7a3bdd246"
+      },
+      "1869": {
+        "id": 1869,
+        "licenseAuthor": "Davidgj32",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Lying Figure Four Stretch",
+        "uuid": "76b6e798-e484-4606-aa64-8421aea51e88"
+      },
+      "1874": {
+        "id": 1874,
+        "licenseAuthor": "Davidgj32",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Runners Lunge Stretch",
+        "uuid": "92cd0459-5cd1-46a0-934d-e7cff8d4ccda"
+      },
+      "1886": {
+        "id": 1886,
+        "licenseAuthor": "teus_ergaster",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Supine Hip Abduction",
+        "uuid": "2fe15ae4-085b-4116-8d73-2a120cc2a231"
+      },
+      "1902": {
+        "id": 1902,
+        "licenseAuthor": "nishant0712",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Weighted push-ups",
+        "uuid": "37abbe32-2fab-4818-8355-fffcff2dc3e3"
+      },
+      "1915": {
+        "id": 1915,
+        "licenseAuthor": "treder",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Quadruped Hip Abduction",
+        "uuid": "2a1f7c0c-c63d-43f1-9934-a209ed405ff8"
+      },
+      "1935": {
+        "id": 1935,
+        "licenseAuthor": "",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Belt Squat",
+        "uuid": "e9f3446f-ca98-4bf2-817c-0dacd123cecd"
+      },
+      "1959": {
+        "id": 1959,
+        "licenseAuthor": "Pete-E automation",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Seated Piriformis Stretch",
+        "uuid": "ad5653e4-098e-4a84-af5b-a9349b108555"
+      },
+      "203": {
+        "id": 203,
+        "licenseAuthor": "ataraxie67",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Dumbbell Goblet Squat",
+        "uuid": "b7c6a444-90ea-4f5b-9fea-748311606eaa"
+      },
+      "206": {
+        "id": 206,
+        "licenseAuthor": "wger.de",
+        "licenseFullName": " Creative Commons Attribution Share Alike 3",
+        "licenseShortName": "CC-BY-SA 3",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+        "name": "Dumbbell Lunges Walking",
+        "uuid": "dcc6e237-a8bb-4eca-bbc5-7fb852636f6a"
+      },
+      "235": {
+        "id": 235,
+        "licenseAuthor": "nate303303",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Flutter Kicks",
+        "uuid": "fdc550b6-ec58-4023-ba62-b54045e9a10d"
+      },
+      "2631": {
+        "id": 2631,
+        "licenseAuthor": "",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Machine Lat Pulldown",
+        "uuid": "e6bf0364-ccce-4053-afe1-eef206a50291"
+      },
+      "2635": {
+        "id": 2635,
+        "licenseAuthor": "trs1800",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Seated Band Row",
+        "uuid": "6b6bd3ce-c40d-486c-9c47-21a3c639626d"
+      },
+      "265": {
+        "id": 265,
+        "licenseAuthor": "tdprice12",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Glute Bridge",
+        "uuid": "ceb0c2d0-06ac-4a49-89e7-8d7b1c1e5672"
+      },
+      "2662": {
+        "id": 2662,
+        "licenseAuthor": "bbk",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Paused Squats",
+        "uuid": "a4c97a23-f044-4095-a041-94d92ffe44bd"
+      },
+      "297": {
+        "id": 297,
+        "licenseAuthor": "Behrooz",
+        "licenseFullName": "Creative Commons Public Domain 1.0",
+        "licenseShortName": "CC0",
+        "licenseURL": "http://creativecommons.org/publicdomain/zero/1.0/",
+        "name": "Hollow Hold",
+        "uuid": "d059c63d-0a81-48a3-912a-44070c0def2e"
+      },
+      "331": {
+        "id": 331,
+        "licenseAuthor": "J120290,cerin",
+        "licenseFullName": " Creative Commons Attribution Share Alike 3",
+        "licenseShortName": "CC-BY-SA 3",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+        "name": "Kettlebell Swings",
+        "uuid": "8b311259-4f67-4dbf-9574-8c38faa92160"
+      },
+      "346": {
+        "id": 346,
+        "licenseAuthor": "Torsten Linnecke",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Landmine press",
+        "uuid": "91c47c8b-6290-4885-8921-df9aa7958c00"
+      },
+      "367": {
+        "id": 367,
+        "licenseAuthor": "wger.de",
+        "licenseFullName": " Creative Commons Attribution Share Alike 3",
+        "licenseShortName": "CC-BY-SA 3",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+        "name": "Leg Curls (standing)",
+        "uuid": "49189e88-40b6-4c0d-a784-0cc3abbb8e75"
+      },
+      "376": {
+        "id": 376,
+        "licenseAuthor": "BFad07",
+        "licenseFullName": "Creative Commons Public Domain 1.0",
+        "licenseShortName": "CC0",
+        "licenseURL": "http://creativecommons.org/publicdomain/zero/1.0/",
+        "name": "Leg Raise",
+        "uuid": "c2078aac-e4e2-4103-a845-6252a3eb795e"
+      },
+      "377": {
+        "id": 377,
+        "licenseAuthor": "wger.de",
+        "licenseFullName": " Creative Commons Attribution Share Alike 3",
+        "licenseShortName": "CC-BY-SA 3",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+        "name": "Leg Raises, Lying",
+        "uuid": "9e34bc01-9cec-4ee2-a9bb-9c937a471c24"
+      },
+      "445": {
+        "id": 445,
+        "licenseAuthor": "Mens Fitness",
+        "licenseFullName": "Creative Commons Public Domain 1.0",
+        "licenseShortName": "CC0",
+        "licenseURL": "http://creativecommons.org/publicdomain/zero/1.0/",
+        "name": "Pause Bench",
+        "uuid": "6441ff9e-037e-48d9-8800-67b430dc8e37"
+      },
+      "454": {
+        "id": 454,
+        "licenseAuthor": "Nash",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Pike Push Ups",
+        "uuid": "3b96a05b-9705-48da-b43e-6e098234bb35"
+      },
+      "456": {
+        "id": 456,
+        "licenseAuthor": "minifigmaster125",
+        "licenseFullName": " Creative Commons Attribution Share Alike 3",
+        "licenseShortName": "CC-BY-SA 3",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+        "name": "Pistol Squat",
+        "uuid": "fe04cf35-1af5-4b51-89d4-c38d7eaa0db1"
+      },
+      "500": {
+        "id": 500,
+        "licenseAuthor": "spacetowaste",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Reverse Plank",
+        "uuid": "09349391-375b-42d5-8979-00a5d7196a5b"
+      },
+      "556": {
+        "id": 556,
+        "licenseAuthor": "klabautermann",
+        "licenseFullName": " Creative Commons Attribution Share Alike 3",
+        "licenseShortName": "CC-BY-SA 3",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+        "name": "Side Bends on Machine",
+        "uuid": "919bb48a-42fe-4a11-9078-ea2b5087c49f"
+      },
+      "57": {
+        "id": 57,
+        "licenseAuthor": "nate303303",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Bear Walk 2",
+        "uuid": "b7267f90-8706-442b-b918-507e16092b8e"
+      },
+      "632": {
+        "id": 632,
+        "licenseAuthor": "sophialj",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Sumo Squats",
+        "uuid": "0a5a7661-1e24-4c15-bb2b-503672141307"
+      },
+      "650": {
+        "id": 650,
+        "licenseAuthor": "BeLikeWater",
+        "licenseFullName": "Creative Commons Public Domain 1.0",
+        "licenseShortName": "CC0",
+        "licenseURL": "http://creativecommons.org/publicdomain/zero/1.0/",
+        "name": "Thruster",
+        "uuid": "51420ded-5c17-4ce0-b005-89f1b67b7c65"
+      },
+      "672": {
+        "id": 672,
+        "licenseAuthor": "Robertcoop",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Trunk Rotation With Cable",
+        "uuid": "90e9f590-7d68-4afb-9f95-8429246ea4aa"
+      },
+      "910": {
+        "id": 910,
+        "licenseAuthor": "karly",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Nordic Curl",
+        "uuid": "9b0f7101-b78a-4c47-b680-fbef15469a8a"
+      },
+      "912": {
+        "id": 912,
+        "licenseAuthor": "novadani",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Straight Bar Cable Curls",
+        "uuid": "36274d27-3812-4b8c-80e2-ab59acf82c4d"
+      },
+      "958": {
+        "id": 958,
+        "licenseAuthor": "clafal",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Biceps with TRX",
+        "uuid": "596b9d2d-0f01-41a0-97e1-1839ffdb824d"
+      },
+      "959": {
+        "id": 959,
+        "licenseAuthor": "clafal",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "TRX Rows",
+        "uuid": "e2599e86-d8b0-434e-8a48-aa3c2df7e790"
+      },
+      "978": {
+        "id": 978,
+        "licenseAuthor": "clafal",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Knee Raises",
+        "uuid": "f4991a98-6422-4884-8ad3-43412f91fac1"
+      },
+      "979": {
+        "id": 979,
+        "licenseAuthor": "clafal",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Leg raises pull up bar",
+        "uuid": "b2025776-2397-4de7-a49e-296321169481"
+      },
+      "984": {
+        "id": 984,
+        "licenseAuthor": "",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Lunges",
+        "uuid": "3284fd27-5402-4821-9c32-29066d4e2667"
+      },
+      "985": {
+        "id": 985,
+        "licenseAuthor": "",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Push-up rotations",
+        "uuid": "a9633731-1d86-4b4a-996f-33a1dee0b0e1"
+      },
+      "988": {
+        "id": 988,
+        "licenseAuthor": "",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Bulgarian split squats left",
+        "uuid": "7ce489d2-1948-46de-aa80-277b2ca737aa"
+      },
+      "999": {
+        "id": 999,
+        "licenseAuthor": "",
+        "licenseFullName": "Creative Commons Attribution Share Alike 4",
+        "licenseShortName": "CC-BY-SA 4",
+        "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+        "name": "Reverse lunges",
+        "uuid": "616f9026-1a1d-4ed8-b068-cfbb81b6a000"
+      }
+    },
+    "retrievedDate": "2026-10-18",
+    "sourceURLTemplate": "https://wger.de/api/v2/exerciseinfo/{id}/"
+  }
+}
