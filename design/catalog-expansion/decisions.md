@@ -58,3 +58,43 @@
 | A3 | `design/11d-experience-scorecard.md` 仍写总数上限 300 | 后续同步为 CX-D2 修订：不设硬数和总数上限 | 删除过时限制 | 待实施 |
 
 本轮范围：数据和必要领域层、旧用户升级验证、spec 同步；拼音搜索、最近使用排序、新器械图标留到第 2b 步。本轮不改 Penpot、README 或 components.md。CX-D4 两条改名和停用继续有效；停用 JSON 字段确定为 `retired: true`，不得改已完成训练的 `displayNameSnapshot`。
+
+## 第 2a 步执行记录
+
+### 最新状态：BLOCKED（2026-10-18）
+
+任务第 3 步明确要求：「如果需要改 Core Data 模型（新的模型版本、新属性），或者需要你自己设计迁移：先停下，把方案写进执行记录交给产品负责人，不要自己做。」提前核查升级路径后发现没有可沿用的版本更新机制，需要设计已有存储的数据升级；因此在清单重生成、JSON 写入及代码实施前停止。不是已确认必须改 Core Data 模型；不能把具备 upsert helper 等同于已实现安全升级。
+
+五行执行记录：
+
+1. **分类和依据**：本轮为已批准目录数据修订及必要领域层变更；筛选沿用既有 chip、布局与图标，目标仅扩充枚举。尚未实施 UI，不主张视觉验收。依据 CX-D1–CX-D9、Q1–Q10、A1–A3 和任务第 3 步停止条件。
+2. **范围**：初始审计只有 untracked `design/catalog-expansion/external-taxonomy-digest.md`，无 tracked 修改、无 staged 内容；保留且未提交。`feat/catalog-expansion` 已 merge 本地 main（`25949bd`），bootstrap 完成，worktree gate PASS；仅追加本文件的已批准决定与本执行记录。
+3. **设计决定**：产品负责人批准内容已独立提交 `4976e7c`；下面的升级方案只是待审候选，不是新增批准决定。未修改 Core Data 模型、JSON、脚本、Swift、specs、Penpot、README 或 components.md。
+4. **实施与检查**：静态追踪启动、seed、repository、mapping、bundle loader 和名称 claim；现有 JSON 实测 146 条、龙门架 21 条。本文件执行 `git diff --check` 并回读；完整 lint、App build、Unit、Integration 均未运行，测试数量 0；未运行 UITests、模拟器或真机。证据为下列源码位置和 `.handoff/subagent/2026-10-18-cprime-step2a-blocked.md`，未产生 `DerivedData/CX2a/evidence/` 运行日志。
+5. **结果**：BLOCKED；新增写入 0 条，当前目录仍为 146 条，批准清单尚未重生成，最终目标总数尚未计算。合并和决定提交见上；本执行记录随独立文档提交保存，提交号见交接文件与最终回报。没有完成第 2a 步，不宣称测试或升级通过。
+
+### 已安装用户升级机制：静态核查证据
+
+- `ios/FineCoachApp/App/AppEnvironment.swift:176` 的 `prepareExerciseCatalog` 调用 `ExerciseLibraryUseCases.seedIfNeeded`（`Core/Application/ExerciseLibraryUseCases.swift:14`），后者只调用 `seedPlaceholderCatalogIfNeeded`。
+- `ios/FineCoachApp/Core/Persistence/CoreDataExerciseRepository.swift:11`：先计数，100…150 条时直接返回，发生在加载 bundle JSON 之前；146 条的旧存储不会读取新增条目和改名，不比较 `metadataVersion` / `contentVersion`。该路径不是逐启动按 JSON 同步，也不只是绝对意义上的首次安装写入；条数不在区间时会重建。
+- 同文件 `:251` 固定范围 100…150；`:272` 对新 JSON 仍做同一条数限制。只扩充 JSON 会使新安装拒绝初始化；只放宽范围又会令 146 条旧存储继续提前返回。
+- 同文件 `:301` 的 `removeBuiltInCatalog` 删除内置条目及其名称 claim 和 preference（`:310–314`）。不能沿用此重建路径来满足单侧、辅助、收藏、隐藏、别名偏好保留要求。
+- `ios/FineCoachApp/Core/Persistence/ExerciseManagedObject+Mapping.swift:9` 写入已有 `metadataVersion`；`:209` 的 upsert 按 id 查找再 apply，没有版本比较、retired 同步或升级编排。`:235` 的统一名称 claim 已被其他 owner 占用时抛 `DomainError.conflict`；需覆盖新内置名与用户自定义名冲突，而不能自行更名、覆盖或吞错。
+- `ios/FineCoachApp/Core/Application/ExerciseProvenanceValidator.swift:228` 从 bundle 解码 JSON；`:275` 的 facet cache 只把 JSON 分类映射给已有行，不插入存储行、不更新存储显示名，不构成升级机制。
+- `ios/FineCoachApp/Core/Persistence/SessionManagedObject+Mapping.swift:41` 独立持久化 `displayNameSnapshot`，`:123` 读取；后续升级方案必须完全不写 Session 及其 snapshot。
+
+### 待审升级候选方案（未实施）
+
+建议在现有 Core Data 模型上研究按稳定 id 原位同步目录：先完整校验候选 JSON、来源、id、名称和版本，再在单个现有 writer transaction 内新增缺失内置动作、更新已有内置动作的目录显示名及 metadata，保留原 createdAt 和所有 preference，不调用 `removeBuiltInCatalog`。不触碰自定义动作、Session、模板引用和训练名字快照。重复启动应幂等，任一失败应回滚并保留最后有效状态；成功后再报告目录可用。
+
+`retired` 可研究仅作为 bundle 元数据来过滤列表与搜索，按 id 读取保留；是否足够覆盖备份/恢复和旧目录仍需后续证明，不据此新增模型属性。条数 gate 应由新目录合同替代旧 100…150 范围，不能只移除校验。以上属于待批准的数据升级设计，不是已完成迁移。
+
+需要产品负责人审查并授权上述升级机制后继续；另需明确新内置名称或改名与已有自定义动作的 claim 冲突时采取何种产品行为。现有证据只能确定当前会抛 conflict，不能擅自选择覆盖、更名或跳过。升级 Integration 验证仍须用旧 JSON 预置存储覆盖新增、改名、停用、偏好、自定义动作、已完成训练 snapshot 保留及幂等结果。
+
+### 入口与布局清单、L3
+
+| 屏幕 | 可见控件 / identifier | 数据变化 | 宽度 owner | 状态 |
+|---|---|---|---|---|
+| 动作库筛选 sheet | `ExerciseLibraryView.swift:247`，`FCFilterChip` / `FCAccessibilityID.exerciseLibraryEquipment(equipment)` | 计划由 8 个器械值扩至 13 个，只修改筛选条件，不持久化训练数据 | `filterSheet` 的 `FCBottomSheet` 内容区 → `VStack` → `FCFlowLayout`（`:234–240`） | 未实施，仍为 8 项；无其他新入口 |
+
+L3 待人工看：13 项筛选在小屏上的换行或滚动、两个改名后的动作、停用动作在列表与搜索中不可见。**未做人工视觉验证**。
