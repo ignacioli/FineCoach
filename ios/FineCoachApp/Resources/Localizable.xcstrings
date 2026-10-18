@@ -263,7 +263,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "填写显示名称"
+            "value": "还没填写显示名称"
           }
         }
       }
@@ -274,7 +274,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "选择性别"
+            "value": "还没选择性别"
           }
         }
       }
@@ -2793,7 +2793,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "输入有效的预计时长。"
+            "value": "预计时长无效。"
           }
         }
       }
@@ -3354,7 +3354,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "填写调整原因。"
+            "value": "还没填写调整原因。"
           }
         }
       }
@@ -7831,7 +7831,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "学员删除不会影响教练的原始数据、已保存的文件或其他副本。"
+            "value": "学员删除不会影响你的原始数据、已保存的文件或其他副本。"
           }
         }
       }
@@ -9371,7 +9371,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "给学员发训练报告时，由教练挑选包含哪些内容。性别、身体数据、伤病、电话、微信和教练的私人备注永远不会进入报告。"
+            "value": "给学员发训练报告时，由你挑选包含哪些内容。性别、身体数据、伤病、电话、微信和你的私人备注永远不会进入报告。"
           }
         }
       }

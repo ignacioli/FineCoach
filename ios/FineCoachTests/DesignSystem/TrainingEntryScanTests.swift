@@ -300,16 +300,29 @@ final class TrainingEntryScanTests: XCTestCase {
             ("操作失败", "说明具体失败结果，不使用「操作失败」"),
             ("！", "避免使用感叹号"),
             ("!", "避免使用感叹号"),
-            ("吧", "避免语气词"),
-            ("呢", "避免语气词"),
-            ("哦", "避免语气词"),
-            ("啦", "避免语气词"),
-            ("呀", "避免语气词"),
-            ("哈", "避免语气词"),
         ]
         for (needle, rule) in forbidden where value.contains(needle) {
             XCTFail("\(source) contains \(needle): \(rule); value=\(value)")
         }
+        if let particle = Self.toneParticle(in: value) {
+            XCTFail("\(source) contains \(particle): 避免语气词; value=\(value)")
+        }
+    }
+
+    /// Sentence-final particles only: a particle followed by the end of the
+    /// text, whitespace or punctuation. Words such as 哈克机 stay legal.
+    private static func toneParticle(in value: String) -> String? {
+        let pattern = "[吧呢哦啦呀哈](?=$|[\\s。，、；：？！?!,.;:）)」』…~])"
+        guard let range = value.range(of: pattern, options: .regularExpression) else { return nil }
+        return String(value[range])
+    }
+
+    func testToneParticleScanIgnoresWordsLikeHackMachine() {
+        XCTAssertNil(Self.toneParticle(in: "哈克机提踵"))
+        XCTAssertNil(Self.toneParticle(in: "哈克深蹲，4 组"))
+        XCTAssertEqual(Self.toneParticle(in: "开始记录第一堂课吧"), "吧")
+        XCTAssertEqual(Self.toneParticle(in: "已保存哦。"), "哦")
+        XCTAssertEqual(Self.toneParticle(in: "好了呢 再看看"), "呢")
     }
 
     private static func extractSwiftStringLiterals(
