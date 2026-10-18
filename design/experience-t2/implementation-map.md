@@ -439,3 +439,10 @@ xcrun swift-format lint --configuration .swift-format --recursive --parallel --s
 | `FineCoachIntegrationTests` 全量 | PASS：执行 167 项，0 失败，14.2 秒 | `fix-integration.log` / `fix-integration.xcresult` |
 
 - 证据都在 Git 忽略的 `DerivedData/B3/evidence/`，文件名用 `fix-` / `baseline-` 前缀；临时 worktree `.worktrees/b3-baseline-check` 用完已删除。没有运行 `FineCoachUITests`，没有 push 或 merge。测试是 simulator 证据，不是真机或人工验收；本次没有改用户可见 UI。
+
+## Penpot 回填（2026-10-18，Claude）
+
+- Penpot「M1-B G5 Design」两页（Foundations、M2 G7 Design）的 16 条旧文案已全部改成新文案，共 17 个文字层，分布在 10 张画板：16 学员列表空态、D13b 人工调整课时、D14 / D14b 备份与恢复、M2-03、M2-04、M2-05、M2-07、M2-10、W-02。回读确认旧文案剩余 0 处。新文案都比原文短，没有改动画板布局。
+- 快照：`before-B3-copy-backfill 2026-10-18`、`B3 copy backfilled 2026-10-18: 16 strings per B-D7`。
+- **待办**：上面 10 张画板对应的 `design/*/screens/*.png` 还是旧文案。2x 导出要由产品负责人在 Penpot 界面里批量导出 zip，再运行 `scripts/penpot/import-penpot-exports.py` 导入。在这之前，以 Penpot 为准。
+- **顺带发现，不属于 B3**：Foundations 页的通知预览写着「15:00 · 你的训练时间到了」，但代码里约课提醒的正文是「HH:mm 有一节训练安排。」（`AppointmentNotificationContentBuilder`）。这是画稿和代码之间的旧偏差，记下备查，本轮不改。
