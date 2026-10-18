@@ -141,7 +141,7 @@ public struct FCInlineResult: View {
                 message: "备份文件无法读取或密码不正确，当前数据没有改动。",
                 retry: .init(title: "重试") {}
             )
-            FCInlineResult(.success, title: "恢复完成", message: "请检查恢复后的学员、课程与训练记录。")
+            FCInlineResult(.success, title: "恢复完成", message: "检查恢复后的学员、课程与训练记录。")
             FCInlineResult(.info, title: "已取消", message: "没有交付任何文件。", retry: .init(title: "重试") {})
         }
         .padding(FCPrimitives.space4)

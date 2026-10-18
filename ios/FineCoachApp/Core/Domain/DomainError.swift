@@ -23,11 +23,11 @@ public enum DomainError: Error, Equatable, LocalizedError, Sendable {
     public var errorDescription: String? {
         switch self {
         case .emptyText:
-            return "请输入内容。"
+            return "输入内容。"
         case .textTooLong:
             return "内容过长，无法保存。"
         case .invalidDecimal, .invalidNumber:
-            return "请输入有效数字。"
+            return "输入有效数字。"
         case .invalidUnit:
             return "单位不受支持。"
         case .invalidMode:
@@ -41,15 +41,15 @@ public enum DomainError: Error, Equatable, LocalizedError, Sendable {
         case .notFound:
             return "记录不存在。"
         case .staleRevision:
-            return "记录已更新，请重试。"
+            return "记录已更新，再试一次。"
         case .protectedDataUnavailable:
             return "受保护数据暂不可用。"
         case .persistenceFailed:
-            return "本地保存失败，请重试。"
+            return "本地保存没有成功，再试一次。"
         case .randomSourceFailed:
             return "安全随机源不可用。"
         case .invalidFileOperation:
-            return "本地文件操作失败。"
+            return "本地文件处理没有完成。"
         case .incompatibleInput:
             return "输入内容不兼容。"
         case .recurrenceLimitExceeded:

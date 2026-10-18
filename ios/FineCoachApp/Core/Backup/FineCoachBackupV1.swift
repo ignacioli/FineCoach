@@ -26,7 +26,7 @@ public enum BackupError: Error, Equatable, LocalizedError, Sendable {
         case .limitExceeded:
             return "本地空间或文件大小超出上限。"
         case .invalidPassword:
-            return "请设置至少 8 个字符的口令。"
+            return "口令至少需要 8 个字符。"
         case .invalidState:
             return "当前无法完成备份或恢复。"
         }
