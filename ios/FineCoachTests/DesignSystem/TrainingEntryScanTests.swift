@@ -106,6 +106,44 @@ final class TrainingEntryScanTests: XCTestCase {
         }
     }
 
+    /// B-D9 / Δ12: keyboard presentation only changes the page-local rest-bar
+    /// visibility. The view model's timer remains the source of truth so its
+    /// countdown and notification lifecycle are independent of the keyboard.
+    func testRestBarHidesForKeyboardWithoutChangingTimerState() throws {
+        let text = try source("Features/ActiveSession/ActiveSessionView.swift").joined(separator: "\n")
+        XCTAssertTrue(text.contains("@State private var isKeyboardVisible = false"))
+        XCTAssertTrue(text.contains("@State private var keyboardDismissedAt = Date.distantPast"))
+        XCTAssertTrue(text.contains("UIResponder.keyboardWillShowNotification"))
+        XCTAssertTrue(text.contains("UIResponder.keyboardWillHideNotification"))
+        XCTAssertTrue(text.contains("if !isKeyboardVisible,"))
+        XCTAssertTrue(text.contains("!restTimer.isFinished(at: keyboardDismissedAt)"))
+        XCTAssertTrue(text.contains("viewModel.restTimer.map { !$0.isFinished(at: keyboardDismissedAt) } ?? false"))
+        XCTAssertFalse(text.contains("!restTimer.isFinished(at: Date())"))
+
+        let showStart = try XCTUnwrap(text.range(of: "UIResponder.keyboardWillShowNotification"))
+        let hideStart = try XCTUnwrap(text.range(of: "UIResponder.keyboardWillHideNotification"))
+        let showHandler = text[showStart.lowerBound..<hideStart.lowerBound]
+        let afterHide = text[hideStart.lowerBound...]
+        let hideEnd = afterHide.range(of: "\n        .onDisappear")?.lowerBound ?? afterHide.endIndex
+        let hideHandler = afterHide[..<hideEnd]
+        XCTAssertTrue(showHandler.contains("isKeyboardVisible = true"))
+        XCTAssertTrue(hideHandler.contains("keyboardDismissedAt = Date()"))
+        XCTAssertTrue(hideHandler.contains("isKeyboardVisible = false"))
+        XCTAssertFalse(showHandler.contains("restTimer = nil"))
+        XCTAssertFalse(hideHandler.contains("restTimer = nil"))
+
+        let safeAreaStart = try XCTUnwrap(text.range(of: ".safeAreaInset(edge: .bottom)"))
+        let finishMarker = try XCTUnwrap(
+            text.range(of: "FCAccessibilityID.activeSessionFinish", range: safeAreaStart.upperBound..<text.endIndex)
+        )
+        let restBranchEnd = try XCTUnwrap(
+            text.range(
+                of: "\n                    }\n                    FCButton(",
+                range: safeAreaStart.upperBound..<finishMarker.lowerBound)
+        )
+        XCTAssertLessThan(restBranchEnd.lowerBound, finishMarker.lowerBound)
+    }
+
     /// Template exercises are list items: deletion is exposed by the native
     /// trailing swipe action, while the move-to-section menu remains visible.
     func testTemplateExerciseRowsUseDestructiveSwipeDelete() throws {
