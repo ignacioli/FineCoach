@@ -272,7 +272,7 @@ ROW_NOTES = {
     "核心:9": "Q8：按交替动作记次数",
     "腹:34": "名字是「摇摆」但源条目是 Hollow Hold 静态支撑，按时长",
     "臀:39": "Q8：源条目 Lying Crossover 是拉伸，按时长",
-    "臀:31": "Q4：去掉「单腿」后与「哑铃罗马尼亚硬拉」近似，默认单侧",
+    "臀:31": "Q4：原名「哑铃单腿罗马尼亚硬拉」，去「单腿」后与现有「罗马尼亚硬拉」近似，默认单侧",
     "臀:40": "Q4：去掉「单腿」后与现有「徒手臀桥」近似，默认单侧",
     "腿:83": "来源器材为「其他」，按规则保留",
     "腿:86": "来源器材为「其他」，按规则保留",
@@ -735,7 +735,11 @@ def tag_approximate_mappings(merged: list[dict]) -> None:
             continue
         for entry in group:
             others = [name for name in names if name != entry["name"]]
-            entry["notes"].append("近似映射：与「%s」共用库内条目 %s" % ("、".join(others), library))
+            if len(others) > 3:
+                label = "%s 等 %d 条" % ("、".join(others[:3]), len(others))
+            else:
+                label = "、".join(others)
+            entry["notes"].append("近似映射：与「%s」共用库内条目 %s" % (label, library))
 
 
 # Rows whose unilateral wording was removed and whose normalised name then hits
@@ -872,8 +876,10 @@ def render(data: dict, merged: list[dict], already: list[dict], calibrations: li
                 "、".join("%s:%s（%s）" % (member["file_short"], member["line"], member["raw_name"])
                          for member in [entry] + entry["merged"]),
             ))
-        if entry["confidence"] == "low":
-            note_parts.append("low，建议采纳（附录 A）")
+        if entry["confidence"] == "low" and not any(
+            "建议采纳（附录 A）" in part for part in note_parts
+        ):
+            note_parts.append("low 行，建议采纳（附录 A）")
         note_parts.extend(entry["pending"])
         note = "；".join(dict.fromkeys(note_parts))
         lines.append("| %d | %s | %s | %s | %s | %s | %s | `%s` | %s | %s | %s | %s | %s |" % (
