@@ -1654,6 +1654,17 @@
         }
       }
     },
+    "exercise.library.recent": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近练过"
+          }
+        }
+      }
+    },
     "exercise.library.entry": {
       "extractionState": "manual",
       "localizations": {

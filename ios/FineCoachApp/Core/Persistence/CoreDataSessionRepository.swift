@@ -103,6 +103,13 @@ public struct CoreDataSessionRepository: Sendable {
         }
     }
 
+    public func listAllCompleted() async throws -> [CompletedSession] {
+        try await writer.read { context in
+            let ids = try HistoryReportManagedObjectMapping.completedSessionIDs(in: context)
+            return try ids.map { try HistoryReportManagedObjectMapping.loadCompletedSession(id: $0, in: context) }
+        }
+    }
+
     public func completedSession(id: StableUUID) async throws -> CompletedSession {
         try await writer.read { context in
             try HistoryReportManagedObjectMapping.loadCompletedSession(id: id.rawValue, in: context)

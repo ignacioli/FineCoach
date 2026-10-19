@@ -49,6 +49,10 @@ final class ActiveSessionViewModel: ObservableObject {
     @Published var exerciseName = ""
     @Published var exerciseNameConflict: String?
     @Published var catalogMatches: [ExerciseLibraryEntry] = []
+    @Published private(set) var catalogEntries: [ExerciseLibraryEntry] = []
+    @Published var catalogMuscleFilter: String?
+    @Published var catalogEquipmentFilter: String?
+    @Published private(set) var recentCatalogMatches: [ExerciseLibraryEntry] = []
     @Published var recordMode: RecordMode = .weightReps
     @Published var isAddingExercise = false
     @Published var weight = ""
@@ -165,6 +169,13 @@ final class ActiveSessionViewModel: ObservableObject {
             saveStatus = useCases.saveStatus
             await loadSections()
             lastPerformances = (try? await useCases.lastPerformances(studentID: studentID)) ?? .empty
+            do {
+                recentCatalogMatches = try await useCases.recentCatalogExercises(studentID: studentID)
+            } catch {
+                recentCatalogMatches = []
+                present(error)
+            }
+            catalogEntries = try await useCases.searchCatalog(query: "")
             await refreshEntryFlags()
             if editingSetID == nil {
                 prefillSetFields(for: currentExercise)
@@ -172,6 +183,33 @@ final class ActiveSessionViewModel: ObservableObject {
         } catch {
             present(error)
         }
+    }
+
+    var catalogSections: [ExerciseCatalogBrowse.Section] {
+        let source =
+            exerciseName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? catalogEntries
+            : catalogMatches
+        return ExerciseCatalogBrowse.sections(
+            from: source,
+            muscleFilter: catalogMuscleFilter,
+            equipmentFilter: catalogEquipmentFilter
+        )
+    }
+
+    var showsRecentCatalogMatches: Bool {
+        exerciseName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && catalogMuscleFilter == nil
+            && catalogEquipmentFilter == nil
+            && !recentCatalogMatches.isEmpty
+    }
+
+    func selectCatalogMuscle(_ value: String?) {
+        catalogMuscleFilter = value
+    }
+
+    func selectCatalogEquipment(_ value: String?) {
+        catalogEquipmentFilter = value
     }
 
     // MARK: - Template save/section management (M1B-FR-018/019/020/021)
@@ -1021,7 +1059,7 @@ final class ActiveSessionViewModel: ObservableObject {
             guard generation == catalogSearchGeneration, !Task.isCancelled else {
                 return
             }
-            catalogMatches = Array(matches.prefix(8))
+            catalogMatches = matches
         } catch is CancellationError {
             return
         } catch {

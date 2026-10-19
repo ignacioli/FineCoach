@@ -9,15 +9,19 @@ final class ExerciseLibraryViewModel: ObservableObject {
     @Published var equipmentFilter: String?
     @Published var entries: [ExerciseLibraryEntry] = []
     @Published var sections: [ExerciseCatalogBrowse.Section] = []
+    @Published private(set) var recentEntries: [ExerciseLibraryEntry] = []
     @Published var errorMessage: String?
     @Published var conflictMessage: String?
 
     let useCases: ExerciseLibraryUseCases
+    private let historyUseCases: HistoryUseCases
+    private var completedHistory: [CompletedSession] = []
     private var reloadGeneration = 0
     private var reloadTask: Task<Void, Never>?
 
-    init(useCases: ExerciseLibraryUseCases) {
+    init(useCases: ExerciseLibraryUseCases, historyUseCases: HistoryUseCases) {
         self.useCases = useCases
+        self.historyUseCases = historyUseCases
     }
 
     func scheduleReload() {
@@ -37,6 +41,7 @@ final class ExerciseLibraryViewModel: ObservableObject {
             }
             entries = result
             rebuildSections()
+            rebuildRecentEntries()
             errorMessage = nil
             conflictMessage = nil
         } catch is CancellationError {
@@ -47,6 +52,25 @@ final class ExerciseLibraryViewModel: ObservableObject {
             }
             present(error)
         }
+    }
+
+    func load() async {
+        await reload()
+        do {
+            completedHistory = try await historyUseCases.listAllHistory()
+            rebuildRecentEntries()
+        } catch {
+            completedHistory = []
+            recentEntries = []
+            present(error)
+        }
+    }
+
+    var showsRecentEntries: Bool {
+        query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && muscleFilter == nil
+            && equipmentFilter == nil
+            && !recentEntries.isEmpty
     }
 
     func selectMuscle(_ value: String?) {
@@ -96,6 +120,13 @@ final class ExerciseLibraryViewModel: ObservableObject {
             from: entries,
             muscleFilter: muscleFilter,
             equipmentFilter: equipmentFilter
+        )
+    }
+
+    private func rebuildRecentEntries() {
+        recentEntries = RecentExerciseSelection.entries(
+            from: completedHistory,
+            availableEntries: entries
         )
     }
 

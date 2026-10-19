@@ -205,6 +205,67 @@ public struct FCListRow: View {
     }
 }
 
+/// The exercise-library variant of `DS-LIST-ROW`: equipment icon, headline,
+/// catalog subtitle, optional favorite mark, and disclosure. The row expands
+/// to the container width so its caller can use the entire 52pt row as the
+/// visible action target in both the library page and add-exercise sheet.
+public struct FCExerciseLibraryRowLabel: View {
+    public let entry: ExerciseLibraryEntry
+
+    public init(entry: ExerciseLibraryEntry) {
+        self.entry = entry
+    }
+
+    public var body: some View {
+        HStack(spacing: FCPrimitives.space4) {
+            if let icon = FCEquipmentIcon.icon(
+                equipmentClass: entry.equipmentClass, primaryMuscleGroup: entry.primaryMuscleGroup)
+            {
+                FCEquipmentIconView(icon)
+            }
+            VStack(alignment: .leading, spacing: FCPrimitives.space1) {
+                Text(entry.displayedName)
+                    .fcFont(.headline)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                Text(Self.subtitle(for: entry))
+                    .fcFont(.caption)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
+            }
+            Spacer(minLength: FCPrimitives.space2)
+            if entry.preference?.isFavorite == true {
+                Image(systemName: "star.fill")
+                    .foregroundStyle(FCSemanticColors.actionPrimary)
+                    .accessibilityLabel(Text("exercise.library.favorite"))
+            }
+            FCSymbol(.forward)
+        }
+        .padding(.vertical, FCPrimitives.space3)
+        .frame(maxWidth: .infinity, minHeight: FCListRowGeometry.minHeight, alignment: .leading)
+        .contentShape(Rectangle())
+    }
+
+    public static func subtitle(for entry: ExerciseLibraryEntry) -> String {
+        var parts: [String] = []
+        if entry.item.kind == .custom {
+            parts.append(String(localized: "exercise.kind.custom"))
+        } else {
+            parts.append(
+                entry.equipmentClass.flatMap { $0.isEmpty ? nil : $0 } ?? String(localized: "exercise.kind.builtIn"))
+            if !entry.secondaryMuscleGroups.isEmpty {
+                parts.append(
+                    String(
+                        format: String(localized: "exercise.library.secondaryFormat"),
+                        entry.secondaryMuscleGroups.joined(separator: "、")
+                    ))
+            }
+        }
+        if entry.preference?.isHidden == true {
+            parts.append(String(localized: "exercise.library.hiddenTag"))
+        }
+        return parts.joined(separator: " · ")
+    }
+}
+
 /// The group row of `DS-LIST-ROW` (§4.7, M2-02): `headline` title → trailing
 /// note → expand symbol (`FCSymbol(.collapse)`, rotated up while expanded) →
 /// tri-state selection circle. Two separate hit areas, each >= 44: the circle
@@ -368,6 +429,39 @@ struct FCListSelectionCircle: View {
 }
 
 #if DEBUG
+    #Preview("Exercise library rows") {
+        let now = Date(timeIntervalSince1970: 0)
+        let favoriteID = StableExerciseID(rawValue: "preview.exercise.favorite")!
+        let customID = StableExerciseID(rawValue: "preview.exercise.custom")!
+        let favorite = try! ExerciseCatalogItem.makeBuiltIn(
+            id: favoriteID,
+            canonicalName: "杠铃卧推",
+            recordMode: .weightReps,
+            metadataVersion: "preview",
+            provenanceRef: "preview.favorite",
+            now: now
+        )
+        let custom = try! ExerciseCatalogItem.makeCustom(
+            id: customID,
+            canonicalName: "我的动作",
+            recordMode: .reps,
+            now: now
+        )
+        VStack(spacing: 0) {
+            FCExerciseLibraryRowLabel(
+                entry: ExerciseLibraryEntry(
+                    item: favorite,
+                    preference: ExercisePreference(exerciseID: favoriteID, isFavorite: true),
+                    primaryMuscleGroup: "胸",
+                    equipmentClass: "杠铃"
+                )
+            )
+            FCListRowDivider()
+            FCExerciseLibraryRowLabel(entry: ExerciseLibraryEntry(item: custom, preference: nil))
+        }
+        .padding(.horizontal, FCPrimitives.space4)
+    }
+
     #Preview("List rows") {
         VStack(spacing: 0) {
             FCListRow(title: "学员资料", showsDisclosure: true) {}

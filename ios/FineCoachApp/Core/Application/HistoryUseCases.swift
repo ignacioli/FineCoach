@@ -62,6 +62,10 @@ public struct HistoryUseCases: Sendable {
         try await sessionRepository.listCompleted(studentID: studentID)
     }
 
+    public func listAllHistory() async throws -> [CompletedSession] {
+        try await sessionRepository.listAllCompleted()
+    }
+
     public func detail(sessionID: StableUUID) async throws -> CompletedSession {
         try await sessionRepository.completedSession(id: sessionID)
     }

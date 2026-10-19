@@ -119,6 +119,16 @@ enum HistoryReportManagedObjectMapping {
         return try context.fetch(request).compactMap { $0.value(forKey: "id") as? UUID }
     }
 
+    static func completedSessionIDs(in context: NSManagedObjectContext) throws -> [UUID] {
+        let request = NSFetchRequest<NSManagedObject>(entityName: sessionEntityName)
+        request.predicate = NSPredicate(format: "state == %@", SessionState.completed.rawValue)
+        request.sortDescriptors = [
+            NSSortDescriptor(key: "completedAtUTC", ascending: false),
+            NSSortDescriptor(key: "startedAtUTC", ascending: false),
+        ]
+        return try context.fetch(request).compactMap { $0.value(forKey: "id") as? UUID }
+    }
+
     static func loadCompletedSession(id: UUID, in context: NSManagedObjectContext) throws -> CompletedSession {
         let sessionObject = try SessionManagedObjectMapping.requireSession(id: id, in: context)
         let session = try SessionManagedObjectMapping.loadAggregate(from: sessionObject, in: context)

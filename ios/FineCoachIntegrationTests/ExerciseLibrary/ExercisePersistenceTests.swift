@@ -1036,6 +1036,101 @@
             try await environment.controller.shutdownForTesting()
         }
 
+        func testRecentSelectionUsesPersistedCompletedHistoryForStudentAndCoach() async throws {
+            let environment = try makeRepository()
+            try await environment.repository.seedPlaceholderCatalogIfNeeded(now: environment.clock.nowUTC())
+            let students = CoreDataStudentRepository(writer: environment.controller.writer)
+            let sessions = CoreDataSessionRepository(writer: environment.controller.writer)
+            let firstStudentID = StableUUID(UUID(uuidString: "71717171-7171-4717-8717-717171717171")!)
+            let secondStudentID = StableUUID(UUID(uuidString: "72727272-7272-4727-8727-727272727272")!)
+            _ = try await students.create(
+                try StudentDraft(displayName: "最近动作学员一", sex: .female).makeStudent(
+                    id: firstStudentID,
+                    now: environment.clock.nowUTC()
+                ))
+            _ = try await students.create(
+                try StudentDraft(displayName: "最近动作学员二", sex: .male).makeStudent(
+                    id: secondStudentID,
+                    now: environment.clock.nowUTC()
+                ))
+
+            let older = try await makeCompletedCatalogSession(
+                studentID: firstStudentID,
+                exerciseID: squatID,
+                sessionID: StableUUID(UUID(uuidString: "73737373-7373-4737-8737-737373737373")!),
+                sessionExerciseID: StableUUID(UUID(uuidString: "74747474-7474-4747-8747-747474747474")!),
+                exerciseRepository: environment.repository,
+                sessionRepository: sessions,
+                completedAt: now
+            )
+            let newer = try await makeCompletedCatalogSession(
+                studentID: secondStudentID,
+                exerciseID: pullupID,
+                sessionID: StableUUID(UUID(uuidString: "75757575-7575-4757-8757-757575757575")!),
+                sessionExerciseID: StableUUID(UUID(uuidString: "76767676-7676-4767-8767-767676767676")!),
+                exerciseRepository: environment.repository,
+                sessionRepository: sessions,
+                completedAt: now.addingTimeInterval(60)
+            )
+            XCTAssertEqual(older.state, .completed)
+            XCTAssertEqual(newer.state, .completed)
+
+            let history = HistoryUseCases(
+                sessionRepository: sessions,
+                clock: environment.clock,
+                ids: SystemIDGenerator()
+            )
+            let allHistory = try await history.listAllHistory()
+            let available = try await environment.repository.searchActive(query: "")
+            XCTAssertEqual(
+                RecentExerciseSelection.entries(
+                    from: allHistory,
+                    studentID: firstStudentID,
+                    availableEntries: available
+                ).map(\.id),
+                [squatID]
+            )
+            XCTAssertEqual(
+                RecentExerciseSelection.entries(from: allHistory, availableEntries: available).map(\.id),
+                [pullupID, squatID]
+            )
+            try await environment.controller.shutdownForTesting()
+        }
+
+        private func makeCompletedCatalogSession(
+            studentID: StableUUID,
+            exerciseID: StableExerciseID,
+            sessionID: StableUUID,
+            sessionExerciseID: StableUUID,
+            exerciseRepository: CoreDataExerciseRepository,
+            sessionRepository: CoreDataSessionRepository,
+            completedAt: Date
+        ) async throws -> Session {
+            var session = Session.start(id: sessionID, studentID: studentID, now: completedAt)
+            let item = try await exerciseRepository.catalogItem(id: exerciseID)
+            session = try session.addingCatalogExercise(
+                id: sessionExerciseID,
+                item: item,
+                now: completedAt
+            )
+            let sessionExerciseIDValue = try XCTUnwrap(session.exercises.first?.id)
+            session = try session.addingSet(
+                exerciseID: sessionExerciseIDValue,
+                setID: StableUUID(UUID()),
+                input: TrainingSetInput(
+                    recordMode: item.recordMode,
+                    weightValue: item.recordMode == .weightReps ? "20" : nil,
+                    repetitionCount: "8",
+                    unit: item.recordMode == .weightReps ? .kilograms : .repetitions
+                ),
+                now: completedAt
+            )
+            let setID = try XCTUnwrap(session.exercises.first?.sets.first?.id)
+            session = try session.confirmingSet(setID: setID, now: completedAt)
+            session = try session.finished(now: completedAt)
+            return try await sessionRepository.saveAndReleaseSessionScopeClaims(session)
+        }
+
         private struct Environment {
             let directory: TemporaryProtectedDirectory
             let controller: PersistenceController

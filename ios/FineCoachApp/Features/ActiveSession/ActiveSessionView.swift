@@ -17,6 +17,7 @@ struct ActiveSessionView: View {
     @Binding var path: [RootDestination]
     @State private var didPushSummary = false
     @State private var addTab: AddTab = .library
+    @State private var isAddExerciseFilterPresented = false
     @State private var isCreatingSection = false
     @State private var studentName = ""
     private let sessionUseCases: ActiveSessionUseCases
@@ -168,6 +169,9 @@ struct ActiveSessionView: View {
         .fcSecondaryPage()
         .fcBottomSheet(isPresented: $viewModel.isAddingExercise) {
             addExerciseSheet
+        }
+        .fcBottomSheet(isPresented: $isAddExerciseFilterPresented) {
+            addExerciseFilterSheet
         }
         .fcBottomSheet(isPresented: $isCreatingSection) {
             createSectionSheet
@@ -603,10 +607,48 @@ struct ActiveSessionView: View {
                             Task { await viewModel.load() }
                         }
                     } else {
-                        QuickCreateExerciseFlow(viewModel: viewModel)
+                        QuickCreateExerciseFlow(
+                            viewModel: viewModel,
+                            isFilterSheetPresented: $isAddExerciseFilterPresented
+                        )
                     }
                 }
                 .frame(maxHeight: 460)
+            }
+        }
+    }
+
+    private var addExerciseFilterSheet: some View {
+        FCBottomSheet(title: String(localized: "exercise.library.filter.title")) {
+            VStack(alignment: .leading, spacing: FCPrimitives.space3) {
+                FCSectionLabel(String(localized: "exercise.library.filter.equipment"))
+                FCFlowLayout(
+                    horizontalSpacing: FCPrimitives.space2,
+                    verticalSpacing: FCPrimitives.space2 - (44 - 30)
+                ) {
+                    FCFilterChip(
+                        title: String(localized: "exercise.library.filter.all"),
+                        isSelected: viewModel.catalogEquipmentFilter == nil
+                    ) {
+                        viewModel.selectCatalogEquipment(nil)
+                    }
+                    .accessibilityIdentifier(FCAccessibilityID.activeSessionCatalogEquipmentAll)
+                    ForEach(ExerciseCatalogBrowse.equipmentClassOrder, id: \.self) { equipment in
+                        FCFilterChip(
+                            title: equipment,
+                            isSelected: viewModel.catalogEquipmentFilter == equipment
+                        ) {
+                            viewModel.selectCatalogEquipment(equipment)
+                        }
+                        .accessibilityIdentifier(FCAccessibilityID.activeSessionCatalogEquipment(equipment))
+                    }
+                }
+                FCListRowDivider()
+                FCLinkButton(title: String(localized: "exercise.library.filter.done")) {
+                    isAddExerciseFilterPresented = false
+                }
+                .frame(maxWidth: .infinity)
+                .accessibilityIdentifier(FCAccessibilityID.activeSessionCatalogFilterDone)
             }
         }
     }
