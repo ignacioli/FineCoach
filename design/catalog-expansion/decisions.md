@@ -61,7 +61,27 @@
 
 ## 第 2a 步执行记录
 
-### 最新状态：BLOCKED（2026-10-18 续作：8 行入库裁决）
+### 最新状态：BLOCKED（2026-10-18 resume2：新内置名与进行中 Session-only claim 冲突）
+
+CX-D12 已记录并提交 `db33187`；清单 `e97d169`、JSON/schema `733d80d` 已提交。实际目录现为 **新增 396 / 总数 542**（含 1 条 retired，未考虑用户偏好时可见 541）；146 个旧 id 保留。旧 401 / 547 仅为历史草稿，不再适用。
+
+**停止依据**：任务要求「遇到上面没写到、并且会影响入库数据或用户已有数据的分歧：停下来写进执行记录，不要自己选」。独立 privacy/security gate 发现新目录名称与进行中 Session-only 动作的 `currentSession` claim 冲突没有负责人裁决。当前草稿保持旧统一名称冲突语义，不删除该 claim，但同步整体回滚；启动错误页阻断训练入口，用户无法结束训练释放 claim。若改成隐藏内置项直到 Session 结束，需要把 CX-D11 的 Custom 例外扩展到 Session-only，属于未批准的数据/行为选择，故停止，不自行采用。
+
+证据：`CoreDataExerciseRepository.swift:506–510` 保留非 builtIn/activeCatalog claim 并抛 conflict；`AppEnvironment.swift:177–187` 设 `catalogUnavailableMessage`；`RootNavigation.swift:80–85` 用错误内容替换业务导航。该场景来自静态路径检查，**尚无 runtime 复现**。独立检查同时指出新增训练路径 `ActiveSessionUseCases.swift:121–129` 直接用不过滤的 `catalogItem(id:)`，旧搜索结果可绕过 retired / custom-shadow；后续需加新增可选性校验并保留历史按 id 查询，不宣称已经修复。未发现本轮新增网络、遥测、凭据或敏感日志路径；不把该结论当物理设备隐私验收。
+
+待负责人裁决：进行中 Session-only 与新内置同名时，是否保留 Session-only claim、临时隐藏内置，并在 Session 结束释放占用后立即恢复；或者指定其他不会阻断已有训练的规则。此处只是选项，未实施、未批准。
+
+五行执行记录：
+
+1. **分类和依据**：批准目录数据修订；对组件属于既有目标的 D 类映射对齐 / 复用，`DS-CHIP` anatomy、样式不变，`DS-EQUIPMENT-ICON` 仅按 CX-D9 把绳索映射到既有 cableCrossover。已读 33 筛选 PNG、README 对应章节及 components 对应项；本轮明确不改 Penpot、README、components.md。13 项数据与组件复用已获任务授权，不增加视觉决定。
+2. **范围**：两个 topic worktree 初始状态已审计并 bootstrap / GATE PASS。catalog_data 完成清单与 JSON；ios-swiftui-dev 完成 App 实现草稿和唯一 V6 model 写入；mobile-reliability-tester 完成测试草稿；mobile-privacy-security-reviewer 独立只读检查触发上述 BLOCKED。所有初始 draft 保留继续；原 untracked digest 保留、不提交。新模型以现有 model wrapper 资源编译，无新增源文件注册，故 pbxproj 最终未修改。
+3. **设计决定**：CX-D1–D12、Q1–Q10、A1–A3 已应用数据生成。代码草稿采用每次启动按稳定 id 原位同步，保留 preference、createdAt、Custom、训练 snapshot 和模板引用；已核实 archiveCustom 删除 claim，改名和归档均在同一事务立即 reconcile。恢复选择为**恢复完成时立即同步**：generation 完整性验证且重新打开后运行 `prepareExerciseCatalog()`，以免恢复旧目录后仍需等重启；若同步失败，恢复结果只表示 generation 已持久化，目录失败通过 catalogUnavailableMessage 表达，下次启动重试。实现未通过运行测试，不能声称同步和 V6 已完成验收。
+4. **实施与检查**：offline verify_sources / build_candidates 双跑逐字节一致；writer 双跑一致；内置中文重名负向校验 PASS，JSON 542 个唯一 id / 542 署名记录，旧 146 id 保留，批准旧条目变化 26。证据 `DerivedData/CX2a/evidence/{candidate-determinism.json,catalog-contract.json}`。全仓 swift-format lint PASS（`swift-format-lint.log`）；App Debug iphoneos build PASS（`app-build-retry1.log`，CODE_SIGNING_ALLOWED=NO）。首次 build 因 Exercise.swift 参数顺序失败（`app-build.log`），一次明确修复后通过。两个仓库 diff --check PASS。**Unit / Integration 未运行，测试数量 0**；未运行 FineCoachUITests、未用 ResetStore、未操作真机，未重启模拟器。测试草稿仅有 parse/lint 静态证据，不能当 runtime 通过。
+5. **结果**：BLOCKED。数据三次提交已完成，App 和 tests 草稿保留未提交，specs 的 spec.md / data-model.md 保留未提交；不 push、不 merge main。全量 Unit / Integration gates 待裁决后继续，不能把 build/lint 当 checkpoint 完成。本次停止记录单独提交；交接见 `.handoff/subagent/2026-10-18-cprime-step2a-resume2-blocked.md`。
+
+入口与布局清单：动作库筛选 sheet → 搜索框右侧可见筛选图标 → `FCAccessibilityID.exerciseLibraryEquipment(equipment)` 的 `FCFilterChip` → 8 值变 13 值，仅改变筛选状态 → `ExerciseLibraryView.swift:234–270` 的 `FCBottomSheet` 内容区 / `VStack` / `FCFlowLayout` 撑满容器；其余无新入口。恢复路径沿用可见恢复确认控件和原 identifier，只增加其持久化后的同步。L3 待负责人看：小屏 13 项换行/滚动、两个改名动作和停用条目不可见；**未做人工视觉验证**。
+
+### 历史状态：BLOCKED（2026-10-18 续作：8 行入库裁决，已由 CX-D12 解除）
 
 CX-D10 / CX-D11 已由产品负责人批准并独立提交 `961a157`，上一轮升级方案的审批阻塞已解除。重生成候选时又发现以下会改变入库数据的分歧，依据原任务「遇到上面没写到、而且会影响入库数据或用户已有数据的分歧，停下来写进执行记录，不要自己选」再次停止。不能把本轮草稿的 401 新增 / 547 总数当作最终批准结果；当前实际 JSON 仍为 146 条、新增写入 0 条。
 
