@@ -174,3 +174,15 @@ L3 待人工看：13 项筛选在小屏上的换行或滚动、两个改名后�
 | 内置中文名 | 生成器未拒绝跨器械中文重名 | 内置之间不得中文重名，生成器重名即失败；以后遇到未裁决同名停止报告 | 不自动加前缀或静默隐藏 | 新增校验，只有上述两条批准名称生效 |
 
 续作初始审计：`feat/catalog-expansion` / HEAD `d600cf9`，7 个未暂存 tracked 草稿与指定 untracked digest 完全匹配；无 staged 内容。已逐项识别为上一轮半成品，保留继续审阅。specs topic worktree 仅有 `FineCoach/001-m1-a-core-session/data-model.md` 未暂存草稿；共享 specs main 不写入。
+
+## 2026-10-19 产品负责人批准：CX-D14（第三次续作）
+
+依据：`.handoff/prompt/2026-10-19-cprime-step2a-resume3-prompt.md` 和决定单 CX-D14。
+
+| 位置 | 当前状态 | 目标 | 理由 | 差异 |
+|---|---|---|---|---|
+| Session-only 名称占用 | 新增或改名内置与 currentSession claim 同名时抛 conflict，启动被阻断 | 临时动作优先；保留名称、记录和 claim，同名内置动态隐藏，不写 isRetired，不弹窗、不改名、不向界面抛该冲突 | 保留进行中训练可用性 | 删除该 conflict 分支；训练结束、放弃或删除等实际释放占用路径立即重新同步 |
+| 已有目录同步失败 | catalogUnavailableMessage 拦整个 App | 事务整体回滚后继续旧目录，下次启动重试；失败仅保留本地状态，无敏感日志和遥测 | 旧目录仍可用 | 删除已有目录失败的启动拦截；首次安装无任何内置条目仍显示目录不可用 |
+| 备份恢复后同步失败 | 恢复后立即同步，失败拦 App | 保持恢复后立即同步，失败不拦 App，继续恢复的有效旧目录 | 与启动降级一致 | 改变失败处理；保留恢复 generation 的持久化验证 |
+
+本轮初始审计：`feat/catalog-expansion@a0d12cf`，13 个 tracked 未暂存草稿、2 个指定 untracked 项，无 staged 内容；specs topic 仅 `FineCoach/001-m1-a-core-session/{spec,data-model}.md` 两个未暂存草稿。所有既有半成品继续审阅，digest 保留不提交；不切换或重建 worktree。
