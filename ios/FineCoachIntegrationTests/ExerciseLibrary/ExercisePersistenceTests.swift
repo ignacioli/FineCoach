@@ -113,6 +113,49 @@
             try await environment.controller.shutdownForTesting()
         }
 
+        func testSearchAppliesPolyphoneFixesToBuiltInCustomAndAliasNames() async throws {
+            let environment = try makeRepository()
+            try await environment.repository.seedPlaceholderCatalogIfNeeded(now: environment.clock.nowUTC())
+
+            for query in ["tanlidai", "tan li dai", "tld"] {
+                let results = try await environment.repository.searchActive(query: query)
+                XCTAssertTrue(results.contains { $0.item.canonicalName.value == "弹力带站姿弯举" }, query)
+            }
+            let oldBuiltInPinyin = try await environment.repository.searchActive(query: "danlidai")
+            XCTAssertFalse(oldBuiltInPinyin.contains { $0.item.canonicalName.value.contains("弹力带") })
+            let builtInFullPinyin = try await environment.repository.searchActive(query: "dilei")
+            XCTAssertTrue(builtInFullPinyin.contains { $0.item.canonicalName.value == "地雷管推举" })
+            let builtInInitials = try await environment.repository.searchActive(query: "dl")
+            XCTAssertTrue(builtInInitials.contains { $0.item.canonicalName.value == "地雷管推举" })
+
+            let custom = try await environment.repository.createCustom(
+                name: "自定义弹力带",
+                recordMode: .reps,
+                id: StableExerciseID(rawValue: "fc.custom.polyphone")!,
+                now: environment.clock.nowUTC()
+            )
+            let customFullPinyin = try await environment.repository.searchActive(query: "tanlidai")
+            XCTAssertTrue(customFullPinyin.contains { $0.id == custom.id })
+            let customInitials = try await environment.repository.searchActive(query: "tld")
+            XCTAssertTrue(customInitials.contains { $0.id == custom.id })
+            let oldCustomPinyin = try await environment.repository.searchActive(query: "danlidai")
+            XCTAssertFalse(oldCustomPinyin.contains { $0.id == custom.id })
+
+            _ = try await environment.repository.setPreference(
+                exerciseID: custom.id,
+                alias: "地板动作",
+                isFavorite: nil,
+                isHidden: nil
+            )
+            let aliasFullPinyin = try await environment.repository.searchActive(query: "diban")
+            XCTAssertTrue(aliasFullPinyin.contains { $0.id == custom.id })
+            let aliasInitials = try await environment.repository.searchActive(query: "db")
+            XCTAssertTrue(aliasInitials.contains { $0.id == custom.id })
+            let oldAliasPinyin = try await environment.repository.searchActive(query: "deban")
+            XCTAssertFalse(oldAliasPinyin.contains { $0.id == custom.id })
+            try await environment.controller.shutdownForTesting()
+        }
+
         func testBuiltInAndCustomSurviveReopenAndPreferencesDoNotChangeIdentity() async throws {
             let directory = try TemporaryProtectedDirectory()
             let storeURL = directory.url.appendingPathComponent("generation/FineCoach.sqlite")

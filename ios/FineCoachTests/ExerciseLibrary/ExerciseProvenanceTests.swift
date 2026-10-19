@@ -17,6 +17,49 @@ final class ExerciseProvenanceTests: XCTestCase {
         XCTAssertTrue(ExercisePinyinSearch.matches(value: "杠铃弯举", query: "glwj"))
     }
 
+    func testPinyinSearchFixesTanForResistanceBandNames() {
+        let tokens = ExercisePinyinSearch.tokens(for: "弹力带")
+
+        XCTAssertEqual(tokens.fullPinyin, "tanlidai")
+        XCTAssertEqual(tokens.initials, "tld")
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "弹力带", query: "tanlidai"))
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "弹力带", query: "tan li dai"))
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "弹力带", query: "tld"))
+        XCTAssertFalse(ExercisePinyinSearch.matches(value: "弹力带", query: "danlidai"))
+    }
+
+    func testPinyinSearchFixesDiForBuiltInAndUserProvidedNames() {
+        let builtInTokens = ExercisePinyinSearch.tokens(for: "地雷管推举")
+
+        XCTAssertTrue(builtInTokens.fullPinyin.hasPrefix("dilei"))
+        XCTAssertTrue(builtInTokens.initials.hasPrefix("dl"))
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "地雷管推举", query: "dilei"))
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "地雷管推举", query: "dl"))
+
+        // Custom exercise and alias values use the same on-demand token path.
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "自定义弹力带动作", query: "tanli"))
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "自定义弹力带动作", query: "tld"))
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "地板别名", query: "diban"))
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "地板别名", query: "db"))
+        XCTAssertFalse(ExercisePinyinSearch.matches(value: "自定义弹力带动作", query: "danli"))
+        XCTAssertFalse(ExercisePinyinSearch.matches(value: "地板别名", query: "deban"))
+    }
+
+    func testPinyinSearchKeepsSyllableBoundariesForAdjacentOverrides() {
+        let expected: [(value: String, fullPinyin: String, initials: String)] = [
+            ("弹地", "tandi", "td"),
+            ("地弹", "ditan", "dt"),
+            ("弹弹", "tantan", "tt"),
+            ("地地", "didi", "dd"),
+        ]
+
+        for item in expected {
+            let tokens = ExercisePinyinSearch.tokens(for: item.value)
+            XCTAssertEqual(tokens.fullPinyin, item.fullPinyin, item.value)
+            XCTAssertEqual(tokens.initials, item.initials, item.value)
+        }
+    }
+
     func testMissingRequiredFieldIsRejectedWithNamedIssue() throws {
         var missingLicense = validPlaceholderManifest()
         missingLicense.records[0].licenseText = "   "
