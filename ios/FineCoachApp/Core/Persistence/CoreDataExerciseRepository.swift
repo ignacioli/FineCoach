@@ -105,6 +105,34 @@ public struct CoreDataExerciseRepository: Sendable {
         }
     }
 
+    /// Loads an item for the visible exercise selector. Historical and
+    /// template callers must continue to use `catalogItem(id:)`, which is an
+    /// id-only read and intentionally does not apply browse visibility rules.
+    public func selectableCatalogItem(id: StableExerciseID) async throws -> ExerciseCatalogItem {
+        try await writer.read { context in
+            let object = try ExerciseManagedObjectMapping.requireCatalogItem(id: id.rawValue, in: context)
+            let item = try ExerciseManagedObjectMapping.makeCatalogItem(from: object)
+            guard item.lifecycle == .active, !item.isRetired else {
+                throw DomainError.invalidState
+            }
+            let preference = try ExerciseManagedObjectMapping.fetchPreference(
+                exerciseID: id.rawValue,
+                in: context
+            ).map { try ExerciseManagedObjectMapping.makePreference(from: $0) }
+            guard preference?.isHidden != true else {
+                throw DomainError.invalidState
+            }
+            if item.kind == .builtIn {
+                let customNames = try Self.activeCustomClaimNames(in: context)
+                let sessionNames = try Self.activeSessionClaimNames(in: context)
+                guard !customNames.contains(item.normalizedName), !sessionNames.contains(item.normalizedName) else {
+                    throw DomainError.invalidState
+                }
+            }
+            return item
+        }
+    }
+
     public func createCustom(
         name: String,
         recordMode: RecordMode,
