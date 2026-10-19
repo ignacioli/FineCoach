@@ -91,4 +91,72 @@
             }
         }
     }
+
+    /// CX-D10: V6 adds only the optional ExerciseCatalogMO.isRetired attribute.
+    /// A V5 store must migrate without changing the existing catalog row, and
+    /// the missing optional value must read as active (`false`) rather than
+    /// making an old built-in disappear.
+    final class V5ToV6MigrationTests: XCTestCase {
+        private let exerciseID = "8e420408-0682-4ab6-89f5-2681e54c7ce0"
+        private let now = Date(timeIntervalSince1970: 1_700_000_000)
+
+        func testV5StoreOpensUnderV6WithCatalogRowActiveByDefault() async throws {
+            let directory = try TemporaryProtectedDirectory()
+            let storeURL = directory.url.appendingPathComponent("generation/FineCoach.sqlite")
+            try makeV5Fixture(at: storeURL)
+
+            let controller = try PersistenceController(storeURL: storeURL)
+            let fixtureExerciseID = exerciseID
+            let rawRetired = try await controller.writer.read { context -> Bool? in
+                let object = try ExerciseManagedObjectMapping.requireCatalogItem(id: fixtureExerciseID, in: context)
+                return object.value(forKey: "isRetired") as? Bool
+            }
+            XCTAssertEqual(rawRetired, false, "V5 rows must default to active during lightweight migration")
+
+            let repository = CoreDataExerciseRepository(writer: controller.writer)
+            let item = try await repository.catalogItem(id: try StableExerciseID(exerciseID))
+            XCTAssertFalse(item.isRetired)
+            XCTAssertEqual(item.canonicalName.value, "引体向上")
+            XCTAssertEqual(item.metadataVersion, "m1a.wger.2026-08-30")
+            try await controller.shutdownForTesting()
+        }
+
+        private func makeV5Fixture(at storeURL: URL) throws {
+            let v5Model = try PersistenceController.loadModelVersionForMigrationTesting(named: "FineCoachV5")
+            XCTAssertNil(
+                v5Model.entitiesByName["ExerciseCatalogMO"]?.attributesByName["isRetired"],
+                "the fixture must really be the pre-retired schema"
+            )
+            let coordinator = NSPersistentStoreCoordinator(managedObjectModel: v5Model)
+            try FileManager.default.createDirectory(
+                at: storeURL.deletingLastPathComponent(),
+                withIntermediateDirectories: true
+            )
+            try coordinator.addPersistentStore(
+                ofType: NSSQLiteStoreType,
+                configurationName: nil,
+                at: storeURL,
+                options: nil
+            )
+            let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+            context.persistentStoreCoordinator = coordinator
+            try context.performAndWait {
+                let object = NSEntityDescription.insertNewObject(forEntityName: "ExerciseCatalogMO", into: context)
+                object.setValue(exerciseID, forKey: "id")
+                object.setValue("builtIn", forKey: "kind")
+                object.setValue("引体向上", forKey: "canonicalName")
+                object.setValue("引体向上", forKey: "normalizedName")
+                object.setValue("reps", forKey: "recordMode")
+                object.setValue("m1a.wger.2026-08-30", forKey: "metadataVersion")
+                object.setValue("active", forKey: "lifecycle")
+                object.setValue(exerciseID, forKey: "provenanceRef")
+                object.setValue(now, forKey: "createdAtUTC")
+                object.setValue(now, forKey: "updatedAtUTC")
+                try context.save()
+            }
+            for store in coordinator.persistentStores {
+                try coordinator.remove(store)
+            }
+        }
+    }
 #endif

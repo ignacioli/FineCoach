@@ -59,7 +59,7 @@ final class IconConsistencyTests: XCTestCase {
     // MARK: T065 — §7.1 exercise → icon table
 
     func testMappingTableMatchesDesignSystem() {
-        for equipmentClass in ["杠铃", "哑铃", "徒手", "龙门架", "史密斯机", "壶铃"] {
+        for equipmentClass in ["杠铃", "哑铃", "徒手", "绳索", "史密斯机", "壶铃", "哈克机"] {
             let muscles: [String?] = ExerciseCatalogBrowse.muscleGroupOrder.map { $0 } + [nil]
             for muscle in muscles {
                 XCTAssertNotNil(FCEquipmentIcon.icon(equipmentClass: equipmentClass, primaryMuscleGroup: muscle))
@@ -68,9 +68,10 @@ final class IconConsistencyTests: XCTestCase {
         XCTAssertEqual(FCEquipmentIcon.icon(equipmentClass: "杠铃", primaryMuscleGroup: "背"), .barbell)
         XCTAssertEqual(FCEquipmentIcon.icon(equipmentClass: "哑铃", primaryMuscleGroup: nil), .dumbbell)
         XCTAssertEqual(FCEquipmentIcon.icon(equipmentClass: "徒手", primaryMuscleGroup: "核心"), .bodyweight)
-        XCTAssertEqual(FCEquipmentIcon.icon(equipmentClass: "龙门架", primaryMuscleGroup: "胸"), .cableCrossover)
+        XCTAssertEqual(FCEquipmentIcon.icon(equipmentClass: "绳索", primaryMuscleGroup: "胸"), .cableCrossover)
         XCTAssertEqual(FCEquipmentIcon.icon(equipmentClass: "史密斯机", primaryMuscleGroup: "大腿"), .smithMachine)
         XCTAssertEqual(FCEquipmentIcon.icon(equipmentClass: "壶铃", primaryMuscleGroup: "臀"), .kettlebell)
+        XCTAssertEqual(FCEquipmentIcon.icon(equipmentClass: "哈克机", primaryMuscleGroup: "大腿"), .hackSquat)
 
         let machine: [String: FCEquipmentIcon?] = [
             "胸": .pecDeck, "肩": .shoulderPress, "大腿": .legExtension, "臀": .hipAdduction,
@@ -79,7 +80,9 @@ final class IconConsistencyTests: XCTestCase {
         for (muscle, expected) in machine {
             XCTAssertEqual(FCEquipmentIcon.icon(equipmentClass: "固定器械", primaryMuscleGroup: muscle), expected, muscle)
         }
-        XCTAssertNil(FCEquipmentIcon.icon(equipmentClass: "其他", primaryMuscleGroup: "胸"))
+        for equipmentClass in ["其他", "悍马机", "弹力带", "悬挂带", "单杠"] {
+            XCTAssertNil(FCEquipmentIcon.icon(equipmentClass: equipmentClass, primaryMuscleGroup: "胸"))
+        }
         XCTAssertNil(FCEquipmentIcon.icon(equipmentClass: nil, primaryMuscleGroup: nil))
     }
 
