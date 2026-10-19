@@ -60,6 +60,32 @@
 
 两条测试各仅修正 1 次：recent fixture 原本给 `.reps` 引体向上传了重量/公斤，违反现有 `TrainingSet` 合同，改为次数单位、不带重量；拼音测试原先错误要求拼音集合等于中文「卧推」集合，忽略 `卧腿 → wotui` 同音与 `抬腿 → wt` 首字母。修正后仍断言原中文命中完整保留且顺序不变，并增加明确同音、首字母额外命中与器械/部位匹配断言；没有更改产品匹配规则、删测试或缩小全量 gates。最后的行修正只把最小高度约束移至 padding 外侧，避免额外增加行高；收紧组件源码测试的扫描范围到该组件，并重新执行全部自动 gates。
 
+### 拼音字级修正（2026-10-19）
+
+1. **决定与范围**：产品负责人在 `.handoff/prompt/2026-10-19-pinyin-polyphone-fix-prompt.md` 批准将「弹」固定为 `tan`、「地」固定为 `di`，替代本轮上方「保留系统结果」对这两个字的处理；其余字仍用 Foundation，不扩成通用多音字表。由干净本地 main `0c683bf` 创建 `.worktrees/pinyin-polyphone` / `fix/pinyin-polyphone`，bootstrap 与 worktree gate PASS，初始无 tracked modification、untracked file 或 staged content。
+2. **改动**：`ExercisePinyinSearch.makeTokens` 在 Foundation 转写前应用仅两项的常量覆盖，注释注明决定日期；覆盖读音两侧保留空格，确保连续「弹地」等仍有独立音节。`sourceValue` 保持原名称，full pinyin 与 initials 共用修正结果；内置预计算缓存和 custom / alias 按需缓存继续走同一路径。代码提交 `5cab194`，未改目录 JSON、动作名、Core Data 模型或界面。
+3. **审计**：在 macOS Foundation 上用修改前与最终实际源码分别生成全部 542 条 tokens，并逐条核对前轮 `DerivedData/C2b/evidence/pinyin-audit.txt` 的系统转写。**64 条变化，478 条完全不变，非「弹／地」条目变化 0，目标误读剩余 0**。变化包含 53 条「弹力带」、1 条「弹跳引体」及 10 条「地」；「弹跳引体」原为 `dantiaoyinti` / `dtyt`，字级决定使其成为 `tantiaoyinti` / `ttyt`。证据为本 worktree 的 `DerivedData/Pinyin/evidence/pinyin-audit.txt`、`pinyin-before.json`、`pinyin-after.json`、`pinyin-comparison.txt`；同目录保留生成脚本、对比脚本、源码快照和环境信息。此审计不替代 iOS runtime 测试。
+4. **回归与入口**：保留全部原有拼音测试，新增 3 个 unit tests，覆盖全拼、空格、首字母、旧读音拒绝、自定义名称／别名及连续覆盖字的音节边界；新增 1 个 integration test，通过实际 repository 覆盖内置「弹力带／地雷」、custom 与 alias 搜索。页面组合、入口、identifier、数据 mutation 与 width owner 均沿用上方第 2b 步入口清单，本轮无新增交互或布局，未进行人工视觉验证。
+5. **结果**：最终 **5/5 gates PASS**：全仓 strict lint、App device SDK Debug build、`build-for-testing`、`FineCoachTests` 全量 **507 tests / 0 failures / 1 skip**、`FineCoachIntegrationTests` 全量 **188 tests / 0 failures**。skip 为既有 `ContrastHarnessTests.testTextDisabledOnSurfacePageIsWCAGExempt`。每次测试前 shutdown / boot / bootstatus，仅使用 iPhone 17 `EFE2D5A0-4877-4682-BE79-7460C0C1E8C8`；全量运行有 1200 秒硬时限和日志 300 秒无增长终止监控。未运行 `FineCoachUITests`、未用 reset-store 或真机。无 BLOCKED 项，审查 **PENDING**；未 push、未合入 main，主 checkout 保持原状。
+
+| 位置 | 原状态 | 最终状态 | 理由与差异 |
+|---|---|---|---|
+| `ExercisePinyinSearch` 的「弹」 | 系统输出 `dan` | 字级覆盖 `tan`，对应 initials 改为 `t` | 删除该字对系统误读的依赖；执行 2026-10-19 决定 |
+| `ExercisePinyinSearch` 的「地」 | 系统输出 `de` | 字级覆盖 `di`，initials 仍为 `d` | 删除该字对系统误读的依赖；执行同一决定 |
+| 其余字、查询归一化、缓存、目录及界面 | 第 2b 步实现 | 保持 | 修复仅限两个字，不新增控件或数据 mutation |
+
+全部证据位于本 worktree 的 `DerivedData/Pinyin/evidence/`：
+
+| 检查 | 最终结果 | 证据 |
+|---|---|---|
+| 全仓 strict lint | PASS，0 diagnostics | `lint-final.log` |
+| App device SDK Debug build | PASS，`CODE_SIGNING_ALLOWED=NO` | `app-build-acceptance.log` |
+| `build-for-testing` | PASS，仅编译 UI tests | `build-for-testing-acceptance.log` |
+| Unit 全量 | PASS，507 tests / 1 skip / 0 failures | `unit-acceptance.log` / `.xcresult`、`unit-acceptance-reboot.log` |
+| Integration 全量 | PASS，188 tests / 0 failures | `integration.log` / `.xcresult`、`integration-reboot.log` |
+
+过程证据保留：`lint.log` 首轮有两处换行格式错误，格式化后全仓复验通过；首轮 `unit.log` 为 506 tests / 1 skip / 0 failures。随后独立转写检查发现连续「弹地／地弹／弹弹／地地」丢失 initials 音节边界，修复一次并增加回归断言后，重新生成审计并重跑最终全部 gates，以上仅以最终结果计完成；未删测试或放宽断言。
+
 ## 决定
 
 | 编号 | 决定 |
