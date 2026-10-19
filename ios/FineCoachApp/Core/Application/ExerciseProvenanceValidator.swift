@@ -364,6 +364,12 @@ public struct ExercisePinyinSearchTokens: Hashable, Sendable {
 }
 
 public enum ExercisePinyinSearch {
+    // Product decision on 2026-10-19: fix these two polyphonic characters only.
+    // Keep the surrounding spaces to preserve syllable boundaries for adjacent overrides.
+    private static let fixedPolyphonicPinyin: [Character: String] = [
+        "弹": " tan ",
+        "地": " di ",
+    ]
     private static let cache = TokenCache()
 
     public static func tokens(for value: String) -> ExercisePinyinSearchTokens {
@@ -401,7 +407,13 @@ public enum ExercisePinyinSearch {
 
     private static func makeTokens(for value: String) -> ExercisePinyinSearchTokens {
         let sourceValue = value.precomposedStringWithCanonicalMapping
-        let transformed = sourceValue.applyingTransform(.mandarinToLatin, reverse: false) ?? sourceValue
+        let transliterationInput =
+            sourceValue
+            .map { fixedPolyphonicPinyin[$0] ?? String($0) }
+            .joined()
+        let transformed =
+            transliterationInput.applyingTransform(.mandarinToLatin, reverse: false)
+            ?? transliterationInput
         let folded = transformed.folding(
             options: [.caseInsensitive, .diacriticInsensitive],
             locale: Locale(identifier: "en_US_POSIX")
