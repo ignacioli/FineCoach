@@ -127,7 +127,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 | `DS-TOGGLE` | `FCToggleStyle` | §8 开关；O7 | 4 个文件 | 稳定 |
 | `DS-STEPPER` | `FCStepper`、`FCStepperField` | §8.1 数字步进器；36/37；P0-a/P0-b 可输入变体 | CoursePackageEditor、ManualCreditAdjustment、ActiveSession | 稳定（可输入变体已回填 README §8.1；Penpot P0-a/P0-b 2026-10-14 已批准） |
 | `DS-TEXT-FIELD` | `FCTextField`、`FCSearchField` | §8 输入框、搜索框 | 输入框 14 个文件；搜索框 2 个 | 稳定 |
-| `DS-LIST-ROW` | `FCListRow`、`FCListGroupRow`、`FCListRowDivider` | §8 列表行；§6 分割线；M2 扩展（§4.7） | 分割线 26 个文件；`FCListRow` 0 个（M2 新页面使用） | 扩展已实现（M2 T004）；其余见 CG-1 |
+| `DS-LIST-ROW` | `FCListRow`、`FCListGroupRow`、`FCListRowDivider`、`FCExerciseLibraryRowLabel` | §8 列表行；§6 分割线；M2 扩展（§4.7） | 分割线 26 个文件；`FCListRow` 0 个（M2 新页面使用） | 扩展已实现（M2 T004）；其余见 CG-1 |
 | `DS-SECTION` | `FCSectionLabel`、`FCGroupEntryRow` | §8 区段标签；§8.1 列表分组入口行 | 区段标签 14 个文件；分组入口 2 个 | 稳定 |
 | `DS-LABEL-VALUE-ROW` | `FCLabelValueRow`、`FCLabelValueText` | §8.1 标签-值两栏行；23/26/27/36/37 | 6 个文件 | 见 CG-5 |
 | `DS-PAGE-HEADER` | `FCPageHeader` | §4.7；§4.6 `DS-PAGE-SECONDARY` 的页头部分；26 | StudentDetail（M2 新页面全部使用） | 已实现（M2 T001），人工项待首次走查 |
@@ -227,10 +227,14 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 - **不变量**：带 `action` 时整行可点；不可点时合并为一个无障碍元素（可自动）。
 - **复用边界**：见 CG-1。目前 feature 中的列表行都是各自拼装。新的普通列表行优先使用 `FCListRow`；需要头像、图标、状态等额外 slot 时，按「扩展」流程增加 slot，不要在页面里再复制一套。
 
+- **C′ 2b 复用位置与已有动作行变体**：动作库页面与训练中添加动作面板的「最近练过」行，和完整列表共用 `FCExerciseLibraryRowLabel`（`DesignSystem/Components/FCListRow.swift`），图标 → 名字 / 副文字 → 弹性空白 → 可选收藏星 → `›`；沿用动作库既有 `space.4` 横向间距、`space.1` 文字间距、`space.3` 上下内边距，不改变普通 `FCListRow` 的 leading slot。label 以 `.frame(maxWidth: .infinity)` 撑满，按钮由页面提供并复用原有 action。无图标时沿用既有动作行留空规则；模板编辑器不变。此为批准画板 C2b 的已有动作行复用，代码抽取而非新视觉决定；满宽和 slot 合同由组件源码测试验证。
+
 #### `DS-SECTION` 区段标签与分组入口
 
 - **部件**：`FCSectionLabel`：`sectionLabel` `text.secondary`，单独一行，位于区块的第一个元素之前。`FCGroupEntryRow`：「标题 · N」（`sectionLabel` `text.secondary`）→ 弹性空白 → `›`，整行可点，最小高 44。
 - **不变量**：区块之间的间距大于行内间距（README §4，人工）。
+
+- **C′ 2b 复用位置**：动作库页面、添加动作面板的「最近练过」标签，与部位区段同级。无搜索和部位/器械筛选且有历史时，显示最多 5 个当前可选的不同动作；按最后一次已完成训练时间倒序，库页面取全部学员，添加面板仅当前学员；Session-only 不计。末行分割线后以 `space.4`（16pt）接完整列表，不移除完整列表中的重复动作。分组和行使用独立 accessibility identifier。来源：批准的 `C2b-recent-group@1x.png`、设计交接「第二轮」「验收通过」。
 
 #### `DS-LABEL-VALUE-ROW` 标签-值两栏行
 
@@ -424,7 +428,7 @@ C 类，只补规则，默认字号下外观不变：
 
 ## 5. 缺口与偏差登记
 
-编号 CG-1–CG-9（Component Gap）是本文自己的登记编号（2026-10-05 盘点时建立），不来自 `roadmap.md` 或任何 spec / tasks；加前缀是为了不与路线图的评审门 G1–G7 混淆。处理方式按 §1.2 分类；需要改代码的条目安排在 M2 Phase 0（已写入当前交接文档）。
+编号 CG-1–CG-10（Component Gap）是本文自己的登记编号（2026-10-05 盘点时建立），不来自 `roadmap.md` 或任何 spec / tasks；加前缀是为了不与路线图的评审门 G1–G7 混淆。处理方式按 §1.2 分类；需要改代码的条目安排在 M2 Phase 0（已写入当前交接文档）。
 
 | # | 缺口 | 证据 | 状态 / 处理 |
 |---|---|---|---|
@@ -437,6 +441,7 @@ C 类，只补规则，默认字号下外观不变：
 | CG-7 | `FCSegmentedSwitch` 在页内使用超出 README 原定义 | 37 画稿 | **已解决（2026-10-05）**：裁决为已批准的复用，限 2–3 个互斥短选项（README §10 C11） |
 | CG-8 | 二级页头 `DS-PAGE-SECONDARY` 约 20 处手工拼装；入口行 `DS-HUB-ROW` 有两份（ResourceHub、Settings） | 约 20 个 feature 文件直接写 `.fcFont(.titleLarge)` 页头；`hubRow` 与 Settings `row` | **M2 Phase 0**：抽取共享 `FCPageHeader`（及入口行，如 M2 设置页用到），补组件测试；只迁移 M2 改动的页面。`DS-PAGE-HEADER`、`DS-HUB-ROW` 规格已起草（§4.7，2026-10-08，随 G7 review 审定） |
 | CG-9 | 组件文件中没有任何 `#Preview` | `ios/FineCoachApp` 中搜索不到 `#Preview` | 规则而非一次性任务：新增或扩展组件时，在组件文件里加覆盖代表状态的 `#Preview`（只在 DEBUG 下编译，不新增 target），供 L3 查看组件时使用 |
+| CG-10 | C′ 2b 的完整动作行和两处最近练过需要同一 anatomy | ExerciseLibrary、QuickCreateExerciseFlow | 本轮收敛为 `DS-LIST-ROW` 既有动作行变体 `FCExerciseLibraryRowLabel`，迁移仅这两处，保留既有样式；普通行和模板编辑器不变 |
 
 **M2 影响（CG-1 / CG-8 为什么需要处理）**：M1 已验收不等于 M2 不碰这些代码。M2 spec（`specs/003-m2-personal-training-archive/spec.md`）明确要求：
 - 学员详情新增「导出个人训练档案」入口（M2-FR-006）——要改 `StudentDetailView`，它的各区块和页头都是手工拼装；

@@ -436,6 +436,25 @@ public enum FCAccessibilityID {
         "activeSession.catalogRow.\(id.rawValue)"
     }
 
+    public static let activeSessionCatalogMuscleAll = "activeSession.catalog.muscle.all"
+
+    public static func activeSessionCatalogMuscle(_ group: String) -> String {
+        "activeSession.catalog.muscle.\(group)"
+    }
+
+    public static let activeSessionCatalogEquipmentAll = "activeSession.catalog.equipment.all"
+
+    public static func activeSessionCatalogEquipment(_ group: String) -> String {
+        "activeSession.catalog.equipment.\(group)"
+    }
+
+    public static let activeSessionCatalogFilter = "activeSession.catalog.filter"
+    public static let activeSessionCatalogFilterDone = "activeSession.catalog.filter.done"
+
+    public static func activeSessionCatalogSection(_ id: String) -> String {
+        "activeSession.catalog.section.\(id)"
+    }
+
     public static let exerciseLibraryEntry = "exerciseLibrary.entry"
     public static let exerciseLibraryRoot = "exerciseLibrary.root"
     public static let exerciseLibrarySearch = "exerciseLibrary.search"
@@ -476,6 +495,18 @@ public enum FCAccessibilityID {
 
     public static func exerciseLibraryRow(_ id: StableExerciseID) -> String {
         "exerciseLibrary.row.\(id.rawValue)"
+    }
+
+    public static let exerciseLibraryRecent = "exerciseLibrary.recent"
+
+    public static func exerciseLibraryRecentRow(_ id: StableExerciseID) -> String {
+        "exerciseLibrary.recentRow.\(id.rawValue)"
+    }
+
+    public static let addExerciseRecent = "activeSession.addExercise.recent"
+
+    public static func addExerciseRecentRow(_ id: StableExerciseID) -> String {
+        "activeSession.addExercise.recentRow.\(id.rawValue)"
     }
 
     public static let customExerciseRoot = "customExercise.root"

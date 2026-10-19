@@ -294,4 +294,144 @@ final class ExerciseIdentityTests: XCTestCase {
         XCTAssertEqual(barbellChest.map(\.id), ["胸"])
         XCTAssertEqual(barbellChest.first?.entries.map(\.displayedName), ["杠铃平板卧推"])
     }
+
+    func testRecentExercisesDeduplicateAndSortByCompletedTime() throws {
+        let first = try makeCatalogEntry(id: "fc.recent.first", name: "卧推")
+        let second = try makeCatalogEntry(id: "fc.recent.second", name: "深蹲")
+        let history = [
+            makeCompletedSession(
+                studentID: StableUUID(UUID(uuidString: "11111111-1111-4111-8111-111111111111")!),
+                completedAt: now,
+                exercises: [first.id, second.id]
+            ),
+            makeCompletedSession(
+                studentID: StableUUID(UUID(uuidString: "11111111-1111-4111-8111-111111111111")!),
+                completedAt: now.addingTimeInterval(60),
+                exercises: [first.id]
+            ),
+        ]
+
+        let result = RecentExerciseSelection.entries(
+            from: history,
+            availableEntries: [first, second]
+        )
+
+        XCTAssertEqual(result.map(\.id), [first.id, second.id])
+    }
+
+    func testRecentExercisesSkipUnavailableAndSessionOnlyAndFillLimit() throws {
+        let hiddenID = StableExerciseID(rawValue: "fc.recent.hidden")!
+        let retiredID = StableExerciseID(rawValue: "fc.recent.retired")!
+        let hiddenItem = try ExerciseCatalogItem.makeBuiltIn(
+            id: hiddenID,
+            canonicalName: "隐藏动作",
+            recordMode: .weightReps,
+            metadataVersion: "test",
+            provenanceRef: "test.hidden",
+            now: now
+        )
+        let retiredItem = try ExerciseCatalogItem.makeBuiltIn(
+            id: retiredID,
+            canonicalName: "停用动作",
+            recordMode: .weightReps,
+            metadataVersion: "test",
+            provenanceRef: "test.retired",
+            now: now,
+            isRetired: true
+        )
+        let hidden = ExerciseLibraryEntry(
+            item: hiddenItem,
+            preference: ExercisePreference(exerciseID: hiddenID, isHidden: true)
+        )
+        let retired = ExerciseLibraryEntry(item: retiredItem, preference: nil)
+        let visible = try (0..<6).map { index in
+            try makeCatalogEntry(id: "fc.recent.visible-\(index)", name: "可选动作\(index)")
+        }
+        let sessionOnlyID = StableExerciseID(rawValue: "fc.recent.session-only")!
+        let session = makeCompletedSession(
+            studentID: StableUUID(UUID(uuidString: "22222222-2222-4222-8222-222222222222")!),
+            completedAt: now,
+            exercises: [hiddenID, retiredID, sessionOnlyID] + visible.map(\.id),
+            sessionOnlyIDs: [sessionOnlyID]
+        )
+
+        let result = RecentExerciseSelection.entries(
+            from: [session],
+            availableEntries: [hidden, retired] + visible
+        )
+
+        XCTAssertEqual(result.map(\.id), visible.prefix(5).map(\.id))
+    }
+
+    func testRecentExercisesCanScopeToStudentOrAllStudentsAndEmptyHistoryIsEmpty() throws {
+        let first = try makeCatalogEntry(id: "fc.recent.student-one", name: "学员一动作")
+        let second = try makeCatalogEntry(id: "fc.recent.student-two", name: "学员二动作")
+        let one = StableUUID(UUID(uuidString: "33333333-3333-4333-8333-333333333333")!)
+        let two = StableUUID(UUID(uuidString: "44444444-4444-4444-8444-444444444444")!)
+        let history = [
+            makeCompletedSession(studentID: one, completedAt: now, exercises: [first.id]),
+            makeCompletedSession(studentID: two, completedAt: now.addingTimeInterval(60), exercises: [second.id]),
+        ]
+
+        XCTAssertEqual(
+            RecentExerciseSelection.entries(from: history, studentID: one, availableEntries: [first, second]).map(\.id),
+            [first.id]
+        )
+        XCTAssertEqual(
+            RecentExerciseSelection.entries(from: history, availableEntries: [first, second]).map(\.id),
+            [second.id, first.id]
+        )
+        XCTAssertTrue(RecentExerciseSelection.entries(from: [], availableEntries: [first]).isEmpty)
+    }
+
+    private func makeCatalogEntry(id: String, name: String) throws -> ExerciseLibraryEntry {
+        let stableID = try StableExerciseID(id)
+        let item = try ExerciseCatalogItem.makeBuiltIn(
+            id: stableID,
+            canonicalName: name,
+            recordMode: .weightReps,
+            metadataVersion: "test",
+            provenanceRef: "test.\(id)",
+            now: now
+        )
+        return ExerciseLibraryEntry(item: item, preference: nil)
+    }
+
+    private func makeCompletedSession(
+        studentID: StableUUID,
+        completedAt: Date,
+        exercises: [StableExerciseID],
+        sessionOnlyIDs: Set<StableExerciseID> = []
+    ) -> CompletedSession {
+        let sessionExercises = exercises.enumerated().map { index, sourceID in
+            SessionExercise(
+                id: StableUUID(UUID()),
+                sessionID: StableUUID(UUID()),
+                orderIndex: UInt32(index),
+                sourceKind: sessionOnlyIDs.contains(sourceID) ? .sessionOnly : .builtIn,
+                sourceID: sessionOnlyIDs.contains(sourceID) ? nil : sourceID,
+                displayNameSnapshot: try! NormalizedName("动作\(index)"),
+                recordModeSnapshot: .weightReps,
+                actionPrivateNote: nil,
+                sets: []
+            )
+        }
+        return CompletedSession(
+            id: StableUUID(UUID()),
+            studentID: studentID,
+            studentDisplayName: try! NormalizedName("测试学员"),
+            startedAtUTC: completedAt.addingTimeInterval(-60),
+            completedAtUTC: completedAt,
+            trainingFocus: [],
+            notes: SessionNotes(privateCoachNote: nil, studentFacingSummary: nil, actionPrivateNotes: [:]),
+            exercises: sessionExercises,
+            statistics: SessionStatistics(
+                completedSetCount: 1,
+                displayedDurationSeconds: .zero,
+                ordinaryTrainingVolume: nil
+            ),
+            revision: 1,
+            latestReport: nil
+        )
+    }
 }

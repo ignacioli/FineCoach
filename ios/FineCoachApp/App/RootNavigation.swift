@@ -149,7 +149,10 @@ struct RootNavigation: View {
                                     path: $path
                                 )
                             case .exerciseLibrary:
-                                ExerciseLibraryView(useCases: environment.requireExerciseUseCases())
+                                ExerciseLibraryView(
+                                    useCases: environment.requireExerciseUseCases(),
+                                    historyUseCases: environment.requireHistoryUseCases()
+                                )
                             case .sessionSummary(let sessionID):
                                 SessionSummaryView(
                                     sessionID: StableUUID(sessionID),

@@ -57,6 +57,19 @@ public struct ActiveSessionUseCases: Sendable {
         LastExercisePerformanceLookup(sessions: try await sessionRepository.listCompleted(studentID: studentID))
     }
 
+    /// The current student's most recently completed catalog exercises for the
+    /// add-exercise panel. Session-only exercises are excluded by the pure
+    /// selector and never become catalog suggestions.
+    public func recentCatalogExercises(studentID: StableUUID) async throws -> [ExerciseLibraryEntry] {
+        let history = try await sessionRepository.listCompleted(studentID: studentID)
+        let available = try await exerciseRepository.searchActive(query: "")
+        return RecentExerciseSelection.entries(
+            from: history,
+            studentID: studentID,
+            availableEntries: available
+        )
+    }
+
     public func startOrOpen(studentID: StableUUID, trainingFocus: Set<BodyPart> = []) async throws -> Session {
         if let active = try await coordinator.workingCopy() {
             return active

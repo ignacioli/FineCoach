@@ -68,4 +68,22 @@ final class TouchTargetComponentTests: XCTestCase {
         // Stacked and side-by-side dialog buttons keep the 44pt hit area (36pt visual).
         XCTAssertTrue(try source("FCConfirmationDialog.swift").contains(".frame(minHeight: 44)"))
     }
+
+    func testExerciseLibraryRowDeclaresApprovedAnatomyAndFullWidthContract() throws {
+        let directory = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("FineCoachApp/DesignSystem/Components")
+        let source = try String(contentsOf: directory.appendingPathComponent("FCListRow.swift"), encoding: .utf8)
+        let start = try XCTUnwrap(source.range(of: "public struct FCExerciseLibraryRowLabel: View"))
+        let end = try XCTUnwrap(source.range(of: "public struct FCListGroupRow: View"))
+        let rowSource = String(source[start.lowerBound..<end.lowerBound])
+        XCTAssertTrue(rowSource.contains("public struct FCExerciseLibraryRowLabel: View"))
+        XCTAssertTrue(rowSource.contains("FCEquipmentIconView(icon)"))
+        XCTAssertTrue(rowSource.contains("Text(Self.subtitle(for: entry))"))
+        XCTAssertTrue(rowSource.contains("FCSymbol(.forward)"))
+        XCTAssertTrue(rowSource.contains("minHeight: FCListRowGeometry.minHeight"))
+        XCTAssertTrue(rowSource.contains("maxWidth: .infinity, minHeight: FCListRowGeometry.minHeight"))
+    }
 }
