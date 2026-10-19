@@ -312,7 +312,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 
 #### `DS-EQUIPMENT-ICON` 器材图标
 
-- 18 个模板渲染图标，`action.primary` 着色，默认 24×24；没有对应图标的动作留空，不使用默认图标补位。L0 全自动（`IconConsistencyTests`）。
+- 21 个模板渲染图标，`action.primary` 着色，默认 24×24；没有对应图标的动作留空，不使用默认图标补位。壶铃铃身唯一允许实心填充 `#2A2822`（CX-D13，2026-10-19），其余仅 `none`；新增 plate-loaded、suspension-trainer、pull-up-bar。L0 全自动（`IconConsistencyTests`）。
 
 #### `DS-BODY-DIAGRAM` 训练部位示意图
 

@@ -223,19 +223,25 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 
 ### 7.1 器材图标（权威：`design/m1-b-hifi/icons/`）
 
-- 共 18 个：barbell、bike、bodyweight、cable-crossover、cable-machine、dumbbell、hack-squat、jump-rope、kettlebell、pec-deck、resistance-band、rowing-machine、shoulder-press、smith-machine、treadmill，以及 2026-09-23 为 T065 新增的 leg-extension（腿屈伸）、hip-adduction（髋内收/外展一体机）、tbar-row（胸托 T 杠划船）。新增 3 个已回填 Penpot「17 器材 icon 库」画板（快照 `before-T065-icons 2026-09-23` → `T065-icons 2026-09-23 (…)`）。
-- 规格：viewBox 24、描边 2、圆角端点与圆角转角、无填充、描边色 `#2A2822`。
+- 共 21 个：barbell、bike、bodyweight、cable-crossover、cable-machine、dumbbell、hack-squat、jump-rope、kettlebell、pec-deck、resistance-band、rowing-machine、shoulder-press、smith-machine、treadmill，以及 2026-09-23 为 T065 新增的 leg-extension（腿屈伸）、hip-adduction（髋内收/外展一体机）、tbar-row（胸托 T 杠划船）。T065 新增的 3 个已回填 Penpot「17 器材 icon 库」画板（快照 `before-T065-icons 2026-09-23` → `T065-icons 2026-09-23 (…)`）。
+- 规格：viewBox 24、描边 2、圆角端点与圆角转角、无填充、描边色 `#2A2822`；例外：kettlebell 铃身为实心填充 `#2A2822`（CX-D13，2026-10-19）。
 - 前 15 个已导入 `ios/FineCoachApp/Resources/Assets.xcassets/equipment-*.imageset`（2026-09-22 核对，与原件逐字节一致），并设置为 template 渲染，着色用 `action.primary`；新增 3 个在 T065 实现时导入。
-- **动作 → 图标对应（产品负责人 2026-09-23，T065）**：按动作库的 `equipmentClass` 对应；`固定器械` 再按 `primaryMuscleGroup` 细分。**没有对应图标的动作不显示图标（留空），不用默认图标补位。**
+- 2026-10-19 C′ 2b 新增 plate-loaded（悍马机）、suspension-trainer（悬挂带）、pull-up-bar（单杠），导入 3 个、替换 5 个（barbell、dumbbell、pec-deck、kettlebell、cable-crossover）；所有 imageset 与原件逐字节一致。`extras/` 为备选，不进图标库。Penpot「17 器材 icon 库」由 Claude 同轮回填。
+- **动作 → 图标对应（产品负责人 2026-09-23 T065；2026-10-19 C′ 2b 扩展）**：按动作库的 `equipmentClass` 对应；`固定器械` 再按 `primaryMuscleGroup` 细分。**没有对应图标的动作不显示图标（留空），不用默认图标补位。**
 
   | 器材类别 | 主练部位 | 图标 |
   |---|---|---|
   | 杠铃 | 任意 | barbell |
   | 哑铃 | 任意 | dumbbell |
   | 徒手 | 任意 | bodyweight |
-  | 龙门架 | 任意 | cable-crossover |
+  | 绳索 | 任意 | cable-crossover |
   | 史密斯机 | 任意 | smith-machine |
   | 壶铃 | 任意 | kettlebell |
+  | 哈克机 | 任意 | hack-squat |
+  | 悍马机 | 任意 | plate-loaded |
+  | 悬挂带 | 任意 | suspension-trainer |
+  | 单杠 | 任意 | pull-up-bar |
+  | 弹力带 | 任意 | resistance-band |
   | 固定器械 | 胸 | pec-deck |
   | 固定器械 | 肩 | shoulder-press |
   | 固定器械 | 大腿 | leg-extension |
@@ -246,7 +252,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
   | 其他 | 任意 | 留空 |
   | 自定义动作 | — | 留空 |
 
-  bike、treadmill、rowing-machine、jump-rope、cable-machine、resistance-band 目前没有对应的器材类别，暂不使用。
+  bike、treadmill、rowing-machine、jump-rope、cable-machine 目前没有对应的器材类别，暂不使用。
 - 用途：动作库、训练中动作行。11 屏的动作行图标为 24×24，位于左边距 16 处，动作名右移到 x=48（O4）。
 - 展示尺寸：24 画布下描边 2；放大显示时描边按比例放大（17 屏 36×36 的描边为 3）。
 
