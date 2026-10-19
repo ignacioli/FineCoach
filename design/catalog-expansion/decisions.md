@@ -190,6 +190,19 @@ L3 待人工看：13 项筛选在小屏上的换行或滚动、两个改名后�
 
 续作初始审计：`feat/catalog-expansion` / HEAD `d600cf9`，7 个未暂存 tracked 草稿与指定 untracked digest 完全匹配；无 staged 内容。已逐项识别为上一轮半成品，保留继续审阅。specs topic worktree 仅有 `FineCoach/001-m1-a-core-session/data-model.md` 未暂存草稿；共享 specs main 不写入。
 
+## 2026-10-19 产品负责人批准：CX-D15（第四次续作）
+
+依据：`.handoff/prompt/2026-10-19-cprime-step2a-resume4-prompt.md` 和决定单 CX-D15。以下为批准合同，实施结果另记。
+
+| 位置 | 当前状态 | 目标 | 理由 | 差异 |
+|---|---|---|---|---|
+| AppEnvironment 同步失败 | 已有目录时所有错误均放行 | `postCommitProtectionAuditFailed` 保持目录不可用拦截；其余已回滚失败按 CX-D14 使用旧目录 | 保存后保护审计失败不符合整体回滚前提 | 增加 CX-D14 例外；不改 PersistenceWriter |
+| finish / abandon | 结束状态先提交，名称占用随后尽力释放 | 结束状态和临时动作 claim 释放同一写事务；随后目录同步尽力执行，失败不影响结束，下次启动补上 | 保证结束与占用释放原子性 | 删除分离的释放事务；保留目录同步重试机制 |
+| 哈克深蹲、哈克机提踵 | 器械为固定器械 | 经生成脚本改为哈克机，名字和 id 保持，按 CX-D10 原位同步 | CX-D1 不重新归类的明确例外 | 仅修改两条器械；增加哈克机 → `.hackSquat` 映射，其他映射不变 |
+| 图标整合 | 另一个设计分支已有画板与图标 | 本轮不合并 | 独立任务范围 | 保留 icons、Assets、Penpot、README、components.md |
+
+初始审计：`feat/catalog-expansion@adfc8c6`，16 个 tracked 未暂存修改、3 个指定 untracked 项，无 staged 内容，与 resume3 交接一致；specs `feat/finecoach-catalog-cx2a` 仅 `spec.md` / `data-model.md` 两个草稿。保留全部既有改动；digest 不提交。
+
 ## 2026-10-19 产品负责人批准：CX-D14（第三次续作）
 
 依据：`.handoff/prompt/2026-10-19-cprime-step2a-resume3-prompt.md` 和决定单 CX-D14。
