@@ -52,6 +52,67 @@
         private let archivedCustomID = StableExerciseID(rawValue: "fc.custom.ning-press")!
         private let reusedCustomID = StableExerciseID(rawValue: "fc.custom.ning-press-2")!
 
+        func testSearchSupportsPinyinForBuiltInAliasAndCustomExercise() async throws {
+            let environment = try makeRepository()
+            try await environment.repository.seedPlaceholderCatalogIfNeeded(now: environment.clock.nowUTC())
+
+            let chineseMatches = try await environment.repository.searchActive(query: "卧推")
+            XCTAssertFalse(chineseMatches.isEmpty)
+            let fullPinyinMatches = try await environment.repository.searchActive(query: "wo tui")
+            // Pinyin also matches homophones: 卧腿 and 卧推 both become wotui.
+            // Preserve every Chinese match and its order without excluding valid phonetic matches.
+            let chineseIDs = Set(chineseMatches.map(\.id))
+            XCTAssertEqual(fullPinyinMatches.filter { chineseIDs.contains($0.id) }.map(\.id), chineseMatches.map(\.id))
+            XCTAssertTrue(fullPinyinMatches.contains { $0.item.canonicalName.value == "弹力带仰卧腿外展" })
+            let initialMatches = try await environment.repository.searchActive(query: "wt")
+            XCTAssertEqual(initialMatches.filter { chineseIDs.contains($0.id) }.map(\.id), chineseMatches.map(\.id))
+            XCTAssertTrue(initialMatches.contains { $0.item.canonicalName.value == "仰卧抬腿" })
+
+            let equipmentMatches = try await environment.repository.searchActive(query: "固定器械")
+            XCTAssertFalse(equipmentMatches.isEmpty)
+            XCTAssertTrue(equipmentMatches.allSatisfy { $0.equipmentClass == "固定器械" })
+            let muscleMatches = try await environment.repository.searchActive(query: "胸")
+            XCTAssertTrue(muscleMatches.contains { $0.item.canonicalName.value == "杠铃平板卧推" })
+
+            _ = try await environment.repository.setPreference(
+                exerciseID: squatID,
+                alias: "卧推别名",
+                isFavorite: nil,
+                isHidden: nil
+            )
+            let aliasMatches = try await environment.repository.searchActive(query: "bie ming")
+            XCTAssertTrue(aliasMatches.contains { $0.id == squatID })
+
+            let custom = try await environment.repository.createCustom(
+                name: "自定义动作",
+                recordMode: .reps,
+                id: customID,
+                now: environment.clock.nowUTC()
+            )
+            let customMatches = try await environment.repository.searchActive(query: "ziding")
+            XCTAssertTrue(customMatches.contains { $0.id == custom.id })
+
+            _ = try await environment.repository.setPreference(
+                exerciseID: customID,
+                alias: "旧别名",
+                isFavorite: nil,
+                isHidden: nil
+            )
+            let oldAliasMatches = try await environment.repository.searchActive(query: "jiu")
+            XCTAssertTrue(oldAliasMatches.contains { $0.id == customID })
+            _ = try await environment.repository.setPreference(
+                exerciseID: customID,
+                alias: "新别名",
+                isFavorite: nil,
+                isHidden: nil
+            )
+            let oldAliasAfterUpdate = try await environment.repository.searchActive(query: "jiu")
+            XCTAssertFalse(oldAliasAfterUpdate.contains { $0.id == customID })
+            let newAliasMatches = try await environment.repository.searchActive(query: "xin")
+            XCTAssertTrue(newAliasMatches.contains { $0.id == customID })
+            try await environment.controller.shutdownForTesting()
+        }
+
         func testBuiltInAndCustomSurviveReopenAndPreferencesDoNotChangeIdentity() async throws {
             let directory = try TemporaryProtectedDirectory()
             let storeURL = directory.url.appendingPathComponent("generation/FineCoach.sqlite")

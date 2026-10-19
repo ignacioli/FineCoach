@@ -2,6 +2,21 @@ import FineCoach
 import XCTest
 
 final class ExerciseProvenanceTests: XCTestCase {
+    func testPinyinSearchMatchesFullPinyinInitialsSubstringsAndCase() {
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "卧推", query: "wotui"))
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "卧推", query: "wo tui"))
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "卧推", query: "wt"))
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "卧推", query: "TUI"))
+        XCTAssertFalse(ExercisePinyinSearch.matches(value: "卧推", query: "深蹲"))
+    }
+
+    func testPinyinSearchUsesFoundationSystemTransliterationForPolyphonicInput() {
+        let tokens = ExercisePinyinSearch.tokens(for: "杠铃弯举")
+
+        XCTAssertEqual(tokens.sourceValue, "杠铃弯举")
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "杠铃弯举", query: "glwj"))
+    }
+
     func testMissingRequiredFieldIsRejectedWithNamedIssue() throws {
         var missingLicense = validPlaceholderManifest()
         missingLicense.records[0].licenseText = "   "

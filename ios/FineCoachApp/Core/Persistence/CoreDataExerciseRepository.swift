@@ -57,6 +57,7 @@ public struct CoreDataExerciseRepository: Sendable {
                 query
                 .trimmingCharacters(in: .whitespacesAndNewlines)
                 .precomposedStringWithCanonicalMapping
+            let normalizedPinyinQuery = ExercisePinyinSearch.normalizedQuery(normalizedQuery)
             var entries: [ExerciseLibraryEntry] = []
             entries.reserveCapacity(objects.count)
             for object in objects {
@@ -78,7 +79,8 @@ public struct CoreDataExerciseRepository: Sendable {
                         item: item,
                         preference: preference,
                         facet: facet,
-                        query: normalizedQuery
+                        query: normalizedQuery,
+                        pinyinQuery: normalizedPinyinQuery
                     )
                 {
                     continue
@@ -588,12 +590,21 @@ public struct CoreDataExerciseRepository: Sendable {
         item: ExerciseCatalogItem,
         preference: ExercisePreference?,
         facet: ExerciseCatalogBrowseFacet?,
-        query: String
+        query: String,
+        pinyinQuery: String
     ) -> Bool {
         if contains(item.canonicalName.value, query: query) {
             return true
         }
+        if pinyinMatches(item: item, value: item.canonicalName.value, query: pinyinQuery) {
+            return true
+        }
         if let alias = preference?.alias?.value, contains(alias, query: query) {
+            return true
+        }
+        if let alias = preference?.alias?.value,
+            pinyinMatches(item: item, value: alias, query: pinyinQuery)
+        {
             return true
         }
         if item.kind == .builtIn, let facet {
@@ -604,6 +615,26 @@ public struct CoreDataExerciseRepository: Sendable {
             }
         }
         return false
+    }
+
+    private static func pinyinMatches(
+        item: ExerciseCatalogItem,
+        value: String,
+        query: String
+    ) -> Bool {
+        guard !query.isEmpty else {
+            return false
+        }
+        let tokens: ExercisePinyinSearchTokens
+        if item.kind == .builtIn,
+            let cached = PlaceholderExerciseCatalogLoader.pinyinTokens(forExerciseID: item.id.rawValue),
+            cached.sourceValue == value
+        {
+            tokens = cached
+        } else {
+            tokens = ExercisePinyinSearch.tokens(for: value)
+        }
+        return ExercisePinyinSearch.matches(tokens: tokens, normalizedQuery: query)
     }
 
     private static func contains(_ value: String, query: String) -> Bool {
