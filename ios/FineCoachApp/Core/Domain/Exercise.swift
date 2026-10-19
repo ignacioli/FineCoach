@@ -29,9 +29,26 @@ public struct ExerciseCatalogItem: Hashable, Codable, Sendable, Identifiable {
     public let recordMode: RecordMode
     public let metadataVersion: String
     public let lifecycle: ExerciseLifecycle
+    /// A built-in item removed from the shipped catalog remains addressable by
+    /// id for old sessions and templates, but is omitted from browse flows.
+    public let isRetired: Bool
     public let provenanceRef: String?
     public let createdAtUTC: Date
     public let updatedAtUTC: Date
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case kind
+        case canonicalName
+        case normalizedName
+        case recordMode
+        case metadataVersion
+        case lifecycle
+        case isRetired
+        case provenanceRef
+        case createdAtUTC
+        case updatedAtUTC
+    }
 
     public init(
         id: StableExerciseID,
@@ -42,7 +59,8 @@ public struct ExerciseCatalogItem: Hashable, Codable, Sendable, Identifiable {
         lifecycle: ExerciseLifecycle,
         provenanceRef: String?,
         createdAtUTC: Date,
-        updatedAtUTC: Date
+        updatedAtUTC: Date,
+        isRetired: Bool = false
     ) throws {
         self.id = id
         self.kind = kind
@@ -51,6 +69,7 @@ public struct ExerciseCatalogItem: Hashable, Codable, Sendable, Identifiable {
         self.recordMode = recordMode
         self.metadataVersion = metadataVersion
         self.lifecycle = lifecycle
+        self.isRetired = isRetired
         self.provenanceRef = provenanceRef
         self.createdAtUTC = createdAtUTC
         self.updatedAtUTC = updatedAtUTC
@@ -62,13 +81,47 @@ public struct ExerciseCatalogItem: Hashable, Codable, Sendable, Identifiable {
         }
     }
 
+    /// `isRetired` was added after the first backup payload. Older backups do
+    /// not contain the key and remain readable as active catalog items.
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        try self.init(
+            id: container.decode(StableExerciseID.self, forKey: .id),
+            kind: container.decode(ExerciseKind.self, forKey: .kind),
+            canonicalName: container.decode(NormalizedName.self, forKey: .canonicalName),
+            recordMode: container.decode(RecordMode.self, forKey: .recordMode),
+            metadataVersion: container.decode(String.self, forKey: .metadataVersion),
+            lifecycle: container.decode(ExerciseLifecycle.self, forKey: .lifecycle),
+            provenanceRef: container.decodeIfPresent(String.self, forKey: .provenanceRef),
+            createdAtUTC: container.decode(Date.self, forKey: .createdAtUTC),
+            updatedAtUTC: container.decode(Date.self, forKey: .updatedAtUTC),
+            isRetired: container.decodeIfPresent(Bool.self, forKey: .isRetired) ?? false
+        )
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(kind, forKey: .kind)
+        try container.encode(canonicalName, forKey: .canonicalName)
+        try container.encode(normalizedName, forKey: .normalizedName)
+        try container.encode(recordMode, forKey: .recordMode)
+        try container.encode(metadataVersion, forKey: .metadataVersion)
+        try container.encode(lifecycle, forKey: .lifecycle)
+        try container.encode(isRetired, forKey: .isRetired)
+        try container.encodeIfPresent(provenanceRef, forKey: .provenanceRef)
+        try container.encode(createdAtUTC, forKey: .createdAtUTC)
+        try container.encode(updatedAtUTC, forKey: .updatedAtUTC)
+    }
+
     public static func makeBuiltIn(
         id: StableExerciseID,
         canonicalName: String,
         recordMode: RecordMode,
         metadataVersion: String,
         provenanceRef: String,
-        now: Date
+        now: Date,
+        isRetired: Bool = false
     ) throws -> ExerciseCatalogItem {
         try ExerciseCatalogItem(
             id: id,
@@ -79,7 +132,8 @@ public struct ExerciseCatalogItem: Hashable, Codable, Sendable, Identifiable {
             lifecycle: .active,
             provenanceRef: provenanceRef,
             createdAtUTC: now,
-            updatedAtUTC: now
+            updatedAtUTC: now,
+            isRetired: isRetired
         )
     }
 
@@ -98,7 +152,8 @@ public struct ExerciseCatalogItem: Hashable, Codable, Sendable, Identifiable {
             lifecycle: .active,
             provenanceRef: nil,
             createdAtUTC: now,
-            updatedAtUTC: now
+            updatedAtUTC: now,
+            isRetired: false
         )
     }
 
@@ -117,7 +172,8 @@ public struct ExerciseCatalogItem: Hashable, Codable, Sendable, Identifiable {
             lifecycle: lifecycle,
             provenanceRef: provenanceRef,
             createdAtUTC: createdAtUTC,
-            updatedAtUTC: now
+            updatedAtUTC: now,
+            isRetired: false
         )
     }
 
@@ -134,7 +190,8 @@ public struct ExerciseCatalogItem: Hashable, Codable, Sendable, Identifiable {
             lifecycle: .archived,
             provenanceRef: provenanceRef,
             createdAtUTC: createdAtUTC,
-            updatedAtUTC: now
+            updatedAtUTC: now,
+            isRetired: false
         )
     }
 
@@ -151,7 +208,8 @@ public struct ExerciseCatalogItem: Hashable, Codable, Sendable, Identifiable {
             lifecycle: .active,
             provenanceRef: provenanceRef,
             createdAtUTC: createdAtUTC,
-            updatedAtUTC: now
+            updatedAtUTC: now,
+            isRetired: false
         )
     }
 }
@@ -323,7 +381,9 @@ public struct ExerciseCatalogBrowseFacet: Hashable, Sendable {
 
 public enum ExerciseCatalogBrowse: Sendable {
     public static let muscleGroupOrder = ["胸", "肩", "背", "大腿", "小腿", "臂", "臀", "核心"]
-    public static let equipmentClassOrder = ["杠铃", "哑铃", "固定器械", "史密斯机", "龙门架", "壶铃", "徒手", "其他"]
+    public static let equipmentClassOrder = [
+        "杠铃", "哑铃", "固定器械", "史密斯机", "绳索", "哈克机", "壶铃", "徒手", "悍马机", "弹力带", "悬挂带", "单杠", "其他",
+    ]
     public static let customSectionID = "custom"
     public static let uncategorizedSectionID = "uncategorized"
 
