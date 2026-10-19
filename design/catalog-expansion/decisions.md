@@ -140,3 +140,17 @@ L3 待人工看：13 项筛选在小屏上的换行或滚动、两个改名后�
 | 其他边界 | CX-D1–D9、Q1–Q10、A1–A3 已批准 | 保持；仅数据与必要领域层，FCEquipmentIcon 龙门架→绳索映射 | 本轮不引入第 2b 步 | 不新增图标、拼音、最近使用排序，不改 Penpot、README、components.md |
 
 本轮初始审计：HEAD `96b385f`，`feat/catalog-expansion`；仅 untracked `design/catalog-expansion/external-taxonomy-digest.md`，无 tracked / staged 修改。该文件视为用户所有，保留且不提交。main 已为 HEAD 的祖先，无需重复 merge；bootstrap 与 worktree gate PASS。
+
+## 2026-10-18 产品负责人批准：CX-D12（8 行入库裁决）
+
+依据：`.handoff/prompt/2026-10-18-cprime-step2a-resume2-prompt.md` 和决定单末尾的 CX-D12。以下裁决解除上一轮 8 行阻塞；不把草稿 401 / 547 当最终统计。
+
+| 位置 | 当前状态 | 目标 | 理由 | 差异 |
+|---|---|---|---|---|
+| 胸:47、背:69、腹:22、腿:84 | 曾列新增候选 | 并入现有条目，不新增 | 负责人逐行裁决 | 删除四条新增候选，保留现有 id |
+| 背:65、背:68 | 现有引体向上、反手引体向上为徒手 | 并入现有，器械原位改为单杠，名字和 id 不变 | CX-D10 同步；负责人明确器械 | 删除两条新增候选，修改两条现有器械；偏好和训练记录保持 |
+| 腹:9 | 候选与现有俄罗斯转体同名 | 新增徒手俄罗斯转体，器械徒手 | 批准器械变式和唯一名 | 新增；现有俄罗斯转体保持哑铃 |
+| 腿:23 | 候选与现有罗马尼亚硬拉同名 | 新增哑铃罗马尼亚硬拉，器械哑铃 | 批准器械变式和唯一名 | 新增；现有罗马尼亚硬拉保持杠铃 |
+| 内置中文名 | 生成器未拒绝跨器械中文重名 | 内置之间不得中文重名，生成器重名即失败；以后遇到未裁决同名停止报告 | 不自动加前缀或静默隐藏 | 新增校验，只有上述两条批准名称生效 |
+
+续作初始审计：`feat/catalog-expansion` / HEAD `d600cf9`，7 个未暂存 tracked 草稿与指定 untracked digest 完全匹配；无 staged 内容。已逐项识别为上一轮半成品，保留继续审阅。specs topic worktree 仅有 `FineCoach/001-m1-a-core-session/data-model.md` 未暂存草稿；共享 specs main 不写入。
