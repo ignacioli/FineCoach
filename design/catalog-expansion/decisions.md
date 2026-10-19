@@ -2,6 +2,62 @@
 
 2026-10-15 产品负责人决定把动作库扩充作为功能需求，与阶段 B 并行，不再按评分卡「不列为优化项」处理。
 
+## 第 2b 步执行记录（2026-10-19）
+
+1. **分类和依据**：B 类；批准来源 `design/cprime-2b-boards` `8172c8c`、Penpot 快照 `cprime-2b approved 2026-10-19`、设计交接「第二轮」「验收通过」。从干净本地 main `5730401` 创建 `.worktrees/cprime-2b` / `feat/cprime-2b`，bootstrap 与 worktree gate PASS，合并设计提交 `03a6926`；主 checkout 不改动。
+2. **范围**：`DS-EQUIPMENT-ICON` 扩展 18 → 21；`DS-SECTION` / `DS-LIST-ROW` 复用。动作库页面与训练中添加动作面板新增「最近练过」，模板编辑器保持；动作库搜索和添加面板共用 CoreData 拼音搜索。既有动作行抽取为 `FCExerciseLibraryRowLabel`，登记 CG-10，普通 `FCListRow` 不变。无需新 Swift 文件或改 `project.pbxproj`；目录 JSON、Core Data 模型和用户数据不变。
+3. **设计决定**：复用批准的 3 个新图标、5 个替换图标、最近 5 个不同目录动作与两种历史范围；CX-D13 仅允许壶铃 `#2A2822` 铃身填充。添加面板原实现只有 quick-create 表单和最多 8 个搜索建议，本轮按批准画板补齐部位 chips、筛选按钮与器械 bottom sheet、完整分组列表；原有创建控件保留在筛选结果下方，仍由同一动作名字段与既有保存用例驱动，无新增修改数据路径。共享行最小高度约束放在 padding 外侧，保留原行内边距而不额外撑高。内置拼音随 facet 首次加载预热，动态名称/alias 按内容缓存，避免改名后旧缓存继续命中；仅用 Foundation。Penpot board 17 回填由 Claude 负责，本任务不操作 Penpot。
+4. **实施与检查**：`IconConsistencyTests` 覆盖 21 个顶层 SVG 的双向枚举、逐字节一致、viewBox、stroke、唯一 fill 例外、template 与 13 类器械映射；`ComponentCatalogTests` / `TouchTargetComponentTests.testExerciseLibraryRowDeclaresApprovedAnatomyAndFullWidthContract` 覆盖组件登记与行合同，组件含 icon/favorite 与 custom/no-icon Preview。`ExerciseIdentityTests.testRecentExercises*` 覆盖去重、倒序、不可选跳过并补足最多 5 个、当前学员/全体、临时动作与空历史；`ExercisePersistenceTests.testRecentSelectionUsesPersistedCompletedHistoryForStudentAndCoach` 覆盖已完成历史的 repository 集成。`ExerciseProvenanceTests.testPinyinSearch*` 与 `ExercisePersistenceTests.testSearchSupportsPinyinForBuiltInAliasAndCustomExercise` 覆盖全拼、空格、首字母、子串、大小写、不相关、alias/custom 与 alias 更新；中文命中及顺序、器械/部位匹配由同一 integration 测试明确断言。页面组合由 `DesignValueScanTests` 与下列入口清单记录。L3：待负责人在集中走查看两处「最近练过」、新图标与添加面板筛选/创建控件衔接，**没有人工视觉验证**。
+5. **结果**：自动实施 gates **PASS**：全仓 strict lint、device SDK App build、`build-for-testing` PASS；L0/L1 42 tests（0 failures、1 skip），`FineCoachTests` 全量 504 tests（0 failures、1 skip），`FineCoachIntegrationTests` 全量 187 tests（0 failures）。skip 为既有 `ContrastHarnessTests.testTextDisabledOnSurfacePageIsWCAGExempt`。运行环境仅指定 iPhone 17 `EFE2D5A0-4877-4682-BE79-7460C0C1E8C8`，每次运行前 shutdown / boot / bootstatus；未运行 `FineCoachUITests`、未使用 reset-store、未用真机。证据位于 `DerivedData/C2b/evidence/`，下表保留失败与最终结果。代码提交：图标 `30d744e`、最近练过 `9a6de8a`、拼音 `90c6109`；无 push、无合入 main。审查、Claude Penpot board 17 回填与 L3 集中走查 **PENDING**，自动 PASS 不代表人工视觉验收。
+
+### 本轮差异（包含移除项）
+
+| 位置 | 当前状态 | 目标 | 理由 | 改变或保留 |
+|---|---|---|---|---|
+| 图标库 / Assets / README §7.1 | 18 个；5 个旧图；全部无填充；4 类器械无映射 | 21 个，替换 5 个，新增 4 类映射，壶铃唯一实心例外 | CX-D13 与批准画板 | 删除旧图字节和旧数量/无填充绝对断言，保留其余几何与 template 合同；extras 不导入 |
+| 动作库页面 | 搜索/筛选后直接完整列表 | 默认有已完成历史时最近分组 → 16pt → 完整列表 | 批准最近练过画板 | 新增分组；无历史/有查询/有部位或器械筛选时不占位；完整列表不去除 recent 重复项 |
+| 添加面板「动作库」 | quick-create 表单、最多 8 个建议；无完整浏览筛选 | 搜索/筛选 → recent → 16pt → 完整分组列表 | 实现批准画板的已有浏览结构 | 删除 8 条建议截断与旧简化建议行；保留原创建字段/按钮/用例、从模板分段与模板编辑器 |
+| 动作行 | feature 内手工 label | 共享 DS-LIST-ROW 既有动作行变体 | 两处 recent 与完整列表保持同一 anatomy | 删除重复拼装；保留图标/名字/副文字/收藏/箭头及 token，显式满宽 |
+| Core 搜索 | 中文/现有文字、器械/部位匹配 | 增加名称与 alias 的全拼/首字母子串匹配 | 批准维度 5 | 原匹配与结果排序、signpost 保留；无手写多音字映射、数据修改或依赖 |
+
+### 入口与布局清单
+
+路径均相对于 `ios/FineCoachApp/`；动态 identifier 由 `App/FCAccessibilityID.swift` 定义。
+
+| 页面 → 可见控件 | 无障碍标识 | 是否改数据 | 宽度 owner / 真实代码 |
+|---|---|---|---|
+| 动作库 →「最近练过」动作行 → 原选项面板 | 分组 `exerciseLibraryRecent`，行 `exerciseLibraryRecentRow(id)`，与完整列表 `exerciseLibraryRow(id)` 不同 | 打开选项本身不改数据；后续沿用原用例 | `Features/ExerciseLibrary/ExerciseLibraryView.swift:172` → `FCExerciseLibraryRowLabel`（`DesignSystem/Components/FCListRow.swift:212` 满宽） |
+| 添加动作「动作库」→「最近练过」动作行 | 分组 `addExerciseRecent`，行 `addExerciseRecentRow(id)` | 是，调用既有 `addCatalogMatch` 添加到当前训练 | `Features/ActiveSession/QuickCreateExerciseFlow.swift:11` → 满宽 `FCExerciseLibraryRowLabel` |
+| 添加动作「动作库」→ 搜索动作 | `activeSessionExerciseName`（沿用） | 否，只改变查询 | `QuickCreateExerciseFlow.swift:122` 的 HStack → `FCSearchField` 弹性宽度 |
+| 添加动作「动作库」→ 全部 / 部位 chip | `activeSessionCatalogMuscleAll` / `activeSessionCatalogMuscle(group)` | 否，只改变筛选 | `QuickCreateExerciseFlow.swift:148` 的横向 ScrollView / HStack → `FCFilterChip` |
+| 添加动作「动作库」→ 筛选图标 | `activeSessionCatalogFilter` | 否，只打开筛选面板 | `QuickCreateExerciseFlow.swift:129` 的 `FCTitleIconButton`，搜索行 HStack 分配宽度 |
+| 添加动作筛选面板 → 全部 / 器械 chip | `activeSessionCatalogEquipmentAll` / `activeSessionCatalogEquipment(group)` | 否，只改变筛选 | `Features/ActiveSession/ActiveSessionView.swift:622` 的 `FCBottomSheet` 内容 VStack / `FCFlowLayout` |
+| 添加动作筛选面板 → 完成 | `activeSessionCatalogFilterDone` | 否，只关闭筛选面板 | `ActiveSessionView.swift:647` 的 `FCLinkButton.frame(maxWidth: .infinity)` |
+| 添加动作「动作库」→ 完整列表动作行 | `activeSessionCatalogRow(id)`（沿用），section `activeSessionCatalogSection(id)` | 是，调用相同 `addCatalogMatch` | `QuickCreateExerciseFlow.swift:32` → 满宽 `FCExerciseLibraryRowLabel` |
+
+### 拼音系统误读
+
+542/542 条已逐项使用 Foundation 转写，完整证据 `DerivedData/C2b/evidence/pinyin-audit.txt`。53 条含「弹力带」的名字系统读作 `dàn lì dài`（语境应为 `tán lì dài`）；10 条「地雷/地板/贴地」系统将「地」读作 `de`：地雷管推举、地雷杆甩、地雷杆划船、地雷杆硬拉、哑铃地板卧推、杠铃地板卧推、地板飞鸟、地板飞鸟(负重)、跪姿地板飞鸟、贴地俯卧撑转体拉伸。依任务保留系统结果，不改目录或手写纠正表。任务示例 `gldl → 杠铃弯举` 与系统 `glwj` 不一致，实现遵循系统转写。
+
+### 验证证据与修复次数
+
+| 检查 | 真实结果 | evidence 下的文件 |
+|---|---|---|
+| 全仓 strict lint（最终） | PASS，0 diagnostics | `lint-acceptance.log` |
+| App device SDK build（最终布局） | PASS，`CODE_SIGNING_ALLOWED=NO` | `app-build-final.log` |
+| 测试 targets 编译（最终） | PASS；仅编译，不执行 UI tests | `build-for-testing-acceptance.log` / `.xcresult` |
+| L0/L1（最终） | PASS，42 tests / 1 skip / 0 failures | `l0-l1-acceptance.log` / `.xcresult` |
+| Unit 全量（最终） | PASS，504 tests / 1 skip / 0 failures | `unit-acceptance.log` / `.xcresult` |
+| Integration 首轮 | FAIL，187 tests / 3 failures（1 unexpected），两条新增测试失败 | `integration.log` / `.xcresult` |
+| 两条失败测试先单独重跑 | FAIL，2 tests / 3 failures，复现首轮原因 | `failures-isolated.log` / `.xcresult` |
+| 两条测试各修正一次后单独重跑 | PASS，2 tests / 0 failures | `corrected-isolated.log` / `.xcresult` |
+| Integration 修正后复验 | PASS，187 tests / 0 failures；随后发现并修正共享行最小高度约束的位置 | `integration-final.log` / `.xcresult` |
+| Integration 全量（最终布局） | PASS，187 tests / 0 failures | `integration-acceptance.log` / `.xcresult` |
+| 模拟器重启 | 每次运行单独记录；最终三次由 fail-fast 脚本串行运行 | `*-reboot.log`，脚本 `../run-acceptance.sh` |
+| SVG / 转写 | 21 SVG byte/template PASS；542/542 条系统转写 | `icon-artifacts.log`、`pinyin-audit.txt` |
+
+两条测试各仅修正 1 次：recent fixture 原本给 `.reps` 引体向上传了重量/公斤，违反现有 `TrainingSet` 合同，改为次数单位、不带重量；拼音测试原先错误要求拼音集合等于中文「卧推」集合，忽略 `卧腿 → wotui` 同音与 `抬腿 → wt` 首字母。修正后仍断言原中文命中完整保留且顺序不变，并增加明确同音、首字母额外命中与器械/部位匹配断言；没有更改产品匹配规则、删测试或缩小全量 gates。最后的行修正只把最小高度约束移至 padding 外侧，避免额外增加行高；收紧组件源码测试的扫描范围到该组件，并重新执行全部自动 gates。
+
 ## 决定
 
 | 编号 | 决定 |
