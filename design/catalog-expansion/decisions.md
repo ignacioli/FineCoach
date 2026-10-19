@@ -98,3 +98,18 @@
 | 动作库筛选 sheet | `ExerciseLibraryView.swift:247`，`FCFilterChip` / `FCAccessibilityID.exerciseLibraryEquipment(equipment)` | 计划由 8 个器械值扩至 13 个，只修改筛选条件，不持久化训练数据 | `filterSheet` 的 `FCBottomSheet` 内容区 → `VStack` → `FCFlowLayout`（`:234–240`） | 未实施，仍为 8 项；无其他新入口 |
 
 L3 待人工看：13 项筛选在小屏上的换行或滚动、两个改名后的动作、停用动作在列表与搜索中不可见。**未做人工视觉验证**。
+
+## 2026-10-18 产品负责人批准：CX-D10 / CX-D11（续作）
+
+依据：`.handoff/prompt/2026-10-18-cprime-step2a-resume-prompt.md`。以下覆盖上一轮待审方案和模型停止条件，历史 BLOCKED 记录保留。
+
+| 决定 | 位置 / 当前状态 | 目标 | 理由 | 差异 |
+|---|---|---|---|---|
+| CX-D10 同步 | seed 按 100–150 条短路，异常时删除并重建 | 每次启动按稳定 id 在一个事务内更新、插入，失败整体回滚，重复执行幂等；移除数量上限，改结构校验 | 已安装用户也获得新目录并保留用户数据 | 删除重建路径及数量 gate；保留 preference、自定义动作、createdAt、Session 名字快照和模板引用 |
+| CX-D10 停用 | 目录没有持久化停用字段，当前模型 V5 | 新建 V6，仅内置动作实体新增 optional Bool `isRetired`、默认 false，轻量迁移；JSON 消失的内置项也标为停用 | 旧引用可继续按 id 读取 | 新增停用过滤：列表、搜索、添加选择器过滤；id 查询保留 |
+| CX-D10 恢复 | 备份恢复可能恢复旧目录 | 恢复完成立即同步或下次启动同步；实施记录明确采用的路径 | 恢复旧备份仍获得当前目录 | 增加恢复后对比；保留最后有效状态 |
+| CX-D11 名称 | 新增或改名内置动作遇自定义 claim 会冲突 | 自定义优先；冲突内置项在本机隐藏，每次同步重新计算，不写 isRetired；不弹窗、不改自定义名、不向 UI 抛该冲突 | 保留教练名字与历史 | 增加动态隐藏，删除这类冲突的 UI 错误路径 |
+| CX-D11 找回 | 尚未核实归档是否释放 claim | 自定义改名后立即重新同步；归档仅在实际释放 claim 时同样找回，并记录调查结论 | 不等下次启动 | 新增改名后的立即同步；归档行为按现有 claim 生命周期核实，不自行改变 |
+| 其他边界 | CX-D1–D9、Q1–Q10、A1–A3 已批准 | 保持；仅数据与必要领域层，FCEquipmentIcon 龙门架→绳索映射 | 本轮不引入第 2b 步 | 不新增图标、拼音、最近使用排序，不改 Penpot、README、components.md |
+
+本轮初始审计：HEAD `96b385f`，`feat/catalog-expansion`；仅 untracked `design/catalog-expansion/external-taxonomy-digest.md`，无 tracked / staged 修改。该文件视为用户所有，保留且不提交。main 已为 HEAD 的祖先，无需重复 merge；bootstrap 与 worktree gate PASS。
