@@ -37,6 +37,7 @@ import csv
 import hashlib
 import json
 import re
+import subprocess
 import unicodedata
 from collections import OrderedDict, defaultdict
 from pathlib import Path
@@ -45,6 +46,7 @@ ROOT = Path(__file__).resolve().parents[3]
 SOURCE = ROOT / "design/catalog-expansion/source/2026-10-17"
 CACHE = ROOT / "design/catalog-expansion/source/cache/verified-sources.json"
 PROVENANCE = ROOT / "ios/FineCoachApp/Resources/ExerciseCatalog/provenance.json"
+BASELINE_COMMIT = "96b385fe730b09171244fedb69341d0bb9f8fb47"
 OUTPUT = ROOT / "design/catalog-expansion/catalog-review-300.md"
 
 AUDIT_CSV = SOURCE / "out/reports/match-audit.csv"
@@ -143,8 +145,8 @@ NAME_OVERRIDES = {
     "肩:58": "肩胛骨后缩热身",            # low row, recommended adopt
     "肩:59": "肩胛骨上回旋热身",
     "肩:60": "肩胛骨下回旋热身",
-    "肩:63": "悬垂带面拉",                # equipment pending (see Q1)
-    "肩:72": "悬垂带后束飞鸟",            # equipment pending (see Q1)
+    "肩:63": "悬挂带面拉",                # equipment pending (see Q1)
+    "肩:72": "悬挂带后束飞鸟",            # equipment pending (see Q1)
     "肩:73": "弹力带耸肩",                # low row, recommended adopt
     "肩:74": "V字俯卧撑",
     "肩:75": "V字俯卧撑(负重)",
@@ -173,7 +175,7 @@ NAME_OVERRIDES = {
     "臀:66": "挂片罗马尼亚硬拉",          # raw name truncated
     "上臂:66": "弹力带站姿弯举",          # low row, recommended adopt
     # CX-D3 / catalog-style name normalisation round two.
-    "上臂:55": "绳索训练器",
+    "上臂:55": "绳索弯举",
     "肩:8": "哑铃侧平举",
     "肩:10": "哑铃半俯身侧平举",
     "肩:11": "哑铃前平举",
@@ -198,6 +200,8 @@ NAME_OVERRIDES = {
     "腹:22": "健腹轮",
     "臀:69": "壶铃摆荡",
     "核心:9": "平板肘撑转换",
+    "腹:9": "徒手俄罗斯转体",  # CX-D12
+    "腿:23": "哑铃罗马尼亚硬拉",  # CX-D12
 }
 
 # recordMode for rows where the generic rule would be wrong (or where the
@@ -210,6 +214,8 @@ MODE_OVERRIDES = {
     "腿:84": "reps",      # 北欧腿弯举 bodyweight, source equipment 其他
     "腿:86": "reps",      # 跳箱 bodyweight plyometrics, source equipment 其他
     "腿:85": "reps",      # 臀桥 bodyweight, source equipment 其他 (already in library)
+    "腿:79": "duration", # A1 overrides the band reps rule
+    "臀:60": "duration", # Same normalized crab-walk movement, merged with 腿:79
     "腿:82": "reps",      # 悬吊带深蹲 bodyweight suspension squat
     "臀:39": "duration",  # 仰卧交叉腿 Lying Crossover is a stretch
 }
@@ -310,7 +316,7 @@ ROW_NOTES = {
 # The 21 low-confidence rows: product-owner decision required. recommend=True
 # rows are proposed for adoption as finecoach-built entries (CX-D5: MIT).
 LOW_ROWS = OrderedDict([
-    ("上臂:66", (True, "弹力带站姿弯举", "弹力带", "weightReps", False, "臂", [],
+    ("上臂:66", (True, "弹力带站姿弯举", "弹力带", "reps", False, "臂", [],
                  "弹力带站姿弯举是带新手、课前热身的常规手臂动作，现有目录弹力带器械完全空白。")),
     ("上臂:67", (False, "", "", "", False, "", [],
                  "与上臂:66 只差轮换节奏，CX-D3 又不能在名字里写交替，收进来是两条几乎一样的记录。")),
@@ -322,7 +328,7 @@ LOW_ROWS = OrderedDict([
                "上斜 Y 字举是肩后束/下斜方肌和圆肩改善的常用辅助动作，现有「哑铃后束飞鸟」方向不同。")),
     ("肩:58", (True, "肩胛骨后缩热身", "绳索", "duration", False, "肩", ["背"],
                "肩胛骨后缩是肩带热身和圆肩矫正常规练习；同表上/下回旋两条已按 medium 自动收录，缺后缩就断了序列。")),
-    ("肩:73", (True, "弹力带耸肩", "弹力带", "weightReps", False, "背", [],
+    ("肩:73", (True, "弹力带耸肩", "弹力带", "reps", False, "背", [],
                "弹力带耸肩是弹力带热身和斜方肌基础训练常规动作；现有耸肩只有杠铃/哑铃/史密斯/绳索。")),
     ("背:18", (False, "", "", "", False, "", [],
                "「站旋转划」名称残缺，不是标准动作名；划船和转体已分别被「坐姿绳索划船」「站姿绳索转体」覆盖。")),
@@ -396,6 +402,7 @@ def strip_separators(name: str) -> str:
 
 def base_name(raw: str) -> str:
     """CX-D3 normalisation: prefixes -> suffix, separators, unilateral wording."""
+    raw = raw.replace("悬垂带", "悬挂带").replace("悬吊带", "悬挂带")
     name = nfc(raw).replace("（", "(").replace("）", ")")
     match = re.match(r"^(拉伸|热身)\s*[-—－]?\s*(.+)$", name)
     if match:
@@ -419,7 +426,7 @@ def normalise_equipment(raw_equipment: str, raw_name: str) -> tuple[str, str]:
     if raw_equipment == "悬挂带 & 弹力带":
         if "弹力带" in raw_name:
             return "弹力带", "器械按名称拆分：悬挂带 & 弹力带→弹力带"
-        if "悬挂带" in raw_name or "TRX" in raw_name:
+        if any(prefix in raw_name for prefix in ("悬挂带", "悬垂带", "悬吊带", "TRX")):
             return "悬挂带", "器械按名称拆分：悬挂带 & 弹力带→悬挂带"
         return PENDING, "器械待决：名称不含弹力带/悬挂带/TRX"
     return raw_equipment, ""
@@ -451,7 +458,7 @@ def derive_mode(row: dict, equipment: str, category: str) -> str:
     )):
         return "duration"
     loaded = "负重" in raw
-    if not loaded and equipment in ("徒手", "单杠", "悬挂带"):
+    if not loaded and equipment in ("徒手", "单杠", "悬挂带", "弹力带"):
         return "reps"
     return "weightReps"
 
@@ -485,9 +492,7 @@ def existing_equipment(current: dict) -> str:
 
 def equipment_compatible(equipment: str, current: dict) -> bool:
     current_equipment = existing_equipment(current)
-    if equipment == current_equipment:
-        return True
-    return equipment in BODYWEIGHT_EQUIPMENT and current_equipment in BODYWEIGHT_EQUIPMENT
+    return equipment == current_equipment
 
 
 def _display(text: str) -> str:
@@ -520,8 +525,19 @@ def load_rows() -> list[dict]:
     return rows
 
 
+def load_baseline_manifest() -> dict:
+    raw = subprocess.check_output([
+        "git", "show", BASELINE_COMMIT + ":" + PROVENANCE.relative_to(ROOT).as_posix()
+    ], cwd=ROOT)
+    manifest = json.loads(raw)
+    if len(manifest["exercises"]) != 146:
+        raise ValueError("the pinned pre-expansion baseline must contain 146 exercises")
+    return manifest
+
+
 def load_existing() -> list[dict]:
-    manifest = json.loads(PROVENANCE.read_text(encoding="utf-8"))
+    # The expanded output must never become its own deduplication input.
+    manifest = load_baseline_manifest()
     records = {record["recordID"]: record for record in manifest["provenance"]["records"]}
     return manifest["exercises"], records
 
@@ -539,6 +555,9 @@ def build_entries(rows: list[dict], existing_by_english: dict, existing_by_name:
         raw_name = row["raw_name"]
         name = NAME_OVERRIDES.get(key) or base_name(raw_name)
         equipment, equipment_note = normalise_equipment(row["raw_equipment"], raw_name)
+        if key in {"胸:44", "胸:45", "胸:46", "胸:47"}:
+            equipment = "史密斯机"
+            equipment_note = "Q10：史密斯机动作归史密斯机"
         primary, secondary, unmapped = derive_parts(row)
 
         # Source + license resolution (CX-D5, CX-D7 license rules).
@@ -663,8 +682,8 @@ def build_entries(rows: list[dict], existing_by_english: dict, existing_by_name:
         match = None
         match_basis = ""
         current_name = existing_by_name.get(name)
-        if current_name is not None:
-            match, match_basis = current_name, "中文名相同"
+        if current_name is not None and equipment_compatible(equipment, current_name):
+            match, match_basis = current_name, "中文名相同且器械相同"
         if match is None and library.startswith("wger:"):
             data = wger.get(library[5:])
             if data:
@@ -675,6 +694,15 @@ def build_entries(rows: list[dict], existing_by_english: dict, existing_by_name:
             current = existing_by_english.get(norm_english(row["english"]))
             if current is not None and equipment_compatible(equipment, current):
                 match, match_basis = current, "英文名相同"
+
+        # Explicit owner decisions take precedence over equipment matching.
+        target = EXPLICIT_EXISTING.get(key)
+        if target is not None:
+            match, match_basis = existing_by_name[target], "产品负责人 Q4/Q5/Q6/Q7/CX-D12 明确合并"
+        elif key in SEMANTIC_EXISTING:
+            current = existing_by_name[SEMANTIC_EXISTING[key]]
+            if equipment_compatible(equipment, current):
+                match, match_basis = current, "Q7 同器械同动作"
 
         if match is not None:
             entry["existing"] = match
@@ -820,39 +848,63 @@ SEMANTIC_DUPLICATES = [
 ]
 
 
-def semantic_duplicates(merged: list[dict], existing: list[dict]) -> list[dict]:
-    """Curated candidate -> existing pairs that are the same movement.
 
-    The mechanical rules (English name / wger UUID / Chinese name) do not catch
-    every wording difference; these pairs were reviewed by hand.
-    """
-    by_key = {entry["key"]: entry for entry in merged}
-    by_name = {current["canonicalName"]: current for current in existing}
+# Product-owner decisions approved 2026-10-18. These are data rules, not output edits.
+EXPLICIT_EXISTING = {
+    "胸:47": "史密斯窄距卧推", "背:65": "引体向上",  # CX-D12
+    "背:68": "反手引体向上", "背:69": "山羊挺身",
+    "腹:22": "健腹轮", "腿:84": "北欧腿弯举",
+    "臀:31": "罗马尼亚硬拉", "臀:40": "徒手臀桥",  # Q4
+    "上臂:55": "绳索弯举",  # Q5
+    "腿:35": "哈克深蹲", "臀:3": "哈克深蹲",  # Q6
+    "腿:83": "哑铃保加利亚分腿蹲", "腹:10": "俄罗斯转体",  # Q7
+    "臀:66": "罗马尼亚硬拉", "臀:28": "罗马尼亚硬拉", "臀:29": "罗马尼亚硬拉",
+}
+SEMANTIC_EXISTING = {key: name for key, name, _ in SEMANTIC_DUPLICATES}
+for _key in ("肩:63", "肩:72", "腿:82"):
+    ROW_NOTES[_key] = "Q1 已批准：悬垂带/悬吊带统一悬挂带，次数动作 reps"
+for _key in ("腿:35", "臀:3"):
+    ROW_NOTES[_key] = "Q6 已批准：并入现有哈克深蹲"
+ROW_NOTES["上臂:55"] = "Q5 已批准：并入现有绳索弯举"
+for _key in ("臀:31", "臀:40"):
+    ROW_NOTES[_key] = "Q4 已批准：单侧变式并入现有条目"
+QUESTIONS = [
+    "Q1–Q10、A1–A3 及 CX-D12 的 8 行裁决已于 2026-10-18 获产品负责人批准。",
+    "Q1 悬挂带统一；Q2 弹力带/悬挂带次数动作 reps；Q3 动作 + 热身；A1 螃蟹行走 duration。",
+    "Q4/Q5/Q6 和 Q7 四个明确例外并入指定现有条目；Q7 其余按同器械同动作判重（附录 E/F）。",
+    "Q8 保持四项记录方式；Q9 采纳 6 条 low 自建 MIT、不采纳 15 条；Q10 胸表四条改史密斯机；A2 保持 11 行默认否；A3 删除旧上限。",
+]
+# Original appendix E's 27 pairs and the audit report's 18 rows remain individually traceable.
+ORIGINAL_E_COLLISIONS = ["肩:47", "背:44", "腹:10", "腿:52", "腿:67", "腿:69", "腿:83", "臀:20", "臀:65", "臀:67"]
+AUDIT_18 = ["胸:47", "肩:47", "肩:64", "肩:63", "背:44", "臀:28", "臀:66", "腿:67", "腿:69", "腿:83", "上臂:69", "上臂:74", "腿:52", "臀:20", "臀:65", "臀:67", "腹:10", "腹:49"]
+
+
+def semantic_duplicates(entries: list[dict], existing: list[dict]) -> list[dict]:
+    by_key = {entry["key"]: entry for entry in entries}
+    by_uuid = {entry["id"]: entry for entry in existing}
+    by_name = {entry["canonicalName"]: entry for entry in existing}
+    verified = json.loads(CACHE.read_text(encoding="utf-8"))
+    original = [(key, None, "原附录 E：共用 wger UUID") for key in ORIGINAL_E_COLLISIONS]
+    original += [(key, name, reason) for key, name, reason in SEMANTIC_DUPLICATES]
+    audit = [(key, None, "核对报告第 4 项：英文名/UUID 命中") for key in AUDIT_18]
     pairs = []
-    for entry in merged:
-        collision = entry.get("source_collision")
-        if collision:
-            name, existing_id, uuid = collision
-            pairs.append({
-                "candidate": entry["name"],
-                "candidate_key": entry["key"],
-                "existing": name,
-                "existing_id": existing_id,
-                "reason": "共用 wger 条目 UUID %s，来源表器械/变式不同" % uuid,
-            })
-    for key, existing_name, reason in SEMANTIC_DUPLICATES:
-        entry = by_key.get(key)
-        current = by_name.get(existing_name)
-        if entry is None or current is None:
-            continue
-        pairs.append({
-            "candidate": entry["name"],
-            "candidate_key": key,
-            "existing": current["canonicalName"],
-            "existing_id": current["id"],
-            "reason": reason,
-        })
+    for appendix, group in (("E", original), ("F", audit)):
+        for key, name, reason in group:
+            entry = by_key[key]
+            current = entry.get("existing") or by_name.get(name)
+            if current is None:
+                library = entry["library"]
+                if library.startswith("wger:"):
+                    current = by_uuid.get(verified["wger"]["entries"][library[5:]]["uuid"])
+                if current is None:
+                    current = next(item for item in existing if norm_english(item["sourceEnglishName"]) == norm_english(entry["english"]))
+            is_existing = "existing" in entry
+            pairs.append({"appendix": appendix, "candidate": entry["name"], "candidate_key": key,
+                "existing": current["canonicalName"], "existing_id": current["id"],
+                "reason": reason + "；器械 %s → %s" % (entry["equipment"], existing_equipment(current)),
+                "decision": ("已在库：" + entry["match_basis"]) if is_existing else "新增：器械不同，按 Q7 保留"})
     return pairs
+
 
 def render(data: dict, merged: list[dict], already: list[dict], calibrations: list[dict],
            duplicates: list[dict]) -> str:
@@ -883,27 +935,27 @@ def render(data: dict, merged: list[dict], already: list[dict], calibrations: li
     already_entries = len({entry["existing"]["id"] for entry in already})
 
     lines = []
-    lines.append("# C′ 动作库扩充候选（待审）")
+    lines.append("# C′ 动作库扩充已审清单")
     lines.append("")
-    lines.append("状态：**待审**（第 1 步：候选清单。未改 `provenance.json`、schema、Swift 代码或 001 spec 正文。）")
+    lines.append("状态：**已审，2026-10-18 产品负责人批准**。依据 Q1–Q10、A1–A3 及 CX-D12；原 146 条以固定 baseline `96b385f` 为准，新增与合并总数见以下实际生成统计。")
     lines.append("")
-    lines.append("生成方式：`python3 -I design/catalog-expansion/tools/build_candidates.py`。")
+    lines.append("生成方式：`.venv/bin/python -I design/catalog-expansion/tools/build_candidates.py`（项目本地 uv venv，保留原要求的 `-I` 隔离；仅标准库）。")
     lines.append("输入：`design/catalog-expansion/source/2026-10-17/`（外部表的冻结副本，"
                  "match-audit.csv SHA-256 `%s`）；来源核对：`tools/verify_sources.py` "
                  "（缓存 + `source/cache/verified-sources.json`，下载日期 2026-10-18）。"
                  % _sha256(AUDIT_CSV))
     lines.append("")
-    lines.append("## 统计")
+    lines.append("## 批准入库统计")
     lines.append("")
     lines.append("- 输入 `match-audit.csv`：%d 行（high 332 / medium 216 / low 21）。" % audit_rows)
     lines.append("- **新增条数**：high/medium 合并去重后 **%d** 条；low 建议采纳 **%d** 条（附录 A，"
                  "已计入主名单并标 low）。主名单合计 **%d** 条。" %
                  (high_medium_added, len(adopted_low), len(ordered)))
-    lines.append("- **合并后总条数**：146 + %d = **%d** 条（若 low 建议不被采纳，则 %d 条）。" %
+    lines.append("- **合并总条数**：146 + %d = **%d** 条（其中不含 low 的条数 %d）。" %
                  (len(ordered), total, 146 + high_medium_added))
     lines.append("- **已在库**：%d 行，对应现有 %d 条条目（附录 B）；**合并掉** %d 行（附录 D）。" %
                  (len(already), already_entries, merged_away))
-    lines.append("- 校准差异：%d 处（附录 C）。疑似重复待确认：%d 组（附录 E）。" %
+    lines.append("- 校准差异：%d 处（附录 C）。逐组复核：%d 行（原附录 E 27 组 + 核对报告 18 行，附录 E/F）。" %
                  (len(calibrations), len(duplicates)))
     lines.append("")
     lines.append("### 主部位条数（主名单，含 low 建议采纳）")
@@ -921,7 +973,7 @@ def render(data: dict, merged: list[dict], already: list[dict], calibrations: li
         if count:
             lines.append("| %s | %d |" % (equip, count))
     lines.append("")
-    lines.append("## 待负责人决定的问题")
+    lines.append("## 已批准决定")
     lines.append("")
     for question in QUESTIONS:
         lines.append("- %s" % question)
@@ -930,10 +982,7 @@ def render(data: dict, merged: list[dict], already: list[dict], calibrations: li
     lines.append("")
     lines.append("排序：主部位（%s）→ 器械（%s）。" % ("、".join(PART_ORDER), "、".join(EQUIP_ORDER)))
     lines.append("")
-    lines.append("「已在库」判定：中文名相同，或英文名相同，或 wger UUID 相同。英文名 / wger UUID "
-                 "命中时还要求器械类别一致（或同属自重类：徒手、单杠、悬挂带、其他），"
-                 "避免把来源表的近似映射（弹力带、品牌器械映射到通用库条目）误判成已在库。"
-                 "改名后与现有条目重名的行按规则当作已在库，列在附录 B。")
+    lines.append("「已在库」判定：Q7 器械相同且动作相同才合并，器械不同新增；不再把徒手、单杠、悬挂带、其他当同一器械。Q4/Q5/Q6 和 Q7 四行明确决定优先。现有中文名/id 一律来自 146 条 baseline，JSON 写入后也不会改变清单。")
     lines.append("")
     lines.append("| # | 主部位 | 次要部位 | 器械 | 中文名 | 原名 | English | 记录方式 | 单侧默认 | 来源 | 许可 | 置信度 | 备注 / 待决 |")
     lines.append("|---:|---|---|---|---|---|---|---|---|---|---|---|---|")
@@ -974,6 +1023,25 @@ def render(data: dict, merged: list[dict], already: list[dict], calibrations: li
                  "来源 `finecoach-built` 的条目按 CX-D5 为 FineCoach 自建，作者 `FineCoach`，许可 `MIT`。")
     lines.append("")
 
+    lines.append("## CX-D12：8 行批准裁决与原始证据")
+    lines.append("")
+    lines.append("| 文件:行 | 批准结果 | 证据 |")
+    lines.append("|---|---|---|")
+    for key, decision, evidence in [
+        ("胸:47", "并入史密斯窄距卧推", "fedb:Smith_Machine_Close-Grip_Bench_Press，同器械同英文名"),
+        ("背:65", "并入引体向上，现有器械改为单杠，id/名不动", "fedb:Pullups；CSV 单杠，缓存 body only"),
+        ("背:68", "并入反手引体向上，现有器械改为单杠，id/名不动", "fedb:Chin-Up；CSV 单杠，缓存 body only"),
+        ("背:69", "并入山羊挺身", "fedb:Hyperextensions_Back_Extensions；器械差异没有证据"),
+        ("腹:9", "新增徒手俄罗斯转体，现有俄罗斯转体保持哑铃", "fedb:Russian_Twist；CSV 无→徒手"),
+        ("腹:22", "并入健腹轮", "fedb:Ab_Roller；器械差异没有证据"),
+        ("腿:23", "新增哑铃罗马尼亚硬拉，现有罗马尼亚硬拉保持杠铃", "wger:1652；Dumbbell Romanian Deadlift"),
+        ("腿:84", "并入北欧腿弯举", "wger:910；UUID 与旧目录相同"),
+    ]:
+        lines.append("| %s | %s | %s |" % (key, decision, evidence))
+    lines.append("")
+    lines.append("证据来自冻结 CSV、verified-sources.json 与固定 baseline `96b385f`。CX-D12 通则：内置条目之间不允许中文重名；生成器遇到重名即失败，不自动加器械前缀。")
+    lines.append("")
+
     # Appendix A: low rows.
     lines.append("## 附录 A：low 行（21 行）采纳建议")
     lines.append("")
@@ -995,9 +1063,7 @@ def render(data: dict, merged: list[dict], already: list[dict], calibrations: li
             low["reason"],
         ))
     lines.append("")
-    lines.append("采纳的 6 条按 CX-D5 作为 FineCoach 自建条目（作者 `FineCoach`，许可 `MIT`）；"
-                 "来源表这 6 行的动作英文名是 `-`，第 2 步写 `provenance.json` 时需要为自建条目确定 "
-                 "`sourceEnglishName`（建议用对应英文动作名，或按自建标记处理）。")
+    lines.append("采纳的 6 条已由产品负责人批准，按 CX-D5 为 FineCoach 自建（作者 `FineCoach`、许可 `MIT`）；`sourceEnglishName` 使用 `FineCoach original: <canonicalName>` 自建标记，不假造外部英文来源。")
     lines.append("")
     lines.append("来源表数据质量问题（不改输入，仅记录）：`上臂:80` 的「铃铃二头弯举」是错字；"
                  "`背:18` 的「绳索站旋转划」名称残缺；`腹:50/51/52` 三条弹力带转体名称互相矛盾、肌肉列不一致。")
@@ -1060,20 +1126,17 @@ def render(data: dict, merged: list[dict], already: list[dict], calibrations: li
         lines.append("无。")
     lines.append("")
 
-    # Appendix E: near duplicates.
-    lines.append("## 附录 E：疑似重复（机械规则没有判重，请确认）")
-    lines.append("")
-    if duplicates:
-        lines.append("| 候选 | 候选来源 | 对照 | 依据 | 建议 |")
+    for appendix, title in (("E", "原附录 E 27 组逐组判定"), ("F", "机械核对报告第 4 项 18 行逐行判定")):
+        lines.append("## 附录 %s：%s（Q7 已批准规则）" % (appendix, title))
+        lines.append("")
+        lines.append("| 候选 | 候选来源 | 对照 | 依据 | 最终判定 |")
         lines.append("|---|---|---|---|---|")
         for item in duplicates:
-            other_label = "现有「%s」（`%s`）" % (item["existing"], item["existing_id"])
-            lines.append("| %s | %s | %s | %s | 请确认是否按「已在库」处理 |" % (
-                item["candidate"], item["candidate_key"], other_label, item["reason"],
-            ))
-    else:
-        lines.append("无。")
-    lines.append("")
+            if item["appendix"] != appendix:
+                continue
+            lines.append("| %s | %s | 现有「%s」（`%s`） | %s | %s |" % (
+                item["candidate"], item["candidate_key"], item["existing"], item["existing_id"], item["reason"], item["decision"]))
+        lines.append("")
 
     return "\n".join(lines) + "\n"
 
@@ -1091,6 +1154,22 @@ def _sha256(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1 << 20), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def validate_builtin_names(existing: list[dict], merged: list[dict]) -> None:
+    """CX-D12: fail on duplicate Chinese names; never invent equipment prefixes."""
+    names = defaultdict(list)
+    renames = {"单臂哑铃划船": "哑铃支撑划船", "哑铃单手提走": "哑铃提箱走"}
+    for current in existing:
+        name = renames.get(current["canonicalName"], current["canonicalName"])
+        names[name].append("baseline:" + current["id"])
+    for entry in merged:
+        names[entry["name"]].append(entry["key"])
+        if entry["pending"]:
+            raise ValueError("unresolved candidate: %s %s" % (entry["key"], entry["pending"]))
+    collisions = {name: keys for name, keys in names.items() if len(keys) > 1}
+    if collisions:
+        raise ValueError("CX-D12 duplicate built-in Chinese names: %s" % collisions)
 
 
 def main() -> None:
@@ -1113,6 +1192,7 @@ def main() -> None:
 
     merged = merge_entries(candidates)
     tag_approximate_mappings(merged)
+    validate_builtin_names(existing, merged)
 
     calibrations = []
     for entry in already:
@@ -1138,7 +1218,7 @@ def main() -> None:
                 "current": "、".join(current["secondaryMuscleGroups"]) or "（空）",
             })
 
-    duplicates = semantic_duplicates(merged, existing)
+    duplicates = semantic_duplicates(entries, existing)
     text = render(built, merged, already, calibrations, duplicates)
     OUTPUT.write_text(text, encoding="utf-8")
 
@@ -1150,7 +1230,7 @@ def main() -> None:
         sum(1 for low in built["low"] if not low["recommend"]),
     ))
     print("calibrations=%d near_duplicates=%d questions=%d" % (
-        len(calibrations), len(duplicates), len(QUESTIONS)))
+        len(calibrations), len(duplicates), 0))
     print("output=%s sha256=%s" % (OUTPUT.relative_to(ROOT), _sha256(OUTPUT)))
 
 
