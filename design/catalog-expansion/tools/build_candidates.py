@@ -47,6 +47,8 @@ SOURCE = ROOT / "design/catalog-expansion/source/2026-10-17"
 CACHE = ROOT / "design/catalog-expansion/source/cache/verified-sources.json"
 PROVENANCE = ROOT / "ios/FineCoachApp/Resources/ExerciseCatalog/provenance.json"
 BASELINE_COMMIT = "96b385fe730b09171244fedb69341d0bb9f8fb47"
+# CX-D15: approved in-place equipment corrections; names and ids stay stable.
+EXISTING_EQUIPMENT_OVERRIDES = {"哈克深蹲": "哈克机", "哈克机提踵": "哈克机"}
 OUTPUT = ROOT / "design/catalog-expansion/catalog-review-300.md"
 
 AUDIT_CSV = SOURCE / "out/reports/match-audit.csv"

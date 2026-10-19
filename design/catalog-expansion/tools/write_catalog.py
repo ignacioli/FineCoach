@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Write the approved CX-D4/D9/D12 catalog from frozen inputs, offline.
+"""Write the approved CX-D4/D9/D12/D15 catalog from frozen inputs, offline.
 
 Run: .venv/bin/python -I design/catalog-expansion/tools/write_catalog.py
 The pinned 146-entry baseline is the input; expanded output is never re-ingested.
@@ -58,6 +58,8 @@ def build_catalog() -> dict:
             item['equipmentClass'] = '绳索'
         if old_name in ('引体向上', '反手引体向上'):
             item['equipmentClass'] = '单杠'
+        if old_name in module.EXISTING_EQUIPMENT_OVERRIDES:
+            item['equipmentClass'] = module.EXISTING_EQUIPMENT_OVERRIDES[old_name]
     catalog['metadataVersion'] = VERSION
     catalog['provenance']['contentVersion'] = VERSION
     records = catalog['provenance']['records']

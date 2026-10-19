@@ -977,7 +977,7 @@
       "secondaryMuscleGroups": [
         "臀"
       ],
-      "equipmentClass": "固定器械",
+      "equipmentClass": "哈克机",
       "sourceEnglishName": "Hack Squats"
     },
     {
@@ -1161,7 +1161,7 @@
       "provenanceRef": "95a9cc46-270e-45f2-8a17-5665a23ff70b",
       "primaryMuscleGroup": "小腿",
       "secondaryMuscleGroups": [],
-      "equipmentClass": "固定器械",
+      "equipmentClass": "哈克机",
       "sourceEnglishName": "Calf Raises on Hackenschmitt Machine"
     },
     {
