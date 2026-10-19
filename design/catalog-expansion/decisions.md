@@ -61,7 +61,22 @@
 
 ## 第 2a 步执行记录
 
-### 最新状态：BLOCKED（2026-10-18 resume2：新内置名与进行中 Session-only claim 冲突）
+### 最新状态：BLOCKED（2026-10-19 resume3：提交后保护审计失败边界待裁决）
+
+1. **分类和依据**：目录数据与领域层修订；`DS-CHIP` / `DS-EQUIPMENT-ICON` 复用，目标 anatomy、视觉样式不变，按 CX-D1–D12 / D14 更新数据及绳索映射；已读批准画稿 33、README §7.1 / §8、components 对应 anatomy；没有新的组件设计，不改 Penpot、README、components.md。
+2. **范围**：初始状态与 resume3 严格一致，13 tracked draft、2 指定 untracked 项，无 staged；bootstrap / gate PASS。本轮新增 startup fallback、Session-only 动态隐藏与释放后 reconcile、新增路径 selectable 校验、固定 146 baseline fixture 及测试。既有半成品保留；specs 独立 topic 仅 spec/data-model 两个草稿，未提交；不写共享 main。唯一模型变动仍是 V6 的 optional isRetired，未改 V1–V5 / pbxproj。
+3. **设计决定**：CX-D14 已先独立提交 `6e9b9af`；普通新建/编辑重名仍报错，不能抢占现有 built-in claim。正常 release/reap 与内置 claim reconcile 在同一事务；恢复 generation 验证并 reload 后立即同步。独立 privacy gate 发现下述两条实际代码路径；第一条是未完成的 CX-D14 持久化缺口，第二条涉及已批准“失败已整体回滚”前提之外的存储失败策略，按 prompt 停止，不擅自更改持久化语义。
+4. **实施与检查**：离线 verify/build/write 各双跑逐字节一致（r3-determinism.json）；fixture 与 96b385f 原文件完全一致。全仓 strict swift-format lint PASS（r3-swift-format-lint.log）；App Debug iphoneos 无签名 build PASS（r3-app-build.log）；Unit 首次 498 tests / 1 skipped / 2 assertion failures，修正旧版本值及“允许13项≠实际全部使用”的合同后全量重跑 PASS：498 tests / 1 skipped / 0 failures（r3-unit-tests-retry1.log / xcresult）。每次 test 前重启指定 iPhone17，alarm1200、300秒日志 watchdog、parallel-testing-enabled NO。Integration 未运行、0 tests，因停止规则未启动；新 Integration tests 只完成 parse/lint，尚无编译/runtime 证明。两个仓库 diff --check PASS。未跑 UITests、未用 ResetStore、未操作真机；未做人工视觉验证。
+5. **结果**：BLOCKED，未完成第2a步；实际 JSON 新增396 / 总542，1 retired，无用户冲突和隐藏时可见541；26个旧条目变化为21绳索+2单杠+2改名+1停用，146旧id保持。代码和测试全部未提交；specs 两个草稿未提交。证据在 `DerivedData/CX2a/evidence/r3-*`，交接 `.handoff/subagent/2026-10-19-cprime-step2a-resume3-blocked.md`。不得把 Unit PASS 当作 Integration 或最终验收完成。
+
+入口与布局清单：动作库筛选 sheet → `FCFilterChip` → `FCAccessibilityID.exerciseLibraryEquipment(equipment)`（`Features/ExerciseLibrary/ExerciseLibraryView.swift:251`）→ 只改筛选状态、器械8项改13项 → `filterSheet` 的 `FCBottomSheet` 内容区 → `VStack` → `FCFlowLayout` 负责内容宽度。其余没有新入口。L3 待人工看：13项小屏换行/滚动、两个改名动作、停用项确实不可见；**未做人工视觉验证**。
+
+#### 未完成项与待裁决边界（静态证据，未做失败注入复现）
+
+- `ActiveSessionUseCases.swift:367–377,437–445`：finish/abandon 先保存结束状态，随后 best-effort 释放 Session-only claim，异常被吞掉。正常路径立即恢复，但释放失败时当前进程内置仍隐藏，直到下次 launch reap。CX-D14 的立即恢复在此失败路径尚不满足；可在续作中研究把结束状态和释放/reconcile 放同一现有 writer transaction，不能靠把异常换成 UI 失败来假装 Session 未结束。未新增 retry queue 或改数据模型。
+- `PersistenceWriter.swift:35–48`：save 成功后另做 secureStoreArtifacts，后者可能抛 `postCommitProtectionAuditFailed`；该错误发生在 rollback catch 之外，因此数据已经提交。`AppEnvironment.swift:185–193` 的 fallback 当前把所有同步异常同样处理，有旧条目就继续；这时不能保证“已整体回滚、继续旧目录”。需负责人明确：这类已提交但保护审计失败是否保留原 fail-closed 处理、作为 CX-D14 非阻断降级的例外；或者另行批准提交后恢复协议。没有把任何一个方案当成已批准，不修改全局 writer / 保护策略。
+
+### 历史状态：BLOCKED（2026-10-18 resume2：新内置名与进行中 Session-only claim 冲突）
 
 CX-D12 已记录并提交 `db33187`；清单 `e97d169`、JSON/schema `733d80d` 已提交。实际目录现为 **新增 396 / 总数 542**（含 1 条 retired，未考虑用户偏好时可见 541）；146 个旧 id 保留。旧 401 / 547 仅为历史草稿，不再适用。
 
