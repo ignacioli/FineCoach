@@ -64,13 +64,21 @@ public final class PersistenceController: @unchecked Sendable {
             protectedFileStore: ProtectedFileStore = ProtectedFileStore(),
             faultInjectionBoundary: FaultInjectionBoundary
         ) throws {
+            let auditState = PostCommitProtectionAuditState()
             try self.init(
                 storeURL: storeURL,
                 model: model,
                 inMemory: inMemory,
                 protectedFileStore: protectedFileStore,
                 writerPreSaveCheck: {
+                    auditState.beginTransaction()
                     try faultInjectionBoundary.check(.persistenceWriterSave)
+                },
+                writerProtectionAuditCheck: {
+                    guard auditState.isPostCommitAudit else {
+                        return
+                    }
+                    try faultInjectionBoundary.check(.postCommitProtectionAudit)
                 }
             )
         }
@@ -81,7 +89,8 @@ public final class PersistenceController: @unchecked Sendable {
         model: NSManagedObjectModel?,
         inMemory: Bool,
         protectedFileStore: ProtectedFileStore,
-        writerPreSaveCheck: @escaping @Sendable () throws -> Void
+        writerPreSaveCheck: @escaping @Sendable () throws -> Void,
+        writerProtectionAuditCheck: @escaping @Sendable () throws -> Void = {}
     ) throws {
         let usedBundledModel = model == nil
         let resolvedModel = try model ?? Self.loadBundledModel()
@@ -193,6 +202,7 @@ public final class PersistenceController: @unchecked Sendable {
                     return
                 }
                 _ = try protectedFileStore.secureSQLiteStoreArtifacts(at: storeURL)
+                try writerProtectionAuditCheck()
             },
             preSaveCheck: writerPreSaveCheck
         )
@@ -300,3 +310,33 @@ public final class PersistenceController: @unchecked Sendable {
         }
     #endif
 }
+
+#if DEBUG
+    private final class PostCommitProtectionAuditState: @unchecked Sendable {
+        private let lock = NSLock()
+        private var secureArtifactAudits = 0
+        private var transactionInProgress = false
+
+        var isPostCommitAudit: Bool {
+            lock.lock()
+            defer { lock.unlock() }
+            guard transactionInProgress else {
+                return false
+            }
+            secureArtifactAudits += 1
+            if secureArtifactAudits == 2 {
+                transactionInProgress = false
+                secureArtifactAudits = 0
+                return true
+            }
+            return false
+        }
+
+        func beginTransaction() {
+            lock.lock()
+            secureArtifactAudits = 0
+            transactionInProgress = true
+            lock.unlock()
+        }
+    }
+#endif

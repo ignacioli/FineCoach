@@ -19,6 +19,7 @@ public final class AppEnvironment: ObservableObject {
     public private(set) var archiveExportUseCases: ArchiveExportUseCases?
     public let startupErrorDescription: String?
     @Published public private(set) var catalogUnavailableMessage: String?
+    public private(set) var catalogSyncFailed = false
     private var studentRepository: CoreDataStudentRepository?
     private var sessionRepository: CoreDataSessionRepository?
     private var reportsRootURL: URL?
@@ -172,18 +173,33 @@ public final class AppEnvironment: ObservableObject {
         return backupCoordinator
     }
 
-    /// Seeds the built-in exercise catalog once local storage is open.
+    /// Synchronizes the built-in exercise catalog after local storage is open.
     /// Call from `RootNavigation.loadInitialState` alongside onboarding load; do not call from `init`.
     func prepareExerciseCatalog() async {
         guard let exerciseUseCases else {
             return
         }
+        await prepareExerciseCatalog(using: exerciseUseCases)
+    }
+
+    func prepareExerciseCatalog(using exerciseUseCases: ExerciseLibraryUseCases) async {
         do {
             try await exerciseUseCases.seedIfNeeded()
+            catalogSyncFailed = false
             catalogUnavailableMessage = nil
         } catch {
-            catalogUnavailableMessage =
-                (error as? LocalizedError)?.errorDescription ?? String(localized: "exercise.catalog.unavailable")
+            catalogSyncFailed = true
+            if let writerError = error as? PersistenceWriterError,
+                writerError == .postCommitProtectionAuditFailed
+            {
+                // The write may already be durable, but the protection audit
+                // failed after commit. Keep the catalog fail-closed until a
+                // later startup can prove the storage protection again.
+                catalogUnavailableMessage = String(localized: "exercise.catalog.unavailable")
+                return
+            }
+            let hasPreviousCatalog = (try? await exerciseUseCases.hasBuiltInCatalog()) == true
+            catalogUnavailableMessage = hasPreviousCatalog ? nil : String(localized: "exercise.catalog.unavailable")
         }
     }
 

@@ -15,6 +15,10 @@ public struct ExerciseLibraryUseCases: Sendable {
         try await repository.seedPlaceholderCatalogIfNeeded(now: clock.nowUTC())
     }
 
+    public func hasBuiltInCatalog() async throws -> Bool {
+        try await repository.hasBuiltInCatalog()
+    }
+
     public func search(query: String, includeHidden: Bool = false) async throws -> [ExerciseLibraryEntry] {
         try await repository.searchActive(query: query, includeHidden: includeHidden)
     }

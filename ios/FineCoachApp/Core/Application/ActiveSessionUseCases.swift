@@ -187,11 +187,7 @@ public struct ActiveSessionUseCases: Sendable {
                 now: clock.nowUTC()
             )
         }
-        try await exerciseRepository.reapSessionScopeClaims(
-            keepingOwnerIDs: Set(
-                session.exercises.filter { $0.sourceKind == .sessionOnly }.map { $0.id.rawValue.uuidString }
-            )
-        )
+        try await reconcileSessionScopeClaims(for: session)
         return session
     }
 
@@ -359,6 +355,7 @@ public struct ActiveSessionUseCases: Sendable {
             }
         }
         let saved = try await coordinator.persist(updated)
+        try await reconcileSessionScopeClaims(for: saved)
         try await sectionRepository.delete(id: sectionID)
         return saved
     }
@@ -369,15 +366,25 @@ public struct ActiveSessionUseCases: Sendable {
 
     public func finish() async throws -> Session {
         try await coordinator.ensureProjectionReadyForCompletion()
-        let session = try await mutate { try $0.finished(now: clock.nowUTC()) }
-        await releaseSessionScopeClaimsBestEffort()
-        return session
+        guard let current = try await coordinator.workingCopy() else {
+            throw DomainError.notFound
+        }
+        let finished = try await coordinator.persistAndReleaseSessionScopeClaims(
+            try current.finished(now: clock.nowUTC())
+        )
+        await reconcileSessionScopeClaimsBestEffort(for: finished)
+        return finished
     }
 
     public func abandonEmpty() async throws -> Session {
-        let session = try await mutate { try $0.abandoned(now: clock.nowUTC()) }
-        await releaseSessionScopeClaimsBestEffort()
-        return session
+        guard let current = try await coordinator.workingCopy() else {
+            throw DomainError.notFound
+        }
+        let abandoned = try await coordinator.persistAndReleaseSessionScopeClaims(
+            try current.abandoned(now: clock.nowUTC())
+        )
+        await reconcileSessionScopeClaimsBestEffort(for: abandoned)
+        return abandoned
     }
 
     private func mutate(_ transform: (Session) throws -> Session) async throws -> Session {
@@ -399,12 +406,32 @@ public struct ActiveSessionUseCases: Sendable {
         case .replay(let snapshot):
             session = snapshot.session
         }
-        let keepIDs = Set(
-            (session?.exercises ?? [])
-                .filter { $0.sourceKind == .sessionOnly }
-                .map { $0.id.rawValue.uuidString }
-        )
+        try await reconcileSessionScopeClaims(for: session)
+    }
+
+    /// Drops claims for removed session-only exercises and restores any
+    /// shadowed built-in names in the same persistence transaction.
+    private func reconcileSessionScopeClaims(for session: Session?) async throws {
+        let keepIDs: Set<String>
+        if session?.state == .inProgress {
+            keepIDs = Set(
+                (session?.exercises ?? [])
+                    .filter { $0.sourceKind == .sessionOnly }
+                    .map { $0.id.rawValue.uuidString }
+            )
+        } else {
+            keepIDs = []
+        }
         try await exerciseRepository.reapSessionScopeClaims(keepingOwnerIDs: keepIDs)
+    }
+
+    private func reconcileSessionScopeClaimsBestEffort(for session: Session) async {
+        do {
+            try await reconcileSessionScopeClaims(for: session)
+        } catch {
+            // Terminal session durability is already committed. Launch
+            // recovery retries this derived catalog reconciliation later.
+        }
     }
 
     private func workingCopyContainsExercise(id: StableUUID) async -> Bool {
@@ -431,13 +458,6 @@ public struct ActiveSessionUseCases: Sendable {
         }
     }
 
-    private func releaseSessionScopeClaimsBestEffort() async {
-        do {
-            try await exerciseRepository.releaseSessionScopeClaims()
-        } catch {
-            return
-        }
-    }
 }
 
 /// Library flags read by the set entry (P0-D8).

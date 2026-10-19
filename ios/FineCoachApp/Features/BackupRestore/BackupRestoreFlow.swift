@@ -78,6 +78,11 @@ final class BackupRestoreFlowViewModel: ObservableObject {
                 BackupRestoreRequest(password: imported, sourceFileURL: sourceURL)
             )
             try environment.reloadAfterCommittedRestore()
+            // The restored generation is verified and opened before the
+            // current catalog comparison. The restore result is reported
+            // separately from catalogUnavailableMessage if this follow-up
+            // sync cannot complete; the next launch retries the same path.
+            await environment.prepareExerciseCatalog()
             succeeded = true
             password = ""
         } catch {
