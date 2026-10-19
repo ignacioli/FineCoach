@@ -61,7 +61,17 @@
 
 ## 第 2a 步执行记录
 
-### 最新状态：BLOCKED（2026-10-19 resume3：提交后保护审计失败边界待裁决）
+### 最新状态：BLOCKED（2026-10-19 resume4：Integration 编译连续失败，重试额度已用完）
+
+1. **分类和依据**：D，按已批准目录和 CX-D9 / D10 / D12 / D14 / D15 修正实现，目标 anatomy 与样式不变；已阅读 `33-exercise-filter-sheet.png`、README §7.1 / 筛选规则和 `components.md` 的 `DS-CHIP` / `DS-EQUIPMENT-ICON`。只复用既有组件与图标，不修改 Penpot、README、components.md、icons 或 Assets；CX-D15 映射是本轮明确批准例外。
+2. **影响范围**：初始 `feat/catalog-expansion@adfc8c6` 的 16 tracked 修改、3 指定 untracked 项与交接一致，无 staged；bootstrap 与 gate PASS。保留并完成既有代码、V6、测试和 fixture 草稿，digest 不提交。specs 唯一写入目标为独立 `feat/finecoach-catalog-cx2a` 的 `FineCoach/001-m1-a-core-session/{spec,data-model}.md`，没有写共享 main。实现由 `ios-swiftui-dev` 负责，`mobile-reliability-tester` 负责运行门禁，主 agent 整合与验收；未另开 privacy/security 审查。
+3. **设计决定**：CX-D15 已独立提交 `6c49fee`。`postCommitProtectionAuditFailed` 保持 `catalogUnavailableMessage` 拦截，其他已回滚同步失败按 CX-D14 使用旧目录，首次安装无目录仍不可用；未改 `PersistenceWriter`。finish / abandon 与临时 claim 释放同 writer transaction，terminal retry / replay 同样释放；之后内置 claim reconcile 尽力执行，失败不影响训练结束，下次启动 reap / seed 补上。删除动作或分组、Custom 改名或归档释放占用后立即 reconcile；普通临时新建遇已有内置名称仍 conflict。备份 generation 验证并 reload 后立即同步。两条哈克机只改器械，名字和 id 不变；其他图标映射保持（既有 CX-D9 绳索映射草稿一起完成）。
+4. **实施与检查**：build_candidates / write_catalog 最终各离线双跑，输出逐字节一致，`r4-determinism.json`；JSON 相对本轮初始只修改两条哈克机器械字段。固定 146 fixture 与 `96b385f` 原文件逐字节一致；全部旧 id 保留；XML 对比确认 V6 只新增 optional Bool isRetired default false（另有模型版本标识变化）。最终 strict lint PASS；App build 首轮 FAIL（缺 return），保留 `r4-app-build.log`，一次定向修复后 PASS（`r4-app-build-retry1.log`）。Integration 首轮因测试引用不存在的 activeRecoveryURL 编译 FAIL，retry1 因迁移测试隐式捕获 non-Sendable XCTest self 编译 FAIL，均为 0 tests；保留 `r4-integration-tests{,-retry1}.log/.xcresult`，分别定向修复后 retry2 仍编译 FAIL：`BackupRoundTripTests.swift:31–32` 的 `@MainActor` 测试调用 nonisolated async 实例 helper `seedLegacyCatalog` / `exportInventory`，Swift 6 报 `sending self risks causing data races`（`r4-integration-tests-retry2.log/.xcresult`）。三次均 0 tests executed；编译失败的两次重试已用完，按任务说明停止，未修复这最后一组诊断。Unit 未启动，0 tests；不能沿用 r3 Unit PASS 作为本轮结果。最后两轮测试修正后的全仓 strict lint 由实施子 agent 复跑 PASS（未另写 final2/final3 日志）；已落盘 `r4-swift-format-lint-final.log` 对应之前的全仓 PASS。未运行 UITests、ResetStore 或真机；未做人工视觉验证。
+5. **结果**：BLOCKED，未完成第 2a 步。四道闸门为 lint PASS、App build PASS、Integration FAIL（编译失败 / 0 tests）、Unit NOT RUN（0 tests）；CX-D14 / D15 与新增路径校验已实施为草稿，但没有本轮 Integration / Unit runtime 验证，不能声明完成。除批准决定和本 BLOCKED 文档外，不提交代码、测试、数据或 specs；所有草稿保留。目录新增 **396 / 总数 542**（1 retired，无用户冲突或隐藏时可见 541）；146 旧 id 保持。器械条数：杠铃75、哑铃88、固定器械76、史密斯机23、绳索59、哈克机2、壶铃4、徒手118、悍马机24、弹力带53、悬挂带7、单杠9、其他4。28 个旧条目变化为21绳索 + 2单杠 + 2哈克机 + 2改名 + 1停用。所有日志 / xcresult 置于 `DerivedData/CX2a/evidence/r4-*`；最终外部审查和 L3 仍待进行。
+
+入口与布局清单：动作库筛选 sheet → 可见 `FCFilterChip` → `FCAccessibilityID.exerciseLibraryEquipment(equipment)`（`Features/ExerciseLibrary/ExerciseLibraryView.swift:251`）→ 只改变筛选条件、器械 8 项变 13 项 → `filterSheet` 的 `FCBottomSheet` 内容区 → `VStack` → `FCFlowLayout` 负责内容宽度；未增加其他入口或控件。L3 待人工看：13 项小屏换行/滚动、两个改名动作、停用项不可见；**未做人工视觉验证**。这是 2a 实现门禁记录，不代替人工审查、视觉或 milestone 接受。
+
+### 历史状态：BLOCKED（2026-10-19 resume3：提交后保护审计失败边界待裁决）
 
 1. **分类和依据**：目录数据与领域层修订；`DS-CHIP` / `DS-EQUIPMENT-ICON` 复用，目标 anatomy、视觉样式不变，按 CX-D1–D12 / D14 更新数据及绳索映射；已读批准画稿 33、README §7.1 / §8、components 对应 anatomy；没有新的组件设计，不改 Penpot、README、components.md。
 2. **范围**：初始状态与 resume3 严格一致，13 tracked draft、2 指定 untracked 项，无 staged；bootstrap / gate PASS。本轮新增 startup fallback、Session-only 动态隐藏与释放后 reconcile、新增路径 selectable 校验、固定 146 baseline fixture 及测试。既有半成品保留；specs 独立 topic 仅 spec/data-model 两个草稿，未提交；不写共享 main。唯一模型变动仍是 V6 的 optional isRetired，未改 V1–V5 / pbxproj。
