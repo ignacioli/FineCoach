@@ -55,6 +55,14 @@ public final class ActiveSessionCoordinator: @unchecked Sendable {
         }
     }
 
+    /// Persists a terminal Session and releases its temporary exercise-name
+    /// claims in one Core Data writer transaction.
+    public func persistAndReleaseSessionScopeClaims(_ session: Session) async throws -> Session {
+        try await persistGate.run {
+            try await self.persistUnlocked(session, releaseSessionScopeClaims: true)
+        }
+    }
+
     public func retry() async throws -> Session {
         try await persistGate.run {
             let snapshot = try self.recoveryStore.load()
@@ -166,7 +174,7 @@ public final class ActiveSessionCoordinator: @unchecked Sendable {
         }
     }
 
-    private func persistUnlocked(_ session: Session) async throws -> Session {
+    private func persistUnlocked(_ session: Session, releaseSessionScopeClaims: Bool = false) async throws -> Session {
         setStatus(.saving)
         let snapshot: ActiveSessionRecoverySnapshot
         do {
@@ -189,7 +197,12 @@ public final class ActiveSessionCoordinator: @unchecked Sendable {
         }
 
         do {
-            let saved = try await sessionRepository.save(session)
+            let saved: Session
+            if releaseSessionScopeClaims || session.state != .inProgress {
+                saved = try await sessionRepository.saveAndReleaseSessionScopeClaims(session)
+            } else {
+                saved = try await sessionRepository.save(session)
+            }
             setPending(nil)
             setStatus(.saved(revision: saved.revision))
             if saved.state != .inProgress {

@@ -4,6 +4,7 @@
     public enum FaultInjectionPoint: String, CaseIterable, Codable, Sendable {
         case recoverySnapshotReplace
         case persistenceWriterSave
+        case postCommitProtectionAudit
         case generationMetadataWrite
         case currentPointerReplace
         case archiveStoreAfterGenerationWritten = "archive.store.afterGenerationWritten"

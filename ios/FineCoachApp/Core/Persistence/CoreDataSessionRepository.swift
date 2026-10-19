@@ -38,6 +38,22 @@ public struct CoreDataSessionRepository: Sendable {
         }
     }
 
+    /// Atomically persists a terminal Session and releases all current-session
+    /// exercise-name claims. Built-in claim reconciliation follows as a
+    /// best-effort operation in the application layer.
+    public func saveAndReleaseSessionScopeClaims(_ session: Session) async throws -> Session {
+        guard session.state != .inProgress else {
+            throw DomainError.invalidState
+        }
+        return try await writer.transaction { context in
+            let saved = try SessionManagedObjectMapping.upsertAggregate(session, in: context)
+            for claim in try ExerciseManagedObjectMapping.fetchClaims(scope: .currentSession, in: context) {
+                context.delete(claim)
+            }
+            return saved
+        }
+    }
+
     // MARK: - Credit settlement note (coach-only; see SessionCreditSettlementNote)
 
     public func recordCreditSettlementNote(_ note: SessionCreditSettlementNote, sessionID: StableUUID) async throws {
