@@ -94,6 +94,9 @@ public struct PlaceholderCatalogExercise: Hashable, Codable, Sendable {
     public var secondaryMuscleGroups: [String]?
     /// P0-D8: trained one side at a time by default. Absent means `false`.
     public var unilateral: Bool?
+    /// A removed built-in remains addressable by stable id but is hidden from
+    /// browse and picker queries. Absent means active for older manifests.
+    public var retired: Bool?
 
     public init(
         id: String,
@@ -103,7 +106,8 @@ public struct PlaceholderCatalogExercise: Hashable, Codable, Sendable {
         primaryMuscleGroup: String? = nil,
         equipmentClass: String? = nil,
         secondaryMuscleGroups: [String]? = nil,
-        unilateral: Bool? = nil
+        unilateral: Bool? = nil,
+        retired: Bool? = nil
     ) {
         self.secondaryMuscleGroups = secondaryMuscleGroups
         self.unilateral = unilateral
@@ -113,6 +117,7 @@ public struct PlaceholderCatalogExercise: Hashable, Codable, Sendable {
         self.provenanceRef = provenanceRef
         self.primaryMuscleGroup = primaryMuscleGroup
         self.equipmentClass = equipmentClass
+        self.retired = retired
     }
 }
 

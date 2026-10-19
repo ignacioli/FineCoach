@@ -33,9 +33,10 @@ public enum FCEquipmentIcon: String, CaseIterable, Sendable {
         case "杠铃": return .barbell
         case "哑铃": return .dumbbell
         case "徒手": return .bodyweight
-        case "龙门架": return .cableCrossover
+        case "绳索": return .cableCrossover
         case "史密斯机": return .smithMachine
         case "壶铃": return .kettlebell
+        case "哈克机": return .hackSquat
         case "固定器械":
             switch primaryMuscleGroup {
             case "胸": return .pecDeck
