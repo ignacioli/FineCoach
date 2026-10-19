@@ -1,8 +1,8 @@
 # FineCoach 评分优化：总蓝图
 
 > 这是 finecoach-scoring-optimization 这条主线的**唯一总览**。人和各个 AI 工具开工前先看这里，弄清现在在哪、下一步是什么、谁来做。
-> 细节以各自的权威文件为准：评分方法见 [`11d-experience-scorecard.md`](11d-experience-scorecard.md)，P0 决定见 [`experience-p0/implementation-map.md`](experience-p0/implementation-map.md)，阶段 B 决定见 [`experience-t2/decisions.md`](experience-t2/decisions.md)，C′ 决定见 `design/catalog-expansion/decisions.md`（在 `feat/catalog-expansion` 分支上）。
-> 最后更新：2026-10-18（B3 合并、C′ 第 1 步交回之后）。每个阶段收尾时更新本文件的「状态」「决定队列」两节。
+> 细节以各自的权威文件为准：评分方法见 [`11d-experience-scorecard.md`](11d-experience-scorecard.md)，P0 决定见 [`experience-p0/implementation-map.md`](experience-p0/implementation-map.md)，阶段 B 决定见 [`experience-t2/decisions.md`](experience-t2/decisions.md)，C′ 决定见 [`catalog-expansion/decisions.md`](catalog-expansion/decisions.md)。
+> 最后更新：2026-10-19（C′ 第 2a 步合并、第 2b 步设计稿通过之后）。每个阶段收尾时更新本文件的「状态」「决定队列」两节。
 
 ## 1. 目标和怎么算赢
 
@@ -23,7 +23,7 @@
 | B3 | T1 称呼和语气（Δ11）：不用「您」和「请」，不用「操作失败」，不用语气词，并加扫描测试 | 11 | ✅ 已合并；**还没人看过**；Penpot 已回填，10 张画板的 PNG 待负责人 2x 导出 | 合并提交 `363beff`；对照表和 Penpot 回填记录在 `experience-t2/implementation-map.md` 的 B3 一节 |
 | Δ12 | 键盘弹起时，休息条盖住「确认」按钮 | 1、2 | ✅ 已合并（B-D9）；**还没人看过**，也没在 UI 测试里跑到 | 合并提交 `5bd6774`（`237078d`）；Codex gpt-6.1-sol 做 |
 | C | T3 对标素材库：训记、Too、Hevy、Todoist 的关键画面放进 Penpot 并标注 | 11、6 | ⏳ 没开始 | 等负责人截图，并确认「dotolist」就是 Todoist |
-| C′ | 动作库扩充：146 条扩到约 550 条 | 5（间接） | 🔄 第 1 步已审，2026-10-18 负责人批准决定单，另定 CX-D9（龙门架改绳索，名字不动）。**第 2a 步**（数据写入）：Codex 按规定停在「已安装用户拿不到新目录」；负责人已批准 CX-D10（每次启动按 id 原位同步，V6 加已停用属性）和 CX-D11（和自定义动作重名时自定义优先，内置隐藏，改名后恢复），续作提示词就绪，待启动。**第 2b 步**：负责人定为画 3 个新器械图标，并加「最近练过」分组；DeepSeek 设计稿提示词就绪，待启动 | `feat/catalog-expansion`；`.handoff/prompt/2026-10-18-cprime-step2a-resume-prompt.md`；`.handoff/prompt/2026-10-18-cprime-step2b-design-deepseek-prompt.md`；`.handoff/subagent/2026-10-18-cprime-step2a-blocked.md` |
+| C′ | 动作库扩充：146 条扩到约 550 条 | 5（间接） | 🔄 **第 2a 步已合并**（2026-10-19，main `e5c65d0`；specs `5b687ea`）：新增 396 条，共 542 条（1 条停用），13 个器械都有动作；每次启动按 id 原位同步，Core Data V6 加 `isRetired`；重名规则 CX-D11/D14，保护审计例外与哈克机归类 CX-D15。闸门：lint、build、Unit 498（1 skipped）、Integration 185，0 失败；**还没人看过界面**。**第 2b 步**：DeepSeek 设计稿 2026-10-19 负责人验收（`design/cprime-2b-boards` `8172c8c`，未合并）：3 个新图标、4 个重画、绳索换稿、「最近练过」分组；壶铃实心为 README §7.1 例外（CX-D13）。实现提示词待写 | `design/catalog-expansion/decisions.md`；`.handoff/2026-10-18-cprime-step1-owner-decisions.md`；`.handoff/subagent/2026-10-19-cprime-step2a-finish.md`；`.handoff/subagent/2026-10-18-cprime-2b-design-handoff.md` |
 | 维度 5 | 拼音或首字母搜索，常用动作和最近练过的动作排前面 | 5 | 🔄 已并入 C′ 第 2b 步 | 见 C′ 行 |
 | D | P1 收获感：破纪录当场提示、课程总结写出进步、里程碑 | 6、4、9 | ⏳ 要先写 spec | 先定规则：什么算个人最佳、有哪些里程碑 |
 | E | P2 洞察：进步停滞、课包快用完、学员很久没约课 | 7 | ⏳ 要先写 spec | 先定展示哪些洞察 |
@@ -38,7 +38,7 @@
 | 泳道 | 内容（按顺序） | 写入方 | 和别的泳道冲不冲突 |
 |---|---|---|---|
 | 1 交互和文案（热点） | ~~Δ12~~、~~B3~~ 已合并 →（挂起）B1 第 5 项 UI 测试调查 → D | 一次只派一个工具 | 训练页等 Feature 页面现在空闲；C′ 第 2 步要改动作库页面，开工时这条泳道不要再派动作库相关改动 |
-| 2 动作库数据 | C′ 第 1 步候选清单 → 负责人审核 → 第 2 步：写入、「已停用」标记、新器械图标和筛选、维度 5 的搜索和排序、001 spec C-009 | DeepSeek、OpenCode 或 Cursor | 改 `ExerciseCatalog`、动作库页面和 Core 层，和泳道 1 基本不重叠；第 2 步开工前先确认泳道 1 没在改动作库页面 |
+| 2 动作库数据 | ~~C′ 第 1 步~~、~~第 2a 步（写入、停用标记、同步、13 项器械、C-009）~~ 已合并 → 第 2b 步实现：新图标整合、「最近练过」、维度 5 的搜索和排序 | DeepSeek、OpenCode 或 Cursor | 改 `ExerciseCatalog`、动作库页面和 Core 层，和泳道 1 基本不重叠；第 2 步开工前先确认泳道 1 没在改动作库页面 |
 | 3 负责人 | 真机重签 → 集中走查 → 真人评分 → 素材截图 | 产品负责人 | 不改代码 |
 | 4 spec | D、E、F 的 spec 写在私有 specs 仓：spec → clarify → plan → tasks | Claude 起草，负责人拍板 | 只改 specs 仓，可以随时并行 |
 
@@ -75,19 +75,18 @@ D 等 B3 合并之后再开工（都要改训练页和课程总结），也要�
 
 1. ~~真机签名~~：2026-10-17 已用 main `a81a9dd` 重签并覆盖安装（覆盖安装会保留数据，还没打开 App 核实），新签名到 **2026-10-25 10:45（北京时间）**。下次在这之前重签。
 2. ~~Δ12 修法~~：2026-10-17 定为 B-D9，同日实现并合并（`5bd6774`）。
-3. **集中走查加真人评分**。A、B 两个阶段做完了，还没有人看过。这次要看的是：`FCUndoRow`、`FCMoreMenu`、删组和删测量的撤销、指标页底部两行、5 个共享确认框、状态栏遮盖。看完按标准任务打分。
-4. ~~C′ 候选清单审核~~：2026-10-18 批准，建议全部采纳；另定 CX-D9。
+3. **集中走查加真人评分**。A、B 两个阶段和 C′ 第 2a 步做完了，还没有人看过。这次要看的是：`FCUndoRow`、`FCMoreMenu`、删组和删测量的撤销、指标页底部两行、5 个共享确认框、状态栏遮盖；动作库 13 项器械筛选在小屏上的换行、两个改名动作、停用动作不出现。看完按标准任务打分。
+4. ~~C′ 候选清单审核~~：2026-10-18 批准，建议全部采纳；另定 CX-D9。之后 CX-D10 到 CX-D15 也已裁决（见决定单）。
 5. **T3 素材**：4 个 App 的截图，以及确认「dotolist」就是 Todoist。
 6. **D 的规则**：什么算个人最佳、有哪些里程碑、要不要进分享报告（身体数据永远不进）。
 7. **F 的隐私规则**：锁屏和通知里能显示什么。
 8. **push 到 GitHub**：本地 `main` 比 `origin/main` 超前约 70 个提交，仓库是公开的。
-9. **清理 worktree**：下面这些分支已经合并，可以删掉对应的 worktree：`finecoach-experience-p0-ui`、`finecoach-scoring-optimization-77676e`、`docs-shared-project-rules`、`t2-interaction-audit`、`b2-interaction-changes`、`compassionate-gauss-735bc6`（Sonnet 整理会话留下的，内容已过时）、`d12-rest-bar-keyboard`、`b3-copy-tone`。`b1-interaction-convergence` 里没提交的 UI 草稿已经被 `23eceb9` 吸收，负责人确认后可以一起删。
+9. ~~清理 worktree~~：2026-10-18 已删除已合并的 worktree 和分支；B1 未提交草稿备份在 `wip/b1-ui-test-draft`。
 
 ## 7. 接下来三步
 
 1. 负责人：
-   - 启动两个任务：Codex 做第 2a 步续作（会改 Core Data 模型，同一时间只能有它一个写入方），DeepSeek 做第 2b 步设计稿（只改设计文件，和 Codex 不冲突）；
-   - 做一次集中走查，打第一次真人分；
+   - 做一次集中走查，打第一次真人分（含动作库新内容）；
    - 在 Penpot 里批量 2x 导出 B3 改过的 10 张画板。
-2. Claude：审 Codex 的第 2a 步结果，审 DeepSeek 的图标和画稿，再交给负责人；画稿通过后，写第 2b 步的实现提示词，内容是新图标、「最近练过」分组和拼音搜索。可以并行起草 D 的 spec。
-3. 其他 agent：第 2b 步实现，要等第 2a 步合并以后再做，两步改的是同一批动作库文件。
+2. Claude：写第 2b 步实现提示词（图标整合进 `FCEquipmentIcon`、Assets、`IconConsistencyTests`、README §7.1 含壶铃例外、components.md、Penpot board 17；「最近练过」分组；拼音和首字母搜索），连同合并 `design/cprime-2b-boards` 一起做。可以并行起草 D 的 spec。
+3. 其他 agent：第 2b 步实现（2a 已合并，可以开工）。
