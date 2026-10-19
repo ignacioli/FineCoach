@@ -61,7 +61,17 @@
 
 ## 第 2a 步执行记录
 
-### 最新状态：BLOCKED（2026-10-19 resume4：Integration 编译连续失败，重试额度已用完）
+### 最新状态：实现闸门 PASS，待审查（2026-10-19 r5 收尾）
+
+1. **分类和依据**：沿用 D 类实现对齐，复用既有 `DS-CHIP` / `DS-EQUIPMENT-ICON` anatomy；依据已批准 CX-D4 / D9–D12 / D14 / D15，不新增设计或产品决定。本轮未改产品代码、目录数据、模型、工程设置、icons、Assets、Penpot、README 或 components.md；仅完成测试修复、运行闸门和提交既有草稿。未做人工视觉验证。
+2. **影响范围**：初始 `feat/catalog-expansion@1a85142` 的 23 个 tracked 修改、3 个指定 untracked 项及 specs 两个草稿与交接完全一致，无 staged；两个 topic worktree 审计 PASS，全部草稿保留。`ios-swiftui-dev` 修测试编译，`mobile-reliability-tester` 执行测试闸门并修测试 fixture，主 agent 核对 specs、分组提交与整合；未另开审查 agent。`external-taxonomy-digest.md` 保持 untracked、不提交。
+3. **设计决定**：批准规则保持不变：稳定 id 原位同步，Custom / Session-only 升级重名优先、内置动态隐藏，释放占用后恢复；已有目录提交前失败回滚并降级，保存后保护审计失败仍拦截；finish / abandon 与 claim 释放同事务、随后尽力同步；新增路径重新校验可选性。目录仍为新增 396 / 总数 542（1 retired，默认可见 541），13 器械都有动作，旧 146 id 保留。
+4. **实施与检查**：测试编译 `build-for-testing` PASS（`DerivedData/CX2a/evidence/r5-build-for-testing{,-retry1,-retry2,-retry3}.log`）；备份测试改为不捕获 XCTest self 的静态 helper，并提供 `@MainActor` export helper。Unit 全量 PASS：498 tests、1 skipped、0 failures（`r5-unit-tests.log/.xcresult`）。Integration 首轮 185 tests / 1 failure：升级保留测试的 weightReps fixture 缺重量；失败单跑复现且结束阶段 wrapper 到 240 秒退出 142，保留 `r5-integration-failure-single.log` 和未完成的 `.xcresult` 目录（不是有效 result bundle）；第一次测试修复补 40 kg 后暴露全部目录 ID 期望遗漏该测试自建 Custom（`r5-integration-fixed-single.log/.xcresult`），第二次修复改为精确 543 条及完整 ID 集合，保留全部业务断言，单条 PASS（`r5-integration-fixed-single2.log/.xcresult`）。最终 Integration 全量 PASS：185 tests、0 skipped、0 failures（`r5-integration-tests-final.log/.xcresult`）；同条测试共修 2 次。每次测试前重启指定 EFE2D5A0 iPhone 17，单条 alarm240、全量 alarm1200；主 agent 人工查看日志，本轮未实施自动 300 秒停滞 watchdog，各次运行均在 300 秒内结束或被硬时限终止。命令和退出状态详见 `r5-runtime-status.md`。最终全仓 strict lint PASS（`r5-swift-format-lint-final.log`）；本轮未改产品代码，App Debug build 沿用 `r4-app-build-retry1.log` PASS。测试 agent 额外执行的 Release build / production test-hook exclusion 均 PASS（`r5-app-release-build.log`、`r5-production-test-hook-exclusion.log`），不替代指定四闸门。两个仓库 diff --check PASS；未跑 UITests、真机或 ResetStore。
+5. **结果与提交**：四道实现闸门 PASS，交由 Claude 审查，L3 与 milestone 接受仍待进行；无新增 BLOCKED 或待决产品问题。产品分组提交：`81a0a72` 模型与映射、`e11d2e2` 目录数据与器械映射、`3f8531d` 同步与占用规则、`807629a` 新增路径校验、`76120d5` 测试与 fixture；specs 独立 topic 提交 `33805f9`（仅 `spec.md` / `data-model.md`，与实现核对一致）。本执行记录独立提交，提交号及最终状态见 `.handoff/subagent/2026-10-19-cprime-step2a-finish.md`。未 push、未合并 main。
+
+入口与布局清单：动作库筛选 sheet → 可见 `FCFilterChip` → `FCAccessibilityID.exerciseLibraryEquipment(equipment)`（`Features/ExerciseLibrary/ExerciseLibraryView.swift:251`）→ 只改变筛选条件、器械 8 项变 13 项 → `filterSheet` 的 `FCBottomSheet` 内容区 → `VStack` → `FCFlowLayout` 负责内容宽度；未增加其他入口或控件。L3 待人工看：13 项小屏换行/滚动、两个改名动作、停用项不可见；**未做人工视觉验证**。
+
+### 历史状态：BLOCKED（2026-10-19 resume4：Integration 编译连续失败，重试额度已用完）
 
 1. **分类和依据**：D，按已批准目录和 CX-D9 / D10 / D12 / D14 / D15 修正实现，目标 anatomy 与样式不变；已阅读 `33-exercise-filter-sheet.png`、README §7.1 / 筛选规则和 `components.md` 的 `DS-CHIP` / `DS-EQUIPMENT-ICON`。只复用既有组件与图标，不修改 Penpot、README、components.md、icons 或 Assets；CX-D15 映射是本轮明确批准例外。
 2. **影响范围**：初始 `feat/catalog-expansion@adfc8c6` 的 16 tracked 修改、3 指定 untracked 项与交接一致，无 staged；bootstrap 与 gate PASS。保留并完成既有代码、V6、测试和 fixture 草稿，digest 不提交。specs 唯一写入目标为独立 `feat/finecoach-catalog-cx2a` 的 `FineCoach/001-m1-a-core-session/{spec,data-model}.md`，没有写共享 main。实现由 `ios-swiftui-dev` 负责，`mobile-reliability-tester` 负责运行门禁，主 agent 整合与验收；未另开 privacy/security 审查。
