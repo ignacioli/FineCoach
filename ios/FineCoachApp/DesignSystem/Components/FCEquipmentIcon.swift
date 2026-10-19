@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The 18 equipment icons (§7.1; source of truth `design/m1-b-hifi/icons/`,
+/// The 21 equipment icons (§7.1; source of truth `design/m1-b-hifi/icons/`,
 /// imported as template-rendered `equipment-<rawValue>` assets).
 public enum FCEquipmentIcon: String, CaseIterable, Sendable {
     case barbell
@@ -15,6 +15,9 @@ public enum FCEquipmentIcon: String, CaseIterable, Sendable {
     case kettlebell
     case legExtension = "leg-extension"
     case pecDeck = "pec-deck"
+    case plateLoaded = "plate-loaded"
+    case suspensionTrainer = "suspension-trainer"
+    case pullUpBar = "pull-up-bar"
     case resistanceBand = "resistance-band"
     case rowingMachine = "rowing-machine"
     case shoulderPress = "shoulder-press"
@@ -37,6 +40,10 @@ public enum FCEquipmentIcon: String, CaseIterable, Sendable {
         case "史密斯机": return .smithMachine
         case "壶铃": return .kettlebell
         case "哈克机": return .hackSquat
+        case "悍马机": return .plateLoaded
+        case "悬挂带": return .suspensionTrainer
+        case "单杠": return .pullUpBar
+        case "弹力带": return .resistanceBand
         case "固定器械":
             switch primaryMuscleGroup {
             case "胸": return .pecDeck
