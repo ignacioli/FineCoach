@@ -123,6 +123,10 @@
         "unilateral": {
           "type": "boolean",
           "description": "P0-D8: trained one side at a time by default; absent means false. The coach can override it per exercise."
+        },
+        "retired": {
+          "type": "boolean",
+          "description": "CX-D4/CX-D10: retired built-ins stay addressable by stable id but are excluded from browse/search/pickers; absent means false."
         }
       }
     },

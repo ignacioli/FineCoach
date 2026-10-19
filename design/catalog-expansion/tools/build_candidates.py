@@ -12,7 +12,7 @@ Writes:
 The script is deterministic: two runs on the same inputs and cache produce a
 byte-identical review. Run from anywhere with the stdlib only:
 
-    python3 -I design/catalog-expansion/tools/build_candidates.py
+    .venv/bin/python -I design/catalog-expansion/tools/build_candidates.py
 
 Mechanical rules applied (see the task prompt, 2026-10-17):
   * equipment normalised to the 13-value CX-D1 enum (CX-D7: plate/hex/landmine -> 杠铃);
@@ -20,8 +20,8 @@ Mechanical rules applied (see the task prompt, 2026-10-17):
     is written to the note and does not change the derived part;
   * Chinese names: CX-D3 removes 单臂/单手/单腿/单边/单侧/交替/轮换 wording, prefixes
     and separators are normalised to the existing catalog style;
-  * rows already in the current catalog are matched by English name (case and
-    punctuation insensitive), wger UUID and Chinese name and are not added;
+  * rows match the fixed baseline by English name, wger UUID or Chinese name
+    with the same equipment, with explicit owner-approved merge exceptions;
   * identical (equipment, Chinese name) rows after normalisation are merged;
   * each entry records source + license (free-exercise-db Unlicense, wger CC per
     entry, finecoach-built entries use MIT under CX-D5).
@@ -486,7 +486,7 @@ BODYWEIGHT_EQUIPMENT = {"徒手", "单杠", "悬挂带", "其他"}
 
 
 def existing_equipment(current: dict) -> str:
-    """CX-D1: the catalog still stores the old 龙门架 value for cable work."""
+    """CX-D9 normalization applied to the pre-expansion baseline."""
     return "绳索" if current["equipmentClass"] == "龙门架" else current["equipmentClass"]
 
 
