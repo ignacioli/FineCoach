@@ -119,7 +119,7 @@ public struct ActiveSessionUseCases: Sendable {
     }
 
     public func addCatalogExercise(itemID: StableExerciseID) async throws -> Session {
-        let item = try await exerciseRepository.catalogItem(id: itemID)
+        let item = try await exerciseRepository.selectableCatalogItem(id: itemID)
         return try await mutate { session in
             try session.addingCatalogExercise(
                 id: StableUUID(ids.makeID()),
