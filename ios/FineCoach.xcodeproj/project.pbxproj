@@ -368,6 +368,8 @@
 		D002B /* SessionGains.swift in Sources */ = {isa = PBXBuildFile; fileRef = D002A; };
 		D003B /* SessionGainsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D003A; };
 		D004B /* ActiveSessionNewRecordTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D004A; };
+		D005B /* SessionGainsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D005A; };
+		D006B /* SessionGainsRebuildTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D006A; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -746,6 +748,8 @@
 		D002A /* SessionGains.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionGains.swift; sourceTree = "<group>"; };
 		D003A /* SessionGainsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionGainsTests.swift; sourceTree = "<group>"; };
 		D004A /* ActiveSessionNewRecordTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionNewRecordTests.swift; sourceTree = "<group>"; };
+		D005A /* SessionGainsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionGainsSectionView.swift; sourceTree = "<group>"; };
+		D006A /* SessionGainsRebuildTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionGainsRebuildTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1360,6 +1364,7 @@
 			isa = PBXGroup;
 			children = (
 				44BB25E9EB066105A853B567 /* PersonalBestRowView.swift */,
+				D005A /* SessionGainsSectionView.swift */,
 				A360 /* SessionSummaryView.swift */,
 				A361 /* HistoryListView.swift */,
 				A362 /* SessionDetailView.swift */,
@@ -1640,6 +1645,7 @@
 		A487 /* ShareReport */ = {
 			isa = PBXGroup;
 			children = (
+				D006A /* SessionGainsRebuildTests.swift */,
 				A242 /* ShareReportCardRendererTests.swift */,
 				A243 /* TempReportLifecycleTests.swift */,
 			);
@@ -2206,6 +2212,7 @@
 				B350 /* ExerciseLibraryView.swift in Sources */,
 				B351 /* ExerciseLibraryViewModel.swift in Sources */,
 				B352 /* CustomExerciseEditorView.swift in Sources */,
+				D005B /* SessionGainsSectionView.swift in Sources */,
 				B360 /* SessionSummaryView.swift in Sources */,
 				B361 /* HistoryListView.swift in Sources */,
 				B362 /* SessionDetailView.swift in Sources */,
@@ -2331,6 +2338,7 @@
 				B720 /* BodyDataPersistenceTests.swift in Sources */,
 				B236 /* RecoveryProjectionTests.swift in Sources */,
 				B239 /* ExercisePersistenceTests.swift in Sources */,
+				D006B /* SessionGainsRebuildTests.swift in Sources */,
 				B242 /* ShareReportCardRendererTests.swift in Sources */,
 				B243 /* TempReportLifecycleTests.swift in Sources */,
 				B244 /* BackupRoundTripTests.swift in Sources */,

@@ -1,6 +1,6 @@
 # 阶段 D 收获感：设计改动与实施映射
 
-> 状态：**Phase 1–3 自动门通过；D-BLOCK-01 已裁定并验证；Phase 4–6 未启动。画稿已批准（2026-10-20）。**本文是 `components.md` §6 要求的里程碑实施映射，不重复 token 数值。
+> 状态：**Phase 1–4 自动门通过；D-BLOCK-01 已裁定并验证；Phase 5–6 待完成。画稿已批准（2026-10-20）。**本文是 `components.md` §6 要求的里程碑实施映射，不重复 token 数值。
 > 行为权威：`specs/004-stage-d-progress-milestones/spec.md`（`1.0-approved`，2026-10-20）。视觉权威：`design/design-system/README.md`、`components.md`。
 > 画稿批准前，本文的组件结构只是约束草稿，不是已批准的设计。
 
@@ -108,11 +108,19 @@ Penpot 版本：`before-stage-D 2026-10-20` → `stage-D boards D-a D-a2 D-b D-b
 - 审计：8 个 tracked 修改、1 个 untracked 新测试，无 staged 内容，均为保留的 Phase 3 成果；specs 仅 tasks.md 已改，按授权继续勾选且不提交。
 - 结果：PASS。strict lint、App build、build-for-testing PASS；FineCoachTests 516 项 / 515 passed / 1 既有 skip / 0 failed；FineCoachIntegrationTests 189 / 189 passed / 0 failed，包含 measureSetConfirm 的既有性能测试。日志：`DerivedData/StageD/evidence/phase3-resume/{lint,app-build,build-for-testing,unit,integration}.log`。本次运行正常结束，无诊断残留。未经人工视觉检查，并入集中走查。
 
+### Phase 4（T016–T021）
+
+- 范围：已批准的 B 类 D-b 页面组合；复用 DS-SECTION、DS-LIST-ROW、PersonalBestRowView。仅本节收获调用允许纪录数值换行，历史既有行保持单行。总结、详情均使用 SessionGains，档案查看页独立且不改。详情将 card 的 summary block 拆到收获之后以保留备注顺序。
+- 设计差异：总结统计/重点后原先直接是备注 → 插入空则隐藏的只读收获；详情 card 备注前插入同一区块；保留全部原有操作和文字读写。D-a～D-c2 本地没有导出 PNG，按任务已确认的 Penpot 批准及 §2 anatomy 实现；读取了既有 29、35 画稿，不新增设计决定。未经人工视觉检查。
+
+- 结果：PASS。strict lint 无输出、App build BUILD SUCCEEDED、build-for-testing TEST BUILD SUCCEEDED；FineCoachTests 516 项 / 515 passed / 1 既有 skip / 0 failed；FineCoachIntegrationTests 190 / 190 passed / 0 failed。日志：`DerivedData/StageD/evidence/phase4/{lint,app-build,build-for-testing,unit,integration}.log`。本轮确认全部代码修改早于证据运行，复用既有证据，无重跑。§5 总结页、详情页两行已对应真实代码。未经人工视觉检查。
+
 ## 5. 入口与布局清单（`components.md` §1.4，实施时填写）
 
 每条新交互一行：画面 → 控件 → accessibility identifier → 是否改数据 → 宽度由谁撑满。每行必须指向真实代码。
 
 | 画面 | 控件 | identifier | 改数据 | 宽度 |
 |---|---|---|---|---|
+| 课程总结页 | 只读「本节收获」 | `FCAccessibilityID.sessionSummaryGains`；`SessionSummaryView.swift` → `SessionGainsSectionView` | 否 | 页面满宽 VStack，space4 边距 |
+| 课程详情页（教练端） | 同一只读区块；在 card 的 summary 之前 | `FCAccessibilityID.sessionDetailGains`；`SessionDetailView.swift` → `SessionGainsSectionView` | 否 | 详情 VStack 与区块 maxWidth infinity，space4 边距 |
 | 训练页 | 组行「新纪录」（只读） | `FCAccessibilityID.setNewRecord(set.id)`；`ActiveSessionView.swift` → `FCSetRow.recordBadge` | 否 | `FCSetRow` 的 HStack 与训练页列表容器；胶囊在标题后，空间不足换到标题下方 |
-
