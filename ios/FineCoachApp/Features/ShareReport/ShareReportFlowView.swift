@@ -11,7 +11,7 @@ final class ShareReportFlowViewModel: ObservableObject {
     @Published var includeVolume = false
     @Published var includePersonalBests = false
     @Published private(set) var dto: ShareReportDTO?
-    @Published private(set) var bestsSetThisSession: [ShareReportPersonalBestDTO] = []
+    @Published private(set) var gains: SessionGains = .empty
     @Published private(set) var subtitle = ""
     @Published var errorMessage: String?
     @Published var lastOutcome: SystemShareOutcome?
@@ -64,15 +64,8 @@ final class ShareReportFlowViewModel: ObservableObject {
                 PackageDetailPresentation.day(generated.completed.completedAtUTC)
             )
             let history = (try? await useCases.listHistory(studentID: generated.completed.studentID)) ?? []
-            var assisted = Set<StableExerciseID>()
-            if let exerciseUseCases, let entries = try? await exerciseUseCases.search(query: "", includeHidden: true) {
-                assisted = Set(entries.filter { $0.preference?.isAssisted == true }.map(\.id))
-            }
-            bestsSetThisSession = ShareReportPolicy.personalBestsSet(
-                in: generated.completed,
-                history: history,
-                assistedExerciseIDs: assisted
-            )
+            let assisted = (try? await exerciseUseCases?.assistedExerciseIDs()) ?? []
+            gains = SessionGains(current: generated.completed, history: history, assistedExerciseIDs: assisted)
             refreshPreview()
             errorMessage = nil
         } catch {
@@ -87,7 +80,7 @@ final class ShareReportFlowViewModel: ObservableObject {
             dto = try ShareReportPolicy.makeDTO(
                 from: completed,
                 modules: modules,
-                personalBests: includePersonalBests ? bestsSetThisSession : []
+                gains: includePersonalBests ? gains : nil
             )
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? String(localized: "student.error.generic")
@@ -142,8 +135,8 @@ final class ShareReportFlowViewModel: ObservableObject {
 }
 
 /// 分享报告设置 (T069j; `28-share-settings-v2`, owner-approved 2026-09-28):
-/// live thumbnail, 包含内容 check circles (tappable, haptic), 个人最佳
-/// (default off, hint when this session set bests), 训练容量 (default off),
+/// live thumbnail, 包含内容 check circles (tappable, haptic), 本节收获
+/// (default off, hidden when empty), 训练容量 (default off),
 /// privacy line with the mascot, and 生成报告卡 → the preview (29).
 struct ShareReportFlowView: View {
     @StateObject private var viewModel: ShareReportFlowViewModel
@@ -305,17 +298,17 @@ struct ShareReportFlowView: View {
                 accessibilityIdentifier: FCAccessibilityID.shareReportSummaryToggle
             )
             FCListRowDivider()
-            toggleRow(
-                String(localized: "history.pb.title"),
-                note: viewModel.bestsSetThisSession.isEmpty
-                    ? String(localized: "share.pb.none")
-                    : String(format: String(localized: "share.pb.hintFormat"), viewModel.bestsSetThisSession.count),
-                emphasizedNote: !viewModel.bestsSetThisSession.isEmpty,
-                isOn: $viewModel.includePersonalBests,
-                isEnabled: !viewModel.bestsSetThisSession.isEmpty
-            )
-            .accessibilityIdentifier(FCAccessibilityID.shareReportPersonalBestToggle)
-            FCListRowDivider()
+            if let hint = ShareReportPolicy.gainsHint(for: viewModel.gains) {
+                toggleRow(
+                    String(localized: "session.gains.title"),
+                    note: hint,
+                    emphasizedNote: true,
+                    isOn: $viewModel.includePersonalBests,
+                    isEnabled: true
+                )
+                .accessibilityIdentifier(FCAccessibilityID.shareReportPersonalBestToggle)
+                FCListRowDivider()
+            }
             toggleRow(
                 String(localized: "share.module.volume"),
                 note: String(localized: "share.defaultOff"),
@@ -373,10 +366,12 @@ struct ShareReportFlowView: View {
         HStack(spacing: FCPrimitives.space2) {
             Text(title)
                 .fcFont(.body)
+                .lineLimit(1)
                 .foregroundStyle(isEnabled ? FCSemanticColors.textPrimary : FCSemanticColors.textDisabled)
             Spacer(minLength: FCPrimitives.space2)
             Text(note)
                 .fcFont(.caption, weight: emphasizedNote ? .semibold : nil)
+                .lineLimit(1)
                 .foregroundStyle(emphasizedNote ? FCSemanticColors.actionPrimary : FCSemanticColors.textSecondary)
             Toggle(
                 title,

@@ -115,6 +115,25 @@ Penpot 版本：`before-stage-D 2026-10-20` → `stage-D boards D-a D-a2 D-b D-b
 
 - 结果：PASS。strict lint 无输出、App build BUILD SUCCEEDED、build-for-testing TEST BUILD SUCCEEDED；FineCoachTests 516 项 / 515 passed / 1 既有 skip / 0 failed；FineCoachIntegrationTests 190 / 190 passed / 0 failed。日志：`DerivedData/StageD/evidence/phase4/{lint,app-build,build-for-testing,unit,integration}.log`。本轮确认全部代码修改早于证据运行，复用既有证据，无重跑。§5 总结页、详情页两行已对应真实代码。未经人工视觉检查。
 
+### Phase 5（T022–T026）
+
+- 审计：Phase 4 提交后产品仓干净；specs 仅既有 tasks.md 修改，继续仅勾选且不提交。
+- 范围和差异：D-c 已批准 B 类修订；保留开关的 identifier、默认关闭和内存状态，标题从「个人最佳」改为「本节收获」；取消空内容的禁用行与 share.pb.none，改为整行隐藏；卡片原 personalBests block 保留分段标识但改名，追加进步与里程碑；共享 FCNewRecordBadge，复用已入库 MascotHeartSticker 资产。历史页个人最佳、档案查看与模型不变。总结/详情的 FCListRow 默认 disclosure 显式关闭，修复只读行箭头漂移（D-FR-020）。
+- 实现和检查：DTO schema 3，allowlist 扩展仅 progress 与 milestoneSessionNumber，progress 值复用 ShareReportSetDTO；开关仅 opt-in 后传入同一 SessionGains。新增测试覆盖门控、与总结同源、提示六种组合和空隐藏、第一次/平手/后续课程不改旧纪录、辅助方向、三类卡片渲染与单独进步/里程碑 block。既有 BodyDataReportExclusionTests 与 DTO 禁用词测试正文未改。入口见 §5；未经人工视觉检查。
+- 编译修正：首次 App build 中 SwiftUI 对 progress 行报类型推导错误；DTO 的数值展示改为使用既有 TrainingSetDisplayFormatting.summary(for:)（TrainingSet 的 displaySummary 不属于 DTO API）。原始日志保留 app-build-initial.log。测试编译中新增反射测试的 Set 拼接改用 union，原始日志保留 build-for-testing-initial.log；两项均为编译修正，未改测试期望。
+
+- 结果：PASS。strict lint 无输出、App build 与 build-for-testing SUCCEEDED；FineCoachTests 519 项 / 518 passed / 1 既有 skip / 0 failed；FineCoachIntegrationTests 191 / 191 passed / 0 failed。日志：`DerivedData/StageD/evidence/phase5/{lint,app-build,build-for-testing,unit,integration}.log`。测试前分别重启指定 iPhone 17 模拟器；本次正常结束，无诊断挂起。未经人工视觉检查。
+
+### 改过的旧断言清单（累计 3 条期望契约）
+
+| 文件 / 测试名 | 旧期望 → 新期望 | 依据 |
+|---|---|---|
+| `ios/FineCoachTests/ActiveSession/SetEntryAssistTests.swift` / `testMotionTableIsWiredAtTheApprovedMoments` | 仅 `.sensoryFeedback(.success, trigger: state)` → 同时要求 `.sensoryFeedback(trigger: state)` 与 `isNewRecord ? .impact(weight: .heavy) : .success`；状态迁移断言保留 | D-BLOCK-01 裁定、Q-D3、D-FR-010；Phase 3 已改 |
+| `ios/FineCoachTests/ShareReport/ShareReportPolicyTests.swift` / `testAllowlistMirrorMatchesFrozenDTOProperties` | schemaVersion 精确等于 2 → 精确等于 3 | D-FR-032、plan §3.6；resume1 唯一放宽条件，强度不变 |
+| 同文件 / 同测试（`allowedShareReportDTOPropertyNames`） | 9 字段精确集合 → 11 字段精确集合（仅加 progress、milestoneSessionNumber）；原有反射、allowlist 等式和 count 断言全保留 | D-FR-032、plan §3.6；resume1 唯一放宽条件，强度不变 |
+
+第一次做、平手、全部历史口径在两个指定测试文件中没有需替换的旧断言；保留原断言，新增严格测试覆盖 Q-D1、D-FR-003、Revision 1.4，不凭空改旧用例。
+
 ## 5. 入口与布局清单（`components.md` §1.4，实施时填写）
 
 每条新交互一行：画面 → 控件 → accessibility identifier → 是否改数据 → 宽度由谁撑满。每行必须指向真实代码。
@@ -124,3 +143,5 @@ Penpot 版本：`before-stage-D 2026-10-20` → `stage-D boards D-a D-a2 D-b D-b
 | 课程总结页 | 只读「本节收获」 | `FCAccessibilityID.sessionSummaryGains`；`SessionSummaryView.swift` → `SessionGainsSectionView` | 否 | 页面满宽 VStack，space4 边距 |
 | 课程详情页（教练端） | 同一只读区块；在 card 的 summary 之前 | `FCAccessibilityID.sessionDetailGains`；`SessionDetailView.swift` → `SessionGainsSectionView` | 否 | 详情 VStack 与区块 maxWidth infinity，space4 边距 |
 | 训练页 | 组行「新纪录」（只读） | `FCAccessibilityID.setNewRecord(set.id)`；`ActiveSessionView.swift` → `FCSetRow.recordBadge` | 否 | `FCSetRow` 的 HStack 与训练页列表容器；胶囊在标题后，空间不足换到标题下方 |
+| 分享设置页 | 可见「本节收获」toggle（空收获整行隐藏） | `FCAccessibilityID.shareReportPersonalBestToggle`；`ShareReportFlowView.swift` → `contentSection` | 仅流程内存状态与 DTO，不持久化 | 页面满宽 VStack，space4 边距；toggleRow 的 Spacer 分配提示与开关 |
+| 分享卡片 / 预览 | 只读「本节收获」block；渲染图无交互 | `FCAccessibilityID.shareReportGains`；`ShareReportCardView.swift` → `content(for:)` | 否 | CardFrame 固定 cardWidth，space6 边距；section 与行撑满 |

@@ -22,13 +22,14 @@ struct SessionGainsSectionView: View {
                         FCListRow(
                             title: progress.displayName,
                             subtitle: SessionGainsPresentation.progress(
-                                previous: progress.previous.displaySummary, current: progress.current.displaySummary))
+                                previous: progress.previous.displaySummary, current: progress.current.displaySummary),
+                            showsDisclosure: false)
                     }
                     if let number = gains.milestoneSessionNumber {
                         if !gains.records.isEmpty || !gains.progress.isEmpty { FCListRowDivider() }
                         FCListRow(
                             title: SessionGainsPresentation.milestone(number),
-                            subtitle: String(localized: "session.gains.milestone.subtitle"))
+                            subtitle: String(localized: "session.gains.milestone.subtitle"), showsDisclosure: false)
                     }
                 }
             }

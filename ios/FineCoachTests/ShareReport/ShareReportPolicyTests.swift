@@ -35,6 +35,8 @@ final class ShareReportPolicyTests: XCTestCase {
         "trainingVolume",
         "exercises",
         "personalBests",
+        "progress",
+        "milestoneSessionNumber",
     ]
 
     // T069j (schema 2): catalog-derived icon and body parts per exercise —
@@ -82,7 +84,7 @@ final class ShareReportPolicyTests: XCTestCase {
         let completed = try makeCompleted(includingNotes: true, includingUnresolvedSets: false)
         let dto = try ShareReportPolicy.makeDTO(from: completed)
         XCTAssertEqual(dto.schemaVersion, ShareReportPolicy.schemaVersion)
-        XCTAssertEqual(ShareReportPolicy.schemaVersion, 2)
+        XCTAssertEqual(ShareReportPolicy.schemaVersion, 3)
 
         XCTAssertEqual(propertyLabels(dto), Self.allowedShareReportDTOPropertyNames)
         XCTAssertEqual(propertyLabels(dto), ShareReportPolicy.allowedDTOPropertyNames)
@@ -354,6 +356,93 @@ final class ShareReportPolicyTests: XCTestCase {
         let volume = try XCTUnwrap(dto.trainingVolume)
         let lines = ShareReportPolicy.previewLines(for: dto)
         XCTAssertTrue(lines.contains("训练容量 \(volume.canonicalString) kg"))
+    }
+
+    func testGainsAreAbsentWhenOffAndMatchSummaryWhenOn() throws {
+        let history = try (1..<10).map { try gainsSession(number: $0) }
+        let completed = try gainsSession(number: 10, recordWeight: "85", progressReps: "7")
+        let gains = SessionGains(current: completed, history: history)
+        let off = try ShareReportPolicy.makeDTO(from: completed)
+        XCTAssertTrue(off.personalBests.isEmpty)
+        XCTAssertTrue(off.progress.isEmpty)
+        XCTAssertNil(off.milestoneSessionNumber)
+        let on = try ShareReportPolicy.makeDTO(from: completed, gains: gains)
+        XCTAssertEqual(on.personalBests, ShareReportPolicy.personalBestsSet(in: completed, history: history))
+        XCTAssertEqual(on.personalBests.count, gains.records.count)
+        XCTAssertEqual(on.personalBests.first?.weightValue, gains.records.first?.set.weightValue)
+        XCTAssertEqual(on.progress.count, gains.progress.count)
+        XCTAssertEqual(on.progress.first?.displayName, gains.progress.first?.displayName)
+        XCTAssertEqual(on.progress.first?.previous.weightValue, gains.progress.first?.previous.weightValue)
+        XCTAssertEqual(on.progress.first?.current.repetitionCount, gains.progress.first?.current.repetitionCount)
+        XCTAssertEqual(on.milestoneSessionNumber, gains.milestoneSessionNumber)
+        XCTAssertEqual(on.milestoneSessionNumber, 10)
+        let progress = try XCTUnwrap(on.progress.first)
+        XCTAssertEqual(propertyLabels(progress), ["displayName", "previous", "current"])
+        XCTAssertEqual(propertyLabels(progress.previous), Self.allowedShareReportSetDTOPropertyNames)
+        XCTAssertEqual(propertyLabels(progress.current), Self.allowedShareReportSetDTOPropertyNames)
+        let surface = propertyLabels(progress).union(propertyLabels(progress.previous)).joined(separator: " ")
+            .lowercased()
+        for token in Self.requiredForbiddenIdentifierTokens {
+            XCTAssertFalse(surface.contains(token.lowercased()))
+        }
+    }
+
+    func testGainsHintUsesPriorityFirstTwoAndExactSeparatorAndHidesEmpty() throws {
+        let history = try (1..<10).map { try gainsSession(number: $0) }
+        let all = try gainsSession(number: 10, recordWeight: "85", progressReps: "7")
+        XCTAssertEqual(
+            ShareReportPolicy.gainsHint(for: SessionGains(current: all, history: history)), "1 项新纪录 · 第 10 节课")
+        let milestoneAndProgress = try gainsSession(number: 10, progressReps: "7")
+        XCTAssertEqual(
+            ShareReportPolicy.gainsHint(for: SessionGains(current: milestoneAndProgress, history: history)),
+            "第 10 节课 · 1 项进步")
+        let recordAndProgress = try gainsSession(number: 3, recordWeight: "85", progressReps: "7")
+        XCTAssertEqual(
+            ShareReportPolicy.gainsHint(for: SessionGains(current: recordAndProgress, history: history)),
+            "1 项新纪录 · 1 项进步")
+        let milestoneOnly = try gainsSession(number: 10)
+        XCTAssertEqual(
+            ShareReportPolicy.gainsHint(for: SessionGains(current: milestoneOnly, history: history)), "第 10 节课")
+        let progressOnly = try gainsSession(number: 3, progressReps: "7")
+        XCTAssertEqual(
+            ShareReportPolicy.gainsHint(for: SessionGains(current: progressOnly, history: history)), "1 项进步")
+        let recordOnly = try gainsSession(number: 3, recordWeight: "85")
+        XCTAssertEqual(
+            ShareReportPolicy.gainsHint(for: SessionGains(current: recordOnly, history: history)), "1 项新纪录")
+        let empty = SessionGains(current: try gainsSession(number: 3), history: history)
+        XCTAssertTrue(empty.isEmpty)
+        XCTAssertNil(ShareReportPolicy.gainsHint(for: empty))
+        XCTAssertNil(ShareReportPolicy.gainsHint(for: .empty))
+    }
+
+    private func gainsSession(number: Int, recordWeight: String = "80", progressReps: String = "5") throws
+        -> CompletedSession
+    {
+        let date = now.addingTimeInterval(Double(number * 1000))
+        let id = StableUUID(UUID())
+        let exercises = try (0..<2).map { index in
+            let exerciseID = StableUUID(UUID())
+            let weight = index == 0 ? recordWeight : (number == 1 ? "100" : "80")
+            let set = try TrainingSet.makeDraft(
+                id: StableUUID(UUID()), sessionExerciseID: exerciseID, orderIndex: 0,
+                input: TrainingSetInput(
+                    recordMode: .weightReps, weightValue: weight,
+                    repetitionCount: index == 0 ? "5" : progressReps, unit: .kilograms), now: date
+            ).confirmed(now: date)
+            return SessionExercise(
+                id: exerciseID, sessionID: id, orderIndex: UInt32(index), sourceKind: .builtIn,
+                sourceID: StableExerciseID(rawValue: "fictional.share.\(index)"),
+                displayNameSnapshot: try NormalizedName("合成动作 \(index + 1)"), recordModeSnapshot: .weightReps,
+                actionPrivateNote: nil, sets: [set])
+        }
+        return CompletedSession(
+            id: id, studentID: studentID, studentDisplayName: try NormalizedName("合成学员"),
+            startedAtUTC: date, completedAtUTC: date, trainingFocus: [],
+            notes: SessionNotes(privateCoachNote: nil, studentFacingSummary: nil, actionPrivateNotes: [:]),
+            exercises: exercises,
+            statistics: SessionStatistics(
+                completedSetCount: 2, displayedDurationSeconds: .zero, ordinaryTrainingVolume: nil),
+            revision: 1, latestReport: nil)
     }
 
     private var finishNow: Date {
