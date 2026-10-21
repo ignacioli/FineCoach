@@ -124,7 +124,7 @@ final class ComparisonLoadDirectionTests: XCTestCase {
     }
 
     // T069j: the share settings hint / opt-in section lists only the bests
-    // SET in the shared session, judged against the full history.
+    // SET in the shared session, judged against compatible preceding history.
     func testPersonalBestsSetInSessionOnlyCountsThatSessionsRecords() throws {
         let older = try makeSession(idSuffix: "1", sets: [("30", "8")], daysOffset: 0)
         let newer = try makeSession(idSuffix: "2", sets: [("25", "12")], daysOffset: 7)
@@ -137,6 +137,23 @@ final class ComparisonLoadDirectionTests: XCTestCase {
         XCTAssertEqual(set.first?.kind, .highestWeight)
         XCTAssertEqual(set.first?.weightValue?.canonicalString, "35")
         XCTAssertEqual(set.first?.repetitionCount?.canonicalString, "6")
+    }
+
+    func testShareRecordsExcludeFirstAndTieButKeepEarlierRecordsAfterLaterSessions() throws {
+        let first = try makeSession(idSuffix: "1", sets: [("30", "8")], daysOffset: 0)
+        let tie = try makeSession(idSuffix: "2", sets: [("30", "8")], daysOffset: 1)
+        let record = try makeSession(idSuffix: "3", sets: [("32", "8")], daysOffset: 2)
+        let later = try makeSession(idSuffix: "4", sets: [("35", "8")], daysOffset: 3)
+        let history = [first, tie, record, later]
+        XCTAssertTrue(ShareReportPolicy.personalBestsSet(in: first, history: history).isEmpty)
+        XCTAssertTrue(ShareReportPolicy.personalBestsSet(in: tie, history: history).isEmpty)
+        let earlierRecord = ShareReportPolicy.personalBestsSet(in: record, history: history)
+        XCTAssertEqual(earlierRecord.count, 1)
+        XCTAssertEqual(earlierRecord.first?.weightValue?.canonicalString, "32")
+        XCTAssertEqual(earlierRecord.first?.repetitionCount?.canonicalString, "8")
+        let assisted = ShareReportPolicy.personalBestsSet(
+            in: record, history: history, assistedExerciseIDs: [exerciseID])
+        XCTAssertTrue(assisted.isEmpty)
     }
 
     // MARK: - Fixtures

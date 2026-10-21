@@ -14,6 +14,9 @@ public struct ShareReportDTO: Hashable, Sendable {
     /// generation starts without it, M1A-FR-035).
     public let personalBests: [ShareReportPersonalBestDTO]
 
+    public let progress: [ShareReportProgressDTO]
+    public let milestoneSessionNumber: Int?
+
     public init(
         schemaVersion: Int,
         studentDisplayName: String?,
@@ -23,7 +26,9 @@ public struct ShareReportDTO: Hashable, Sendable {
         studentFacingSummary: String?,
         trainingVolume: DecimalValue?,
         exercises: [ShareReportExerciseDTO],
-        personalBests: [ShareReportPersonalBestDTO] = []
+        personalBests: [ShareReportPersonalBestDTO] = [],
+        progress: [ShareReportProgressDTO] = [],
+        milestoneSessionNumber: Int? = nil
     ) {
         self.schemaVersion = schemaVersion
         self.studentDisplayName = studentDisplayName
@@ -34,6 +39,8 @@ public struct ShareReportDTO: Hashable, Sendable {
         self.trainingVolume = trainingVolume
         self.exercises = exercises
         self.personalBests = personalBests
+        self.progress = progress
+        self.milestoneSessionNumber = milestoneSessionNumber
     }
 }
 
@@ -143,3 +150,16 @@ public struct ShareReportSetDTO: Hashable, Sendable {
 }
 
 extension ShareReportSetDTO: TrainingSetDisplayValues {}
+
+/// Allowlisted training performance only, shared with the summary's derived result.
+public struct ShareReportProgressDTO: Hashable, Sendable {
+    public let displayName: String
+    public let previous: ShareReportSetDTO
+    public let current: ShareReportSetDTO
+
+    public init(displayName: String, previous: ShareReportSetDTO, current: ShareReportSetDTO) {
+        self.displayName = displayName
+        self.previous = previous
+        self.current = current
+    }
+}

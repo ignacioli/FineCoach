@@ -6876,28 +6876,8 @@
         }
       }
     },
-    "share.pb.hintFormat": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "本次刷新 %d 项"
-          }
-        }
-      }
-    },
-    "share.pb.none": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "本次无新纪录"
-          }
-        }
-      }
-    },
+    "share.gains.records.format": {"extractionState": "manual", "localizations": {"zh-Hans": {"stringUnit": {"state": "translated", "value": "%d 项新纪录"}}}},
+    "share.gains.progress.format": {"extractionState": "manual", "localizations": {"zh-Hans": {"stringUnit": {"state": "translated", "value": "%d 项进步"}}}},
     "share.defaultOff": {
       "extractionState": "manual",
       "localizations": {

@@ -43,7 +43,9 @@ struct ShareReportCardView: View {
         if !ShareReportCardPresentation.stats(dto).isEmpty { result.append(.stats) }
         if let parts = trainedParts(dto), !parts.isEmpty { result.append(.trainedParts) }
         result.append(contentsOf: dto.exercises.indices.map(Block.exercise))
-        if !dto.personalBests.isEmpty { result.append(.personalBests) }
+        if !dto.personalBests.isEmpty || !dto.progress.isEmpty || dto.milestoneSessionNumber != nil {
+            result.append(.personalBests)
+        }
         if let summary = dto.studentFacingSummary, !summary.isEmpty { result.append(.summary) }
         if style == .shareCard { result.append(.footer) }
         return result
@@ -90,22 +92,57 @@ struct ShareReportCardView: View {
                 exerciseBlock(dto.exercises[index])
             }
         case .personalBests:
-            section(String(localized: "history.pb.title")) {
-                VStack(spacing: 0) {
+            section(String(localized: "session.gains.title")) {
+                VStack(alignment: .leading, spacing: 0) {
                     ForEach(Array(dto.personalBests.enumerated()), id: \.offset) { _, best in
-                        HStack {
-                            Text(best.displayName)
-                                .fcFont(.headline)
-                                .foregroundStyle(FCSemanticColors.textPrimary)
-                            Spacer(minLength: FCPrimitives.space2)
+                        HStack(spacing: FCPrimitives.space3) {
+                            VStack(alignment: .leading, spacing: FCPrimitives.space1) {
+                                HStack(spacing: FCPrimitives.space2) {
+                                    Text(best.displayName)
+                                        .fcFont(.headline)
+                                        .foregroundStyle(FCSemanticColors.textPrimary)
+                                    FCNewRecordBadge()
+                                }
+                                Text(bestKind(best))
+                                    .fcFont(.caption)
+                                    .foregroundStyle(FCSemanticColors.textSecondary)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
                             Text(ShareReportCardPresentation.bestValue(best))
                                 .fcFont(.titleEmphasis)
                                 .foregroundStyle(FCSemanticColors.textPrimary)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
                         .padding(.vertical, FCPrimitives.space2)
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel(
+                            "\(best.displayName)，\(String(localized: "session.set.newRecord"))，\(ShareReportCardPresentation.bestValue(best))"
+                        )
+                    }
+                    ForEach(Array(dto.progress.enumerated()), id: \.offset) { _, progress in
+                        FCListRow(
+                            title: progress.displayName,
+                            subtitle: SessionGainsPresentation.progress(
+                                previous: TrainingSetDisplayFormatting.summary(for: progress.previous),
+                                current: TrainingSetDisplayFormatting.summary(for: progress.current)),
+                            showsDisclosure: false)
+                    }
+                    if let number = dto.milestoneSessionNumber {
+                        HStack(spacing: FCPrimitives.space3) {
+                            // Approved D-c2 illustration size (README §9); decorative only.
+                            Image("MascotHeartSticker")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 40, height: 40)
+                                .accessibilityHidden(true)
+                            FCListRow(
+                                title: SessionGainsPresentation.milestone(number),
+                                subtitle: String(localized: "session.gains.milestone.subtitle"), showsDisclosure: false)
+                        }
                     }
                 }
             }
+            .accessibilityIdentifier(FCAccessibilityID.shareReportGains)
         case .summary:
             section(String(localized: "shareCard.summary")) {
                 Text(dto.studentFacingSummary ?? "")
@@ -123,7 +160,16 @@ struct ShareReportCardView: View {
         }
     }
 
+    private func bestKind(_ best: ShareReportPersonalBestDTO) -> String {
+        switch best.kind {
+        case .highestWeight: return String(localized: "history.pb.highestWeight")
+        case .longestDuration: return String(localized: "history.pb.longestDuration")
+        case .longestDistance: return String(localized: "history.pb.longestDistance")
+        }
+    }
+
     private struct CardFrame: ViewModifier {
+
         let style: Style
 
         func body(content: Content) -> some View {
