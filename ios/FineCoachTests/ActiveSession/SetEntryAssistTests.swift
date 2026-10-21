@@ -139,7 +139,8 @@ final class SetEntryAssistTests: XCTestCase {
         XCTAssertTrue(circle.contains(".easeInOut(duration: 0.2)"))
 
         let row = try source("FineCoachApp/DesignSystem/Components/FCSetRow.swift")
-        XCTAssertTrue(row.contains(".sensoryFeedback(.success, trigger: state)"))
+        XCTAssertTrue(row.contains(".sensoryFeedback(trigger: state)"))
+        XCTAssertTrue(row.contains("isNewRecord ? .impact(weight: .heavy) : .success"))
         XCTAssertTrue(row.contains("new == .completed && old != .completed"))
 
         let stepper = try source("FineCoachApp/DesignSystem/Components/FCStepper.swift")

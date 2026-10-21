@@ -53,6 +53,18 @@ final class ComponentCatalogTests: XCTestCase {
         XCTAssertTrue(source.contains("FCSemanticColors.actionPrimary"))
     }
 
+    func testNewRecordRowKeepsTextAccessibilityAndOneStateTriggeredFeedback() throws {
+        let url = repositoryRoot().appendingPathComponent("ios/FineCoachApp/DesignSystem/Components/FCSetRow.swift")
+        let source = try String(contentsOf: url, encoding: .utf8)
+        XCTAssertTrue(source.contains("self.isNewRecord = isNewRecord && state == .completed"))
+        XCTAssertTrue(source.contains(".accessibilityLabel(Text(accessibilityText))"))
+        XCTAssertTrue(source.contains("String(localized: \"session.set.newRecord\")"))
+        XCTAssertTrue(source.contains("ViewThatFits(in: .horizontal)"))
+        XCTAssertTrue(source.contains(".sensoryFeedback(trigger: state)"))
+        XCTAssertTrue(source.contains("isNewRecord ? .impact(weight: .heavy) : .success"))
+        XCTAssertEqual(source.components(separatedBy: ".sensoryFeedback(").count - 1, 1)
+    }
+
     // MARK: - Sources
 
     private struct IndexRow {

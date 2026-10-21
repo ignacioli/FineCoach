@@ -43,7 +43,25 @@ enum SessionCreditPrompt: Equatable {
 
 @MainActor
 final class ActiveSessionViewModel: ObservableObject {
-    @Published var session: Session?
+    private struct RecordState {
+        let session: Session?
+        let holders: Set<StableUUID>
+    }
+    @Published private var recordState = RecordState(session: nil, holders: [])
+    private var completedHistory: [CompletedSession] = []
+    var session: Session? {
+        get { recordState.session }
+        set {
+            let holders =
+                newValue.map {
+                    SessionGains(current: $0, history: completedHistory, assistedExerciseIDs: entryFlags.assisted)
+                        .recordHolderSetIDs
+                } ?? []
+            recordState = RecordState(session: newValue, holders: holders)
+        }
+    }
+    var recordHolderSetIDs: Set<StableUUID> { recordState.holders }
+
     @Published var errorMessage: String?
     @Published var saveStatus: PersistenceProjectionStatus = .saved(revision: 0)
     @Published var exerciseName = ""
@@ -168,9 +186,12 @@ final class ActiveSessionViewModel: ObservableObject {
             errorMessage = nil
             saveStatus = useCases.saveStatus
             await loadSections()
-            lastPerformances = (try? await useCases.lastPerformances(studentID: studentID)) ?? .empty
+            completedHistory = try await useCases.completedHistory(studentID: studentID)
+            lastPerformances = LastExercisePerformanceLookup(sessions: completedHistory)
             do {
-                recentCatalogMatches = try await useCases.recentCatalogExercises(studentID: studentID)
+                recentCatalogMatches = RecentExerciseSelection.entries(
+                    from: completedHistory, studentID: studentID,
+                    availableEntries: try await useCases.searchCatalog(query: ""))
             } catch {
                 recentCatalogMatches = []
                 present(error)
@@ -870,6 +891,8 @@ final class ActiveSessionViewModel: ObservableObject {
     private func refreshEntryFlags() async {
         if let flags = try? await useCases.exerciseEntryFlags() {
             entryFlags = flags
+            let current = session
+            session = current
         }
     }
 

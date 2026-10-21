@@ -1,6 +1,10 @@
 import Foundation
 
 public enum FCAccessibilityID {
+    public static func setNewRecord(_ id: StableUUID) -> String {
+        "activeSession.set.newRecord.\(id.rawValue.uuidString.lowercased())"
+    }
+
     public static let bodyMeasurementMore = "bodyMeasurementEntry.more"
     public static func setUndoAt(_ index: Int) -> String {
         "activeSession.set.undo.at.\(index)"

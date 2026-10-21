@@ -17,6 +17,8 @@ public struct FCSetRow: View {
     private let title: String
     private let value: String
     private let state: State
+    private let isNewRecord: Bool
+    private let newRecordIdentifier: String?
     private let onConfirm: (() -> Void)?
     private let onEdit: (() -> Void)?
     private let onUndo: (() -> Void)?
@@ -25,6 +27,8 @@ public struct FCSetRow: View {
         title: String,
         value: String,
         state: State,
+        isNewRecord: Bool = false,
+        newRecordIdentifier: String? = nil,
         onConfirm: (() -> Void)? = nil,
         onEdit: (() -> Void)? = nil,
         onUndo: (() -> Void)? = nil
@@ -32,6 +36,8 @@ public struct FCSetRow: View {
         self.title = title
         self.value = value
         self.state = state
+        self.isNewRecord = isNewRecord && state == .completed
+        self.newRecordIdentifier = newRecordIdentifier
         self.onConfirm = onConfirm
         self.onEdit = onEdit
         self.onUndo = onUndo
@@ -49,12 +55,17 @@ public struct FCSetRow: View {
             // One line, as D8 / P0-a draw it: title, then the value pushed
             // toward the trailing status (experience P0 Δ5).
             HStack(alignment: .firstTextBaseline, spacing: FCPrimitives.space2) {
-                Text(title)
-                    .fcFont(.body)
-                    .foregroundStyle(
-                        state == .completed ? FCSemanticColors.textPrimary : FCSemanticColors.textSecondary
-                    )
-                    .fixedSize()
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: FCPrimitives.space2) {
+                        rowTitle
+                        recordBadge
+                    }
+                    .fixedSize(horizontal: true, vertical: false)
+                    VStack(alignment: .leading, spacing: FCPrimitives.space1) {
+                        rowTitle
+                        recordBadge
+                    }
+                }
                 Spacer(minLength: FCPrimitives.space2)
                 Text(value)
                     .fcFont(.body)
@@ -80,7 +91,7 @@ public struct FCSetRow: View {
         .padding(.vertical, FCPrimitives.space2)
         .frame(minHeight: 44)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("\(title)，\(value)，\(state.rawValue)"))
+        .accessibilityLabel(Text(accessibilityText))
         .accessibilityHint(state.isConfirmable ? Text(String(localized: "session.set.confirmHint")) : Text(""))
         .accessibilityAction {
             onConfirm?()
@@ -93,8 +104,30 @@ public struct FCSetRow: View {
                 Button(String(localized: "session.action.undo"), action: onUndo)
             }
         }
-        .sensoryFeedback(.success, trigger: state) { old, new in
-            new == .completed && old != .completed
+        .sensoryFeedback(trigger: state) { old, new -> SensoryFeedback? in
+            guard new == .completed && old != .completed else { return nil }
+            return isNewRecord ? .impact(weight: .heavy) : .success
+        }
+
+    }
+
+    private var accessibilityText: String {
+        [title, value, isNewRecord ? String(localized: "session.set.newRecord") : nil, state.rawValue]
+            .compactMap { $0 }.joined(separator: "，")
+    }
+
+    private var rowTitle: some View {
+        Text(title)
+            .fcFont(.body)
+            .foregroundStyle(state == .completed ? FCSemanticColors.textPrimary : FCSemanticColors.textSecondary)
+            .fixedSize()
+    }
+
+    @ViewBuilder
+    private var recordBadge: some View {
+        if isNewRecord {
+            FCNewRecordBadge()
+                .accessibilityIdentifier(newRecordIdentifier ?? "")
         }
     }
 
@@ -138,3 +171,12 @@ public struct FCSetRow: View {
         }
     }
 }
+
+#if DEBUG
+    #Preview {
+        VStack {
+            FCSetRow(title: "第 1 组", value: "80 kg × 5", state: .pending)
+            FCSetRow(title: "第 2 组", value: "82.5 kg × 5", state: .completed, isNewRecord: true)
+        }
+    }
+#endif
