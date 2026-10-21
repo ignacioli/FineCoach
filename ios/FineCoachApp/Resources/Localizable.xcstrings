@@ -1,6 +1,10 @@
 {
   "sourceLanguage": "zh-Hans",
   "strings": {
+    "session.gains.title": {"extractionState": "manual", "localizations": {"zh-Hans": {"stringUnit": {"state": "translated", "value": "本节收获"}}}},
+    "session.gains.progress.format": {"extractionState": "manual", "localizations": {"zh-Hans": {"stringUnit": {"state": "translated", "value": "上次 %@ → 本次 %@"}}}},
+    "session.gains.milestone.format": {"extractionState": "manual", "localizations": {"zh-Hans": {"stringUnit": {"state": "translated", "value": "第 %lld 节课"}}}},
+    "session.gains.milestone.subtitle": {"extractionState": "manual", "localizations": {"zh-Hans": {"stringUnit": {"state": "translated", "value": "累计完成的课程"}}}},
     "session.set.newRecord": {
       "extractionState": "manual",
       "localizations": { "zh-Hans": { "stringUnit": { "state": "translated", "value": "新纪录" } } }

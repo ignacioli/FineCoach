@@ -1,6 +1,8 @@
 import Foundation
 
 public enum FCAccessibilityID {
+    static let sessionSummaryGains = "sessionSummary.gains"
+    static let sessionDetailGains = "sessionDetail.gains"
     public static func setNewRecord(_ id: StableUUID) -> String {
         "activeSession.set.newRecord.\(id.rawValue.uuidString.lowercased())"
     }

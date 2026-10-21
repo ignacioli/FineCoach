@@ -158,6 +158,7 @@ struct RootNavigation: View {
                                     sessionID: StableUUID(sessionID),
                                     useCases: environment.requireHistoryUseCases(),
                                     templateUseCases: environment.templateUseCases,
+                                    exerciseUseCases: environment.requireExerciseUseCases(),
                                     path: $path
                                 )
                             case .history(let studentID):
@@ -173,6 +174,7 @@ struct RootNavigation: View {
                                     sessionID: StableUUID(sessionID),
                                     useCases: environment.requireHistoryUseCases(),
                                     templateUseCases: environment.templateUseCases,
+                                    exerciseUseCases: environment.requireExerciseUseCases(),
                                     path: $path
                                 )
                             case .sessionEdit(let sessionID):

@@ -10,6 +10,8 @@ struct PersonalBestRowView: View {
     let day: String?
     let detail: String?
 
+    var allowsValueWrapping = false
+
     var body: some View {
         HStack(alignment: .center, spacing: FCPrimitives.space4) {
             VStack(alignment: .leading, spacing: FCPrimitives.space1) {
@@ -24,7 +26,7 @@ struct PersonalBestRowView: View {
             Text(value)
                 .fcFont(.titleEmphasis)
                 .foregroundStyle(FCSemanticColors.textPrimary)
-                .lineLimit(1)
+                .lineLimit(allowsValueWrapping ? nil : 1)
             VStack(alignment: .trailing, spacing: FCPrimitives.space1) {
                 if let day {
                     Text(day)

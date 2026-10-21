@@ -11,11 +11,18 @@ final class SessionSummaryViewModel: ObservableObject {
     @Published var templateName = ""
     @Published var savedTemplateName: String?
 
+    @Published var gains: SessionGains = .empty
+    private let exerciseUseCases: ExerciseLibraryUseCases?
+
     let sessionID: StableUUID
     private let useCases: HistoryUseCases
     let templateUseCases: TemplateUseCases?
 
-    init(sessionID: StableUUID, useCases: HistoryUseCases, templateUseCases: TemplateUseCases? = nil) {
+    init(
+        sessionID: StableUUID, useCases: HistoryUseCases, templateUseCases: TemplateUseCases? = nil,
+        exerciseUseCases: ExerciseLibraryUseCases? = nil
+    ) {
+        self.exerciseUseCases = exerciseUseCases
         self.sessionID = sessionID
         self.useCases = useCases
         self.templateUseCases = templateUseCases
@@ -45,6 +52,9 @@ final class SessionSummaryViewModel: ObservableObject {
     func load() async {
         do {
             let completed = try await useCases.detail(sessionID: sessionID)
+            let history = try await useCases.listHistory(studentID: completed.studentID)
+            let assisted = (try? await exerciseUseCases?.assistedExerciseIDs()) ?? []
+            gains = SessionGains(current: completed, history: history, assistedExerciseIDs: assisted)
             focus = completed.trainingFocus
             privateNote = completed.notes.privateCoachNote?.value ?? ""
             studentSummary = completed.notes.studentFacingSummary?.value ?? ""
@@ -90,11 +100,13 @@ struct SessionSummaryView: View {
         sessionID: StableUUID,
         useCases: HistoryUseCases,
         templateUseCases: TemplateUseCases? = nil,
+        exerciseUseCases: ExerciseLibraryUseCases? = nil,
         path: Binding<[RootDestination]>
     ) {
         _viewModel = StateObject(
             wrappedValue: SessionSummaryViewModel(
-                sessionID: sessionID, useCases: useCases, templateUseCases: templateUseCases)
+                sessionID: sessionID, useCases: useCases, templateUseCases: templateUseCases,
+                exerciseUseCases: exerciseUseCases)
         )
         _path = path
     }
@@ -117,6 +129,8 @@ struct SessionSummaryView: View {
 
                 BodyPartMultiSelectView(title: String(localized: "summary.focus"), selection: $viewModel.focus)
                     .accessibilityIdentifier(FCAccessibilityID.sessionSummaryFocus)
+                SessionGainsSectionView(gains: viewModel.gains)
+                    .accessibilityIdentifier(FCAccessibilityID.sessionSummaryGains)
                 labeledField(
                     title: String(localized: "summary.privateNote"),
                     text: $viewModel.privateNote,

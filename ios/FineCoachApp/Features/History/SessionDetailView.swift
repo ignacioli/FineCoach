@@ -14,13 +14,20 @@ final class SessionDetailViewModel: ObservableObject {
     @Published var saveAsTemplateName = ""
     @Published var didSaveAsTemplate = false
 
+    @Published var gains: SessionGains = .empty
+    private let exerciseUseCases: ExerciseLibraryUseCases?
+
     let sessionID: StableUUID
     private let useCases: HistoryUseCases
     private let templateUseCases: TemplateUseCases?
 
     var canSaveAsTemplate: Bool { templateUseCases != nil }
 
-    init(sessionID: StableUUID, useCases: HistoryUseCases, templateUseCases: TemplateUseCases? = nil) {
+    init(
+        sessionID: StableUUID, useCases: HistoryUseCases, templateUseCases: TemplateUseCases? = nil,
+        exerciseUseCases: ExerciseLibraryUseCases? = nil
+    ) {
+        self.exerciseUseCases = exerciseUseCases
         self.sessionID = sessionID
         self.useCases = useCases
         self.templateUseCases = templateUseCases
@@ -29,6 +36,9 @@ final class SessionDetailViewModel: ObservableObject {
     func load() async {
         do {
             let loaded = try await useCases.detail(sessionID: sessionID)
+            let history = try await useCases.listHistory(studentID: loaded.studentID)
+            let assisted = (try? await exerciseUseCases?.assistedExerciseIDs()) ?? []
+            gains = SessionGains(current: loaded, history: history, assistedExerciseIDs: assisted)
             completed = loaded
             record = try ShareReportPolicy.makeDTO(from: loaded, modules: .privacySafeDefaults)
             creditNote = (try? await useCases.creditSettlementNote(sessionID: sessionID)) ?? nil
@@ -77,13 +87,15 @@ struct SessionDetailView: View {
         sessionID: StableUUID,
         useCases: HistoryUseCases,
         templateUseCases: TemplateUseCases? = nil,
+        exerciseUseCases: ExerciseLibraryUseCases? = nil,
         path: Binding<[RootDestination]>
     ) {
         _viewModel = StateObject(
             wrappedValue: SessionDetailViewModel(
                 sessionID: sessionID,
                 useCases: useCases,
-                templateUseCases: templateUseCases
+                templateUseCases: templateUseCases,
+                exerciseUseCases: exerciseUseCases
             )
         )
         _path = path
@@ -99,7 +111,14 @@ struct SessionDetailView: View {
                 }
 
                 if let record = viewModel.record {
-                    ShareReportCardView(dto: record, style: .page)
+                    ShareReportCardView(
+                        dto: record, style: .page,
+                        blocks: ShareReportCardView.blocks(for: record, style: .page).filter { $0 != .summary })
+                    SessionGainsSectionView(gains: viewModel.gains)
+                        .accessibilityIdentifier(FCAccessibilityID.sessionDetailGains)
+                    if let summary = record.studentFacingSummary, !summary.isEmpty {
+                        ShareReportCardView(dto: record, style: .page, blocks: [.summary])
+                    }
                 }
 
                 if viewModel.creditNote == .noActivePackage {
