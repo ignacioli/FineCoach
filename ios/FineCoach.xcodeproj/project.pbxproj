@@ -367,6 +367,7 @@
 		D001B /* FCNewRecordBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D001A; };
 		D002B /* SessionGains.swift in Sources */ = {isa = PBXBuildFile; fileRef = D002A; };
 		D003B /* SessionGainsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D003A; };
+		D004B /* ActiveSessionNewRecordTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D004A; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -744,6 +745,7 @@
 		D001A /* FCNewRecordBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCNewRecordBadge.swift; sourceTree = "<group>"; };
 		D002A /* SessionGains.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionGains.swift; sourceTree = "<group>"; };
 		D003A /* SessionGainsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionGainsTests.swift; sourceTree = "<group>"; };
+		D004A /* ActiveSessionNewRecordTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionNewRecordTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1499,6 +1501,7 @@
 			children = (
 				A233 /* ActiveSessionPersistenceTests.swift */,
 				A710 /* ActiveSessionSetRowInteractionTests.swift */,
+				D004A /* ActiveSessionNewRecordTests.swift */,
 				A975 /* ActiveSessionSetEntryPrefillTests.swift */,
 				A711 /* ActiveSessionCardioDurationConversionTests.swift */,
 			);
@@ -2322,6 +2325,7 @@
 				B231 /* StudentPersistenceTests.swift in Sources */,
 				B233 /* ActiveSessionPersistenceTests.swift in Sources */,
 				B710 /* ActiveSessionSetRowInteractionTests.swift in Sources */,
+				D004B /* ActiveSessionNewRecordTests.swift in Sources */,
 				B975 /* ActiveSessionSetEntryPrefillTests.swift in Sources */,
 				B711 /* ActiveSessionCardioDurationConversionTests.swift in Sources */,
 				B720 /* BodyDataPersistenceTests.swift in Sources */,

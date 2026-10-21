@@ -705,6 +705,8 @@ struct ActiveSessionView: View {
                 title: setTitle(trainingSet, index: index),
                 value: setValue(trainingSet),
                 state: rowState(trainingSet.state),
+                isNewRecord: viewModel.recordHolderSetIDs.contains(trainingSet.id),
+                newRecordIdentifier: FCAccessibilityID.setNewRecord(trainingSet.id),
                 onConfirm: trainingSet.state == .completed
                     ? nil
                     : { Task { await viewModel.confirmSet(setID: trainingSet.id) } },

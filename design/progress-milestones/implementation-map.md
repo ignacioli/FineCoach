@@ -1,6 +1,6 @@
 # 阶段 D 收获感：设计改动与实施映射
 
-> 状态：**画稿已批准（2026-10-20），待实施**。本文是 `components.md` §6 要求的里程碑实施映射，不重复 token 数值。
+> 状态：**Phase 1–3 自动门通过；D-BLOCK-01 已裁定并验证；Phase 4–6 未启动。画稿已批准（2026-10-20）。**本文是 `components.md` §6 要求的里程碑实施映射，不重复 token 数值。
 > 行为权威：`specs/004-stage-d-progress-milestones/spec.md`（`1.0-approved`，2026-10-20）。视觉权威：`design/design-system/README.md`、`components.md`。
 > 画稿批准前，本文的组件结构只是约束草稿，不是已批准的设计。
 
@@ -69,17 +69,9 @@ Penpot 版本：`before-stage-D 2026-10-20` → `stage-D boards D-a D-a2 D-b D-b
 分类和依据：D-a/D-b/D-c 均为 B；目标设计有变化；依据 spec 004 与本文 §1。
 范围：DS-SET-ROW 扩展；总结页、分享页组合；受影响使用方见 §2。
 设计决定：D-a～D-c2 已于 2026-10-20 批准；Revision 1.4 与 plan §3.8 已于 2026-10-21 确认（任务说明）。本轮执行已批准的 B 类扩展，不改 Penpot。
-实现和检查：（待实施）
-结果：（待实施）
+实现和检查：Phase 1–2 自动门通过（下文）；Phase 3 按裁定更新触感断言后全量通过，初次失败及续做结果见下文；入口见 §5。未经人工视觉检查。
+结果：Phase 3 续做 PASS（下文）；尚未完成 Phase 4–6。
 ```
-
-## 5. 入口与布局清单（`components.md` §1.4，实施时填写）
-
-每条新交互一行：画面 → 控件 → accessibility identifier → 是否改数据 → 宽度由谁撑满。每行必须指向真实代码。
-
-| 画面 | 控件 | identifier | 改数据 | 宽度 |
-|---|---|---|---|---|
-| （待实施） | | | | |
 
 ### Phase 1
 
@@ -92,3 +84,35 @@ Penpot 版本：`before-stage-D 2026-10-20` → `stage-D boards D-a D-a2 D-b D-b
 - 范围：T005–T008，统一纯领域比较与 SessionGains，辅助动作查询工具；无新 UI。
 - 实现和检查：现有 Comparison 的历史平手归最近课程规则保留；SessionGains 只在严格更好时更新各纪录项持有者。进行中课程使用进入训练页时读取的已完成历史；完成课程按 (completedAtUTC, id) 截断。
 - 结果：PASS。strict lint、App build、build-for-testing PASS；FineCoachTests 515 项 / 514 passed / 1 既有 skip / 0 failed；FineCoachIntegrationTests 188 / 188 passed / 0 failed。日志：`DerivedData/StageD/evidence/phase2/{lint,app-build,build-for-testing,unit,integration}.log`。首次编译的辅助标记访问错误已按现有 preference.isAssisted 修正，未修改测试断言。
+
+### Phase 3
+
+- 范围：DS-SET-ROW 已批准 B 类扩展；ActiveSessionViewModel 使用单一 RecordState 同步发布 session 与持有者集合，每次 session 写入纯内存重算；load 的一次 listCompleted 同时用于上次、最近动作与新纪录。
+- 实现和检查：新增标记与组行自动 contract 检查；新增 ActiveSessionNewRecordTests 的确认、转移、撤销与 reload 场景；入口见 §5。初次运行未改旧断言；续做按 D-BLOCK-01 裁定更新一处触感 contract。
+- 结果：BLOCKED。strict lint、App build、build-for-testing PASS；FineCoachTests 516 项 / 514 passed / 1 既有 skip / 1 failed。失败为 SetEntryAssistTests.testMotionTableIsWiredAtTheApprovedMoments（单独复跑 1 项 / 0 passed / 1 failed）；FineCoachIntegrationTests 189 / 189 passed / 0 failed（含现有 PerformanceMeasurementTests.testRecoverySearchAndSetConfirmMeetP95Budgets 与新增 ActiveSessionNewRecordTests）。日志：`DerivedData/StageD/evidence/phase3/`。训练页标记、小屏 / 最大字体和触感未经人工视觉检查，并入集中走查。
+
+### 待决项 D-BLOCK-01（Phase 3）
+
+- 位置：`ios/FineCoachTests/ActiveSession/SetEntryAssistTests.swift:142`，`testMotionTableIsWiredAtTheApprovedMoments`。
+- 当前：旧静态断言要求 `FCSetRow.swift` 源码含 `.sensoryFeedback(.success, trigger: state)`；全量与单独复跑均在此失败。
+- 目标：plan §3.7 与 D-FR-010 / Q-D3 要求使用返回 `SensoryFeedback?` 的闭包，按同次发布的 `isNewRecord` 在 heavy / success 中选择一个；D-FR-012 禁止重算时触感。
+- 冲突：任务说明只允许 T025 修改指定旧口径断言，其他旧断言一律不改；该文件不在 T025 范围。不能用源码注释、死代码或保留无效调用来满足旧字符串检查。
+- 处置：保留旧断言，记录 FAIL，不提交 Phase 3；按 Phase 严格串行要求，T015 与 Phase 4–6 暂不完成。需要审查者裁定该旧触感 contract 断言的更新范围。所有 Phase 3 实现保留在 worktree，未撤销任何工作。
+
+- 运行器收尾：Phase 3 unit 的 XCTest 已报告上述结果后，xcodebuild 在 simctl diagnose 阶段日志连续 300 秒未增长，watchdog 按任务规则终止；watchdog 后续 KILL 记录 EPERM（见 unit-watch.log），已核实 xcodebuild 退出，并单独终止残留诊断子进程。原始失败日志和单独复跑日志均保留，未把被中断的全量运行记为 PASS。
+
+- 已裁定（审查者 2026-10-21，依据 Q-D3）：更新 SetEntryAssistTests 第 142 行为新触感形式，强度不变。纳入 T025 改过的旧断言清单，Phase 6 汇总。
+
+### Phase 3 续做（T015）
+
+- 审计：8 个 tracked 修改、1 个 untracked 新测试，无 staged 内容，均为保留的 Phase 3 成果；specs 仅 tasks.md 已改，按授权继续勾选且不提交。
+- 结果：PASS。strict lint、App build、build-for-testing PASS；FineCoachTests 516 项 / 515 passed / 1 既有 skip / 0 failed；FineCoachIntegrationTests 189 / 189 passed / 0 failed，包含 measureSetConfirm 的既有性能测试。日志：`DerivedData/StageD/evidence/phase3-resume/{lint,app-build,build-for-testing,unit,integration}.log`。本次运行正常结束，无诊断残留。未经人工视觉检查，并入集中走查。
+
+## 5. 入口与布局清单（`components.md` §1.4，实施时填写）
+
+每条新交互一行：画面 → 控件 → accessibility identifier → 是否改数据 → 宽度由谁撑满。每行必须指向真实代码。
+
+| 画面 | 控件 | identifier | 改数据 | 宽度 |
+|---|---|---|---|---|
+| 训练页 | 组行「新纪录」（只读） | `FCAccessibilityID.setNewRecord(set.id)`；`ActiveSessionView.swift` → `FCSetRow.recordBadge` | 否 | `FCSetRow` 的 HStack 与训练页列表容器；胶囊在标题后，空间不足换到标题下方 |
+
