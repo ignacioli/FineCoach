@@ -1,7 +1,7 @@
 # 阶段 D 收获感：设计改动与实施映射
 
-> 状态：**Phase 1–4 自动门通过；D-BLOCK-01 已裁定并验证；Phase 5–6 待完成。画稿已批准（2026-10-20）。**本文是 `components.md` §6 要求的里程碑实施映射，不重复 token 数值。
-> 行为权威：`specs/004-stage-d-progress-milestones/spec.md`（`1.0-approved`，2026-10-20）。视觉权威：`design/design-system/README.md`、`components.md`。
+> 状态：**Phase 1–6 自动门通过；实现完成，待审查与集中走查；D-BLOCK-01 已关闭。画稿已批准（2026-10-20）。**本文是 `components.md` §6 要求的里程碑实施映射，不重复 token 数值。
+> 行为权威：`specs/004-stage-d-progress-milestones/spec.md`（`1.3-approved` + Revision 1.4；2026-10-21 任务说明确认）。视觉权威：`design/design-system/README.md`、`components.md`。
 > 画稿批准前，本文的组件结构只是约束草稿，不是已批准的设计。
 
 ## 1. 按设计变化分类（`components.md` §1.2）
@@ -69,8 +69,8 @@ Penpot 版本：`before-stage-D 2026-10-20` → `stage-D boards D-a D-a2 D-b D-b
 分类和依据：D-a/D-b/D-c 均为 B；目标设计有变化；依据 spec 004 与本文 §1。
 范围：DS-SET-ROW 扩展；总结页、分享页组合；受影响使用方见 §2。
 设计决定：D-a～D-c2 已于 2026-10-20 批准；Revision 1.4 与 plan §3.8 已于 2026-10-21 确认（任务说明）。本轮执行已批准的 B 类扩展，不改 Penpot。
-实现和检查：Phase 1–2 自动门通过（下文）；Phase 3 按裁定更新触感断言后全量通过，初次失败及续做结果见下文；入口见 §5。未经人工视觉检查。
-结果：Phase 3 续做 PASS（下文）；尚未完成 Phase 4–6。
+实现和检查：Phase 1–6 自动门通过（下文），含 L0 token、L1 component contract、L2 DesignValueScanTests；页面组合为 ActiveSession → FCSetRow / FCNewRecordBadge，总结与详情 → SessionGainsSectionView / DS-SECTION / DS-LIST-ROW / PersonalBestRowView，分享 → toggleRow / FCNewRecordBadge / MascotHeartSticker；入口与宽度归属见 §5 共 5 行。旧期望契约调整累计 3 条（下文）。未经人工视觉检查。
+结果：Phase 1–6 PASS（下文，保留 Phase 3 初次 BLOCKED 的原始证据与裁定）；T001–T029 已完成，待审查。L3 集中走查待负责人执行，不表示真机或视觉验收通过。
 ```
 
 ### Phase 1
@@ -133,6 +133,14 @@ Penpot 版本：`before-stage-D 2026-10-20` → `stage-D boards D-a D-a2 D-b D-b
 | 同文件 / 同测试（`allowedShareReportDTOPropertyNames`） | 9 字段精确集合 → 11 字段精确集合（仅加 progress、milestoneSessionNumber）；原有反射、allowlist 等式和 count 断言全保留 | D-FR-032、plan §3.6；resume1 唯一放宽条件，强度不变 |
 
 第一次做、平手、全部历史口径在两个指定测试文件中没有需替换的旧断言；保留原断言，新增严格测试覆盖 Q-D1、D-FR-003、Revision 1.4，不凭空改旧用例。
+
+### Phase 6（T027–T029）
+
+- 审计：Phase 5 提交后产品仓干净；本阶段仅收尾文档与授权 tasks.md 勾选，不改 App 或测试代码。
+- 实现和检查：五行执行记录与旧断言清单已补全，§5 共 5 行对应真实代码；blueprint 阶段 D 改为「实现完成，待集中走查」。Phase 3 初次失败、裁定、续做 PASS 原样留存，D-BLOCK-01 已关闭，无其他待决项。
+- 未经人工视觉检查、并入集中走查：训练页新纪录标记、持有者转移、小屏/最大字体及 heavy/success 触感；总结页与教练详情页本节收获有内容/无内容（另含只有里程碑）及最大 Dynamic Type 关键数值不截断（AC-D13）；分享开关单行提示、空时隐藏、卡片新纪录胶囊/进步行/里程碑贴纸。没有截图比较、UITests 或真机验收；这些自动门不证明 Feature UI 已视觉验证。
+
+- 结果：PASS。strict lint 无输出、App build BUILD SUCCEEDED、build-for-testing TEST BUILD SUCCEEDED；FineCoachTests 519 项 / 518 passed / 1 既有 WCAG exemption skipped / 0 failed；FineCoachIntegrationTests 191 / 191 passed / 0 failed。日志：`DerivedData/StageD/evidence/phase6/{lint,app-build,build-for-testing,unit,integration}.log`。每个 target 运行前重启指定 iPhone 17 模拟器 EFE2D5A0-4877-4682-BE79-7460C0C1E8C8；测试正常退出，无诊断挂起。全部 Phase 的自动证据已记录；无 BLOCKED 或待决项，保留人工集中走查与审查为后续步骤。
 
 ## 5. 入口与布局清单（`components.md` §1.4，实施时填写）
 

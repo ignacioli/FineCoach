@@ -25,7 +25,7 @@
 | C | T3 对标素材库：训记、Too、Hevy、Todoist 的关键画面放进 Penpot 并标注 | 11、6 | ⏳ 没开始 | 等负责人截图，并确认「dotolist」就是 Todoist |
 | C′ | 动作库扩充：146 条扩到约 550 条 | 5（间接） | ✅ **已合并**（2026-10-19）。**2a**（main `e5c65d0`，specs `5b687ea`）：新增 396 条，共 542 条（1 条停用），13 个器械都有动作；启动时按 id 原位同步，Core Data V6；重名和失败规则 CX-D10–D15。**2b**（main `1a7c3a7`）：图标 18 → 21（壶铃实心例外 CX-D13），动作库和添加动作面板加「最近练过」，拼音和首字母搜索；Unit 504、Integration 187，0 失败。拼音字级修正（弹→tan、地→di）已合并（main `218d63a`，Unit 507、Integration 188，0 失败）；**还没人看过界面** | `design/catalog-expansion/decisions.md`；`.handoff/2026-10-18-cprime-step1-owner-decisions.md`；`.handoff/subagent/2026-10-19-cprime-step2b-e92b89f-handoff.md` |
 | 维度 5 | 拼音或首字母搜索，常用动作和最近练过的动作排前面 | 5 | ✅ 随 C′ 第 2b 步合并（排序按负责人决定改为顶部「最近练过」分组）；待真人评分 | 见 C′ 行 |
-| D | P1 收获感：破纪录当场提示、课程总结写出进步、里程碑 | 6、4、9 | 📝 规则已定（PD-D1～D5，2026-10-20）；spec `0.1-draft` 待 review，§9 有 5 项待确认；之后画 D-a/D-b/D-c | `specs/004-stage-d-progress-milestones/spec.md`（specs 分支 `docs/stage-d-pr-milestones`） |
+| D | P1 收获感：破纪录当场提示、课程总结写出进步、里程碑 | 6、4、9 | 实现完成，待集中走查 | `specs/004-stage-d-progress-milestones/spec.md`（specs 分支 `docs/stage-d-pr-milestones`） |
 | E | P2 洞察：进步停滞、课包快用完、学员很久没约课 | 7 | ⏳ 要先写 spec | 先定展示哪些洞察 |
 | F | P3 系统级入口：小组件、Live Activity、快捷指令 | 8 | ⏳ 要先写 spec，并先做隐私威胁评估 | AGENTS.md 隐私红线 |
 
