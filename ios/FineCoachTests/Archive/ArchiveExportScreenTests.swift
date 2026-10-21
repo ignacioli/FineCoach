@@ -360,11 +360,11 @@ final class ArchiveExportScreenTests: XCTestCase {
 
         let active = try await studentUseCases.searchActive(query: "")
         let archived = try await studentUseCases.listArchived()
-        XCTAssertEqual(active.count, 6)
+        XCTAssertEqual(active.count, 7)
         XCTAssertEqual(archived.map(\.displayName.value), ["孙已归档"])
         let longName = try XCTUnwrap(active.first { $0.displayName.value.hasPrefix("欧阳慕容") })
         XCTAssertGreaterThan(longName.displayName.value.count, 25)
-        let expectedActive = ["王小明", "李思远", "陈嘉怡", "张浩然", "赵无数"]
+        let expectedActive = ["王小明", "李思远", "陈嘉怡", "张浩然", "赵无数", "周十节"]
         for name in expectedActive {
             XCTAssertTrue(active.contains { $0.displayName.value == name }, "missing \(name)")
         }
@@ -381,7 +381,7 @@ final class ArchiveExportScreenTests: XCTestCase {
         }
         let expectedSessions = [
             "王小明": 6, "李思远": 5, "陈嘉怡": 3, longName.displayName.value: 1,
-            "张浩然": 4, "赵无数": 0, "孙已归档": 2,
+            "张浩然": 4, "赵无数": 0, "周十节": 9, "孙已归档": 2,
         ]
         for (name, count) in expectedSessions {
             let actual = try await sessionCount(name)
@@ -426,8 +426,8 @@ final class ArchiveExportScreenTests: XCTestCase {
         XCTAssertEqual(count(.absent), 1)
         XCTAssertEqual(count(.cancelled), 1)
         XCTAssertEqual(count(.inProgress), 0)
-        // 6 weekly + 4 every-two-days + today 13:00, 15:30 + in 2 days
-        XCTAssertEqual(count(.scheduled), 13)
+        // 6 weekly + 4 every-two-days + today 13:00, 15:30, 16:30 + in 2 days
+        XCTAssertEqual(count(.scheduled), 14)
         XCTAssertEqual(all.filter { $0.seriesID != nil }.count, 10)
         let cancelled = try XCTUnwrap(all.first { $0.status == .cancelled })
         XCTAssertEqual(cancelled.cancellationReason?.value, "合成测试：学员临时有事")
@@ -435,10 +435,10 @@ final class ArchiveExportScreenTests: XCTestCase {
         XCTAssertEqual(all.first { $0.status == .absent }?.absentCreditChoice, .notCharged)
         XCTAssertNotNil(all.first { $0.status == .completed }?.linkedSessionID)
 
-        // Today: completed, absent, cancelled, and three scheduled rows.
+        // Today: completed, absent, cancelled, and four scheduled rows.
         let today = try await appointmentUseCases.todayOrdering()
-        XCTAssertEqual(today.count, 6)
-        XCTAssertEqual(today.filter { $0.appointment.status == .scheduled }.count, 3)
+        XCTAssertEqual(today.count, 7)
+        XCTAssertEqual(today.filter { $0.appointment.status == .scheduled }.count, 4)
         XCTAssertTrue(all.contains { $0.date > appointmentUseCases.todayLocalDate() }, "no future appointments")
 
         // Templates: one saved from a session, one blank with exercises.
