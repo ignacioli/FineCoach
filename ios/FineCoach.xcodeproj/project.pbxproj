@@ -365,6 +365,8 @@
 		016E1128FF8B3A0A928741A8 /* ArchiveExportDebugSeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38987A9BE9D66B2A01BC2302 /* ArchiveExportDebugSeed.swift */; };
 		84D9618B61F2BC059C9B7FF6 /* ArchiveExportScreenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 359027FF7430F369D5495762 /* ArchiveExportScreenTests.swift */; };
 		D001B /* FCNewRecordBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D001A; };
+		D002B /* SessionGains.swift in Sources */ = {isa = PBXBuildFile; fileRef = D002A; };
+		D003B /* SessionGainsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D003A; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -740,6 +742,8 @@
 		38987A9BE9D66B2A01BC2302 /* ArchiveExportDebugSeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportDebugSeed.swift; sourceTree = "<group>"; };
 		359027FF7430F369D5495762 /* ArchiveExportScreenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportScreenTests.swift; sourceTree = "<group>"; };
 		D001A /* FCNewRecordBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCNewRecordBadge.swift; sourceTree = "<group>"; };
+		D002A /* SessionGains.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionGains.swift; sourceTree = "<group>"; };
+		D003A /* SessionGainsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionGainsTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1090,6 +1094,7 @@
 				A601 /* BodyMetric.swift */,
 				A602 /* BodyMeasurement.swift */,
 				A603 /* Comparison.swift */,
+				D002A /* SessionGains.swift */,
 				A971 /* SetValueStepping.swift */,
 				A970 /* LastExercisePerformance.swift */,
 				A940 /* BodyPart.swift */,
@@ -1565,6 +1570,7 @@
 			isa = PBXGroup;
 			children = (
 				A240 /* HistoryReportDomainTests.swift */,
+				D003A /* SessionGainsTests.swift */,
 				A944 /* HistoryFilterCriteriaTests.swift */,
 				A701 /* CompletedSessionMostRecentTests.swift */,
 				A722 /* ComparisonLoadDirectionTests.swift */,
@@ -2130,6 +2136,7 @@
 				B601 /* BodyMetric.swift in Sources */,
 				B602 /* BodyMeasurement.swift in Sources */,
 				B603 /* Comparison.swift in Sources */,
+				D002B /* SessionGains.swift in Sources */,
 				B971 /* SetValueStepping.swift in Sources */,
 				B970 /* LastExercisePerformance.swift in Sources */,
 				B604 /* BodyDataUseCases.swift in Sources */,
@@ -2244,6 +2251,7 @@
 				B979 /* ExercisePreferenceUnilateralTests.swift in Sources */,
 				B730 /* TrendsViewPointLabelTests.swift in Sources */,
 				B240 /* HistoryReportDomainTests.swift in Sources */,
+				D003B /* SessionGainsTests.swift in Sources */,
 				B944 /* HistoryFilterCriteriaTests.swift in Sources */,
 				B701 /* CompletedSessionMostRecentTests.swift in Sources */,
 				B722 /* ComparisonLoadDirectionTests.swift in Sources */,
