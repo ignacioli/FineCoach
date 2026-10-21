@@ -364,6 +364,7 @@
 		71F372DF4FD322366CEA4AF5 /* ArchiveDeliveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F80D6F31F404A5F07E2DB8B /* ArchiveDeliveryView.swift */; };
 		016E1128FF8B3A0A928741A8 /* ArchiveExportDebugSeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38987A9BE9D66B2A01BC2302 /* ArchiveExportDebugSeed.swift */; };
 		84D9618B61F2BC059C9B7FF6 /* ArchiveExportScreenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 359027FF7430F369D5495762 /* ArchiveExportScreenTests.swift */; };
+		D001B /* FCNewRecordBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D001A; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -738,6 +739,7 @@
 		9F80D6F31F404A5F07E2DB8B /* ArchiveDeliveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveDeliveryView.swift; sourceTree = "<group>"; };
 		38987A9BE9D66B2A01BC2302 /* ArchiveExportDebugSeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportDebugSeed.swift; sourceTree = "<group>"; };
 		359027FF7430F369D5495762 /* ArchiveExportScreenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportScreenTests.swift; sourceTree = "<group>"; };
+		D001A /* FCNewRecordBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCNewRecordBadge.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1284,6 +1286,7 @@
 				A160 /* FCButton.swift */,
 				A161 /* FCTextField.swift */,
 				A162 /* FCSetRow.swift */,
+				D001A /* FCNewRecordBadge.swift */,
 				A163 /* FCSaveStatusView.swift */,
 				A910 /* FCSegmentedSwitch.swift */,
 				A911 /* FCChip.swift */,
@@ -2175,6 +2178,7 @@
 				B160 /* FCButton.swift in Sources */,
 				B161 /* FCTextField.swift in Sources */,
 				B162 /* FCSetRow.swift in Sources */,
+				D001B /* FCNewRecordBadge.swift in Sources */,
 				B163 /* FCSaveStatusView.swift in Sources */,
 				B310 /* OnboardingView.swift in Sources */,
 				B311 /* StudentEditorView.swift in Sources */,

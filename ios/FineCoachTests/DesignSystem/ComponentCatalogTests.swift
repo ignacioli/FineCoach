@@ -42,6 +42,17 @@ final class ComponentCatalogTests: XCTestCase {
         }
     }
 
+    func testNewRecordBadgeUsesLocalizedTextAndDelegatesAccessibilityToItsRow() throws {
+        let url = repositoryRoot().appendingPathComponent(
+            "ios/FineCoachApp/DesignSystem/Components/FCNewRecordBadge.swift")
+        let source = try String(contentsOf: url, encoding: .utf8)
+        XCTAssertTrue(source.contains("String(localized: \"session.set.newRecord\")"))
+        XCTAssertTrue(source.contains(".accessibilityHidden(true)"))
+        XCTAssertTrue(source.contains(".fcFont(.sectionLabel)"))
+        XCTAssertTrue(source.contains("FCSemanticColors.surfaceSelected, in: Capsule()"))
+        XCTAssertTrue(source.contains("FCSemanticColors.actionPrimary"))
+    }
+
     // MARK: - Sources
 
     private struct IndexRow {

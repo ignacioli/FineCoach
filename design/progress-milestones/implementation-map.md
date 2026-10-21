@@ -68,7 +68,7 @@ Penpot 版本：`before-stage-D 2026-10-20` → `stage-D boards D-a D-a2 D-b D-b
 ```text
 分类和依据：D-a/D-b/D-c 均为 B；目标设计有变化；依据 spec 004 与本文 §1。
 范围：DS-SET-ROW 扩展；总结页、分享页组合；受影响使用方见 §2。
-设计决定：新纪录胶囊（surface.selected 底 + action.primary 字）、「本节收获」统一命名（spec 1.1）为新的视觉决定，待产品负责人审 Penpot 画稿。
+设计决定：D-a～D-c2 已于 2026-10-20 批准；Revision 1.4 与 plan §3.8 已于 2026-10-21 确认（任务说明）。本轮执行已批准的 B 类扩展，不改 Penpot。
 实现和检查：（待实施）
 结果：（待实施）
 ```
@@ -80,3 +80,9 @@ Penpot 版本：`before-stage-D 2026-10-20` → `stage-D boards D-a D-a2 D-b D-b
 | 画面 | 控件 | identifier | 改数据 | 宽度 |
 |---|---|---|---|---|
 | （待实施） | | | | |
+
+### Phase 1
+
+- 初始审计：产品仓与 specs 仓均干净（tracked/staged/untracked 均无）；specs 在 main，仅按任务授权修改 tasks.md，不提交。
+- 实现和检查：T001–T003 已实现；本阶段无新交互。新纪录文字键随组件加入，保证组件可独立使用。
+- 结果：PASS。strict lint、iphoneos Debug App build、Simulator build-for-testing 通过；FineCoachTests 508 项 / 507 passed / 1 既有 WCAG exemption skipped / 0 failed；FineCoachIntegrationTests 188 / 188 passed / 0 failed。日志：`DerivedData/StageD/evidence/phase1/{lint,app-build,build-for-testing,unit,integration}.log`。未经人工视觉检查。
