@@ -1,6 +1,6 @@
 # 阶段 D 收获感：设计改动与实施映射
 
-> 状态：**草稿，待产品负责人审 Penpot 画稿 D-a / D-b / D-c**。本文是 `components.md` §6 要求的里程碑实施映射，不重复 token 数值。
+> 状态：**画稿已批准（2026-10-20），待实施**。本文是 `components.md` §6 要求的里程碑实施映射，不重复 token 数值。
 > 行为权威：`specs/004-stage-d-progress-milestones/spec.md`（`1.0-approved`，2026-10-20）。视觉权威：`design/design-system/README.md`、`components.md`。
 > 画稿批准前，本文的组件结构只是约束草稿，不是已批准的设计。
 
@@ -72,3 +72,11 @@ Penpot 版本：`before-stage-D 2026-10-20` → `stage-D boards D-a D-a2 D-b D-b
 实现和检查：（待实施）
 结果：（待实施）
 ```
+
+## 5. 入口与布局清单（`components.md` §1.4，实施时填写）
+
+每条新交互一行：画面 → 控件 → accessibility identifier → 是否改数据 → 宽度由谁撑满。每行必须指向真实代码。
+
+| 画面 | 控件 | identifier | 改数据 | 宽度 |
+|---|---|---|---|---|
+| （待实施） | | | | |
