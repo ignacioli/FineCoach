@@ -23,6 +23,10 @@ public struct ExerciseLibraryUseCases: Sendable {
         try await repository.searchActive(query: query, includeHidden: includeHidden)
     }
 
+    public func assistedExerciseIDs() async throws -> Set<StableExerciseID> {
+        Set(try await search(query: "", includeHidden: true).filter { $0.preference?.isAssisted == true }.map(\.id))
+    }
+
     public func createCustom(name: String, recordMode: RecordMode) async throws -> ExerciseCatalogItem {
         try await repository.createCustom(
             name: name,

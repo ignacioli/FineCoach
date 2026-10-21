@@ -86,3 +86,9 @@ Penpot 版本：`before-stage-D 2026-10-20` → `stage-D boards D-a D-a2 D-b D-b
 - 初始审计：产品仓与 specs 仓均干净（tracked/staged/untracked 均无）；specs 在 main，仅按任务授权修改 tasks.md，不提交。
 - 实现和检查：T001–T003 已实现；本阶段无新交互。新纪录文字键随组件加入，保证组件可独立使用。
 - 结果：PASS。strict lint、iphoneos Debug App build、Simulator build-for-testing 通过；FineCoachTests 508 项 / 507 passed / 1 既有 WCAG exemption skipped / 0 failed；FineCoachIntegrationTests 188 / 188 passed / 0 failed。日志：`DerivedData/StageD/evidence/phase1/{lint,app-build,build-for-testing,unit,integration}.log`。未经人工视觉检查。
+
+### Phase 2
+
+- 范围：T005–T008，统一纯领域比较与 SessionGains，辅助动作查询工具；无新 UI。
+- 实现和检查：现有 Comparison 的历史平手归最近课程规则保留；SessionGains 只在严格更好时更新各纪录项持有者。进行中课程使用进入训练页时读取的已完成历史；完成课程按 (completedAtUTC, id) 截断。
+- 结果：PASS。strict lint、App build、build-for-testing PASS；FineCoachTests 515 项 / 514 passed / 1 既有 skip / 0 failed；FineCoachIntegrationTests 188 / 188 passed / 0 failed。日志：`DerivedData/StageD/evidence/phase2/{lint,app-build,build-for-testing,unit,integration}.log`。首次编译的辅助标记访问错误已按现有 preference.isAssisted 修正，未修改测试断言。
