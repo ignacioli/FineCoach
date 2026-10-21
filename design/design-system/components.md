@@ -136,7 +136,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 | `DS-ACTION-ROW` | `FCActionRow` | §8.1 操作行；18/24；destructive 图标（§4.7） | 10 个文件 | 稳定；destructive 图标已实现（M2 T005） |
 | `DS-UNDO-ROW` | `FCUndoRow` | §8.1 删除后撤销行；B-b（2026-10-16 已批准） | ActiveSession（删组）、BodyMeasurementEntry（删单条测量） | 规格已定（§4.8），代码待 B2 |
 | `DS-MORE-MENU` | `FCMoreMenu` | §8.1 标题行「…」菜单；B-a / B-b（2026-10-16 已批准） | ActiveSession、TemplateEditor（分区标题）；BodyMeasurementEntry（页头，B2 迁移） | 规格已定（§4.8），代码待 B2 |
-| `DS-SET-ROW` | `FCSetRow`、`FCSetStateCircle` | §6 组圆圈；11/30 | ActiveSession；圆圈另用于 ShareReport、History | 见 CG-4 |
+| `DS-SET-ROW` | `FCSetRow`、`FCSetStateCircle`、`FCNewRecordBadge` | §6 组圆圈；11/30 | ActiveSession；圆圈另用于 ShareReport、History | 见 CG-4 |
 | `DS-HERO-CARD` | `FCHeroCard` | §8 深色 hero 卡；01/18 | Today、StudentDetail | 见 CG-6 |
 | `DS-HINT-BAR` | `FCHintBar`、`FCActiveSessionBar` | §8 提示条；§8.1 训练中提示条；21 | StudentDetail、StudentList | 稳定 |
 | `DS-BOTTOM-SHEET` | `FCBottomSheet`、`View.fcBottomSheet` | §8.1 底部面板；18/31/33/34 | 8 个文件 | 稳定 |
@@ -251,6 +251,8 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 - **复用边界**：放在底部面板和编辑页的操作区。普通内容浏览列表使用 `DS-LIST-ROW`。
 
 #### `DS-SET-ROW` 训练组行
+
+- **阶段 D 新纪录状态**：已批准的 D-a anatomy、标记外观、阅读顺序、换行与触感规则见 `design/progress-milestones/implementation-map.md` §2 D-a。`FCNewRecordBadge` 是本组件的胶囊部件（文字本地化，自身无障碍隐藏，由组行朗读），仅 completed 且持有纪录时显示；ShareReport 卡片复用该标记。
 
 - **部件**：组状态圆圈（22×22，点击区 44）→ 一行内：标题「第 N 组」（`body`；已完成为 `text.primary`，其余为 `text.secondary`）→ 弹性空白 → 数值（`body` `text.primary`，单行，最小缩放 0.8）→ 状态文字（`callout` 400 `text.secondary`），刚确认的一组在 4 秒内换成「撤销」（`FCLinkButton`，P0-D11）→ 可选编辑按钮（铅笔，44）。2026-10-15 起由上下两行改为一行，与已批准的 D8 / P0-a2 稿一致（implementation-map Δ5）。
 - **`FCSetStateCircle` 状态**：待完成：1.5pt `border.control` 描边；草稿：1pt `text.secondary` 虚线（3/2）；已完成：`action.primary` 实心 + 白色 ✓。
