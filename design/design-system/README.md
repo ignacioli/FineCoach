@@ -344,8 +344,9 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 |---|---|---|
 | App 图标 | `assets/app-icon-{light,dark,tinted}.png`，1024×1024 | 见 §9.2 |
 | 吉祥物（空态） | `assets/mascot-empty-state.jpeg`，1024×1024 | 与 Penpot 内嵌原图 `inset-warm2.jpeg` 逐字节一致（276383 字节，SHA-256 `aca587ee…d87395b`） |
+| 吉祥物贴纸「比心」（阶段 D） | `assets/mascot-heart-sticker.png`，1254×1254，RGBA 透明底 | 产品负责人 2026-10-20 用 ChatGPT image 以 `mascot-avatar`、`mascot-empty-state` 为参考生成（提示词见产品仓 `.handoff/prompt/2026-10-20-stage-d-mascot-heart-sticker-prompt.md`）：胸像，耳朵下垂，比心手势加一颗小橙色心，无道具无文字。SHA-256 `7b697f1b…09064bc24`。Penpot D-c2 内嵌 80×80 缩小版 |
 
-吉祥物只用于空态插图，画稿显示尺寸为 220×220。例外：28 分享设置页隐私说明与 M2 首次说明页 W-01b 使用 `mascot-avatar` 头像（装饰），分别为 44×44（`radius.md`）与 64×64（`radius.lg`）；M2-07 首次启动二选一使用全身吉祥物 220×220（见 `m2-hifi/welcome-redesign.md` §2）。
+吉祥物只用于空态插图，画稿显示尺寸为 220×220。例外：28 分享设置页隐私说明与 M2 首次说明页 W-01b 使用 `mascot-avatar` 头像（装饰），分别为 44×44（`radius.md`）与 64×64（`radius.lg`）；M2-07 首次启动二选一使用全身吉祥物 220×220（见 `m2-hifi/welcome-redesign.md` §2）。阶段 D：分享报告卡片「本节收获」区块的里程碑行使用 `mascot-heart-sticker` 贴纸，40×40，无底色无圆角裁切，只用于分享卡片，教练端页面不用（spec 004 D-FR-034）。贴纸内的橙色属于插图，同 §9.2 规则，不得用于界面元素。
 
 ### 9.1 训练部位示意图（D7，方案 A，2026-09-26 批准）
 

@@ -2,7 +2,7 @@
 
 > 这是 finecoach-scoring-optimization 这条主线的**唯一总览**。人和各个 AI 工具开工前先看这里，弄清现在在哪、下一步是什么、谁来做。
 > 细节以各自的权威文件为准：评分方法见 [`11d-experience-scorecard.md`](11d-experience-scorecard.md)，P0 决定见 [`experience-p0/implementation-map.md`](experience-p0/implementation-map.md)，阶段 B 决定见 [`experience-t2/decisions.md`](experience-t2/decisions.md)，C′ 决定见 [`catalog-expansion/decisions.md`](catalog-expansion/decisions.md)。
-> 最后更新：2026-10-19（C′ 第 2a、2b 步都已合并之后）。每个阶段收尾时更新本文件的「状态」「决定队列」两节。
+> 最后更新：2026-10-20（阶段 D 规则已裁决，spec 草稿已写）。每个阶段收尾时更新本文件的「状态」「决定队列」两节。
 
 ## 1. 目标和怎么算赢
 
@@ -25,7 +25,7 @@
 | C | T3 对标素材库：训记、Too、Hevy、Todoist 的关键画面放进 Penpot 并标注 | 11、6 | ⏳ 没开始 | 等负责人截图，并确认「dotolist」就是 Todoist |
 | C′ | 动作库扩充：146 条扩到约 550 条 | 5（间接） | ✅ **已合并**（2026-10-19）。**2a**（main `e5c65d0`，specs `5b687ea`）：新增 396 条，共 542 条（1 条停用），13 个器械都有动作；启动时按 id 原位同步，Core Data V6；重名和失败规则 CX-D10–D15。**2b**（main `1a7c3a7`）：图标 18 → 21（壶铃实心例外 CX-D13），动作库和添加动作面板加「最近练过」，拼音和首字母搜索；Unit 504、Integration 187，0 失败。拼音字级修正（弹→tan、地→di）已合并（main `218d63a`，Unit 507、Integration 188，0 失败）；**还没人看过界面** | `design/catalog-expansion/decisions.md`；`.handoff/2026-10-18-cprime-step1-owner-decisions.md`；`.handoff/subagent/2026-10-19-cprime-step2b-e92b89f-handoff.md` |
 | 维度 5 | 拼音或首字母搜索，常用动作和最近练过的动作排前面 | 5 | ✅ 随 C′ 第 2b 步合并（排序按负责人决定改为顶部「最近练过」分组）；待真人评分 | 见 C′ 行 |
-| D | P1 收获感：破纪录当场提示、课程总结写出进步、里程碑 | 6、4、9 | ⏳ 要先写 spec | 先定规则：什么算个人最佳、有哪些里程碑 |
+| D | P1 收获感：破纪录当场提示、课程总结写出进步、里程碑 | 6、4、9 | 📝 规则已定（PD-D1～D5，2026-10-20）；spec `0.1-draft` 待 review，§9 有 5 项待确认；之后画 D-a/D-b/D-c | `specs/004-stage-d-progress-milestones/spec.md`（specs 分支 `docs/stage-d-pr-milestones`） |
 | E | P2 洞察：进步停滞、课包快用完、学员很久没约课 | 7 | ⏳ 要先写 spec | 先定展示哪些洞察 |
 | F | P3 系统级入口：小组件、Live Activity、快捷指令 | 8 | ⏳ 要先写 spec，并先做隐私威胁评估 | AGENTS.md 隐私红线 |
 
@@ -78,7 +78,7 @@ D 等 B3 合并之后再开工（都要改训练页和课程总结），也要�
 3. **集中走查加真人评分**。A、B 两个阶段和 C′ 第 2a 步做完了，还没有人看过。这次要看的是：`FCUndoRow`、`FCMoreMenu`、删组和删测量的撤销、指标页底部两行、5 个共享确认框、状态栏遮盖；动作库 13 项器械筛选在小屏上的换行、两个改名动作、停用动作不出现。看完按标准任务打分。
 4. ~~C′ 候选清单审核~~：2026-10-18 批准，建议全部采纳；另定 CX-D9。之后 CX-D10 到 CX-D15 也已裁决（见决定单）。
 5. **T3 素材**：4 个 App 的截图，以及确认「dotolist」就是 Todoist。
-6. **D 的规则**：什么算个人最佳、有哪些里程碑、要不要进分享报告（身体数据永远不进）。
+6. ~~D 的规则~~：2026-10-20 裁决 PD-D1～D5（沿用 M1B-FR-029 口径、组行当场标记、第 N 节课里程碑、总结页只读区块、跟随个人最佳开关）。**新增待定**：spec §9 Q-D1～Q-D5。
 7. **F 的隐私规则**：锁屏和通知里能显示什么。
 8. **push 到 GitHub**：本地 `main` 比 `origin/main` 超前约 70 个提交，仓库是公开的。
 9. ~~清理 worktree~~：2026-10-18 已删除已合并的 worktree 和分支；B1 未提交草稿备份在 `wip/b1-ui-test-draft`。
@@ -87,5 +87,5 @@ D 等 B3 合并之后再开工（都要改训练页和课程总结），也要�
 
 1. 负责人：
    - 做一次集中走查，打第一次真人分（含动作库新内容、两处「最近练过」、新图标）；
-2. Claude：起草 D 的 spec。
-3. 其他 agent：暂无，等 D 的 spec。
+2. 负责人：review D 的 spec，回答 §9 Q-D1～Q-D5。
+3. Claude：spec 定稿后画 D-a/D-b/D-c，批准后写 plan、tasks 和 Codex 提示词。其他 agent 暂无。
