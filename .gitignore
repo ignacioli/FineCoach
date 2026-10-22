@@ -86,3 +86,6 @@ blob-report/
 
 # local git worktrees
 .worktrees/
+
+# local deepseek harness agent tooling
+.dsh/
