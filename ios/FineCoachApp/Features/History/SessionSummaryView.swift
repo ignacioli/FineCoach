@@ -93,6 +93,7 @@ final class SessionSummaryViewModel: ObservableObject {
 
 struct SessionSummaryView: View {
     @StateObject private var viewModel: SessionSummaryViewModel
+    @Binding var rootTab: RootTab
     @Binding var path: [RootDestination]
     @State private var isNamingTemplate = false
 
@@ -101,6 +102,7 @@ struct SessionSummaryView: View {
         useCases: HistoryUseCases,
         templateUseCases: TemplateUseCases? = nil,
         exerciseUseCases: ExerciseLibraryUseCases? = nil,
+        rootTab: Binding<RootTab>,
         path: Binding<[RootDestination]>
     ) {
         _viewModel = StateObject(
@@ -108,6 +110,7 @@ struct SessionSummaryView: View {
                 sessionID: sessionID, useCases: useCases, templateUseCases: templateUseCases,
                 exerciseUseCases: exerciseUseCases)
         )
+        _rootTab = rootTab
         _path = path
     }
 
@@ -166,10 +169,10 @@ struct SessionSummaryView: View {
                 }
                 .accessibilityIdentifier(FCAccessibilityID.sessionSummaryGenerateReport)
 
-                FCButton(title: String(localized: "summary.skipShare")) {
+                FCSecondaryButton(title: String(localized: "summary.skipShare")) {
                     Task {
                         guard await viewModel.persistNotes() else { return }
-                        path.popToStudentDetail()
+                        path.returnToToday(tab: &rootTab)
                     }
                 }
                 .accessibilityIdentifier(FCAccessibilityID.sessionSummarySkipShare)

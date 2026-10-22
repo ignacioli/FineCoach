@@ -5,6 +5,10 @@ final class TodayViewModel: ObservableObject {
     @Published var rows: [TodayOrderedAppointment] = []
     @Published var studentNames: [StableUUID: String] = [:]
     @Published var errorMessage: String?
+    /// False until the first successful reload. A freshly built view model has
+    /// empty `rows`/`inProgress`, so without this gate Today would render its
+    /// empty state before the first load returns (C15 walkthrough follow-up).
+    @Published private(set) var hasCompletedInitialLoad = false
     @Published var isResolvedExpanded = false
     /// Every Student currently training, oldest start first (M1A-FR-018
     /// revision; owner decision 2026-10-22: one hint-bar row per Student).
@@ -61,6 +65,16 @@ final class TodayViewModel: ObservableObject {
         studentNames[studentID] ?? ""
     }
 
+    /// The empty state is a load result, never a placeholder: before the first
+    /// successful load the conditional content stays empty instead.
+    var showsEmptyState: Bool {
+        TodayEmptyStatePresentation.showsEmptyState(
+            hasCompletedInitialLoad: hasCompletedInitialLoad,
+            visibleRows: visibleRows,
+            inProgress: inProgress
+        )
+    }
+
     func reload() async {
         do {
             rows = try await appointmentUseCases.todayOrdering()
@@ -73,6 +87,7 @@ final class TodayViewModel: ObservableObject {
             }
             studentNames = names
             await reloadPackageAlerts()
+            hasCompletedInitialLoad = true
             errorMessage = nil
         } catch {
             errorMessage = String(localized: "today.error.generic")
@@ -100,6 +115,19 @@ final class TodayViewModel: ObservableObject {
 
     func present(_ message: String) {
         errorMessage = message
+    }
+}
+
+enum TodayEmptyStatePresentation {
+    /// Only a completed load with nothing to show is an empty Today. Split out
+    /// so the first-load gate is unit-testable without building the Core
+    /// Data-backed view model.
+    static func showsEmptyState(
+        hasCompletedInitialLoad: Bool,
+        visibleRows: [TodayOrderedAppointment],
+        inProgress: [InProgressTrainingSummary]
+    ) -> Bool {
+        hasCompletedInitialLoad && visibleRows.isEmpty && inProgress.isEmpty
     }
 }
 
@@ -168,7 +196,7 @@ struct TodayView: View {
                     inProgressHero(viewModel.inProgress)
                 }
 
-                if viewModel.visibleRows.isEmpty, viewModel.inProgress.isEmpty {
+                if viewModel.showsEmptyState {
                     emptyState
                 } else {
                     appointmentSections

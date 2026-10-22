@@ -127,6 +127,8 @@
 		B952 /* FCBodyPartChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = A952 /* FCBodyPartChip.swift */; };
 		B953 /* FCCalendarDayCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A953 /* FCCalendarDayCell.swift */; };
 		B954 /* TrainedBodyPartsSummaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A954 /* TrainedBodyPartsSummaryTests.swift */; };
+		B95A /* EmptyStateFirstLoadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95A /* EmptyStateFirstLoadTests.swift */; };
+		B95B /* RootNavigationReturnTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95B /* RootNavigationReturnTests.swift */; };
 		B917 /* FCToggleStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A917 /* FCToggleStyle.swift */; };
 		B962 /* FCStepper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A962 /* FCStepper.swift */; };
 		B918 /* FCSetStateCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A918 /* FCSetStateCircle.swift */; };
@@ -489,6 +491,8 @@
 		A952 /* FCBodyPartChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCBodyPartChip.swift; sourceTree = "<group>"; };
 		A953 /* FCCalendarDayCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCCalendarDayCell.swift; sourceTree = "<group>"; };
 		A954 /* TrainedBodyPartsSummaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainedBodyPartsSummaryTests.swift; sourceTree = "<group>"; };
+		A95A /* EmptyStateFirstLoadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateFirstLoadTests.swift; sourceTree = "<group>"; };
+		A95B /* RootNavigationReturnTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootNavigationReturnTests.swift; sourceTree = "<group>"; };
 		A917 /* FCToggleStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCToggleStyle.swift; sourceTree = "<group>"; };
 		A962 /* FCStepper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCStepper.swift; sourceTree = "<group>"; };
 		A918 /* FCSetStateCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCSetStateCircle.swift; sourceTree = "<group>"; };
@@ -1686,6 +1690,8 @@
 			isa = PBXGroup;
 			children = (
 				A252 /* ScenePrivacyCoordinatorTests.swift */,
+				A95A /* EmptyStateFirstLoadTests.swift */,
+				A95B /* RootNavigationReturnTests.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -2270,6 +2276,8 @@
 				B722 /* ComparisonLoadDirectionTests.swift in Sources */,
 				B241 /* ShareReportPolicyTests.swift in Sources */,
 				B954 /* TrainedBodyPartsSummaryTests.swift in Sources */,
+				B95A /* EmptyStateFirstLoadTests.swift in Sources */,
+				B95B /* RootNavigationReturnTests.swift in Sources */,
 				B500 /* VisionHarnessTests.swift in Sources */,
 				B956 /* IconConsistencyTests.swift in Sources */,
 				B930 /* FCStatusTests.swift in Sources */,
