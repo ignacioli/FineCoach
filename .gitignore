@@ -87,3 +87,6 @@ blob-report/
 
 # local git worktrees
 .worktrees/
+
+# local agent tooling (canonical dsh-gate lives in its own repository)
+.dsh/
