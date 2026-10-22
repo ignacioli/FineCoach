@@ -159,6 +159,7 @@ struct RootNavigation: View {
                                     useCases: environment.requireHistoryUseCases(),
                                     templateUseCases: environment.templateUseCases,
                                     exerciseUseCases: environment.requireExerciseUseCases(),
+                                    rootTab: $rootTab,
                                     path: $path
                                 )
                             case .history(let studentID):
@@ -190,6 +191,7 @@ struct RootNavigation: View {
                                     exerciseUseCases: environment.requireExerciseUseCases(),
                                     reportsRootURL: environment.requireReportsRootURL(),
                                     shareAdapter: environment.requireShareAdapter(),
+                                    rootTab: $rootTab,
                                     path: $path
                                 )
                             case .settings:
@@ -415,5 +417,14 @@ extension Array where Element == RootDestination {
             return
         }
         removeAll()
+    }
+
+    /// C15: 「完成」/「跳过分享」end the report flow at the 今日 root. The stack
+    /// and the top-level segment are separate state, so both move here:
+    /// clearing only the stack would leave the user on 学员, and switching
+    /// only the tab would keep the old flow alive behind it.
+    mutating func returnToToday(tab: inout RootTab) {
+        removeAll()
+        tab = .today
     }
 }

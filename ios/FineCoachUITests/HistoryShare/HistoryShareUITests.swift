@@ -48,7 +48,7 @@ final class HistoryShareUITests: XCTestCase {
         typeInto(in: app, identifier: "sessionSummary.studentSummary", text: studentFacingSummary)
         dismissKeyboard(in: app)
 
-        skipShareToStudentContext(in: app)
+        skipShareToToday(in: app)
         assertRecentAndHistoryReachable(in: app)
         openHistory(in: app)
         XCTAssertTrue(element(in: app, identifier: "history.row.0").waitForExistence(timeout: 8))
@@ -81,7 +81,7 @@ final class HistoryShareUITests: XCTestCase {
         openSharePreviewFromSummary(in: app)
         closeSharePreviewWithoutSending(in: app)
         if element(in: app, identifier: "sessionSummary.root").exists {
-            skipShareToStudentContext(in: app)
+            skipShareToToday(in: app)
         }
 
         openHistory(in: app)
@@ -195,7 +195,7 @@ final class HistoryShareUITests: XCTestCase {
         XCTAssertTrue(element(in: app, identifier: "sessionSummary.skipShare").exists)
         XCTAssertTrue(element(in: app, identifier: "sessionSummary.generateReport").exists)
 
-        skipShareToStudentContext(in: app)
+        skipShareToToday(in: app)
         assertRecentAndHistoryReachable(in: app)
         assertHittableTarget(in: app, identifier: "studentDetail.history", label: "训练历史")
         openHistory(in: app)
@@ -415,19 +415,16 @@ final class HistoryShareUITests: XCTestCase {
         )
     }
 
-    private func skipShareToStudentContext(in app: XCUIApplication) {
+    /// C15 (2026-10-22): 跳过分享 ends the flow at the 今日 root. The callers
+    /// continue from a Student's pages, so switch to 学员 afterwards.
+    private func skipShareToToday(in app: XCUIApplication) {
         tapControl(in: app, identifier: "sessionSummary.skipShare", label: "跳过分享")
-        if element(in: app, identifier: "sessionSummary.root").waitForExistence(timeout: 1),
-            app.buttons["完成"].exists
-        {
-            app.buttons["完成"].tap()
-        }
         XCTAssertTrue(
-            element(in: app, identifier: "studentDetail.root").waitForExistence(timeout: 8)
-                || element(in: app, identifier: "history.root").waitForExistence(timeout: 2)
-                || app.staticTexts["林青"].waitForExistence(timeout: 2),
-            "skip share must return to student detail/history without forcing share"
+            element(in: app, identifier: "today.root").waitForExistence(timeout: 8),
+            "skip share must return to Today without forcing share"
         )
+        app.buttons["学员"].firstMatch.tap()
+        waitForStudentList(in: app)
     }
 
     private func assertRecentAndHistoryReachable(in app: XCUIApplication) {

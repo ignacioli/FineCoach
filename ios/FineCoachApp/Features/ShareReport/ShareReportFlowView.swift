@@ -140,6 +140,7 @@ final class ShareReportFlowViewModel: ObservableObject {
 /// privacy line with the mascot, and 生成报告卡 → the preview (29).
 struct ShareReportFlowView: View {
     @StateObject private var viewModel: ShareReportFlowViewModel
+    @Binding var rootTab: RootTab
     @Binding var path: [RootDestination]
     @State private var isShowingPreview = false
 
@@ -149,6 +150,7 @@ struct ShareReportFlowView: View {
         exerciseUseCases: ExerciseLibraryUseCases? = nil,
         reportsRootURL: URL,
         shareAdapter: SystemShareAdapter,
+        rootTab: Binding<RootTab>,
         path: Binding<[RootDestination]>
     ) {
         _viewModel = StateObject(
@@ -160,6 +162,7 @@ struct ShareReportFlowView: View {
                 shareAdapter: shareAdapter
             )
         )
+        _rootTab = rootTab
         _path = path
     }
 
@@ -201,7 +204,7 @@ struct ShareReportFlowView: View {
         .background(FCSemanticColors.surfacePage)
         .fcSecondaryPage()
         .navigationDestination(isPresented: $isShowingPreview) {
-            ShareReportPreviewPage(viewModel: viewModel)
+            ShareReportPreviewPage(viewModel: viewModel, rootTab: $rootTab, path: $path)
         }
         .task { await viewModel.load() }
     }
@@ -419,6 +422,8 @@ struct ShareReportFlowView: View {
 /// image rendered from the same DTO.
 struct ShareReportPreviewPage: View {
     @ObservedObject var viewModel: ShareReportFlowViewModel
+    @Binding var rootTab: RootTab
+    @Binding var path: [RootDestination]
 
     var body: some View {
         ScrollView {
@@ -443,6 +448,17 @@ struct ShareReportPreviewPage: View {
                 }
                 statusLine
                     .padding(.horizontal, FCPrimitives.space4)
+                // C15: always visible after the card and status line, in every
+                // share state. Navigation only — the temp report is cleaned up
+                // by the existing `onDisappear { viewModel.close() }`.
+                FCSecondaryButton(
+                    title: String(localized: "share.done"),
+                    isEnabled: !viewModel.isSharing
+                ) {
+                    path.returnToToday(tab: &rootTab)
+                }
+                .accessibilityIdentifier(FCAccessibilityID.shareReportDone)
+                .padding(.horizontal, FCPrimitives.space4)
             }
             .padding(.bottom, FCPrimitives.space6)
         }
