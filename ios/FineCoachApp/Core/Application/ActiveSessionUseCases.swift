@@ -9,8 +9,13 @@ public struct ActiveSessionUseCases: Sendable {
     private let clock: any Clock
     private let ids: any IDGenerator
 
+    /// Aggregate status for the single-Session call sites.
     public var saveStatus: PersistenceProjectionStatus {
         coordinator.saveStatus
+    }
+
+    public func saveStatus(sessionID: StableUUID) -> PersistenceProjectionStatus {
+        coordinator.saveStatus(sessionID: sessionID)
     }
 
     public init(
@@ -39,15 +44,21 @@ public struct ActiveSessionUseCases: Sendable {
 
     public func reconcileOnLaunch() async throws -> RecoveryLaunchDecision {
         let decision = try await coordinator.reconcileOnLaunch()
-        try await reapSessionScopeClaims(for: decision)
+        // Reap only session-scope claims that no CURRENT in-progress Session
+        // still owns; finishing or launching one Student must not release
+        // another Student's session-only names (M1A-FR-018 revision). If the
+        // read fails, leave claims alone rather than deleting every Session's.
+        if let active = try? await sessionRepository.loadAllActive() {
+            try await reconcileSessionScopeClaims(for: active)
+        }
         return decision
     }
 
-    public func retry() async throws -> Session {
-        try await coordinator.retry()
+    public func retry(sessionID: StableUUID? = nil) async throws -> Session {
+        try await coordinator.retry(sessionID: sessionID)
     }
 
-    public func checkpointOnBackground() async throws -> Session? {
+    public func checkpointOnBackground() async throws -> [Session] {
         try await coordinator.checkpointOnBackground()
     }
 
@@ -75,7 +86,7 @@ public struct ActiveSessionUseCases: Sendable {
     }
 
     public func startOrOpen(studentID: StableUUID, trainingFocus: Set<BodyPart> = []) async throws -> Session {
-        if let active = try await coordinator.workingCopy() {
+        if let active = try await coordinator.workingCopy(studentID: studentID) {
             return active
         }
         let student = try await studentRepository.student(id: studentID)
@@ -88,23 +99,71 @@ public struct ActiveSessionUseCases: Sendable {
             trainingFocus: trainingFocus,
             now: clock.nowUTC()
         )
-        return try await coordinator.persist(session)
+        do {
+            return try await coordinator.persist(session)
+        } catch DomainError.conflict {
+            // A concurrent start for the same Student won; return his Session
+            // instead of creating a second one.
+            if let existing = try await coordinator.workingCopy(studentID: studentID) {
+                return existing
+            }
+            throw DomainError.conflict
+        }
     }
 
+    /// Compatibility for single-Session call sites. With several Sessions in
+    /// progress this throws rather than returning a different Student's class.
     public func loadActive() async throws -> Session? {
         try await sessionRepository.loadActive()
     }
 
-    /// The CURRENT Session's own `SessionSection` rows (T032 UI: grouping
-    /// display + the exclusion set `TemplateUseCases.saveAsTemplate` needs).
-    public func sessionSections() async throws -> [SessionSection] {
-        guard let current = try await coordinator.workingCopy() else {
+    public func loadActive(sessionID: StableUUID) async throws -> Session? {
+        if let working = try await coordinator.workingCopy(sessionID: sessionID),
+            working.state == .inProgress
+        {
+            return working
+        }
+        return try await sessionRepository.loadActive(sessionID: sessionID)
+    }
+
+    public func loadActive(studentID: StableUUID) async throws -> Session? {
+        if let working = try await coordinator.workingCopy(studentID: studentID),
+            working.state == .inProgress
+        {
+            return working
+        }
+        return try await sessionRepository.loadActive(studentID: studentID)
+    }
+
+    public func loadAllActive() async throws -> [Session] {
+        let database = try await sessionRepository.loadAllActive()
+        var byID = Dictionary(uniqueKeysWithValues: database.map { ($0.id, $0) })
+        for session in database {
+            if let working = try? await coordinator.workingCopy(sessionID: session.id),
+                working.state == .inProgress, working.revision >= session.revision
+            {
+                byID[session.id] = working
+            }
+        }
+        return byID.values.sorted { $0.startedAtUTC < $1.startedAtUTC }
+    }
+
+    /// The Session's own `SessionSection` rows (T032 UI: grouping display +
+    /// the exclusion set `TemplateUseCases.saveAsTemplate` needs).
+    public func sessionSections(sessionID: StableUUID? = nil) async throws -> [SessionSection] {
+        let sessionID = try await resolveSessionID(sessionID)
+        guard let current = try await coordinator.workingCopy(sessionID: sessionID) else {
             return []
         }
         return try await sectionRepository.sections(ownerKind: .session, ownerID: current.id)
     }
 
-    public func addSessionOnlyExercise(displayName: String, recordMode: RecordMode) async throws -> Session {
+    public func addSessionOnlyExercise(
+        sessionID: StableUUID? = nil,
+        displayName: String,
+        recordMode: RecordMode
+    ) async throws -> Session {
+        let sessionID = try await resolveSessionID(sessionID)
         let exerciseID = StableUUID(ids.makeID())
         let ownerID = try StableExerciseID(exerciseID.rawValue.uuidString)
         let claim = try ExerciseNameClaim(
@@ -115,7 +174,7 @@ public struct ActiveSessionUseCases: Sendable {
         )
         try await exerciseRepository.acquireUnifiedClaim(claim)
         do {
-            return try await mutate { session in
+            return try await mutate(sessionID: sessionID) { session in
                 try session.addingSessionOnlyExercise(
                     id: exerciseID,
                     displayName: displayName,
@@ -124,7 +183,7 @@ public struct ActiveSessionUseCases: Sendable {
                 )
             }
         } catch {
-            if !(await workingCopyContainsExercise(id: exerciseID)) {
+            if !(await workingCopyContainsExercise(sessionID: sessionID, id: exerciseID)) {
                 await releaseClaimBestEffort(ownerID: ownerID)
             }
             throw error
@@ -135,9 +194,10 @@ public struct ActiveSessionUseCases: Sendable {
         try await exerciseRepository.searchActive(query: query)
     }
 
-    public func addCatalogExercise(itemID: StableExerciseID) async throws -> Session {
+    public func addCatalogExercise(sessionID: StableUUID? = nil, itemID: StableExerciseID) async throws -> Session {
+        let sessionID = try await resolveSessionID(sessionID)
         let item = try await exerciseRepository.selectableCatalogItem(id: itemID)
-        return try await mutate { session in
+        return try await mutate(sessionID: sessionID) { session in
             try session.addingCatalogExercise(
                 id: StableUUID(ids.makeID()),
                 item: item,
@@ -157,10 +217,12 @@ public struct ActiveSessionUseCases: Sendable {
     }
 
     public func addCustomToLibraryAndSession(
+        sessionID: StableUUID? = nil,
         name: String,
         recordMode: RecordMode,
         isUnilateral: Bool = false
     ) async throws -> Session {
+        let sessionID = try await resolveSessionID(sessionID)
         let item = try await exerciseRepository.createCustom(
             name: name,
             recordMode: recordMode,
@@ -177,7 +239,7 @@ public struct ActiveSessionUseCases: Sendable {
                     isUnilateral: true
                 )
             }
-            return try await mutate { session in
+            return try await mutate(sessionID: sessionID) { session in
                 try session.addingCatalogExercise(
                     id: StableUUID(ids.makeID()),
                     item: item,
@@ -185,31 +247,46 @@ public struct ActiveSessionUseCases: Sendable {
                 )
             }
         } catch {
-            if !(await workingCopyContainsCatalogSource(id: item.id)) {
+            if !(await workingCopyContainsCatalogSource(sessionID: sessionID, id: item.id)) {
                 await archiveCustomBestEffort(id: item.id)
             }
             throw error
         }
     }
 
-    public func reorderExercises(orderedIDs: [StableUUID]) async throws -> Session {
-        try await mutate { try $0.reorderingExercises(ids: orderedIDs, now: clock.nowUTC()) }
+    public func reorderExercises(sessionID: StableUUID? = nil, orderedIDs: [StableUUID]) async throws -> Session {
+        let sessionID = try await resolveSessionID(sessionID)
+        return try await mutate(sessionID: sessionID) {
+            try $0.reorderingExercises(ids: orderedIDs, now: clock.nowUTC())
+        }
     }
 
-    public func removeExercise(exerciseID: StableUUID, confirmedIfCompleted: Bool) async throws -> Session {
-        let session = try await mutate {
+    public func removeExercise(
+        sessionID: StableUUID? = nil,
+        exerciseID: StableUUID,
+        confirmedIfCompleted: Bool
+    ) async throws -> Session {
+        let sessionID = try await resolveSessionID(sessionID)
+        let session = try await mutate(sessionID: sessionID) {
             try $0.removingExercise(
                 id: exerciseID,
                 confirmedIfCompleted: confirmedIfCompleted,
                 now: clock.nowUTC()
             )
         }
-        try await reconcileSessionScopeClaims(for: session)
+        if let active = try? await sessionRepository.loadAllActive() {
+            try await reconcileSessionScopeClaims(for: active)
+        }
         return session
     }
 
-    public func addSet(exerciseID: StableUUID, input: TrainingSetInput) async throws -> Session {
-        try await mutate {
+    public func addSet(
+        sessionID: StableUUID? = nil,
+        exerciseID: StableUUID,
+        input: TrainingSetInput
+    ) async throws -> Session {
+        let sessionID = try await resolveSessionID(sessionID)
+        return try await mutate(sessionID: sessionID) {
             try $0.addingSet(
                 exerciseID: exerciseID,
                 setID: StableUUID(ids.makeID()),
@@ -219,16 +296,27 @@ public struct ActiveSessionUseCases: Sendable {
         }
     }
 
-    public func editSet(setID: StableUUID, input: TrainingSetInput) async throws -> Session {
-        try await mutate { try $0.editingSet(setID: setID, input: input, now: clock.nowUTC()) }
+    public func editSet(
+        sessionID: StableUUID? = nil,
+        setID: StableUUID,
+        input: TrainingSetInput
+    ) async throws -> Session {
+        let sessionID = try await resolveSessionID(sessionID)
+        return try await mutate(sessionID: sessionID) {
+            try $0.editingSet(setID: setID, input: input, now: clock.nowUTC())
+        }
     }
 
-    public func confirmSet(setID: StableUUID) async throws -> Session {
-        try await mutate { try $0.confirmingSet(setID: setID, now: clock.nowUTC()) }
+    public func confirmSet(sessionID: StableUUID? = nil, setID: StableUUID) async throws -> Session {
+        let sessionID = try await resolveSessionID(sessionID)
+        return try await mutate(sessionID: sessionID) {
+            try $0.confirmingSet(setID: setID, now: clock.nowUTC())
+        }
     }
 
-    public func copySet(sourceSetID: StableUUID) async throws -> Session {
-        try await mutate {
+    public func copySet(sessionID: StableUUID? = nil, sourceSetID: StableUUID) async throws -> Session {
+        let sessionID = try await resolveSessionID(sessionID)
+        return try await mutate(sessionID: sessionID) {
             try $0.copyingSet(
                 sourceSetID: sourceSetID,
                 newSetID: StableUUID(ids.makeID()),
@@ -237,43 +325,55 @@ public struct ActiveSessionUseCases: Sendable {
         }
     }
 
-    public func undoSet(setID: StableUUID) async throws -> Session {
-        try await mutate { try $0.undoingSet(setID: setID, now: clock.nowUTC()) }
+    public func undoSet(sessionID: StableUUID? = nil, setID: StableUUID) async throws -> Session {
+        let sessionID = try await resolveSessionID(sessionID)
+        return try await mutate(sessionID: sessionID) {
+            try $0.undoingSet(setID: setID, now: clock.nowUTC())
+        }
     }
 
-    public func deleteSet(setID: StableUUID) async throws -> Session {
-        try await mutate { try $0.deletingSet(setID: setID, now: clock.nowUTC()) }
+    public func deleteSet(sessionID: StableUUID? = nil, setID: StableUUID) async throws -> Session {
+        let sessionID = try await resolveSessionID(sessionID)
+        return try await mutate(sessionID: sessionID) {
+            try $0.deletingSet(setID: setID, now: clock.nowUTC())
+        }
     }
 
-    public func restoreDeletedSet(_ set: TrainingSet, at originalIndex: Int) async throws -> Session {
-        try await mutate {
+    public func restoreDeletedSet(
+        sessionID: StableUUID? = nil,
+        _ set: TrainingSet,
+        at originalIndex: Int
+    ) async throws -> Session {
+        let sessionID = try await resolveSessionID(sessionID)
+        return try await mutate(sessionID: sessionID) {
             try $0.restoringSet(set, at: originalIndex, now: clock.nowUTC())
         }
     }
 
-    public func discardUnresolved() async throws -> Session {
-        try await mutate { try $0.discardingUnresolvedSets(now: clock.nowUTC()) }
+    public func discardUnresolved(sessionID: StableUUID? = nil) async throws -> Session {
+        let sessionID = try await resolveSessionID(sessionID)
+        return try await mutate(sessionID: sessionID) {
+            try $0.discardingUnresolvedSets(now: clock.nowUTC())
+        }
     }
 
     // MARK: - Template application (M1B-FR-019, D-009) and Sections (M1B-FR-020/021)
 
-    /// Deep-copies a template's Exercise/Section snapshot onto the CURRENT
+    /// Deep-copies a template's Exercise/Section snapshot onto the addressed
     /// working-copy Session as new, independent `.pending` Exercises/Sets
-    /// (M1B-FR-019). `templateExercises`/`templateSections` are the
-    /// read-only snapshot `TemplateUseCases.loadApplicationSnapshot` already
-    /// fetched; `existingSessionSections` is this Session's current Section
-    /// rows (from `TemplateUseCases.sessionSections`). The returned
-    /// `newSections` MUST be persisted by the caller via
-    /// `TemplateUseCases.persistAppliedSections` -- this call only persists
-    /// the Session side (through the same crash-recovery-safe
+    /// (M1B-FR-019). The returned `newSections` MUST be persisted by the
+    /// caller via `TemplateUseCases.persistAppliedSections` -- this call only
+    /// persists the Session side (through the same crash-recovery-safe
     /// `ActiveSessionCoordinator` every other Session mutation here uses).
     public func applyTemplate(
+        sessionID: StableUUID? = nil,
         templateExercises: [TemplateExercise],
         templateSections: [SessionSection],
         templateTrainingFocus: Set<BodyPart> = [],
         existingSessionSections: [SessionSection]
     ) async throws -> TemplateApplicationResult {
-        guard let current = try await coordinator.workingCopy() else {
+        let sessionID = try await resolveSessionID(sessionID)
+        guard let current = try await coordinator.workingCopy(sessionID: sessionID) else {
             throw DomainError.notFound
         }
         let now = clock.nowUTC()
@@ -292,10 +392,11 @@ public struct ActiveSessionUseCases: Sendable {
         return TemplateApplicationResult(session: savedSession, newSections: result.newSections)
     }
 
-    /// Creates a new, empty Section at the end of the CURRENT Session's
+    /// Creates a new, empty Section at the end of the addressed Session's
     /// unified order axis (M1B-FR-020). Does not touch any Exercise.
-    public func createSection(name: String) async throws -> SessionSection {
-        guard let current = try await coordinator.workingCopy() else {
+    public func createSection(sessionID: StableUUID? = nil, name: String) async throws -> SessionSection {
+        let sessionID = try await resolveSessionID(sessionID)
+        guard let current = try await coordinator.workingCopy(sessionID: sessionID) else {
             throw DomainError.notFound
         }
         let existingSections = try await sectionRepository.sections(ownerKind: .session, ownerID: current.id)
@@ -312,8 +413,13 @@ public struct ActiveSessionUseCases: Sendable {
     }
 
     @discardableResult
-    public func renameSection(sectionID: StableUUID, name: String) async throws -> SessionSection {
-        guard let current = try await coordinator.workingCopy() else {
+    public func renameSection(
+        sessionID: StableUUID? = nil,
+        sectionID: StableUUID,
+        name: String
+    ) async throws -> SessionSection {
+        let sessionID = try await resolveSessionID(sessionID)
+        guard let current = try await coordinator.workingCopy(sessionID: sessionID) else {
             throw DomainError.notFound
         }
         let existingSections = try await sectionRepository.sections(ownerKind: .session, ownerID: current.id)
@@ -326,10 +432,13 @@ public struct ActiveSessionUseCases: Sendable {
     /// Moves one Exercise into `targetSectionID` (`nil` = unsectioned)
     /// without changing its position in the unified order axis
     /// (M1B-FR-020/021).
-    public func moveExerciseToSection(exerciseID: StableUUID, toSectionID targetSectionID: StableUUID?)
-        async throws -> Session
-    {
-        try await mutate { session in
+    public func moveExerciseToSection(
+        sessionID: StableUUID? = nil,
+        exerciseID: StableUUID,
+        toSectionID targetSectionID: StableUUID?
+    ) async throws -> Session {
+        let sessionID = try await resolveSessionID(sessionID)
+        return try await mutate(sessionID: sessionID) { session in
             try session.updatingExerciseSection(
                 exerciseID: exerciseID,
                 sectionID: targetSectionID,
@@ -338,14 +447,16 @@ public struct ActiveSessionUseCases: Sendable {
         }
     }
 
-    /// Deletes a Section from the CURRENT Session, requiring an explicit
+    /// Deletes a Section from the addressed Session, requiring an explicit
     /// disposition for its member Exercises (M1B-FR-020/021) -- there is no
     /// overload that omits `disposition`.
     public func deleteSection(
+        sessionID: StableUUID? = nil,
         sectionID: StableUUID,
         disposition: SessionSectionDeletionDisposition
     ) async throws -> Session {
-        guard let current = try await coordinator.workingCopy() else {
+        let sessionID = try await resolveSessionID(sessionID)
+        guard let current = try await coordinator.workingCopy(sessionID: sessionID) else {
             throw DomainError.notFound
         }
         let existingSections = try await sectionRepository.sections(ownerKind: .session, ownerID: current.id)
@@ -372,91 +483,101 @@ public struct ActiveSessionUseCases: Sendable {
             }
         }
         let saved = try await coordinator.persist(updated)
-        try await reconcileSessionScopeClaims(for: saved)
+        if let active = try? await sessionRepository.loadAllActive() {
+            try await reconcileSessionScopeClaims(for: active)
+        }
         try await sectionRepository.delete(id: sectionID)
         return saved
     }
 
-    public func applyCoachAdjustedDuration(_ seconds: DecimalValue) async throws -> Session {
-        try await mutate { try $0.applyingCoachAdjustedDuration(seconds, now: clock.nowUTC()) }
+    public func applyCoachAdjustedDuration(
+        sessionID: StableUUID? = nil,
+        _ seconds: DecimalValue
+    ) async throws -> Session {
+        let sessionID = try await resolveSessionID(sessionID)
+        return try await mutate(sessionID: sessionID) {
+            try $0.applyingCoachAdjustedDuration(seconds, now: clock.nowUTC())
+        }
     }
 
-    public func finish() async throws -> Session {
-        try await coordinator.ensureProjectionReadyForCompletion()
-        guard let current = try await coordinator.workingCopy() else {
+    public func finish(sessionID: StableUUID? = nil) async throws -> Session {
+        let sessionID = try await resolveSessionID(sessionID)
+        try await coordinator.ensureProjectionReadyForCompletion(sessionID: sessionID)
+        guard let current = try await coordinator.workingCopy(sessionID: sessionID) else {
             throw DomainError.notFound
         }
         let finished = try await coordinator.persistAndReleaseSessionScopeClaims(
             try current.finished(now: clock.nowUTC())
         )
-        await reconcileSessionScopeClaimsBestEffort(for: finished)
+        if let active = try? await sessionRepository.loadAllActive() {
+            await reconcileSessionScopeClaimsBestEffort(for: active)
+        }
         return finished
     }
 
-    public func abandonEmpty() async throws -> Session {
-        guard let current = try await coordinator.workingCopy() else {
+    public func abandonEmpty(sessionID: StableUUID? = nil) async throws -> Session {
+        let sessionID = try await resolveSessionID(sessionID)
+        guard let current = try await coordinator.workingCopy(sessionID: sessionID) else {
             throw DomainError.notFound
         }
         let abandoned = try await coordinator.persistAndReleaseSessionScopeClaims(
             try current.abandoned(now: clock.nowUTC())
         )
-        await reconcileSessionScopeClaimsBestEffort(for: abandoned)
+        if let active = try? await sessionRepository.loadAllActive() {
+            await reconcileSessionScopeClaimsBestEffort(for: active)
+        }
         return abandoned
     }
 
-    private func mutate(_ transform: (Session) throws -> Session) async throws -> Session {
-        guard let current = try await coordinator.workingCopy() else {
+    private func mutate(
+        sessionID: StableUUID,
+        _ transform: (Session) throws -> Session
+    ) async throws -> Session {
+        guard let current = try await coordinator.workingCopy(sessionID: sessionID) else {
             throw DomainError.notFound
         }
         return try await coordinator.persist(transform(current))
     }
 
-    private func reapSessionScopeClaims(for decision: RecoveryLaunchDecision) async throws {
-        let session: Session?
-        switch decision {
-        case .noActiveSession:
-            session = nil
-        case .failClosed:
-            session = try await sessionRepository.loadActive()
-        case .consistent(let recovered), .ignoreOlderSnapshot(let recovered):
-            session = recovered
-        case .replay(let snapshot):
-            session = snapshot.session
+    private func resolveSessionID(_ explicit: StableUUID?) async throws -> StableUUID {
+        if let explicit {
+            return explicit
         }
-        try await reconcileSessionScopeClaims(for: session)
+        if let sole = try await coordinator.soleKnownSessionID() {
+            return sole
+        }
+        throw DomainError.notFound
     }
 
     /// Drops claims for removed session-only exercises and restores any
-    /// shadowed built-in names in the same persistence transaction.
-    private func reconcileSessionScopeClaims(for session: Session?) async throws {
-        let keepIDs: Set<String>
-        if session?.state == .inProgress {
-            keepIDs = Set(
-                (session?.exercises ?? [])
-                    .filter { $0.sourceKind == .sessionOnly }
-                    .map { $0.id.rawValue.uuidString }
-            )
-        } else {
-            keepIDs = []
-        }
+    /// shadowed built-in names in the same persistence transaction. Keeps the
+    /// union of every in-progress Session's session-only ids.
+    private func reconcileSessionScopeClaims(for sessions: [Session]) async throws {
+        let keepIDs = Set(
+            sessions
+                .filter { $0.state == .inProgress }
+                .flatMap { $0.exercises }
+                .filter { $0.sourceKind == .sessionOnly }
+                .map { $0.id.rawValue.uuidString }
+        )
         try await exerciseRepository.reapSessionScopeClaims(keepingOwnerIDs: keepIDs)
     }
 
-    private func reconcileSessionScopeClaimsBestEffort(for session: Session) async {
+    private func reconcileSessionScopeClaimsBestEffort(for sessions: [Session]) async {
         do {
-            try await reconcileSessionScopeClaims(for: session)
+            try await reconcileSessionScopeClaims(for: sessions)
         } catch {
             // Terminal session durability is already committed. Launch
             // recovery retries this derived catalog reconciliation later.
         }
     }
 
-    private func workingCopyContainsExercise(id: StableUUID) async -> Bool {
-        (try? await coordinator.workingCopy())?.exercises.contains { $0.id == id } == true
+    private func workingCopyContainsExercise(sessionID: StableUUID, id: StableUUID) async -> Bool {
+        (try? await coordinator.workingCopy(sessionID: sessionID))?.exercises.contains { $0.id == id } == true
     }
 
-    private func workingCopyContainsCatalogSource(id: StableExerciseID) async -> Bool {
-        (try? await coordinator.workingCopy())?.exercises.contains { $0.sourceID == id } == true
+    private func workingCopyContainsCatalogSource(sessionID: StableUUID, id: StableExerciseID) async -> Bool {
+        (try? await coordinator.workingCopy(sessionID: sessionID))?.exercises.contains { $0.sourceID == id } == true
     }
 
     private func releaseClaimBestEffort(ownerID: StableExerciseID) async {

@@ -166,6 +166,17 @@ final class ActiveSessionViewModel: ObservableObject {
         return session.exercises.last
     }
 
+    /// This page owns exactly one Session; every use-case call names it so a
+    /// concurrently open Student's Session is never touched.
+    private var sessionID: StableUUID? { session?.id }
+
+    private var resolvedSaveStatus: PersistenceProjectionStatus {
+        guard let sessionID else {
+            return .saved(revision: 0)
+        }
+        return useCases.saveStatus(sessionID: sessionID)
+    }
+
     var statsText: String {
         let count = session?.completedSetCount ?? 0
         return "\(String(localized: "session.stats.completedLabel")) \(count)"
@@ -184,13 +195,14 @@ final class ActiveSessionViewModel: ObservableObject {
             session = try await useCases.startOrOpen(studentID: studentID)
             selectedExerciseID = session?.exercises.last?.id
             errorMessage = nil
-            saveStatus = useCases.saveStatus
+            saveStatus = resolvedSaveStatus
             await loadSections()
-            completedHistory = try await useCases.completedHistory(studentID: studentID)
+            let sessionStudentID = session?.studentID ?? studentID
+            completedHistory = try await useCases.completedHistory(studentID: sessionStudentID)
             lastPerformances = LastExercisePerformanceLookup(sessions: completedHistory)
             do {
                 recentCatalogMatches = RecentExerciseSelection.entries(
-                    from: completedHistory, studentID: studentID,
+                    from: completedHistory, studentID: sessionStudentID,
                     availableEntries: try await useCases.searchCatalog(query: ""))
             } catch {
                 recentCatalogMatches = []
@@ -236,7 +248,7 @@ final class ActiveSessionViewModel: ObservableObject {
     // MARK: - Template save/section management (M1B-FR-018/019/020/021)
 
     func loadSections() async {
-        sections = (try? await useCases.sessionSections()) ?? []
+        sections = (try? await useCases.sessionSections(sessionID: sessionID)) ?? []
     }
 
     func saveAsTemplate() async {
@@ -267,7 +279,7 @@ final class ActiveSessionViewModel: ObservableObject {
             return
         }
         do {
-            _ = try await useCases.createSection(name: name)
+            _ = try await useCases.createSection(sessionID: sessionID, name: name)
             newSectionName = ""
             await loadSections()
         } catch {
@@ -278,6 +290,7 @@ final class ActiveSessionViewModel: ObservableObject {
     func moveExercise(_ exerciseID: StableUUID, toSectionID sectionID: StableUUID?) async {
         await run {
             self.session = try await self.useCases.moveExerciseToSection(
+                sessionID: self.sessionID,
                 exerciseID: exerciseID,
                 toSectionID: sectionID
             )
@@ -298,7 +311,11 @@ final class ActiveSessionViewModel: ObservableObject {
 
     func deleteSection(_ section: SessionSection, disposition: SessionSectionDeletionDisposition) async {
         await run {
-            self.session = try await self.useCases.deleteSection(sectionID: section.id, disposition: disposition)
+            self.session = try await self.useCases.deleteSection(
+                sessionID: self.sessionID,
+                sectionID: section.id,
+                disposition: disposition
+            )
         }
         pendingSectionDeletion = nil
         await loadSections()
@@ -318,7 +335,7 @@ final class ActiveSessionViewModel: ObservableObject {
 
     func retrySave() async {
         await run {
-            self.session = try await self.useCases.retry()
+            self.session = try await self.useCases.retry(sessionID: self.sessionID)
         }
     }
 
@@ -329,6 +346,7 @@ final class ActiveSessionViewModel: ObservableObject {
         let unilateral = newExerciseIsUnilateral && mode == .weightReps
         await run {
             let updated = try await self.useCases.addSessionOnlyExercise(
+                sessionID: self.sessionID,
                 displayName: name,
                 recordMode: mode
             )
@@ -346,6 +364,7 @@ final class ActiveSessionViewModel: ObservableObject {
         let unilateral = newExerciseIsUnilateral && mode == .weightReps
         await run {
             let updated = try await self.useCases.addCustomToLibraryAndSession(
+                sessionID: self.sessionID,
                 name: name,
                 recordMode: mode,
                 isUnilateral: unilateral
@@ -362,7 +381,10 @@ final class ActiveSessionViewModel: ObservableObject {
 
     func addCatalogMatch(_ id: StableExerciseID) async {
         await run {
-            let updated = try await self.useCases.addCatalogExercise(itemID: id)
+            let updated = try await self.useCases.addCatalogExercise(
+                sessionID: self.sessionID,
+                itemID: id
+            )
             let mode = updated.exercises.last?.recordModeSnapshot ?? .weightReps
             await self.refreshEntryFlags()
             self.applySavedExercise(updated, mode: mode)
@@ -389,6 +411,7 @@ final class ActiveSessionViewModel: ObservableObject {
         Task {
             await run {
                 self.session = try await self.useCases.removeExercise(
+                    sessionID: self.sessionID,
                     exerciseID: exercise.id,
                     confirmedIfCompleted: false
                 )
@@ -404,6 +427,7 @@ final class ActiveSessionViewModel: ObservableObject {
         presentedSheet = nil
         await run {
             self.session = try await self.useCases.removeExercise(
+                sessionID: self.sessionID,
                 exerciseID: exerciseID,
                 confirmedIfCompleted: true
             )
@@ -428,6 +452,7 @@ final class ActiveSessionViewModel: ObservableObject {
         }
         await run {
             let updated = try await self.useCases.addSet(
+                sessionID: self.sessionID,
                 exerciseID: exercise.id,
                 input: self.currentInput(for: exercise)
             )
@@ -454,12 +479,16 @@ final class ActiveSessionViewModel: ObservableObject {
         }
         let confirmed = await run {
             let input = self.currentInput(for: exercise)
-            let added = try await self.useCases.addSet(exerciseID: exercise.id, input: input)
+            let added = try await self.useCases.addSet(
+                sessionID: self.sessionID,
+                exerciseID: exercise.id,
+                input: input
+            )
             guard let newSetID = added.exercises.first(where: { $0.id == exercise.id })?.sets.last?.id else {
                 throw DomainError.notFound
             }
             self.session = try await self.signposts.measureSetConfirm {
-                try await self.useCases.confirmSet(setID: newSetID)
+                try await self.useCases.confirmSet(sessionID: self.sessionID, setID: newSetID)
             }
             self.offerUndo(for: newSetID)
         }
@@ -474,7 +503,7 @@ final class ActiveSessionViewModel: ObservableObject {
     func confirmSet(setID: StableUUID) async {
         let confirmed = await run {
             self.session = try await self.signposts.measureSetConfirm {
-                try await self.useCases.confirmSet(setID: setID)
+                try await self.useCases.confirmSet(sessionID: self.sessionID, setID: setID)
             }
         }
         if errorMessage == nil, activeDraftSetID == setID {
@@ -525,7 +554,11 @@ final class ActiveSessionViewModel: ObservableObject {
         }
         let input = currentInput(for: exercise)
         await run {
-            self.session = try await self.useCases.editSet(setID: setID, input: input)
+            self.session = try await self.useCases.editSet(
+                sessionID: self.sessionID,
+                setID: setID,
+                input: input
+            )
         }
         if errorMessage == nil {
             editingSetID = nil
@@ -546,7 +579,7 @@ final class ActiveSessionViewModel: ObservableObject {
 
         if set.state == .completed {
             let removed = await run {
-                self.session = try await self.useCases.deleteSet(setID: setID)
+                self.session = try await self.useCases.deleteSet(sessionID: self.sessionID, setID: setID)
             }
             guard removed else {
                 return
@@ -566,7 +599,7 @@ final class ActiveSessionViewModel: ObservableObject {
         }
 
         await run {
-            self.session = try await self.useCases.deleteSet(setID: setID)
+            self.session = try await self.useCases.deleteSet(sessionID: self.sessionID, setID: setID)
         }
         guard errorMessage == nil else {
             return
@@ -591,6 +624,7 @@ final class ActiveSessionViewModel: ObservableObject {
         }
         let restored = await run {
             self.session = try await self.useCases.restoreDeletedSet(
+                sessionID: self.sessionID,
                 deletedSetUndo.set,
                 at: deletedSetUndo.originalIndex
             )
@@ -617,7 +651,7 @@ final class ActiveSessionViewModel: ObservableObject {
             return
         }
         let undone = await run {
-            self.session = try await self.useCases.deleteSet(setID: setID)
+            self.session = try await self.useCases.deleteSet(sessionID: self.sessionID, setID: setID)
         }
         guard undone else {
             return
@@ -653,7 +687,10 @@ final class ActiveSessionViewModel: ObservableObject {
     func confirmDurationReview(_ seconds: String) async {
         presentedSheet = nil
         await run {
-            self.session = try await self.useCases.applyCoachAdjustedDuration(try DecimalValue(seconds))
+            self.session = try await self.useCases.applyCoachAdjustedDuration(
+                sessionID: self.sessionID,
+                try DecimalValue(seconds)
+            )
         }
         if session?.finishGate == .canComplete, session?.coachAdjustedDurationSeconds != nil {
             requestFinish()
@@ -664,7 +701,7 @@ final class ActiveSessionViewModel: ObservableObject {
         presentedSheet = nil
         await run {
             let abandoned = try await self.signposts.measureSessionFinish {
-                try await self.useCases.abandonEmpty()
+                try await self.useCases.abandonEmpty(sessionID: self.sessionID)
             }
             // The Session is already abandoned; a failed Appointment update
             // must not turn that into a visible failure.
@@ -678,11 +715,14 @@ final class ActiveSessionViewModel: ObservableObject {
     func discardDraftsAndFinish() async {
         presentedSheet = nil
         await run {
-            _ = try await self.useCases.discardUnresolved()
-            if let gate = try await self.useCases.loadActive()?.finishGate, gate == .canComplete {
+            guard let sessionID = self.sessionID else { throw DomainError.notFound }
+            _ = try await self.useCases.discardUnresolved(sessionID: sessionID)
+            if let gate = try await self.useCases.loadActive(sessionID: sessionID)?.finishGate,
+                gate == .canComplete
+            {
                 try await self.finishNowThrowing()
             } else {
-                self.session = try await self.useCases.loadActive()
+                self.session = try await self.useCases.loadActive(sessionID: sessionID)
             }
         }
     }
@@ -697,7 +737,7 @@ final class ActiveSessionViewModel: ObservableObject {
 
     private func finishNowThrowing() async throws {
         let finished = try await signposts.measureSessionFinish {
-            try await self.useCases.finish()
+            try await self.useCases.finish(sessionID: self.sessionID)
         }
         // Set before `session` so the view holds the summary push until the
         // coach has answered (M1B-FR-013/014).
@@ -971,7 +1011,11 @@ final class ActiveSessionViewModel: ObservableObject {
         guard let notifications else {
             return
         }
-        let plan = RestEndNotification.plan(endsAt: restTimer?.endsAt, now: now())
+        let plan = RestEndNotification.plan(
+            endsAt: restTimer?.endsAt,
+            now: now(),
+            sessionID: sessionID
+        )
         let previous = restNotificationTask
         restNotificationTask = Task { @MainActor in
             _ = await previous?.value
@@ -1050,7 +1094,7 @@ final class ActiveSessionViewModel: ObservableObject {
             try await work()
             errorMessage = nil
             exerciseNameConflict = nil
-            saveStatus = useCases.saveStatus
+            saveStatus = resolvedSaveStatus
             return true
         } catch {
             present(error)
@@ -1059,7 +1103,7 @@ final class ActiveSessionViewModel: ObservableObject {
     }
 
     private func present(_ error: Error) {
-        saveStatus = useCases.saveStatus
+        saveStatus = resolvedSaveStatus
         if error as? DomainError == .conflict {
             exerciseNameConflict = String(localized: "exercise.conflict")
             errorMessage = nil

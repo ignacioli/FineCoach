@@ -12,7 +12,7 @@ final class StudentListViewModel: ObservableObject {
 
     @Published var students: [Student] = []
     @Published var query = ""
-    @Published var inProgress: InProgressTrainingSummary?
+    @Published var inProgress: [InProgressTrainingSummary] = []
     @Published var errorMessage: String?
     @Published var archivedCount = 0
     @Published var rowInfo: [StableUUID: RowInfo] = [:]
@@ -45,10 +45,10 @@ final class StudentListViewModel: ObservableObject {
         do {
             if showsArchived {
                 students = try await useCases.listArchived()
-                inProgress = nil
+                inProgress = []
             } else {
                 students = try await useCases.searchActive(query: query)
-                inProgress = try await useCases.inProgressTraining()
+                inProgress = try await useCases.inProgressTrainings()
                 archivedCount = try await useCases.listArchived().count
                 await loadRowInfo()
             }
@@ -212,8 +212,12 @@ struct StudentListView: View {
                         Task { await viewModel.reload() }
                     }
 
-                if let inProgress = viewModel.inProgress, viewModel.query.isEmpty {
-                    inTrainingBar(inProgress)
+                if !viewModel.inProgress.isEmpty, viewModel.query.isEmpty {
+                    VStack(spacing: FCPrimitives.space2) {
+                        ForEach(viewModel.inProgress, id: \.studentID) { summary in
+                            inTrainingBar(summary)
+                        }
+                    }
                 }
 
                 if let errorMessage = viewModel.errorMessage {
@@ -288,7 +292,11 @@ struct StudentListView: View {
                 path.append(.activeSession(summary.studentID.rawValue))
             }
         }
-        .accessibilityIdentifier(FCAccessibilityID.studentListInProgress)
+        .accessibilityIdentifier(
+            viewModel.inProgress.count == 1
+                ? FCAccessibilityID.studentListInProgress
+                : FCAccessibilityID.studentListInProgressRow(summary.studentID)
+        )
     }
 
     /// Avatar initial + name + "训练重点 · …" + next class / package hint + ›.

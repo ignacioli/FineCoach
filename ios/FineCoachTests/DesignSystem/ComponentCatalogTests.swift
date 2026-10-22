@@ -65,6 +65,36 @@ final class ComponentCatalogTests: XCTestCase {
         XCTAssertEqual(source.components(separatedBy: ".sensoryFeedback(").count - 1, 1)
     }
 
+    // MARK: - DS-HERO-CARD multi-row (W-08, approved 2026-10-22)
+
+    func testHeroCardMultiRowBuildsOneIdentifiedButtonPerRow() throws {
+        let source = try source("ios/FineCoachApp/DesignSystem/Components/FCHeroCard.swift")
+        let start = try XCTUnwrap(source.range(of: "private func multiRowCard"))
+        let multi = String(source[start.lowerBound...])
+        XCTAssertTrue(multi.contains("ForEach(rows)"))
+        XCTAssertEqual(
+            multi.components(separatedBy: "Button {").count - 1, 1,
+            "the multi-row variant must create exactly one Button per row, not one card-level Button")
+        XCTAssertTrue(multi.contains(".accessibilityIdentifier(row.accessibilityIdentifier)"))
+        XCTAssertTrue(multi.contains("minHeight: 44"))
+    }
+
+    func testHeroCardMultiRowCountFollowsRowsAndEmptyIsSuppressed() throws {
+        let hero = try source("ios/FineCoachApp/DesignSystem/Components/FCHeroCard.swift")
+        XCTAssertTrue(hero.contains("if isMultiRow"))
+        XCTAssertTrue(hero.contains("if rows.isEmpty"))
+        XCTAssertTrue(hero.contains("EmptyView()"))
+        let start = try XCTUnwrap(hero.range(of: "private func multiRowCard"))
+        let multi = String(hero[start.lowerBound...])
+        XCTAssertTrue(multi.contains("ForEach(rows)"))
+        XCTAssertTrue(multi.contains("if row.id != rows.first?.id"))
+
+        let today = try source("ios/FineCoachApp/Features/Today/TodayView.swift")
+        XCTAssertTrue(today.contains("if !viewModel.inProgress.isEmpty"))
+        XCTAssertTrue(today.contains("summaries.map { summary in"))
+        XCTAssertTrue(today.contains("summaries.count == 1, let summary = summaries.first"))
+    }
+
     // MARK: - Sources
 
     private struct IndexRow {
@@ -97,6 +127,10 @@ final class ComponentCatalogTests: XCTestCase {
             types.formUnion(Self.matches(Self.publicTypePattern, in: source))
         }
         return types
+    }
+
+    private func source(_ relativePath: String) throws -> String {
+        try String(contentsOf: repositoryRoot().appendingPathComponent(relativePath), encoding: .utf8)
     }
 
     private func componentsDoc() throws -> String {

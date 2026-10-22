@@ -80,6 +80,8 @@ final class VisionHarnessTests: XCTestCase {
         XCTAssertEqual(FCSemanticColors.textDisabledHex, "#A8A39A")
         // §10 C9: backfilled from the artwork, no primitive of its own.
         XCTAssertEqual(FCSemanticColors.textOnActionSecondaryHex, "#B0ABA2")
+        // §2.2, added 2026-10-22 (W-08): decorative line between hero rows.
+        XCTAssertEqual(FCSemanticColors.surfaceDividerOnActionHex, "#4C4A45")
         XCTAssertEqual(FCSemanticColors.statusSuccessHex, "#2A2822")
         XCTAssertEqual(FCSemanticColors.statusWarningHex, "#B45309")
         // §10 O1: dimmed from the original #D9563E (3.92:1) to #D4442A (4.51:1).

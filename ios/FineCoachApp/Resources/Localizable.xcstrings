@@ -2476,6 +2476,28 @@
         }
       }
     },
+    "today.inProgress.multiBadgeFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "进行中 · %d"
+          }
+        }
+      }
+    },
+    "today.inProgress.rowContinue": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "继续 ›"
+          }
+        }
+      }
+    },
     "today.section.nextUp": {
       "extractionState": "manual",
       "localizations": {
@@ -5672,7 +5694,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "训练中 · %1$@ · 已训练 %2$d 分钟"
+            "value": "%1$@ 训练中 · 已训练 %2$d 分钟"
           }
         }
       }
@@ -5683,7 +5705,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "训练中 · %@"
+            "value": "%@ 训练中"
           }
         }
       }

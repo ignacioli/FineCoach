@@ -12,8 +12,16 @@ public enum SessionFinishGate: Equatable, Sendable {
     case unresolvedDrafts
 }
 
+/// `ActiveSessionPointerMO.singletonKey` is unique. Since 2026-10-22 each
+/// Student with an in-progress Session owns one row keyed by the Student's
+/// UUID string (M1A-FR-018 revision). `singleton` is the legacy single-pointer
+/// key, read once at launch and migrated to the owning Student's key.
 public enum ActiveSessionPointerKey {
     public static let singleton = "active"
+
+    public static func student(_ studentID: StableUUID) -> String {
+        studentID.rawValue.uuidString
+    }
 }
 
 public struct Session: Hashable, Codable, Sendable, Identifiable {

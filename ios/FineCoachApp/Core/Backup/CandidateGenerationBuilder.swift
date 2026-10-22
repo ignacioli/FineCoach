@@ -56,9 +56,13 @@ enum CandidateGenerationBuilder {
     static func apply(
         _ inventory: BackupInventory,
         in context: NSManagedObjectContext
-    ) throws -> Session? {
+    ) throws -> [Session] {
         let inProgress = inventory.inProgressSessions
-        guard inProgress.count <= 1 else {
+        // M1A-FR-018 (2026-10-22 revision): several Students may be in
+        // progress, but one Student may never have two in-progress Sessions.
+        // A corrupt/malicious file that claims otherwise fails closed here.
+        let inProgressByStudent = Dictionary(grouping: inProgress, by: \.studentID)
+        guard inProgressByStudent.values.allSatisfy({ $0.count <= 1 }) else {
             throw BackupError.invalidState
         }
         // `CoursePackage.status == .active` is authoritative M1-B inventory
@@ -206,15 +210,16 @@ enum CandidateGenerationBuilder {
             object.setValue(setting.schemaVersion, forKey: "schemaVersion")
         }
 
-        if let active = inProgress.first {
-            return try SessionManagedObjectMapping.loadAggregate(
-                from: try SessionManagedObjectMapping.requireSession(id: active.id.rawValue, in: context),
+        let restoredActive = try inProgress.map { session in
+            try SessionManagedObjectMapping.loadAggregate(
+                from: try SessionManagedObjectMapping.requireSession(id: session.id.rawValue, in: context),
                 in: context
             )
         }
-        if let pointer = try SessionManagedObjectMapping.fetchPointer(in: context) {
-            context.delete(pointer)
-        }
-        return nil
+        try SessionManagedObjectMapping.deleteStalePointers(
+            activeSessionIDs: Set(restoredActive.map(\.id.rawValue)),
+            in: context
+        )
+        return restoredActive
     }
 }

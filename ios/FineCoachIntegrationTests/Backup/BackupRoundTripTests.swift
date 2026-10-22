@@ -574,7 +574,7 @@
                 XCTAssertEqual(restoredActive.id, inProgressSessionID)
                 XCTAssertEqual(restoredActive.state, .inProgress)
                 XCTAssertEqual(restoredActive.studentID, studentID)
-                XCTAssertEqual(pointer?.singletonKey, ActiveSessionPointerKey.singleton)
+                XCTAssertEqual(pointer?.singletonKey, ActiveSessionPointerKey.student(studentID))
                 XCTAssertEqual(pointer?.sessionID, inProgressSessionID.rawValue)
             } else {
                 XCTAssertNil(active)
@@ -615,10 +615,6 @@
         ) async throws -> (singletonKey: String, sessionID: UUID)? {
             try await writer.read { context in
                 let request = NSFetchRequest<NSManagedObject>(entityName: "ActiveSessionPointerMO")
-                request.predicate = NSPredicate(
-                    format: "singletonKey == %@",
-                    ActiveSessionPointerKey.singleton
-                )
                 request.fetchLimit = 1
                 guard let object = try context.fetch(request).first else {
                     return nil
