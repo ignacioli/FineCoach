@@ -48,7 +48,7 @@ final class StudentDetailViewModel: ObservableObject {
     func reload() async {
         do {
             student = try await useCases.student(id: studentID)
-            inProgress = try await useCases.inProgressTraining()
+            inProgress = try await useCases.inProgressTraining(studentID: studentID)
             let history = try await historyUseCases.listHistory(studentID: studentID)
             mostRecentCompletedSession = CompletedSession.mostRecent(in: history)
             if let appointmentUseCases {

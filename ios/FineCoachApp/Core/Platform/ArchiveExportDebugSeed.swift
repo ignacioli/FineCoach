@@ -97,22 +97,33 @@ import os
             ]
             for (index, entry) in plan.enumerated() {
                 setDaysAgo(entry.0)
-                _ = try await sessions.startOrOpen(studentID: student.id)
+                let active = try await sessions.startOrOpen(studentID: student.id)
                 for catalogID in entry.1 {
-                    let session = try await sessions.addCatalogExercise(itemID: catalogID)
+                    let session = try await sessions.addCatalogExercise(
+                        sessionID: active.id,
+                        itemID: catalogID
+                    )
                     try await recordSets(session, base: 50 + index * 5, using: sessions)
                 }
                 switch entry.2 {
                 case .custom(let name):
-                    let session = try await sessions.addCustomToLibraryAndSession(name: name, recordMode: .weightReps)
+                    let session = try await sessions.addCustomToLibraryAndSession(
+                        sessionID: active.id,
+                        name: name,
+                        recordMode: .weightReps
+                    )
                     try await recordSets(session, base: 10, using: sessions)
                 case .oneOff(let name):
-                    let session = try await sessions.addSessionOnlyExercise(displayName: name, recordMode: .weightReps)
+                    let session = try await sessions.addSessionOnlyExercise(
+                        sessionID: active.id,
+                        displayName: name,
+                        recordMode: .weightReps
+                    )
                     try await recordSets(session, base: 16, using: sessions)
                 case nil:
                     break
                 }
-                let finished = try await sessions.finish()
+                let finished = try await sessions.finish(sessionID: active.id)
                 _ = try await history.saveSummaryNotes(
                     sessionID: finished.id,
                     trainingFocus: [.chest, .thighs],
@@ -354,12 +365,15 @@ import os
             base: Int,
             using sessions: ActiveSessionUseCases
         ) async throws -> Session {
-            _ = try await sessions.startOrOpen(studentID: studentID)
+            let active = try await sessions.startOrOpen(studentID: studentID)
             for catalogID in exercises {
-                let session = try await sessions.addCatalogExercise(itemID: catalogID)
+                let session = try await sessions.addCatalogExercise(
+                    sessionID: active.id,
+                    itemID: catalogID
+                )
                 try await recordSets(session, base: base, using: sessions)
             }
-            return try await sessions.finish()
+            return try await sessions.finish(sessionID: active.id)
         }
 
         private enum Extra {
@@ -376,6 +390,7 @@ import os
             }
             for offset in 0..<3 {
                 let added = try await sessions.addSet(
+                    sessionID: session.id,
                     exerciseID: exerciseID,
                     input: TrainingSetInput(
                         recordMode: .weightReps,
@@ -385,7 +400,7 @@ import os
                     )
                 )
                 if let setID = added.exercises.last?.sets.last?.id {
-                    _ = try await sessions.confirmSet(setID: setID)
+                    _ = try await sessions.confirmSet(sessionID: session.id, setID: setID)
                 }
             }
         }

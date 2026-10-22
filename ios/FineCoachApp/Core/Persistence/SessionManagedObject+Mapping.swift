@@ -218,14 +218,41 @@ enum SessionManagedObjectMapping {
         return object
     }
 
-    static func inProgressSession(in context: NSManagedObjectContext) throws -> NSManagedObject? {
-        if let pointed = try pointedSession(in: context) {
+    /// Every in-progress Session, oldest start first, for the per-Student
+    /// launch reconciliation and the global claim reaper (M1A-FR-018 revision).
+    static func inProgressSessions(in context: NSManagedObjectContext) throws -> [NSManagedObject] {
+        let request = NSFetchRequest<NSManagedObject>(entityName: sessionEntityName)
+        request.predicate = NSPredicate(format: "state == %@", SessionState.inProgress.rawValue)
+        request.sortDescriptors = [
+            NSSortDescriptor(key: "startedAtUTC", ascending: true),
+            NSSortDescriptor(key: "id", ascending: true),
+        ]
+        return try context.fetch(request)
+    }
+
+    /// The Student's in-progress Session, preferring the Student's own pointer
+    /// and falling back to the legacy single pointer (still `"active"` until
+    /// the launch migration rewrites it).
+    static func inProgressSession(studentID: UUID, in context: NSManagedObjectContext) throws -> NSManagedObject? {
+        if let pointed = try pointedSession(studentID: studentID, in: context),
+            pointed.value(forKey: "state") as? String == SessionState.inProgress.rawValue
+        {
             return pointed
         }
         let request = NSFetchRequest<NSManagedObject>(entityName: sessionEntityName)
-        request.predicate = NSPredicate(format: "state == %@", SessionState.inProgress.rawValue)
+        request.predicate = NSPredicate(
+            format: "studentID == %@ AND state == %@",
+            studentID as CVarArg,
+            SessionState.inProgress.rawValue
+        )
         request.fetchLimit = 1
         return try context.fetch(request).first
+    }
+
+    /// Compatibility for the single-session call sites and tests: the first
+    /// in-progress Session in start order, if any.
+    static func inProgressSession(in context: NSManagedObjectContext) throws -> NSManagedObject? {
+        try inProgressSessions(in: context).first
     }
 
     static func loadAggregate(from sessionObject: NSManagedObject, in context: NSManagedObjectContext)
@@ -269,20 +296,97 @@ enum SessionManagedObjectMapping {
         return try loadAggregate(from: sessionObject, in: context)
     }
 
-    static func pointedSession(in context: NSManagedObjectContext) throws -> NSManagedObject? {
-        guard let pointer = try fetchPointer(in: context),
-            let sessionID = pointer.value(forKey: "sessionID") as? UUID
+    static func pointedSession(studentID: UUID, in context: NSManagedObjectContext) throws -> NSManagedObject? {
+        if let pointer = try fetchPointer(forStudentID: studentID, in: context),
+            let sessionID = pointer.value(forKey: "sessionID") as? UUID,
+            let session = try fetchSession(id: sessionID, in: context)
+        {
+            return session
+        }
+        // Legacy data: one global `"active"` pointer whose Session belongs to
+        // this Student. The launch migration rewrites the key, but reads before
+        // that migration must still find the right Session.
+        guard let legacy = try fetchLegacyPointer(in: context),
+            let sessionID = legacy.value(forKey: "sessionID") as? UUID,
+            let session = try fetchSession(id: sessionID, in: context),
+            session.value(forKey: "studentID") as? UUID == studentID
         else {
             return nil
         }
-        return try fetchSession(id: sessionID, in: context)
+        return session
     }
 
-    static func fetchPointer(in context: NSManagedObjectContext) throws -> NSManagedObject? {
+    static func fetchPointer(forStudentID studentID: UUID, in context: NSManagedObjectContext)
+        throws -> NSManagedObject?
+    {
+        let request = NSFetchRequest<NSManagedObject>(entityName: pointerEntityName)
+        request.predicate = NSPredicate(
+            format: "singletonKey == %@",
+            ActiveSessionPointerKey.student(StableUUID(studentID))
+        )
+        request.fetchLimit = 1
+        return try context.fetch(request).first
+    }
+
+    static func fetchLegacyPointer(in context: NSManagedObjectContext) throws -> NSManagedObject? {
         let request = NSFetchRequest<NSManagedObject>(entityName: pointerEntityName)
         request.predicate = NSPredicate(format: "singletonKey == %@", ActiveSessionPointerKey.singleton)
         request.fetchLimit = 1
         return try context.fetch(request).first
+    }
+
+    static func allPointers(in context: NSManagedObjectContext) throws -> [NSManagedObject] {
+        let request = NSFetchRequest<NSManagedObject>(entityName: pointerEntityName)
+        return try context.fetch(request)
+    }
+
+    /// Keeps one pointer per in-progress Session and drops stale rows (for
+    /// example a pointer whose Session was completed, or leftover legacy data).
+    static func deleteStalePointers(activeSessionIDs: Set<UUID>, in context: NSManagedObjectContext) throws {
+        for pointer in try allPointers(in: context) {
+            guard let sessionID = pointer.value(forKey: "sessionID") as? UUID,
+                activeSessionIDs.contains(sessionID)
+            else {
+                context.delete(pointer)
+                continue
+            }
+            guard let session = try fetchSession(id: sessionID, in: context),
+                let studentID = session.value(forKey: "studentID") as? UUID
+            else {
+                context.delete(pointer)
+                continue
+            }
+            let expectedKey = ActiveSessionPointerKey.student(StableUUID(studentID))
+            if pointer.value(forKey: "singletonKey") as? String != expectedKey {
+                context.delete(pointer)
+            }
+        }
+    }
+
+    /// Rewrites the legacy single pointer to the owning Student's key. Called
+    /// once at launch before reconciliation; idempotent.
+    static func migrateLegacyPointer(in context: NSManagedObjectContext) throws {
+        guard let legacy = try fetchLegacyPointer(in: context) else {
+            return
+        }
+        guard let sessionID = legacy.value(forKey: "sessionID") as? UUID,
+            let session = try fetchSession(id: sessionID, in: context),
+            let studentID = session.value(forKey: "studentID") as? UUID
+        else {
+            context.delete(legacy)
+            return
+        }
+        guard session.value(forKey: "state") as? String == SessionState.inProgress.rawValue else {
+            context.delete(legacy)
+            return
+        }
+        if try fetchPointer(forStudentID: studentID, in: context) != nil {
+            // The Student already has the authoritative pointer; keep it and
+            // drop the legacy row.
+            context.delete(legacy)
+            return
+        }
+        legacy.setValue(ActiveSessionPointerKey.student(StableUUID(studentID)), forKey: "singletonKey")
     }
 
     private static func syncExercises(
@@ -338,15 +442,28 @@ enum SessionManagedObjectMapping {
     }
 
     private static func syncPointer(for session: Session, in context: NSManagedObjectContext) throws {
-        let pointer = try fetchPointer(in: context)
         if session.state == .inProgress {
+            if let legacy = try fetchLegacyPointer(in: context),
+                legacy.value(forKey: "sessionID") as? UUID == session.id.rawValue
+            {
+                context.delete(legacy)
+            }
             let object =
-                pointer
+                try fetchPointer(forStudentID: session.studentID.rawValue, in: context)
                 ?? NSEntityDescription.insertNewObject(forEntityName: pointerEntityName, into: context)
-            object.setValue(ActiveSessionPointerKey.singleton, forKey: "singletonKey")
+            object.setValue(ActiveSessionPointerKey.student(session.studentID), forKey: "singletonKey")
             object.setValue(session.id.rawValue, forKey: "sessionID")
-        } else if let pointer {
-            context.delete(pointer)
+        } else {
+            if let pointer = try fetchPointer(forStudentID: session.studentID.rawValue, in: context),
+                pointer.value(forKey: "sessionID") as? UUID == session.id.rawValue
+            {
+                context.delete(pointer)
+            }
+            if let legacy = try fetchLegacyPointer(in: context),
+                legacy.value(forKey: "sessionID") as? UUID == session.id.rawValue
+            {
+                context.delete(legacy)
+            }
         }
     }
 

@@ -163,6 +163,9 @@ public enum FCAccessibilityID {
     public static let todaySegmentToday = "today.segment.today"
     public static let todaySegmentStudents = "today.segment.students"
     public static let todayInProgress = "today.inProgress"
+    public static func todayInProgressRow(_ studentID: StableUUID) -> String {
+        "today.inProgress.\(studentID.rawValue.uuidString.lowercased())"
+    }
     public static let todayResolvedFold = "today.resolvedFold"
     public static let todayCalendarEntry = "today.calendarEntry"
     public static let todayAddAppointment = "today.addAppointment"
@@ -194,6 +197,9 @@ public enum FCAccessibilityID {
     public static let historyCompareSelect = "history.compareSelect"
     public static let studentListArchived = "studentList.archived"
     public static let studentListInProgress = "studentList.inProgress"
+    public static func studentListInProgressRow(_ studentID: StableUUID) -> String {
+        "studentList.inProgress.\(studentID.rawValue.uuidString.lowercased())"
+    }
 
     public static func studentListRestore(_ id: StableUUID) -> String {
         "studentList.restore.\(id.rawValue.uuidString)"

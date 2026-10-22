@@ -14,7 +14,7 @@
         private let setID = StableUUID(UUID(uuidString: "dddddddd-dddd-4ddd-8ddd-dddddddddddd")!)
         private let now = Date(timeIntervalSince1970: 1_700_000_000)
 
-        func testStartCreatesSingletonPointerAndSecondStartReturnsSameSession() async throws {
+        func testStartCreatesPerStudentPointerAndSecondStartReturnsSameSession() async throws {
             let environment = try makeUseCases(
                 ids: [firstID.rawValue, sessionID.rawValue, secondID.rawValue]
             )
@@ -30,21 +30,30 @@
             let inProgressCount = try await sessionCount(state: "inProgress", writer: environment.controller.writer)
             XCTAssertEqual(inProgressCount, 1)
 
-            let pointer = try await fetchActivePointer(writer: environment.controller.writer)
-            XCTAssertEqual(pointer?.singletonKey, ActiveSessionPointerKey.singleton)
-            XCTAssertEqual(pointer?.singletonKey, "active")
+            let pointer = try await fetchActivePointer(studentID: firstID, writer: environment.controller.writer)
+            XCTAssertEqual(pointer?.singletonKey, ActiveSessionPointerKey.student(firstID))
             XCTAssertEqual(pointer?.sessionID, first.id.rawValue)
 
             _ = try await environment.studentUseCases.create(
                 draft: StudentDraft(displayName: "周宁", sex: .male)
             )
             let otherStudentOpen = try await environment.sessionUseCases.startOrOpen(studentID: secondID)
-            XCTAssertEqual(otherStudentOpen.id, first.id)
-            XCTAssertEqual(otherStudentOpen.studentID, firstID)
+            XCTAssertEqual(otherStudentOpen.studentID, secondID)
+            XCTAssertNotEqual(otherStudentOpen.id, first.id)
             let stillInProgress = try await sessionCount(state: "inProgress", writer: environment.controller.writer)
             let totalSessions = try await sessionCount(writer: environment.controller.writer)
-            XCTAssertEqual(stillInProgress, 1)
-            XCTAssertEqual(totalSessions, 1)
+            XCTAssertEqual(stillInProgress, 2)
+            XCTAssertEqual(totalSessions, 2)
+            let firstPointer = try await fetchActivePointer(
+                studentID: firstID,
+                writer: environment.controller.writer
+            )
+            let secondPointer = try await fetchActivePointer(
+                studentID: secondID,
+                writer: environment.controller.writer
+            )
+            XCTAssertEqual(firstPointer?.sessionID, first.id.rawValue)
+            XCTAssertEqual(secondPointer?.sessionID, otherStudentOpen.id.rawValue)
             try await environment.controller.shutdownForTesting()
         }
 
@@ -401,14 +410,17 @@
         }
 
         private func fetchActivePointer(
+            studentID: StableUUID? = nil,
             writer: PersistenceWriter
         ) async throws -> (singletonKey: String, sessionID: UUID)? {
             try await writer.read { context in
                 let request = NSFetchRequest<NSManagedObject>(entityName: "ActiveSessionPointerMO")
-                request.predicate = NSPredicate(
-                    format: "singletonKey == %@",
-                    ActiveSessionPointerKey.singleton
-                )
+                if let studentID {
+                    request.predicate = NSPredicate(
+                        format: "singletonKey == %@",
+                        ActiveSessionPointerKey.student(studentID)
+                    )
+                }
                 request.fetchLimit = 1
                 guard let object = try context.fetch(request).first else {
                     return nil

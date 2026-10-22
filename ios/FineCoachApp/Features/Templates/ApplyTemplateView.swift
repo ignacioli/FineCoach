@@ -13,10 +13,16 @@ final class ApplyTemplateViewModel: ObservableObject {
 
     private let templateUseCases: TemplateUseCases
     private let sessionUseCases: ActiveSessionUseCases
+    private let sessionID: StableUUID?
 
-    init(templateUseCases: TemplateUseCases, sessionUseCases: ActiveSessionUseCases) {
+    init(
+        templateUseCases: TemplateUseCases,
+        sessionUseCases: ActiveSessionUseCases,
+        sessionID: StableUUID? = nil
+    ) {
         self.templateUseCases = templateUseCases
         self.sessionUseCases = sessionUseCases
+        self.sessionID = sessionID
     }
 
     func reload() async {
@@ -35,12 +41,19 @@ final class ApplyTemplateViewModel: ObservableObject {
 
     func apply(_ template: TrainingTemplate) async {
         do {
-            guard let current = try await sessionUseCases.loadActive() else {
+            let current: Session?
+            if let sessionID {
+                current = try await sessionUseCases.loadActive(sessionID: sessionID)
+            } else {
+                current = try await sessionUseCases.loadActive()
+            }
+            guard let current else {
                 throw DomainError.notFound
             }
             let snapshot = try await templateUseCases.loadApplicationSnapshot(templateID: template.id)
             let existingSessionSections = try await templateUseCases.sessionSections(sessionID: current.id)
             let result = try await sessionUseCases.applyTemplate(
+                sessionID: current.id,
                 templateExercises: snapshot.exercises,
                 templateSections: snapshot.sections,
                 templateTrainingFocus: template.trainingFocus,
@@ -63,9 +76,18 @@ struct ApplyTemplateView: View {
     @StateObject private var viewModel: ApplyTemplateViewModel
     @Binding var path: [RootDestination]
 
-    init(templateUseCases: TemplateUseCases, sessionUseCases: ActiveSessionUseCases, path: Binding<[RootDestination]>) {
+    init(
+        templateUseCases: TemplateUseCases,
+        sessionUseCases: ActiveSessionUseCases,
+        sessionID: StableUUID? = nil,
+        path: Binding<[RootDestination]>
+    ) {
         _viewModel = StateObject(
-            wrappedValue: ApplyTemplateViewModel(templateUseCases: templateUseCases, sessionUseCases: sessionUseCases)
+            wrappedValue: ApplyTemplateViewModel(
+                templateUseCases: templateUseCases,
+                sessionUseCases: sessionUseCases,
+                sessionID: sessionID
+            )
         )
         _path = path
     }
@@ -116,9 +138,18 @@ struct TemplatePickList: View {
     @StateObject private var viewModel: ApplyTemplateViewModel
     private let onApplied: () -> Void
 
-    init(templateUseCases: TemplateUseCases, sessionUseCases: ActiveSessionUseCases, onApplied: @escaping () -> Void) {
+    init(
+        templateUseCases: TemplateUseCases,
+        sessionUseCases: ActiveSessionUseCases,
+        sessionID: StableUUID? = nil,
+        onApplied: @escaping () -> Void
+    ) {
         _viewModel = StateObject(
-            wrappedValue: ApplyTemplateViewModel(templateUseCases: templateUseCases, sessionUseCases: sessionUseCases)
+            wrappedValue: ApplyTemplateViewModel(
+                templateUseCases: templateUseCases,
+                sessionUseCases: sessionUseCases,
+                sessionID: sessionID
+            )
         )
         self.onApplied = onApplied
     }

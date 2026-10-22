@@ -178,7 +178,8 @@ struct ActiveSessionView: View {
         }
         .task {
             await viewModel.load()
-            if let studentUseCases, let student = try? await studentUseCases.student(id: viewModel.studentID) {
+            let resolvedStudentID = viewModel.session?.studentID ?? viewModel.studentID
+            if let studentUseCases, let student = try? await studentUseCases.student(id: resolvedStudentID) {
                 studentName = student.displayName.value
             }
         }
@@ -602,7 +603,11 @@ struct ActiveSessionView: View {
                 }
                 ScrollView {
                     if addTab == .template, let templateUseCases {
-                        TemplatePickList(templateUseCases: templateUseCases, sessionUseCases: sessionUseCases) {
+                        TemplatePickList(
+                            templateUseCases: templateUseCases,
+                            sessionUseCases: sessionUseCases,
+                            sessionID: viewModel.session?.id
+                        ) {
                             viewModel.isAddingExercise = false
                             Task { await viewModel.load() }
                         }

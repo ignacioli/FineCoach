@@ -42,10 +42,21 @@ struct RestTimerState: Equatable {
     }
 }
 
-/// The one pending "rest ended" notification (P0-D5). Copy is generic on
-/// purpose: a locked phone must not show a student name, exercise, or weight.
+/// One pending "rest ended" notification per Session (P0-D5). Copy is generic
+/// on purpose: a locked phone must not show a student name, exercise, or
+/// weight. The per-Session identifier keeps two Sessions' rests from cancelling
+/// each other.
 enum RestEndNotification {
+    /// The shared prefix; the no-Session overload keeps this exact identifier
+    /// for the single-Session tests and backwards compatibility.
     static let identifier = "active-session.rest-ended"
+
+    static func notificationIdentifier(for sessionID: StableUUID?) -> String {
+        guard let sessionID else {
+            return identifier
+        }
+        return "\(identifier).\(sessionID.rawValue.uuidString.lowercased())"
+    }
 
     enum Plan: Equatable {
         case remove
@@ -53,13 +64,13 @@ enum RestEndNotification {
     }
 
     /// Remove when there is no future end. Otherwise schedule at `endsAt`.
-    static func plan(endsAt: Date?, now: Date) -> Plan {
+    static func plan(endsAt: Date?, now: Date, sessionID: StableUUID? = nil) -> Plan {
         guard let endsAt, endsAt > now else {
             return .remove
         }
         return .schedule(
             NotificationRequestDescriptor(
-                identifier: identifier,
+                identifier: notificationIdentifier(for: sessionID),
                 title: String(localized: "session.rest.notificationTitle"),
                 body: String(localized: "session.rest.notificationBody"),
                 fireDate: endsAt

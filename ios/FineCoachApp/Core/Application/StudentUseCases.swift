@@ -60,6 +60,14 @@ public struct StudentUseCases: Sendable {
         try await repository.inProgressTraining()
     }
 
+    public func inProgressTraining(studentID: StableUUID) async throws -> InProgressTrainingSummary? {
+        try await repository.inProgressTraining(studentID: studentID)
+    }
+
+    public func inProgressTrainings() async throws -> [InProgressTrainingSummary] {
+        try await repository.inProgressTrainings()
+    }
+
     public func isOnboardingCompleted() async throws -> Bool {
         try await repository.isOnboardingCompleted()
     }

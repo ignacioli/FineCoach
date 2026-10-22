@@ -150,23 +150,51 @@ public struct CoreDataStudentRepository: Sendable {
         }
     }
 
+    /// Compatibility for single-session call sites: the oldest in-progress
+    /// Session. Prefer `inProgressTrainings()` or the Student-specific
+    /// overload when several Students can train at once.
     public func inProgressTraining() async throws -> InProgressTrainingSummary? {
+        let summaries = try await inProgressTrainings()
+        return summaries.first
+    }
+
+    public func inProgressTraining(studentID: StableUUID) async throws -> InProgressTrainingSummary? {
         try await writer.read { context in
-            guard let session = try StudentManagedObjectMapping.inProgressSession(in: context) else {
+            guard
+                let session = try StudentManagedObjectMapping.inProgressSession(
+                    studentID: studentID.rawValue,
+                    in: context
+                )
+            else {
                 return nil
             }
-            guard let studentID = session.value(forKey: "studentID") as? UUID else {
-                throw DomainError.incompatibleInput
-            }
-            let object = try StudentManagedObjectMapping.requireStudent(id: studentID, in: context)
-            let student = try StudentManagedObjectMapping.makeStudent(from: object)
-            return InProgressTrainingSummary(
-                studentID: StableUUID(studentID),
-                studentDisplayName: student.displayName.value,
-                startedAtUTC: session.value(forKey: "startedAtUTC") as? Date,
-                trainingFocus: BodyPartCoding.parts(fromMask: session.value(forKey: "trainingFocusMask") as? Int32 ?? 0)
-            )
+            return try makeSummary(from: session, in: context)
         }
+    }
+
+    public func inProgressTrainings() async throws -> [InProgressTrainingSummary] {
+        try await writer.read { context in
+            try StudentManagedObjectMapping.inProgressSessions(in: context).map {
+                try makeSummary(from: $0, in: context)
+            }
+        }
+    }
+
+    private func makeSummary(
+        from session: NSManagedObject,
+        in context: NSManagedObjectContext
+    ) throws -> InProgressTrainingSummary {
+        guard let studentID = session.value(forKey: "studentID") as? UUID else {
+            throw DomainError.incompatibleInput
+        }
+        let object = try StudentManagedObjectMapping.requireStudent(id: studentID, in: context)
+        let student = try StudentManagedObjectMapping.makeStudent(from: object)
+        return InProgressTrainingSummary(
+            studentID: StableUUID(studentID),
+            studentDisplayName: student.displayName.value,
+            startedAtUTC: session.value(forKey: "startedAtUTC") as? Date,
+            trainingFocus: BodyPartCoding.parts(fromMask: session.value(forKey: "trainingFocusMask") as? Int32 ?? 0)
+        )
     }
 
     public func isOnboardingCompleted() async throws -> Bool {
