@@ -137,7 +137,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 | `DS-UNDO-ROW` | `FCUndoRow` | §8.1 删除后撤销行；B-b（2026-10-16 已批准） | ActiveSession（删组）、BodyMeasurementEntry（删单条测量） | 规格已定（§4.8），代码待 B2 |
 | `DS-MORE-MENU` | `FCMoreMenu` | §8.1 标题行「…」菜单；B-a / B-b（2026-10-16 已批准） | ActiveSession、TemplateEditor（分区标题）；BodyMeasurementEntry（页头，B2 迁移） | 规格已定（§4.8），代码待 B2 |
 | `DS-SET-ROW` | `FCSetRow`、`FCSetStateCircle`、`FCNewRecordBadge` | §6 组圆圈；11/30 | ActiveSession；圆圈另用于 ShareReport、History | 见 CG-4 |
-| `DS-HERO-CARD` | `FCHeroCard` | §8 深色 hero 卡；01/18 | Today、StudentDetail | 见 CG-6 |
+| `DS-HERO-CARD` | `FCHeroCard` | §8 深色 hero 卡；01/18；多行变体 Penpot `W08-a`（2026-10-22） | Today（单行 / 多行）、StudentDetail（单行） | 多行变体 2026-10-22 批准，代码待 W-08 |
 | `DS-HINT-BAR` | `FCHintBar`、`FCActiveSessionBar` | §8 提示条；§8.1 训练中提示条；21 | StudentDetail、StudentList | 稳定 |
 | `DS-BOTTOM-SHEET` | `FCBottomSheet`、`View.fcBottomSheet` | §8.1 底部面板；18/31/33/34 | 8 个文件 | 稳定 |
 | `DS-CONFIRM-DIALOG` | `FCConfirmationDialog`、`View.fcConfirmationDialog` | §8 确认弹窗；14 | CoursePackageList、CourseActionSheet、TemplateEditor | 内容变长规则已实现（M2 T006）；CG-6 |
@@ -263,9 +263,10 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 
 #### `DS-HERO-CARD` 深色 hero 卡
 
-- **部件**：徽标（56×24 胶囊、`surface.canvas` 底、`sectionLabel` `action.primary` 字）→ 标题行：左侧标题（`headline` `action.on`）+ 下方副文字（`callout` `text.onActionSecondary`）；右侧可选操作文字（`callout` 600 `action.on`，与标题首行基线对齐）。整卡 `action.primary` 底、`radius.lg`、内边距 `space.4`、最小高 100。
-- **不变量**：每屏最多一个（这是页面组合规则，组件本身无法保证；属于 L2 组合检查）；有 action 时整卡就是一个点击目标，操作文字是它的可见标签（人工）。
-- **复用边界**：见 CG-6（徽标宽度固定）。
+- **部件**：徽标（高 24 胶囊、最小宽 56、左右内边距 `space.2`，宽度随文字增长；`surface.canvas` 底、`sectionLabel` `action.primary` 字）→ 标题行：左侧标题（`headline` `action.on`）+ 下方副文字（`callout` `text.onActionSecondary`）；右侧可选操作文字（`callout` 600 `action.on`，与标题首行基线对齐）。整卡 `action.primary` 底、`radius.lg`、内边距 `space.4`、最小高 100。
+- **变体「多行」（2026-10-22 产品负责人批准，方案 A，W-08）**：同一张卡承载多名同时训练的学员。徽标文字「进行中 · N」→ 每名学员一行，行内部件、字号和颜色同单行变体的标题行（标题 = 学员名 · 部位，副文字 = 已训练 N 分钟，右侧操作「继续 ›」），行最小高 44，行间距 `space.3`，行与行之间 1pt `surface.dividerOnAction` 分割线（只在行之间，首行之上、末行之下不画）。行按开始时间升序（最早开始的在最上面），不设上限，卡片高度随行数增长。只有 1 名学员时就是原来的单行变体（徽标「进行中」、操作「继续训练」），外观与 01 完全一致。
+- **不变量**：每屏最多一个（这是页面组合规则，组件本身无法保证；属于 L2 组合检查）；单行变体有 action 时整卡就是一个点击目标，操作文字是它的可见标签（人工）；多行变体每一行是独立的点击目标（整行，最小高 44），各自进入对应学员，整卡不再是一个按钮（可自动：源码扫描每行一个 Button + accessibility identifier）；多行变体的行数等于传入的条目数，0 条时调用方不显示本组件（可自动）。
+- **复用边界**：多行变体只用于今日页「同时训练的学员」（W-08）；学员详情页只会有这名学员自己的一节，继续使用单行变体。学员列表的训练中提示仍是 `DS-HINT-BAR`，不用 hero。CG-6 的徽标宽度规则已随本次补上。
 
 #### `DS-HINT-BAR` 提示条
 
@@ -439,7 +440,7 @@ C 类，只补规则，默认字号下外观不变：
 | CG-3 | `FCSaveStatusView` 未显式声明字体（继承 App 根部 `.fcFont(.body)`，渲染为 Noto Sans SC 17/400）；状态文字是写死的中文 `rawValue`，不是本地化键 | `FineCoachApp.swift:20`、`FCSaveStatusView.swift` | 规格**已补**（§4.5、README §8，§10 C12）。**已解决（M2 T007，2026-10-10）**：显式写 `.fcFont(.body)` 并改用本地化键（D 类，外观不变） |
 | CG-4 | `FCSetRow` 的状态文字写死在 `rawValue` 中 | `FCSetRow.swift` | 本地化问题，与视觉无关；下次修改该组件时处理 |
 | CG-5 | CoursePackageEditor、ManualCreditAdjustment 各有私有 `editorRow`，与 `FCLabelValueRow` 职责重叠 | 两个文件中的 `editorRow` | 只在这两个页面被修改时迁移；M2 不涉及课包，不安排 |
-| CG-6 | `FCHeroCard` 徽标固定 56 宽、`FCConfirmationDialog` 固定 300 宽，字号放大时的规则没写 | 两个组件源码 | 下次涉及时先补「内容变长」规则（C 类）；M2 若使用确认弹窗（删除档案、替换档案），在 Phase 0 补规则。确认弹窗规则已起草（§4.7，2026-10-08）；M2 不使用 hero 卡，徽标规则不处理 |
+| CG-6 | `FCHeroCard` 徽标固定 56 宽、`FCConfirmationDialog` 固定 300 宽，字号放大时的规则没写 | 两个组件源码 | 下次涉及时先补「内容变长」规则（C 类）；M2 若使用确认弹窗（删除档案、替换档案），在 Phase 0 补规则。确认弹窗规则已起草（§4.7，2026-10-08）。**徽标已解决（2026-10-22，W-08）**：最小宽 56、随文字增长（`DS-HERO-CARD` 部件） |
 | CG-7 | `FCSegmentedSwitch` 在页内使用超出 README 原定义 | 37 画稿 | **已解决（2026-10-05）**：裁决为已批准的复用，限 2–3 个互斥短选项（README §10 C11） |
 | CG-8 | 二级页头 `DS-PAGE-SECONDARY` 约 20 处手工拼装；入口行 `DS-HUB-ROW` 有两份（ResourceHub、Settings） | 约 20 个 feature 文件直接写 `.fcFont(.titleLarge)` 页头；`hubRow` 与 Settings `row` | **M2 Phase 0**：抽取共享 `FCPageHeader`（及入口行，如 M2 设置页用到），补组件测试；只迁移 M2 改动的页面。`DS-PAGE-HEADER`、`DS-HUB-ROW` 规格已起草（§4.7，2026-10-08，随 G7 review 审定） |
 | CG-9 | 组件文件中没有任何 `#Preview` | `ios/FineCoachApp` 中搜索不到 `#Preview` | 规则而非一次性任务：新增或扩展组件时，在组件文件里加覆盖代表状态的 `#Preview`（只在 DEBUG 下编译，不新增 target），供 L3 查看组件时使用 |

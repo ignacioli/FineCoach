@@ -76,6 +76,13 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 - 快照：`before-P0-approved-sync 2026-10-15` → `P0-a P0-b approved 2026-10-14 (titles, DS plugin data)`（revn 320）。`File.validate()` 0 个错误。
 - 两块画板没有展示投影，已有 2 倍 PNG 导出预设。没有重新导出 04、06、07、08、12。没有改任何几何或颜色。
 
+### 1.6 W-08 多人训练 hero 卡（2026-10-22）
+
+- 产品负责人 2026-10-22 选定方案 A（一张 hero 卡多行，§10 C14）。分类 B：修订已批准的 01 今日页 hero 卡。
+- Penpot：Foundations 页 y=3750 一行末尾（x=11770，D-c2 右侧）新增画板「W08-a 今日 · 多人训练 hero（方案 A，2026-10-22）」，含 1 人 / 2 人 / 3 人三种状态。之前：该位置为空；之后：画板 390×772，字号、颜色取自 01 hero 卡原图层。
+- 已知差异（本轮不处理，记录待查）：01 原图层的副文字是 13/400（`caption`），本文件 §8 和 `components.md` 写的是 `callout`。W08-a 照 01 原图层画；代码实现时副文字沿用 `FCHeroCard` 现有样式，不在本轮改。
+- 导出：`design/w08-concurrent-sessions/W08-a-today-multi-hero@1x.png`（MCP 1x 参考图；2x 正式导出待做）。
+
 ## 2. 颜色
 
 ### 2.1 原子色（FC Primitives）
@@ -116,6 +123,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 | `color.text.secondary` | neutral.600 | `#5C5A52` | 辅助文字、字段标签、区段标签、箭头 |
 | `color.text.disabled` | neutral.400 | `#A8A39A` | 画稿未使用，保留给禁用态 |
 | `color.text.onActionSecondary` | —（画稿补充） | `#B0ABA2` | 深色 hero 卡内的次要文字（01「已训练 32 分钟」）。原不在 Penpot token 集中，已按画稿补入 |
+| `color.surface.dividerOnAction` | —（2026-10-22 新增） | `#4C4A45` | 深色 hero 卡多行变体的行间 1pt 分割线（白色 16% 叠在 `action.primary` 上的不透明等值）。仅作装饰，不作为控件边界 |
 | `color.status.success` | green.600 | `#2A2822` | 成功/完成状态 |
 | `color.status.warning` | amber.700 | `#B45309` | 逾期、时间冲突图标底 |
 | `color.status.destructive` | red.700 | `#D4442A` | 失败、破坏性操作文字（O1） |
@@ -293,7 +301,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 | 顶部分段切换（今日 / 学员） | 选中项 50×32 胶囊，`action.primary` 底 + `headline` 白字；未选中项为纯文字 `body` `text.secondary`。同一外观也用于页内 2–3 个互斥短选项（37「扣减 / 返还」；趋势指标、身体数据录入单位），选项更多或文字较长时改用筛选胶囊（2026-10-05，§10 C11） |
 | 筛选胶囊（07） | 高 30 胶囊；未选中 `surface.selected` 底 + `chipLabel` `text.primary`；选中 `action.primary` 底 + 白字 |
 | 开关 | 44×26 胶囊，滑块 18×18 白色圆，**左关右开**（iOS 惯例，与画稿 02/12 一致）。开启：轨道 `action.primary`。关闭：轨道 `surface.divider` 底 + 1.5pt `border.control` 内描边（O7）。实现为系统原生 `Toggle` + 自定义外观样式，保留系统开关的无障碍语义；可点击区域不小于 44×44 |
-| 深色 hero 卡（01） | 358×100，`radius.lg`，`action.primary` 底；内含徽标（56×24 胶囊，`surface.canvas` 底，`sectionLabel` `action.primary` 字）、`headline` 白字标题、`text.onActionSecondary` 副文字、`callout` 600 白字操作。每屏最多一个 |
+| 深色 hero 卡（01） | 358×100，`radius.lg`，`action.primary` 底；内含徽标（高 24 胶囊，最小宽 56、随文字增长，`surface.canvas` 底，`sectionLabel` `action.primary` 字）、`headline` 白字标题、`text.onActionSecondary` 副文字、`callout` 600 白字操作。每屏最多一个。**多行变体（W08-a，2026-10-22）**：多名学员同时训练时仍是一张卡，徽标「进行中 · N」，每人一行（学员名 · 部位 / 已训练 N 分钟 / 「继续 ›」），行最小高 44，行间 `surface.dividerOnAction` 分割线，按开始时间升序；每行单独可点。1 人时与 01 相同 |
 | 列表行 | 左 16；主文字 `headline` 或 `body`，元信息 `caption` `text.secondary`，右侧 `›`；行间用 1pt 分割线 |
 | 区段标签 | `sectionLabel`，`text.secondary` |
 | 头像 | 44×44 圆，`surface.selected` 底，首字 `headline` `action.primary` |
@@ -389,6 +397,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 | C11 | `FCSegmentedSwitch` 在 README 中只定义为「今日 / 学员」顶部切换，代码另用于人工调整、趋势指标、身体数据录入单位 | 37 画稿（D13b，2026-09-29 批准）已在页内用同一胶囊表达「扣减 / 返还」，属于已批准的复用；限定为 2–3 个互斥短选项。不用系统分段 `Picker`（色板外，与 D13 取代系统 `Stepper` 同理），也不用筛选胶囊（筛选 / 多选语义） | 已定（产品负责人授权 AI 裁决，2026-10-05） |
 | C12 | 保存状态组件没有画稿行，组件代码也未显式声明字体（继承 App 根部 `body`） | 按 M1 已验收的实际呈现补规格（§8「保存状态」）；非核心链路，不出画稿 | 已定（产品负责人 2026-10-05） |
 | C13 | §8「星期多选（02）」「类型标签（15「有氧」）」对应组件没有任何界面使用：02 已被 23（D4 重复规则）取代；15 的「有氧」标签从未实现，训练中用记录方式选择表达有氧 | 作为废弃设计删除这两行，并删除 `FCWeekdayChip`、`FCTypeTag` 代码；02、15 画板保留为历史画稿，其中这两处不再是实现依据，Penpot 已加评论标注。D6b 编辑资料的「男 / 女」也画成 64×28 胶囊，但实现为 4 个选项的 `FCFilterChip`（G6 已验收），按筛选胶囊对待，64 固定宽不作为规格 | 已定（产品负责人 2026-10-05） |
+| C14 | 多名学员可同时训练（M1A-FR-018 2026-10-22 修订，W-08）后，今日页需要同时展示多节进行中的课；§2.4「每屏最多一个深色 hero 面板」不变 | 采用方案 A：一张 hero 卡的多行变体（见 §8 深色 hero 卡、`components.md` `DS-HERO-CARD`）；新增 `surface.dividerOnAction`；徽标改为最小宽 56、随文字增长（CG-6）。否决横向翻页（他人被隐藏、同屏露出两张深色卡）和 hero + 提示条（同为上课学员却主次不等） | 已定（产品负责人 2026-10-22） |
 | O6 | 吉祥物造型与知名动画角色是否存在版权关联 | 产品负责人确认：吉祥物为其自行生成的原创形象，与该角色无关，不涉及版权问题 | 已定（产品负责人） |
 
 ## 11. 对比度核验（WCAG 2.x）
