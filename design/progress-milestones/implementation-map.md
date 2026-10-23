@@ -150,6 +150,14 @@ Penpot 版本：`before-stage-D 2026-10-20` → `stage-D boards D-a D-a2 D-b D-b
 - 结果：PASS（宿主标准门禁，无 `-disable-sandbox`）。strict lint 无输出；App build BUILD SUCCEEDED；build-for-testing TEST BUILD SUCCEEDED；FineCoachTests 536 项 / 1 既有 skip / 0 failed；FineCoachIntegrationTests 200 项 / 0 failed。每个测试 target 前重启模拟器 4DD81BE1。日志 `.handoff/logs/2026-10-23-gains-accept-{lint,build,bft,unit,integ}.log`。
 - 未经人工检查：真机新纪录 heavy 与普通 success 触感、总结页与分享卡片动作行和胶囊（含最大字体换行，AC-D13）、分享开关提示计数。并入回归走查 D1、D2、D7、D8、D10～D13。
 
+### Phase 8（Revision 1.6，2026-10-23）
+
+- 分类与依据：B 类修订（README §1.9、§10 C17、§14；Penpot D-a3、D-a2 ④，快照 `record-float D-a3 + D-a2 haptic note 2026-10-23`）。spec 004 Revision 1.6（D-FR-010、D-FR-013、AC-D05）。
+- 范围：新增 `FCMotion` / `FCHaptic` token（internal）；`DS-SET-ROW` 扩展数值浮起（页面下发序号，overlay，`accessibilityHidden`，Reduce Motion 不播）；`ActiveSessionViewModel.recordFloatRequest` 只在严格新纪录确认时发布、页面认领一次；所有确认统一 `FCHaptic.confirm`（light），退役 heavy / success；`FCSetStateCircle`、`FCStepper`、休息条迁移到 token；DEBUG 动效试验页（`MotionLabView`，A/B/C 三档只在本页定义）。pbxproj 只加 3 个文件条目；Core Data、`SessionGains` 不变。
+- 实现和检查：由 dsh 实现（任务说明 `.handoff/prompt/2026-10-23-dsh-record-float-motion-prompt.md`，最终报告 `.handoff/logs/2026-10-23-dsh-record-float-final.md`）。改过的旧断言 2 个测试共 6 处，均对应 §14.2–14.4（清单见最终报告 §3）；新增 `FCMotionTests` 5 条、源码守护 2 条、浮起发布/不发布集成用例 2 条。已知边界：同一 runloop 内连续两次严格新纪录只播后一次（UI 点击不会发生，审查接受）。
+- 结果：PASS（宿主标准门禁，无 `-disable-sandbox`）。strict lint 无输出；iphoneos Debug 与 Release build 均 BUILD SUCCEEDED（Release 证明 DEBUG 试验页不进正式包）；build-for-testing TEST BUILD SUCCEEDED；FineCoachTests 543 项 / 1 既有 skip / 0 failed；FineCoachIntegrationTests 202 项 / 0 failed。每个测试 target 前重启模拟器 4DD81BE1。日志 `.handoff/logs/2026-10-23-float-accept-{lint,build,release,bft,unit,integ}.log`。
+- 未经人工检查：浮起观感与是否被列表行裁切、light 触感强度、Reduce Motion 下无浮起、A/B/C 选档。并入回归走查 D1、D2、D7、D8、D10～D13。
+
 ## 5. 入口与布局清单（`components.md` §1.4，实施时填写）
 
 每条新交互一行：画面 → 控件 → accessibility identifier → 是否改数据 → 宽度由谁撑满。每行必须指向真实代码。
@@ -161,3 +169,6 @@ Penpot 版本：`before-stage-D 2026-10-20` → `stage-D boards D-a D-a2 D-b D-b
 | 训练页 | 组行「新纪录」（只读）；确认触感由页面级 `.sensoryFeedback(trigger: confirmationFeedback)` 发出（Revision 1.5） | `FCAccessibilityID.setNewRecord(set.id)`；`ActiveSessionView.swift` → `FCSetRow.recordBadge` | 否 | `FCSetRow` 的 HStack 与训练页列表容器；胶囊在标题后，空间不足换到标题下方 |
 | 分享设置页 | 可见「本节收获」toggle（空收获整行隐藏） | `FCAccessibilityID.shareReportPersonalBestToggle`；`ShareReportFlowView.swift` → `contentSection` | 仅流程内存状态与 DTO，不持久化 | 页面满宽 VStack，space4 边距；toggleRow 的 Spacer 分配提示与开关 |
 | 分享卡片 / 预览 | 只读「本节收获」block，动作行同总结页、右侧不再列数值；渲染图无交互 | `FCAccessibilityID.shareReportGains`；`ShareReportCardView.swift` → `content(for:)` | 否 | CardFrame 固定 cardWidth，space6 边距；section 与行撑满 |
+| 训练页 | 新纪录数值浮起（装饰，非控件）；确认触感统一 `FCHaptic.confirm`（Revision 1.6） | 无（副本 `accessibilityHidden(true)`、`allowsHitTesting(false)`）；`ActiveSessionView.swift` → `FCSetRow.valueText` | 否 | overlay 不参与布局，沿用 `FCSetRow` HStack |
+| 设置页（仅 DEBUG） | 「动效试验（开发版）」`FCHubRow` | `FCAccessibilityID.settingsMotionLab`；`SettingsView.swift` | 否（只导航） | 设置页 VStack，space4 边距；`FCHubRow` 内 Spacer |
+| 动效试验页（仅 DEBUG） | 示例组行；A / B / C 三档按钮；「普通确认」 | `motionLab.sampleRow`、`motionLab.option.{A,B,C}`、`motionLab.plainConfirm`；`MotionLabView.swift` | 否（只本页状态与触感） | `FCSecondaryButton` / `FCButton` 的 `maxWidth: .infinity`；space4 边距 |

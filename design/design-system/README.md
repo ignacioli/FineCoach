@@ -107,7 +107,8 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
   - 新增画板「D-a3 新纪录浮起（关键帧，2026-10-23）」，x=12650、y=3750（D7b-r 右侧）：0.1 / 0.3 / 0.6 s 三帧、参数标注、真机试选 A/B/C。
   - D-a2 ④ 触感说明改为「确认一组统一 light 触感；破纪录另有数字浮起，见 D-a3。」
 - 导出：`design/progress-milestones/D-a3-record-float@1x.png`（MCP 1x 参考图）。
-- 代码尚未修改；最终位移和时长由负责人在真机动效试验页从 A/B/C 中选定后写回 §14。
+- 代码已实现（分支 `fix/record-float-motion`，2026-10-23）：`FCMotion` / `FCHaptic`（`ios/FineCoachApp/DesignSystem/FCMotion.swift`，internal：是 token 不是组件，不进 `components.md` §3 索引）；`DS-SET-ROW` 数值浮起；训练页、组圆圈、步进器迁移到 token；DEBUG 动效试验页。正式代码当前为 B 档（12pt / 0.6 s）。执行记录见 `design/progress-milestones/implementation-map.md` §4 Phase 8。
+- 最终位移和时长由负责人在真机动效试验页从 A/B/C 中选定后写回 §14。
 
 ## 2. 颜色
 
