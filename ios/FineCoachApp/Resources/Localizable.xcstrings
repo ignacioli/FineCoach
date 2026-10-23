@@ -1404,7 +1404,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "时长（秒）"
+            "value": "训练时长"
           }
         }
       }
@@ -1757,6 +1757,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "本次中断较长或时钟异常，确认或修正训练时长后再结束。"
+          }
+        }
+      }
+    },
+    "session.duration.inputHint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "例如 1 小时 12 分、1h12m、55 分钟、55m"
+          }
+        }
+      }
+    },
+    "session.duration.inputError": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练时长无效，按上面的例子填写。"
           }
         }
       }

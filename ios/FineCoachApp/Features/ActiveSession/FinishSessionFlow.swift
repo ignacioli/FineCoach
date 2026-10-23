@@ -71,12 +71,15 @@ struct DurationReviewFlow: View {
     let onCancel: () -> Void
     let onConfirm: (String) -> Void
     @State private var durationText: String
+    @State private var hasDurationError = false
 
     init(elapsedSeconds: String, onCancel: @escaping () -> Void, onConfirm: @escaping (String) -> Void) {
         self.elapsedSeconds = elapsedSeconds
         self.onCancel = onCancel
         self.onConfirm = onConfirm
-        _durationText = State(initialValue: elapsedSeconds)
+        _durationText = State(
+            initialValue: DurationTextParser.formatSessionDurationForEditing(seconds: elapsedSeconds)
+        )
     }
 
     var body: some View {
@@ -87,8 +90,24 @@ struct DurationReviewFlow: View {
                 .foregroundStyle(FCSemanticColors.textSecondary)
             FCTextField(String(localized: "session.field.duration"), text: $durationText)
                 .accessibilityIdentifier(FCAccessibilityID.activeSessionDurationValue)
+            Text(String(localized: "session.duration.inputHint"))
+                .fcFont(.caption)
+                .foregroundStyle(FCSemanticColors.textSecondary)
+                .accessibilityIdentifier(FCAccessibilityID.activeSessionDurationHint)
+            if hasDurationError {
+                Text(String(localized: "session.duration.inputError"))
+                    .fcFont(.caption)
+                    .foregroundStyle(FCSemanticColors.statusDestructive)
+                    .padding(.bottom, FCPrimitives.space2)
+                    .accessibilityIdentifier(FCAccessibilityID.activeSessionDurationError)
+            }
             FCButton(title: String(localized: "session.duration.confirm")) {
-                onConfirm(durationText)
+                guard let seconds = DurationTextParser.parseSessionDurationSeconds(durationText) else {
+                    hasDurationError = true
+                    return
+                }
+                hasDurationError = false
+                onConfirm(seconds)
             }
             .accessibilityIdentifier(FCAccessibilityID.activeSessionDurationConfirm)
             Button(String(localized: "student.flow.cancel"), action: onCancel)

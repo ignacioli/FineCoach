@@ -35,6 +35,61 @@ public enum DurationTextParser {
         pattern: "^(\\d+)\\s*[秒sS]$"
     )
 
+    private static let sessionChinesePattern = try! NSRegularExpression(
+        pattern: "^(\\d+)\\s*小时\\s*(\\d+)\\s*分(?:钟)?$"
+    )
+    private static let sessionLatinPattern = try! NSRegularExpression(
+        pattern: "^(\\d+)\\s*[hH]\\s*(\\d+)\\s*[mM]$"
+    )
+    private static let sessionHoursPattern = try! NSRegularExpression(
+        pattern: "^(\\d+)\\s*(?:小时|[hH])$"
+    )
+    private static let sessionMinutesPattern = try! NSRegularExpression(
+        pattern: "^(\\d+)(?:\\s*(?:分钟|分|[mM]))?$"
+    )
+
+    /// Session review uses hours and minutes; a bare integer means minutes.
+    /// Set-duration parsing remains separate and continues to use seconds.
+    public static func parseSessionDurationSeconds(_ text: String) -> String? {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let hours: Int
+        let minutes: Int
+        if let match = firstMatch(sessionChinesePattern, in: trimmed, groups: 2)
+            ?? firstMatch(sessionLatinPattern, in: trimmed, groups: 2)
+        {
+            (hours, minutes) = match
+        } else if let match = firstMatch(sessionHoursPattern, in: trimmed, groups: 1) {
+            (hours, minutes) = (match.0, 0)
+        } else if let match = firstMatch(sessionMinutesPattern, in: trimmed, groups: 1) {
+            (hours, minutes) = (0, match.0)
+        } else {
+            return nil
+        }
+        let hourSeconds = hours.multipliedReportingOverflow(by: 3600)
+        let minuteSeconds = minutes.multipliedReportingOverflow(by: 60)
+        let total = hourSeconds.partialValue.addingReportingOverflow(minuteSeconds.partialValue)
+        guard !hourSeconds.overflow, !minuteSeconds.overflow, !total.overflow else { return nil }
+        return String(total.partialValue)
+    }
+
+    /// Rounds stored session seconds to the nearest minute, with halves up.
+    public static func formatSessionDurationForEditing(seconds: String) -> String {
+        guard let value = try? DecimalValue(seconds), value >= .zero else { return "" }
+        var minutesValue = value.decimal / 60
+        var rounded = Decimal()
+        NSDecimalRound(&rounded, &minutesValue, 0, .plain)
+        guard let totalMinutes = Int(NSDecimalNumber(decimal: rounded).stringValue) else { return "" }
+        let hours = totalMinutes / 60
+        let minutes = totalMinutes % 60
+        if hours > 0, minutes > 0 {
+            return "\(hours) 小时 \(minutes) 分"
+        }
+        if hours > 0 {
+            return "\(hours) 小时"
+        }
+        return "\(minutes) 分"
+    }
+
     public static func parseSeconds(_ text: String) -> String? {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return nil }

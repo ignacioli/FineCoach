@@ -111,6 +111,68 @@ final class DurationTextParserTests: XCTestCase {
         XCTAssertEqual(DurationTextParser.formatForEditing(secondsText: nil), "")
     }
 
+    // MARK: - Session review (hours and minutes)
+
+    func testParsesSessionDurationFormats() {
+        let cases: [(String, String)] = [
+            ("1h12m", "4320"),
+            ("1小时12分", "4320"),
+            ("1小时12分钟", "4320"),
+            ("55分钟", "3300"),
+            ("55分", "3300"),
+            ("55m", "3300"),
+            ("2h", "7200"),
+            ("2小时", "7200"),
+            ("12 小时 5 分", "43500"),
+            ("1h 12m", "4320"),
+            (" 1 H 12 M ", "4320"),
+            ("55M", "3300"),
+            ("2H", "7200"),
+            ("1 小时 12 分钟", "4320"),
+            ("55 分钟", "3300"),
+            ("55 分", "3300"),
+            ("55 m", "3300"),
+            ("2 h", "7200"),
+            ("2 小时", "7200"),
+            ("90m", "5400"),
+            ("1h90m", "9000"),
+        ]
+        for (text, seconds) in cases {
+            XCTAssertEqual(DurationTextParser.parseSessionDurationSeconds(text), seconds, text)
+        }
+    }
+
+    func testSessionBareIntegerMeansMinutes() {
+        XCTAssertEqual(DurationTextParser.parseSessionDurationSeconds("90"), "5400")
+        XCTAssertEqual(DurationTextParser.parseSessionDurationSeconds("0"), "0")
+    }
+
+    func testRejectsInvalidSessionDurationAndOverflow() {
+        for text in ["abc", "1h2x", "", "   ", "-1", "1.5", "30s", "2m1h", "1h12", "1h2m!"] {
+            XCTAssertNil(DurationTextParser.parseSessionDurationSeconds(text), text)
+        }
+        for text in ["\(Int.max)h", "\(Int.max)m", "\(Int.max)0", "2562047788015215h31m"] {
+            XCTAssertNil(DurationTextParser.parseSessionDurationSeconds(text), text)
+        }
+    }
+
+    func testFormatsSessionDurationRoundedToMinutes() {
+        let cases: [(String, String)] = [
+            ("0", "0 分"),
+            ("29", "0 分"),
+            ("30", "1 分"),
+            ("59", "1 分"),
+            ("3300", "55 分"),
+            ("7200", "2 小时"),
+            ("43500", "12 小时 5 分"),
+            ("7180", "2 小时"),
+        ]
+        for (seconds, text) in cases {
+            XCTAssertEqual(DurationTextParser.formatSessionDurationForEditing(seconds: seconds), text, seconds)
+            XCTAssertNotNil(DurationTextParser.parseSessionDurationSeconds(text), text)
+        }
+    }
+
     // MARK: - round-trip
 
     func testRoundTripParseThenFormatIsStable() {

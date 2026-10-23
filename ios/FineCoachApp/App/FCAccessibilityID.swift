@@ -453,6 +453,8 @@ public enum FCAccessibilityID {
     public static let activeSessionFinishBlocked = "activeSession.finishBlocked"
     public static let activeSessionDurationReview = "activeSession.durationReview"
     public static let activeSessionDurationValue = "activeSession.durationValue"
+    public static let activeSessionDurationHint = "activeSession.durationHint"
+    public static let activeSessionDurationError = "activeSession.durationError"
     public static let activeSessionDurationConfirm = "activeSession.durationConfirm"
     public static let activeSessionSaveExerciseToLibrary = "activeSession.saveExerciseToLibrary"
     public static let activeSessionExerciseNameConflict = "activeSession.exerciseNameConflict"
