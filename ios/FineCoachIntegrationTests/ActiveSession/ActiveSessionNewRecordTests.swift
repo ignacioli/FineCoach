@@ -5,12 +5,21 @@
 
     @MainActor
     final class ActiveSessionNewRecordTests: XCTestCase {
-        func testConfirmationTransfersHolderUndoRemovesItAndReloadRebuildsIt() async throws {
+        private struct Harness {
+            let directory: TemporaryProtectedDirectory
+            let controller: PersistenceController
+            let useCases: ActiveSessionUseCases
+            let studentID: StableUUID
+            let itemID: StableExerciseID
+            let clock: TestClock
+        }
+
+        private func makeHarness() async throws -> Harness {
             let directory = try TemporaryProtectedDirectory()
             let controller = try PersistenceController(
                 storeURL: directory.url.appendingPathComponent("generation/FineCoach.sqlite"))
             let clock = TestClock()
-            let ids = TestIDGenerator(ids: (0..<40).map { _ in UUID() })
+            let ids = TestIDGenerator(ids: (0..<80).map { _ in UUID() })
             let students = CoreDataStudentRepository(writer: controller.writer)
             let exercises = CoreDataExerciseRepository(writer: controller.writer)
             try await exercises.seedPlaceholderCatalogIfNeeded(now: clock.nowUTC())
@@ -26,42 +35,137 @@
                     url: directory.url.appendingPathComponent("recovery.json"), protectedFileStore: ProtectedFileStore()
                 ),
                 storeGenerationUUID: UUID(), clock: clock, ids: ids)
-            _ = try await useCases.startOrOpen(studentID: student.id)
-            _ = try await useCases.addCatalogExercise(itemID: item.id)
-            let first = ActiveSessionViewModel(studentID: student.id, useCases: useCases)
-            await first.load()
-            first.weight = "80"
-            first.reps = "5"
-            await first.confirmActiveDraftSet()
-            XCTAssertTrue(first.recordHolderSetIDs.isEmpty, "first-time performance is a baseline")
-            first.dismissRest()
-            _ = try await useCases.finish()
-            clock.advance(seconds: 60)
-            _ = try await useCases.startOrOpen(studentID: student.id)
-            _ = try await useCases.addCatalogExercise(itemID: item.id)
-            let viewModel = ActiveSessionViewModel(studentID: student.id, useCases: useCases)
+            return Harness(
+                directory: directory, controller: controller, useCases: useCases, studentID: student.id,
+                itemID: item.id, clock: clock)
+        }
+
+        private func startSession(_ harness: Harness) async throws -> ActiveSessionViewModel {
+            _ = try await harness.useCases.startOrOpen(studentID: harness.studentID)
+            _ = try await harness.useCases.addCatalogExercise(itemID: harness.itemID)
+            let viewModel = ActiveSessionViewModel(studentID: harness.studentID, useCases: harness.useCases)
             await viewModel.load()
-            viewModel.weight = "85"
-            viewModel.reps = "5"
+            return viewModel
+        }
+
+        @discardableResult
+        private func confirm(_ viewModel: ActiveSessionViewModel, weight: String, reps: String) async throws
+            -> StableUUID
+        {
+            viewModel.weight = weight
+            viewModel.reps = reps
             await viewModel.confirmActiveDraftSet()
-            let firstID = try XCTUnwrap(viewModel.session?.exercises.first?.sets.last?.id)
-            XCTAssertEqual(viewModel.recordHolderSetIDs, [firstID])
             viewModel.dismissRest()
-            viewModel.weight = "90"
-            viewModel.reps = "5"
-            await viewModel.confirmActiveDraftSet()
-            let secondID = try XCTUnwrap(viewModel.session?.exercises.first?.sets.last?.id)
+            return try XCTUnwrap(viewModel.session?.exercises.first?.sets.last?.id)
+        }
+
+        /// A finished 80 kg x 5 Session, then a fresh Session on top of it.
+        private func makeSessionAfterBaseline() async throws -> (Harness, ActiveSessionViewModel) {
+            let harness = try await makeHarness()
+            let baseline = try await startSession(harness)
+            _ = try await confirm(baseline, weight: "80", reps: "5")
+            _ = try await harness.useCases.finish()
+            harness.clock.advance(seconds: 60)
+            let viewModel = try await startSession(harness)
+            return (harness, viewModel)
+        }
+
+        func testConfirmationTransfersHolderUndoRemovesItAndReloadRebuildsIt() async throws {
+            let (harness, viewModel) = try await makeSessionAfterBaseline()
+            let firstID = try await confirm(viewModel, weight: "85", reps: "5")
+            XCTAssertEqual(viewModel.recordHolderSetIDs, [firstID])
+            XCTAssertEqual(viewModel.strictRecordHolderSetIDs, [firstID])
+            XCTAssertEqual(viewModel.confirmationFeedback?.isRecordImprovement, true)
+            // Same weight, more reps: the badge moves to this set, but the main
+            // metric did not beat the earlier set, so it is not a strict record.
+            let repTransferID = try await confirm(viewModel, weight: "85", reps: "8")
+            XCTAssertEqual(viewModel.recordHolderSetIDs, [repTransferID])
+            XCTAssertTrue(viewModel.strictRecordHolderSetIDs.isEmpty)
+            XCTAssertEqual(viewModel.confirmationFeedback?.isRecordImprovement, false)
+            let secondID = try await confirm(viewModel, weight: "90", reps: "5")
             XCTAssertEqual(viewModel.recordHolderSetIDs, [secondID])
-            viewModel.dismissRest()
+            XCTAssertEqual(viewModel.strictRecordHolderSetIDs, [secondID])
+            XCTAssertEqual(viewModel.confirmationFeedback?.isRecordImprovement, true)
+            let lastConfirmation = viewModel.confirmationFeedback
             await viewModel.undoRecentSet()
-            XCTAssertEqual(viewModel.recordHolderSetIDs, [firstID])
+            XCTAssertEqual(viewModel.recordHolderSetIDs, [repTransferID])
             XCTAssertFalse(viewModel.recordHolderSetIDs.contains(secondID))
-            let restored = ActiveSessionViewModel(studentID: student.id, useCases: useCases)
+            XCTAssertTrue(viewModel.strictRecordHolderSetIDs.isEmpty)
+            // Undo is recomputation only: it must not publish another event.
+            XCTAssertEqual(viewModel.confirmationFeedback, lastConfirmation)
+            let restored = ActiveSessionViewModel(studentID: harness.studentID, useCases: harness.useCases)
             await restored.load()
             XCTAssertEqual(restored.recordHolderSetIDs, viewModel.recordHolderSetIDs)
+            XCTAssertEqual(restored.strictRecordHolderSetIDs, viewModel.strictRecordHolderSetIDs)
+            XCTAssertNil(restored.confirmationFeedback, "reloading never replays a confirmation haptic")
             XCTAssertNil(viewModel.errorMessage)
             XCTAssertNil(restored.errorMessage)
-            try await controller.shutdownForTesting()
+            try await harness.controller.shutdownForTesting()
+        }
+
+        func testConfirmationFeedbackIsTrueOnlyForAStrictMainMetricImprovement() async throws {
+            let harness = try await makeHarness()
+            // First time doing the exercise: a baseline, so a plain success.
+            let first = try await startSession(harness)
+            _ = try await confirm(first, weight: "80", reps: "5")
+            XCTAssertTrue(first.recordHolderSetIDs.isEmpty)
+            XCTAssertEqual(first.confirmationFeedback?.isRecordImprovement, false)
+            _ = try await harness.useCases.finish()
+            harness.clock.advance(seconds: 60)
+            let viewModel = try await startSession(harness)
+            XCTAssertNil(viewModel.confirmationFeedback)
+
+            // Equal to history: not a record.
+            _ = try await confirm(viewModel, weight: "80", reps: "5")
+            XCTAssertEqual(viewModel.confirmationFeedback?.isRecordImprovement, false)
+
+            // Strictly heavier: a record.
+            _ = try await confirm(viewModel, weight: "85", reps: "5")
+            XCTAssertEqual(viewModel.confirmationFeedback?.isRecordImprovement, true)
+
+            // Same weight, more reps: progress, but not a strict improvement.
+            _ = try await confirm(viewModel, weight: "85", reps: "8")
+            XCTAssertEqual(viewModel.confirmationFeedback?.isRecordImprovement, false)
+
+            // Heavier again: a strict improvement over every earlier set.
+            _ = try await confirm(viewModel, weight: "90", reps: "5")
+            XCTAssertEqual(viewModel.confirmationFeedback?.isRecordImprovement, true)
+            XCTAssertNil(viewModel.errorMessage)
+            try await harness.controller.shutdownForTesting()
+        }
+
+        func testEditDeleteAndUndoDoNotPublishAnotherConfirmationEvent() async throws {
+            let (harness, viewModel) = try await makeSessionAfterBaseline()
+            let setID = try await confirm(viewModel, weight: "85", reps: "5")
+            let published = try XCTUnwrap(viewModel.confirmationFeedback)
+            XCTAssertTrue(published.isRecordImprovement)
+
+            // Editing the confirmed set recomputes the marks but is not a
+            // confirmation (D-FR-012).
+            let set = try XCTUnwrap(viewModel.session?.exercises.first?.sets.first)
+            viewModel.beginEditingSet(set)
+            viewModel.weight = "79"
+            viewModel.reps = "5"
+            await viewModel.saveEditingSet()
+            XCTAssertNil(viewModel.errorMessage)
+            XCTAssertTrue(viewModel.recordHolderSetIDs.isEmpty)
+            XCTAssertEqual(viewModel.confirmationFeedback, published)
+
+            // Deleting a completed set is also recomputation only.
+            await viewModel.removeSet(setID: setID)
+            XCTAssertNil(viewModel.errorMessage)
+            XCTAssertEqual(viewModel.confirmationFeedback, published)
+
+            // A new confirmation publishes exactly one new event ...
+            let newSetID = try await confirm(viewModel, weight: "85", reps: "5")
+            let next = try XCTUnwrap(viewModel.confirmationFeedback)
+            XCTAssertGreaterThan(next.sequence, published.sequence)
+            XCTAssertTrue(next.isRecordImprovement)
+            // ... and undoing it does not publish another.
+            XCTAssertEqual(viewModel.undoableSetID, newSetID)
+            await viewModel.undoRecentSet()
+            XCTAssertEqual(viewModel.confirmationFeedback, next)
+            try await harness.controller.shutdownForTesting()
         }
     }
 #endif

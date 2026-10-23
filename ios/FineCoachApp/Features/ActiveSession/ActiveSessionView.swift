@@ -166,6 +166,14 @@ struct ActiveSessionView: View {
             }
         }
         .background(FCSemanticColors.surfacePage)
+        // The single confirmation haptic for the whole page. It lives on this
+        // stable ancestor -- not on a set row -- because the primary confirm
+        // path inserts an already-completed row, whose state never transitions
+        // (D-FR-010/D-FR-012, round-2 fix for D1/D2).
+        .sensoryFeedback(trigger: viewModel.confirmationFeedback) { _, feedback in
+            guard let feedback else { return nil }
+            return feedback.isRecordImprovement ? .impact(weight: .heavy) : .success
+        }
         .fcSecondaryPage()
         .fcBottomSheet(isPresented: $viewModel.isAddingExercise) {
             addExerciseSheet

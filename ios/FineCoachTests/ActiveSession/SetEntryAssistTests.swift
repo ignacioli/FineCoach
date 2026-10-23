@@ -139,9 +139,10 @@ final class SetEntryAssistTests: XCTestCase {
         XCTAssertTrue(circle.contains(".easeInOut(duration: 0.2)"))
 
         let row = try source("FineCoachApp/DesignSystem/Components/FCSetRow.swift")
-        XCTAssertTrue(row.contains(".sensoryFeedback(trigger: state)"))
-        XCTAssertTrue(row.contains("isNewRecord ? .impact(weight: .heavy) : .success"))
-        XCTAssertTrue(row.contains("new == .completed && old != .completed"))
+        // Round-2 fix: confirmation feedback no longer lives on the row, whose
+        // state does not transition on the primary add-and-confirm path.
+        XCTAssertFalse(row.contains("sensoryFeedback"))
+        XCTAssertFalse(row.contains("isRecordImprovement"))
 
         let stepper = try source("FineCoachApp/DesignSystem/Components/FCStepper.swift")
         let fieldStart = try XCTUnwrap(stepper.range(of: "struct FCStepperField"))
@@ -152,6 +153,12 @@ final class SetEntryAssistTests: XCTestCase {
         XCTAssertTrue(field.contains("accessibilityReduceMotion"))
 
         let session = try source("FineCoachApp/Features/ActiveSession/ActiveSessionView.swift")
+        XCTAssertTrue(session.contains(".sensoryFeedback(trigger: viewModel.confirmationFeedback)"))
+        XCTAssertTrue(session.contains("feedback.isRecordImprovement ? .impact(weight: .heavy) : .success"))
+        XCTAssertTrue(session.contains("guard let feedback else { return nil }"))
+        XCTAssertEqual(
+            session.components(separatedBy: ".sensoryFeedback(trigger: viewModel.confirmationFeedback)").count - 1, 1,
+            "exactly one stable-ancestor confirmation haptic")
         XCTAssertTrue(session.contains(".move(edge: .bottom).combined(with: .opacity)"))
         XCTAssertTrue(session.contains("removal: .opacity"))
         XCTAssertTrue(session.contains(".easeInOut(duration: 0.25)"))

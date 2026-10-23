@@ -53,6 +53,9 @@ public struct FCListRow: View {
     private let leading: Leading
     private let isIndented: Bool
     private let note: String?
+    /// D-b/D-c "本节收获" action row: the shared 「新纪录」 badge after the title.
+    /// The containing row still owns the accessible name.
+    private let showsNewRecordBadge: Bool
     private let interaction: Interaction
 
     public init(
@@ -63,11 +66,12 @@ public struct FCListRow: View {
         isIndented: Bool = false,
         note: String? = nil,
         showsDisclosure: Bool = true,
+        showsNewRecordBadge: Bool = false,
         action: (() -> Void)? = nil
     ) {
         self.init(
             title: title, titleStyle: titleStyle, subtitle: subtitle, leading: leading,
-            isIndented: isIndented, note: note,
+            isIndented: isIndented, note: note, showsNewRecordBadge: showsNewRecordBadge,
             interaction: .plain(showsDisclosure: showsDisclosure, action: action)
         )
     }
@@ -85,7 +89,7 @@ public struct FCListRow: View {
     ) {
         self.init(
             title: title, titleStyle: titleStyle, subtitle: subtitle, leading: leading,
-            isIndented: isIndented, note: note,
+            isIndented: isIndented, note: note, showsNewRecordBadge: false,
             interaction: .selectable(isSelected: isSelected, toggle: toggle)
         )
     }
@@ -101,7 +105,8 @@ public struct FCListRow: View {
     ) -> FCListRow {
         FCListRow(
             title: title, titleStyle: titleStyle, subtitle: subtitle, leading: leading,
-            isIndented: isIndented, note: nil, interaction: .unavailable(reason: reason)
+            isIndented: isIndented, note: nil, showsNewRecordBadge: false,
+            interaction: .unavailable(reason: reason)
         )
     }
 
@@ -112,6 +117,7 @@ public struct FCListRow: View {
         leading: Leading,
         isIndented: Bool,
         note: String?,
+        showsNewRecordBadge: Bool,
         interaction: Interaction
     ) {
         self.title = title
@@ -120,6 +126,7 @@ public struct FCListRow: View {
         self.leading = leading
         self.isIndented = isIndented
         self.note = note
+        self.showsNewRecordBadge = showsNewRecordBadge
         self.interaction = interaction
     }
 
@@ -149,6 +156,16 @@ public struct FCListRow: View {
 
     @ViewBuilder
     private var content: some View {
+        if showsNewRecordBadge {
+            rowContent.modifier(GainsRowAccessibility(label: accessibilityText))
+        } else {
+            rowContent.accessibilityElement(children: .combine)
+        }
+    }
+
+    /// The row's drawn content, before its accessibility contract. A gains row
+    /// names itself explicitly so the hidden 「新纪录」 badge is still read.
+    private var rowContent: some View {
         HStack(spacing: FCPrimitives.space3) {
             if case .equipmentSlot(let icon) = leading {
                 Group {
@@ -162,9 +179,7 @@ public struct FCListRow: View {
             }
             HStack(spacing: FCPrimitives.space2) {
                 VStack(alignment: .leading, spacing: FCPrimitives.space1) {
-                    Text(title)
-                        .fcFont(titleStyle == .headline ? .headline : .body)
-                        .foregroundStyle(isUnavailable ? FCSemanticColors.textDisabled : FCSemanticColors.textPrimary)
+                    titleLine
                     if let subtitle {
                         Text(subtitle)
                             .fcFont(.caption)
@@ -187,7 +202,38 @@ public struct FCListRow: View {
             minHeight: isCompact ? FCListRowGeometry.compactMinHeight : FCListRowGeometry.minHeight
         )
         .contentShape(Rectangle())
-        .accessibilityElement(children: .combine)
+    }
+
+    /// Title, with the gains badge after it. At large Dynamic Type the badge
+    /// moves under the title rather than squeezing the title or the value.
+    @ViewBuilder
+    private var titleLine: some View {
+        if showsNewRecordBadge {
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .firstTextBaseline, spacing: FCPrimitives.space2) {
+                    titleText
+                    FCNewRecordBadge()
+                }
+                .fixedSize(horizontal: true, vertical: false)
+                VStack(alignment: .leading, spacing: FCPrimitives.space1) {
+                    titleText
+                    FCNewRecordBadge()
+                }
+            }
+        } else {
+            titleText
+        }
+    }
+
+    private var titleText: some View {
+        Text(title)
+            .fcFont(titleStyle == .headline ? .headline : .body)
+            .foregroundStyle(isUnavailable ? FCSemanticColors.textDisabled : FCSemanticColors.textPrimary)
+    }
+
+    private var accessibilityText: String {
+        [title, subtitle, showsNewRecordBadge ? String(localized: "session.set.newRecord") : nil]
+            .compactMap { $0 }.joined(separator: "，")
     }
 
     @ViewBuilder
@@ -202,6 +248,18 @@ public struct FCListRow: View {
         case .unavailable:
             EmptyView()
         }
+    }
+}
+
+/// D-b/D-c: the gains row owns the accessible name, so the visually hidden
+/// 「新纪录」 badge is still read after the action name (AC-D13).
+private struct GainsRowAccessibility: ViewModifier {
+    let label: String
+
+    func body(content: Content) -> some View {
+        content
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text(label))
     }
 }
 

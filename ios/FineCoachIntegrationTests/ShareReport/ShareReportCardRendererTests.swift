@@ -67,7 +67,10 @@
                 personalBests: [
                     .init(displayName: "合成纪录动作", kind: .highestWeight, weightValue: try DecimalValue("45"))
                 ],
-                progress: [.init(displayName: "合成进步动作", previous: previous, current: current)],
+                gainRows: [
+                    .init(
+                        displayName: "合成进步动作", isNewRecord: true, previous: previous, current: current)
+                ],
                 milestoneSessionNumber: 10)
             let blocks = ShareReportCardView.blocks(for: dto)
             XCTAssertEqual(blocks.filter { $0 == .personalBests }.count, 1)
@@ -80,7 +83,7 @@
                     schemaVersion: ShareReportPolicy.schemaVersion, studentDisplayName: nil,
                     sessionDateUTC: nil, durationSeconds: nil, trainingFocus: nil,
                     studentFacingSummary: nil, trainingVolume: nil, exercises: [],
-                    progress: milestone == nil ? dto.progress : [], milestoneSessionNumber: milestone)
+                    gainRows: milestone == nil ? dto.gainRows : [], milestoneSessionNumber: milestone)
                 XCTAssertTrue(ShareReportCardView.blocks(for: single).contains(.personalBests))
             }
         }

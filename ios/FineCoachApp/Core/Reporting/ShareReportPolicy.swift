@@ -1,8 +1,9 @@
 import Foundation
 
 public enum ShareReportPolicy {
-    /// 3: opt-in session gains (records, progress, and session milestone).
-    public static let schemaVersion = 3
+    /// 4: opt-in session gains as one "上次 → 本次" row per action (spec 004
+    /// Revision 1.5), plus the session milestone.
+    public static let schemaVersion = 4
 
     public static let allowedDTOPropertyNames: Set<String> = [
         "schemaVersion",
@@ -14,7 +15,7 @@ public enum ShareReportPolicy {
         "trainingVolume",
         "exercises",
         "personalBests",
-        "progress",
+        "gainRows",
         "milestoneSessionNumber",
     ]
 
@@ -118,9 +119,10 @@ public enum ShareReportPolicy {
             trainingVolume: modules.includeTrainingVolume ? completed.statistics.ordinaryTrainingVolume : nil,
             exercises: exercises,
             personalBests: gains.map { personalBestsSet(from: $0) } ?? personalBests,
-            progress: gains?.progress.map {
-                ShareReportProgressDTO(
-                    displayName: $0.displayName, previous: reportSet($0.previous), current: reportSet($0.current))
+            gainRows: gains?.rows.map {
+                ShareReportGainRowDTO(
+                    displayName: $0.displayName, isNewRecord: $0.isNewRecord, previous: reportSet($0.previous),
+                    current: reportSet($0.current))
             } ?? [],
             milestoneSessionNumber: gains?.milestoneSessionNumber
         )
@@ -140,20 +142,25 @@ public enum ShareReportPolicy {
         gains.records.map { record in
             let kind: ShareReportPersonalBestDTO.Kind
             switch record.kind {
-            case .mostRepsAtWeight, .highestWeight: kind = .highestWeight
+            case .highestWeight: kind = .highestWeight
             case .longestDuration: kind = .longestDuration
-            case .longestDistance: kind = .longestDistance
+            case .mostReps: kind = .mostReps
             }
             return ShareReportPersonalBestDTO(
                 displayName: record.displayName, kind: kind,
                 weightValue: kind == .highestWeight ? record.set.weightValue : nil,
-                repetitionCount: record.kind == .mostRepsAtWeight ? record.set.repetitionCount : nil,
+                // The set detail travels with a weight record; the record
+                // itself is still judged on the weight alone (Revision 1.5).
+                repetitionCount: kind == .highestWeight || kind == .mostReps
+                    ? record.set.repetitionCount : nil,
                 durationSeconds: kind == .longestDuration ? record.set.durationSeconds : nil,
-                distanceValue: kind == .longestDistance ? record.set.distanceValue : nil)
+                distanceValue: nil)
         }
     }
 
     /// A nil hint also means the settings row must be absent (D-FR-031).
+    /// "N 项新纪录" counts record actions; "N 项进步" counts the action rows
+    /// that improved without a record, so no action is counted twice.
     public static func gainsHint(for gains: SessionGains) -> String? {
         var parts: [String] = []
         if !gains.records.isEmpty {

@@ -1,6 +1,8 @@
 import SwiftUI
 
 /// D-b: one read-only composition shared by the summary and coach history.
+/// Revision 1.5 (C16): one "上次 … → 本次 …" row per action; a record action
+/// carries the 「新纪录」 badge on that same row and never gets a second row.
 struct SessionGainsSectionView: View {
     let gains: SessionGains
 
@@ -9,24 +11,17 @@ struct SessionGainsSectionView: View {
             VStack(alignment: .leading, spacing: FCPrimitives.space3) {
                 FCSectionLabel(String(localized: "session.gains.title"))
                 VStack(spacing: 0) {
-                    ForEach(Array(gains.records.enumerated()), id: \.offset) { index, record in
+                    ForEach(Array(gains.rows.enumerated()), id: \.offset) { index, row in
                         if index > 0 { FCListRowDivider() }
-                        PersonalBestRowView(
-                            name: record.displayName, kind: SessionGainsPresentation.kind(record.kind),
-                            value: SessionGainsPresentation.value(record), day: nil,
-                            detail: record.kind == .mostRepsAtWeight ? record.set.displaySummary : nil,
-                            allowsValueWrapping: true)
-                    }
-                    ForEach(Array(gains.progress.enumerated()), id: \.offset) { index, progress in
-                        if index > 0 || !gains.records.isEmpty { FCListRowDivider() }
                         FCListRow(
-                            title: progress.displayName,
+                            title: row.displayName,
                             subtitle: SessionGainsPresentation.progress(
-                                previous: progress.previous.displaySummary, current: progress.current.displaySummary),
-                            showsDisclosure: false)
+                                previous: row.previous.displaySummary, current: row.current.displaySummary),
+                            showsDisclosure: false,
+                            showsNewRecordBadge: row.isNewRecord)
                     }
                     if let number = gains.milestoneSessionNumber {
-                        if !gains.records.isEmpty || !gains.progress.isEmpty { FCListRowDivider() }
+                        if !gains.rows.isEmpty { FCListRowDivider() }
                         FCListRow(
                             title: SessionGainsPresentation.milestone(number),
                             subtitle: String(localized: "session.gains.milestone.subtitle"), showsDisclosure: false)
@@ -39,23 +34,6 @@ struct SessionGainsSectionView: View {
 }
 
 enum SessionGainsPresentation {
-    static func kind(_ kind: SessionGains.RecordKind) -> String {
-        switch kind {
-        case .mostRepsAtWeight, .highestWeight: return String(localized: "history.pb.highestWeight")
-        case .longestDuration: return String(localized: "history.pb.longestDuration")
-        case .longestDistance: return String(localized: "history.pb.longestDistance")
-        }
-    }
-
-    static func value(_ record: SessionGains.Record) -> String {
-        switch record.kind {
-        case .mostRepsAtWeight, .highestWeight: return "\(record.set.weightValue?.canonicalString ?? "-") kg"
-        case .longestDuration:
-            return DurationTextParser.formatForEditing(secondsText: record.set.durationSeconds?.canonicalString ?? "0")
-        case .longestDistance: return "\(record.set.distanceValue?.canonicalString ?? "-") km"
-        }
-    }
-
     static func progress(previous: String, current: String) -> String {
         String(format: String(localized: "session.gains.progress.format"), previous, current)
     }

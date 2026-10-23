@@ -43,7 +43,7 @@ struct ShareReportCardView: View {
         if !ShareReportCardPresentation.stats(dto).isEmpty { result.append(.stats) }
         if let parts = trainedParts(dto), !parts.isEmpty { result.append(.trainedParts) }
         result.append(contentsOf: dto.exercises.indices.map(Block.exercise))
-        if !dto.personalBests.isEmpty || !dto.progress.isEmpty || dto.milestoneSessionNumber != nil {
+        if !dto.gainRows.isEmpty || dto.milestoneSessionNumber != nil {
             result.append(.personalBests)
         }
         if let summary = dto.studentFacingSummary, !summary.isEmpty { result.append(.summary) }
@@ -94,38 +94,14 @@ struct ShareReportCardView: View {
         case .personalBests:
             section(String(localized: "session.gains.title")) {
                 VStack(alignment: .leading, spacing: 0) {
-                    ForEach(Array(dto.personalBests.enumerated()), id: \.offset) { _, best in
-                        HStack(spacing: FCPrimitives.space3) {
-                            VStack(alignment: .leading, spacing: FCPrimitives.space1) {
-                                HStack(spacing: FCPrimitives.space2) {
-                                    Text(best.displayName)
-                                        .fcFont(.headline)
-                                        .foregroundStyle(FCSemanticColors.textPrimary)
-                                    FCNewRecordBadge()
-                                }
-                                Text(bestKind(best))
-                                    .fcFont(.caption)
-                                    .foregroundStyle(FCSemanticColors.textSecondary)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            Text(ShareReportCardPresentation.bestValue(best))
-                                .fcFont(.titleEmphasis)
-                                .foregroundStyle(FCSemanticColors.textPrimary)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                        .padding(.vertical, FCPrimitives.space2)
-                        .accessibilityElement(children: .combine)
-                        .accessibilityLabel(
-                            "\(best.displayName)，\(String(localized: "session.set.newRecord"))，\(ShareReportCardPresentation.bestValue(best))"
-                        )
-                    }
-                    ForEach(Array(dto.progress.enumerated()), id: \.offset) { _, progress in
+                    ForEach(Array(dto.gainRows.enumerated()), id: \.offset) { _, row in
                         FCListRow(
-                            title: progress.displayName,
+                            title: row.displayName,
                             subtitle: SessionGainsPresentation.progress(
-                                previous: TrainingSetDisplayFormatting.summary(for: progress.previous),
-                                current: TrainingSetDisplayFormatting.summary(for: progress.current)),
-                            showsDisclosure: false)
+                                previous: TrainingSetDisplayFormatting.summary(for: row.previous),
+                                current: TrainingSetDisplayFormatting.summary(for: row.current)),
+                            showsDisclosure: false,
+                            showsNewRecordBadge: row.isNewRecord)
                     }
                     if let number = dto.milestoneSessionNumber {
                         HStack(spacing: FCPrimitives.space3) {
@@ -157,14 +133,6 @@ struct ShareReportCardView: View {
                     .fcFont(.caption)
                     .foregroundStyle(FCSemanticColors.textSecondary)
             }
-        }
-    }
-
-    private func bestKind(_ best: ShareReportPersonalBestDTO) -> String {
-        switch best.kind {
-        case .highestWeight: return String(localized: "history.pb.highestWeight")
-        case .longestDuration: return String(localized: "history.pb.longestDuration")
-        case .longestDistance: return String(localized: "history.pb.longestDistance")
         }
     }
 
@@ -312,21 +280,6 @@ enum ShareReportCardPresentation {
             result.append(("\(minutes)", String(localized: "shareCard.stat.minutes")))
         }
         return result
-    }
-
-    static func bestValue(_ best: ShareReportPersonalBestDTO) -> String {
-        switch best.kind {
-        case .highestWeight:
-            let weight = best.weightValue?.canonicalString ?? ""
-            if let reps = best.repetitionCount?.canonicalString {
-                return String(format: String(localized: "history.pb.setDetailFormat"), weight, reps)
-            }
-            return "\(weight) kg"
-        case .longestDuration:
-            return DurationTextParser.formatForEditing(secondsText: best.durationSeconds?.canonicalString ?? "0")
-        case .longestDistance:
-            return "\(best.distanceValue?.canonicalString ?? "") km"
-        }
     }
 
     private static func grouped(_ value: Double) -> String {

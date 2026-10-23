@@ -35,7 +35,7 @@ final class ShareReportPolicyTests: XCTestCase {
         "trainingVolume",
         "exercises",
         "personalBests",
-        "progress",
+        "gainRows",
         "milestoneSessionNumber",
     ]
 
@@ -84,7 +84,7 @@ final class ShareReportPolicyTests: XCTestCase {
         let completed = try makeCompleted(includingNotes: true, includingUnresolvedSets: false)
         let dto = try ShareReportPolicy.makeDTO(from: completed)
         XCTAssertEqual(dto.schemaVersion, ShareReportPolicy.schemaVersion)
-        XCTAssertEqual(ShareReportPolicy.schemaVersion, 3)
+        XCTAssertEqual(ShareReportPolicy.schemaVersion, 4)
 
         XCTAssertEqual(propertyLabels(dto), Self.allowedShareReportDTOPropertyNames)
         XCTAssertEqual(propertyLabels(dto), ShareReportPolicy.allowedDTOPropertyNames)
@@ -364,23 +364,25 @@ final class ShareReportPolicyTests: XCTestCase {
         let gains = SessionGains(current: completed, history: history)
         let off = try ShareReportPolicy.makeDTO(from: completed)
         XCTAssertTrue(off.personalBests.isEmpty)
-        XCTAssertTrue(off.progress.isEmpty)
+        XCTAssertTrue(off.gainRows.isEmpty)
         XCTAssertNil(off.milestoneSessionNumber)
         let on = try ShareReportPolicy.makeDTO(from: completed, gains: gains)
         XCTAssertEqual(on.personalBests, ShareReportPolicy.personalBestsSet(in: completed, history: history))
         XCTAssertEqual(on.personalBests.count, gains.records.count)
         XCTAssertEqual(on.personalBests.first?.weightValue, gains.records.first?.set.weightValue)
-        XCTAssertEqual(on.progress.count, gains.progress.count)
-        XCTAssertEqual(on.progress.first?.displayName, gains.progress.first?.displayName)
-        XCTAssertEqual(on.progress.first?.previous.weightValue, gains.progress.first?.previous.weightValue)
-        XCTAssertEqual(on.progress.first?.current.repetitionCount, gains.progress.first?.current.repetitionCount)
+        XCTAssertEqual(on.gainRows.count, gains.rows.count)
+        XCTAssertEqual(on.gainRows.first?.displayName, gains.rows.first?.displayName)
+        XCTAssertEqual(on.gainRows.first?.isNewRecord, gains.rows.first?.isNewRecord)
+        XCTAssertEqual(on.gainRows.first?.previous.weightValue, gains.rows.first?.previous.weightValue)
+        XCTAssertEqual(on.gainRows.first?.current.repetitionCount, gains.rows.first?.current.repetitionCount)
         XCTAssertEqual(on.milestoneSessionNumber, gains.milestoneSessionNumber)
         XCTAssertEqual(on.milestoneSessionNumber, 10)
-        let progress = try XCTUnwrap(on.progress.first)
-        XCTAssertEqual(propertyLabels(progress), ["displayName", "previous", "current"])
-        XCTAssertEqual(propertyLabels(progress.previous), Self.allowedShareReportSetDTOPropertyNames)
-        XCTAssertEqual(propertyLabels(progress.current), Self.allowedShareReportSetDTOPropertyNames)
-        let surface = propertyLabels(progress).union(propertyLabels(progress.previous)).joined(separator: " ")
+        let row = try XCTUnwrap(on.gainRows.first)
+        XCTAssertTrue(row.isNewRecord)
+        XCTAssertEqual(propertyLabels(row), ["displayName", "isNewRecord", "previous", "current"])
+        XCTAssertEqual(propertyLabels(row.previous), Self.allowedShareReportSetDTOPropertyNames)
+        XCTAssertEqual(propertyLabels(row.current), Self.allowedShareReportSetDTOPropertyNames)
+        let surface = propertyLabels(row).union(propertyLabels(row.previous)).joined(separator: " ")
             .lowercased()
         for token in Self.requiredForbiddenIdentifierTokens {
             XCTAssertFalse(surface.contains(token.lowercased()))
@@ -397,9 +399,14 @@ final class ShareReportPolicyTests: XCTestCase {
             ShareReportPolicy.gainsHint(for: SessionGains(current: milestoneAndProgress, history: history)),
             "第 10 节课 · 1 项进步")
         let recordAndProgress = try gainsSession(number: 3, recordWeight: "85", progressReps: "7")
+        let counted = SessionGains(current: recordAndProgress, history: history)
         XCTAssertEqual(
-            ShareReportPolicy.gainsHint(for: SessionGains(current: recordAndProgress, history: history)),
+            ShareReportPolicy.gainsHint(for: counted),
             "1 项新纪录 · 1 项进步")
+        // The record action is also progress, but it is counted only once.
+        XCTAssertEqual(counted.records.count, 1)
+        XCTAssertEqual(counted.rows.filter { $0.isNewRecord }.count, 1)
+        XCTAssertEqual(counted.progress.count, 1)
         let milestoneOnly = try gainsSession(number: 10)
         XCTAssertEqual(
             ShareReportPolicy.gainsHint(for: SessionGains(current: milestoneOnly, history: history)), "第 10 节课")

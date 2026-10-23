@@ -23,6 +23,17 @@ struct DeletedSetUndo: Equatable {
     let originalIndex: Int
 }
 
+/// One successful set confirmation (D-FR-010). Published together with the
+/// updated Session and record holders so the training page can give exactly
+/// one haptic per confirmation; `sequence` makes two identical booleans two
+/// distinct events. Recomputation (edit, delete, undo, restore, reload) never
+/// publishes one (D-FR-012).
+struct ConfirmationFeedback: Equatable, Sendable {
+    let sequence: Int
+    /// The confirmed set is in `strictRecordHolderSetIDs` after recomputation.
+    let isRecordImprovement: Bool
+}
+
 /// The coach-facing credit question or notice shown after a Session
 /// finishes (M1B-FR-013/014). Appointment-linked debits need no prompt.
 enum SessionCreditPrompt: Equatable {
@@ -46,21 +57,43 @@ final class ActiveSessionViewModel: ObservableObject {
     private struct RecordState {
         let session: Session?
         let holders: Set<StableUUID>
+        /// Holders whose main metric is also strictly above every earlier set
+        /// this session; only these give the new-record haptic (D-FR-013).
+        let strictHolders: Set<StableUUID>
     }
-    @Published private var recordState = RecordState(session: nil, holders: [])
+    @Published private var recordState = RecordState(session: nil, holders: [], strictHolders: [])
     private var completedHistory: [CompletedSession] = []
     var session: Session? {
         get { recordState.session }
         set {
-            let holders =
-                newValue.map {
-                    SessionGains(current: $0, history: completedHistory, assistedExerciseIDs: entryFlags.assisted)
-                        .recordHolderSetIDs
-                } ?? []
-            recordState = RecordState(session: newValue, holders: holders)
+            guard let newValue else {
+                recordState = RecordState(session: nil, holders: [], strictHolders: [])
+                return
+            }
+            let gains = SessionGains(
+                current: newValue, history: completedHistory, assistedExerciseIDs: entryFlags.assisted)
+            recordState = RecordState(
+                session: newValue, holders: gains.recordHolderSetIDs,
+                strictHolders: gains.strictRecordHolderSetIDs)
         }
     }
     var recordHolderSetIDs: Set<StableUUID> { recordState.holders }
+    var strictRecordHolderSetIDs: Set<StableUUID> { recordState.strictHolders }
+    /// The most recent successful confirmation; nil until the first one and
+    /// after a reload. Drives the single confirmation haptic.
+    @Published private(set) var confirmationFeedback: ConfirmationFeedback?
+    private var confirmationSequence = 0
+
+    /// Publishes the one confirmation event for `setID` after the new Session
+    /// (and therefore the record holders) has been assigned, so the view sees
+    /// both in the same main-thread update. Only successful confirmations call
+    /// this -- recomputation paths must not (D-FR-012).
+    private func publishConfirmationFeedback(for setID: StableUUID) {
+        confirmationSequence += 1
+        confirmationFeedback = ConfirmationFeedback(
+            sequence: confirmationSequence,
+            isRecordImprovement: strictRecordHolderSetIDs.contains(setID))
+    }
 
     @Published var errorMessage: String?
     @Published var saveStatus: PersistenceProjectionStatus = .saved(revision: 0)
@@ -490,6 +523,7 @@ final class ActiveSessionViewModel: ObservableObject {
             self.session = try await self.signposts.measureSetConfirm {
                 try await self.useCases.confirmSet(sessionID: self.sessionID, setID: newSetID)
             }
+            self.publishConfirmationFeedback(for: newSetID)
             self.offerUndo(for: newSetID)
         }
         if confirmed {
@@ -505,6 +539,7 @@ final class ActiveSessionViewModel: ObservableObject {
             self.session = try await self.signposts.measureSetConfirm {
                 try await self.useCases.confirmSet(sessionID: self.sessionID, setID: setID)
             }
+            self.publishConfirmationFeedback(for: setID)
         }
         if errorMessage == nil, activeDraftSetID == setID {
             activeDraftSetID = nil

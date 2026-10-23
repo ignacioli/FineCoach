@@ -104,10 +104,6 @@ public struct FCSetRow: View {
                 Button(String(localized: "session.action.undo"), action: onUndo)
             }
         }
-        .sensoryFeedback(trigger: state) { old, new -> SensoryFeedback? in
-            guard new == .completed && old != .completed else { return nil }
-            return isNewRecord ? .impact(weight: .heavy) : .success
-        }
 
     }
 
