@@ -181,6 +181,9 @@ feature 专有组件见 §4。共享组件的新增 / 扩展条目写在 `compon
 设置 42 → 「备份与恢复」入口行 → FCAccessibilityID.settingsBackup → 否（导航）→ FCHubRow（SettingsView.swift:24）
 设置 42 → 「关于」行（版本号「版本 0.2.0（1）」，无 ›，不可点）→ FCAccessibilityID.settingsAbout → 否 → FCHubRow（SettingsView.swift:32）
 设置 42 → 「源代码」行（代码图标、网址副标题、›；README §10 C21）→ FCAccessibilityID.settingsSourceCode → 否（openURL 交给系统浏览器）→ FCHubRow .frame(maxWidth: .infinity, minHeight: 64)（SettingsView.swift:40）
+复核训练时长（全屏确认流程，README §10 C22）→ 「训练时长」输入框（预填「12 小时 5 分」）→ FCAccessibilityID.activeSessionDurationValue → 否（只改本页状态）→ FCTextField 撑满（FinishSessionFlow.swift:91）
+复核训练时长 → 格式提示 / 就地错误（只读文字）→ activeSession.durationHint / activeSession.durationError → 否 → 父 VStack，space4 边距（FinishSessionFlow.swift:93、:98）
+复核训练时长 → 「确认时长」→ FCAccessibilityID.activeSessionDurationConfirm → 是（有效输入才写入调整后的时长；无效不提交）→ FCButton maxWidth: .infinity（FinishSessionFlow.swift:104）
 备份与恢复 39 → 「恢复完成」就地结果 → FCAccessibilityID.restoreSucceeded → 否 → FCInlineResult .frame(maxWidth: .infinity)（BackupRestoreFlow.swift:164）
 备份与恢复 38 → 「恢复失败」就地结果 → FCAccessibilityID.restoreFailed → 否 → FCInlineResult（BackupRestoreFlow.swift:176）
 备份与恢复 38 → 「重试」可见链接按钮（恢复中禁用）→ FCAccessibilityID.restoreRetry → 是（重新执行恢复；可见按钮，非手势）→ FCInlineResult 内 FCLinkButton .frame(maxWidth: .infinity)（BackupRestoreFlow.swift:186）
