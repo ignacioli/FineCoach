@@ -211,6 +211,9 @@ struct ActiveSessionView: View {
         .fcBottomSheet(isPresented: $isCreatingSection) {
             createSectionSheet
         }
+        .onAppear {
+            RestNotificationRouter.shared.activeSessionDidAppear(studentID: viewModel.studentID)
+        }
         .task {
             await viewModel.load()
             let resolvedStudentID = viewModel.session?.studentID ?? viewModel.studentID
@@ -231,6 +234,7 @@ struct ActiveSessionView: View {
             isKeyboardVisible = false
         }
         .onDisappear {
+            RestNotificationRouter.shared.activeSessionDidDisappear(studentID: viewModel.studentID)
             viewModel.expireDeletedSetUndo()
         }
         .fcConfirmationDialog(

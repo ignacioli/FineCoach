@@ -118,7 +118,8 @@ enum RestEndNotification {
                 title: String(localized: "session.rest.notificationTitle"),
                 body: body(exerciseName: exerciseName),
                 fireDate: endsAt,
-                userInfo: userInfo
+                userInfo: userInfo,
+                threadIdentifier: sessionID == nil ? nil : identifier
             )
         )
     }

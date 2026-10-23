@@ -1,3 +1,4 @@
+import UserNotifications
 import XCTest
 
 @testable import FineCoach
@@ -35,6 +36,74 @@ final class RestNotificationRoutingTests: XCTestCase {
             )
         )
         XCTAssertTrue(source.contains("withCompletionHandler completionHandler:"))
+        XCTAssertNil(
+            source.range(
+                of: #"willPresent\s+notification:\s*UNNotification\s*\)\s*async"#,
+                options: .regularExpression
+            )
+        )
+        XCTAssertNotNil(
+            source.range(
+                of: #"willPresent\s+notification:\s*UNNotification,\s*withCompletionHandler\s+completionHandler:"#,
+                options: .regularExpression
+            )
+        )
+    }
+
+    // MARK: - Foreground presentation and visible Student
+
+    func testOtherStudentRestPresentsBannerListAndSound() {
+        let request = RestNotificationRouteRequest(studentID: otherStudentID, sessionID: otherSessionID)
+        XCTAssertEqual(
+            RestNotificationPresentation.options(for: request, visibleStudentID: studentID),
+            [.banner, .list, .sound]
+        )
+    }
+
+    func testVisibleStudentRestDoesNotPresentSystemNotification() {
+        let request = RestNotificationRouteRequest(studentID: studentID, sessionID: sessionID)
+        XCTAssertEqual(
+            RestNotificationPresentation.options(for: request, visibleStudentID: studentID),
+            []
+        )
+    }
+
+    func testNonRestPayloadDoesNotPresentSystemNotification() {
+        let payloads: [[String: String]] = [
+            [:],
+            [
+                RestNotificationPayload.kindKey: "appointmentReminder",
+                RestNotificationPayload.studentIDKey: studentID.rawValue.uuidString,
+                RestNotificationPayload.sessionIDKey: sessionID.rawValue.uuidString,
+            ],
+        ]
+        for payload in payloads {
+            let request = RestNotificationRouteRequest(userInfo: payload)
+            XCTAssertNil(request)
+            XCTAssertEqual(RestNotificationPresentation.options(for: request, visibleStudentID: studentID), [])
+            XCTAssertEqual(RestNotificationPresentation.options(for: request, visibleStudentID: nil), [])
+        }
+    }
+
+    func testRestWithoutVisibleTrainingPagePresentsBannerListAndSound() {
+        let request = RestNotificationRouteRequest(studentID: studentID, sessionID: sessionID)
+        XCTAssertEqual(
+            RestNotificationPresentation.options(for: request, visibleStudentID: nil),
+            [.banner, .list, .sound]
+        )
+    }
+
+    func testPreviousStudentDisappearingDoesNotClearNewVisibleStudent() {
+        let router = RestNotificationRouter()
+        XCTAssertNil(router.visibleStudentID)
+        router.activeSessionDidAppear(studentID: studentID)
+        XCTAssertEqual(router.visibleStudentID, studentID)
+        router.activeSessionDidAppear(studentID: otherStudentID)
+        XCTAssertEqual(router.visibleStudentID, otherStudentID)
+        router.activeSessionDidDisappear(studentID: studentID)
+        XCTAssertEqual(router.visibleStudentID, otherStudentID)
+        router.activeSessionDidDisappear(studentID: otherStudentID)
+        XCTAssertNil(router.visibleStudentID)
     }
 
     // MARK: - Payload parsing
@@ -300,6 +369,7 @@ final class RestNotificationRoutingTests: XCTestCase {
         let scheduled = await center.scheduled
         let descriptor = try XCTUnwrap(scheduled.values.first)
         XCTAssertTrue(descriptor.userInfo.isEmpty)
+        XCTAssertNil(descriptor.threadIdentifier)
         XCTAssertNil(RestNotificationRouteRequest(userInfo: descriptor.userInfo))
     }
 

@@ -69,6 +69,19 @@ struct RestNotificationRouteRequest: Equatable, Sendable {
     }
 }
 
+/// Foreground rest reminders only interrupt when their Student is not on screen.
+enum RestNotificationPresentation {
+    static func options(
+        for request: RestNotificationRouteRequest?,
+        visibleStudentID: StableUUID?
+    ) -> UNNotificationPresentationOptions {
+        guard let request, request.studentID != visibleStudentID else {
+            return []
+        }
+        return [.banner, .list, .sound]
+    }
+}
+
 /// Everything the notification route depends on besides the read-only
 /// Session lookup. `isRootNavigationReady` is the cold-start gate: a tap that
 /// arrives before onboarding/root navigation exist waits for the next consume.
@@ -142,8 +155,18 @@ final class RestNotificationRouter: ObservableObject {
     static let shared = RestNotificationRouter()
 
     @Published private(set) var pendingRequest: RestNotificationRouteRequest?
+    private(set) var visibleStudentID: StableUUID?
 
     init() {}
+
+    func activeSessionDidAppear(studentID: StableUUID) {
+        visibleStudentID = studentID
+    }
+
+    func activeSessionDidDisappear(studentID: StableUUID) {
+        guard visibleStudentID == studentID else { return }
+        visibleStudentID = nil
+    }
 
     func receive(userInfo: [AnyHashable: Any]) {
         guard let request = RestNotificationRouteRequest(userInfo: userInfo) else {
@@ -179,9 +202,8 @@ final class RestNotificationRouter: ObservableObject {
     }
 }
 
-/// Sets the notification-center delegate at launch. Only the response hook is
-/// implemented: `willPresent` is deliberately absent so a foreground
-/// notification still produces no banner (P0-D5).
+/// Sets the notification-center delegate at launch. Foreground rest reminders
+/// use the in-app bar for the visible Student and system alerts for others.
 @MainActor
 final class RestNotificationAppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     func application(
@@ -191,6 +213,22 @@ final class RestNotificationAppDelegate: NSObject, UIApplicationDelegate, UNUser
         UNUserNotificationCenter.current().delegate = self
         RestNotificationDiagnostics.record(.delegateInstalled)
         return true
+    }
+
+    nonisolated func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification,
+        withCompletionHandler completionHandler: @escaping @Sendable (UNNotificationPresentationOptions) -> Void
+    ) {
+        let request = RestNotificationRouteRequest(userInfo: notification.request.content.userInfo)
+        Task { @MainActor in
+            completionHandler(
+                RestNotificationPresentation.options(
+                    for: request,
+                    visibleStudentID: RestNotificationRouter.shared.visibleStudentID
+                )
+            )
+        }
     }
 
     nonisolated func userNotificationCenter(

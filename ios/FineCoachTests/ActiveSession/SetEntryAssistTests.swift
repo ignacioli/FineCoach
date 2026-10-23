@@ -114,6 +114,7 @@ final class SetEntryAssistTests: XCTestCase {
             return XCTFail("expected a scheduled notification")
         }
         XCTAssertEqual(descriptor.identifier, RestEndNotification.identifier)
+        XCTAssertNil(descriptor.threadIdentifier, "legacy requests without a Session keep default grouping")
         XCTAssertEqual(descriptor.fireDate, ended)
         XCTAssertEqual(descriptor.title, String(localized: "session.rest.notificationTitle"))
         XCTAssertEqual(descriptor.body, String(localized: "session.rest.notificationBody"))
@@ -173,6 +174,8 @@ final class SetEntryAssistTests: XCTestCase {
         XCTAssertTrue(descriptor.body.contains("杠铃深蹲"))
         XCTAssertFalse(descriptor.body.contains("林青"))
         XCTAssertEqual(descriptor.identifier, RestEndNotification.notificationIdentifier(for: sessionID))
+        XCTAssertEqual(descriptor.threadIdentifier, descriptor.identifier)
+        XCTAssertEqual(descriptor.threadIdentifier, "active-session.rest-ended.aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa")
 
         let request = try XCTUnwrap(RestNotificationRouteRequest(userInfo: descriptor.userInfo))
         XCTAssertEqual(request.studentID, studentID)

@@ -19,19 +19,23 @@ public struct NotificationRequestDescriptor: Equatable, Sendable {
     /// Invisible routing data (Revision 1.3). Appointment reminders leave this
     /// empty, so their tap behavior stays unchanged.
     public let userInfo: [String: String]
+    /// Optional opaque grouping key; appointment reminders keep the system default.
+    public let threadIdentifier: String?
 
     public init(
         identifier: String,
         title: String,
         body: String,
         fireDate: Date,
-        userInfo: [String: String] = [:]
+        userInfo: [String: String] = [:],
+        threadIdentifier: String? = nil
     ) {
         self.identifier = identifier
         self.title = title
         self.body = body
         self.fireDate = fireDate
         self.userInfo = userInfo
+        self.threadIdentifier = threadIdentifier
     }
 }
 
@@ -89,6 +93,9 @@ public struct SystemNotificationAdapter: LocalNotificationScheduling, Notificati
         content.body = descriptor.body
         content.sound = .default
         content.userInfo = descriptor.userInfo
+        if let threadIdentifier = descriptor.threadIdentifier {
+            content.threadIdentifier = threadIdentifier
+        }
 
         let interval = descriptor.fireDate.timeIntervalSinceNow
         guard interval > 0 else {
