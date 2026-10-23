@@ -1,7 +1,7 @@
 # 阶段 D 收获感：设计改动与实施映射
 
 > 状态：**Phase 1–6 自动门通过；实现完成，待审查与集中走查；D-BLOCK-01 已关闭。画稿已批准（2026-10-20）。**本文是 `components.md` §6 要求的里程碑实施映射，不重复 token 数值。
-> 行为权威：`specs/004-stage-d-progress-milestones/spec.md`（`1.3-approved` + Revision 1.4；2026-10-21 任务说明确认；**Revision 1.5（2026-10-23）重新定义新纪录与比上次进步，见 README §10 C16，代码尚未按 1.5 修改**）。视觉权威：`design/design-system/README.md`、`components.md`。
+> 行为权威：`specs/004-stage-d-progress-milestones/spec.md`（`1.3-approved` + Revision 1.4；2026-10-21 任务说明确认；**Revision 1.5（2026-10-23）重新定义新纪录与比上次进步，见 README §10 C16；代码已按 1.5 修改，见 §4 Phase 7**）。视觉权威：`design/design-system/README.md`、`components.md`。
 > 画稿批准前，本文的组件结构只是约束草稿，不是已批准的设计。
 
 ## 1. 按设计变化分类（`components.md` §1.2）
@@ -142,14 +142,22 @@ Penpot 版本：`before-stage-D 2026-10-20` → `stage-D boards D-a D-a2 D-b D-b
 
 - 结果：PASS。strict lint 无输出、App build BUILD SUCCEEDED、build-for-testing TEST BUILD SUCCEEDED；FineCoachTests 519 项 / 518 passed / 1 既有 WCAG exemption skipped / 0 failed；FineCoachIntegrationTests 191 / 191 passed / 0 failed。日志：`DerivedData/StageD/evidence/phase6/{lint,app-build,build-for-testing,unit,integration}.log`。每个 target 运行前重启指定 iPhone 17 模拟器 EFE2D5A0-4877-4682-BE79-7460C0C1E8C8；测试正常退出，无诊断挂起。全部 Phase 的自动证据已记录；无 BLOCKED 或待决项，保留人工集中走查与审查为后续步骤。
 
+### Phase 7（T030–T034，Revision 1.5，2026-10-23）
+
+- 分类与依据：B 类修订（README §10 C16；Penpot D-a2、D-b、D-c2，快照 `gains-redefine D-a2 D-b D-c2 2026-10-23 (fix)`）。spec 004 Revision 1.5，plan §3.10。
+- 范围：`SessionGains` 改为主指标判定，新增 `GainRow`（每个动作一行，`isNewRecord`）与 `strictRecordHolderSetIDs`；`DS-LIST-ROW` 扩展新纪录胶囊 slot；总结页、教练详情、分享卡片改为动作行；分享 DTO `progress` → `gainRows`，`schemaVersion` 3 → 4；`gainsHint` 的进步只数没破纪录的动作。确认触感从 `FCSetRow` 移到 `ActiveSessionView` 的页面级确认事件（`ActiveSessionViewModel.confirmationFeedback`），修复主确认路径从不触发触感的问题（D1/D2 根因）。历史页个人最佳、Core Data 模型、pbxproj 不变。
+- 实现和检查：由 dsh 两轮实现（任务说明 `.handoff/prompt/2026-10-23-dsh-gains-redefine-prompt.md`、`…-round2-prompt.md`）。改过的旧断言 11 条（第一轮 8 条、第二轮 3 条，清单见 `.handoff/logs/2026-10-23-dsh-gains-redefine-final.md` §3 与 `…-round2-final.md` §3），均对应 Revision 1.5 条目；新增判定、提示计数、触感事件用例。同重量同次数两组都破纪录时标较早组（审查接受）。
+- 结果：PASS（宿主标准门禁，无 `-disable-sandbox`）。strict lint 无输出；App build BUILD SUCCEEDED；build-for-testing TEST BUILD SUCCEEDED；FineCoachTests 536 项 / 1 既有 skip / 0 failed；FineCoachIntegrationTests 200 项 / 0 failed。每个测试 target 前重启模拟器 4DD81BE1。日志 `.handoff/logs/2026-10-23-gains-accept-{lint,build,bft,unit,integ}.log`。
+- 未经人工检查：真机新纪录 heavy 与普通 success 触感、总结页与分享卡片动作行和胶囊（含最大字体换行，AC-D13）、分享开关提示计数。并入回归走查 D1、D2、D7、D8、D10～D13。
+
 ## 5. 入口与布局清单（`components.md` §1.4，实施时填写）
 
 每条新交互一行：画面 → 控件 → accessibility identifier → 是否改数据 → 宽度由谁撑满。每行必须指向真实代码。
 
 | 画面 | 控件 | identifier | 改数据 | 宽度 |
 |---|---|---|---|---|
-| 课程总结页 | 只读「本节收获」 | `FCAccessibilityID.sessionSummaryGains`；`SessionSummaryView.swift` → `SessionGainsSectionView` | 否 | 页面满宽 VStack，space4 边距 |
+| 课程总结页 | 只读「本节收获」：每个动作一行「上次 → 本次」，新纪录动作在动作名后带胶囊（Revision 1.5） | `FCAccessibilityID.sessionSummaryGains`；`SessionSummaryView.swift` → `SessionGainsSectionView` | 否 | 页面满宽 VStack，space4 边距 |
 | 课程详情页（教练端） | 同一只读区块；在 card 的 summary 之前 | `FCAccessibilityID.sessionDetailGains`；`SessionDetailView.swift` → `SessionGainsSectionView` | 否 | 详情 VStack 与区块 maxWidth infinity，space4 边距 |
-| 训练页 | 组行「新纪录」（只读） | `FCAccessibilityID.setNewRecord(set.id)`；`ActiveSessionView.swift` → `FCSetRow.recordBadge` | 否 | `FCSetRow` 的 HStack 与训练页列表容器；胶囊在标题后，空间不足换到标题下方 |
+| 训练页 | 组行「新纪录」（只读）；确认触感由页面级 `.sensoryFeedback(trigger: confirmationFeedback)` 发出（Revision 1.5） | `FCAccessibilityID.setNewRecord(set.id)`；`ActiveSessionView.swift` → `FCSetRow.recordBadge` | 否 | `FCSetRow` 的 HStack 与训练页列表容器；胶囊在标题后，空间不足换到标题下方 |
 | 分享设置页 | 可见「本节收获」toggle（空收获整行隐藏） | `FCAccessibilityID.shareReportPersonalBestToggle`；`ShareReportFlowView.swift` → `contentSection` | 仅流程内存状态与 DTO，不持久化 | 页面满宽 VStack，space4 边距；toggleRow 的 Spacer 分配提示与开关 |
-| 分享卡片 / 预览 | 只读「本节收获」block；渲染图无交互 | `FCAccessibilityID.shareReportGains`；`ShareReportCardView.swift` → `content(for:)` | 否 | CardFrame 固定 cardWidth，space6 边距；section 与行撑满 |
+| 分享卡片 / 预览 | 只读「本节收获」block，动作行同总结页、右侧不再列数值；渲染图无交互 | `FCAccessibilityID.shareReportGains`；`ShareReportCardView.swift` → `content(for:)` | 否 | CardFrame 固定 cardWidth，space6 边距；section 与行撑满 |

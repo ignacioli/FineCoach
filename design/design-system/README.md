@@ -98,7 +98,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
   - D-a2：新增「⑤ 判定口径（2026-10-23 修订）」六行说明，画板高 772。
   - D-a 不改。
 - 导出：三块画板均以 MCP 1x 导出看过（未入库）；2x 正式导出与其他 D 画板一并待做。
-- 代码尚未按新口径修改（`SessionGains`、训练中标记、总结与分享行），见 `design/progress-milestones/implementation-map.md`。
+- 代码已按新口径修改（分支 `fix/gains-redefine`，2026-10-23）：`SessionGains` 主指标判定、每个动作一行、`DS-LIST-ROW` 新增新纪录胶囊 slot；确认触感改由训练页级确认事件触发（修复真机走查 D1/D2 无触感）。执行记录见 `design/progress-milestones/implementation-map.md` §4 Phase 7。
 
 ## 2. 颜色
 

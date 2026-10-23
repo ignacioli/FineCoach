@@ -227,6 +227,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 - **不变量**：带 `action` 时整行可点；不可点时合并为一个无障碍元素（可自动）。
 - **复用边界**：见 CG-1。目前 feature 中的列表行都是各自拼装。新的普通列表行优先使用 `FCListRow`；需要头像、图标、状态等额外 slot 时，按「扩展」流程增加 slot，不要在页面里再复制一套。
 
+- **本节收获动作行 slot（2026-10-23，README §10 C16，B 类扩展）**：`FCListRow(…, showsNewRecordBadge:)`，默认关闭。开启时主文字后接 `FCNewRecordBadge`（`DS-SET-ROW` 的胶囊部件，间距 `space.2`），横向放不下时（大字体）用 `ViewThatFits` 换到主文字下方；整行读作「标题，元信息，新纪录」。只用于总结页、教练历史详情、分享卡片的「上次 → 本次」动作行（Penpot D-b、D-c2）；其他消费者默认关闭，不受影响。
 - **C′ 2b 复用位置与已有动作行变体**：动作库页面与训练中添加动作面板的「最近练过」行，和完整列表共用 `FCExerciseLibraryRowLabel`（`DesignSystem/Components/FCListRow.swift`），图标 → 名字 / 副文字 → 弹性空白 → 可选收藏星 → `›`；沿用动作库既有 `space.4` 横向间距、`space.1` 文字间距、`space.3` 上下内边距，不改变普通 `FCListRow` 的 leading slot。label 以 `.frame(maxWidth: .infinity)` 撑满，按钮由页面提供并复用原有 action。无图标时沿用既有动作行留空规则；模板编辑器不变。此为批准画板 C2b 的已有动作行复用，代码抽取而非新视觉决定；满宽和 slot 合同由组件源码测试验证。
 
 #### `DS-SECTION` 区段标签与分组入口
@@ -252,7 +253,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 
 #### `DS-SET-ROW` 训练组行
 
-- **阶段 D 新纪录状态**：已批准的 D-a anatomy、标记外观、阅读顺序、换行与触感规则见 `design/progress-milestones/implementation-map.md` §2 D-a。`FCNewRecordBadge` 是本组件的胶囊部件（文字本地化，自身无障碍隐藏，由组行朗读），仅 completed 且持有纪录时显示；ShareReport 卡片复用该标记。2026-10-23 起（README §10 C16）每个动作最多一组持有标记，总结与分享卡片的胶囊放在「上次 → 本次」动作行的动作名后。
+- **阶段 D 新纪录状态**：已批准的 D-a anatomy、标记外观、阅读顺序、换行与触感规则见 `design/progress-milestones/implementation-map.md` §2 D-a。`FCNewRecordBadge` 是本组件的胶囊部件（文字本地化，自身无障碍隐藏，由组行朗读），仅 completed 且持有纪录时显示；ShareReport 卡片复用该标记。2026-10-23 起（README §10 C16）每个动作最多一组持有标记，总结与分享卡片的胶囊放在「上次 → 本次」动作行的动作名后。确认触感不再挂在组行上：主确认路径插入的是已完成的新行，行状态没有变化，组行触感永远不响（真机走查 D1/D2）；现由 `ActiveSessionView` 上唯一的 `.sensoryFeedback(trigger: confirmationFeedback)` 发出，组行只负责徽标。
 
 - **部件**：组状态圆圈（22×22，点击区 44）→ 一行内：标题「第 N 组」（`body`；已完成为 `text.primary`，其余为 `text.secondary`）→ 弹性空白 → 数值（`body` `text.primary`，单行，最小缩放 0.8）→ 状态文字（`callout` 400 `text.secondary`），刚确认的一组在 4 秒内换成「撤销」（`FCLinkButton`，P0-D11）→ 可选编辑按钮（铅笔，44）。2026-10-15 起由上下两行改为一行，与已批准的 D8 / P0-a2 稿一致（implementation-map Δ5）。
 - **`FCSetStateCircle` 状态**：待完成：1.5pt `border.control` 描边；草稿：1pt `text.secondary` 虚线（3/2）；已完成：`action.primary` 实心 + 白色 ✓。
