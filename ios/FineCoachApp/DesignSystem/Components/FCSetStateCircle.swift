@@ -26,7 +26,12 @@ public struct FCSetStateCircle: View {
                 .opacity(state == .completed ? 1 : 0)
         }
         .frame(width: 22, height: 22)
-        .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: state == .completed)
+        // §14.4: the set circle flips with `fast` + `symmetric`; Reduce Motion
+        // switches directly.
+        .animation(
+            reduceMotion ? nil : FCMotion.curveSymmetric(duration: FCMotion.durationFast),
+            value: state == .completed
+        )
         .accessibilityHidden(true)
     }
 

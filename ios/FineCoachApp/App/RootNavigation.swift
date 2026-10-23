@@ -27,6 +27,10 @@ enum RootDestination: Hashable {
     case bodyMeasurementEntry(studentID: UUID, metricID: UUID)
     case trends(UUID)
     case archiveExport(UUID)
+    #if DEBUG
+        /// 动效试验（开发版）only exists in DEBUG builds (README §14.1).
+        case motionLab
+    #endif
     case placeholder(PlaceholderKind)
 }
 
@@ -153,6 +157,10 @@ struct RootNavigation: View {
                                     useCases: environment.requireExerciseUseCases(),
                                     historyUseCases: environment.requireHistoryUseCases()
                                 )
+                            #if DEBUG
+                                case .motionLab:
+                                    MotionLabView()
+                            #endif
                             case .sessionSummary(let sessionID):
                                 SessionSummaryView(
                                     sessionID: StableUUID(sessionID),

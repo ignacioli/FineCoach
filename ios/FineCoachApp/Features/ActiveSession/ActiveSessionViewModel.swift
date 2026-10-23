@@ -34,6 +34,14 @@ struct ConfirmationFeedback: Equatable, Sendable {
     let isRecordImprovement: Bool
 }
 
+/// A new-record value float the training page has not claimed yet (README
+/// §14.4, Penpot D-a3; D-FR-013). `sequence` makes two identical records two
+/// distinct requests, so claiming one can never swallow or replay another.
+struct RecordFloatRequest: Equatable, Sendable {
+    let setID: StableUUID
+    let sequence: Int
+}
+
 /// The coach-facing credit question or notice shown after a Session
 /// finishes (M1B-FR-013/014). Appointment-linked debits need no prompt.
 enum SessionCreditPrompt: Equatable {
@@ -84,15 +92,36 @@ final class ActiveSessionViewModel: ObservableObject {
     @Published private(set) var confirmationFeedback: ConfirmationFeedback?
     private var confirmationSequence = 0
 
+    /// The newest strict-record float the training page has not claimed yet.
+    /// Only a successful confirmation whose set is a strict record holder
+    /// publishes one; recomputation (edit, delete, undo, restore, reload)
+    /// never does (D-FR-012), so no row can float without a confirmation.
+    @Published private(set) var recordFloatRequest: RecordFloatRequest?
+    private var recordFloatSequence = 0
+
     /// Publishes the one confirmation event for `setID` after the new Session
     /// (and therefore the record holders) has been assigned, so the view sees
     /// both in the same main-thread update. Only successful confirmations call
     /// this -- recomputation paths must not (D-FR-012).
     private func publishConfirmationFeedback(for setID: StableUUID) {
         confirmationSequence += 1
+        let isRecordImprovement = strictRecordHolderSetIDs.contains(setID)
         confirmationFeedback = ConfirmationFeedback(
             sequence: confirmationSequence,
-            isRecordImprovement: strictRecordHolderSetIDs.contains(setID))
+            isRecordImprovement: isRecordImprovement)
+        if isRecordImprovement {
+            recordFloatSequence += 1
+            recordFloatRequest = RecordFloatRequest(setID: setID, sequence: recordFloatSequence)
+        }
+    }
+
+    /// The training page claims the pending float in the same update that
+    /// renders it, so a row built later (scroll, List reuse, reload) has
+    /// nothing left to replay. Claiming the same sequence twice, or a stale
+    /// sequence after a newer request, is a no-op.
+    func consumeRecordFloat(sequence: Int) {
+        guard recordFloatRequest?.sequence == sequence else { return }
+        recordFloatRequest = nil
     }
 
     @Published var errorMessage: String?
@@ -223,6 +252,9 @@ final class ActiveSessionViewModel: ObservableObject {
     }
 
     func load() async {
+        // A reload is not a confirmation: anything still pending from an
+        // earlier confirmation is dropped, never replayed.
+        recordFloatRequest = nil
         do {
             _ = try await useCases.reconcileOnLaunch()
             session = try await useCases.startOrOpen(studentID: studentID)

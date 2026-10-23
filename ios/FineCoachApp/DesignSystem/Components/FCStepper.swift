@@ -162,7 +162,7 @@ public struct FCStepperField: View {
                 }
             )
         }
-        .sensoryFeedback(.selection, trigger: selectionTick)
+        .sensoryFeedback(FCHaptic.selection, trigger: selectionTick)
         .frame(maxWidth: .infinity, minHeight: 48)
         .background(Capsule().fill(FCSemanticColors.surfaceCanvas))
         .overlay {

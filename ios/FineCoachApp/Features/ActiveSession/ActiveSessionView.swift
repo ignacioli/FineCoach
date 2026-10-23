@@ -47,6 +47,11 @@ struct ActiveSessionView: View {
     /// ended at that moment must not flash back into view, while an active
     /// rest keeps the normal ended-state hold when it finishes afterwards.
     @State private var keyboardDismissedAt = Date.distantPast
+    /// The record float this page claimed from the view model, kept only for
+    /// one animation window (README §14.4). The view model's pending request
+    /// is claimed in the same update, so a row that is built later (scroll,
+    /// List reuse, a reload) can never play it.
+    @State private var recordFloatPlayback: RecordFloatRequest?
 
     init(
         studentID: StableUUID,
@@ -150,7 +155,10 @@ struct ActiveSessionView: View {
                 }
                 .padding(.horizontal, FCPrimitives.space4)
                 .padding(.vertical, FCPrimitives.space2)
-                .animation(.easeInOut(duration: 0.25), value: restBarVisible)
+                .animation(
+                    FCMotion.curveSymmetric(duration: FCMotion.durationStandard),
+                    value: restBarVisible
+                )
                 .background(FCSemanticColors.surfacePage)
             }
         }
@@ -172,7 +180,26 @@ struct ActiveSessionView: View {
         // (D-FR-010/D-FR-012, round-2 fix for D1/D2).
         .sensoryFeedback(trigger: viewModel.confirmationFeedback) { _, feedback in
             guard let feedback else { return nil }
-            return feedback.isRecordImprovement ? .impact(weight: .heavy) : .success
+            // Every confirmed set -- plain, progress or record -- gives the
+            // same light confirm impact (§14.3, §14.4). A record is told
+            // apart by the value float, never by a heavier haptic.
+            return FCHaptic.confirm
+        }
+        // Claim the pending record float as soon as it is published. The
+        // claim happens here, on the page, not on the row: an off-screen row
+        // must not play the float whenever it is finally built.
+        .onChange(of: viewModel.recordFloatRequest) { _, request in
+            guard let request else { return }
+            viewModel.consumeRecordFloat(sequence: request.sequence)
+            recordFloatPlayback = request
+        }
+        // Hold the claim for one emphasis animation; after that the row has
+        // had its chance to play and a later appearance is silent.
+        .task(id: recordFloatPlayback?.sequence) {
+            guard recordFloatPlayback != nil else { return }
+            try? await Task.sleep(for: .seconds(FCMotion.durationEmphasis))
+            guard !Task.isCancelled else { return }
+            recordFloatPlayback = nil
         }
         .fcSecondaryPage()
         .fcBottomSheet(isPresented: $viewModel.isAddingExercise) {
@@ -726,7 +753,11 @@ struct ActiveSessionView: View {
                 onEdit: { viewModel.beginEditingSet(trainingSet) },
                 onUndo: viewModel.undoableSetID == trainingSet.id
                     ? { Task { await viewModel.undoRecentSet() } }
-                    : nil
+                    : nil,
+                recordFloatSequence: recordFloatSequence(for: trainingSet),
+                // Production keeps the approved pair: `space.3` + `emphasis`.
+                recordFloatDistance: FCMotion.recordFloatDistance,
+                recordFloatDuration: FCMotion.durationEmphasis
             )
             .accessibilityIdentifier(FCAccessibilityID.setAt(index))
             .accessibilityAddTraits(.updatesFrequently)
@@ -767,6 +798,13 @@ struct ActiveSessionView: View {
 
     private func setValue(_ set: TrainingSet) -> String {
         set.displaySummary
+    }
+
+    /// The float token only for the set the page just confirmed; every other
+    /// row gets `nil`.
+    private func recordFloatSequence(for set: TrainingSet) -> Int? {
+        guard let recordFloatPlayback, recordFloatPlayback.setID == set.id else { return nil }
+        return recordFloatPlayback.sequence
     }
 
     /// P0 motion table: slide up on appear, fade on dismiss. Reduce Motion
@@ -812,7 +850,7 @@ struct RestTimerBar: View {
                     running(seconds: timer.remainingSeconds(at: context.date))
                 }
             }
-            .sensoryFeedback(.warning, trigger: finished) { _, isFinished in
+            .sensoryFeedback(FCHaptic.attention, trigger: finished) { _, isFinished in
                 isFinished
             }
         }

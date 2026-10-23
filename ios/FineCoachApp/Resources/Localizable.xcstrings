@@ -9,6 +9,105 @@
       "extractionState": "manual",
       "localizations": { "zh-Hans": { "stringUnit": { "state": "translated", "value": "新纪录" } } }
     },
+    "settings.motionLab": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动效试验（开发版）"
+          }
+        }
+      }
+    },
+    "motionLab.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动效试验"
+          }
+        }
+      }
+    },
+    "motionLab.intro": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "点 A / B / C 播放一次新纪录数值浮起，并给一次确认触感；「普通确认」只给触感。正式代码当前用 B 档。"
+          }
+        }
+      }
+    },
+    "motionLab.sampleTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 3 组"
+          }
+        }
+      }
+    },
+    "motionLab.sampleValue": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "125 kg × 5"
+          }
+        }
+      }
+    },
+    "motionLab.optionA": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A 8pt · 0.5 s"
+          }
+        }
+      }
+    },
+    "motionLab.optionB": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "B 12pt · 0.6 s"
+          }
+        }
+      }
+    },
+    "motionLab.optionC": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "C 16pt · 0.8 s"
+          }
+        }
+      }
+    },
+    "motionLab.plainConfirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "普通确认"
+          }
+        }
+      }
+    },
     "app.title": {
       "comment": "Application title",
       "extractionState": "manual",

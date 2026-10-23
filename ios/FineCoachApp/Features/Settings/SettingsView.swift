@@ -33,6 +33,18 @@ struct SettingsView: View {
                     )
                     .accessibilityIdentifier(FCAccessibilityID.settingsAbout)
                     FCListRowDivider()
+                    #if DEBUG
+                        // 动效试验（开发版）: a visible settings row, DEBUG only
+                        // (README §14.1). It is not part of the approved 42/43
+                        // screens and never ships.
+                        FCHubRow(
+                            icon: .symbol("slider.horizontal.3"),
+                            title: String(localized: "settings.motionLab"),
+                            mode: .action { path.append(.motionLab) }
+                        )
+                        .accessibilityIdentifier(FCAccessibilityID.settingsMotionLab)
+                        FCListRowDivider()
+                    #endif
                 }
             }
             .padding(.horizontal, FCPrimitives.space4)

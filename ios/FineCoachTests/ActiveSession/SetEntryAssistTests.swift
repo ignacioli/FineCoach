@@ -131,12 +131,13 @@ final class SetEntryAssistTests: XCTestCase {
         XCTAssertEqual(removed, [[RestEndNotification.identifier], [RestEndNotification.identifier]])
     }
 
-    /// P0 motion table. The views are not rendered here; this pins the
-    /// moments, the two durations, and Reduce Motion to the approved table.
+    /// P0 motion table + README §14.4. The views are not rendered here; this
+    /// pins the moments, the token values, and Reduce Motion to the approved
+    /// table.
     func testMotionTableIsWiredAtTheApprovedMoments() throws {
         let circle = try source("FineCoachApp/DesignSystem/Components/FCSetStateCircle.swift")
         XCTAssertTrue(circle.contains("accessibilityReduceMotion"))
-        XCTAssertTrue(circle.contains(".easeInOut(duration: 0.2)"))
+        XCTAssertTrue(circle.contains("FCMotion.curveSymmetric(duration: FCMotion.durationFast)"))
 
         let row = try source("FineCoachApp/DesignSystem/Components/FCSetRow.swift")
         // Round-2 fix: confirmation feedback no longer lives on the row, whose
@@ -148,23 +149,67 @@ final class SetEntryAssistTests: XCTestCase {
         let fieldStart = try XCTUnwrap(stepper.range(of: "struct FCStepperField"))
         XCTAssertFalse(stepper[..<fieldStart.lowerBound].contains("sensoryFeedback"))
         let field = stepper[fieldStart.lowerBound...]
-        XCTAssertTrue(field.contains(".sensoryFeedback(.selection, trigger: selectionTick)"))
+        XCTAssertTrue(field.contains(".sensoryFeedback(FCHaptic.selection, trigger: selectionTick)"))
         XCTAssertTrue(field.contains(".numericText(countsDown: true)"))
         XCTAssertTrue(field.contains("accessibilityReduceMotion"))
 
         let session = try source("FineCoachApp/Features/ActiveSession/ActiveSessionView.swift")
         XCTAssertTrue(session.contains(".sensoryFeedback(trigger: viewModel.confirmationFeedback)"))
-        XCTAssertTrue(session.contains("feedback.isRecordImprovement ? .impact(weight: .heavy) : .success"))
+        // §14.3/§14.4: plain, progress and record confirmations share one
+        // light impact; the record is expressed by the value float.
+        XCTAssertTrue(session.contains("return FCHaptic.confirm"))
         XCTAssertTrue(session.contains("guard let feedback else { return nil }"))
         XCTAssertEqual(
             session.components(separatedBy: ".sensoryFeedback(trigger: viewModel.confirmationFeedback)").count - 1, 1,
             "exactly one stable-ancestor confirmation haptic")
         XCTAssertTrue(session.contains(".move(edge: .bottom).combined(with: .opacity)"))
         XCTAssertTrue(session.contains("removal: .opacity"))
-        XCTAssertTrue(session.contains(".easeInOut(duration: 0.25)"))
-        XCTAssertTrue(session.contains(".sensoryFeedback(.warning, trigger: finished)"))
+        XCTAssertTrue(session.contains("FCMotion.curveSymmetric(duration: FCMotion.durationStandard)"))
+        XCTAssertTrue(session.contains(".sensoryFeedback(FCHaptic.attention, trigger: finished)"))
         XCTAssertTrue(session.contains(".numericText(countsDown: true)"))
         XCTAssertTrue(session.contains("accessibilityReduceMotion"))
+    }
+
+    /// README §14.2/§14.3 (2026-10-23): the training-page files use the motion
+    /// and haptic tokens instead of raw curves and the retired `.success` /
+    /// heavy impact. Scope is exactly these four files -- other pages keep
+    /// their current values until their own migration (README §14.4).
+    func testTrainingPageFilesHaveNoRawMotionOrConfirmHapticValues() throws {
+        let paths = [
+            "FineCoachApp/Features/ActiveSession/ActiveSessionView.swift",
+            "FineCoachApp/DesignSystem/Components/FCSetRow.swift",
+            "FineCoachApp/DesignSystem/Components/FCSetStateCircle.swift",
+            "FineCoachApp/DesignSystem/Components/FCStepper.swift",
+        ]
+        let retired = [".easeOut(duration:", ".easeInOut(duration:", ".success", ".impact(weight: .heavy)"]
+        for path in paths {
+            let text = try source(path)
+            for raw in retired {
+                XCTAssertFalse(text.contains(raw), "\(path) still writes \(raw) instead of a README §14 token")
+            }
+        }
+    }
+
+    /// components.md `DS-SET-ROW` 新纪录数值浮起 / README §14.4: the copy is a
+    /// decorative overlay of the value, tries/fades once, takes no tap, is
+    /// hidden from accessibility, and does not float under Reduce Motion.
+    func testRecordFloatCopyIsDecorativeAndHonoursReduceMotion() throws {
+        let row = try source("FineCoachApp/DesignSystem/Components/FCSetRow.swift")
+        XCTAssertTrue(row.contains("recordFloatDistance: FCMotion.recordFloatDistance"))
+        XCTAssertTrue(row.contains("recordFloatDuration: FCMotion.durationEmphasis"))
+        XCTAssertTrue(row.contains("FCMotion.curveStandard(duration: recordFloatDuration)"))
+        XCTAssertTrue(row.contains(".overlay {"))
+        XCTAssertEqual(
+            row.components(separatedBy: ".offset(y: -recordFloatDistance").count - 1, 1,
+            "one decorative copy, lifted by the float distance")
+        XCTAssertTrue(row.contains(".allowsHitTesting(false)"))
+        XCTAssertTrue(row.contains(".accessibilityHidden(true)"))
+        XCTAssertTrue(row.contains("guard !reduceMotion else { return }"))
+        XCTAssertTrue(row.contains("guard playedRecordFloatSequence != sequence else { return }"))
+        // The float token comes from the page, never from the row's own state.
+        XCTAssertTrue(row.contains(".task(id: recordFloatSequence)"))
+        XCTAssertFalse(row.contains("onChange(of:"))
+        XCTAssertFalse(row.contains(".onAppear {"))
     }
 
     /// The entry map has to name the real identifiers. A control that exists

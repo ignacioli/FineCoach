@@ -22,6 +22,20 @@ public struct FCSetRow: View {
     private let onConfirm: (() -> Void)?
     private let onEdit: (() -> Void)?
     private let onUndo: (() -> Void)?
+    /// A page-issued playback token for the new-record value float (README
+    /// §14.4, Penpot D-a3). `nil` means this row has nothing to play; a new
+    /// value plays once. The row never derives it from its own state, because
+    /// the primary confirm path inserts an already-completed row.
+    private let recordFloatSequence: Int?
+    private let recordFloatDistance: CGFloat
+    private let recordFloatDuration: Double
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    /// The sequence this row instance already played, so a List reuse or a
+    /// re-appearance within the same playback window cannot replay it.
+    @State private var playedRecordFloatSequence: Int?
+    @State private var isFloating = false
+    @State private var floatProgress: CGFloat = 0
 
     public init(
         title: String,
@@ -33,6 +47,38 @@ public struct FCSetRow: View {
         onEdit: (() -> Void)? = nil,
         onUndo: (() -> Void)? = nil
     ) {
+        self.init(
+            title: title,
+            value: value,
+            state: state,
+            isNewRecord: isNewRecord,
+            newRecordIdentifier: newRecordIdentifier,
+            onConfirm: onConfirm,
+            onEdit: onEdit,
+            onUndo: onUndo,
+            recordFloatSequence: nil,
+            recordFloatDistance: FCMotion.recordFloatDistance,
+            recordFloatDuration: FCMotion.durationEmphasis
+        )
+    }
+
+    /// Internal because the motion tokens are internal (§14 is the token
+    /// source; `components.md` is not edited, so the tokens are not public).
+    /// Production callers use the defaults above -- `space3` and `emphasis`,
+    /// i.e. candidate B; only the DEBUG motion test bench overrides them.
+    init(
+        title: String,
+        value: String,
+        state: State,
+        isNewRecord: Bool = false,
+        newRecordIdentifier: String? = nil,
+        onConfirm: (() -> Void)? = nil,
+        onEdit: (() -> Void)? = nil,
+        onUndo: (() -> Void)? = nil,
+        recordFloatSequence: Int?,
+        recordFloatDistance: CGFloat,
+        recordFloatDuration: Double
+    ) {
         self.title = title
         self.value = value
         self.state = state
@@ -41,6 +87,9 @@ public struct FCSetRow: View {
         self.onConfirm = onConfirm
         self.onEdit = onEdit
         self.onUndo = onUndo
+        self.recordFloatSequence = recordFloatSequence
+        self.recordFloatDistance = recordFloatDistance
+        self.recordFloatDuration = recordFloatDuration
     }
 
     public var body: some View {
@@ -67,11 +116,7 @@ public struct FCSetRow: View {
                     }
                 }
                 Spacer(minLength: FCPrimitives.space2)
-                Text(value)
-                    .fcFont(.body)
-                    .foregroundStyle(FCSemanticColors.textPrimary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                valueText
             }
             .contentShape(Rectangle())
             .onLongPressGesture(minimumDuration: 0.5) {
@@ -90,6 +135,14 @@ public struct FCSetRow: View {
         }
         .padding(.vertical, FCPrimitives.space2)
         .frame(minHeight: 44)
+        // The float is driven by a page-issued sequence, not by a row state
+        // transition or `.onAppear` (D1/D2: the confirmed row is often born
+        // already completed). Reduce Motion still consumes the token, so a
+        // later re-appearance cannot play it.
+        .task(id: recordFloatSequence) {
+            guard let recordFloatSequence else { return }
+            playRecordFloat(sequence: recordFloatSequence)
+        }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(accessibilityText))
         .accessibilityHint(state.isConfirmable ? Text(String(localized: "session.set.confirmHint")) : Text(""))
@@ -145,6 +198,46 @@ public struct FCSetRow: View {
             }
         }
         .frame(minWidth: 44, minHeight: 44)
+    }
+
+    /// The value and, while a float is playing, its decorative copy: same
+    /// font, same colour, lifted `recordFloatDistance` and faded `1 → 0`
+    /// (README §14.4; Penpot D-a3). Being an overlay, the copy changes no
+    /// layout, keeps the row height, cannot be tapped, and is hidden from
+    /// accessibility so the row still reads 「…，新纪录，…」.
+    private var valueText: some View {
+        Text(value)
+            .fcFont(.body)
+            .foregroundStyle(FCSemanticColors.textPrimary)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+            .overlay {
+                if isFloating {
+                    Text(value)
+                        .fcFont(.body)
+                        .foregroundStyle(FCSemanticColors.textPrimary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                        .offset(y: -recordFloatDistance * floatProgress)
+                        .opacity(Double(1 - floatProgress))
+                        .allowsHitTesting(false)
+                        .accessibilityHidden(true)
+                }
+            }
+    }
+
+    private func playRecordFloat(sequence: Int) {
+        guard playedRecordFloatSequence != sequence else { return }
+        playedRecordFloatSequence = sequence
+        guard !reduceMotion else { return }
+        floatProgress = 0
+        isFloating = true
+        withAnimation(FCMotion.curveStandard(duration: recordFloatDuration)) {
+            floatProgress = 1
+        } completion: {
+            isFloating = false
+            floatProgress = 0
+        }
     }
 
     private var circleState: FCSetStateCircle.State {

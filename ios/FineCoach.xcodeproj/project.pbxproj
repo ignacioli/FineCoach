@@ -99,6 +99,7 @@
 		B142 /* StoreGeneration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A142 /* StoreGeneration.swift */; };
 		B143 /* CurrentGenerationPointer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A143 /* CurrentGenerationPointer.swift */; };
 		B150 /* Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = A150 /* Tokens.swift */; };
+		B981 /* FCMotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = A981 /* FCMotion.swift */; };
 		B903 /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = A903 /* Typography.swift */; };
 		B160 /* FCButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A160 /* FCButton.swift */; };
 		B161 /* FCTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = A161 /* FCTextField.swift */; };
@@ -119,6 +120,7 @@
 		B960 /* CourseActionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A960 /* CourseActionSheet.swift */; };
 		B958 /* ResourceHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A958 /* ResourceHubView.swift */; };
 		AD5E02 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5E01 /* SettingsView.swift */; };
+		AD5E05 /* MotionLabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5E04 /* MotionLabView.swift */; };
 		B957 /* FCSymbol.swift in Sources */ = {isa = PBXBuildFile; fileRef = A957 /* FCSymbol.swift */; };
 		B955 /* FCEquipmentIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = A955 /* FCEquipmentIcon.swift */; };
 		B956 /* IconConsistencyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A956 /* IconConsistencyTests.swift */; };
@@ -307,6 +309,7 @@
 		B722 /* ComparisonLoadDirectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A722 /* ComparisonLoadDirectionTests.swift */; };
 		B241 /* ShareReportPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A241 /* ShareReportPolicyTests.swift */; };
 		B500 /* VisionHarnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A501 /* VisionHarnessTests.swift */; };
+		B982 /* FCMotionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A982 /* FCMotionTests.swift */; };
 		AD5F02 /* CapabilityManifestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5F01 /* CapabilityManifestTests.swift */; };
 		AD5F12 /* LogSurfaceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5F11 /* LogSurfaceTests.swift */; };
 		FF8D9EBECC4D6070F1FC54DA /* ArchivePrivacyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01194BC815492A688C282A24 /* ArchivePrivacyTests.swift */; };
@@ -463,6 +466,7 @@
 		A142 /* StoreGeneration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreGeneration.swift; sourceTree = "<group>"; };
 		A143 /* CurrentGenerationPointer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentGenerationPointer.swift; sourceTree = "<group>"; };
 		A150 /* Tokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tokens.swift; sourceTree = "<group>"; };
+		A981 /* FCMotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCMotion.swift; sourceTree = "<group>"; };
 		A903 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
 		A160 /* FCButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCButton.swift; sourceTree = "<group>"; };
 		A161 /* FCTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCTextField.swift; sourceTree = "<group>"; };
@@ -482,6 +486,7 @@
 		A961 /* ShareReportCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareReportCardView.swift; sourceTree = "<group>"; };
 		A960 /* CourseActionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CourseActionSheet.swift; sourceTree = "<group>"; };
 		AD5E01 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		AD5E04 /* MotionLabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionLabView.swift; sourceTree = "<group>"; };
 		A958 /* ResourceHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceHubView.swift; sourceTree = "<group>"; };
 		A957 /* FCSymbol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCSymbol.swift; sourceTree = "<group>"; };
 		A955 /* FCEquipmentIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCEquipmentIcon.swift; sourceTree = "<group>"; };
@@ -639,6 +644,7 @@
 		A722 /* ComparisonLoadDirectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComparisonLoadDirectionTests.swift; sourceTree = "<group>"; };
 		A241 /* ShareReportPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareReportPolicyTests.swift; sourceTree = "<group>"; };
 		A501 /* VisionHarnessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionHarnessTests.swift; sourceTree = "<group>"; };
+		A982 /* FCMotionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCMotionTests.swift; sourceTree = "<group>"; };
 		AD5F01 /* CapabilityManifestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapabilityManifestTests.swift; sourceTree = "<group>"; };
 		AD5F11 /* LogSurfaceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogSurfaceTests.swift; sourceTree = "<group>"; };
 		01194BC815492A688C282A24 /* ArchivePrivacyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchivePrivacyTests.swift; sourceTree = "<group>"; };
@@ -903,6 +909,7 @@
 			isa = PBXGroup;
 			children = (
 				A150 /* Tokens.swift */,
+				A981 /* FCMotion.swift */,
 				A903 /* Typography.swift */,
 				A431 /* Components */,
 			);
@@ -1005,6 +1012,7 @@
 			isa = PBXGroup;
 			children = (
 				AD5E01 /* SettingsView.swift */,
+				AD5E04 /* MotionLabView.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -1608,6 +1616,7 @@
 			isa = PBXGroup;
 			children = (
 				A501 /* VisionHarnessTests.swift */,
+				A982 /* FCMotionTests.swift */,
 				A956 /* IconConsistencyTests.swift */,
 				A930 /* FCStatusTests.swift */,
 				AD5F41 /* TouchTargetComponentTests.swift */,
@@ -2097,6 +2106,7 @@
 				B960 /* CourseActionSheet.swift in Sources */,
 				B958 /* ResourceHubView.swift in Sources */,
 				AD5E02 /* SettingsView.swift in Sources */,
+				AD5E05 /* MotionLabView.swift in Sources */,
 				B524 /* CalendarView.swift in Sources */,
 				B525 /* AppointmentEditorView.swift in Sources */,
 				B518 /* NotificationScheduler.swift in Sources */,
@@ -2203,6 +2213,7 @@
 				B160 /* FCButton.swift in Sources */,
 				B161 /* FCTextField.swift in Sources */,
 				B162 /* FCSetRow.swift in Sources */,
+				B981 /* FCMotion.swift in Sources */,
 				D001B /* FCNewRecordBadge.swift in Sources */,
 				B163 /* FCSaveStatusView.swift in Sources */,
 				B310 /* OnboardingView.swift in Sources */,
@@ -2279,6 +2290,7 @@
 				B95A /* EmptyStateFirstLoadTests.swift in Sources */,
 				B95B /* RootNavigationReturnTests.swift in Sources */,
 				B500 /* VisionHarnessTests.swift in Sources */,
+				B982 /* FCMotionTests.swift in Sources */,
 				B956 /* IconConsistencyTests.swift in Sources */,
 				B930 /* FCStatusTests.swift in Sources */,
 				AD5F42 /* TouchTargetComponentTests.swift in Sources */,

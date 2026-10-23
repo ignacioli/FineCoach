@@ -134,6 +134,96 @@
             try await harness.controller.shutdownForTesting()
         }
 
+        /// README §14.4 / components.md `DS-SET-ROW` 新纪录数值浮起: a confirmed
+        /// strict record publishes exactly one float request for that set. A
+        /// plain confirmation, progress without a strict main-metric
+        /// improvement, or a same-weight repeat never publishes one.
+        func testStrictRecordConfirmationPublishesExactlyOneFloatRequest() async throws {
+            let (harness, viewModel) = try await makeSessionAfterBaseline()
+            XCTAssertNil(viewModel.recordFloatRequest, "a fresh load publishes no float")
+
+            let recordID = try await confirm(viewModel, weight: "85", reps: "5")
+            let request = try XCTUnwrap(viewModel.recordFloatRequest)
+            XCTAssertEqual(request.setID, recordID)
+            XCTAssertEqual(request.sequence, 1)
+
+            // Same weight, more reps: the marker moves to this set, but the
+            // main metric did not improve, so nothing floats.
+            let transferID = try await confirm(viewModel, weight: "85", reps: "8")
+            XCTAssertEqual(viewModel.recordHolderSetIDs, [transferID])
+            XCTAssertEqual(
+                viewModel.recordFloatRequest, request,
+                "a non-record confirmation must not publish or replace a float")
+
+            // Strictly heavier again: a new, distinct request.
+            let heavierID = try await confirm(viewModel, weight: "90", reps: "5")
+            let next = try XCTUnwrap(viewModel.recordFloatRequest)
+            XCTAssertEqual(next.setID, heavierID)
+            XCTAssertGreaterThan(next.sequence, request.sequence)
+
+            // Claimed once: the pending request is gone, and replaying the
+            // stale claim cannot bring it back (the row never replays).
+            viewModel.consumeRecordFloat(sequence: next.sequence)
+            XCTAssertNil(viewModel.recordFloatRequest)
+            viewModel.consumeRecordFloat(sequence: next.sequence)
+            XCTAssertNil(viewModel.recordFloatRequest, "a consumed request is never re-triggered")
+            XCTAssertNil(viewModel.errorMessage)
+            try await harness.controller.shutdownForTesting()
+        }
+
+        /// D-FR-010 / README §14.4: editing, deleting, undoing, restoring and
+        /// reloading are recomputation only -- they never publish a float.
+        func testRecomputationNeverPublishesARecordFloatRequest() async throws {
+            let (harness, viewModel) = try await makeSessionAfterBaseline()
+            let setID = try await confirm(viewModel, weight: "85", reps: "5")
+            let claimed = try XCTUnwrap(viewModel.recordFloatRequest)
+            XCTAssertEqual(claimed.setID, setID)
+            viewModel.consumeRecordFloat(sequence: claimed.sequence)
+            XCTAssertNil(viewModel.recordFloatRequest)
+
+            // Editing the confirmed set: recomputation only.
+            let set = try XCTUnwrap(viewModel.session?.exercises.first?.sets.first)
+            viewModel.beginEditingSet(set)
+            viewModel.weight = "79"
+            viewModel.reps = "5"
+            await viewModel.saveEditingSet()
+            XCTAssertNil(viewModel.errorMessage)
+            XCTAssertNil(viewModel.recordFloatRequest, "editing must not publish a float")
+
+            // Deleting a completed set, then restoring it: neither publishes.
+            await viewModel.removeSet(setID: setID)
+            XCTAssertNil(viewModel.errorMessage)
+            XCTAssertNil(viewModel.recordFloatRequest)
+            await viewModel.undoDeletedSet()
+            XCTAssertNil(viewModel.errorMessage)
+            XCTAssertNil(viewModel.recordFloatRequest)
+
+            // A record confirmation publishes one; undoing it recomputes only.
+            let recordID = try await confirm(viewModel, weight: "95", reps: "5")
+            let published = try XCTUnwrap(viewModel.recordFloatRequest)
+            XCTAssertEqual(published.setID, recordID)
+            XCTAssertEqual(viewModel.undoableSetID, recordID)
+            await viewModel.undoRecentSet()
+            XCTAssertEqual(
+                viewModel.recordFloatRequest, published,
+                "undoing the confirmed set must not publish another float")
+
+            // An unclaimed request is dropped by a reload, not played later.
+            let reloadRecordID = try await confirm(viewModel, weight: "100", reps: "5")
+            XCTAssertEqual(viewModel.recordFloatRequest?.setID, reloadRecordID)
+            await viewModel.load()
+            XCTAssertNil(viewModel.recordFloatRequest, "reloading drops any unclaimed float")
+            XCTAssertTrue(viewModel.recordHolderSetIDs.contains(reloadRecordID))
+
+            // Reloading (a new view model on the same session) publishes
+            // nothing and has nothing left to replay.
+            let restored = ActiveSessionViewModel(studentID: harness.studentID, useCases: harness.useCases)
+            await restored.load()
+            XCTAssertNil(restored.recordFloatRequest)
+            XCTAssertNil(restored.confirmationFeedback)
+            try await harness.controller.shutdownForTesting()
+        }
+
         func testEditDeleteAndUndoDoNotPublishAnotherConfirmationEvent() async throws {
             let (harness, viewModel) = try await makeSessionAfterBaseline()
             let setID = try await confirm(viewModel, weight: "85", reps: "5")

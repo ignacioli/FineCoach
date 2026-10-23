@@ -180,6 +180,17 @@ public enum FCAccessibilityID {
     public static let settingsBackup = "settings.backup"
     public static let settingsAbout = "settings.about"
 
+    #if DEBUG
+        // 动效试验（开发版）, the DEBUG-only motion test bench (README §14.1).
+        public static let settingsMotionLab = "settings.motionLab"
+        public static let motionLabRoot = "motionLab.root"
+        public static let motionLabSampleRow = "motionLab.sampleRow"
+        public static let motionLabPlainConfirm = "motionLab.plainConfirm"
+        public static func motionLabOption(_ code: String) -> String {
+            "motionLab.option.\(code)"
+        }
+    #endif
+
     public static func todayRow(_ id: StableUUID) -> String {
         "today.row.\(id.rawValue.uuidString)"
     }

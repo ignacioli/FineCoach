@@ -67,7 +67,11 @@ final class ComponentCatalogTests: XCTestCase {
         let session = try source("ios/FineCoachApp/Features/ActiveSession/ActiveSessionView.swift")
         XCTAssertTrue(session.contains(".sensoryFeedback(trigger: viewModel.confirmationFeedback)"))
         XCTAssertTrue(session.contains("guard let feedback else { return nil }"))
-        XCTAssertTrue(session.contains("feedback.isRecordImprovement ? .impact(weight: .heavy) : .success"))
+        // README §14.3 (2026-10-23): every confirmed set uses `haptic.confirm`
+        // (light); the retired `.success` / heavy impact must not return.
+        XCTAssertTrue(session.contains("return FCHaptic.confirm"))
+        XCTAssertFalse(session.contains(".impact(weight: .heavy)"))
+        XCTAssertFalse(session.contains(".success"))
         XCTAssertEqual(
             session.components(separatedBy: ".sensoryFeedback(trigger: viewModel.confirmationFeedback)").count - 1, 1,
             "the training page must have exactly one confirmation haptic source")
