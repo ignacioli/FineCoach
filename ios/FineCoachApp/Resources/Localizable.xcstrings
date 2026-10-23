@@ -1332,6 +1332,17 @@
         }
       }
     },
+    "session.rest.overdueFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已超时 %@"
+          }
+        }
+      }
+    },
     "session.rest.close": {
       "extractionState": "manual",
       "localizations": {

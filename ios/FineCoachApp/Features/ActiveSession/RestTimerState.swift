@@ -1,7 +1,7 @@
 import Foundation
 
 /// The between-sets rest countdown (experience P0-D3: starts after a set is
-/// confirmed, 120 s). The countdown itself is not persisted. The generic
+/// confirmed, 120 s). The countdown is kept per Session in memory only. The generic
 /// end notification (P0-D5) is a separate pending request and can still
 /// fire if the process is killed.
 struct RestTimerState: Equatable {
@@ -25,6 +25,15 @@ struct RestTimerState: Equatable {
         remainingSeconds(at: now) == 0
     }
 
+    func overdueSeconds(at now: Date) -> Int {
+        max(0, Int(floor(now.timeIntervalSince(endsAt))))
+    }
+
+    /// Decide once on appearance; a bar already on screen keeps its normal hold.
+    func showsOverdueOnAppearance(at now: Date) -> Bool {
+        now >= endsAt.addingTimeInterval(Self.finishedHold)
+    }
+
     /// ±15 s; never moves the end before `now`.
     mutating func adjust(by seconds: TimeInterval, now: Date) {
         endsAt = max(now, endsAt.addingTimeInterval(seconds))
@@ -39,6 +48,31 @@ struct RestTimerState: Equatable {
     /// plus `finishedHold` after `endsAt`. Already past the hold returns 0.
     func autoDismissDelay(at now: Date) -> TimeInterval {
         max(0, endsAt.addingTimeInterval(Self.finishedHold).timeIntervalSince(now))
+    }
+}
+
+/// Survives page/view-model replacement, but never writes to disk.
+@MainActor
+final class RestTimerStore {
+    static let shared = RestTimerStore()
+
+    struct Entry: Equatable {
+        let timer: RestTimerState
+        let exerciseName: String?
+    }
+
+    private var entries: [StableUUID: Entry] = [:]
+
+    func entry(for sessionID: StableUUID) -> Entry? {
+        entries[sessionID]
+    }
+
+    func set(_ timer: RestTimerState, exerciseName: String?, for sessionID: StableUUID) {
+        entries[sessionID] = Entry(timer: timer, exerciseName: exerciseName)
+    }
+
+    func clear(for sessionID: StableUUID) {
+        entries[sessionID] = nil
     }
 }
 

@@ -440,6 +440,7 @@ public enum FCAccessibilityID {
     public static let activeSessionRestPlus = "activeSession.rest.plus"
     public static let activeSessionRestSkip = "activeSession.rest.skip"
     public static let activeSessionRestEnded = "activeSession.rest.ended"
+    public static let activeSessionRestOverdue = "activeSession.rest.overdue"
     public static let activeSessionRestClose = "activeSession.rest.close"
     public static let activeSessionAbandonConfirm = "activeSession.abandonConfirm"
     public static let activeSessionDiscardDrafts = "activeSession.discardDrafts"

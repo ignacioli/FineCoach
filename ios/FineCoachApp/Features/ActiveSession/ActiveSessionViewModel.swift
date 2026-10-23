@@ -190,6 +190,7 @@ final class ActiveSessionViewModel: ObservableObject {
     private let signposts: PerformanceSignposts
     private let notifications: (any LocalNotificationScheduling)?
     private let now: () -> Date
+    private let restTimerStore: RestTimerStore
     private var restNotificationTask: Task<Void, Never>?
     /// The exercise that owned the set which started the current rest; fixed
     /// for this rest so ±15 s reschedules keep the same notification body.
@@ -210,6 +211,7 @@ final class ActiveSessionViewModel: ObservableObject {
         creditSettlement: SessionCreditSettlement? = nil,
         signposts: PerformanceSignposts = .shared,
         notifications: (any LocalNotificationScheduling)? = nil,
+        restTimerStore: RestTimerStore = .shared,
         now: @escaping () -> Date = Date.init
     ) {
         self.studentID = studentID
@@ -218,6 +220,7 @@ final class ActiveSessionViewModel: ObservableObject {
         self.creditSettlement = creditSettlement
         self.signposts = signposts
         self.notifications = notifications
+        self.restTimerStore = restTimerStore
         self.now = now
     }
 
@@ -261,6 +264,9 @@ final class ActiveSessionViewModel: ObservableObject {
         do {
             _ = try await useCases.reconcileOnLaunch()
             session = try await useCases.startOrOpen(studentID: studentID)
+            let rest = sessionID.flatMap { restTimerStore.entry(for: $0) }
+            restTimer = rest?.timer
+            restExerciseName = rest?.exerciseName
             selectedExerciseID = session?.exercises.last?.id
             errorMessage = nil
             saveStatus = resolvedSaveStatus
@@ -1024,6 +1030,7 @@ final class ActiveSessionViewModel: ObservableObject {
 
     func adjustRest(by seconds: TimeInterval) {
         restTimer?.adjust(by: seconds, now: now())
+        storeRest()
         syncRestNotification()
     }
 
@@ -1070,14 +1077,23 @@ final class ActiveSessionViewModel: ObservableObject {
     private func startRest(exerciseName: String?) {
         restExerciseName = exerciseName
         restTimer = RestTimerState(startedAt: now())
+        storeRest()
         syncRestNotification()
     }
 
     /// Drops the in-app bar and the pending end notification together.
     private func clearRest() {
+        if let sessionID {
+            restTimerStore.clear(for: sessionID)
+        }
         restTimer = nil
         syncRestNotification()
         restExerciseName = nil
+    }
+
+    private func storeRest() {
+        guard let sessionID, let restTimer else { return }
+        restTimerStore.set(restTimer, exerciseName: restExerciseName, for: sessionID)
     }
 
     /// P0-D5: one local notification at the rest end. +15 / −15 replace it

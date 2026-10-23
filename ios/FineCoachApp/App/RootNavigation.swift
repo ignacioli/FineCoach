@@ -153,6 +153,7 @@ struct RootNavigation: View {
                                     creditSettlement: environment.sessionCreditSettlement,
                                     path: $path
                                 )
+                                .id(studentID)
                             case .exerciseLibrary:
                                 ExerciseLibraryView(
                                     useCases: environment.requireExerciseUseCases(),

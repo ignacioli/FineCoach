@@ -835,7 +835,7 @@ struct ActiveSessionView: View {
 /// Finished: "✓ 休息结束，可以开始下一组" and 关闭, then it dismisses itself
 /// `finishedHold` seconds after `endsAt`. One `.warning` haptic when it
 /// finishes. The countdown rolls with `.numericText` unless Reduce Motion
-/// is on.
+/// is on. A bar appearing after the hold shows elapsed overtime until closed.
 struct RestTimerBar: View {
     let timer: RestTimerState
     let onAdjust: (TimeInterval) -> Void
@@ -843,13 +843,17 @@ struct RestTimerBar: View {
     let onDismiss: () -> Void
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var appearedAt = Date()
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 1)) { context in
             let finished = timer.isFinished(at: context.date)
             Group {
                 if finished {
-                    ended
+                    ended(
+                        overdueSeconds: timer.showsOverdueOnAppearance(at: appearedAt)
+                            ? timer.overdueSeconds(at: context.date) : nil
+                    )
                 } else {
                     running(seconds: timer.remainingSeconds(at: context.date))
                 }
@@ -859,13 +863,13 @@ struct RestTimerBar: View {
             }
         }
         .task(id: timer.endsAt) {
-            let delay = timer.autoDismissDelay(at: Date())
-            if delay > 0 {
-                do {
-                    try await Task.sleep(for: .seconds(delay))
-                } catch {
-                    return
-                }
+            appearedAt = Date()
+            let delay = timer.autoDismissDelay(at: appearedAt)
+            guard delay > 0 else { return }
+            do {
+                try await Task.sleep(for: .seconds(delay))
+            } catch {
+                return
             }
             guard !Task.isCancelled else { return }
             onDismiss()
@@ -906,15 +910,30 @@ struct RestTimerBar: View {
         .accessibilityIdentifier(FCAccessibilityID.activeSessionRest)
     }
 
-    private var ended: some View {
+    private func ended(overdueSeconds: Int?) -> some View {
         HStack(alignment: .center, spacing: FCPrimitives.space3) {
             FCSymbol(.check)
-            Text(String(localized: "session.rest.ended"))
-                .fcFont(.headline)
-                .foregroundStyle(FCSemanticColors.textPrimary)
-                .lineLimit(2)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .accessibilityIdentifier(FCAccessibilityID.activeSessionRestEnded)
+            VStack(alignment: .leading, spacing: FCPrimitives.space1) {
+                Text(String(localized: "session.rest.ended"))
+                    .fcFont(.headline)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                    .lineLimit(2)
+                    .accessibilityIdentifier(FCAccessibilityID.activeSessionRestEnded)
+                if let overdueSeconds {
+                    Text(
+                        String(
+                            format: String(localized: "session.rest.overdueFormat"),
+                            RestTimerState.text(seconds: overdueSeconds)
+                        )
+                    )
+                    .fcFont(.caption)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
+                    .monospacedDigit()
+                    .accessibilityIdentifier(FCAccessibilityID.activeSessionRestOverdue)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .accessibilityElement(children: .combine)
             FCLinkButton(title: String(localized: "session.rest.close")) {
                 onDismiss()
             }

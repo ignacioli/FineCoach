@@ -231,6 +231,104 @@
             try await environment.controller.shutdownForTesting()
         }
 
+        func testRestRestoresAcrossViewModelsWithoutReplayingNotification() async throws {
+            let environment = try makeEnvironment()
+            let store = RestTimerStore()
+            let original = try await startSession(
+                environment, exercises: ["杠铃深蹲", "哑铃卧推"], restTimerStore: store
+            )
+            let squat = try XCTUnwrap(original.session?.exercises.first)
+            original.selectExercise(squat.id)
+            original.weight = "80"
+            original.reps = "5"
+            await original.confirmActiveDraftSet()
+            original.adjustRest(by: RestTimerState.adjustmentStep)
+            let timer = try XCTUnwrap(original.restTimer)
+            let sessionID = try XCTUnwrap(original.session?.id)
+            XCTAssertEqual(store.entry(for: sessionID)?.timer, timer)
+            XCTAssertEqual(store.entry(for: sessionID)?.exerciseName, "杠铃深蹲")
+
+            let center = FakeNotificationScheduling()
+            let restored = ActiveSessionViewModel(
+                studentID: studentID, useCases: environment.sessionUseCases,
+                notifications: center, restTimerStore: store,
+                now: { [now] in now.addingTimeInterval(20) }
+            )
+            await restored.load()
+            XCTAssertEqual(restored.session?.id, sessionID)
+            XCTAssertEqual(restored.restTimer, timer)
+            XCTAssertEqual(restored.currentExercise?.displayNameSnapshot.value, "哑铃卧推")
+            let pendingAfterLoad = await center.scheduled
+            let authorizationAfterLoad = await center.authorizationRequested
+            XCTAssertTrue(pendingAfterLoad.isEmpty)
+            XCTAssertFalse(authorizationAfterLoad)
+
+            restored.adjustRest(by: RestTimerState.adjustmentStep)
+            let identifier = RestEndNotification.notificationIdentifier(for: sessionID)
+            let candidate = await waitForScheduled(center, identifier: identifier) {
+                $0.body.contains("杠铃深蹲")
+            }
+            let descriptor = try XCTUnwrap(candidate)
+            XCTAssertEqual(descriptor.fireDate, timer.endsAt.addingTimeInterval(RestTimerState.adjustmentStep))
+            XCTAssertFalse(descriptor.body.contains("哑铃卧推"))
+            XCTAssertEqual(store.entry(for: sessionID)?.timer, restored.restTimer)
+
+            let expiredCenter = FakeNotificationScheduling()
+            let late = ActiveSessionViewModel(
+                studentID: studentID, useCases: environment.sessionUseCases,
+                notifications: expiredCenter, restTimerStore: store,
+                now: { [now] in now.addingTimeInterval(250) }
+            )
+            await late.load()
+            XCTAssertEqual(late.restTimer, restored.restTimer)
+            XCTAssertTrue(try XCTUnwrap(late.restTimer).showsOverdueOnAppearance(at: now.addingTimeInterval(250)))
+            let pendingAfterLateLoad = await expiredCenter.scheduled
+            XCTAssertTrue(pendingAfterLateLoad.isEmpty, "a delivered notification must not be replayed")
+
+            restored.dismissRest()
+            XCTAssertNil(restored.restTimer)
+            XCTAssertNil(store.entry(for: sessionID))
+            let removed = await waitUntilRemoved(center, identifier: identifier)
+            XCTAssertTrue(removed)
+            await late.load()
+            XCTAssertNil(late.restTimer)
+            try await environment.controller.shutdownForTesting()
+        }
+
+        func testFinishingAndAbandoningClearOnlyTheirSessionsRest() async throws {
+            let environment = try makeEnvironment()
+            let store = RestTimerStore()
+            let otherSessionID = StableUUID(UUID())
+            let otherTimer = RestTimerState(startedAt: now)
+            store.set(otherTimer, exerciseName: "哑铃卧推", for: otherSessionID)
+            let finishing = try await startSession(
+                environment, exercises: ["杠铃深蹲"], restTimerStore: store
+            )
+            finishing.weight = "80"
+            finishing.reps = "5"
+            await finishing.confirmActiveDraftSet()
+            let finishedID = try XCTUnwrap(finishing.session?.id)
+            XCTAssertNotNil(store.entry(for: finishedID))
+            await finishing.finishNow()
+            XCTAssertEqual(finishing.session?.state, .completed)
+            XCTAssertNil(finishing.restTimer)
+            XCTAssertNil(store.entry(for: finishedID))
+            XCTAssertEqual(store.entry(for: otherSessionID)?.timer, otherTimer)
+
+            let abandoning = try await startSession(environment, exercises: [], restTimerStore: store)
+            let abandonedID = try XCTUnwrap(abandoning.session?.id)
+            // Seed a rest directly: an empty Session normally has no confirmed set.
+            store.set(RestTimerState(startedAt: now), exerciseName: nil, for: abandonedID)
+            await abandoning.load()
+            XCTAssertNotNil(abandoning.restTimer)
+            await abandoning.abandon()
+            XCTAssertEqual(abandoning.session?.state, .abandonedEmpty)
+            XCTAssertNil(abandoning.restTimer)
+            XCTAssertNil(store.entry(for: abandonedID))
+            XCTAssertEqual(store.entry(for: otherSessionID)?.timer, otherTimer)
+            try await environment.controller.shutdownForTesting()
+        }
+
         // MARK: - Environment
 
         private struct Environment {
@@ -300,7 +398,8 @@
         private func startSession(
             _ environment: Environment,
             exercises: [String],
-            notifications: (any LocalNotificationScheduling)? = nil
+            notifications: (any LocalNotificationScheduling)? = nil,
+            restTimerStore: RestTimerStore = RestTimerStore()
         ) async throws -> ActiveSessionViewModel {
             try await ensureStudent(environment)
             _ = try await environment.sessionUseCases.startOrOpen(studentID: studentID)
@@ -312,6 +411,7 @@
                 studentID: studentID,
                 useCases: environment.sessionUseCases,
                 notifications: notifications,
+                restTimerStore: restTimerStore,
                 now: { [now] in now }
             )
             await viewModel.load()

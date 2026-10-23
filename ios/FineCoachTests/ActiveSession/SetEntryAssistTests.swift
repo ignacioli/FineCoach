@@ -77,6 +77,45 @@ final class SetEntryAssistTests: XCTestCase {
         XCTAssertEqual(timer.autoDismissDelay(at: end.addingTimeInterval(10)), 0, accuracy: 0.001)
     }
 
+    func testOverdueSecondsAndTimerFormat() {
+        let timer = RestTimerState(startedAt: start)
+        XCTAssertEqual(timer.overdueSeconds(at: start), 0)
+        XCTAssertEqual(timer.overdueSeconds(at: timer.endsAt), 0)
+        XCTAssertEqual(timer.overdueSeconds(at: timer.endsAt.addingTimeInterval(0.9)), 0)
+        XCTAssertEqual(timer.overdueSeconds(at: timer.endsAt.addingTimeInterval(1)), 1)
+        let seconds = timer.overdueSeconds(at: timer.endsAt.addingTimeInterval(80))
+        XCTAssertEqual(seconds, 80)
+        XCTAssertEqual(RestTimerState.text(seconds: seconds), "1:20")
+    }
+
+    func testOverdueAppearanceStartsExactlyAtEndOfHold() {
+        let timer = RestTimerState(startedAt: start)
+        let threshold = timer.endsAt.addingTimeInterval(RestTimerState.finishedHold)
+        XCTAssertFalse(timer.showsOverdueOnAppearance(at: start))
+        XCTAssertFalse(timer.showsOverdueOnAppearance(at: timer.endsAt))
+        XCTAssertFalse(timer.showsOverdueOnAppearance(at: threshold.addingTimeInterval(-0.001)))
+        XCTAssertTrue(timer.showsOverdueOnAppearance(at: threshold))
+        XCTAssertTrue(timer.showsOverdueOnAppearance(at: threshold.addingTimeInterval(80)))
+        XCTAssertEqual(timer.autoDismissDelay(at: threshold), 0)
+    }
+
+    @MainActor
+    func testRestStoreKeepsSessionsAndExerciseNamesIndependent() {
+        let store = RestTimerStore()
+        let firstID = StableUUID(UUID())
+        let secondID = StableUUID(UUID())
+        let first = RestTimerState(startedAt: start)
+        let second = RestTimerState(startedAt: start.addingTimeInterval(30))
+        store.set(first, exerciseName: "杠铃深蹲", for: firstID)
+        store.set(second, exerciseName: "哑铃卧推", for: secondID)
+        XCTAssertEqual(store.entry(for: firstID), .init(timer: first, exerciseName: "杠铃深蹲"))
+        XCTAssertEqual(store.entry(for: secondID), .init(timer: second, exerciseName: "哑铃卧推"))
+        store.clear(for: firstID)
+        XCTAssertNil(store.entry(for: firstID))
+        XCTAssertEqual(store.entry(for: secondID), .init(timer: second, exerciseName: "哑铃卧推"))
+        XCTAssertNil(RestTimerStore().entry(for: secondID), "a fresh process store has no countdown")
+    }
+
     func testTrainingScreenPlacesTheRestBarAboveFinish() throws {
         let url = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
@@ -90,6 +129,10 @@ final class SetEntryAssistTests: XCTestCase {
         XCTAssertTrue(source.contains("activeSessionRestSkip"))
         XCTAssertTrue(source.contains("activeSessionRestClose"))
         XCTAssertTrue(source.contains("session.rest.ended"))
+        XCTAssertTrue(source.contains("activeSessionRestOverdue"))
+        XCTAssertTrue(source.contains("session.rest.overdueFormat"))
+        XCTAssertTrue(source.contains(".accessibilityElement(children: .combine)"))
+        XCTAssertTrue(source.contains("guard delay > 0 else { return }"))
         let bar = try XCTUnwrap(source.range(of: "RestTimerBar("))
         let finish = try XCTUnwrap(source.range(of: "session.action.finish"))
         XCTAssertLessThan(bar.lowerBound, finish.lowerBound)
