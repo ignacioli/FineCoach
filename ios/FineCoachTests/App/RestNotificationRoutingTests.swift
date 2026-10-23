@@ -13,6 +13,30 @@ final class RestNotificationRoutingTests: XCTestCase {
     private let otherSessionID = StableUUID(UUID(uuidString: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb")!)
     private let now = Date(timeIntervalSince1970: 1_700_000_000)
 
+    // MARK: - Delegate source guard
+
+    func testDelegateUsesExplicitCompletionInsteadOfAsyncBridge() throws {
+        let url = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("FineCoachApp/App/RestNotificationRouting.swift")
+        let source = try String(contentsOf: url, encoding: .utf8)
+        XCTAssertNil(
+            source.range(
+                of: #"nonisolated\s+func\s+userNotificationCenter\s*\([^)]*\)\s*async"#,
+                options: .regularExpression
+            )
+        )
+        XCTAssertNil(
+            source.range(
+                of: #"didReceive\s+response:\s*UNNotificationResponse\s*\)\s*async"#,
+                options: .regularExpression
+            )
+        )
+        XCTAssertTrue(source.contains("withCompletionHandler completionHandler:"))
+    }
+
     // MARK: - Payload parsing
 
     func testPayloadParsesKindAndBothIdentifiers() throws {

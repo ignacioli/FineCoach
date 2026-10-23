@@ -195,17 +195,21 @@ final class RestNotificationAppDelegate: NSObject, UIApplicationDelegate, UNUser
 
     nonisolated func userNotificationCenter(
         _ center: UNUserNotificationCenter,
-        didReceive response: UNNotificationResponse
-    ) async {
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping @Sendable () -> Void
+    ) {
         RestNotificationDiagnostics.record(.responseReceived)
-        guard
-            let request = RestNotificationRouteRequest(
-                userInfo: response.notification.request.content.userInfo
-            )
-        else {
-            RestNotificationDiagnostics.record(.ignoredPayload)
-            return
+        let request = RestNotificationRouteRequest(
+            userInfo: response.notification.request.content.userInfo
+        )
+        Task { @MainActor in
+            // UIKit's cold-start restoration requires completion on the main thread.
+            defer { completionHandler() }
+            guard let request else {
+                RestNotificationDiagnostics.record(.ignoredPayload)
+                return
+            }
+            RestNotificationRouter.shared.receive(request)
         }
-        await RestNotificationRouter.shared.receive(request)
     }
 }
