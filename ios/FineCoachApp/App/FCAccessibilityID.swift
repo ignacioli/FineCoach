@@ -1,6 +1,25 @@
 import Foundation
 
 public enum FCAccessibilityID {
+    static let sessionSummaryGains = "sessionSummary.gains"
+    static let sessionDetailGains = "sessionDetail.gains"
+    public static func setNewRecord(_ id: StableUUID) -> String {
+        "activeSession.set.newRecord.\(id.rawValue.uuidString.lowercased())"
+    }
+
+    public static let bodyMeasurementMore = "bodyMeasurementEntry.more"
+    public static func setUndoAt(_ index: Int) -> String {
+        "activeSession.set.undo.at.\(index)"
+    }
+    public static func bodyMeasurementUndo(_ id: StableUUID) -> String {
+        "bodyMeasurementEntry.undo.\(id.rawValue.uuidString.lowercased())"
+    }
+    public static func activeSessionSectionMore(_ id: StableUUID) -> String {
+        "activeSession.section.more.\(id.rawValue.uuidString.lowercased())"
+    }
+    public static func templateEditorSectionMore(_ id: StableUUID) -> String {
+        "templateEditor.section.more.\(id.rawValue.uuidString.lowercased())"
+    }
     public static let privacyCover = "privacy.cover"
 
     public static let archiveViewerRoot = "archive.viewer.root"
@@ -77,6 +96,7 @@ public enum FCAccessibilityID {
     public static let archiveSettingsDensity = "archiveSettings.density"
     public static let archiveSettingsImportNewer = "archiveSettings.importNewer"
     public static let archiveSettingsDelete = "archiveSettings.delete"
+    public static let archiveSettingsDeleteConfirm = "archiveSettings.deleteConfirm"
     public static let archiveSettingsDeleteFailure = "archiveSettings.deleteFailure"
     public static let archiveSettingsDeleteRetry = "archiveSettings.deleteRetry"
     public static let archiveViewerLoadError = "archiveViewer.loadError"
@@ -124,6 +144,9 @@ public enum FCAccessibilityID {
     public static let calendarRoot = "calendar.root"
     public static let appointmentEditorRoot = "appointmentEditor.root"
     public static let appointmentEditorSave = "appointmentEditor.save"
+    public static let appointmentEditorConflictOverride = "appointmentEditor.conflictOverride"
+    public static let appointmentEditorScopeThisOnly = "appointmentEditor.scope.thisOnly"
+    public static let appointmentEditorScopeThisAndFuture = "appointmentEditor.scope.thisAndFuture"
     public static let calendarPreviousMonth = "calendar.previousMonth"
     public static let calendarNextMonth = "calendar.nextMonth"
     public static let calendarAdd = "calendar.add"
@@ -140,14 +163,34 @@ public enum FCAccessibilityID {
     public static let todaySegmentToday = "today.segment.today"
     public static let todaySegmentStudents = "today.segment.students"
     public static let todayInProgress = "today.inProgress"
+    public static func todayInProgressRow(_ studentID: StableUUID) -> String {
+        "today.inProgress.\(studentID.rawValue.uuidString.lowercased())"
+    }
     public static let todayResolvedFold = "today.resolvedFold"
     public static let todayCalendarEntry = "today.calendarEntry"
     public static let todayAddAppointment = "today.addAppointment"
+    public static let todayStartTraining = "today.startTraining"
+    public static let todayCancelCourse = "today.cancelCourse"
+    public static let todayCancelConfirm = "today.cancelConfirm"
+    public static let todayAbsentNotCharged = "today.absentNotCharged"
+    public static let todayAbsentCharged = "today.absentCharged"
     public static let settingsEntry = "settings.entry"
     public static let settingsRoot = "settings.root"
     public static let settingsNotifications = "settings.notifications"
     public static let settingsBackup = "settings.backup"
     public static let settingsAbout = "settings.about"
+    public static let settingsSourceCode = "settings.sourceCode"
+
+    #if DEBUG
+        // 动效试验（开发版）, the DEBUG-only motion test bench (README §14.1).
+        public static let settingsMotionLab = "settings.motionLab"
+        public static let motionLabRoot = "motionLab.root"
+        public static let motionLabSampleRow = "motionLab.sampleRow"
+        public static let motionLabPlainConfirm = "motionLab.plainConfirm"
+        public static func motionLabOption(_ code: String) -> String {
+            "motionLab.option.\(code)"
+        }
+    #endif
 
     public static func todayRow(_ id: StableUUID) -> String {
         "today.row.\(id.rawValue.uuidString)"
@@ -166,6 +209,13 @@ public enum FCAccessibilityID {
     public static let historyCompareSelect = "history.compareSelect"
     public static let studentListArchived = "studentList.archived"
     public static let studentListInProgress = "studentList.inProgress"
+    public static func studentListInProgressRow(_ studentID: StableUUID) -> String {
+        "studentList.inProgress.\(studentID.rawValue.uuidString.lowercased())"
+    }
+
+    public static func studentListRestore(_ id: StableUUID) -> String {
+        "studentList.restore.\(id.rawValue.uuidString)"
+    }
 
     public static let editorRoot = "studentEditor.root"
     public static let editorName = "studentEditor.displayName"
@@ -184,20 +234,27 @@ public enum FCAccessibilityID {
     public static let templatesEntry = "templates.entry"
     public static let templateListRoot = "templates.root"
     public static let templateListAdd = "templates.add"
+    public static let templateListCreate = "templates.create"
     public static let templateListDelete = "templates.delete"
     public static let templateEditorRoot = "templateEditor.root"
     public static let templateEditorName = "templateEditor.name"
+    public static let templateEditorDeleteConfirm = "templateEditor.deleteConfirm"
     public static let templateEditorAddExercise = "templateEditor.addExercise"
     public static let templateEditorExerciseName = "templateEditor.exerciseName"
     public static let templateEditorCreateSection = "templateEditor.createSection"
     public static let templateEditorSectionName = "templateEditor.sectionName"
+    public static let templateEditorMoveToUnsectioned = "templateEditor.moveToUnsectioned"
+    public static let templateEditorDeleteSectionMoveOut = "templateEditor.deleteSection.moveOut"
     public static let activeSessionSaveAsTemplate = "activeSession.saveAsTemplate"
     public static let activeSessionSaveAsTemplateName = "activeSession.saveAsTemplateName"
     public static let activeSessionSaveAsTemplateConfirm = "activeSession.saveAsTemplateConfirm"
     public static let activeSessionApplyTemplate = "activeSession.applyTemplate"
     public static let activeSessionCreateSection = "activeSession.createSection"
     public static let activeSessionSectionName = "activeSession.sectionName"
-    public static let applyTemplateRoot = "applyTemplate.root"
+    public static let activeSessionCreateSectionSubmit = "activeSession.createSection.submit"
+    public static let activeSessionDeleteSectionMoveOut = "activeSession.deleteSection.moveOut"
+    public static let activeSessionMoveToUnsectioned = "activeSession.moveToUnsectioned"
+    public static let activeSessionCreditDebitConfirm = "activeSession.credit.debitConfirm"
 
     public static func templateRow(_ id: StableUUID) -> String {
         "templates.row.\(id.rawValue.uuidString)"
@@ -205,6 +262,22 @@ public enum FCAccessibilityID {
 
     public static func templateExerciseRow(_ id: StableUUID) -> String {
         "templateEditor.exerciseRow.\(id.rawValue.uuidString)"
+    }
+
+    public static func templateEditorTrainingFocus(_ part: BodyPart) -> String {
+        "templateEditor.trainingFocus.\(part.rawValue)"
+    }
+
+    public static func templateEditorMoveToSection(_ id: StableUUID) -> String {
+        "templateEditor.moveToSection.\(id.rawValue.uuidString)"
+    }
+
+    public static func templateEditorRemoveExercise(_ id: StableUUID) -> String {
+        "templateEditor.removeExercise.\(id.rawValue.uuidString)"
+    }
+
+    public static func templateEditorDeleteSection(_ id: StableUUID) -> String {
+        "templateEditor.deleteSection.\(id.rawValue.uuidString)"
     }
 
     public static func templateSectionRow(_ id: StableUUID) -> String {
@@ -217,6 +290,14 @@ public enum FCAccessibilityID {
 
     public static func activeSessionSectionHeader(_ id: StableUUID) -> String {
         "activeSession.sectionHeader.\(id.rawValue.uuidString)"
+    }
+
+    public static func activeSessionDeleteSection(_ id: StableUUID) -> String {
+        "activeSession.deleteSection.\(id.rawValue.uuidString)"
+    }
+
+    public static func activeSessionMoveToSectionChoice(_ id: StableUUID) -> String {
+        "activeSession.moveToSection.choice.\(id.rawValue.uuidString)"
     }
 
     public static let coursePackageListRoot = "coursePackages.root"
@@ -233,6 +314,7 @@ public enum FCAccessibilityID {
     public static let bodyDataAddCustomMetric = "bodyData.addCustomMetric"
     public static let bodyDataEmptyState = "bodyData.emptyState"
     public static let bodyDataNewCustomMetricError = "bodyData.newCustomMetric.error"
+    public static let bodyDataNewCustomMetricSave = "bodyData.newCustomMetric.save"
 
     public static func bodyDataMetricRow(_ id: StableUUID) -> String {
         "bodyData.metricRow.\(id.rawValue.uuidString)"
@@ -247,9 +329,17 @@ public enum FCAccessibilityID {
         "bodyMeasurementEntry.row.\(id.rawValue.uuidString)"
     }
 
-    public static let bodyMeasurementDeleteConfirm = "bodyMeasurementEntry.deleteConfirm"
+    public static let bodyMeasurementDeleteMetricConfirm = "bodyMeasurementEntry.deleteMetricConfirm"
+    public static let bodyMeasurementDeleteMetric = "bodyMeasurementEntry.deleteMetric"
     public static let bodyMeasurementDeleteAll = "bodyMeasurementEntry.deleteAll"
     public static let bodyMeasurementDeleteAllConfirm = "bodyMeasurementEntry.deleteAllConfirm"
+
+    public static let bodyMeasurementArchive = "bodyMeasurementEntry.archive"
+    public static let bodyMeasurementRestore = "bodyMeasurementEntry.restore"
+
+    public static func bodyMeasurementDeleteMeasurement(_ id: StableUUID) -> String {
+        "bodyMeasurementEntry.deleteMeasurement.\(id.rawValue.uuidString)"
+    }
 
     public static let trendsRoot = "trends.root"
     public static let trendsFilterDateRange = "trends.filterDateRange"
@@ -267,6 +357,8 @@ public enum FCAccessibilityID {
     public static let coursePackageEditorName = "coursePackageEditor.name"
     public static let coursePackageEditorTotalCredits = "coursePackageEditor.totalCredits"
     public static let coursePackageEditorSave = "coursePackageEditor.save"
+    public static let coursePackageEditorConfirmEndActive = "coursePackageEditor.confirmEndActive"
+    public static let coursePackageListEndConfirm = "coursePackages.endConfirm"
 
     public static let manualAdjustmentRoot = "manualAdjustment.root"
     public static let manualAdjustmentDirection = "manualAdjustment.direction"
@@ -299,8 +391,10 @@ public enum FCAccessibilityID {
     public static let detailTrends = "studentDetail.trends"
 
     public static let archiveConfirm = "archive.confirm"
+    public static let archiveCancel = "student.archive.cancel"
     public static let deleteName = "deleteStudent.confirmName"
     public static let deleteConfirm = "deleteStudent.confirm"
+    public static let deleteCancel = "student.delete.cancel"
     public static let deleteBlocked = "deleteStudent.blocked"
     public static let deleteBackup = "deleteStudent.backup"
 
@@ -312,29 +406,42 @@ public enum FCAccessibilityID {
     public static let activeSessionModeDuration = "activeSession.mode.duration"
     public static let activeSessionModeCardio = "activeSession.mode.cardio"
     public static let activeSessionSaveExercise = "activeSession.saveExercise"
-    public static let activeSessionMoveUp = "activeSession.moveUp"
-    public static let activeSessionMoveDown = "activeSession.moveDown"
+    public static let activeSessionMoveToSection = "activeSession.moveToSection"
     public static let activeSessionDeleteExercise = "activeSession.deleteExercise"
     public static let activeSessionDeleteExerciseConfirm = "activeSession.deleteExerciseConfirm"
-    public static let activeSessionAddSet = "activeSession.addSet"
     public static let activeSessionWeight = "activeSession.weight"
+    public static let activeSessionWeightDecrement = "activeSession.weight.decrement"
+    public static let activeSessionWeightIncrement = "activeSession.weight.increment"
+    public static let activeSessionWeightStepHint = "activeSession.weightStepHint"
     public static let activeSessionReps = "activeSession.reps"
+    public static let activeSessionRepsDecrement = "activeSession.reps.decrement"
+    public static let activeSessionRepsIncrement = "activeSession.reps.increment"
     public static let activeSessionDuration = "activeSession.duration"
     public static let activeSessionDistance = "activeSession.distance"
     public static let activeSessionSpeed = "activeSession.speed"
     public static let activeSessionResistance = "activeSession.resistance"
-    public static let activeSessionSideNone = "activeSession.sideNone"
-    public static let activeSessionSideBilateral = "activeSession.sideBilateral"
     public static let activeSessionLeft = "activeSession.left"
     public static let activeSessionRight = "activeSession.right"
+    public static let activeSessionLeftDecrement = "activeSession.left.decrement"
+    public static let activeSessionLeftIncrement = "activeSession.left.increment"
+    public static let activeSessionRightDecrement = "activeSession.right.decrement"
+    public static let activeSessionRightIncrement = "activeSession.right.increment"
+    public static let activeSessionSplitSides = "activeSession.splitSides"
+    public static let activeSessionKeyboardDone = "activeSession.keyboardDone"
+    public static let activeSessionNewExerciseUnilateral = "activeSession.newExercise.unilateral"
     public static let activeSessionConfirmSet = "activeSession.confirmSet"
     public static let activeSessionSaveSetEdit = "activeSession.saveSetEdit"
     public static let activeSessionCancelSetEdit = "activeSession.cancelSetEdit"
-    public static let activeSessionCopyPrevious = "activeSession.copyPrevious"
-    public static let activeSessionCopyLastSame = "activeSession.copyLastSame"
-    public static let activeSessionUndoSet = "activeSession.undoSet"
     public static let activeSessionStats = "activeSession.stats"
     public static let activeSessionFinish = "activeSession.finish"
+    public static let activeSessionRest = "activeSession.rest"
+    public static let activeSessionRestRemaining = "activeSession.rest.remaining"
+    public static let activeSessionRestMinus = "activeSession.rest.minus"
+    public static let activeSessionRestPlus = "activeSession.rest.plus"
+    public static let activeSessionRestSkip = "activeSession.rest.skip"
+    public static let activeSessionRestEnded = "activeSession.rest.ended"
+    public static let activeSessionRestOverdue = "activeSession.rest.overdue"
+    public static let activeSessionRestClose = "activeSession.rest.close"
     public static let activeSessionAbandonConfirm = "activeSession.abandonConfirm"
     public static let activeSessionDiscardDrafts = "activeSession.discardDrafts"
     public static let activeSessionReturnToDrafts = "activeSession.returnToDrafts"
@@ -347,12 +454,33 @@ public enum FCAccessibilityID {
     public static let activeSessionFinishBlocked = "activeSession.finishBlocked"
     public static let activeSessionDurationReview = "activeSession.durationReview"
     public static let activeSessionDurationValue = "activeSession.durationValue"
+    public static let activeSessionDurationHint = "activeSession.durationHint"
+    public static let activeSessionDurationError = "activeSession.durationError"
     public static let activeSessionDurationConfirm = "activeSession.durationConfirm"
     public static let activeSessionSaveExerciseToLibrary = "activeSession.saveExerciseToLibrary"
     public static let activeSessionExerciseNameConflict = "activeSession.exerciseNameConflict"
 
     public static func activeSessionCatalogRow(_ id: StableExerciseID) -> String {
         "activeSession.catalogRow.\(id.rawValue)"
+    }
+
+    public static let activeSessionCatalogMuscleAll = "activeSession.catalog.muscle.all"
+
+    public static func activeSessionCatalogMuscle(_ group: String) -> String {
+        "activeSession.catalog.muscle.\(group)"
+    }
+
+    public static let activeSessionCatalogEquipmentAll = "activeSession.catalog.equipment.all"
+
+    public static func activeSessionCatalogEquipment(_ group: String) -> String {
+        "activeSession.catalog.equipment.\(group)"
+    }
+
+    public static let activeSessionCatalogFilter = "activeSession.catalog.filter"
+    public static let activeSessionCatalogFilterDone = "activeSession.catalog.filter.done"
+
+    public static func activeSessionCatalogSection(_ id: String) -> String {
+        "activeSession.catalog.section.\(id)"
     }
 
     public static let exerciseLibraryEntry = "exerciseLibrary.entry"
@@ -389,11 +517,28 @@ public enum FCAccessibilityID {
         "exerciseLibrary.assisted.\(id.rawValue)"
     }
 
+    public static func exerciseLibraryUnilateral(_ id: StableExerciseID) -> String {
+        "exerciseLibrary.unilateral.\(id.rawValue)"
+    }
+
     public static func exerciseLibraryRow(_ id: StableExerciseID) -> String {
         "exerciseLibrary.row.\(id.rawValue)"
     }
 
+    public static let exerciseLibraryRecent = "exerciseLibrary.recent"
+
+    public static func exerciseLibraryRecentRow(_ id: StableExerciseID) -> String {
+        "exerciseLibrary.recentRow.\(id.rawValue)"
+    }
+
+    public static let addExerciseRecent = "activeSession.addExercise.recent"
+
+    public static func addExerciseRecentRow(_ id: StableExerciseID) -> String {
+        "activeSession.addExercise.recentRow.\(id.rawValue)"
+    }
+
     public static let customExerciseRoot = "customExercise.root"
+    public static let customExerciseBack = "customExercise.back"
     public static let customExerciseName = "customExercise.name"
     public static let customExerciseModeWeightReps = "customExercise.mode.weightReps"
     public static let customExerciseModeReps = "customExercise.mode.reps"
@@ -404,6 +549,14 @@ public enum FCAccessibilityID {
 
     public static func exerciseAt(_ index: Int) -> String {
         "activeSession.exercise.at.\(index)"
+    }
+
+    public static func exerciseLastReference(_ index: Int) -> String {
+        "activeSession.exercise.last.\(index)"
+    }
+
+    public static func exerciseMode(_ index: Int) -> String {
+        "activeSession.exercise.mode.\(index)"
     }
 
     public static func setAt(_ index: Int) -> String {
@@ -459,12 +612,17 @@ public enum FCAccessibilityID {
     public static let sessionEditSave = "sessionEdit.save"
 
     public static let shareReportModules = "shareReport.modules"
+    public static let shareReportRecordToggle = "shareReport.recordToggle"
+    public static let shareReportExercisesToggle = "shareReport.exercisesToggle"
+    public static let shareReportSummaryToggle = "shareReport.summaryToggle"
     public static let shareReportVolumeToggle = "shareReport.volumeToggle"
     public static let shareReportPreview = "shareReport.preview"
     public static let shareReportShare = "shareReport.share"
     public static let shareReportRetry = "shareReport.retry"
     public static let shareReportClose = "shareReport.close"
     public static let shareReportGenerateCard = "shareReport.generateCard"
+    public static let shareReportDone = "shareReport.done"
+    public static let shareReportGains = "shareReport.gains"
     public static let shareReportPersonalBestToggle = "shareReport.personalBestToggle"
     public static let shareReportNotSentStatus = "shareReport.notSentStatus"
     public static let shareReportHandedOffStatus = "shareReport.handedOffStatus"
@@ -481,6 +639,8 @@ public enum FCAccessibilityID {
     public static let restoreWarning = "restore.warning"
     public static let restoreSuggestBackup = "restore.suggestBackup"
     public static let restorePassword = "restore.password"
+    public static let restoreReplaceCancel = "restore.replaceConfirm.cancel"
+    public static let restoreReplaceConfirm = "restore.replaceConfirm.confirm"
     public static let restoreConfirm = "restore.confirm"
     public static let restoreRetry = "restore.retry"
     public static let restoreFailed = "restore.failed"

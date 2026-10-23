@@ -42,6 +42,74 @@ final class ComponentCatalogTests: XCTestCase {
         }
     }
 
+    func testNewRecordBadgeUsesLocalizedTextAndDelegatesAccessibilityToItsRow() throws {
+        let url = repositoryRoot().appendingPathComponent(
+            "ios/FineCoachApp/DesignSystem/Components/FCNewRecordBadge.swift")
+        let source = try String(contentsOf: url, encoding: .utf8)
+        XCTAssertTrue(source.contains("String(localized: \"session.set.newRecord\")"))
+        XCTAssertTrue(source.contains(".accessibilityHidden(true)"))
+        XCTAssertTrue(source.contains(".fcFont(.sectionLabel)"))
+        XCTAssertTrue(source.contains("FCSemanticColors.surfaceSelected, in: Capsule()"))
+        XCTAssertTrue(source.contains("FCSemanticColors.actionPrimary"))
+    }
+
+    func testNewRecordRowKeepsBadgeAndConfirmationHapticHasOneStableSource() throws {
+        let row = try source("ios/FineCoachApp/DesignSystem/Components/FCSetRow.swift")
+        XCTAssertTrue(row.contains("self.isNewRecord = isNewRecord && state == .completed"))
+        XCTAssertTrue(row.contains(".accessibilityLabel(Text(accessibilityText))"))
+        XCTAssertTrue(row.contains("String(localized: \"session.set.newRecord\")"))
+        XCTAssertTrue(row.contains("ViewThatFits(in: .horizontal)"))
+        // The row must not own confirmation feedback: the primary confirm path
+        // inserts an already-completed row, so a row-state trigger never fires.
+        XCTAssertFalse(row.contains("sensoryFeedback"))
+        XCTAssertFalse(row.contains("isRecordImprovement"))
+
+        let session = try source("ios/FineCoachApp/Features/ActiveSession/ActiveSessionView.swift")
+        XCTAssertTrue(session.contains(".sensoryFeedback(trigger: viewModel.confirmationFeedback)"))
+        XCTAssertTrue(session.contains("guard let feedback else { return nil }"))
+        // README §14.3 (2026-10-23): every confirmed set uses `haptic.confirm`
+        // (light); the retired `.success` / heavy impact must not return.
+        XCTAssertTrue(session.contains("return FCHaptic.confirm"))
+        XCTAssertFalse(session.contains(".impact(weight: .heavy)"))
+        XCTAssertFalse(session.contains(".success"))
+        XCTAssertEqual(
+            session.components(separatedBy: ".sensoryFeedback(trigger: viewModel.confirmationFeedback)").count - 1, 1,
+            "the training page must have exactly one confirmation haptic source")
+
+        let editor = try source("ios/FineCoachApp/Features/ActiveSession/SetEditor.swift")
+        XCTAssertFalse(editor.contains("sensoryFeedback"))
+    }
+
+    // MARK: - DS-HERO-CARD multi-row (W-08, approved 2026-10-22)
+
+    func testHeroCardMultiRowBuildsOneIdentifiedButtonPerRow() throws {
+        let source = try source("ios/FineCoachApp/DesignSystem/Components/FCHeroCard.swift")
+        let start = try XCTUnwrap(source.range(of: "private func multiRowCard"))
+        let multi = String(source[start.lowerBound...])
+        XCTAssertTrue(multi.contains("ForEach(rows)"))
+        XCTAssertEqual(
+            multi.components(separatedBy: "Button {").count - 1, 1,
+            "the multi-row variant must create exactly one Button per row, not one card-level Button")
+        XCTAssertTrue(multi.contains(".accessibilityIdentifier(row.accessibilityIdentifier)"))
+        XCTAssertTrue(multi.contains("minHeight: 44"))
+    }
+
+    func testHeroCardMultiRowCountFollowsRowsAndEmptyIsSuppressed() throws {
+        let hero = try source("ios/FineCoachApp/DesignSystem/Components/FCHeroCard.swift")
+        XCTAssertTrue(hero.contains("if isMultiRow"))
+        XCTAssertTrue(hero.contains("if rows.isEmpty"))
+        XCTAssertTrue(hero.contains("EmptyView()"))
+        let start = try XCTUnwrap(hero.range(of: "private func multiRowCard"))
+        let multi = String(hero[start.lowerBound...])
+        XCTAssertTrue(multi.contains("ForEach(rows)"))
+        XCTAssertTrue(multi.contains("if row.id != rows.first?.id"))
+
+        let today = try source("ios/FineCoachApp/Features/Today/TodayView.swift")
+        XCTAssertTrue(today.contains("if !viewModel.inProgress.isEmpty"))
+        XCTAssertTrue(today.contains("summaries.map { summary in"))
+        XCTAssertTrue(today.contains("summaries.count == 1, let summary = summaries.first"))
+    }
+
     // MARK: - Sources
 
     private struct IndexRow {
@@ -74,6 +142,10 @@ final class ComponentCatalogTests: XCTestCase {
             types.formUnion(Self.matches(Self.publicTypePattern, in: source))
         }
         return types
+    }
+
+    private func source(_ relativePath: String) throws -> String {
+        try String(contentsOf: repositoryRoot().appendingPathComponent(relativePath), encoding: .utf8)
     }
 
     private func componentsDoc() throws -> String {

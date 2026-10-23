@@ -62,6 +62,10 @@ public struct HistoryUseCases: Sendable {
         try await sessionRepository.listCompleted(studentID: studentID)
     }
 
+    public func listAllHistory() async throws -> [CompletedSession] {
+        try await sessionRepository.listAllCompleted()
+    }
+
     public func detail(sessionID: StableUUID) async throws -> CompletedSession {
         try await sessionRepository.completedSession(id: sessionID)
     }
@@ -173,9 +177,11 @@ public struct HistoryUseCases: Sendable {
                 let day = LocalDate(date: session.completedAtUTC, calendar: calendar)
                 guard dateRange.contains(day) else { return false }
             }
-            guard HistoryFilterCriteria.matchesTrainingFocus(
-                sessionFocus: session.trainingFocus, filter: criteria.trainingFocus
-            ) else {
+            guard
+                HistoryFilterCriteria.matchesTrainingFocus(
+                    sessionFocus: session.trainingFocus, filter: criteria.trainingFocus
+                )
+            else {
                 return false
             }
             if let exerciseID = criteria.exerciseID {

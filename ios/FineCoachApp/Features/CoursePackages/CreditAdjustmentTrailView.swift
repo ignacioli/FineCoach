@@ -86,7 +86,8 @@ struct PackageDetailContent: View {
 enum PackageDetailPresentation {
     /// "扣减 1 课时" / "返还 1 课时"
     static func amountTitle(_ adjustment: CreditAdjustment) -> String {
-        let format = adjustment.direction == .debit
+        let format =
+            adjustment.direction == .debit
             ? String(localized: "packageDetail.debitFormat")
             : String(localized: "packageDetail.creditFormat")
         return String(format: format, adjustment.amount)
@@ -150,7 +151,8 @@ final class CreditAdjustmentTrailViewModel: ObservableObject {
             balance = try await useCases.balance(packageID: packageID)
             errorMessage = nil
         } catch {
-            errorMessage = (error as? LocalizedError)?.errorDescription
+            errorMessage =
+                (error as? LocalizedError)?.errorDescription
                 ?? String(localized: "creditTrail.error.generic")
         }
     }
@@ -168,7 +170,8 @@ struct CreditAdjustmentTrailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: FCPrimitives.space4) {
-                FCPageHeader(title: viewModel.package?.displayName ?? String(localized: "packageDetail.title"), back: .init())
+                FCPageHeader(
+                    title: viewModel.package?.displayName ?? String(localized: "packageDetail.title"), back: .init())
 
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)

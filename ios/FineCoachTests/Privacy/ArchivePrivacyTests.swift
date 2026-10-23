@@ -33,10 +33,11 @@ final class ArchivePrivacyTests: XCTestCase {
             let files = try swiftFiles(in: directory)
             XCTAssertFalse(files.isEmpty, "\(directory.lastPathComponent) holds no Swift files")
             for file in files {
-                sources.append((
-                    "\(directory.lastPathComponent)/\(file.lastPathComponent)",
-                    try String(contentsOf: file, encoding: .utf8)
-                ))
+                sources.append(
+                    (
+                        "\(directory.lastPathComponent)/\(file.lastPathComponent)",
+                        try String(contentsOf: file, encoding: .utf8)
+                    ))
             }
         }
         return sources
@@ -108,22 +109,26 @@ final class ArchivePrivacyTests: XCTestCase {
         let categories = Set(AppLogErrorCategory.allCases.map { String(describing: $0) })
         for (name, text) in try archiveSources() {
             // Nothing else may write to a log or the console.
-            for word in ["print(", "NSLog(", "os_log(", "debugPrint(", "dump(", "Logger(subsystem", "import OSLog", "import os"] {
+            for word in [
+                "print(", "NSLog(", "os_log(", "debugPrint(", "dump(", "Logger(subsystem", "import OSLog", "import os",
+            ] {
                 XCTAssertFalse(text.contains(word), "\(name) must not use \(word)")
             }
             for call in Self.loggerCalls(in: text) {
                 calls += 1
                 XCTAssertTrue(["info", "failure"].contains(call.method), "\(name): logger.\(call.method)")
-                XCTAssertFalse(call.arguments.contains("\""), "\(name): a log call holds a string literal: \(call.arguments)")
+                XCTAssertFalse(
+                    call.arguments.contains("\""), "\(name): a log call holds a string literal: \(call.arguments)")
                 XCTAssertFalse(call.arguments.contains("\\("), "\(name): a log call interpolates: \(call.arguments)")
                 let arguments = call.arguments
                     .split(separator: ",", omittingEmptySubsequences: true)
                     .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
                 // Every argument is a labelled or bare leading-dot case: `.archiveX`, `operation: .y`.
                 for argument in arguments {
-                    let value = argument.split(separator: ":", maxSplits: 1).last.map {
-                        $0.trimmingCharacters(in: .whitespaces)
-                    } ?? ""
+                    let value =
+                        argument.split(separator: ":", maxSplits: 1).last.map {
+                            $0.trimmingCharacters(in: .whitespaces)
+                        } ?? ""
                     XCTAssertTrue(value.hasPrefix("."), "\(name): argument \(argument) is not a fixed case")
                     let caseName = String(value.dropFirst())
                     if argument.hasPrefix("operation:") {
@@ -178,7 +183,8 @@ final class ArchivePrivacyTests: XCTestCase {
         urls += try XCTUnwrap(FileManager.default.enumerator(at: root, includingPropertiesForKeys: nil)).compactMap {
             $0 as? URL
         }
-        XCTAssertGreaterThanOrEqual(urls.count, 6, "root, current.json, generations, one generation, snapshot.bin, settings")
+        XCTAssertGreaterThanOrEqual(
+            urls.count, 6, "root, current.json, generations, one generation, snapshot.bin, settings")
         for url in urls {
             let values = try url.resourceValues(forKeys: [.isExcludedFromBackupKey])
             XCTAssertEqual(values.isExcludedFromBackup, true, "\(url.lastPathComponent) is not excluded from backup")
@@ -194,7 +200,9 @@ final class ArchivePrivacyTests: XCTestCase {
         for (name, text) in sources {
             // A leading-dot content type (`.password`), not a property access like `model.password`.
             let contentType = try NSRegularExpression(
-                pattern: "(?<![A-Za-z0-9_])\\.(password|newPassword|oneTimeCode)\\b|UITextContentType\\.(password|newPassword|oneTimeCode)\\b|rawValue: \"(password|newPassword|oneTimeCode)\"")
+                pattern:
+                    "(?<![A-Za-z0-9_])\\.(password|newPassword|oneTimeCode)\\b|UITextContentType\\.(password|newPassword|oneTimeCode)\\b|rawValue: \"(password|newPassword|oneTimeCode)\""
+            )
             XCTAssertNil(
                 contentType.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)),
                 "\(name) declares a password content type")
@@ -230,10 +238,12 @@ final class ArchivePrivacyTests: XCTestCase {
         XCTAssertGreaterThan(views.count, 15)
         let factRowFile = "ArchiveExport/ArchiveDeliveryWarningView.swift"
         for (name, text) in views {
-            for word in [".foregroundStyle(.red", ".foregroundStyle(.orange", ".foregroundStyle(.yellow",
-                ".foregroundStyle(.green", ".foregroundColor(", "Color.red", "Color.orange", "Color.green", "Color.yellow",
-                "Color(.system", "UIColor.system"]
-            {
+            for word in [
+                ".foregroundStyle(.red", ".foregroundStyle(.orange", ".foregroundStyle(.yellow",
+                ".foregroundStyle(.green", ".foregroundColor(", "Color.red", "Color.orange", "Color.green",
+                "Color.yellow",
+                "Color(.system", "UIColor.system",
+            ] {
                 XCTAssertFalse(text.contains(word), "\(name) hand-colours with \(word)")
             }
             if name != factRowFile {

@@ -59,22 +59,28 @@ final class ArchiveExportPolicyTests: XCTestCase {
         let source = try await seededSource()
         let snapshot = try makeSnapshot(source, keeping: [.trainingRecords])
         let text = try payload(snapshot)
-        let fileName = ArchiveExportPolicy.fileName(snapshotAtUTC: snapshot.manifest.snapshotAtUTC, timeZone: X.shanghai)
+        let fileName = ArchiveExportPolicy.fileName(
+            snapshotAtUTC: snapshot.manifest.snapshotAtUTC, timeZone: X.shanghai)
 
         let modules = snapshot.manifest.modules
         XCTAssertTrue(modules.trainingRecords)
-        XCTAssertFalse(modules.displayName || modules.sex || modules.bodyData || modules.trends || modules.summaries || modules.exerciseInfo)
+        XCTAssertFalse(
+            modules.displayName || modules.sex || modules.bodyData || modules.trends || modules.summaries
+                || modules.exerciseInfo)
         XCTAssertNil(snapshot.student)
         XCTAssertTrue(snapshot.summaries.isEmpty && snapshot.bodyMetrics.isEmpty && snapshot.bodyMeasurements.isEmpty)
         XCTAssertNil(snapshot.attribution)
         XCTAssertTrue(snapshot.exercises.allSatisfy { $0.info == nil })
 
         let hidden =
-            X.excludedValues + [X.studentName, "female"] + X.bodyWeightValues + [X.customMetricValue, X.customMetricName]
+            X.excludedValues + [X.studentName, "female"] + X.bodyWeightValues + [
+                X.customMetricValue, X.customMetricName,
+            ]
             + X.summaries + [X.inProgressSummary]
             + [X.builtInName, X.secondBuiltInName, X.customExerciseName] + X.oneOffNames
             + [X.builtInID, X.secondBuiltInID, X.customExerciseID.uuidString, X.studentID.rawValue.uuidString]
-            + [X.session1ID, X.session2ID, X.inProgressSessionID, X.abandonedSessionID, X.sectionID].map(\.rawValue.uuidString)
+            + [X.session1ID, X.session2ID, X.inProgressSessionID, X.abandonedSessionID, X.sectionID].map(
+                \.rawValue.uuidString)
         assertAbsent(hidden, in: text, "payload")
         assertAbsent(hidden, in: fileName, "file name")
         XCTAssertEqual(fileName, "FineCoach-档案-20261009-1600.fcarchive")
@@ -91,7 +97,10 @@ final class ArchiveExportPolicyTests: XCTestCase {
         )
         let text = try payload(snapshot)
         assertAbsent(
-            X.excludedValues + [X.inProgressSummary, X.builtInID, X.secondBuiltInID, X.customExerciseID.uuidString, X.studentID.rawValue.uuidString],
+            X.excludedValues + [
+                X.inProgressSummary, X.builtInID, X.secondBuiltInID, X.customExerciseID.uuidString,
+                X.studentID.rawValue.uuidString,
+            ],
             in: text, "all-selected payload")
         let imageMarkers = ["image", ".png", ".jpg", ".gif", ".mp4"]
         assertAbsent(imageMarkers, in: text.lowercased(), "all-selected payload (media)")
@@ -125,8 +134,9 @@ final class ArchiveExportPolicyTests: XCTestCase {
     func testNumberingNeverDependsOnNamesAndRenamedExerciseKeepsItsNumber() throws {
         let catalog = handCatalog()
         func exercise(_ id: String, _ name: String) -> ArchiveExportSource.Exercise {
-            .init(identity: .stable(id), kind: .builtIn, isAssisted: false, name: name, catalog: catalog,
-                  recordMode: .weightReps, sets: [handSet()])
+            .init(
+                identity: .stable(id), kind: .builtIn, isAssisted: false, name: name, catalog: catalog,
+                recordMode: .weightReps, sets: [handSet()])
         }
         // Same name for two exercises, a rename for one of them, in two sessions.
         let source = handSource(sessions: [
@@ -310,10 +320,15 @@ final class ArchiveExportPolicyTests: XCTestCase {
         let source = try await seededSource()
         let snapshot = try makeSnapshot(source, keeping: [.trainingRecords, .exerciseInfo])
         let infos = snapshot.exercises.map(\.info)
-        XCTAssertEqual(infos[0], ArchiveExerciseInfo(name: X.builtInName, primaryMuscles: ["胸"], secondaryMuscles: ["肩", "臂"], equipment: "杠铃"))
+        XCTAssertEqual(
+            infos[0],
+            ArchiveExerciseInfo(
+                name: X.builtInName, primaryMuscles: ["胸"], secondaryMuscles: ["肩", "臂"], equipment: "杠铃"))
         XCTAssertEqual(
             infos[1],
-            ArchiveExerciseInfo(name: X.customExerciseName, primaryMuscles: [], secondaryMuscles: [], equipment: ArchiveExportPolicy.unknownEquipment))
+            ArchiveExerciseInfo(
+                name: X.customExerciseName, primaryMuscles: [], secondaryMuscles: [],
+                equipment: ArchiveExportPolicy.unknownEquipment))
         XCTAssertEqual(infos[2]?.name, X.oneOffNames[0])
         XCTAssertEqual(infos[3]?.name, X.secondBuiltInName)
         XCTAssertEqual(infos[3]?.equipment, "哑铃")
@@ -385,7 +400,8 @@ final class ArchiveExportPolicyTests: XCTestCase {
     func testFileNameIsGenericAndUsesSnapshotLocalTime() {
         let at = Date(timeIntervalSince1970: 1_791_532_800.789)  // 2026-10-09T08:00:00Z
         XCTAssertEqual(
-            ArchiveExportPolicy.fileName(snapshotAtUTC: at, timeZone: X.shanghai), "FineCoach-档案-20261009-1600.fcarchive")
+            ArchiveExportPolicy.fileName(snapshotAtUTC: at, timeZone: X.shanghai),
+            "FineCoach-档案-20261009-1600.fcarchive")
         XCTAssertEqual(
             ArchiveExportPolicy.fileName(snapshotAtUTC: at, timeZone: TimeZone(identifier: "UTC")!),
             "FineCoach-档案-20261009-0800.fcarchive")
@@ -432,7 +448,8 @@ final class ArchiveExportPolicyTests: XCTestCase {
         let share = ScriptedSharePresenter(outcomes)
         let logger = RecordingLogger()
         let useCases = ArchiveExportUseCases(
-            sourceReader: StubSourceReader(source: source ?? handSource(sessions: [handSession(day: 1, [handExercise()])], summary: "示例总结")),
+            sourceReader: StubSourceReader(
+                source: source ?? handSource(sessions: [handSession(day: 1, [handExercise()])], summary: "示例总结")),
             identity: identity,
             share: SystemShareAdapter(presenter: share),
             tempRootURL: root.url,
@@ -472,18 +489,24 @@ final class ArchiveExportPolicyTests: XCTestCase {
         XCTAssertEqual(state, .selecting)
         await assertInvalidTransition(.selecting) { try await flow.confirmPreview() }
         await assertInvalidTransition(.selecting) { try await flow.confirmFacts() }
-        await assertInvalidTransition(.selecting) { _ = try await flow.submitPassword("长度足够的口令abc", confirmation: "长度足够的口令abc") }
+        await assertInvalidTransition(.selecting) {
+            _ = try await flow.submitPassword("长度足够的口令abc", confirmation: "长度足够的口令abc")
+        }
         await assertInvalidTransition(.selecting) { _ = try await flow.deliver() }
         await assertInvalidTransition(.selecting) { _ = try await flow.retry() }
 
         _ = try await flow.preview()
         await assertInvalidTransition(.previewing) { try await flow.confirmFacts() }
-        await assertInvalidTransition(.previewing) { _ = try await flow.submitPassword("长度足够的口令abc", confirmation: "长度足够的口令abc") }
+        await assertInvalidTransition(.previewing) {
+            _ = try await flow.submitPassword("长度足够的口令abc", confirmation: "长度足够的口令abc")
+        }
         await assertInvalidTransition(.previewing) { _ = try await flow.preview() }
         await assertInvalidTransition(.previewing) { try await flow.setGroup(.bodyData, selected: false) }
 
         try await flow.confirmPreview()
-        await assertInvalidTransition(.confirmingFacts) { _ = try await flow.submitPassword("长度足够的口令abc", confirmation: "长度足够的口令abc") }
+        await assertInvalidTransition(.confirmingFacts) {
+            _ = try await flow.submitPassword("长度足够的口令abc", confirmation: "长度足够的口令abc")
+        }
 
         state = await flow.state
         XCTAssertEqual(state, .confirmingFacts)
@@ -581,7 +604,8 @@ final class ArchiveExportPolicyTests: XCTestCase {
             try await advance(h.flow, through: .settingPassword)
             let generated = try await h.flow.submitPassword("长度足够的口令abc", confirmation: "长度足够的口令abc")
             XCTAssertEqual(generated, .generated)
-            XCTAssertEqual(h.tempFiles.filter { $0.hasSuffix(".fcarchive") }.count, 1, "file exists while the system holds it")
+            XCTAssertEqual(
+                h.tempFiles.filter { $0.hasSuffix(".fcarchive") }.count, 1, "file exists while the system holds it")
 
             let result = try await h.flow.deliver()
             XCTAssertEqual(result, expectedState, "\(outcome)")
@@ -607,7 +631,8 @@ final class ArchiveExportPolicyTests: XCTestCase {
         let bytes = try Data(contentsOf: h.root.url.appendingPathComponent(file))
         let kept = await h.flow.generatedSnapshot
         let snapshot = try XCTUnwrap(kept)
-        XCTAssertEqual(try ArchiveFileCodec.decode(file: bytes, password: try ArchivePassword(importing: password)), snapshot)
+        XCTAssertEqual(
+            try ArchiveFileCodec.decode(file: bytes, password: try ArchivePassword(importing: password)), snapshot)
         XCTAssertEqual(h.identity.calls, 1)
 
         let done = try await h.flow.deliver()
@@ -706,8 +731,16 @@ final class ArchiveExportPolicyTests: XCTestCase {
     private final class Flag: @unchecked Sendable {
         private let lock = NSLock()
         private var value = false
-        var isSet: Bool { lock.lock(); defer { lock.unlock() }; return value }
-        func set() { lock.lock(); value = true; lock.unlock() }
+        var isSet: Bool {
+            lock.lock()
+            defer { lock.unlock() }
+            return value
+        }
+        func set() {
+            lock.lock()
+            value = true
+            lock.unlock()
+        }
     }
 
     // MARK: Janitor
@@ -737,8 +770,9 @@ final class ArchiveExportPolicyTests: XCTestCase {
     }
 
     private func handExercise(id: String = "builtin-1") -> ArchiveExportSource.Exercise {
-        .init(identity: .stable(id), kind: .builtIn, isAssisted: false, name: "示例内置", catalog: handCatalog(),
-              recordMode: .weightReps, sets: [handSet()])
+        .init(
+            identity: .stable(id), kind: .builtIn, isAssisted: false, name: "示例内置", catalog: handCatalog(),
+            recordMode: .weightReps, sets: [handSet()])
     }
 
     private func handSession(day: Int, _ exercises: [ArchiveExportSource.Exercise], summary: String? = nil)

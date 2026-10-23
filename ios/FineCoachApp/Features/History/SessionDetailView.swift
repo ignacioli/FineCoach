@@ -14,13 +14,20 @@ final class SessionDetailViewModel: ObservableObject {
     @Published var saveAsTemplateName = ""
     @Published var didSaveAsTemplate = false
 
+    @Published var gains: SessionGains = .empty
+    private let exerciseUseCases: ExerciseLibraryUseCases?
+
     let sessionID: StableUUID
     private let useCases: HistoryUseCases
     private let templateUseCases: TemplateUseCases?
 
     var canSaveAsTemplate: Bool { templateUseCases != nil }
 
-    init(sessionID: StableUUID, useCases: HistoryUseCases, templateUseCases: TemplateUseCases? = nil) {
+    init(
+        sessionID: StableUUID, useCases: HistoryUseCases, templateUseCases: TemplateUseCases? = nil,
+        exerciseUseCases: ExerciseLibraryUseCases? = nil
+    ) {
+        self.exerciseUseCases = exerciseUseCases
         self.sessionID = sessionID
         self.useCases = useCases
         self.templateUseCases = templateUseCases
@@ -29,6 +36,9 @@ final class SessionDetailViewModel: ObservableObject {
     func load() async {
         do {
             let loaded = try await useCases.detail(sessionID: sessionID)
+            let history = try await useCases.listHistory(studentID: loaded.studentID)
+            let assisted = (try? await exerciseUseCases?.assistedExerciseIDs()) ?? []
+            gains = SessionGains(current: loaded, history: history, assistedExerciseIDs: assisted)
             completed = loaded
             record = try ShareReportPolicy.makeDTO(from: loaded, modules: .privacySafeDefaults)
             creditNote = (try? await useCases.creditSettlementNote(sessionID: sessionID)) ?? nil
@@ -77,13 +87,15 @@ struct SessionDetailView: View {
         sessionID: StableUUID,
         useCases: HistoryUseCases,
         templateUseCases: TemplateUseCases? = nil,
+        exerciseUseCases: ExerciseLibraryUseCases? = nil,
         path: Binding<[RootDestination]>
     ) {
         _viewModel = StateObject(
             wrappedValue: SessionDetailViewModel(
                 sessionID: sessionID,
                 useCases: useCases,
-                templateUseCases: templateUseCases
+                templateUseCases: templateUseCases,
+                exerciseUseCases: exerciseUseCases
             )
         )
         _path = path
@@ -92,6 +104,8 @@ struct SessionDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: FCPrimitives.space6) {
+                FCPageHeader(title: String(localized: "detail.title"), back: .init())
+
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
                         .fcFont(.callout, weight: .regular)
@@ -99,7 +113,14 @@ struct SessionDetailView: View {
                 }
 
                 if let record = viewModel.record {
-                    ShareReportCardView(dto: record, style: .page)
+                    ShareReportCardView(
+                        dto: record, style: .page,
+                        blocks: ShareReportCardView.blocks(for: record, style: .page).filter { $0 != .summary })
+                    SessionGainsSectionView(gains: viewModel.gains)
+                        .accessibilityIdentifier(FCAccessibilityID.sessionDetailGains)
+                    if let summary = record.studentFacingSummary, !summary.isEmpty {
+                        ShareReportCardView(dto: record, style: .page, blocks: [.summary])
+                    }
                 }
 
                 if viewModel.creditNote == .noActivePackage {
@@ -111,7 +132,8 @@ struct SessionDetailView: View {
                 }
 
                 if let report = viewModel.completed?.latestReport,
-                   report.freshness == .stale || report.handedToSystemAtUTC != nil {
+                    report.freshness == .stale || report.handedToSystemAtUTC != nil
+                {
                     VStack(alignment: .leading, spacing: FCPrimitives.space2) {
                         if report.freshness == .stale {
                             FCStatusLabel(text: String(localized: "detail.reportStale"), symbolName: "exclamationmark")
@@ -131,7 +153,7 @@ struct SessionDetailView: View {
                 actions
             }
             .padding(.horizontal, FCPrimitives.space4)
-            .padding(.vertical, FCPrimitives.space4)
+            .padding(.bottom, FCPrimitives.space4)
         }
         .safeAreaInset(edge: .bottom) {
             FCButton(title: String(localized: "summary.generateReport")) {
@@ -143,8 +165,7 @@ struct SessionDetailView: View {
             .background(FCSemanticColors.surfacePage)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(String(localized: "detail.title"))
-        .navigationBarTitleDisplayMode(.inline)
+        .fcSecondaryPage()
         .task { await viewModel.load() }
         .onChange(of: path) { _, _ in
             Task { await viewModel.load() }

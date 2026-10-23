@@ -30,6 +30,132 @@ import XCTest
 
 final class FoundationIntegrationTests: XCTestCase {
     #if DEBUG
+        @MainActor
+        func testCatalogSyncFailureKeepsExistingCatalogAndRetries() async throws {
+            let directory = try TemporaryProtectedDirectory()
+            let environment = try AppEnvironment(
+                rootURL: directory.url.appendingPathComponent("app"),
+                notificationCenter: FakeNotificationScheduling()
+            )
+            let injector = TestFaultInjector()
+            let controller = try PersistenceController(
+                storeURL: directory.url.appendingPathComponent("catalog/FineCoach.sqlite"),
+                faultInjectionBoundary: FaultInjectionBoundary(injector: injector)
+            )
+            let repository = CoreDataExerciseRepository(writer: controller.writer)
+            var catalog = try PlaceholderExerciseCatalogLoader.loadFromBundle(Bundle(for: PersistenceController.self))
+            catalog.exercises = Array(catalog.exercises.prefix(1))
+            let recordIDs = Set(catalog.exercises.map(\.provenanceRef))
+            catalog.provenance.records = catalog.provenance.records.filter { recordIDs.contains($0.recordID) }
+            try await repository.syncBuiltInCatalog(catalog, now: Date(timeIntervalSince1970: 0))
+            let useCases = ExerciseLibraryUseCases(
+                repository: repository, clock: SystemClock(), ids: SystemIDGenerator())
+            injector.setFailure(at: .persistenceWriterSave, enabled: true)
+            await environment.prepareExerciseCatalog(using: useCases)
+            XCTAssertTrue(environment.catalogSyncFailed)
+            XCTAssertNil(environment.catalogUnavailableMessage)
+            XCTAssertTrue(environment.isStorageAvailable)
+            let retained = try await useCases.search(query: "")
+            XCTAssertEqual(retained.map(\.id.rawValue), catalog.exercises.map(\.id))
+            injector.setFailure(at: .persistenceWriterSave, enabled: false)
+            await environment.prepareExerciseCatalog(using: useCases)
+            XCTAssertFalse(environment.catalogSyncFailed)
+            XCTAssertNil(environment.catalogUnavailableMessage)
+            let updated = try await useCases.search(query: "")
+            XCTAssertEqual(updated.count, 541)
+            try await controller.shutdownForTesting()
+        }
+
+        @MainActor
+        func testPostCommitProtectionAuditFailureKeepsCatalogUnavailableUntilRetry() async throws {
+            let directory = try TemporaryProtectedDirectory()
+            let environment = try AppEnvironment(
+                rootURL: directory.url.appendingPathComponent("app"),
+                notificationCenter: FakeNotificationScheduling()
+            )
+            let injector = TestFaultInjector()
+            let controller = try PersistenceController(
+                storeURL: directory.url.appendingPathComponent("catalog/FineCoach.sqlite"),
+                faultInjectionBoundary: FaultInjectionBoundary(injector: injector)
+            )
+            let repository = CoreDataExerciseRepository(writer: controller.writer)
+            var catalog = try PlaceholderExerciseCatalogLoader.loadFromBundle(Bundle(for: PersistenceController.self))
+            catalog.exercises = Array(catalog.exercises.prefix(1))
+            let recordIDs = Set(catalog.exercises.map(\.provenanceRef))
+            catalog.provenance.records = catalog.provenance.records.filter { recordIDs.contains($0.recordID) }
+            try await repository.syncBuiltInCatalog(catalog, now: Date(timeIntervalSince1970: 0))
+            let useCases = ExerciseLibraryUseCases(
+                repository: repository, clock: SystemClock(), ids: SystemIDGenerator())
+
+            injector.setFailure(at: .postCommitProtectionAudit, enabled: true)
+            await environment.prepareExerciseCatalog(using: useCases)
+            XCTAssertTrue(environment.catalogSyncFailed)
+            XCTAssertNotNil(environment.catalogUnavailableMessage)
+            XCTAssertTrue(environment.isStorageAvailable)
+            let committedAfterAuditFailure = try await useCases.search(query: "")
+            XCTAssertEqual(committedAfterAuditFailure.count, 541)
+
+            injector.setFailure(at: .postCommitProtectionAudit, enabled: false)
+            await environment.prepareExerciseCatalog(using: useCases)
+            XCTAssertFalse(environment.catalogSyncFailed)
+            XCTAssertNil(environment.catalogUnavailableMessage)
+            let recoveredEntries = try await useCases.search(query: "")
+            XCTAssertEqual(recoveredEntries.count, 541)
+            try await controller.shutdownForTesting()
+        }
+
+        @MainActor
+        func testFirstInstallCatalogSyncFailureStillBlocksUntilRetrySucceeds() async throws {
+            let directory = try TemporaryProtectedDirectory()
+            let environment = try AppEnvironment(
+                rootURL: directory.url.appendingPathComponent("app"),
+                notificationCenter: FakeNotificationScheduling()
+            )
+            let injector = TestFaultInjector(failingPoints: [.persistenceWriterSave])
+            let controller = try PersistenceController(
+                storeURL: directory.url.appendingPathComponent("catalog/FineCoach.sqlite"),
+                faultInjectionBoundary: FaultInjectionBoundary(injector: injector)
+            )
+            let repository = CoreDataExerciseRepository(writer: controller.writer)
+            let useCases = ExerciseLibraryUseCases(
+                repository: repository, clock: SystemClock(), ids: SystemIDGenerator())
+            await environment.prepareExerciseCatalog(using: useCases)
+            XCTAssertTrue(environment.catalogSyncFailed)
+            XCTAssertNotNil(environment.catalogUnavailableMessage)
+            let retained = try await useCases.search(query: "")
+            XCTAssertTrue(retained.isEmpty)
+            injector.setFailure(at: .persistenceWriterSave, enabled: false)
+            await environment.prepareExerciseCatalog(using: useCases)
+            XCTAssertFalse(environment.catalogSyncFailed)
+            XCTAssertNil(environment.catalogUnavailableMessage)
+            try await controller.shutdownForTesting()
+        }
+
+        @MainActor
+        func testAppEnvironmentStartupAllowsSessionOnlyNameBeforeCatalogSync() async throws {
+            let directory = try TemporaryProtectedDirectory()
+            let environment = try AppEnvironment(
+                rootURL: directory.url.appendingPathComponent("app"),
+                notificationCenter: FakeNotificationScheduling()
+            )
+            let student = try await environment.requireUseCases().create(
+                draft: StudentDraft(displayName: "启动重名测试学员", sex: .female)
+            )
+            _ = try await environment.requireSessionUseCases().startOrOpen(studentID: student.id)
+            _ = try await environment.requireSessionUseCases().addSessionOnlyExercise(
+                displayName: "杠铃深蹲",
+                recordMode: .weightReps
+            )
+
+            await environment.prepareExerciseCatalog()
+
+            XCTAssertTrue(environment.isStorageAvailable)
+            XCTAssertFalse(environment.catalogSyncFailed)
+            XCTAssertNil(environment.catalogUnavailableMessage)
+            let matchingEntries = try await environment.requireExerciseUseCases().search(query: "杠铃深蹲")
+            XCTAssertTrue(matchingEntries.isEmpty)
+        }
+
         private func assertProtectionRawValue(
             _ actual: String?,
             expected: FileProtectionType,

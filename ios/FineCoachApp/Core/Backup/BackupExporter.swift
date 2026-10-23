@@ -328,23 +328,41 @@ public struct BackupCoordinator: Sendable {
         return pointer.generationUUID
     }
 
-    private func writeRecovery(active: Session?, generationUUID: UUID, at url: URL) throws {
+    private func writeRecovery(active: [Session], generationUUID: UUID, at url: URL) throws {
         let store = ActiveSessionRecoveryStore(url: url)
-        if let active, active.state == .inProgress, active.revision >= 1 {
-            try store.replace(try ActiveSessionRecoverySnapshot(storeGenerationUUID: generationUUID, session: active))
-        } else {
+        let inProgress = active.filter { $0.state == .inProgress && $0.revision >= 1 }
+        guard !inProgress.isEmpty else {
             try store.remove()
+            return
+        }
+        for session in inProgress {
+            try store.replace(
+                try ActiveSessionRecoverySnapshot(storeGenerationUUID: generationUUID, session: session)
+            )
         }
     }
 
     private func promoteRecovery(from generationUUID: UUID, directory: StoreGenerationDirectory) throws {
-        let staged = directory.recoveryURL(for: generationUUID)
-        let live = directory.activeRecoveryURL
-        if FileManager.default.fileExists(atPath: staged.path) {
-            let data = try Data(contentsOf: staged)
-            try protectedFileStore.atomicReplace(data: data, at: live, policy: .business)
-        } else if FileManager.default.fileExists(atPath: live.path) {
-            try FileManager.default.removeItem(at: live)
+        let stagedDirectory = directory.generationURL(for: generationUUID)
+        let liveDirectory = directory.rootURL
+        let stem = directory.activeRecoveryURL.deletingPathExtension().lastPathComponent
+        let stagedFiles = (try? FileManager.default.contentsOfDirectory(atPath: stagedDirectory.path)) ?? []
+        let liveFiles = (try? FileManager.default.contentsOfDirectory(atPath: liveDirectory.path)) ?? []
+        let stagedNames = Set(stagedFiles.filter { isRecoveryFile($0, stem: stem) })
+        for name in liveFiles where isRecoveryFile(name, stem: stem) && !stagedNames.contains(name) {
+            try? FileManager.default.removeItem(at: liveDirectory.appendingPathComponent(name))
         }
+        for name in stagedNames {
+            let data = try Data(contentsOf: stagedDirectory.appendingPathComponent(name))
+            _ = try protectedFileStore.atomicReplace(
+                data: data,
+                at: liveDirectory.appendingPathComponent(name),
+                policy: .business
+            )
+        }
+    }
+
+    private func isRecoveryFile(_ name: String, stem: String) -> Bool {
+        name == "\(stem).json" || (name.hasPrefix("\(stem).") && name.hasSuffix(".json"))
     }
 }

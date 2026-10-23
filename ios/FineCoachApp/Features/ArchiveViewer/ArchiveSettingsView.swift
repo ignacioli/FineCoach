@@ -29,7 +29,9 @@ struct ArchiveSettingsView: View {
                         selection: model.settings.weightUnit.rawValue,
                         identifier: FCAccessibilityID.archiveSettingsWeight
                     ) { raw in
-                        model.update { $0.weightUnit = ArchiveDisplaySettings.WeightUnit(rawValue: raw) ?? $0.weightUnit }
+                        model.update {
+                            $0.weightUnit = ArchiveDisplaySettings.WeightUnit(rawValue: raw) ?? $0.weightUnit
+                        }
                     }
                     FCListRowDivider()
                     switchRow(
@@ -38,7 +40,9 @@ struct ArchiveSettingsView: View {
                         selection: model.settings.lengthUnit.rawValue,
                         identifier: FCAccessibilityID.archiveSettingsLength
                     ) { raw in
-                        model.update { $0.lengthUnit = ArchiveDisplaySettings.LengthUnit(rawValue: raw) ?? $0.lengthUnit }
+                        model.update {
+                            $0.lengthUnit = ArchiveDisplaySettings.LengthUnit(rawValue: raw) ?? $0.lengthUnit
+                        }
                     }
                     FCListRowDivider()
                     switchRow(
@@ -108,7 +112,10 @@ struct ArchiveSettingsView: View {
                 cancelAction: .init(title: String(localized: "archive.settings.deleteConfirm.cancel")) {
                     isConfirmingDelete = false
                 },
-                confirmAction: .init(title: String(localized: "archive.settings.deleteConfirm.confirm")) {
+                confirmAction: .init(
+                    title: String(localized: "archive.settings.deleteConfirm.confirm"),
+                    accessibilityIdentifier: FCAccessibilityID.archiveSettingsDeleteConfirm
+                ) {
                     isConfirmingDelete = false
                     deleteConfirmed()
                 }

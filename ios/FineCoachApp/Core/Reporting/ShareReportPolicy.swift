@@ -1,8 +1,9 @@
 import Foundation
 
 public enum ShareReportPolicy {
-    /// 2 since T069j: exercise icon/body parts and opt-in personal bests.
-    public static let schemaVersion = 2
+    /// 4: opt-in session gains as one "上次 → 本次" row per action (spec 004
+    /// Revision 1.5), plus the session milestone.
+    public static let schemaVersion = 4
 
     public static let allowedDTOPropertyNames: Set<String> = [
         "schemaVersion",
@@ -14,6 +15,8 @@ public enum ShareReportPolicy {
         "trainingVolume",
         "exercises",
         "personalBests",
+        "gainRows",
+        "milestoneSessionNumber",
     ]
 
     public static let forbiddenIdentifierTokens: [String] = [
@@ -35,7 +38,8 @@ public enum ShareReportPolicy {
     public static func makeDTO(
         from completed: CompletedSession,
         modules: ShareReportModuleSelection = .privacySafeDefaults,
-        personalBests: [ShareReportPersonalBestDTO] = []
+        personalBests: [ShareReportPersonalBestDTO] = [],
+        gains: SessionGains? = nil
     ) throws -> ShareReportDTO {
         guard completed.completedAtUTC.timeIntervalSince1970.isFinite else {
             throw DomainError.invalidState
@@ -67,7 +71,9 @@ public enum ShareReportPolicy {
         let exercises: [ShareReportExerciseDTO]
         if modules.includeExercisesAndSets {
             exercises = completed.exercises.map { exercise in
-                let facet = exercise.sourceID.flatMap { PlaceholderExerciseCatalogLoader.facet(forExerciseID: $0.rawValue) }
+                let facet = exercise.sourceID.flatMap {
+                    PlaceholderExerciseCatalogLoader.facet(forExerciseID: $0.rawValue)
+                }
                 let parts = ExerciseBodyParts(
                     catalogPrimary: facet?.primaryMuscleGroup,
                     catalogSecondary: facet?.secondaryMuscleGroups ?? []
@@ -91,7 +97,8 @@ public enum ShareReportPolicy {
                         )
                     },
                     equipmentIcon: facet.flatMap {
-                        FCEquipmentIcon.icon(equipmentClass: $0.equipmentClass, primaryMuscleGroup: $0.primaryMuscleGroup)?.rawValue
+                        FCEquipmentIcon.icon(
+                            equipmentClass: $0.equipmentClass, primaryMuscleGroup: $0.primaryMuscleGroup)?.rawValue
                     },
                     primaryBodyPart: parts.primary,
                     secondaryBodyParts: parts.secondary
@@ -111,44 +118,69 @@ public enum ShareReportPolicy {
             studentFacingSummary: summary,
             trainingVolume: modules.includeTrainingVolume ? completed.statistics.ordinaryTrainingVolume : nil,
             exercises: exercises,
-            personalBests: personalBests
+            personalBests: gains.map { personalBestsSet(from: $0) } ?? personalBests,
+            gainRows: gains?.rows.map {
+                ShareReportGainRowDTO(
+                    displayName: $0.displayName, isNewRecord: $0.isNewRecord, previous: reportSet($0.previous),
+                    current: reportSet($0.current))
+            } ?? [],
+            milestoneSessionNumber: gains?.milestoneSessionNumber
         )
     }
 
-    /// Personal bests (M1B-FR-029 rules, `Comparison.personalRecords`) that
-    /// were SET in `completed`, judged against the student's full history.
-    /// Used for the settings hint ("本次刷新 N 项") and, only when the coach
-    /// opts in, the report's 个人最佳 section.
+    /// Strict improvements over compatible history before this session (D-FR-001–004).
     public static func personalBestsSet(
         in completed: CompletedSession,
         history: [CompletedSession],
         assistedExerciseIDs: Set<StableExerciseID> = []
     ) -> [ShareReportPersonalBestDTO] {
-        var seen = Set<String>()
-        var result: [ShareReportPersonalBestDTO] = []
-        let sessions = history.contains { $0.id == completed.id } ? history : history + [completed]
-        for exercise in completed.exercises {
-            guard let sourceID = exercise.sourceID else { continue }
-            let mode = exercise.recordModeSnapshot
-            guard seen.insert("\(sourceID.rawValue)|\(mode.rawValue)").inserted else { continue }
-            let records = Comparison.personalRecords(
-                exerciseID: sourceID,
-                recordMode: mode,
-                across: sessions,
-                loadDirection: assistedExerciseIDs.contains(sourceID) ? .decreaseIsImprovement : .increaseIsImprovement
-            )
-            let name = exercise.displayNameSnapshot.value
-            if let best = records.mostRepsAtWeight, best.sessionID == completed.id {
-                result.append(.init(displayName: name, kind: .highestWeight, weightValue: best.weight, repetitionCount: best.reps))
-            } else if records.mostRepsAtWeight == nil, let best = records.highestWeight, best.sessionID == completed.id {
-                result.append(.init(displayName: name, kind: .highestWeight, weightValue: best.weight))
-            } else if let best = records.longestDuration, best.sessionID == completed.id {
-                result.append(.init(displayName: name, kind: .longestDuration, durationSeconds: best.seconds))
-            } else if let best = records.longestDistance, best.sessionID == completed.id {
-                result.append(.init(displayName: name, kind: .longestDistance, distanceValue: best.distance))
+        personalBestsSet(
+            from: SessionGains(current: completed, history: history, assistedExerciseIDs: assistedExerciseIDs))
+    }
+
+    public static func personalBestsSet(from gains: SessionGains) -> [ShareReportPersonalBestDTO] {
+        gains.records.map { record in
+            let kind: ShareReportPersonalBestDTO.Kind
+            switch record.kind {
+            case .highestWeight: kind = .highestWeight
+            case .longestDuration: kind = .longestDuration
+            case .mostReps: kind = .mostReps
             }
+            return ShareReportPersonalBestDTO(
+                displayName: record.displayName, kind: kind,
+                weightValue: kind == .highestWeight ? record.set.weightValue : nil,
+                // The set detail travels with a weight record; the record
+                // itself is still judged on the weight alone (Revision 1.5).
+                repetitionCount: kind == .highestWeight || kind == .mostReps
+                    ? record.set.repetitionCount : nil,
+                durationSeconds: kind == .longestDuration ? record.set.durationSeconds : nil,
+                distanceValue: nil)
         }
-        return result
+    }
+
+    /// A nil hint also means the settings row must be absent (D-FR-031).
+    /// "N 项新纪录" counts record actions; "N 项进步" counts the action rows
+    /// that improved without a record, so no action is counted twice.
+    public static func gainsHint(for gains: SessionGains) -> String? {
+        var parts: [String] = []
+        if !gains.records.isEmpty {
+            parts.append(String(format: String(localized: "share.gains.records.format"), gains.records.count))
+        }
+        if let number = gains.milestoneSessionNumber {
+            parts.append(String(format: String(localized: "session.gains.milestone.format"), Int64(number)))
+        }
+        if !gains.progress.isEmpty {
+            parts.append(String(format: String(localized: "share.gains.progress.format"), gains.progress.count))
+        }
+        return parts.isEmpty ? nil : parts.prefix(2).joined(separator: " · ")
+    }
+
+    private static func reportSet(_ set: TrainingSet) -> ShareReportSetDTO {
+        ShareReportSetDTO(
+            orderIndex: set.orderIndex, recordMode: set.recordMode, weightValue: set.weightValue,
+            repetitionCount: set.repetitionCount, durationSeconds: set.durationSeconds, unit: set.unit,
+            side: set.side, leftValue: set.leftValue, rightValue: set.rightValue,
+            distanceValue: set.distanceValue, speedValue: set.speedValue, resistanceValue: set.resistanceValue)
     }
 
     public static func previewLines(for dto: ShareReportDTO) -> [String] {
@@ -169,7 +201,7 @@ public enum ShareReportPolicy {
             lines.append("课后总结 \(summary)")
         }
         if let volume = dto.trainingVolume {
-            lines.append("训练容量 \(volume.canonicalString)kg")
+            lines.append("训练容量 \(volume.canonicalString) kg")
         }
         for exercise in dto.exercises {
             lines.append(exercise.displayName)

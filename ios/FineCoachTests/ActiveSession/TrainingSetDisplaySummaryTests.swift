@@ -20,26 +20,26 @@ final class TrainingSetDisplaySummaryTests: XCTestCase {
         let set = try makeSet(
             TrainingSetInput(recordMode: .weightReps, weightValue: "17.5", repetitionCount: "12", unit: .kilograms)
         )
-        XCTAssertEqual(set.displaySummary, "17.5kg × 12次")
+        XCTAssertEqual(set.displaySummary, "17.5 kg × 12")
     }
 
     func testRepsDisplaySummary() throws {
         let set = try makeSet(
             TrainingSetInput(recordMode: .reps, repetitionCount: "20", unit: .repetitions)
         )
-        XCTAssertEqual(set.displaySummary, "20次")
+        XCTAssertEqual(set.displaySummary, "20 次")
     }
 
     func testDurationDisplaySummaryFormatsAsMinutesAndSeconds() throws {
         let wholeMinute = try makeSet(
             TrainingSetInput(recordMode: .duration, durationSeconds: "60", unit: .seconds)
         )
-        XCTAssertEqual(wholeMinute.displaySummary, "1分")
+        XCTAssertEqual(wholeMinute.displaySummary, "1 分")
 
         let underAMinute = try makeSet(
             TrainingSetInput(recordMode: .duration, durationSeconds: "45", unit: .seconds)
         )
-        XCTAssertEqual(underAMinute.displaySummary, "45秒")
+        XCTAssertEqual(underAMinute.displaySummary, "45 秒")
 
         // The exact scenario reported after the mm:ss input change: a
         // History detail row for a 50-minute duration-mode set must not
@@ -47,7 +47,7 @@ final class TrainingSetDisplaySummaryTests: XCTestCase {
         let fiftyMinutes = try makeSet(
             TrainingSetInput(recordMode: .duration, durationSeconds: "3000", unit: .seconds)
         )
-        XCTAssertEqual(fiftyMinutes.displaySummary, "50分")
+        XCTAssertEqual(fiftyMinutes.displaySummary, "50 分")
     }
 
     func testCardioDisplaySummaryFormatsDurationAsMinutesAndSeconds() throws {
@@ -61,14 +61,14 @@ final class TrainingSetDisplaySummaryTests: XCTestCase {
                 resistanceValue: "3"
             )
         )
-        XCTAssertEqual(set.displaySummary, "5分 · 5km · 速度 10 · 阻力 3")
+        XCTAssertEqual(set.displaySummary, "5 分 · 5 km · 速度 10 · 阻力 3")
     }
 
     func testCardioDisplaySummaryOmitsOptionalFieldsWhenAbsent() throws {
         let set = try makeSet(
             TrainingSetInput(recordMode: .cardio, durationSeconds: "90", unit: .seconds, distanceValue: "1")
         )
-        XCTAssertEqual(set.displaySummary, "1分30秒 · 1km")
+        XCTAssertEqual(set.displaySummary, "1 分 30 秒 · 1 km")
     }
 
     func testBilateralWeightRepsDisplaySummaryShowsBothSides() throws {
@@ -82,6 +82,21 @@ final class TrainingSetDisplaySummaryTests: XCTestCase {
                 rightValue: "9"
             )
         )
-        XCTAssertEqual(set.displaySummary, "左 8kg / 右 9kg × 10次")
+        XCTAssertEqual(set.displaySummary, "左 8 kg / 右 9 kg × 10")
+    }
+
+    func testEqualSidesDisplayAsPerSideWeight() throws {
+        let set = try makeSet(
+            TrainingSetInput(
+                recordMode: .weightReps,
+                weightValue: "12.5",
+                repetitionCount: "10",
+                unit: .kilograms,
+                side: .bilateral,
+                leftValue: "12.5",
+                rightValue: "12.5"
+            )
+        )
+        XCTAssertEqual(set.displaySummary, "每侧 12.5 kg × 10")
     }
 }

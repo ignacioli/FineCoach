@@ -12,6 +12,7 @@ public struct FCSetStateCircle: View {
     }
 
     private let state: State
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     public init(_ state: State) {
         self.state = state
@@ -19,20 +20,38 @@ public struct FCSetStateCircle: View {
 
     public var body: some View {
         ZStack {
-            switch state {
-            case .pending:
-                Circle().strokeBorder(FCSemanticColors.borderControl, lineWidth: 1.5)
-            case .draft:
-                Circle().strokeBorder(
-                    FCSemanticColors.textSecondary,
-                    style: StrokeStyle(lineWidth: 1, dash: [3, 2])
-                )
-            case .completed:
-                Circle().fill(FCSemanticColors.actionPrimary)
-                FCSymbol(.checkOnFill)
-            }
+            stroke
+                .opacity(state == .completed ? 0 : 1)
+            completed
+                .opacity(state == .completed ? 1 : 0)
         }
         .frame(width: 22, height: 22)
+        // §14.4: the set circle flips with `fast` + `symmetric`; Reduce Motion
+        // switches directly.
+        .animation(
+            reduceMotion ? nil : FCMotion.curveSymmetric(duration: FCMotion.durationFast),
+            value: state == .completed
+        )
         .accessibilityHidden(true)
+    }
+
+    @ViewBuilder
+    private var stroke: some View {
+        switch state {
+        case .draft:
+            Circle().strokeBorder(
+                FCSemanticColors.textSecondary,
+                style: StrokeStyle(lineWidth: 1, dash: [3, 2])
+            )
+        case .pending, .completed:
+            Circle().strokeBorder(FCSemanticColors.borderControl, lineWidth: 1.5)
+        }
+    }
+
+    private var completed: some View {
+        ZStack {
+            Circle().fill(FCSemanticColors.actionPrimary)
+            FCSymbol(.checkOnFill)
+        }
     }
 }

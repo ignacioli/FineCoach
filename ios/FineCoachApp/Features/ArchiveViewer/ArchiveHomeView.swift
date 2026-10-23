@@ -64,7 +64,8 @@ struct ArchiveHomeView: View {
         FCHubRow(
             icon: .symbol("list.bullet.rectangle"),
             title: String(localized: "archive.export.item.trainingRecords"),
-            trailing: .note(String(format: String(localized: "archive.viewer.home.recordCount"), content.snapshot.sessions.count)),
+            trailing: .note(
+                String(format: String(localized: "archive.viewer.home.recordCount"), content.snapshot.sessions.count)),
             mode: content.hasTrainingRecords ? .action { open(.records) } : notIncluded
         )
         .accessibilityIdentifier(FCAccessibilityID.archiveHomeRecords)
@@ -74,7 +75,9 @@ struct ArchiveHomeView: View {
         FCHubRow(
             icon: .symbol("figure.stand"),
             title: String(localized: "archive.export.group.bodyData"),
-            trailing: .note(String(format: String(localized: "archive.viewer.home.metricCount"), content.snapshot.bodyMetrics.count)),
+            trailing: .note(
+                String(format: String(localized: "archive.viewer.home.metricCount"), content.snapshot.bodyMetrics.count)
+            ),
             mode: content.hasBodyData ? .action { open(.bodyData) } : notIncluded
         )
         .accessibilityIdentifier(FCAccessibilityID.archiveHomeBody)

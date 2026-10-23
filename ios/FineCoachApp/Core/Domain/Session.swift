@@ -12,8 +12,16 @@ public enum SessionFinishGate: Equatable, Sendable {
     case unresolvedDrafts
 }
 
+/// `ActiveSessionPointerMO.singletonKey` is unique. Since 2026-10-22 each
+/// Student with an in-progress Session owns one row keyed by the Student's
+/// UUID string (M1A-FR-018 revision). `singleton` is the legacy single-pointer
+/// key, read once at launch and migrated to the owning Student's key.
 public enum ActiveSessionPointerKey {
     public static let singleton = "active"
+
+    public static func student(_ studentID: StableUUID) -> String {
+        studentID.rawValue.uuidString
+    }
 }
 
 public struct Session: Hashable, Codable, Sendable, Identifiable {
@@ -162,7 +170,8 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
         guard !additional.isEmpty else {
             return self
         }
-        return replacing(trainingFocus: .some(trainingFocus.union(additional)), revision: nextRevision, updatedAtUTC: now)
+        return replacing(
+            trainingFocus: .some(trainingFocus.union(additional)), revision: nextRevision, updatedAtUTC: now)
     }
 
     public func addingSessionOnlyExercise(
@@ -295,12 +304,21 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
         return replacingExercise(at: index, with: exercise.replacingSets(exercise.sets + [trainingSet]), now: now)
     }
 
+    /// Saves new values onto a set. A completed set stays completed: the
+    /// coach's 「保存」 is itself the explicit confirmation, the same as
+    /// `editingCompletedSet` in history (experience P0-D14, owner decision
+    /// 2026-10-15). Invalid values throw and leave the set as it was. Draft
+    /// and pending sets keep their old behavior.
     public func editingSet(setID: StableUUID, input: TrainingSetInput, now: Date) throws -> Session {
         try mutateSet(setID, now: now) { trainingSet in
             guard input.recordMode == trainingSet.recordMode else {
                 throw DomainError.invalidMode
             }
-            return try trainingSet.updating(input: input, now: now)
+            let updated = try trainingSet.updating(input: input, now: now)
+            guard trainingSet.state == .completed else {
+                return updated
+            }
+            return try updated.confirmed(now: now, completedAtUTC: trainingSet.completedAtUTC ?? now)
         }
     }
 
@@ -328,6 +346,21 @@ public struct Session: Hashable, Codable, Sendable, Identifiable {
         let (index, exercise, _) = try requireSet(setID)
         let remaining = exercise.sets.filter { $0.id != setID }
         return replacingExercise(at: index, with: exercise.replacingSets(remaining), now: now)
+    }
+
+    /// Restores one previously deleted set at its original position. The
+    /// current session is used as the base so edits made after deletion are
+    /// preserved; only the deleted set is reinserted.
+    public func restoringSet(_ set: TrainingSet, at originalIndex: Int, now: Date) throws -> Session {
+        try ensureInProgress()
+        let (index, exercise) = try requireExercise(set.sessionExerciseID)
+        guard !exercise.sets.contains(where: { $0.id == set.id }) else {
+            return self
+        }
+        var sets = exercise.sets
+        let insertionIndex = min(max(originalIndex, 0), sets.count)
+        sets.insert(set, at: insertionIndex)
+        return replacingExercise(at: index, with: exercise.replacingSets(sets), now: now)
     }
 
     public func discardingUnresolvedSets(now: Date) throws -> Session {

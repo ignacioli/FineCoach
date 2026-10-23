@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24000" systemVersion="26.0" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="FineCoachV5">
+    <entity name="StudentMO" representedClassName="NSManagedObject" syncable="NO">
+        <attribute name="id" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="displayName" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="sex" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="trainingGoal" optional="YES" attributeType="String" syncable="NO"/>
+        <attribute name="injuryNotes" optional="YES" attributeType="String" syncable="NO"/>
+        <attribute name="privateCoachNote" optional="YES" attributeType="String" syncable="NO"/>
+        <attribute name="phone" optional="YES" attributeType="String" syncable="NO"/>
+        <attribute name="wechatID" optional="YES" attributeType="String" syncable="NO"/>
+        <attribute name="lifecycle" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="createdAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <attribute name="updatedAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <relationship name="sessions" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="SessionMO" inverseName="student" inverseEntity="SessionMO"/>
+        <uniquenessConstraints>
+            <constraint>
+                <constraint property="id"/>
+            </constraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="ExerciseCatalogMO" representedClassName="NSManagedObject" syncable="NO">
+        <attribute name="id" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="kind" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="canonicalName" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="normalizedName" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="recordMode" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="metadataVersion" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="lifecycle" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="provenanceRef" optional="YES" attributeType="String" syncable="NO"/>
+        <attribute name="createdAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <attribute name="updatedAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <relationship name="preferences" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ExercisePreferenceMO" inverseName="exercise" inverseEntity="ExercisePreferenceMO"/>
+        <uniquenessConstraints>
+            <constraint>
+                <constraint property="id"/>
+            </constraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="ExerciseNameClaimMO" representedClassName="NSManagedObject" syncable="NO">
+        <attribute name="normalizedName" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="ownerKind" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="ownerID" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="scope" optional="NO" attributeType="String" syncable="NO"/>
+        <uniquenessConstraints>
+            <constraint>
+                <constraint property="normalizedName"/>
+            </constraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="ExercisePreferenceMO" representedClassName="NSManagedObject" syncable="NO">
+        <attribute name="exerciseID" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="alias" optional="YES" attributeType="String" syncable="NO"/>
+        <attribute name="isFavorite" optional="NO" attributeType="Boolean" usesScalarValueType="YES" syncable="NO"/>
+        <attribute name="isHidden" optional="NO" attributeType="Boolean" usesScalarValueType="YES" syncable="NO"/>
+        <attribute name="isAssisted" optional="NO" attributeType="Boolean" usesScalarValueType="YES" defaultValueString="NO" syncable="NO"/>
+        <attribute name="isUnilateral" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="NO"/>
+        <relationship name="exercise" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ExerciseCatalogMO" inverseName="preferences" inverseEntity="ExerciseCatalogMO"/>
+    </entity>
+    <entity name="SessionMO" representedClassName="NSManagedObject" syncable="NO">
+        <attribute name="id" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="studentID" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="state" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="startedAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <attribute name="lastCheckpointUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <attribute name="elapsedSeconds" optional="NO" attributeType="Decimal" syncable="NO"/>
+        <attribute name="interruptionStartedAtUTC" optional="YES" attributeType="Date" syncable="NO"/>
+        <attribute name="durationNeedsReview" optional="NO" attributeType="Boolean" usesScalarValueType="YES" syncable="NO"/>
+        <attribute name="coachAdjustedDurationSeconds" optional="YES" attributeType="Decimal" syncable="NO"/>
+        <attribute name="trainingFocusMask" optional="NO" attributeType="Integer 32" usesScalarValueType="YES" defaultValueString="0" syncable="NO"/>
+        <attribute name="studentFacingSummary" optional="YES" attributeType="String" syncable="NO"/>
+        <attribute name="privateCoachNote" optional="YES" attributeType="String" syncable="NO"/>
+        <attribute name="revision" optional="NO" attributeType="Integer 64" usesScalarValueType="YES" syncable="NO"/>
+        <attribute name="createdAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <attribute name="updatedAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <attribute name="completedAtUTC" optional="YES" attributeType="Date" syncable="NO"/>
+        <attribute name="appointmentID" optional="YES" attributeType="UUID" syncable="NO"/>
+        <attribute name="creditSettlementNote" optional="YES" attributeType="String" syncable="NO"/>
+        <relationship name="student" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="StudentMO" inverseName="sessions" inverseEntity="StudentMO"/>
+        <relationship name="sessionExercises" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="SessionExerciseMO" inverseName="session" inverseEntity="SessionExerciseMO"/>
+        <relationship name="reports" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ShareReportMO" inverseName="session" inverseEntity="ShareReportMO"/>
+        <uniquenessConstraints>
+            <constraint>
+                <constraint property="id"/>
+            </constraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="SessionExerciseMO" representedClassName="NSManagedObject" syncable="NO">
+        <attribute name="id" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="sessionID" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="orderIndex" optional="NO" attributeType="Integer 32" usesScalarValueType="YES" syncable="NO"/>
+        <attribute name="sourceKind" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="sourceID" optional="YES" attributeType="String" syncable="NO"/>
+        <attribute name="displayNameSnapshot" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="recordModeSnapshot" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="actionPrivateNote" optional="YES" attributeType="String" syncable="NO"/>
+        <attribute name="sectionID" optional="YES" attributeType="UUID" syncable="NO"/>
+        <relationship name="session" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SessionMO" inverseName="sessionExercises" inverseEntity="SessionMO"/>
+        <relationship name="sets" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="TrainingSetMO" inverseName="sessionExercise" inverseEntity="TrainingSetMO"/>
+        <uniquenessConstraints>
+            <constraint>
+                <constraint property="id"/>
+            </constraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="TrainingSetMO" representedClassName="NSManagedObject" syncable="NO">
+        <attribute name="id" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="sessionExerciseID" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="orderIndex" optional="NO" attributeType="Integer 32" usesScalarValueType="YES" syncable="NO"/>
+        <attribute name="state" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="recordMode" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="weightValue" optional="YES" attributeType="Decimal" syncable="NO"/>
+        <attribute name="repetitionCount" optional="YES" attributeType="Decimal" syncable="NO"/>
+        <attribute name="durationSeconds" optional="YES" attributeType="Decimal" syncable="NO"/>
+        <attribute name="unit" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="side" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="leftValue" optional="YES" attributeType="Decimal" syncable="NO"/>
+        <attribute name="rightValue" optional="YES" attributeType="Decimal" syncable="NO"/>
+        <attribute name="createdAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <attribute name="updatedAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <attribute name="completedAtUTC" optional="YES" attributeType="Date" syncable="NO"/>
+        <attribute name="distanceValue" optional="YES" attributeType="Decimal" syncable="NO"/>
+        <attribute name="speedValue" optional="YES" attributeType="Decimal" syncable="NO"/>
+        <attribute name="resistanceValue" optional="YES" attributeType="Decimal" syncable="NO"/>
+        <relationship name="sessionExercise" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SessionExerciseMO" inverseName="sets" inverseEntity="SessionExerciseMO"/>
+        <uniquenessConstraints>
+            <constraint>
+                <constraint property="id"/>
+            </constraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="ShareReportMO" representedClassName="NSManagedObject" syncable="NO">
+        <attribute name="id" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="sessionID" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="generatedForRevision" optional="NO" attributeType="Integer 64" usesScalarValueType="YES" syncable="NO"/>
+        <attribute name="freshness" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="createdAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <attribute name="handedToSystemAtUTC" optional="YES" attributeType="Date" syncable="NO"/>
+        <attribute name="selectedModules" optional="YES" attributeType="Binary" syncable="NO"/>
+        <relationship name="session" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SessionMO" inverseName="reports" inverseEntity="SessionMO"/>
+        <uniquenessConstraints>
+            <constraint>
+                <constraint property="id"/>
+            </constraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="AppSettingMO" representedClassName="NSManagedObject" syncable="NO">
+        <attribute name="key" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="typedValue" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="schemaVersion" optional="NO" attributeType="Integer 64" usesScalarValueType="YES" syncable="NO"/>
+        <uniquenessConstraints>
+            <constraint>
+                <constraint property="key"/>
+            </constraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="ActiveSessionPointerMO" representedClassName="NSManagedObject" syncable="NO">
+        <attribute name="singletonKey" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="sessionID" optional="NO" attributeType="UUID" syncable="NO"/>
+        <uniquenessConstraints>
+            <constraint>
+                <constraint property="singletonKey"/>
+            </constraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="StoreGenerationMetadataMO" representedClassName="NSManagedObject" syncable="NO">
+        <attribute name="generationUUID" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="schemaVersion" optional="NO" attributeType="Integer 64" usesScalarValueType="YES" syncable="NO"/>
+        <attribute name="createdAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <attribute name="validationState" optional="NO" attributeType="String" syncable="NO"/>
+        <uniquenessConstraints>
+            <constraint>
+                <constraint property="generationUUID"/>
+            </constraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="RecurrenceSeriesMO" representedClassName="NSManagedObject" syncable="NO">
+        <attribute name="id" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="studentID" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="intervalDays" optional="NO" attributeType="Integer 32" usesScalarValueType="YES" defaultValueString="7" syncable="NO"/>
+        <attribute name="terminationKind" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="endDate" optional="YES" attributeType="String" syncable="NO"/>
+        <attribute name="repeatCount" optional="YES" attributeType="Integer 32" syncable="NO"/>
+        <attribute name="defaultStartTime" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="defaultDurationMinutes" optional="NO" attributeType="Integer 32" usesScalarValueType="YES" syncable="NO"/>
+        <attribute name="defaultReminderEnabled" optional="NO" attributeType="Boolean" usesScalarValueType="YES" syncable="NO"/>
+        <attribute name="defaultReminderLeadMinutes" optional="YES" attributeType="Integer 32" syncable="NO"/>
+        <attribute name="status" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="createdAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <attribute name="updatedAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <relationship name="appointments" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="AppointmentMO" inverseName="series" inverseEntity="AppointmentMO"/>
+        <uniquenessConstraints>
+            <constraint>
+                <constraint property="id"/>
+            </constraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="AppointmentMO" representedClassName="NSManagedObject" syncable="NO">
+        <attribute name="id" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="studentID" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="seriesID" optional="YES" attributeType="UUID" syncable="NO"/>
+        <attribute name="date" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="startTime" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="durationMinutes" optional="NO" attributeType="Integer 32" usesScalarValueType="YES" syncable="NO"/>
+        <attribute name="status" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="absentCreditChoice" optional="YES" attributeType="String" syncable="NO"/>
+        <attribute name="cancellationReason" optional="YES" attributeType="String" syncable="NO"/>
+        <attribute name="isDetachedException" optional="NO" attributeType="Boolean" usesScalarValueType="YES" syncable="NO"/>
+        <attribute name="reminderEnabled" optional="NO" attributeType="Boolean" usesScalarValueType="YES" syncable="NO"/>
+        <attribute name="reminderLeadMinutes" optional="YES" attributeType="Integer 32" syncable="NO"/>
+        <attribute name="linkedSessionID" optional="YES" attributeType="UUID" syncable="NO"/>
+        <attribute name="trainingFocusMask" optional="NO" attributeType="Integer 32" usesScalarValueType="YES" defaultValueString="0" syncable="NO"/>
+        <attribute name="createdAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <attribute name="updatedAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <relationship name="series" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="RecurrenceSeriesMO" inverseName="appointments" inverseEntity="RecurrenceSeriesMO"/>
+        <uniquenessConstraints>
+            <constraint>
+                <constraint property="id"/>
+            </constraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="CoursePackageMO" representedClassName="NSManagedObject" syncable="NO">
+        <attribute name="id" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="studentID" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="NO"/>
+        <attribute name="totalCredits" optional="NO" attributeType="Integer 32" usesScalarValueType="YES" syncable="NO"/>
+        <attribute name="remainingCredits" optional="NO" attributeType="Integer 32" usesScalarValueType="YES" syncable="NO"/>
+        <attribute name="startDate" optional="YES" attributeType="String" syncable="NO"/>
+        <attribute name="endDate" optional="YES" attributeType="String" syncable="NO"/>
+        <attribute name="status" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="createdAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <attribute name="updatedAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <relationship name="adjustments" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CreditAdjustmentMO" inverseName="package" inverseEntity="CreditAdjustmentMO"/>
+        <uniquenessConstraints>
+            <constraint>
+                <constraint property="id"/>
+            </constraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="CreditAdjustmentMO" representedClassName="NSManagedObject" syncable="NO">
+        <attribute name="id" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="packageID" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="direction" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="amount" optional="NO" attributeType="Integer 32" usesScalarValueType="YES" syncable="NO"/>
+        <attribute name="reasonKind" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="reasonText" optional="YES" attributeType="String" syncable="NO"/>
+        <attribute name="linkedSessionID" optional="YES" attributeType="UUID" syncable="NO"/>
+        <attribute name="linkedAppointmentID" optional="YES" attributeType="UUID" syncable="NO"/>
+        <attribute name="sourceEventKey" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="createdAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <relationship name="package" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CoursePackageMO" inverseName="adjustments" inverseEntity="CoursePackageMO"/>
+        <uniquenessConstraints>
+            <constraint>
+                <constraint property="id"/>
+            </constraint>
+            <constraint>
+                <constraint property="sourceEventKey"/>
+            </constraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="ActiveCoursePackageClaimMO" representedClassName="NSManagedObject" syncable="NO">
+        <attribute name="studentID" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="packageID" optional="NO" attributeType="UUID" syncable="NO"/>
+        <uniquenessConstraints>
+            <constraint>
+                <constraint property="studentID"/>
+            </constraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="TrainingTemplateMO" representedClassName="NSManagedObject" syncable="NO">
+        <attribute name="id" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="name" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="trainingFocusMask" optional="NO" attributeType="Integer 32" usesScalarValueType="YES" defaultValueString="0" syncable="NO"/>
+        <attribute name="createdAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <attribute name="updatedAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <relationship name="exercises" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="TemplateExerciseMO" inverseName="template" inverseEntity="TemplateExerciseMO"/>
+        <uniquenessConstraints>
+            <constraint>
+                <constraint property="id"/>
+            </constraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="TemplateExerciseMO" representedClassName="NSManagedObject" syncable="NO">
+        <attribute name="id" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="templateID" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="sectionID" optional="YES" attributeType="UUID" syncable="NO"/>
+        <attribute name="orderIndex" optional="NO" attributeType="Integer 32" usesScalarValueType="YES" syncable="NO"/>
+        <attribute name="sourceKind" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="sourceID" optional="YES" attributeType="String" syncable="NO"/>
+        <attribute name="displayNameSnapshot" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="recordModeSnapshot" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="planSetsData" optional="NO" attributeType="Binary" syncable="NO"/>
+        <relationship name="template" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TrainingTemplateMO" inverseName="exercises" inverseEntity="TrainingTemplateMO"/>
+        <uniquenessConstraints>
+            <constraint>
+                <constraint property="id"/>
+            </constraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="SessionSectionMO" representedClassName="NSManagedObject" syncable="NO">
+        <attribute name="id" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="ownerKind" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="ownerID" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="name" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="orderIndex" optional="NO" attributeType="Integer 32" usesScalarValueType="YES" syncable="NO"/>
+        <uniquenessConstraints>
+            <constraint>
+                <constraint property="id"/>
+            </constraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="BodyMetricDefinitionMO" representedClassName="NSManagedObject" syncable="NO">
+        <attribute name="id" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="studentID" optional="YES" attributeType="UUID" syncable="NO"/>
+        <attribute name="kind" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="name" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="normalizedName" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="unitRuleKind" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="currentUnit" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="lifecycle" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="createdAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <attribute name="updatedAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <uniquenessConstraints>
+            <constraint>
+                <constraint property="id"/>
+            </constraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="BodyMeasurementMO" representedClassName="NSManagedObject" syncable="NO">
+        <attribute name="id" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="studentID" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="metricID" optional="NO" attributeType="UUID" syncable="NO"/>
+        <attribute name="localCalendarDay" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="value" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="enteredUnit" optional="NO" attributeType="String" syncable="NO"/>
+        <attribute name="createdAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <attribute name="updatedAtUTC" optional="NO" attributeType="Date" syncable="NO"/>
+        <uniquenessConstraints>
+            <constraint>
+                <constraint property="id"/>
+            </constraint>
+            <constraint>
+                <constraint property="studentID"/>
+                <constraint property="metricID"/>
+                <constraint property="localCalendarDay"/>
+            </constraint>
+        </uniquenessConstraints>
+    </entity>
+    <elements>
+        <element name="StudentMO" positionX="-360" positionY="-270" width="160" height="330"/>
+        <element name="ExerciseCatalogMO" positionX="-120" positionY="-270" width="180" height="270"/>
+        <element name="ExerciseNameClaimMO" positionX="180" positionY="-270" width="180" height="150"/>
+        <element name="ExercisePreferenceMO" positionX="420" positionY="-270" width="180" height="150"/>
+        <element name="SessionMO" positionX="-360" positionY="180" width="200" height="330"/>
+        <element name="SessionExerciseMO" positionX="-60" positionY="180" width="200" height="240"/>
+        <element name="TrainingSetMO" positionX="240" positionY="180" width="190" height="300"/>
+        <element name="ShareReportMO" positionX="500" positionY="180" width="190" height="210"/>
+        <element name="AppSettingMO" positionX="-100" positionY="570" width="160" height="120"/>
+        <element name="ActiveSessionPointerMO" positionX="180" positionY="570" width="180" height="120"/>
+        <element name="StoreGenerationMetadataMO" positionX="460" positionY="570" width="210" height="150"/>
+        <element name="RecurrenceSeriesMO" positionX="-720" positionY="-270" width="200" height="270"/>
+        <element name="AppointmentMO" positionX="-980" positionY="-270" width="200" height="300"/>
+        <element name="CoursePackageMO" positionX="-720" positionY="180" width="200" height="240"/>
+        <element name="CreditAdjustmentMO" positionX="-980" positionY="180" width="200" height="240"/>
+        <element name="ActiveCoursePackageClaimMO" positionX="-720" positionY="420" width="200" height="120"/>
+        <element name="TrainingTemplateMO" positionX="-1240" positionY="-270" width="200" height="150"/>
+        <element name="TemplateExerciseMO" positionX="-1240" positionY="180" width="200" height="240"/>
+        <element name="SessionSectionMO" positionX="-1240" positionY="570" width="200" height="150"/>
+        <element name="BodyMetricDefinitionMO" positionX="-980" positionY="570" width="200" height="240"/>
+        <element name="BodyMeasurementMO" positionX="-720" positionY="850" width="200" height="210"/>
+    </elements>
+</model>

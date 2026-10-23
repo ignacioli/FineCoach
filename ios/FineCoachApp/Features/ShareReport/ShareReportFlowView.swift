@@ -11,7 +11,7 @@ final class ShareReportFlowViewModel: ObservableObject {
     @Published var includeVolume = false
     @Published var includePersonalBests = false
     @Published private(set) var dto: ShareReportDTO?
-    @Published private(set) var bestsSetThisSession: [ShareReportPersonalBestDTO] = []
+    @Published private(set) var gains: SessionGains = .empty
     @Published private(set) var subtitle = ""
     @Published var errorMessage: String?
     @Published var lastOutcome: SystemShareOutcome?
@@ -64,15 +64,8 @@ final class ShareReportFlowViewModel: ObservableObject {
                 PackageDetailPresentation.day(generated.completed.completedAtUTC)
             )
             let history = (try? await useCases.listHistory(studentID: generated.completed.studentID)) ?? []
-            var assisted = Set<StableExerciseID>()
-            if let exerciseUseCases, let entries = try? await exerciseUseCases.search(query: "", includeHidden: true) {
-                assisted = Set(entries.filter { $0.preference?.isAssisted == true }.map(\.id))
-            }
-            bestsSetThisSession = ShareReportPolicy.personalBestsSet(
-                in: generated.completed,
-                history: history,
-                assistedExerciseIDs: assisted
-            )
+            let assisted = (try? await exerciseUseCases?.assistedExerciseIDs()) ?? []
+            gains = SessionGains(current: generated.completed, history: history, assistedExerciseIDs: assisted)
             refreshPreview()
             errorMessage = nil
         } catch {
@@ -87,7 +80,7 @@ final class ShareReportFlowViewModel: ObservableObject {
             dto = try ShareReportPolicy.makeDTO(
                 from: completed,
                 modules: modules,
-                personalBests: includePersonalBests ? bestsSetThisSession : []
+                gains: includePersonalBests ? gains : nil
             )
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? String(localized: "student.error.generic")
@@ -142,11 +135,12 @@ final class ShareReportFlowViewModel: ObservableObject {
 }
 
 /// 分享报告设置 (T069j; `28-share-settings-v2`, owner-approved 2026-09-28):
-/// live thumbnail, 包含内容 check circles (tappable, haptic), 个人最佳
-/// (default off, hint when this session set bests), 训练容量 (default off),
+/// live thumbnail, 包含内容 check circles (tappable, haptic), 本节收获
+/// (default off, hidden when empty), 训练容量 (default off),
 /// privacy line with the mascot, and 生成报告卡 → the preview (29).
 struct ShareReportFlowView: View {
     @StateObject private var viewModel: ShareReportFlowViewModel
+    @Binding var rootTab: RootTab
     @Binding var path: [RootDestination]
     @State private var isShowingPreview = false
 
@@ -156,6 +150,7 @@ struct ShareReportFlowView: View {
         exerciseUseCases: ExerciseLibraryUseCases? = nil,
         reportsRootURL: URL,
         shareAdapter: SystemShareAdapter,
+        rootTab: Binding<RootTab>,
         path: Binding<[RootDestination]>
     ) {
         _viewModel = StateObject(
@@ -167,6 +162,7 @@ struct ShareReportFlowView: View {
                 shareAdapter: shareAdapter
             )
         )
+        _rootTab = rootTab
         _path = path
     }
 
@@ -208,7 +204,7 @@ struct ShareReportFlowView: View {
         .background(FCSemanticColors.surfacePage)
         .fcSecondaryPage()
         .navigationDestination(isPresented: $isShowingPreview) {
-            ShareReportPreviewPage(viewModel: viewModel)
+            ShareReportPreviewPage(viewModel: viewModel, rootTab: $rootTab, path: $path)
         }
         .task { await viewModel.load() }
     }
@@ -274,9 +270,10 @@ struct ShareReportFlowView: View {
 
     private func thumbnailParts(_ dto: ShareReportDTO) -> String? {
         guard !dto.exercises.isEmpty else { return nil }
-        let summary = TrainedBodyPartsSummary(exercises: dto.exercises.map {
-            ExerciseBodyParts(primary: $0.primaryBodyPart, secondary: $0.secondaryBodyParts)
-        })
+        let summary = TrainedBodyPartsSummary(
+            exercises: dto.exercises.map {
+                ExerciseBodyParts(primary: $0.primaryBodyPart, secondary: $0.secondaryBodyParts)
+            })
         return BodyPart.joinedDisplayNames(for: summary.primary, separator: "、")
     }
 
@@ -287,23 +284,34 @@ struct ShareReportFlowView: View {
             FCSectionLabel(String(localized: "share.modules"))
                 .padding(.bottom, FCPrimitives.space2)
             FCListRowDivider()
-            checkRow(String(localized: "share.module.record"), note: String(localized: "share.module.recordNote"), isOn: $viewModel.includeRecord)
+            checkRow(
+                String(localized: "share.module.record"), note: String(localized: "share.module.recordNote"),
+                isOn: $viewModel.includeRecord,
+                accessibilityIdentifier: FCAccessibilityID.shareReportRecordToggle)
             FCListRowDivider()
-            checkRow(String(localized: "share.module.exercises"), note: String(localized: "share.module.exercisesNote"), isOn: $viewModel.includeExercises)
+            checkRow(
+                String(localized: "share.module.exercises"), note: String(localized: "share.module.exercisesNote"),
+                isOn: $viewModel.includeExercises,
+                accessibilityIdentifier: FCAccessibilityID.shareReportExercisesToggle)
             FCListRowDivider()
-            checkRow(String(localized: "share.module.summary"), note: nil, isOn: $viewModel.includeSummary)
-            FCListRowDivider()
-            toggleRow(
-                String(localized: "history.pb.title"),
-                note: viewModel.bestsSetThisSession.isEmpty
-                    ? String(localized: "share.pb.none")
-                    : String(format: String(localized: "share.pb.hintFormat"), viewModel.bestsSetThisSession.count),
-                emphasizedNote: !viewModel.bestsSetThisSession.isEmpty,
-                isOn: $viewModel.includePersonalBests,
-                isEnabled: !viewModel.bestsSetThisSession.isEmpty
+            checkRow(
+                String(localized: "share.module.summary"),
+                note: nil,
+                isOn: $viewModel.includeSummary,
+                accessibilityIdentifier: FCAccessibilityID.shareReportSummaryToggle
             )
-            .accessibilityIdentifier(FCAccessibilityID.shareReportPersonalBestToggle)
             FCListRowDivider()
+            if let hint = ShareReportPolicy.gainsHint(for: viewModel.gains) {
+                toggleRow(
+                    String(localized: "session.gains.title"),
+                    note: hint,
+                    emphasizedNote: true,
+                    isOn: $viewModel.includePersonalBests,
+                    isEnabled: true
+                )
+                .accessibilityIdentifier(FCAccessibilityID.shareReportPersonalBestToggle)
+                FCListRowDivider()
+            }
             toggleRow(
                 String(localized: "share.module.volume"),
                 note: String(localized: "share.defaultOff"),
@@ -318,7 +326,12 @@ struct ShareReportFlowView: View {
         .accessibilityIdentifier(FCAccessibilityID.shareReportModules)
     }
 
-    private func checkRow(_ title: String, note: String?, isOn: Binding<Bool>) -> some View {
+    private func checkRow(
+        _ title: String,
+        note: String?,
+        isOn: Binding<Bool>,
+        accessibilityIdentifier: String
+    ) -> some View {
         Button {
             isOn.wrappedValue.toggle()
             viewModel.refreshPreview()
@@ -343,6 +356,7 @@ struct ShareReportFlowView: View {
         .buttonStyle(.plain)
         .sensoryFeedback(.selection, trigger: isOn.wrappedValue)
         .accessibilityAddTraits(isOn.wrappedValue ? .isSelected : [])
+        .accessibilityIdentifier(accessibilityIdentifier)
     }
 
     private func toggleRow(
@@ -355,18 +369,23 @@ struct ShareReportFlowView: View {
         HStack(spacing: FCPrimitives.space2) {
             Text(title)
                 .fcFont(.body)
+                .lineLimit(1)
                 .foregroundStyle(isEnabled ? FCSemanticColors.textPrimary : FCSemanticColors.textDisabled)
             Spacer(minLength: FCPrimitives.space2)
             Text(note)
                 .fcFont(.caption, weight: emphasizedNote ? .semibold : nil)
+                .lineLimit(1)
                 .foregroundStyle(emphasizedNote ? FCSemanticColors.actionPrimary : FCSemanticColors.textSecondary)
-            Toggle(title, isOn: Binding(
-                get: { isOn.wrappedValue },
-                set: { value in
-                    isOn.wrappedValue = value
-                    viewModel.refreshPreview()
-                }
-            ))
+            Toggle(
+                title,
+                isOn: Binding(
+                    get: { isOn.wrappedValue },
+                    set: { value in
+                        isOn.wrappedValue = value
+                        viewModel.refreshPreview()
+                    }
+                )
+            )
             .toggleStyle(FCToggleStyle())
             .labelsHidden()
             .disabled(!isEnabled)
@@ -403,6 +422,8 @@ struct ShareReportFlowView: View {
 /// image rendered from the same DTO.
 struct ShareReportPreviewPage: View {
     @ObservedObject var viewModel: ShareReportFlowViewModel
+    @Binding var rootTab: RootTab
+    @Binding var path: [RootDestination]
 
     var body: some View {
         ScrollView {
@@ -427,6 +448,17 @@ struct ShareReportPreviewPage: View {
                 }
                 statusLine
                     .padding(.horizontal, FCPrimitives.space4)
+                // C15: always visible after the card and status line, in every
+                // share state. Navigation only — the temp report is cleaned up
+                // by the existing `onDisappear { viewModel.close() }`.
+                FCSecondaryButton(
+                    title: String(localized: "share.done"),
+                    isEnabled: !viewModel.isSharing
+                ) {
+                    path.returnToToday(tab: &rootTab)
+                }
+                .accessibilityIdentifier(FCAccessibilityID.shareReportDone)
+                .padding(.horizontal, FCPrimitives.space4)
             }
             .padding(.bottom, FCPrimitives.space6)
         }

@@ -17,21 +17,79 @@ public struct FCSetRow: View {
     private let title: String
     private let value: String
     private let state: State
+    private let isNewRecord: Bool
+    private let newRecordIdentifier: String?
     private let onConfirm: (() -> Void)?
     private let onEdit: (() -> Void)?
+    private let onUndo: (() -> Void)?
+    /// A page-issued playback token for the new-record value float (README
+    /// §14.4, Penpot D-a3). `nil` means this row has nothing to play; a new
+    /// value plays once. The row never derives it from its own state, because
+    /// the primary confirm path inserts an already-completed row.
+    private let recordFloatSequence: Int?
+    private let recordFloatDistance: CGFloat
+    private let recordFloatDuration: Double
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    /// The sequence this row instance already played, so a List reuse or a
+    /// re-appearance within the same playback window cannot replay it.
+    @State private var playedRecordFloatSequence: Int?
+    @State private var isFloating = false
+    @State private var floatProgress: CGFloat = 0
 
     public init(
         title: String,
         value: String,
         state: State,
+        isNewRecord: Bool = false,
+        newRecordIdentifier: String? = nil,
         onConfirm: (() -> Void)? = nil,
-        onEdit: (() -> Void)? = nil
+        onEdit: (() -> Void)? = nil,
+        onUndo: (() -> Void)? = nil
+    ) {
+        self.init(
+            title: title,
+            value: value,
+            state: state,
+            isNewRecord: isNewRecord,
+            newRecordIdentifier: newRecordIdentifier,
+            onConfirm: onConfirm,
+            onEdit: onEdit,
+            onUndo: onUndo,
+            recordFloatSequence: nil,
+            recordFloatDistance: FCMotion.recordFloatDistance,
+            recordFloatDuration: FCMotion.durationEmphasis
+        )
+    }
+
+    /// Internal because the motion tokens are internal (§14 is the token
+    /// source; `components.md` is not edited, so the tokens are not public).
+    /// Production callers use the defaults above -- `space6` and `emphasis`,
+    /// i.e. candidate D; only the DEBUG motion test bench overrides them.
+    init(
+        title: String,
+        value: String,
+        state: State,
+        isNewRecord: Bool = false,
+        newRecordIdentifier: String? = nil,
+        onConfirm: (() -> Void)? = nil,
+        onEdit: (() -> Void)? = nil,
+        onUndo: (() -> Void)? = nil,
+        recordFloatSequence: Int?,
+        recordFloatDistance: CGFloat,
+        recordFloatDuration: Double
     ) {
         self.title = title
         self.value = value
         self.state = state
+        self.isNewRecord = isNewRecord && state == .completed
+        self.newRecordIdentifier = newRecordIdentifier
         self.onConfirm = onConfirm
         self.onEdit = onEdit
+        self.onUndo = onUndo
+        self.recordFloatSequence = recordFloatSequence
+        self.recordFloatDistance = recordFloatDistance
+        self.recordFloatDuration = recordFloatDuration
     }
 
     public var body: some View {
@@ -43,26 +101,50 @@ public struct FCSetRow: View {
             // steal their tap gestures (classic SwiftUI parent-gesture-wins
             // conflict), which is exactly what made both buttons dead on a
             // real device despite compiling and unit-testing fine.
-            VStack(alignment: .leading, spacing: FCPrimitives.space2) {
-                Text(title)
-                    .fcFont(.body)
-                    .foregroundStyle(state == .completed ? FCSemanticColors.textPrimary : FCSemanticColors.textSecondary)
-                Text(value).fcFont(.callout, weight: .regular).foregroundStyle(FCSemanticColors.textSecondary)
+            // One line, as D8 / P0-a draw it: title, then the value pushed
+            // toward the trailing status (experience P0 Δ5).
+            HStack(alignment: .firstTextBaseline, spacing: FCPrimitives.space2) {
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: FCPrimitives.space2) {
+                        rowTitle
+                        recordBadge
+                    }
+                    .fixedSize(horizontal: true, vertical: false)
+                    VStack(alignment: .leading, spacing: FCPrimitives.space1) {
+                        rowTitle
+                        recordBadge
+                    }
+                }
+                Spacer(minLength: FCPrimitives.space2)
+                valueText
             }
             .contentShape(Rectangle())
             .onLongPressGesture(minimumDuration: 0.5) {
                 onEdit?()
             }
-            Spacer(minLength: FCPrimitives.space2)
-            Text(state.rawValue)
-                .fcFont(.callout, weight: .regular)
-                .foregroundStyle(FCSemanticColors.textSecondary)
+            // A just-confirmed set offers undo in place of its status for a
+            // few seconds (P0-D11).
+            if let onUndo {
+                FCLinkButton(title: String(localized: "session.action.undo"), action: onUndo)
+            } else {
+                Text(state.rawValue)
+                    .fcFont(.callout, weight: .regular)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
+            }
             editControl
         }
         .padding(.vertical, FCPrimitives.space2)
         .frame(minHeight: 44)
+        // The float is driven by a page-issued sequence, not by a row state
+        // transition or `.onAppear` (D1/D2: the confirmed row is often born
+        // already completed). Reduce Motion still consumes the token, so a
+        // later re-appearance cannot play it.
+        .task(id: recordFloatSequence) {
+            guard let recordFloatSequence else { return }
+            playRecordFloat(sequence: recordFloatSequence)
+        }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("\(title)，\(value)，\(state.rawValue)"))
+        .accessibilityLabel(Text(accessibilityText))
         .accessibilityHint(state.isConfirmable ? Text(String(localized: "session.set.confirmHint")) : Text(""))
         .accessibilityAction {
             onConfirm?()
@@ -70,26 +152,91 @@ public struct FCSetRow: View {
         .accessibilityAction(named: Text(String(localized: "session.set.editAction"))) {
             onEdit?()
         }
+        .accessibilityActions {
+            if let onUndo {
+                Button(String(localized: "session.action.undo"), action: onUndo)
+            }
+        }
+
+    }
+
+    private var accessibilityText: String {
+        [title, value, isNewRecord ? String(localized: "session.set.newRecord") : nil, state.rawValue]
+            .compactMap { $0 }.joined(separator: "，")
+    }
+
+    private var rowTitle: some View {
+        Text(title)
+            .fcFont(.body)
+            .foregroundStyle(state == .completed ? FCSemanticColors.textPrimary : FCSemanticColors.textSecondary)
+            .fixedSize()
     }
 
     @ViewBuilder
+    private var recordBadge: some View {
+        if isNewRecord {
+            FCNewRecordBadge()
+                .accessibilityIdentifier(newRecordIdentifier ?? "")
+        }
+    }
+
+    /// The circle stays in one place so the 0.2s stroke-to-check transition
+    /// can run. The clear button is only there while the set can still be
+    /// confirmed.
     private var confirmControl: some View {
-        // Visual only: swapped the plain SF Symbol circle for the design
-        // system's FCSetStateCircle (§6), which distinguishes draft (dashed)
-        // from pending (solid stroke) — the confirm button wiring,
-        // accessibility hiding, and hit-area frame are unchanged.
-        if state.isConfirmable {
-            Button {
-                onConfirm?()
-            } label: {
-                FCSetStateCircle(circleState)
-                    .frame(minWidth: 44, minHeight: 44)
-            }
-            .accessibilityHidden(true)
-        } else {
+        ZStack {
             FCSetStateCircle(circleState)
-                .frame(minWidth: 44, minHeight: 44)
+            if state.isConfirmable {
+                Button {
+                    onConfirm?()
+                } label: {
+                    Color.clear
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(Rectangle())
+                }
                 .accessibilityHidden(true)
+            }
+        }
+        .frame(minWidth: 44, minHeight: 44)
+    }
+
+    /// The value and, while a float is playing, its decorative copy: same
+    /// font, same colour, lifted `recordFloatDistance` and faded `1 → 0`
+    /// (README §14.4; Penpot D-a3). Being an overlay, the copy changes no
+    /// layout, keeps the row height, cannot be tapped, and is hidden from
+    /// accessibility so the row still reads 「…，新纪录，…」.
+    private var valueText: some View {
+        Text(value)
+            .fcFont(.body)
+            .foregroundStyle(FCSemanticColors.textPrimary)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+            .overlay {
+                if isFloating {
+                    Text(value)
+                        .fcFont(.body)
+                        .foregroundStyle(FCSemanticColors.textPrimary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                        .offset(y: -recordFloatDistance * floatProgress)
+                        .opacity(Double(1 - floatProgress))
+                        .allowsHitTesting(false)
+                        .accessibilityHidden(true)
+                }
+            }
+    }
+
+    private func playRecordFloat(sequence: Int) {
+        guard playedRecordFloatSequence != sequence else { return }
+        playedRecordFloatSequence = sequence
+        guard !reduceMotion else { return }
+        floatProgress = 0
+        isFloating = true
+        withAnimation(FCMotion.curveStandard(duration: recordFloatDuration)) {
+            floatProgress = 1
+        } completion: {
+            isFloating = false
+            floatProgress = 0
         }
     }
 
@@ -113,3 +260,12 @@ public struct FCSetRow: View {
         }
     }
 }
+
+#if DEBUG
+    #Preview {
+        VStack {
+            FCSetRow(title: "第 1 组", value: "80 kg × 5", state: .pending)
+            FCSetRow(title: "第 2 组", value: "82.5 kg × 5", state: .completed, isNewRecord: true)
+        }
+    }
+#endif

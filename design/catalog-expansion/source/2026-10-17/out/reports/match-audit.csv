@@ -1,0 +1,570 @@
+﻿文件,行号,器材,动作名称,主要肌肉群,次要肌肉群,动作英文名,开放许可库,库内ID,库内原始英文名,置信度,备注
+上臂健身器械动作分类表.md,3,哑铃,哑铃弯举,肱二头肌,前臂肌,Dumbbell Bicep Curl,free-exercise-db:Dumbbell_Bicep_Curl (Unlicense),fedb:Dumbbell_Bicep_Curl,Dumbbell Bicep Curl,high,库中哑铃弯举标准条目
+上臂健身器械动作分类表.md,4,哑铃,哑铃轮换弯举,肱二头肌,前臂肌,Dumbbell Alternate Bicep Curl,free-exercise-db:Dumbbell_Alternate_Bicep_Curl (Unlicense),fedb:Dumbbell_Alternate_Bicep_Curl,Dumbbell Alternate Bicep Curl,high,交替（轮换）哑铃弯举
+上臂健身器械动作分类表.md,5,哑铃,坐姿单手牧师凳弯举,肱二头肌,-,One Arm Dumbbell Preacher Curl,free-exercise-db:One_Arm_Dumbbell_Preacher_Curl (Unlicense),fedb:One_Arm_Dumbbell_Preacher_Curl,One Arm Dumbbell Preacher Curl,high,坐姿单臂牧师凳弯举
+上臂健身器械动作分类表.md,6,哑铃,坐姿哑铃弯举,肱二头肌,-,Seated Dumbbell Curl,free-exercise-db:Seated_Dumbbell_Curl (Unlicense),fedb:Seated_Dumbbell_Curl,Seated Dumbbell Curl,high,坐姿哑铃弯举
+上臂健身器械动作分类表.md,7,哑铃,牧师凳锤式弯举,肱二头肌,前臂肌,Preacher Hammer Dumbbell Curl,free-exercise-db:Preacher_Hammer_Dumbbell_Curl (Unlicense),fedb:Preacher_Hammer_Dumbbell_Curl,Preacher Hammer Dumbbell Curl,high,牧师凳锤式哑铃弯举
+上臂健身器械动作分类表.md,8,哑铃,集中弯举,肱二头肌,前臂肌,Concentration Curls,free-exercise-db:Concentration_Curls (Unlicense),fedb:Concentration_Curls,Concentration Curls,high,集中弯举
+上臂健身器械动作分类表.md,9,哑铃,上斜锤式弯举,肱二头肌,-,Incline Hammer Curls,free-exercise-db:Incline_Hammer_Curls (Unlicense),fedb:Incline_Hammer_Curls,Incline Hammer Curls,high,上斜锤式弯举
+上臂健身器械动作分类表.md,10,哑铃,哑铃过头臂屈伸,肱三头肌,-,Seated Triceps Press,free-exercise-db:Seated_Triceps_Press (Unlicense),fedb:Seated_Triceps_Press,Seated Triceps Press,high,双手持哑铃过头臂屈伸（坐姿）
+上臂健身器械动作分类表.md,11,哑铃,碎颅者,肱三头肌,胸大肌、三角肌,Lying Dumbbell Tricep Extension,free-exercise-db:Lying_Dumbbell_Tricep_Extension (Unlicense),fedb:Lying_Dumbbell_Tricep_Extension,Lying Dumbbell Tricep Extension,high,哑铃仰卧臂屈伸即碎颅者
+上臂健身器械动作分类表.md,12,哑铃,哑铃臂屈伸,肱三头肌,-,Standing Dumbbell Triceps Extension,free-exercise-db:Standing_Dumbbell_Triceps_Extension (Unlicense),fedb:Standing_Dumbbell_Triceps_Extension,Standing Dumbbell Triceps Extension,high,站姿哑铃臂屈伸
+上臂健身器械动作分类表.md,13,哑铃,坐姿哑铃单臂臂屈伸,肱三头肌,-,Seated Bent-Over One-Arm Dumbbell Triceps Extension,free-exercise-db:Seated_Bent-Over_One-Arm_Dumbbell_Triceps_Extension (Unlicense),fedb:Seated_Bent-Over_One-Arm_Dumbbell_Triceps_Extension,Seated Bent-Over One-Arm Dumbbell Triceps Extension,high,坐姿单臂哑铃臂屈伸
+上臂健身器械动作分类表.md,14,哑铃,哑铃坐姿牧师凳弯举,肱二头肌,-,Two-Arm Dumbbell Preacher Curl,free-exercise-db:Two-Arm_Dumbbell_Preacher_Curl (Unlicense),fedb:Two-Arm_Dumbbell_Preacher_Curl,Two-Arm Dumbbell Preacher Curl,high,坐姿双手哑铃牧师凳弯举
+上臂健身器械动作分类表.md,15,哑铃,哑铃 Tate 推举,肱三头肌,胸大肌、三角肌,Tate Press,free-exercise-db:Tate_Press (Unlicense),fedb:Tate_Press,Tate Press,high,库中有同名 Tate Press 哑铃条目
+上臂健身器械动作分类表.md,16,哑铃,哑铃酒杯弯举,肱二头肌,前臂肌,Dumbbell Bicep Curl,free-exercise-db:Dumbbell_Bicep_Curl (Unlicense),fedb:Dumbbell_Bicep_Curl,Dumbbell Bicep Curl,medium,酒杯式握法变体，映射到通用哑铃弯举
+上臂健身器械动作分类表.md,17,哑铃,单臂牧师凳弯举,肱二头肌,-,One Arm Dumbbell Preacher Curl,free-exercise-db:One_Arm_Dumbbell_Preacher_Curl (Unlicense),fedb:One_Arm_Dumbbell_Preacher_Curl,One Arm Dumbbell Preacher Curl,high,单臂牧师凳弯举
+上臂健身器械动作分类表.md,19,哑铃,锤式弯举,肱二头肌,-,Hammer Curls,free-exercise-db:Hammer_Curls (Unlicense),fedb:Hammer_Curls,Hammer Curls,high,锤式弯举
+上臂健身器械动作分类表.md,20,哑铃,上斜哑铃弯举,肱二头肌,-,Incline Dumbbell Curl,free-exercise-db:Incline_Dumbbell_Curl (Unlicense),fedb:Incline_Dumbbell_Curl,Incline Dumbbell Curl,high,上斜哑铃弯举
+上臂健身器械动作分类表.md,21,哑铃,卧姿弯举,肱二头肌,-,Lying Supine Dumbbell Curl,free-exercise-db:Lying_Supine_Dumbbell_Curl (Unlicense),fedb:Lying_Supine_Dumbbell_Curl,Lying Supine Dumbbell Curl,high,仰卧（卧姿）哑铃弯举
+上臂健身器械动作分类表.md,22,哑铃,哑铃反手腕弯举,前臂肌,-,Palms-Down Dumbbell Wrist Curl Over A Bench,free-exercise-db:Palms-Down_Dumbbell_Wrist_Curl_Over_A_Bench (Unlicense),fedb:Palms-Down_Dumbbell_Wrist_Curl_Over_A_Bench,Palms-Down Dumbbell Wrist Curl Over A Bench,high,反手腕弯举即旋前腕弯举
+上臂健身器械动作分类表.md,23,哑铃,反握集中弯举,肱二头肌,前臂肌,Standing Dumbbell Reverse Curl,free-exercise-db:Standing_Dumbbell_Reverse_Curl (Unlicense),fedb:Standing_Dumbbell_Reverse_Curl,Standing Dumbbell Reverse Curl,medium,反握集中弯举，映射到反握哑铃弯举
+上臂健身器械动作分类表.md,24,哑铃,哑铃佐特曼弯举,肱二头肌,前臂肌,Zottman Curl,free-exercise-db:Zottman_Curl (Unlicense),fedb:Zottman_Curl,Zottman Curl,high,佐特曼弯举
+上臂健身器械动作分类表.md,25,杠铃,牧师凳弯举,肱二头肌,-,Preacher Curl,free-exercise-db:Preacher_Curl (Unlicense),fedb:Preacher_Curl,Preacher Curl,high,杠铃牧师凳弯举
+上臂健身器械动作分类表.md,26,杠铃,杠铃弯举,肱二头肌,前臂肌,Barbell Curl,free-exercise-db:Barbell_Curl (Unlicense),fedb:Barbell_Curl,Barbell Curl,high,杠铃弯举
+上臂健身器械动作分类表.md,27,杠铃,EZ 杠二头弯举,肱二头肌,-,EZ-Bar Curl,free-exercise-db:EZ-Bar_Curl (Unlicense),fedb:EZ-Bar_Curl,EZ-Bar Curl,high,EZ 杠二头弯举
+上臂健身器械动作分类表.md,28,杠铃,仰卧杠铃臂屈伸,肱三头肌,-,Lying Triceps Press,free-exercise-db:Lying_Triceps_Press (Unlicense),fedb:Lying_Triceps_Press,Lying Triceps Press,medium,库中条目为 EZ 杠仰卧臂屈伸，杠铃同类
+上臂健身器械动作分类表.md,29,杠铃,窄距卧推（靠近）,肱三头肌,胸大肌、三角肌,Close-Grip Barbell Bench Press,free-exercise-db:Close-Grip_Barbell_Bench_Press (Unlicense),fedb:Close-Grip_Barbell_Bench_Press,Close-Grip Barbell Bench Press,high,窄距卧推（靠近）
+上臂健身器械动作分类表.md,30,杠铃,杠铃拖拉弯举,肱二头肌,前臂肌,Drag Curl,free-exercise-db:Drag_Curl (Unlicense),fedb:Drag_Curl,Drag Curl,high,杠铃拖拉弯举
+上臂健身器械动作分类表.md,31,杠铃,杠铃俯身上斜弯举,肱二头肌,-,Barbell Curls Lying Against An Incline,free-exercise-db:Barbell_Curls_Lying_Against_An_Incline (Unlicense),fedb:Barbell_Curls_Lying_Against_An_Incline,Barbell Curls Lying Against An Incline,high,俯身上斜（贴斜凳）杠铃弯举
+上臂健身器械动作分类表.md,32,杠铃,蜘蛛弯举,肱二头肌,-,Spider Curl,free-exercise-db:Spider_Curl (Unlicense),fedb:Spider_Curl,Spider Curl,high,蜘蛛弯举，库中为 EZ 杠版本
+上臂健身器械动作分类表.md,33,杠铃,杠铃集中弯举,肱二头肌,-,Seated Close-Grip Concentration Barbell Curl,free-exercise-db:Seated_Close-Grip_Concentration_Barbell_Curl (Unlicense),fedb:Seated_Close-Grip_Concentration_Barbell_Curl,Seated Close-Grip Concentration Barbell Curl,high,杠铃集中弯举
+上臂健身器械动作分类表.md,34,杠铃,坐姿杠铃过头臂屈伸,肱三头肌,三角肌,Standing Overhead Barbell Triceps Extension,free-exercise-db:Standing_Overhead_Barbell_Triceps_Extension (Unlicense),fedb:Standing_Overhead_Barbell_Triceps_Extension,Standing Overhead Barbell Triceps Extension,medium,坐姿过头杠铃臂屈伸，映射到站姿通用条目
+上臂健身器械动作分类表.md,35,杠铃,窄距卧推（散开）,肱三头肌,胸大肌、三角肌,Close-Grip Barbell Bench Press,free-exercise-db:Close-Grip_Barbell_Bench_Press (Unlicense),fedb:Close-Grip_Barbell_Bench_Press,Close-Grip Barbell Bench Press,medium,窄距卧推肘部外展变式，映射到通用窄距卧推
+上臂健身器械动作分类表.md,36,杠铃,正手杠铃弯举,肱二头肌,前臂肌,Barbell Curl,free-exercise-db:Barbell_Curl (Unlicense),fedb:Barbell_Curl,Barbell Curl,high,正手（旋后）握法即标准杠铃弯举
+上臂健身器械动作分类表.md,37,杠铃,杠铃碎颅者,肱三头肌,前臂肌,EZ-Bar Skullcrusher,free-exercise-db:EZ-Bar_Skullcrusher (Unlicense),fedb:EZ-Bar_Skullcrusher,EZ-Bar Skullcrusher,high,杠铃/曲杠碎颅者
+上臂健身器械动作分类表.md,38,绳索,绳索弯举,肱二头肌,-,Standing Biceps Cable Curl,free-exercise-db:Standing_Biceps_Cable_Curl (Unlicense),fedb:Standing_Biceps_Cable_Curl,Standing Biceps Cable Curl,high,绳索弯举
+上臂健身器械动作分类表.md,39,绳索,直杆绳索弯举,肱二头肌,-,Straight Bar Cable Curls,wger:912 (CC-BY-SA 4),wger:912,Straight Bar Cable Curls,high,直杆绳索弯举精确条目
+上臂健身器械动作分类表.md,41,绳索,绳索过头臂屈伸,肱三头肌,-,Cable Rope Overhead Triceps Extension,free-exercise-db:Cable_Rope_Overhead_Triceps_Extension (Unlicense),fedb:Cable_Rope_Overhead_Triceps_Extension,Cable Rope Overhead Triceps Extension,high,绳索过头臂屈伸
+上臂健身器械动作分类表.md,42,绳索,V-Bar 绳索下压,肱三头肌,-,Triceps Pushdown - V-Bar Attachment,free-exercise-db:Triceps_Pushdown_-_V-Bar_Attachment (Unlicense),fedb:Triceps_Pushdown_-_V-Bar_Attachment,Triceps Pushdown - V-Bar Attachment,high,V-Bar 绳索下压
+上臂健身器械动作分类表.md,43,绳索,绳索臂屈伸（站姿）,肱三头肌,-,Triceps Pushdown - Rope Attachment,free-exercise-db:Triceps_Pushdown_-_Rope_Attachment (Unlicense),fedb:Triceps_Pushdown_-_Rope_Attachment,Triceps Pushdown - Rope Attachment,high,站姿绳索（绳头）臂屈伸
+上臂健身器械动作分类表.md,44,绳索,绳索高位前拉,肱二头肌,-,High Cable Curls,free-exercise-db:High_Cable_Curls (Unlicense),fedb:High_Cable_Curls,High Cable Curls,medium,高位绳索前拉，映射到高位绳索弯举
+上臂健身器械动作分类表.md,45,绳索,单手绳索三头肌,肱三头肌,-,Cable One Arm Tricep Extension,free-exercise-db:Cable_One_Arm_Tricep_Extension (Unlicense),fedb:Cable_One_Arm_Tricep_Extension,Cable One Arm Tricep Extension,high,单手绳索三头肌臂屈伸
+上臂健身器械动作分类表.md,46,绳索,绳索下压（站姿）,肱三头肌,-,Triceps Pushdown,free-exercise-db:Triceps_Pushdown (Unlicense),fedb:Triceps_Pushdown,Triceps Pushdown,high,站姿绳索下压
+上臂健身器械动作分类表.md,47,绳索,直杆正手绳索弯举,肱二头肌,前臂肌,Reverse Cable Curl,free-exercise-db:Reverse_Cable_Curl (Unlicense),fedb:Reverse_Cable_Curl,Reverse Cable Curl,high,直杆正手（旋前）绳索弯举
+上臂健身器械动作分类表.md,48,绳索,背后二头单边弯举,肱二头肌,-,Standing One-Arm Cable Curl,free-exercise-db:Standing_One-Arm_Cable_Curl (Unlicense),fedb:Standing_One-Arm_Cable_Curl,Standing One-Arm Cable Curl,medium,背后固定上臂的单边弯举，映射到单臂绳索弯举
+上臂健身器械动作分类表.md,49,绳索,跪姿绳索臂屈伸,肱三头肌,-,Kneeling Cable Triceps Extension,free-exercise-db:Kneeling_Cable_Triceps_Extension (Unlicense),fedb:Kneeling_Cable_Triceps_Extension,Kneeling Cable Triceps Extension,high,跪姿绳索臂屈伸
+上臂健身器械动作分类表.md,51,绳索,直杆绳索下压,肱三头肌,-,Triceps Pushdown,free-exercise-db:Triceps_Pushdown (Unlicense),fedb:Triceps_Pushdown,Triceps Pushdown,high,直杆绳索下压
+上臂健身器械动作分类表.md,52,绳索,反手三头臂屈伸,肱三头肌,-,Reverse Grip Triceps Pushdown,free-exercise-db:Reverse_Grip_Triceps_Pushdown (Unlicense),fedb:Reverse_Grip_Triceps_Pushdown,Reverse Grip Triceps Pushdown,high,反手（旋前）三头下压
+上臂健身器械动作分类表.md,53,绳索,单手绳索臂屈伸,肱三头肌,胸大肌、三角肌,Standing Low-Pulley One-Arm Triceps Extension,free-exercise-db:Standing_Low-Pulley_One-Arm_Triceps_Extension (Unlicense),fedb:Standing_Low-Pulley_One-Arm_Triceps_Extension,Standing Low-Pulley One-Arm Triceps Extension,high,单手绳索臂屈伸
+上臂健身器械动作分类表.md,54,绳索,单手绳索弯举,肱二头肌,-,Standing One-Arm Cable Curl,free-exercise-db:Standing_One-Arm_Cable_Curl (Unlicense),fedb:Standing_One-Arm_Cable_Curl,Standing One-Arm Cable Curl,high,单手绳索弯举
+上臂健身器械动作分类表.md,55,绳索,绳索训练器,肱二头肌,-,Standing Biceps Cable Curl,free-exercise-db:Standing_Biceps_Cable_Curl (Unlicense),fedb:Standing_Biceps_Cable_Curl,Standing Biceps Cable Curl,medium,绳索训练器通用名，按二头绳索弯举处理
+上臂健身器械动作分类表.md,56,绳索,绳索过头弯举,肱二头肌,-,Overhead Cable Curl,free-exercise-db:Overhead_Cable_Curl (Unlicense),fedb:Overhead_Cable_Curl,Overhead Cable Curl,high,绳索过头弯举
+上臂健身器械动作分类表.md,57,固定器械,器械弯举,肱二头肌,-,Machine Bicep Curl,free-exercise-db:Machine_Bicep_Curl (Unlicense),fedb:Machine_Bicep_Curl,Machine Bicep Curl,high,器械弯举
+上臂健身器械动作分类表.md,58,固定器械,坐姿器械二头弯举,肱二头肌,-,Machine Bicep Curl,free-exercise-db:Machine_Bicep_Curl (Unlicense),fedb:Machine_Bicep_Curl,Machine Bicep Curl,high,坐姿器械二头弯举
+上臂健身器械动作分类表.md,59,固定器械,器械三头下压,肱三头肌,-,Machine Triceps Extension,free-exercise-db:Machine_Triceps_Extension (Unlicense),fedb:Machine_Triceps_Extension,Machine Triceps Extension,high,器械三头下压
+上臂健身器械动作分类表.md,61,固定器械,器械臂屈伸,肱三头肌,胸大肌、三角肌,Dip Machine,free-exercise-db:Dip_Machine (Unlicense),fedb:Dip_Machine,Dip Machine,medium,器械臂屈伸，映射到器械双杠臂屈伸
+上臂健身器械动作分类表.md,62,固定器械,牧师凳弯举,肱二头肌,-,Machine Preacher Curls,free-exercise-db:Machine_Preacher_Curls (Unlicense),fedb:Machine_Preacher_Curls,Machine Preacher Curls,high,器械牧师凳弯举
+上臂健身器械动作分类表.md,65,悬挂带 & 弹力带,悬挂带二头弯举,肱二头肌,-,Biceps with TRX,wger:958 (CC-BY-SA 4),wger:958,Biceps with TRX,high,悬挂带（TRX）二头弯举
+上臂健身器械动作分类表.md,66,悬挂带 & 弹力带,弹力带二头弯举（站姿）,肱二头肌,-,-,-,-,-,low,库中无弹力带站姿弯举条目（仅有绳索版本），按规则留空（肌肉按解剖常识填写）
+上臂健身器械动作分类表.md,67,悬挂带 & 弹力带,弹力带站姿轮换弯举,肱二头肌,前臂肌,-,-,-,-,low,库中无弹力带轮换弯举条目（仅有哑铃版本），按规则留空（肌肉按解剖常识填写）
+上臂健身器械动作分类表.md,68,悬挂带 & 弹力带,弹力带集中弯举,肱二头肌,前臂肌,Concentration Curls,free-exercise-db:Concentration_Curls (Unlicense),fedb:Concentration_Curls,Concentration Curls,medium,弹力带集中弯举，映射到哑铃集中弯举
+上臂健身器械动作分类表.md,69,悬挂带 & 弹力带,弹力带锤式弯举,肱二头肌,-,Hammer Curls,free-exercise-db:Hammer_Curls (Unlicense),fedb:Hammer_Curls,Hammer Curls,medium,弹力带锤式弯举，映射到哑铃锤式弯举
+上臂健身器械动作分类表.md,70,悬挂带 & 弹力带,弹力带坐姿弯举,肱二头肌,-,-,-,-,-,low,库中无弹力带坐姿弯举条目（仅有哑铃版本），按规则留空（肌肉按解剖常识填写）
+上臂健身器械动作分类表.md,71,悬挂带 & 弹力带,弹力带碎颅者,肱三头肌,-,Band Skull Crusher,free-exercise-db:Band_Skull_Crusher (Unlicense),fedb:Band_Skull_Crusher,Band Skull Crusher,high,弹力带碎颅者
+上臂健身器械动作分类表.md,72,悬挂带 & 弹力带,弹力带过头臂屈伸,肱三头肌,-,Speed Band Overhead Triceps,free-exercise-db:Speed_Band_Overhead_Triceps (Unlicense),fedb:Speed_Band_Overhead_Triceps,Speed Band Overhead Triceps,high,弹力带过头臂屈伸
+上臂健身器械动作分类表.md,73,悬挂带 & 弹力带,弹力带单手臂屈伸,肱三头肌,-,Speed Band Overhead Triceps,free-exercise-db:Speed_Band_Overhead_Triceps (Unlicense),fedb:Speed_Band_Overhead_Triceps,Speed Band Overhead Triceps,medium,单臂弹力带臂屈伸，映射到弹力带过头臂屈伸
+上臂健身器械动作分类表.md,74,悬挂带 & 弹力带,弹力带三头压拉,肱三头肌,-,Triceps Pushdown,free-exercise-db:Triceps_Pushdown (Unlicense),fedb:Triceps_Pushdown,Triceps Pushdown,medium,弹力带三头下压，映射到绳索下压
+上臂健身器械动作分类表.md,75,悬挂带 & 弹力带,悬挂带臂屈伸,肱三头肌,-,TRX Tricep Extension,wger:1266 (CC-BY-SA 4),wger:1266,TRX Tricep Extension,high,悬挂带臂屈伸
+上臂健身器械动作分类表.md,76,固定器械,上斜器械弯举,肱二头肌,-,Machine Bicep Curl,free-exercise-db:Machine_Bicep_Curl (Unlicense),fedb:Machine_Bicep_Curl,Machine Bicep Curl,medium,上斜器械弯举，映射到通用器械弯举
+上臂健身器械动作分类表.md,77,无,窄距俯卧撑,肱三头肌,胸大肌、三角肌,Push-Ups - Close Triceps Position,free-exercise-db:Push-Ups_-_Close_Triceps_Position (Unlicense),fedb:Push-Ups_-_Close_Triceps_Position,Push-Ups - Close Triceps Position,high,窄距俯卧撑
+上臂健身器械动作分类表.md,78,无,平板臂屈伸,肱三头肌,胸大肌、三角肌,Bench Dips,free-exercise-db:Bench_Dips (Unlicense),fedb:Bench_Dips,Bench Dips,high,平板（长凳）臂屈伸
+上臂健身器械动作分类表.md,79,无,钻石俯卧撑,肱三头肌,胸大肌、三角肌,Push-Ups - Close Triceps Position,free-exercise-db:Push-Ups_-_Close_Triceps_Position (Unlicense),fedb:Push-Ups_-_Close_Triceps_Position,Push-Ups - Close Triceps Position,high,钻石俯卧撑即窄距三头俯卧撑
+上臂健身器械动作分类表.md,80,无,铃铃二头弯举,肱二头肌,前臂肌,-,-,-,-,low,动作名不含明确器材且库中仅有哑铃条目，无法对应，按规则留空（肌肉按解剖常识填写）
+小腿部健身器械动作分类表.md,3,杠铃,坐姿杠铃提踵,小腿肌,-,Barbell Seated Calf Raise,free-exercise-db:Barbell_Seated_Calf_Raise (Unlicense),fedb:Barbell_Seated_Calf_Raise,Barbell Seated Calf Raise,high,坐姿杠铃提踵，与库条目完全对应
+小腿部健身器械动作分类表.md,4,杠铃,杠铃站姿提踵,小腿肌,-,Standing Barbell Calf Raise,free-exercise-db:Standing_Barbell_Calf_Raise (Unlicense),fedb:Standing_Barbell_Calf_Raise,Standing Barbell Calf Raise,high,站姿杠铃提踵，直配
+小腿部健身器械动作分类表.md,5,无,热身 - 踝关节绕环,小腿肌,-,Ankle Circles,free-exercise-db:Ankle_Circles (Unlicense),fedb:Ankle_Circles,Ankle Circles,high,踝关节绕环热身，库 stretching 条目
+小腿部健身器械动作分类表.md,6,无,拉伸 - 墙面小腿（直膝）,小腿肌,-,Calf Stretch Hands Against Wall,free-exercise-db:Calf_Stretch_Hands_Against_Wall (Unlicense),fedb:Calf_Stretch_Hands_Against_Wall,Calf Stretch Hands Against Wall,high,墙面直膝小腿拉伸，直配
+小腿部健身器械动作分类表.md,7,无,拉伸 - 墙面比目鱼肌（屈膝）,小腿肌,-,Standing Soleus And Achilles Stretch,free-exercise-db:Standing_Soleus_And_Achilles_Stretch (Unlicense),fedb:Standing_Soleus_And_Achilles_Stretch,Standing Soleus And Achilles Stretch,high,屈膝比目鱼肌拉伸，与库条目同模式
+小腿部健身器械动作分类表.md,8,无,拉伸 - 坐姿腓骨肌,小腿肌,-,Peroneals Stretch,free-exercise-db:Peroneals_Stretch (Unlicense),fedb:Peroneals_Stretch,Peroneals Stretch,high,坐姿带辅助腓骨肌拉伸，直配
+小腿部健身器械动作分类表.md,9,无,拉伸 - 跪姿胫骨肌,小腿肌,-,Anterior Tibialis-SMR,free-exercise-db:Anterior_Tibialis-SMR (Unlicense),fedb:Anterior_Tibialis-SMR,Anterior Tibialis-SMR,medium,胫骨前肌，库中为坐姿泡沫轴放松近似条目
+小腿部健身器械动作分类表.md,10,哑铃,站姿哑铃提踵,小腿肌,-,Standing Dumbbell Calf Raise,free-exercise-db:Standing_Dumbbell_Calf_Raise (Unlicense),fedb:Standing_Dumbbell_Calf_Raise,Standing Dumbbell Calf Raise,high,站姿哑铃提踵，直配
+小腿部健身器械动作分类表.md,11,固定器械,坐姿器械提踵,小腿肌,-,Seated Calf Raise,free-exercise-db:Seated_Calf_Raise (Unlicense),fedb:Seated_Calf_Raise,Seated Calf Raise,high,坐姿器械提踵，直配
+小腿部健身器械动作分类表.md,12,固定器械,站姿器械提踵,小腿肌,-,Standing Calf Raises,free-exercise-db:Standing_Calf_Raises (Unlicense),fedb:Standing_Calf_Raises,Standing Calf Raises,high,站姿器械提踵，直配
+小腿部健身器械动作分类表.md,13,固定器械,腿举机提踵,小腿肌,-,Calf Press On The Leg Press Machine,free-exercise-db:Calf_Press_On_The_Leg_Press_Machine (Unlicense),fedb:Calf_Press_On_The_Leg_Press_Machine,Calf Press On The Leg Press Machine,high,腿举机提踵，直配
+小腿部健身器械动作分类表.md,14,史密斯机,史密斯机提踵,小腿肌,-,Smith Machine Calf Raise,free-exercise-db:Smith_Machine_Calf_Raise (Unlicense),fedb:Smith_Machine_Calf_Raise,Smith Machine Calf Raise,high,史密斯机提踵，直配
+小臂部健身器械动作分类表.md,3,杠铃,正手杠铃手腕弯举,前臂肌,-,Palms-Down Wrist Curl Over A Bench,free-exercise-db:Palms-Down_Wrist_Curl_Over_A_Bench (Unlicense),fedb:Palms-Down_Wrist_Curl_Over_A_Bench,Palms-Down Wrist Curl Over A Bench,high,正手（旋前）杠铃腕弯举，直配
+小臂部健身器械动作分类表.md,4,杠铃,EZ 正手杠铃弯举,前臂肌,肱二头肌,Reverse Barbell Curl,free-exercise-db:Reverse_Barbell_Curl (Unlicense),fedb:Reverse_Barbell_Curl,Reverse Barbell Curl,medium,EZ 正手（反握）弯举，映射到通用反手杠铃弯举；按小臂语境主肌取前臂
+小臂部健身器械动作分类表.md,5,杠铃,杠铃片正手弯举,前臂肌,肱二头肌,Reverse Plate Curls,free-exercise-db:Reverse_Plate_Curls (Unlicense),fedb:Reverse_Plate_Curls,Reverse Plate Curls,high,杠铃片正手弯举，直配
+小臂部健身器械动作分类表.md,6,绳索,绳索手腕弯举,前臂肌,-,Cable Wrist Curl,free-exercise-db:Cable_Wrist_Curl (Unlicense),fedb:Cable_Wrist_Curl,Cable Wrist Curl,high,绳索腕弯举，直配
+小臂部健身器械动作分类表.md,7,哑铃,单手哑铃手腕弯举（反手）,前臂肌,-,Seated One-Arm Dumbbell Palms-Up Wrist Curl,free-exercise-db:Seated_One-Arm_Dumbbell_Palms-Up_Wrist_Curl (Unlicense),fedb:Seated_One-Arm_Dumbbell_Palms-Up_Wrist_Curl,Seated One-Arm Dumbbell Palms-Up Wrist Curl,high,单手反手（旋后）腕弯举，直配
+小臂部健身器械动作分类表.md,8,哑铃,单手哑铃手腕弯举（正手）,前臂肌,-,Seated One-Arm Dumbbell Palms-Down Wrist Curl,free-exercise-db:Seated_One-Arm_Dumbbell_Palms-Down_Wrist_Curl (Unlicense),fedb:Seated_One-Arm_Dumbbell_Palms-Down_Wrist_Curl,Seated One-Arm Dumbbell Palms-Down Wrist Curl,high,单手正手（旋前）腕弯举，直配
+小臂部健身器械动作分类表.md,9,哑铃,垂式哑铃手腕弯举,前臂肌,-,Seated Dumbbell Palms-Down Wrist Curl,free-exercise-db:Seated_Dumbbell_Palms-Down_Wrist_Curl (Unlicense),fedb:Seated_Dumbbell_Palms-Down_Wrist_Curl,Seated Dumbbell Palms-Down Wrist Curl,medium,垂式（对握）腕弯举，用掌下腕弯举近似
+小臂部健身器械动作分类表.md,10,无,热身 - 手腕绕环,前臂肌,-,Wrist Circles,free-exercise-db:Wrist_Circles (Unlicense),fedb:Wrist_Circles,Wrist Circles,high,手腕绕环热身，直配
+小臂部健身器械动作分类表.md,11,无,拉伸 - 手腕屈肌,前臂肌,-,Kneeling Forearm Stretch,free-exercise-db:Kneeling_Forearm_Stretch (Unlicense),fedb:Kneeling_Forearm_Stretch,Kneeling Forearm Stretch,high,跪姿腕屈肌拉伸，直配
+小臂部健身器械动作分类表.md,12,无,拉伸 - 手腕伸肌,前臂肌,三角肌,Side Wrist Pull,free-exercise-db:Side_Wrist_Pull (Unlicense),fedb:Side_Wrist_Pull,Side Wrist Pull,medium,腕伸肌拉伸，用库中侧向拉腕拉伸近似
+核心健身动作分类表.md,3,无,静态侧卧支撑,腹肌,三角肌,Side Bridge,free-exercise-db:Side_Bridge (Unlicense),fedb:Side_Bridge,Side Bridge,high,静态侧卧支撑（侧桥），对应 Side Bridge
+核心健身动作分类表.md,4,无,平板支撑交替摆,腹肌,臀大肌、腹斜肌,Plank with Alternating Leg Lift,wger:1410 (CC-BY-SA 4),wger:1410,Plank with Alternating Leg Lift,medium,平板支撑交替抬腿变式；库中主肌肉标为臀部，按动作模式补正为腹肌
+核心健身动作分类表.md,5,无,固定熊爬,腹肌、三角肌,肱三头肌、股四头肌、小腿肌,Bear Walk 2,wger:57 (CC-BY-SA 4),wger:57,Bear Walk 2,medium,固定熊爬，映射到熊爬类条目 Bear Walk 2
+核心健身动作分类表.md,6,无,鸟狗式,腹肌,三角肌、臀大肌,Bird Dog,wger:1572 (CC-BY-SA 4),wger:1572,Bird Dog,high,鸟狗式直接对应 Bird Dog
+核心健身动作分类表.md,7,无,反向支撑交叉腿,臀大肌、竖脊肌,腘绳肌、三角肌,Reverse Plank,wger:500 (CC-BY-SA 4),wger:500,Reverse Plank,medium,反向支撑交叉腿，映射到 Reverse Plank；库中未标肌肉，按解剖常识填写
+核心健身动作分类表.md,8,无,左右摸脚踝,腹肌,腹斜肌,Alternate Heel Touchers,free-exercise-db:Alternate_Heel_Touchers (Unlicense),fedb:Alternate_Heel_Touchers,Alternate Heel Touchers,high,左右交替摸脚踝即 Alternate Heel Touchers，补腹斜肌
+核心健身动作分类表.md,9,无,平板交替手肘支,腹肌、三角肌,肱三头肌,Plank-to-Elbow Extension,wger:1406 (CC-BY-SA 4),wger:1406,Plank-to-Elbow Extension,high,平板交替手肘支撑对应 Plank-to-Elbow Extension
+核心健身动作分类表.md,10,杠铃,地雷杆甩,腹肌,腹斜肌、三角肌,Landmine 180's,free-exercise-db:Landmine_180s (Unlicense),fedb:Landmine_180s,Landmine 180's,medium,地雷杆甩（旋转发力），映射到 Landmine 180's
+肩部健身器械动作分类表.md,3,哑铃,哑铃推举,三角肌,肱三头肌,Dumbbell Shoulder Press,free-exercise-db:Dumbbell_Shoulder_Press (Unlicense),fedb:Dumbbell_Shoulder_Press,Dumbbell Shoulder Press,high,哑铃推举，直配
+肩部健身器械动作分类表.md,4,哑铃,斯科特推举,三角肌,肱三头肌,Arnold Dumbbell Press,free-exercise-db:Arnold_Dumbbell_Press (Unlicense),fedb:Arnold_Dumbbell_Press,Arnold Dumbbell Press,medium,斯科特推举，用阿诺德推举近似
+肩部健身器械动作分类表.md,5,哑铃,古巴推举,三角肌,斜方肌,Cuban Press,free-exercise-db:Cuban_Press (Unlicense),fedb:Cuban_Press,Cuban Press,high,古巴推举，直配
+肩部健身器械动作分类表.md,6,哑铃,阿诺德推举,三角肌,肱三头肌,Arnold Dumbbell Press,free-exercise-db:Arnold_Dumbbell_Press (Unlicense),fedb:Arnold_Dumbbell_Press,Arnold Dumbbell Press,high,阿诺德推举，直配
+肩部健身器械动作分类表.md,7,哑铃,站姿哑铃推举,三角肌,肱三头肌,Standing Dumbbell Press,free-exercise-db:Standing_Dumbbell_Press (Unlicense),fedb:Standing_Dumbbell_Press,Standing Dumbbell Press,high,站姿哑铃推举，直配
+肩部健身器械动作分类表.md,8,哑铃,侧平举,三角肌,-,Side Lateral Raise,free-exercise-db:Side_Lateral_Raise (Unlicense),fedb:Side_Lateral_Raise,Side Lateral Raise,high,侧平举，直配
+肩部健身器械动作分类表.md,9,哑铃,平板上斜侧平举,三角肌,-,One-Arm Incline Lateral Raise,free-exercise-db:One-Arm_Incline_Lateral_Raise (Unlicense),fedb:One-Arm_Incline_Lateral_Raise,One-Arm Incline Lateral Raise,high,上斜板侧卧侧平举，直配
+肩部健身器械动作分类表.md,10,哑铃,半俯身侧平举,三角肌,-,Seated Bent-Over Rear Delt Raise,free-exercise-db:Seated_Bent-Over_Rear_Delt_Raise (Unlicense),fedb:Seated_Bent-Over_Rear_Delt_Raise,Seated Bent-Over Rear Delt Raise,medium,半俯身侧平举，用坐姿俯身后束飞鸟近似
+肩部健身器械动作分类表.md,11,哑铃,前平举,三角肌,-,Front Dumbbell Raise,free-exercise-db:Front_Dumbbell_Raise (Unlicense),fedb:Front_Dumbbell_Raise,Front Dumbbell Raise,high,前平举，直配
+肩部健身器械动作分类表.md,12,哑铃,俯身飞鸟,三角肌,-,Reverse Flyes,free-exercise-db:Reverse_Flyes (Unlicense),fedb:Reverse_Flyes,Reverse Flyes,high,俯身飞鸟，直配
+肩部健身器械动作分类表.md,13,哑铃,平板哑铃提拉,胸大肌,背阔肌、三角肌,Bent-Arm Dumbbell Pullover,free-exercise-db:Bent-Arm_Dumbbell_Pullover (Unlicense),fedb:Bent-Arm_Dumbbell_Pullover,Bent-Arm Dumbbell Pullover,high,平板哑铃提拉；库条目以胸大肌为主、肩为辅助
+肩部健身器械动作分类表.md,14,哑铃,哑铃直立划船,斜方肌,三角肌、肱二头肌,Standing Dumbbell Upright Row,free-exercise-db:Standing_Dumbbell_Upright_Row (Unlicense),fedb:Standing_Dumbbell_Upright_Row,Standing Dumbbell Upright Row,high,哑铃直立划船，直配
+肩部健身器械动作分类表.md,15,哑铃,哑铃上斜俯卧臂,三角肌,-,Lying Rear Delt Raise,free-exercise-db:Lying_Rear_Delt_Raise (Unlicense),fedb:Lying_Rear_Delt_Raise,Lying Rear Delt Raise,medium,上斜俯卧后束飞鸟，用俯卧后束飞鸟近似
+肩部健身器械动作分类表.md,16,哑铃,哑铃上斜仰卧臂,三角肌,肱三头肌,Dumbbell Incline Shoulder Raise,free-exercise-db:Dumbbell_Incline_Shoulder_Raise (Unlicense),fedb:Dumbbell_Incline_Shoulder_Raise,Dumbbell Incline Shoulder Raise,high,上斜仰卧臂上举，直配
+肩部健身器械动作分类表.md,17,哑铃,哑铃耸肩,斜方肌,-,Dumbbell Shrug,free-exercise-db:Dumbbell_Shrug (Unlicense),fedb:Dumbbell_Shrug,Dumbbell Shrug,high,哑铃耸肩，直配
+肩部健身器械动作分类表.md,18,哑铃,哑铃锤式复合推,三角肌,肱三头肌,Standing Palms-In Dumbbell Press,free-exercise-db:Standing_Palms-In_Dumbbell_Press (Unlicense),fedb:Standing_Palms-In_Dumbbell_Press,Standing Palms-In Dumbbell Press,medium,锤式（对握）复合推，用对握哑铃推举近似
+肩部健身器械动作分类表.md,19,哑铃,哑铃坐姿侧平举,三角肌,-,Seated Side Lateral Raise,free-exercise-db:Seated_Side_Lateral_Raise (Unlicense),fedb:Seated_Side_Lateral_Raise,Seated Side Lateral Raise,high,坐姿哑铃侧平举，直配
+肩部健身器械动作分类表.md,20,哑铃,哑铃后束飞鸟,三角肌,-,Bent Over Dumbbell Rear Delt Raise With Head On Bench,free-exercise-db:Bent_Over_Dumbbell_Rear_Delt_Raise_With_Head_On_Bench (Unlicense),fedb:Bent_Over_Dumbbell_Rear_Delt_Raise_With_Head_On_Bench,Bent Over Dumbbell Rear Delt Raise With Head On Bench,medium,后束飞鸟，用俯身后束飞鸟近似
+肩部健身器械动作分类表.md,21,哑铃,上斜哑铃 Y 字飞,三角肌、斜方肌,菱形肌,-,-,-,-,low,上斜 Y 字飞，库中无 Y 字举条目
+肩部健身器械动作分类表.md,22,固定器械,器械侧平举,三角肌,-,Machine Side Lateral Raises,wger:1744 (CC-BY-SA 4),wger:1744,Machine Side Lateral Raises,high,器械侧平举，wger 同名条目
+肩部健身器械动作分类表.md,23,固定器械,器械坐姿推举,三角肌,肱三头肌,Machine Shoulder (Military) Press,free-exercise-db:Machine_Shoulder_Military_Press (Unlicense),fedb:Machine_Shoulder_Military_Press,Machine Shoulder (Military) Press,high,器械坐姿推举，直配
+肩部健身器械动作分类表.md,24,固定器械,蝴蝶机反向飞鸟,三角肌,-,Reverse Machine Flyes,free-exercise-db:Reverse_Machine_Flyes (Unlicense),fedb:Reverse_Machine_Flyes,Reverse Machine Flyes,high,蝴蝶机反向飞鸟，直配
+肩部健身器械动作分类表.md,25,固定器械,器械把手侧平举,三角肌,-,Machine Lateral Raise,wger:1654 (CC-BY-SA 4),wger:1654,Machine Lateral Raise,medium,器械把手侧平举，用器械侧平举近似
+肩部健身器械动作分类表.md,26,固定器械,站姿器械侧平举,三角肌,-,Machine Side Lateral Raises,wger:1744 (CC-BY-SA 4),wger:1744,Machine Side Lateral Raises,medium,站姿器械侧平举，站姿变式
+肩部健身器械动作分类表.md,27,固定器械,器械耸肩,斜方肌,前臂肌,Leverage Shrug,free-exercise-db:Leverage_Shrug (Unlicense),fedb:Leverage_Shrug,Leverage Shrug,high,器械耸肩，直配
+肩部健身器械动作分类表.md,28,固定器械,硬拉器械耸肩,斜方肌,前臂肌,Leverage Shrug,free-exercise-db:Leverage_Shrug (Unlicense),fedb:Leverage_Shrug,Leverage Shrug,medium,硬拉器械耸肩，器械变式映射到通用器械耸肩
+肩部健身器械动作分类表.md,29,固定器械,耸肩器械耸肩,斜方肌,前臂肌,Leverage Shrug,free-exercise-db:Leverage_Shrug (Unlicense),fedb:Leverage_Shrug,Leverage Shrug,medium,耸肩器械耸肩，器械变式映射到通用器械耸肩
+肩部健身器械动作分类表.md,30,固定器械,肩胛引体,斜方肌,背阔肌、菱形肌,Scapular Pull-Up,free-exercise-db:Scapular_Pull-Up (Unlicense),fedb:Scapular_Pull-Up,Scapular Pull-Up,high,肩胛引体，直配
+肩部健身器械动作分类表.md,31,杠铃,杠铃前平举,三角肌,-,Standing Front Barbell Raise Over Head,free-exercise-db:Standing_Front_Barbell_Raise_Over_Head (Unlicense),fedb:Standing_Front_Barbell_Raise_Over_Head,Standing Front Barbell Raise Over Head,medium,杠铃前平举，库中为过顶前平举变式
+肩部健身器械动作分类表.md,32,杠铃,杠铃直立划船,三角肌,斜方肌,Upright Barbell Row,free-exercise-db:Upright_Barbell_Row (Unlicense),fedb:Upright_Barbell_Row,Upright Barbell Row,high,杠铃直立划船，直配
+肩部健身器械动作分类表.md,33,杠铃,站姿杠铃推举,三角肌,肱三头肌,Standing Military Press,free-exercise-db:Standing_Military_Press (Unlicense),fedb:Standing_Military_Press,Standing Military Press,high,站姿杠铃推举，直配
+肩部健身器械动作分类表.md,34,杠铃,站姿布拉德福德,三角肌,肱三头肌,Standing Bradford Press,free-exercise-db:Standing_Bradford_Press (Unlicense),fedb:Standing_Bradford_Press,Standing Bradford Press,high,站姿布拉德福德推举，直配
+肩部健身器械动作分类表.md,35,杠铃,坐姿杠铃推举,三角肌,肱三头肌,Seated Barbell Military Press,free-exercise-db:Seated_Barbell_Military_Press (Unlicense),fedb:Seated_Barbell_Military_Press,Seated Barbell Military Press,high,坐姿杠铃推举，直配
+肩部健身器械动作分类表.md,36,杠铃,杠铃俯身提拉,三角肌,菱形肌、背阔肌,Barbell Rear Delt Row,free-exercise-db:Barbell_Rear_Delt_Row (Unlicense),fedb:Barbell_Rear_Delt_Row,Barbell Rear Delt Row,high,杠铃俯身提拉，直配
+肩部健身器械动作分类表.md,37,杠铃,杠铃耸肩,斜方肌,-,Barbell Shrug,free-exercise-db:Barbell_Shrug (Unlicense),fedb:Barbell_Shrug,Barbell Shrug,high,杠铃耸肩，直配
+肩部健身器械动作分类表.md,38,杠铃,杠铃过头顶臂,三角肌,肱三头肌,Standing Military Press,free-exercise-db:Standing_Military_Press (Unlicense),fedb:Standing_Military_Press,Standing Military Press,medium,名称截断，按杠铃过头推举处理
+肩部健身器械动作分类表.md,39,杠铃,杠铃上斜推举,三角肌,肱三头肌,Barbell Shoulder Press,free-exercise-db:Barbell_Shoulder_Press (Unlicense),fedb:Barbell_Shoulder_Press,Barbell Shoulder Press,medium,肩部文件中的上斜杠铃推举（上斜凳肩推），映射到杠铃肩推条目
+肩部健身器械动作分类表.md,40,杠铃,杠铃片旋转,三角肌,斜方肌、前臂肌,Plate Twist,free-exercise-db:Plate_Twist (Unlicense),fedb:Plate_Twist,Plate Twist,medium,杠铃片绕环/旋转，按肩部语境取库中 Plate Twist
+肩部健身器械动作分类表.md,41,杠铃,杠铃片前平举,三角肌,-,Front Plate Raise,free-exercise-db:Front_Plate_Raise (Unlicense),fedb:Front_Plate_Raise,Front Plate Raise,high,杠铃片前平举，直配
+肩部健身器械动作分类表.md,42,史密斯机,史密斯机推举,三角肌,肱三头肌,Smith Machine Overhead Shoulder Press,free-exercise-db:Smith_Machine_Overhead_Shoulder_Press (Unlicense),fedb:Smith_Machine_Overhead_Shoulder_Press,Smith Machine Overhead Shoulder Press,high,史密斯机推举，直配
+肩部健身器械动作分类表.md,43,史密斯机,史密斯耸肩,斜方肌,三角肌,Smith Machine Behind the Back Shrug,free-exercise-db:Smith_Machine_Behind_the_Back_Shrug (Unlicense),fedb:Smith_Machine_Behind_the_Back_Shrug,Smith Machine Behind the Back Shrug,medium,史密斯耸肩，库中为背后耸肩变式
+肩部健身器械动作分类表.md,44,史密斯机,史密斯机背后肩,斜方肌,三角肌,Smith Machine Behind the Back Shrug,free-exercise-db:Smith_Machine_Behind_the_Back_Shrug (Unlicense),fedb:Smith_Machine_Behind_the_Back_Shrug,Smith Machine Behind the Back Shrug,high,史密斯机背后耸肩，直配
+肩部健身器械动作分类表.md,45,史密斯机,史密斯机站姿肩推,三角肌,肱三头肌,Smith Machine Overhead Shoulder Press,free-exercise-db:Smith_Machine_Overhead_Shoulder_Press (Unlicense),fedb:Smith_Machine_Overhead_Shoulder_Press,Smith Machine Overhead Shoulder Press,high,史密斯机站姿肩推，直配
+肩部健身器械动作分类表.md,46,悍马机,悍马机坐姿推举,三角肌,肱三头肌,Leverage Shoulder Press,free-exercise-db:Leverage_Shoulder_Press (Unlicense),fedb:Leverage_Shoulder_Press,Leverage Shoulder Press,medium,悍马机品牌器械，映射到通用杠杆式推举
+肩部健身器械动作分类表.md,47,悍马机,悍马机侧平举,三角肌,-,Machine Side Lateral Raises,wger:1744 (CC-BY-SA 4),wger:1744,Machine Side Lateral Raises,medium,悍马机品牌器械，映射到通用器械侧平举
+肩部健身器械动作分类表.md,48,悍马机,悍马机半俯身侧,三角肌,-,Reverse Machine Flyes,free-exercise-db:Reverse_Machine_Flyes (Unlicense),fedb:Reverse_Machine_Flyes,Reverse Machine Flyes,medium,悍马机品牌器械，映射到通用反向飞鸟
+肩部健身器械动作分类表.md,49,悍马机,单手开肘悍马俯,三角肌,-,Reverse Machine Flyes,free-exercise-db:Reverse_Machine_Flyes (Unlicense),fedb:Reverse_Machine_Flyes,Reverse Machine Flyes,medium,悍马机单臂开肘俯身，映射到器械反向飞鸟
+肩部健身器械动作分类表.md,50,悍马机,开肘悍马俯身划,三角肌、菱形肌,背阔肌、肱二头肌,Leverage Iso Row,free-exercise-db:Leverage_Iso_Row (Unlicense),fedb:Leverage_Iso_Row,Leverage Iso Row,medium,悍马机开肘俯身划船偏后束，取库中器械等长划船
+肩部健身器械动作分类表.md,51,绳索,俯身绳索飞鸟,三角肌,-,Cable Rear Delt Fly,free-exercise-db:Cable_Rear_Delt_Fly (Unlicense),fedb:Cable_Rear_Delt_Fly,Cable Rear Delt Fly,high,俯身绳索飞鸟，直配
+肩部健身器械动作分类表.md,52,绳索,绳索胸前平举,三角肌,-,Front Cable Raise,free-exercise-db:Front_Cable_Raise (Unlicense),fedb:Front_Cable_Raise,Front Cable Raise,high,绳索胸前平举，直配
+肩部健身器械动作分类表.md,53,绳索,面拉,三角肌,菱形肌,Face Pull,free-exercise-db:Face_Pull (Unlicense),fedb:Face_Pull,Face Pull,high,面拉，直配
+肩部健身器械动作分类表.md,54,绳索,绳索侧平举,三角肌,前臂肌,Standing Low-Pulley Deltoid Raise,free-exercise-db:Standing_Low-Pulley_Deltoid_Raise (Unlicense),fedb:Standing_Low-Pulley_Deltoid_Raise,Standing Low-Pulley Deltoid Raise,high,绳索侧平举，直配
+肩部健身器械动作分类表.md,55,绳索,绳索侧平举（单边）,三角肌,-,Cable Lateral Raises (Single Arm),wger:1378 (CC-BY-SA 4),wger:1378,Cable Lateral Raises (Single Arm),high,绳索单边侧平举，wger 同名条目
+肩部健身器械动作分类表.md,56,绳索,绳索交叉后束飞鸟,三角肌,-,Cable Rear Delt Fly,free-exercise-db:Cable_Rear_Delt_Fly (Unlicense),fedb:Cable_Rear_Delt_Fly,Cable Rear Delt Fly,medium,绳索交叉后束飞鸟，与库交叉反向飞鸟同模式
+肩部健身器械动作分类表.md,57,绳索,绳索耸肩,斜方肌,-,Cable Shrugs,free-exercise-db:Cable_Shrugs (Unlicense),fedb:Cable_Shrugs,Cable Shrugs,high,绳索耸肩，直配
+肩部健身器械动作分类表.md,58,绳索,热身 - 肩胛骨后缩灵活性,三角肌、斜方肌,菱形肌,-,-,-,-,low,库中无绳索肩胛后缩条目（仅有弹力带版本），按规则留空（肌肉按解剖常识填写）
+肩部健身器械动作分类表.md,59,绳索,热身 - 肩胛骨上回旋灵活性,三角肌,斜方肌,Arm Circles,free-exercise-db:Arm_Circles (Unlicense),fedb:Arm_Circles,Arm Circles,medium,肩胛上回旋灵活性，用肩绕环热身近似
+肩部健身器械动作分类表.md,60,绳索,热身 - 肩胛骨下回旋灵活性,三角肌,斜方肌,Shoulder Circles,free-exercise-db:Shoulder_Circles (Unlicense),fedb:Shoulder_Circles,Shoulder Circles,medium,肩胛下回旋灵活性，用肩绕环热身近似
+肩部健身器械动作分类表.md,61,绳索,绳索直立划船,斜方肌,三角肌,Upright Cable Row,free-exercise-db:Upright_Cable_Row (Unlicense),fedb:Upright_Cable_Row,Upright Cable Row,high,绳索直立划船，直配
+肩部健身器械动作分类表.md,62,绳索,绳索 45 度单臂反向飞鸟,三角肌,菱形肌、斜方肌,Bent Over Low-Pulley Side Lateral,free-exercise-db:Bent_Over_Low-Pulley_Side_Lateral (Unlicense),fedb:Bent_Over_Low-Pulley_Side_Lateral,Bent Over Low-Pulley Side Lateral,high,绳索 45 度单臂反向飞鸟，直配
+肩部健身器械动作分类表.md,63,悬挂带 & 弹力带,悬垂带 - 面拉,三角肌,菱形肌,Face Pull,free-exercise-db:Face_Pull (Unlicense),fedb:Face_Pull,Face Pull,medium,悬垂带面拉，映射到通用面拉条目
+肩部健身器械动作分类表.md,64,悬挂带 & 弹力带,弹力带 - 面拉,三角肌,菱形肌,Face Pull,free-exercise-db:Face_Pull (Unlicense),fedb:Face_Pull,Face Pull,medium,弹力带面拉，映射到通用面拉条目
+肩部健身器械动作分类表.md,65,悬挂带 & 弹力带,弹力带 - 坐姿推举,三角肌,肱三头肌,Shoulder Press - With Bands,free-exercise-db:Shoulder_Press_-_With_Bands (Unlicense),fedb:Shoulder_Press_-_With_Bands,Shoulder Press - With Bands,medium,弹力带坐姿推举，站姿变式近似
+肩部健身器械动作分类表.md,66,悬挂带 & 弹力带,弹力带 - 站姿推举,三角肌,肱三头肌,Shoulder Press - With Bands,free-exercise-db:Shoulder_Press_-_With_Bands (Unlicense),fedb:Shoulder_Press_-_With_Bands,Shoulder Press - With Bands,high,弹力带站姿推举，直配
+肩部健身器械动作分类表.md,67,悬挂带 & 弹力带,弹力带 - 侧平举,三角肌,-,Lateral Raise - With Bands,free-exercise-db:Lateral_Raise_-_With_Bands (Unlicense),fedb:Lateral_Raise_-_With_Bands,Lateral Raise - With Bands,high,弹力带侧平举，直配
+肩部健身器械动作分类表.md,69,悬挂带 & 弹力带,弹力带 - 提拉,斜方肌,三角肌,Upright Row - With Bands,free-exercise-db:Upright_Row_-_With_Bands (Unlicense),fedb:Upright_Row_-_With_Bands,Upright Row - With Bands,high,弹力带提拉，直配
+肩部健身器械动作分类表.md,70,悬挂带 & 弹力带,弹力带 - 侧拉,三角肌,菱形肌、斜方肌,Band Pull Apart,free-exercise-db:Band_Pull_Apart (Unlicense),fedb:Band_Pull_Apart,Band Pull Apart,medium,弹力带侧拉，用弹力带后拉扩胸近似
+肩部健身器械动作分类表.md,71,悬挂带 & 弹力带,弹力带 - 俯身后束飞鸟,三角肌,菱形肌、肱三头肌,Back Flyes - With Bands,free-exercise-db:Back_Flyes_-_With_Bands (Unlicense),fedb:Back_Flyes_-_With_Bands,Back Flyes - With Bands,high,弹力带俯身后束飞鸟，直配
+肩部健身器械动作分类表.md,72,悬挂带 & 弹力带,悬垂带 - 后束飞鸟,三角肌,菱形肌、肱三头肌,Back Flyes - With Bands,free-exercise-db:Back_Flyes_-_With_Bands (Unlicense),fedb:Back_Flyes_-_With_Bands,Back Flyes - With Bands,medium,悬垂带后束飞鸟，映射到弹力带后束飞鸟
+肩部健身器械动作分类表.md,73,悬挂带 & 弹力带,弹力带 - 弹力带耸肩,斜方肌,-,-,-,-,-,low,库中无弹力带耸肩条目（仅有杠铃版本），按规则留空（肌肉按解剖常识填写）
+肩部健身器械动作分类表.md,74,无,V - 俯卧撑,三角肌、肱三头肌,胸大肌,Pike Push Ups,wger:454 (CC-BY-SA 4),wger:454,Pike Push Ups,high,V 字（派克）俯卧撑，wger 同名条目
+肩部健身器械动作分类表.md,75,无,V - 俯卧撑 - 负重,三角肌、肱三头肌,胸大肌,Pike Push Ups,wger:454 (CC-BY-SA 4),wger:454,Pike Push Ups,medium,负重 V 字俯卧撑，同条目
+肩部健身器械动作分类表.md,76,无,靠墙倒立撑,三角肌,肱三头肌,Handstand Push-Ups,free-exercise-db:Handstand_Push-Ups (Unlicense),fedb:Handstand_Push-Ups,Handstand Push-Ups,medium,靠墙倒立撑，用倒立俯卧撑近似
+肩部健身器械动作分类表.md,77,无,自由倒立撑,三角肌,肱三头肌,Handstand Push-Ups,free-exercise-db:Handstand_Push-Ups (Unlicense),fedb:Handstand_Push-Ups,Handstand Push-Ups,high,自由倒立撑，直配
+肩部健身器械动作分类表.md,78,无,拉伸 - 肩内外旋,三角肌,胸大肌、肱二头肌,Round The World Shoulder Stretch,free-exercise-db:Round_The_World_Shoulder_Stretch (Unlicense),fedb:Round_The_World_Shoulder_Stretch,Round The World Shoulder Stretch,medium,肩内外旋拉伸，用棍棒绕环肩拉伸近似
+肩部健身器械动作分类表.md,79,无,拉伸 - 扩胸开合,胸大肌,菱形肌,Dynamic Chest Stretch,free-exercise-db:Dynamic_Chest_Stretch (Unlicense),fedb:Dynamic_Chest_Stretch,Dynamic Chest Stretch,high,扩胸开合动态拉伸，直配
+肩部健身器械动作分类表.md,80,无,拉伸 - 单臂侧转,三角肌,-,Shoulder Stretch,free-exercise-db:Shoulder_Stretch (Unlicense),fedb:Shoulder_Stretch,Shoulder Stretch,high,单臂横抱（侧转）肩拉伸，直配
+肩部健身器械动作分类表.md,81,无,拉伸 - 三头肌,肱三头肌,背阔肌,Overhead Triceps,free-exercise-db:Overhead_Triceps (Unlicense),fedb:Overhead_Triceps,Overhead Triceps,high,过顶三头肌拉伸，直配
+肩部健身器械动作分类表.md,82,无,拉伸 - 手臂交叉,三角肌,-,Shoulder Stretch,free-exercise-db:Shoulder_Stretch (Unlicense),fedb:Shoulder_Stretch,Shoulder Stretch,medium,手臂交叉拉伸，用横抱肩拉伸近似
+肩部健身器械动作分类表.md,83,无,倒立俯卧撑,三角肌,肱三头肌,Handstand Push-Ups,free-exercise-db:Handstand_Push-Ups (Unlicense),fedb:Handstand_Push-Ups,Handstand Push-Ups,high,倒立俯卧撑，直配
+肩部健身器械动作分类表.md,84,无,派克俯卧撑（辅）,三角肌、肱三头肌,胸大肌,Pike Push Ups,wger:454 (CC-BY-SA 4),wger:454,Pike Push Ups,medium,辅助派克俯卧撑，同条目
+肩部健身器械动作分类表.md,85,壶铃,壶铃推举,三角肌,肱三头肌,Two-Arm Kettlebell Military Press,free-exercise-db:Two-Arm_Kettlebell_Military_Press (Unlicense),fedb:Two-Arm_Kettlebell_Military_Press,Two-Arm Kettlebell Military Press,high,壶铃推举，直配
+肩部健身器械动作分类表.md,86,壶铃,单臂壶铃肩推,三角肌,肱三头肌,One-Arm Kettlebell Military Press To The Side,free-exercise-db:One-Arm_Kettlebell_Military_Press_To_The_Side (Unlicense),fedb:One-Arm_Kettlebell_Military_Press_To_The_Side,One-Arm Kettlebell Military Press To The Side,medium,单臂壶铃肩推，用单臂侧向军事推举近似
+肩部健身器械动作分类表.md,87,地雷杆,地雷杆单推举,三角肌,胸大肌、肱三头肌,Landmine press,wger:346 (CC-BY-SA 4),wger:346,Landmine press,high,地雷杆单臂推举，wger 同名条目
+背部健身器械动作分类表.md,3,绳索,宽距下拉,背阔肌,肱二头肌、菱形肌、三角肌,Wide-Grip Lat Pulldown,free-exercise-db:Wide-Grip_Lat_Pulldown (Unlicense),fedb:Wide-Grip_Lat_Pulldown,Wide-Grip Lat Pulldown,high,宽距绳索下拉，库中同名条目
+背部健身器械动作分类表.md,4,绳索,绳索直臂下压,背阔肌,-,Rope Straight-Arm Pulldown,free-exercise-db:Rope_Straight-Arm_Pulldown (Unlicense),fedb:Rope_Straight-Arm_Pulldown,Rope Straight-Arm Pulldown,high,绳索直臂下压，库中绳索附件条目，库无次要肌肉
+背部健身器械动作分类表.md,5,绳索,拉杆坐姿划船,菱形肌,肱二头肌、背阔肌、三角肌,Seated Cable Rows,free-exercise-db:Seated_Cable_Rows (Unlicense),fedb:Seated_Cable_Rows,Seated Cable Rows,high,拉杆坐姿划船，对应绳索坐姿划船
+背部健身器械动作分类表.md,6,绳索,颈后下拉,背阔肌,肱二头肌、菱形肌、三角肌,Wide-Grip Pulldown Behind The Neck,free-exercise-db:Wide-Grip_Pulldown_Behind_The_Neck (Unlicense),fedb:Wide-Grip_Pulldown_Behind_The_Neck,Wide-Grip Pulldown Behind The Neck,high,颈后宽距下拉，库中同名条目
+背部健身器械动作分类表.md,7,绳索,绳索坐姿划船,菱形肌,肱二头肌、背阔肌、三角肌,Seated Cable Rows,free-exercise-db:Seated_Cable_Rows (Unlicense),fedb:Seated_Cable_Rows,Seated Cable Rows,high,绳索坐姿划船，与 E0189 共用同一条目保证一致
+背部健身器械动作分类表.md,8,绳索,宽握反手下拉,背阔肌,肱二头肌、菱形肌、三角肌,Underhand Cable Pulldowns,free-exercise-db:Underhand_Cable_Pulldowns (Unlicense),fedb:Underhand_Cable_Pulldowns,Underhand Cable Pulldowns,high,宽握反手（underhand）下拉，库中反手下拉条目
+背部健身器械动作分类表.md,9,绳索,坐姿单手划船,菱形肌,肱二头肌、背阔肌、斜方肌,Seated One-arm Cable Pulley Rows,free-exercise-db:Seated_One-arm_Cable_Pulley_Rows (Unlicense),fedb:Seated_One-arm_Cable_Pulley_Rows,Seated One-arm Cable Pulley Rows,high,坐姿单臂绳索划船，库中同名条目
+背部健身器械动作分类表.md,10,绳索,V-bar 划船,菱形肌,肱二头肌、背阔肌、三角肌,Seated Cable Rows,free-exercise-db:Seated_Cable_Rows (Unlicense),fedb:Seated_Cable_Rows,Seated Cable Rows,medium,V-bar 窄握把手变式，映射通用绳索坐姿划船
+背部健身器械动作分类表.md,11,绳索,坐姿绳索双边下,背阔肌,肱二头肌、菱形肌、三角肌,Wide-Grip Lat Pulldown,free-exercise-db:Wide-Grip_Lat_Pulldown (Unlicense),fedb:Wide-Grip_Lat_Pulldown,Wide-Grip Lat Pulldown,medium,名称疑为“坐姿绳索双边下拉”截断，按双手绳索下拉映射
+背部健身器械动作分类表.md,12,绳索,对握高位下拉,背阔肌,肱二头肌、菱形肌、三角肌,V-Bar Pulldown,free-exercise-db:V-Bar_Pulldown (Unlicense),fedb:V-Bar_Pulldown,V-Bar Pulldown,high,对握（neutral grip）高位下拉，对应 V 把下拉
+背部健身器械动作分类表.md,13,绳索,窄距下拉,背阔肌,肱二头肌、菱形肌、三角肌,Close-Grip Front Lat Pulldown,free-exercise-db:Close-Grip_Front_Lat_Pulldown (Unlicense),fedb:Close-Grip_Front_Lat_Pulldown,Close-Grip Front Lat Pulldown,high,窄距下拉，库中同名条目
+背部健身器械动作分类表.md,14,绳索,坐姿划船,菱形肌,肱二头肌、背阔肌、三角肌,Seated Cable Rows,free-exercise-db:Seated_Cable_Rows (Unlicense),fedb:Seated_Cable_Rows,Seated Cable Rows,high,坐姿划船通用条目
+背部健身器械动作分类表.md,15,绳索,V-bar 下拉,背阔肌,肱二头肌、菱形肌、三角肌,V-Bar Pulldown,free-exercise-db:V-Bar_Pulldown (Unlicense),fedb:V-Bar_Pulldown,V-Bar Pulldown,high,V-bar 下拉，库中同名条目
+背部健身器械动作分类表.md,16,绳索,铁杆直臂下压,背阔肌,-,Straight-Arm Pulldown,free-exercise-db:Straight-Arm_Pulldown (Unlicense),fedb:Straight-Arm_Pulldown,Straight-Arm Pulldown,high,直杆（铁杆）直臂下压，库中同名条目
+背部健身器械动作分类表.md,17,绳索,单手下拉,背阔肌,肱二头肌、菱形肌,One Arm Lat Pulldown,free-exercise-db:One_Arm_Lat_Pulldown (Unlicense),fedb:One_Arm_Lat_Pulldown,One Arm Lat Pulldown,high,单臂下拉，库中同名条目
+背部健身器械动作分类表.md,18,绳索,绳索站旋转划,背阔肌、菱形肌,腹斜肌、肱二头肌,-,-,-,-,low,库无“站姿旋转划船”条目，旋转类以核心参与为主，按解剖填
+背部健身器械动作分类表.md,19,绳索,竖直坐姿绳索划,菱形肌,肱二头肌、背阔肌、三角肌,Seated Cable Rows,free-exercise-db:Seated_Cable_Rows (Unlicense),fedb:Seated_Cable_Rows,Seated Cable Rows,medium,竖直坐姿绳索划船，映射通用绳索坐姿划船
+背部健身器械动作分类表.md,20,绳索,窄握反手下拉,背阔肌,肱二头肌、菱形肌、三角肌,Underhand Cable Pulldowns,free-exercise-db:Underhand_Cable_Pulldowns (Unlicense),fedb:Underhand_Cable_Pulldowns,Underhand Cable Pulldowns,medium,窄握反手下拉变式，映射通用反手下拉
+背部健身器械动作分类表.md,21,绳索,绳索单边俯身划,背阔肌,肱二头肌、菱形肌,Shotgun Row,free-exercise-db:Shotgun_Row (Unlicense),fedb:Shotgun_Row,Shotgun Row,medium,绳索单臂俯身划船，近似对应单臂旋转划船（Shotgun Row）
+背部健身器械动作分类表.md,22,绳索,绳索分腿站姿单绳,背阔肌,肱二头肌、菱形肌,One Arm Lat Pulldown,free-exercise-db:One_Arm_Lat_Pulldown (Unlicense),fedb:One_Arm_Lat_Pulldown,One Arm Lat Pulldown,medium,分腿站姿单臂绳索下压，映射绳索单臂下拉
+背部健身器械动作分类表.md,23,杠铃,杠铃划船,菱形肌,肱二头肌、背阔肌、三角肌,Bent Over Barbell Row,free-exercise-db:Bent_Over_Barbell_Row (Unlicense),fedb:Bent_Over_Barbell_Row,Bent Over Barbell Row,high,杠铃俯身划船，库中同名条目
+背部健身器械动作分类表.md,24,杠铃,地雷杆单手划船,菱形肌,肱二头肌、背阔肌、斜方肌,Bent Over One-Arm Long Bar Row,free-exercise-db:Bent_Over_One-Arm_Long_Bar_Row (Unlicense),fedb:Bent_Over_One-Arm_Long_Bar_Row,Bent Over One-Arm Long Bar Row,medium,地雷杆（landmine）单手划船，映射杠铃单臂长杆划船
+背部健身器械动作分类表.md,25,杠铃,半程硬拉,竖脊肌,前臂肌、臀大肌、腘绳肌,Rack Pulls,free-exercise-db:Rack_Pulls (Unlicense),fedb:Rack_Pulls,Rack Pulls,medium,半程硬拉，映射架上拉（Rack Pulls）半程硬拉条目
+背部健身器械动作分类表.md,26,杠铃,T 杆划船（窄）,菱形肌,肱二头肌、背阔肌,T-Bar Row with Handle,free-exercise-db:T-Bar_Row_with_Handle (Unlicense),fedb:T-Bar_Row_with_Handle,T-Bar Row with Handle,high,窄握 T 杆划船，库中带把手条目
+背部健身器械动作分类表.md,27,杠铃,T 杆划船（宽）,菱形肌,肱二头肌、背阔肌,Bent Over Two-Arm Long Bar Row,free-exercise-db:Bent_Over_Two-Arm_Long_Bar_Row (Unlicense),fedb:Bent_Over_Two-Arm_Long_Bar_Row,Bent Over Two-Arm Long Bar Row,medium,宽握 T 杆划船，映射杠铃双手长杆划船
+背部健身器械动作分类表.md,28,杠铃,反手杠铃划船,菱形肌,肱二头肌、背阔肌、三角肌,Reverse Grip Bent-Over Rows,free-exercise-db:Reverse_Grip_Bent-Over_Rows (Unlicense),fedb:Reverse_Grip_Bent-Over_Rows,Reverse Grip Bent-Over Rows,high,反手杠铃俯身划船，库中同名条目
+背部健身器械动作分类表.md,29,杠铃,潘德雷划船,菱形肌,肱二头肌、背阔肌、三角肌,Bent Over Barbell Row,free-exercise-db:Bent_Over_Barbell_Row (Unlicense),fedb:Bent_Over_Barbell_Row,Bent Over Barbell Row,medium,潘德雷（Pendlay）为触地式变式，映射通用杠铃俯身划船
+背部健身器械动作分类表.md,30,杠铃,俯卧杠铃划船,菱形肌,肱二头肌、背阔肌、斜方肌,Lying Cambered Barbell Row,free-exercise-db:Lying_Cambered_Barbell_Row (Unlicense),fedb:Lying_Cambered_Barbell_Row,Lying Cambered Barbell Row,high,俯卧杠铃划船，库中同名条目
+背部健身器械动作分类表.md,31,杠铃,海豹杠铃划船,菱形肌,背阔肌、三角肌,Incline Bench Pull,free-exercise-db:Incline_Bench_Pull (Unlicense),fedb:Incline_Bench_Pull,Incline Bench Pull,medium,海豹划船为俯卧支撑划船，映射斜凳俯卧拉
+背部健身器械动作分类表.md,32,悍马机,悍马机划船,背阔肌,肱二头肌、菱形肌,Leverage Iso Row,free-exercise-db:Leverage_Iso_Row (Unlicense),fedb:Leverage_Iso_Row,Leverage Iso Row,medium,悍马机（Hammer Strength）品牌器械，映射通用挂片划船
+背部健身器械动作分类表.md,34,悍马机,悍马机大剪刀,背阔肌,肱二头肌、菱形肌,Leverage Iso Row,free-exercise-db:Leverage_Iso_Row (Unlicense),fedb:Leverage_Iso_Row,Leverage Iso Row,medium,悍马机“大剪刀”分动式划船，品牌编号变式，映射通用挂片划船
+背部健身器械动作分类表.md,35,悍马机,轨道划船器划船,背阔肌,肱二头肌、菱形肌,Leverage Iso Row,free-exercise-db:Leverage_Iso_Row (Unlicense),fedb:Leverage_Iso_Row,Leverage Iso Row,medium,轨道划船器为品牌器械，映射通用挂片划船
+背部健身器械动作分类表.md,36,悍马机,分动式高位划,菱形肌,背阔肌,Leverage High Row,free-exercise-db:Leverage_High_Row (Unlicense),fedb:Leverage_High_Row,Leverage High Row,medium,悍马机分动式高位划，映射通用器械高位划船
+背部健身器械动作分类表.md,37,悍马机,单手悍马机下拉,菱形肌,背阔肌,Leverage High Row,free-exercise-db:Leverage_High_Row (Unlicense),fedb:Leverage_High_Row,Leverage High Row,medium,单手悍马机高位下拉，映射通用器械高位划船
+背部健身器械动作分类表.md,38,悍马机,单手悍马机划船,背阔肌,肱二头肌、菱形肌,Leverage Iso Row,free-exercise-db:Leverage_Iso_Row (Unlicense),fedb:Leverage_Iso_Row,Leverage Iso Row,medium,单手悍马机划船，品牌器械，映射通用挂片划船
+背部健身器械动作分类表.md,39,悍马机,单手支撑式悍马,背阔肌,肱二头肌、菱形肌,Leverage Iso Row,free-exercise-db:Leverage_Iso_Row (Unlicense),fedb:Leverage_Iso_Row,Leverage Iso Row,medium,单手支撑式悍马机划船，品牌器械，映射通用挂片划船
+背部健身器械动作分类表.md,40,悍马机,反握式悍马划船,背阔肌,肱二头肌、菱形肌,Leverage Iso Row,free-exercise-db:Leverage_Iso_Row (Unlicense),fedb:Leverage_Iso_Row,Leverage Iso Row,medium,反握式悍马划船，品牌器械变式，映射通用挂片划船
+背部健身器械动作分类表.md,41,悍马机,支撑式悍马俯身,背阔肌,肱二头肌、菱形肌,Leverage Iso Row,free-exercise-db:Leverage_Iso_Row (Unlicense),fedb:Leverage_Iso_Row,Leverage Iso Row,medium,支撑式悍马俯身划船，品牌器械，映射通用挂片划船
+背部健身器械动作分类表.md,42,悍马机,分动式高位划船,菱形肌,背阔肌,Leverage High Row,free-exercise-db:Leverage_High_Row (Unlicense),fedb:Leverage_High_Row,Leverage High Row,medium,悍马机分动式高位划船，品牌器械，映射通用高位划船
+背部健身器械动作分类表.md,43,悍马机,悍马机手下拉,菱形肌,背阔肌,Leverage High Row,free-exercise-db:Leverage_High_Row (Unlicense),fedb:Leverage_High_Row,Leverage High Row,medium,悍马机高位下拉，品牌器械，映射通用器械高位划船
+背部健身器械动作分类表.md,44,悍马机,悍马机鹦鹉螺,背阔肌,胸大肌、肱三头肌,Pullover Machine,wger:1384 (CC-BY-SA 4),wger:1384,Pullover Machine,medium,鹦鹉螺（Nautilus）品牌下拉/仰卧拉器械，映射通用器械下拉条目
+背部健身器械动作分类表.md,45,悍马机,单手坐悍马机,背阔肌,肱二头肌、菱形肌,Leverage Iso Row,free-exercise-db:Leverage_Iso_Row (Unlicense),fedb:Leverage_Iso_Row,Leverage Iso Row,medium,单手坐姿悍马机划船，品牌器械，映射通用挂片划船
+背部健身器械动作分类表.md,46,悍马机,单边大剪刀划船,背阔肌,肱二头肌、菱形肌,Leverage Iso Row,free-exercise-db:Leverage_Iso_Row (Unlicense),fedb:Leverage_Iso_Row,Leverage Iso Row,medium,单边大剪刀划船，品牌编号变式，映射通用挂片划船
+背部健身器械动作分类表.md,47,悍马机,悍马俯身划船,背阔肌,肱二头肌、菱形肌,Leverage Iso Row,free-exercise-db:Leverage_Iso_Row (Unlicense),fedb:Leverage_Iso_Row,Leverage Iso Row,medium,悍马俯身划船，品牌器械，映射通用挂片划船
+背部健身器械动作分类表.md,48,悍马机,挂片划船,背阔肌,肱二头肌、菱形肌,Leverage Iso Row,free-exercise-db:Leverage_Iso_Row (Unlicense),fedb:Leverage_Iso_Row,Leverage Iso Row,medium,挂片式划船，映射通用挂片划船条目
+背部健身器械动作分类表.md,49,固定器械,窄距引体向上,背阔肌,肱二头肌、菱形肌、三角肌,V-Bar Pullup,free-exercise-db:V-Bar_Pullup (Unlicense),fedb:V-Bar_Pullup,V-Bar Pullup,medium,窄距引体，映射 V 把（对握）引体条目
+背部健身器械动作分类表.md,50,固定器械,器械划船,背阔肌,肱二头肌、菱形肌,Leverage Iso Row,free-exercise-db:Leverage_Iso_Row (Unlicense),fedb:Leverage_Iso_Row,Leverage Iso Row,medium,器械划船，映射通用挂片划船条目
+背部健身器械动作分类表.md,51,固定器械,坐姿器械背屈伸,竖脊肌,臀大肌、腘绳肌,Lower Back Extensions,wger:1348 (CC-BY-SA 4),wger:1348,Lower Back Extensions,medium,坐姿器械背屈伸，库中条目无 primary 数据，按解剖补
+背部健身器械动作分类表.md,52,固定器械,器械绳索划船,菱形肌,肱二头肌、背阔肌、三角肌,Seated Cable Rows,free-exercise-db:Seated_Cable_Rows (Unlicense),fedb:Seated_Cable_Rows,Seated Cable Rows,medium,器械绳索划船，映射绳索坐姿划船
+背部健身器械动作分类表.md,53,固定器械,器械下拉,背阔肌、肱二头肌,-,Machine Lat Pulldown,wger:2631 (CC-BY-SA 4),wger:2631,Machine Lat Pulldown,medium,固定器械下拉，库中 primary 为肱二头肌/背阔肌，按背部语境调整顺序
+背部健身器械动作分类表.md,54,固定器械,引体向上（辅助）,背阔肌,腹肌、前臂肌、菱形肌,Band Assisted Pull-Up,free-exercise-db:Band_Assisted_Pull-Up (Unlicense),fedb:Band_Assisted_Pull-Up,Band Assisted Pull-Up,medium,器械辅助引体，映射弹力带辅助引体条目
+背部健身器械动作分类表.md,55,固定器械,俯卧 T-bar 划船,菱形肌,肱二头肌、背阔肌,Lying T-Bar Row,free-exercise-db:Lying_T-Bar_Row (Unlicense),fedb:Lying_T-Bar_Row,Lying T-Bar Row,high,俯卧 T-bar 划船，库中同名器械条目
+背部健身器械动作分类表.md,56,固定器械,器械大剪刀,背阔肌,肱二头肌、菱形肌,Leverage Iso Row,free-exercise-db:Leverage_Iso_Row (Unlicense),fedb:Leverage_Iso_Row,Leverage Iso Row,medium,器械大剪刀，品牌编号变式，映射通用挂片划船
+背部健身器械动作分类表.md,57,哑铃,哑铃划船,菱形肌,肱二头肌、背阔肌、三角肌,One-Arm Dumbbell Row,free-exercise-db:One-Arm_Dumbbell_Row (Unlicense),fedb:One-Arm_Dumbbell_Row,One-Arm Dumbbell Row,high,哑铃划船，库中同名条目
+背部健身器械动作分类表.md,58,哑铃,站姿旋转划船,菱形肌,肱二头肌、背阔肌、三角肌,Bent Over Two-Dumbbell Row,free-exercise-db:Bent_Over_Two-Dumbbell_Row (Unlicense),fedb:Bent_Over_Two-Dumbbell_Row,Bent Over Two-Dumbbell Row,medium,站姿旋转划船，库无旋转变式，映射俯身双手哑铃划船
+背部健身器械动作分类表.md,59,哑铃,俯身哑铃划船,菱形肌,肱二头肌、背阔肌、三角肌,Bent Over Two-Dumbbell Row,free-exercise-db:Bent_Over_Two-Dumbbell_Row (Unlicense),fedb:Bent_Over_Two-Dumbbell_Row,Bent Over Two-Dumbbell Row,high,俯身哑铃划船，库中同名条目
+背部健身器械动作分类表.md,60,哑铃,哑铃划船（手）,菱形肌,肱二头肌、背阔肌、三角肌,One-Arm Dumbbell Row,free-exercise-db:One-Arm_Dumbbell_Row (Unlicense),fedb:One-Arm_Dumbbell_Row,One-Arm Dumbbell Row,high,手撑单臂哑铃划船，与 E0240 共用条目
+背部健身器械动作分类表.md,61,哑铃,站姿哑铃划船,菱形肌,肱二头肌、背阔肌、三角肌,Bent Over Two-Dumbbell Row,free-exercise-db:Bent_Over_Two-Dumbbell_Row (Unlicense),fedb:Bent_Over_Two-Dumbbell_Row,Bent Over Two-Dumbbell Row,high,站姿（俯身）哑铃划船，库中俯身双手条目
+背部健身器械动作分类表.md,62,哑铃,平躺哑铃过头拉,背阔肌、胸大肌,三角肌、肱三头肌,Cross-Bench Dumbbell Pullovers,wger:161 (CC-BY-SA 3),wger:161,Cross-Bench Dumbbell Pullovers,medium,平躺哑铃过头拉；fedb 同类条目 primary 为胸大肌，改用 wger 背阔肌条目
+背部健身器械动作分类表.md,63,哑铃,俯卧哑铃划船,菱形肌,肱二头肌、背阔肌、前臂肌,Dumbbell Incline Row,free-exercise-db:Dumbbell_Incline_Row (Unlicense),fedb:Dumbbell_Incline_Row,Dumbbell Incline Row,high,俯卧斜凳支撑哑铃划船，库中同名条目
+背部健身器械动作分类表.md,64,哑铃,俯卧反手哑铃划船,菱形肌,肱二头肌、背阔肌、三角肌,Bent Over Two-Dumbbell Row,free-exercise-db:Bent_Over_Two-Dumbbell_Row (Unlicense),fedb:Bent_Over_Two-Dumbbell_Row,Bent Over Two-Dumbbell Row,medium,俯卧反手（supinated）哑铃划船，映射通用双手哑铃划船
+背部健身器械动作分类表.md,65,单杠,引体向上,背阔肌,肱二头肌、菱形肌,Pullups,free-exercise-db:Pullups (Unlicense),fedb:Pullups,Pullups,high,引体向上，库中同名条目
+背部健身器械动作分类表.md,66,单杠,辅助引体,背阔肌,腹肌、前臂肌、菱形肌,Band Assisted Pull-Up,free-exercise-db:Band_Assisted_Pull-Up (Unlicense),fedb:Band_Assisted_Pull-Up,Band Assisted Pull-Up,high,单杠辅助引体，对应弹力带辅助引体条目
+背部健身器械动作分类表.md,67,单杠,对握引体向上,背阔肌,肱二头肌、菱形肌、三角肌,V-Bar Pullup,free-exercise-db:V-Bar_Pullup (Unlicense),fedb:V-Bar_Pullup,V-Bar Pullup,high,对握引体，对应 V 把引体条目
+背部健身器械动作分类表.md,68,单杠,反手引体向上,背阔肌,肱二头肌、前臂肌、菱形肌,Chin-Up,free-exercise-db:Chin-Up (Unlicense),fedb:Chin-Up,Chin-Up,high,反手引体向上，库中同名条目
+背部健身器械动作分类表.md,69,无,山羊挺身,竖脊肌,臀大肌、腘绳肌,Hyperextensions (Back Extensions),free-exercise-db:Hyperextensions_Back_Extensions (Unlicense),fedb:Hyperextensions_Back_Extensions,Hyperextensions (Back Extensions),high,山羊挺身，库中同名条目
+背部健身器械动作分类表.md,70,无,平板手肘撑,腹肌,竖脊肌,Plank,free-exercise-db:Plank (Unlicense),fedb:Plank,Plank,medium,平板手肘撑以核心为主，列于背部表作稳定类参考
+背部健身器械动作分类表.md,71,单杠,弹跳引体,背阔肌,肱二头肌、菱形肌,Pullups,free-exercise-db:Pullups (Unlicense),fedb:Pullups,Pullups,medium,弹跳式引体，库无对应变式，映射通用引体条目
+背部健身器械动作分类表.md,72,单杠,引体上拉,背阔肌,肱二头肌、菱形肌,Pullups,free-exercise-db:Pullups (Unlicense),fedb:Pullups,Pullups,high,引体上拉，通用引体条目
+背部健身器械动作分类表.md,73,史密斯机,史密斯反手划船,菱形肌,肱二头肌、背阔肌、三角肌,Smith Machine Bent Over Row,free-exercise-db:Smith_Machine_Bent_Over_Row (Unlicense),fedb:Smith_Machine_Bent_Over_Row,Smith Machine Bent Over Row,high,史密斯反手划船，库中史密斯俯身划船条目
+背部健身器械动作分类表.md,74,悬挂带 & 弹力带,悬挂带 深蹲划船,菱形肌,背阔肌,TRX Rows,wger:959 (CC-BY-SA 4),wger:959,TRX Rows,medium,悬挂带（TRX）深蹲划船，改用 TRX Rows 条目
+背部健身器械动作分类表.md,75,悬挂带 & 弹力带,悬挂带 坐姿下拉（负重）,背阔肌,肱二头肌、菱形肌,-,-,-,-,low,库无悬挂带坐姿下拉（负重）条目，按解剖填
+背部健身器械动作分类表.md,76,悬挂带 & 弹力带,悬挂带 水平划船,菱形肌,背阔肌,TRX Rows,wger:959 (CC-BY-SA 4),wger:959,TRX Rows,medium,悬挂带水平划船，改用 TRX Rows 条目
+背部健身器械动作分类表.md,77,悬挂带 & 弹力带,弹力带 俯身划船,背阔肌,肱二头肌、斜方肌,Seated Band Row,wger:2635 (CC-BY-SA 4),wger:2635,Seated Band Row,medium,弹力带俯身划船，库中仅有弹力带坐姿划船条目
+背部健身器械动作分类表.md,78,悬挂带 & 弹力带,弹力带 坐姿划船,背阔肌,肱二头肌、斜方肌,Seated Band Row,wger:2635 (CC-BY-SA 4),wger:2635,Seated Band Row,high,弹力带坐姿划船，库中同名条目
+背部健身器械动作分类表.md,79,悬挂带 & 弹力带,弹力带 单手下拉,背阔肌,肱二头肌、菱形肌,One Arm Lat Pulldown,free-exercise-db:One_Arm_Lat_Pulldown (Unlicense),fedb:One_Arm_Lat_Pulldown,One Arm Lat Pulldown,medium,弹力带单手下拉，映射绳索单臂下拉
+背部健身器械动作分类表.md,80,悬挂带 & 弹力带,弹力带 单手划船,菱形肌,肱二头肌、背阔肌、斜方肌,-,-,-,-,low,库中无弹力带单手划船条目（仅有绳索版本），按规则留空（肌肉按解剖常识填写）
+背部健身器械动作分类表.md,81,悬挂带 & 弹力带,弹力带 反向早安,腘绳肌,臀大肌、竖脊肌,Band Good Morning,free-exercise-db:Band_Good_Morning (Unlicense),fedb:Band_Good_Morning,Band Good Morning,medium,弹力带反向早安，映射弹力带早安条目
+背部健身器械动作分类表.md,82,悬挂带 & 弹力带,弹力带 跪姿下拉,背阔肌,肱二头肌、菱形肌,Kneeling High Pulley Row,free-exercise-db:Kneeling_High_Pulley_Row (Unlicense),fedb:Kneeling_High_Pulley_Row,Kneeling High Pulley Row,medium,弹力带跪姿下拉，映射绳索跪姿高位下拉
+背部健身器械动作分类表.md,83,悬挂带 & 弹力带,弹力带 直臂下拉,背阔肌,-,Straight-Arm Pulldown,free-exercise-db:Straight-Arm_Pulldown (Unlicense),fedb:Straight-Arm_Pulldown,Straight-Arm Pulldown,medium,弹力带直臂下拉，映射绳索直臂下压
+背部健身器械动作分类表.md,84,悬挂带 & 弹力带,弹力带 坐姿直立划船,斜方肌,三角肌,Upright Row - With Bands,free-exercise-db:Upright_Row_-_With_Bands (Unlicense),fedb:Upright_Row_-_With_Bands,Upright Row - With Bands,medium,弹力带坐姿直立划船，库中为弹力带直立划船站姿条目
+背部健身器械动作分类表.md,85,悬挂带 & 弹力带,弹力带 站姿直立划船,斜方肌,三角肌,Upright Row - With Bands,free-exercise-db:Upright_Row_-_With_Bands (Unlicense),fedb:Upright_Row_-_With_Bands,Upright Row - With Bands,high,弹力带站姿直立划船，库中同名条目
+背部健身器械动作分类表.md,86,悬挂带 & 弹力带,弹力带 反手下拉,背阔肌,肱二头肌、菱形肌、三角肌,-,-,-,-,low,库中无弹力带反手下拉条目（仅有绳索版本），按规则留空（肌肉按解剖常识填写）
+背部健身器械动作分类表.md,87,悬挂带 & 弹力带,弹力带 高位下拉,背阔肌,肱二头肌、菱形肌、三角肌,Wide-Grip Lat Pulldown,free-exercise-db:Wide-Grip_Lat_Pulldown (Unlicense),fedb:Wide-Grip_Lat_Pulldown,Wide-Grip Lat Pulldown,medium,弹力带高位下拉，映射宽距下拉条目
+背部健身器械动作分类表.md,88,固定器械,罗马椅背部伸展,竖脊肌,臀大肌、腘绳肌,Hyperextensions (Back Extensions),free-exercise-db:Hyperextensions_Back_Extensions (Unlicense),fedb:Hyperextensions_Back_Extensions,Hyperextensions (Back Extensions),high,罗马椅背部伸展，对应山羊挺身条目
+背部健身器械动作分类表.md,89,壶铃,壶铃 大猩猩划船,菱形肌,肱二头肌、背阔肌,Alternating Kettlebell Row,free-exercise-db:Alternating_Kettlebell_Row (Unlicense),fedb:Alternating_Kettlebell_Row,Alternating Kettlebell Row,high,壶铃大猩猩划船为交替壶铃划船，库中同名条目
+胸部健身器械动作分类表.md,3,杠铃,杠铃卧推,胸大肌,三角肌、肱三头肌,Barbell Bench Press - Medium Grip,free-exercise-db:Barbell_Bench_Press_-_Medium_Grip (Unlicense),fedb:Barbell_Bench_Press_-_Medium_Grip,Barbell Bench Press - Medium Grip,high,标准杠铃卧推
+胸部健身器械动作分类表.md,4,杠铃,宽距杠铃卧推,胸大肌,三角肌、肱三头肌,Wide-Grip Barbell Bench Press,free-exercise-db:Wide-Grip_Barbell_Bench_Press (Unlicense),fedb:Wide-Grip_Barbell_Bench_Press,Wide-Grip Barbell Bench Press,high,宽距变式对宽距条目
+胸部健身器械动作分类表.md,5,杠铃,下斜杠铃卧推,胸大肌,三角肌、肱三头肌,Decline Barbell Bench Press,free-exercise-db:Decline_Barbell_Bench_Press (Unlicense),fedb:Decline_Barbell_Bench_Press,Decline Barbell Bench Press,high,下斜变式对下斜条目
+胸部健身器械动作分类表.md,6,杠铃,抬腿杠铃卧推,胸大肌,肱三头肌,Larsen Press,wger:1546 (CC-BY-SA 4),wger:1546,Larsen Press,medium,抬腿（离地）杠铃卧推近似 Larsen Press，fedb 无对应
+胸部健身器械动作分类表.md,7,杠铃,暂停卧推,胸大肌,肱三头肌,Pause Bench,wger:445 (CC0),wger:445,Pause Bench,high,暂停卧推，fedb 无对应，取 wger Pause Bench
+胸部健身器械动作分类表.md,8,杠铃,上斜杠铃卧推,胸大肌,三角肌、肱三头肌,Barbell Incline Bench Press - Medium Grip,free-exercise-db:Barbell_Incline_Bench_Press_-_Medium_Grip (Unlicense),fedb:Barbell_Incline_Bench_Press_-_Medium_Grip,Barbell Incline Bench Press - Medium Grip,high,上斜变式对上斜条目
+胸部健身器械动作分类表.md,9,杠铃,杠铃片夹胸,胸大肌,三角肌、肱三头肌、前臂肌,Svend Press,free-exercise-db:Svend_Press (Unlicense),fedb:Svend_Press,Svend Press,high,杠铃片夹胸即 Svend Press（片挤压）
+胸部健身器械动作分类表.md,10,杠铃,杠铃地板卧推,胸大肌、肱三头肌,三角肌,Floor Press,free-exercise-db:Floor_Press (Unlicense),fedb:Floor_Press,Floor Press,high,地板卧推；库中主肌肉为肱三头肌，胸部语境并列胸大肌
+胸部健身器械动作分类表.md,11,哑铃,哑铃卧推,胸大肌,三角肌、肱三头肌,Dumbbell Bench Press,free-exercise-db:Dumbbell_Bench_Press (Unlicense),fedb:Dumbbell_Bench_Press,Dumbbell Bench Press,high,标准哑铃卧推
+胸部健身器械动作分类表.md,12,哑铃,上斜哑铃卧推,胸大肌,三角肌、肱三头肌,Incline Dumbbell Press,free-exercise-db:Incline_Dumbbell_Press (Unlicense),fedb:Incline_Dumbbell_Press,Incline Dumbbell Press,high,上斜变式对上斜条目
+胸部健身器械动作分类表.md,13,哑铃,窄距哑铃卧推,胸大肌、肱三头肌,三角肌,Close-Grip Dumbbell Press,free-exercise-db:Close-Grip_Dumbbell_Press (Unlicense),fedb:Close-Grip_Dumbbell_Press,Close-Grip Dumbbell Press,high,窄距变式；库中主肌肉为肱三头肌，并列胸大肌
+胸部健身器械动作分类表.md,14,哑铃,平板哑铃飞鸟,胸大肌,三角肌,Dumbbell Flyes,free-exercise-db:Dumbbell_Flyes (Unlicense),fedb:Dumbbell_Flyes,Dumbbell Flyes,high,平板哑铃飞鸟即 Dumbbell Flyes
+胸部健身器械动作分类表.md,15,哑铃,仰卧旋转展臂上,胸大肌,三角肌,Around The Worlds,free-exercise-db:Around_The_Worlds (Unlicense),fedb:Around_The_Worlds,Around The Worlds,medium,仰卧旋转展臂（画圈），映射到 Around The Worlds
+胸部健身器械动作分类表.md,16,哑铃,上斜哑铃飞鸟,胸大肌,三角肌,Incline Dumbbell Flyes,free-exercise-db:Incline_Dumbbell_Flyes (Unlicense),fedb:Incline_Dumbbell_Flyes,Incline Dumbbell Flyes,high,上斜哑铃飞鸟
+胸部健身器械动作分类表.md,17,哑铃,反手哑铃卧推,胸大肌,三角肌、肱三头肌,DB Underhand bench press,wger:1497 (CC-BY-SA 4),wger:1497,DB Underhand bench press,high,反手哑铃卧推对应 DB Underhand bench press，fedb 无对应
+胸部健身器械动作分类表.md,18,哑铃,地板哑铃卧推,胸大肌、肱三头肌,三角肌,Dumbbell Floor Press,free-exercise-db:Dumbbell_Floor_Press (Unlicense),fedb:Dumbbell_Floor_Press,Dumbbell Floor Press,high,地板哑铃卧推；库中主肌肉为肱三头肌，并列胸大肌
+胸部健身器械动作分类表.md,19,哑铃,平板哑铃锤式卧推,胸大肌,三角肌、肱三头肌,Dumbbell Bench Press with Neutral Grip,free-exercise-db:Dumbbell_Bench_Press_with_Neutral_Grip (Unlicense),fedb:Dumbbell_Bench_Press_with_Neutral_Grip,Dumbbell Bench Press with Neutral Grip,high,锤式即中立握卧推
+胸部健身器械动作分类表.md,20,哑铃,平板哑铃卧推,胸大肌,三角肌、肱三头肌,Dumbbell Bench Press,free-exercise-db:Dumbbell_Bench_Press (Unlicense),fedb:Dumbbell_Bench_Press,Dumbbell Bench Press,high,平板哑铃卧推
+胸部健身器械动作分类表.md,21,哑铃,下斜哑铃卧推,胸大肌,三角肌、肱三头肌,Decline Dumbbell Bench Press,free-exercise-db:Decline_Dumbbell_Bench_Press (Unlicense),fedb:Decline_Dumbbell_Bench_Press,Decline Dumbbell Bench Press,high,下斜变式对下斜条目
+胸部健身器械动作分类表.md,22,哑铃,哑铃飞鸟,胸大肌,三角肌,Dumbbell Flyes,free-exercise-db:Dumbbell_Flyes (Unlicense),fedb:Dumbbell_Flyes,Dumbbell Flyes,high,哑铃飞鸟通用条目
+胸部健身器械动作分类表.md,23,哑铃,仰卧屈臂上拉,胸大肌,背阔肌、三角肌、肱三头肌,Bent-Arm Dumbbell Pullover,free-exercise-db:Bent-Arm_Dumbbell_Pullover (Unlicense),fedb:Bent-Arm_Dumbbell_Pullover,Bent-Arm Dumbbell Pullover,high,仰卧屈臂上拉即 Bent-Arm Dumbbell Pullover
+胸部健身器械动作分类表.md,24,哑铃,反手上斜哑铃卧推,胸大肌,三角肌、肱三头肌,Incline Dumbbell Press,free-exercise-db:Incline_Dumbbell_Press (Unlicense),fedb:Incline_Dumbbell_Press,Incline Dumbbell Press,medium,反手上斜变式库中无专门条目，映射到上斜哑铃卧推通用条目
+胸部健身器械动作分类表.md,25,哑铃,地板反手哑铃卧推,胸大肌、肱三头肌,三角肌,Dumbbell Floor Press,free-exercise-db:Dumbbell_Floor_Press (Unlicense),fedb:Dumbbell_Floor_Press,Dumbbell Floor Press,medium,反手地板变式库中无专门条目，映射到通用地板哑铃卧推
+胸部健身器械动作分类表.md,26,哑铃,哑铃卧推（锤）,胸大肌,三角肌、肱三头肌,Dumbbell Bench Press with Neutral Grip,free-exercise-db:Dumbbell_Bench_Press_with_Neutral_Grip (Unlicense),fedb:Dumbbell_Bench_Press_with_Neutral_Grip,Dumbbell Bench Press with Neutral Grip,high,锤式（中立握）卧推
+胸部健身器械动作分类表.md,27,哑铃,哑铃下斜飞鸟,胸大肌,三角肌,Decline Dumbbell Flyes,free-exercise-db:Decline_Dumbbell_Flyes (Unlicense),fedb:Decline_Dumbbell_Flyes,Decline Dumbbell Flyes,high,下斜哑铃飞鸟
+胸部健身器械动作分类表.md,28,固定器械,器械推胸,胸大肌,三角肌、肱三头肌,Machine Bench Press,free-exercise-db:Machine_Bench_Press (Unlicense),fedb:Machine_Bench_Press,Machine Bench Press,high,固定器械推胸对器械卧推条目
+胸部健身器械动作分类表.md,29,固定器械,双杠臂屈伸（辅）,胸大肌、肱三头肌,三角肌,Dip Machine,free-exercise-db:Dip_Machine (Unlicense),fedb:Dip_Machine,Dip Machine,medium,辅助式双杠臂屈伸，映射到 Dip Machine
+胸部健身器械动作分类表.md,30,固定器械,站姿器械夹胸,胸大肌,三角肌,Butterfly,free-exercise-db:Butterfly (Unlicense),fedb:Butterfly,Butterfly,medium,站姿器械夹胸，映射到通用蝴蝶机夹胸条目
+胸部健身器械动作分类表.md,31,固定器械,器械推胸 - V4,胸大肌,三角肌、肱三头肌,Machine Bench Press,free-exercise-db:Machine_Bench_Press (Unlicense),fedb:Machine_Bench_Press,Machine Bench Press,medium,编号变式（-V4），映射到通用器械推胸条目
+胸部健身器械动作分类表.md,32,固定器械,蝴蝶机飞鸟 - V2,胸大肌,三角肌,Butterfly,free-exercise-db:Butterfly (Unlicense),fedb:Butterfly,Butterfly,medium,编号变式（-V2），映射到通用蝴蝶机飞鸟条目
+胸部健身器械动作分类表.md,33,固定器械,蝴蝶机夹胸 V2,胸大肌,三角肌,Butterfly,free-exercise-db:Butterfly (Unlicense),fedb:Butterfly,Butterfly,medium,编号变式，映射到通用蝴蝶机夹胸条目
+胸部健身器械动作分类表.md,34,固定器械,器械坐姿夹胸,胸大肌,三角肌,Butterfly,free-exercise-db:Butterfly (Unlicense),fedb:Butterfly,Butterfly,high,坐姿器械夹胸即蝴蝶机夹胸
+胸部健身器械动作分类表.md,35,固定器械,对握式器械推胸,胸大肌,三角肌、肱三头肌,Machine Bench Press,free-exercise-db:Machine_Bench_Press (Unlicense),fedb:Machine_Bench_Press,Machine Bench Press,medium,对握（中立握）变式，映射到通用器械推胸条目
+胸部健身器械动作分类表.md,36,固定器械,悍马机推胸,胸大肌,三角肌、肱三头肌,Leverage Chest Press,free-exercise-db:Leverage_Chest_Press (Unlicense),fedb:Leverage_Chest_Press,Leverage Chest Press,medium,悍马机品牌器械，映射到 Leverage 通用器械推胸条目
+胸部健身器械动作分类表.md,37,固定器械,上斜悍马机推胸,胸大肌,三角肌、肱三头肌,Leverage Incline Chest Press,free-exercise-db:Leverage_Incline_Chest_Press (Unlicense),fedb:Leverage_Incline_Chest_Press,Leverage Incline Chest Press,medium,悍马机品牌上斜推胸，映射到 Leverage 上斜推胸条目
+胸部健身器械动作分类表.md,38,固定器械,下斜悍马机推胸,胸大肌,三角肌、肱三头肌,Leverage Decline Chest Press,free-exercise-db:Leverage_Decline_Chest_Press (Unlicense),fedb:Leverage_Decline_Chest_Press,Leverage Decline Chest Press,medium,悍马机品牌下斜推胸，映射到 Leverage 下斜推胸条目
+胸部健身器械动作分类表.md,39,固定器械,上斜悍马机飞鸟,胸大肌,三角肌,Butterfly,free-exercise-db:Butterfly (Unlicense),fedb:Butterfly,Butterfly,medium,上斜悍马机飞鸟，库中无对应，映射到通用器械飞鸟条目
+胸部健身器械动作分类表.md,40,固定器械,单边悍马机推胸,胸大肌,三角肌、肱三头肌,Leverage Chest Press,free-exercise-db:Leverage_Chest_Press (Unlicense),fedb:Leverage_Chest_Press,Leverage Chest Press,medium,单边悍马机推胸，映射到 Leverage 通用推胸条目
+胸部健身器械动作分类表.md,41,固定器械,悍马机推胸 - V2,胸大肌,三角肌、肱三头肌,Leverage Chest Press,free-exercise-db:Leverage_Chest_Press (Unlicense),fedb:Leverage_Chest_Press,Leverage Chest Press,medium,编号变式（-V2），映射到 Leverage 通用推胸条目
+胸部健身器械动作分类表.md,42,固定器械,悍马机推胸 - V3,胸大肌,三角肌、肱三头肌,Leverage Chest Press,free-exercise-db:Leverage_Chest_Press (Unlicense),fedb:Leverage_Chest_Press,Leverage Chest Press,medium,编号变式（-V3），映射到 Leverage 通用推胸条目
+胸部健身器械动作分类表.md,43,固定器械,直立器械推胸,胸大肌,三角肌、肱三头肌,Machine Bench Press,free-exercise-db:Machine_Bench_Press (Unlicense),fedb:Machine_Bench_Press,Machine Bench Press,medium,直立/站姿器械推胸，映射到通用器械推胸条目
+胸部健身器械动作分类表.md,44,固定器械,史密斯机卧推,胸大肌,三角肌、肱三头肌,Smith Machine Bench Press,free-exercise-db:Smith_Machine_Bench_Press (Unlicense),fedb:Smith_Machine_Bench_Press,Smith Machine Bench Press,high,史密斯机卧推
+胸部健身器械动作分类表.md,45,固定器械,上斜史密斯机卧推,胸大肌,三角肌、肱三头肌,Smith Machine Incline Bench Press,free-exercise-db:Smith_Machine_Incline_Bench_Press (Unlicense),fedb:Smith_Machine_Incline_Bench_Press,Smith Machine Incline Bench Press,high,上斜变式对上斜条目
+胸部健身器械动作分类表.md,46,固定器械,下斜史密斯机卧推,胸大肌,三角肌、肱三头肌,Smith Machine Decline Press,free-exercise-db:Smith_Machine_Decline_Press (Unlicense),fedb:Smith_Machine_Decline_Press,Smith Machine Decline Press,high,下斜变式对下斜条目
+胸部健身器械动作分类表.md,47,固定器械,史密斯机 V-bar,胸大肌、肱三头肌,三角肌,Smith Machine Close-Grip Bench Press,free-exercise-db:Smith_Machine_Close-Grip_Bench_Press (Unlicense),fedb:Smith_Machine_Close-Grip_Bench_Press,Smith Machine Close-Grip Bench Press,medium,V-bar（窄距）推胸，映射到史密斯机窄距卧推条目
+胸部健身器械动作分类表.md,48,绳索,绳索十字夹胸,胸大肌,三角肌,Cable Crossover,free-exercise-db:Cable_Crossover (Unlicense),fedb:Cable_Crossover,Cable Crossover,high,绳索十字夹胸即 Cable Crossover
+胸部健身器械动作分类表.md,49,绳索,绳索夹胸,胸大肌,三角肌,Cable Crossover,free-exercise-db:Cable_Crossover (Unlicense),fedb:Cable_Crossover,Cable Crossover,high,绳索夹胸通用条目
+胸部健身器械动作分类表.md,50,绳索,平板绳索夹胸,胸大肌,三角肌,Flat Bench Cable Flyes,free-exercise-db:Flat_Bench_Cable_Flyes (Unlicense),fedb:Flat_Bench_Cable_Flyes,Flat Bench Cable Flyes,high,平板绳索夹胸
+胸部健身器械动作分类表.md,51,绳索,上斜绳索夹胸,胸大肌,三角肌,Incline Cable Flye,free-exercise-db:Incline_Cable_Flye (Unlicense),fedb:Incline_Cable_Flye,Incline Cable Flye,high,上斜绳索夹胸
+胸部健身器械动作分类表.md,52,绳索,下斜绳索夹胸,胸大肌,三角肌,Low Cable Crossover,free-exercise-db:Low_Cable_Crossover (Unlicense),fedb:Low_Cable_Crossover,Low Cable Crossover,high,下斜（低位）绳索夹胸
+胸部健身器械动作分类表.md,53,绳索,绳索站姿单臂飞鸟,胸大肌,三角肌,Single-Arm Cable Crossover,free-exercise-db:Single-Arm_Cable_Crossover (Unlicense),fedb:Single-Arm_Cable_Crossover,Single-Arm Cable Crossover,high,站姿单臂绳索飞鸟
+胸部健身器械动作分类表.md,54,弹力带,弹力带 - 高位飞鸟,胸大肌,三角肌、肱二头肌,Cross Over - With Bands,free-exercise-db:Cross_Over_-_With_Bands (Unlicense),fedb:Cross_Over_-_With_Bands,Cross Over - With Bands,medium,弹力带高位飞鸟，映射到弹力带十字夹胸条目
+胸部健身器械动作分类表.md,55,弹力带,弹力带 - 低位飞鸟,胸大肌,三角肌、肱二头肌,Cross Over - With Bands,free-exercise-db:Cross_Over_-_With_Bands (Unlicense),fedb:Cross_Over_-_With_Bands,Cross Over - With Bands,medium,弹力带低位飞鸟，映射到弹力带十字夹胸条目
+胸部健身器械动作分类表.md,56,弹力带,弹力带 - 十字飞鸟,胸大肌,三角肌、肱二头肌,Cross Over - With Bands,free-exercise-db:Cross_Over_-_With_Bands (Unlicense),fedb:Cross_Over_-_With_Bands,Cross Over - With Bands,high,弹力带十字飞鸟
+胸部健身器械动作分类表.md,57,弹力带,弹力带 - 阻力俯卧撑,胸大肌,三角肌、肱三头肌,Pushups,free-exercise-db:Pushups (Unlicense),fedb:Pushups,Pushups,medium,弹力带阻力俯卧撑，库中无对应，映射到标准俯卧撑
+胸部健身器械动作分类表.md,58,弹力带,弹力带 - 前推,胸大肌,三角肌、肱三头肌,Bench Press - With Bands,free-exercise-db:Bench_Press_-_With_Bands (Unlicense),fedb:Bench_Press_-_With_Bands,Bench Press - With Bands,medium,弹力带站姿前推（水平推），映射到弹力带卧推条目
+胸部健身器械动作分类表.md,59,弹力带,弹力带 - 上推,胸大肌,三角肌、肱三头肌,Bench Press - With Bands,free-exercise-db:Bench_Press_-_With_Bands (Unlicense),fedb:Bench_Press_-_With_Bands,Bench Press - With Bands,medium,弹力带向上推，映射到弹力带卧推条目
+胸部健身器械动作分类表.md,60,弹力带,弹力带 - 卧推,胸大肌,三角肌、肱三头肌,Bench Press - With Bands,free-exercise-db:Bench_Press_-_With_Bands (Unlicense),fedb:Bench_Press_-_With_Bands,Bench Press - With Bands,high,弹力带卧推
+胸部健身器械动作分类表.md,61,弹力带,弹力带 - 坐姿前推,胸大肌,三角肌、肱三头肌,Bench Press - With Bands,free-exercise-db:Bench_Press_-_With_Bands (Unlicense),fedb:Bench_Press_-_With_Bands,Bench Press - With Bands,medium,弹力带坐姿前推，映射到弹力带卧推条目
+胸部健身器械动作分类表.md,62,无,双杠臂屈伸,胸大肌,三角肌、肱三头肌,Dips - Chest Version,free-exercise-db:Dips_-_Chest_Version (Unlicense),fedb:Dips_-_Chest_Version,Dips - Chest Version,high,双杠臂屈伸（胸大肌版）
+胸部健身器械动作分类表.md,63,无,俯卧撑,胸大肌,三角肌、肱三头肌,Pushups,free-exercise-db:Pushups (Unlicense),fedb:Pushups,Pushups,high,标准俯卧撑
+胸部健身器械动作分类表.md,64,无,上斜俯卧撑,胸大肌,三角肌、肱三头肌,Incline Push-Up,free-exercise-db:Incline_Push-Up (Unlicense),fedb:Incline_Push-Up,Incline Push-Up,high,上斜俯卧撑
+胸部健身器械动作分类表.md,65,无,下斜俯卧撑,胸大肌,三角肌、肱三头肌,Decline Push-Up,free-exercise-db:Decline_Push-Up (Unlicense),fedb:Decline_Push-Up,Decline Push-Up,high,下斜俯卧撑
+胸部健身器械动作分类表.md,66,无,俯卧撑（负重）,胸大肌,三角肌、肱三头肌,Weighted push-ups,wger:1902 (CC-BY-SA 4),wger:1902,Weighted push-ups,high,负重俯卧撑对应 Weighted push-ups
+胸部健身器械动作分类表.md,67,无,反手俯卧撑,胸大肌,三角肌、肱三头肌,Pushups,free-exercise-db:Pushups (Unlicense),fedb:Pushups,Pushups,medium,反手（旋外）俯卧撑，库中仅有上斜反手条目，映射到标准俯卧撑
+胸部健身器械动作分类表.md,68,无,反手俯卧撑（负重）,胸大肌,三角肌、肱三头肌,Weighted push-ups,wger:1902 (CC-BY-SA 4),wger:1902,Weighted push-ups,medium,负重反手俯卧撑，映射到 Weighted push-ups
+胸部健身器械动作分类表.md,69,无,臂屈伸式俯卧撑,胸大肌、肱三头肌,三角肌,Push-Ups - Close Triceps Position,free-exercise-db:Push-Ups_-_Close_Triceps_Position (Unlicense),fedb:Push-Ups_-_Close_Triceps_Position,Push-Ups - Close Triceps Position,high,臂屈伸式（窄距三头）俯卧撑
+胸部健身器械动作分类表.md,70,无,臀屈伸式俯卧撑,胸大肌、三角肌,肱三头肌,Hindu Pushups,wger:1080 (CC-BY-SA 4),wger:1080,Hindu Pushups,medium,臀屈伸式（屈髋伸髋）俯卧撑，近似 Hindu Pushups
+胸部健身器械动作分类表.md,71,无,地板飞鸟,胸大肌,三角肌、肱三头肌,Bodyweight Flyes,free-exercise-db:Bodyweight_Flyes (Unlicense),fedb:Bodyweight_Flyes,Bodyweight Flyes,high,地板飞鸟即 Bodyweight Flyes（地面滑动）
+胸部健身器械动作分类表.md,72,无,地板飞鸟（负重）,胸大肌,三角肌、肱三头肌,Bodyweight Flyes,free-exercise-db:Bodyweight_Flyes (Unlicense),fedb:Bodyweight_Flyes,Bodyweight Flyes,medium,负重地板飞鸟，映射到 Bodyweight Flyes
+胸部健身器械动作分类表.md,73,无,派克俯卧撑,胸大肌,三角肌、肱三头肌,Pike Push Ups,wger:454 (CC-BY-SA 4),wger:454,Pike Push Ups,high,派克俯卧撑对应 Pike Push Ups
+胸部健身器械动作分类表.md,74,无,俯卧撑（把柄）,胸大肌,三角肌、肱三头肌,Push-Ups | Parallettes,wger:1113 (CC-BY-SA 4),wger:1113,Push-Ups | Parallettes,high,使用把柄/双杠支架的俯卧撑
+胸部健身器械动作分类表.md,75,无,单手下斜俯卧撑,胸大肌,三角肌、肱三头肌,Single-Arm Push-Up,free-exercise-db:Single-Arm_Push-Up (Unlicense),fedb:Single-Arm_Push-Up,Single-Arm Push-Up,medium,单手下斜俯卧撑，映射到单手俯卧撑条目
+胸部健身器械动作分类表.md,76,无,俯卧撑（支撑）,胸大肌,三角肌、肱三头肌,Pushups,free-exercise-db:Pushups (Unlicense),fedb:Pushups,Pushups,medium,俯卧撑（支撑保持式），库中无专门条目，映射到标准俯卧撑
+胸部健身器械动作分类表.md,77,无,单手俯卧撑,胸大肌,三角肌、肱三头肌,Single-Arm Push-Up,free-exercise-db:Single-Arm_Push-Up (Unlicense),fedb:Single-Arm_Push-Up,Single-Arm Push-Up,high,单手俯卧撑
+胸部健身器械动作分类表.md,78,无,跪姿俯卧撑,胸大肌、三角肌,肱三头肌,Knee Push-Ups,wger:1218 (CC-BY-SA 4),wger:1218,knee push-ups,high,跪姿俯卧撑对应 knee push-ups
+胸部健身器械动作分类表.md,79,无,跪姿地板飞鸟,胸大肌,三角肌、肱三头肌,Bodyweight Flyes,free-exercise-db:Bodyweight_Flyes (Unlicense),fedb:Bodyweight_Flyes,Bodyweight Flyes,medium,跪姿地板飞鸟，映射到 Bodyweight Flyes
+胸部健身器械动作分类表.md,80,无,拉伸 - 单手扶墙,胸大肌、背阔肌,三角肌,One Arm Against Wall,free-exercise-db:One_Arm_Against_Wall (Unlicense),fedb:One_Arm_Against_Wall,One Arm Against Wall,medium,单手扶墙拉伸；库中主肌肉为背阔肌，胸部语境并列胸大肌
+胸部健身器械动作分类表.md,81,无,拉伸 - 杆扩胸,胸大肌,三角肌,Behind Head Chest Stretch,free-exercise-db:Behind_Head_Chest_Stretch (Unlicense),fedb:Behind_Head_Chest_Stretch,Behind Head Chest Stretch,medium,持杆辅助扩胸拉伸，映射到 Behind Head Chest Stretch
+胸部健身器械动作分类表.md,82,无,拉伸 - 辅助胸腔,胸大肌,三角肌,Chest And Front Of Shoulder Stretch,free-exercise-db:Chest_And_Front_Of_Shoulder_Stretch (Unlicense),fedb:Chest_And_Front_Of_Shoulder_Stretch,Chest And Front Of Shoulder Stretch,medium,辅助胸腔（胸廓）拉伸，映射到胸及肩前侧拉伸条目
+胸部健身器械动作分类表.md,83,无,宽距俯卧撑,胸大肌,腹肌、三角肌、肱三头肌,Push-Up Wide,free-exercise-db:Push-Up_Wide (Unlicense),fedb:Push-Up_Wide,Push-Up Wide,high,宽距俯卧撑
+胸部健身器械动作分类表.md,84,无,鼓掌俯卧撑,胸大肌,三角肌、腹肌、肱三头肌,Clap Push-UP,wger:1554 (CC-BY-SA 4),wger:1554,Clap Push-UP,high,鼓掌俯卧撑对应 Clap Push-UP
+腹部健身器械动作分类表.md,5,无,坐姿交替提膝卷腹,腹肌,腹斜肌,Seated Knee Tuck,wger:1105 (CC-BY-SA 4),wger:1105,Seated Knee Tuck,high,坐姿交替提膝卷腹
+腹部健身器械动作分类表.md,6,无,坐姿交替直腿抬腿,腹肌,-,Seated Flat Bench Leg Pull-In,free-exercise-db:Seated_Flat_Bench_Leg_Pull-In (Unlicense),fedb:Seated_Flat_Bench_Leg_Pull-In,Seated Flat Bench Leg Pull-In,medium,坐姿交替直腿抬腿，映射到坐姿平凳收腿
+腹部健身器械动作分类表.md,7,无,坐姿交叉对侧提膝,腹斜肌,腹肌,Seated Corkscrew,wger:1477 (CC-BY-SA 4),wger:1477,Seated Corkscrew,medium,坐姿交叉对侧提膝，映射到坐姿旋转卷腹
+腹部健身器械动作分类表.md,8,无,死虫,腹肌,-,Dead Bug,free-exercise-db:Dead_Bug (Unlicense),fedb:Dead_Bug,Dead Bug,high,死虫
+腹部健身器械动作分类表.md,9,无,俄罗斯转体,腹肌,腹斜肌、竖脊肌,Russian Twist,free-exercise-db:Russian_Twist (Unlicense),fedb:Russian_Twist,Russian Twist,high,库给竖脊肌，转体补腹斜肌
+腹部健身器械动作分类表.md,10,无,负重俄罗斯转体,腹肌,腹斜肌,Russian Twist,wger:1193 (CC-BY-SA 4),wger:1193,Russian Twist,high,持哑铃负重俄罗斯转体
+腹部健身器械动作分类表.md,11,无,负重仰卧起坐,腹肌,-,Sit-Up,free-exercise-db:Sit-Up (Unlicense),fedb:Sit-Up,Sit-Up,medium,负重仰卧起坐，映射到通用仰卧起坐
+腹部健身器械动作分类表.md,12,无,3/4仰卧起坐,腹肌,-,3/4 Sit-Up,free-exercise-db:3_4_Sit-Up (Unlicense),fedb:3_4_Sit-Up,3/4 Sit-Up,high,3/4 仰卧起坐
+腹部健身器械动作分类表.md,13,无,仰卧抬腿,腹肌,-,Flat Bench Lying Leg Raise,free-exercise-db:Flat_Bench_Lying_Leg_Raise (Unlicense),fedb:Flat_Bench_Lying_Leg_Raise,Flat Bench Lying Leg Raise,high,仰卧抬腿
+腹部健身器械动作分类表.md,14,无,抬腿,腹肌,-,"Leg Raises, Lying",wger:377 (CC-BY-SA 3),wger:377,"Leg Raises, Lying",high,仰卧抬腿通用条目
+腹部健身器械动作分类表.md,15,无,蝴蝶收腹,腹肌,腹斜肌,Butterfly Sit Up,wger:1476 (CC-BY-SA 4),wger:1476,Butterfly Sit Up,high,蝴蝶收腹
+腹部健身器械动作分类表.md,16,无,平板蝴蝶收腹,腹肌,腹斜肌,Butterfly Sit Up,wger:1476 (CC-BY-SA 4),wger:1476,Butterfly Sit Up,medium,平板位蝴蝶收腹变式
+腹部健身器械动作分类表.md,17,无,空中单车,腹肌,-,Air Bike,free-exercise-db:Air_Bike (Unlicense),fedb:Air_Bike,Air Bike,high,空中单车
+腹部健身器械动作分类表.md,18,无,空中单车(高难),腹肌,-,Air Bike,free-exercise-db:Air_Bike (Unlicense),fedb:Air_Bike,Air Bike,medium,空中单车高难变式
+腹部健身器械动作分类表.md,19,无,平躺蹬姿转体,腹肌,腹斜肌,Bicycle Crunches,wger:1412 (CC-BY-SA 4),wger:1412,bicycle crunches,medium,平躺蹬姿转体，映射到自行车卷腹
+腹部健身器械动作分类表.md,20,无,保护式卷腹,腹肌,-,Crunches,free-exercise-db:Crunches (Unlicense),fedb:Crunches,Crunches,medium,保护式（双手护头）卷腹，映射到通用卷腹
+腹部健身器械动作分类表.md,21,无,平躺抬腿,腹肌,-,"Leg Raises, Lying",wger:377 (CC-BY-SA 3),wger:377,"Leg Raises, Lying",high,平躺抬腿
+腹部健身器械动作分类表.md,22,无,腹肌轮收,腹肌,三角肌,Ab Roller,free-exercise-db:Ab_Roller (Unlicense),fedb:Ab_Roller,Ab Roller,high,腹肌轮
+腹部健身器械动作分类表.md,23,无,上斜卷腹转体,腹肌,腹斜肌,Incline Crunches,wger:171 (CC-BY-SA 3),wger:171,Incline Crunches,medium,上斜卷腹转体，库中原条目无转体，补腹斜肌
+腹部健身器械动作分类表.md,24,无,卷腹,腹肌,-,Crunches,free-exercise-db:Crunches (Unlicense),fedb:Crunches,Crunches,high,卷腹
+腹部健身器械动作分类表.md,25,无,平板支撑,腹肌,-,Plank,free-exercise-db:Plank (Unlicense),fedb:Plank,Plank,high,平板支撑
+腹部健身器械动作分类表.md,26,无,器械抬腿,腹肌,-,Leg Raise,wger:376 (CC0),wger:376,Leg Raise,medium,器械抬腿，映射到通用 Leg Raise（原引用为德文条目）
+腹部健身器械动作分类表.md,27,无,拉伸-平躺曲腿旋转,腹斜肌,腹肌,Torso rotation stretch,wger:1451 (CC-BY-SA 4),wger:1451,Torso rotation stretch,medium,平躺曲腿旋转拉伸，映射到躯干旋转拉伸
+腹部健身器械动作分类表.md,28,无,拉伸-贴地俯卧撑转体,腹斜肌,腹肌,Push-up rotations,wger:985 (CC-BY-SA 4),wger:985,Push-up rotations,medium,贴地俯卧撑转体拉伸；库给胸/三头，按腹部语境以腹斜肌为主
+腹部健身器械动作分类表.md,29,无,拉伸-单手抱头侧身,腹斜肌,腹肌,Standing Lateral Stretch,free-exercise-db:Standing_Lateral_Stretch (Unlicense),fedb:Standing_Lateral_Stretch,Standing Lateral Stretch,high,库给腹肌，单手抱头侧身主拉腹斜肌
+腹部健身器械动作分类表.md,30,无,反向卷腹,腹肌,-,Reverse Crunch,free-exercise-db:Reverse_Crunch (Unlicense),fedb:Reverse_Crunch,Reverse Crunch,high,反向卷腹
+腹部健身器械动作分类表.md,31,无,仰卧交替触脚卷腹,腹肌,腹斜肌,Alternate Heel Touchers,free-exercise-db:Alternate_Heel_Touchers (Unlicense),fedb:Alternate_Heel_Touchers,Alternate Heel Touchers,high,库无次要肌肉，触脚卷腹补腹斜肌
+腹部健身器械动作分类表.md,32,无,45度侧弯,腹斜肌,腹肌,Side bend,wger:1188 (CC-BY-SA 4),wger:1188,Side bend,medium,45 度侧弯；库中为持哑铃侧弯条目
+腹部健身器械动作分类表.md,33,无,下斜卷腹,腹肌,-,Decline Crunch,free-exercise-db:Decline_Crunch (Unlicense),fedb:Decline_Crunch,Decline Crunch,high,下斜卷腹
+腹部健身器械动作分类表.md,34,无,空心摇摆,腹肌,-,Hollow Hold,wger:297 (CC0),wger:297,Hollow Hold,medium,空心摇摆，映射到空心支撑
+腹部健身器械动作分类表.md,35,无,仰卧摆脚,腹肌,-,Scissor Kick,free-exercise-db:Scissor_Kick (Unlicense),fedb:Scissor_Kick,Scissor Kick,high,仰卧摆脚（剪刀踢）
+腹部健身器械动作分类表.md,36,无,蹬腿,腹肌,腹斜肌,Flutter Kicks,wger:235 (CC-BY-SA 4),wger:235,Flutter Kicks,medium,仰卧交替蹬腿
+腹部健身器械动作分类表.md,37,无,L坐,腹肌,股四头肌、肱三头肌,L-sit,wger:1852 (CC-BY-SA 4),wger:1852,L-sit,high,L 坐即 L-sit
+腹部健身器械动作分类表.md,38,无,仰卧肘碰膝,腹肌,腹斜肌,Elbow to Knee,free-exercise-db:Elbow_to_Knee (Unlicense),fedb:Elbow_to_Knee,Elbow to Knee,high,库无次要肌肉，肘碰膝转体补腹斜肌
+腹部健身器械动作分类表.md,39,无,龙旗,腹肌、腹斜肌,三角肌,Dragon-flag,wger:1409 (CC-BY-SA 4),wger:1409,Dragon-flag,high,龙旗
+腹部健身器械动作分类表.md,40,固定器械,器械卷腹,腹肌,-,Ab Crunch Machine,free-exercise-db:Ab_Crunch_Machine (Unlicense),fedb:Ab_Crunch_Machine,Ab Crunch Machine,high,器械卷腹
+腹部健身器械动作分类表.md,41,固定器械,器械侧卷腹,腹斜肌,腹肌,Side Bends on Machine,wger:556 (CC-BY-SA 3),wger:556,Side Bends on Machine,medium,器械侧卷腹，映射到器械侧弯
+腹部健身器械动作分类表.md,42,固定器械,滑轮器卷腹,腹肌,-,Cable Crunch,free-exercise-db:Cable_Crunch (Unlicense),fedb:Cable_Crunch,Cable Crunch,high,滑轮器（绳索）卷腹
+腹部健身器械动作分类表.md,43,固定器械,坐姿器械卷腹,腹肌,-,Crunches on Machine,wger:172 (CC-BY-SA 3),wger:172,Crunches on Machine,high,坐姿器械卷腹
+腹部健身器械动作分类表.md,44,绳索,绳索跪姿卷腹,腹肌,-,Cable Crunch,free-exercise-db:Cable_Crunch (Unlicense),fedb:Cable_Crunch,Cable Crunch,high,跪姿绳索卷腹
+腹部健身器械动作分类表.md,45,绳索,站姿绳索转体,腹斜肌,背阔肌,Trunk Rotation With Cable,wger:672 (CC-BY-SA 4),wger:672,Trunk Rotation With Cable,high,站姿绳索转体
+腹部健身器械动作分类表.md,46,绳索,站姿绳索卷腹,腹肌,-,Standing Rope Crunch,free-exercise-db:Standing_Rope_Crunch (Unlicense),fedb:Standing_Rope_Crunch,Standing Rope Crunch,high,站姿绳索卷腹
+腹部健身器械动作分类表.md,47,绳索,绳索水平帕洛夫,腹肌,胸大肌、三角肌,Pallof Press,free-exercise-db:Pallof_Press (Unlicense),fedb:Pallof_Press,Pallof Press,high,绳索水平帕洛夫
+腹部健身器械动作分类表.md,48,弹力带,弹力带-跪姿卷腹,腹肌,-,-,-,-,-,low,库中无弹力带跪姿卷腹条目（仅有绳索版本），按规则留空（肌肉按解剖常识填写）
+腹部健身器械动作分类表.md,49,弹力带,弹力带-仰卧卷腹,腹肌,-,Crunches,free-exercise-db:Crunches (Unlicense),fedb:Crunches,Crunches,medium,弹力带仰卧卷腹，映射到通用卷腹
+腹部健身器械动作分类表.md,50,弹力带,弹力带-下上转体,腹肌,三角肌,-,-,-,-,low,库中无弹力带转体条目（仅有绳索版本），按规则留空（肌肉按解剖常识填写）
+腹部健身器械动作分类表.md,51,弹力带,弹力带-上下转体,腹肌,三角肌,-,-,-,-,low,库中无弹力带转体条目（仅有绳索版本），按规则留空（肌肉按解剖常识填写）
+腹部健身器械动作分类表.md,52,弹力带,弹力带-十字转体,腹肌,腹斜肌,-,-,-,-,low,库中无弹力带转体条目（仅有绳索版本），按规则留空（肌肉按解剖常识填写）
+腹部健身器械动作分类表.md,53,哑铃,哑铃侧弯,腹肌,腹斜肌,Dumbbell Side Bend,free-exercise-db:Dumbbell_Side_Bend (Unlicense),fedb:Dumbbell_Side_Bend,Dumbbell Side Bend,high,库无次要肌肉，侧弯补腹斜肌
+腹部健身器械动作分类表.md,54,单杠,悬垂屈膝举腿,腹肌,腹斜肌,Knee Raises,wger:978 (CC-BY-SA 4),wger:978,Knee Raises,high,悬垂屈膝举腿
+腹部健身器械动作分类表.md,55,单杠,前悬举腿,腹肌,-,Hanging Leg Raise,free-exercise-db:Hanging_Leg_Raise (Unlicense),fedb:Hanging_Leg_Raise,Hanging Leg Raise,high,悬垂举腿
+腹部健身器械动作分类表.md,56,单杠,悬垂举腿抬腿,腹肌,腹斜肌、股四头肌,Leg raises pull up bar,wger:979 (CC-BY-SA 4),wger:979,Leg raises pull up bar,high,悬垂举腿抬腿
+腹部健身器械动作分类表.md,57,杠铃片,负重下斜卷腹,腹肌,-,Decline Crunch,free-exercise-db:Decline_Crunch (Unlicense),fedb:Decline_Crunch,Decline Crunch,medium,负重下斜卷腹，映射到通用下斜卷腹
+腿部健身器械动作分类表.md,3,杠铃,深蹲,股四头肌,臀大肌、腘绳肌、竖脊肌,Barbell Squat,free-exercise-db:Barbell_Squat (Unlicense),fedb:Barbell_Squat,Barbell Squat,high,杠铃深蹲标准条目
+腿部健身器械动作分类表.md,4,杠铃,泽奇深蹲,股四头肌,臀大肌、腘绳肌、小腿肌,Zercher Squats,free-exercise-db:Zercher_Squats (Unlicense),fedb:Zercher_Squats,Zercher Squats,high,泽奇深蹲库中有同名条目
+腿部健身器械动作分类表.md,5,杠铃,杠铃哈克深蹲,股四头肌,腘绳肌、小腿肌,Barbell Hack Squat,free-exercise-db:Barbell_Hack_Squat (Unlicense),fedb:Barbell_Hack_Squat,Barbell Hack Squat,high,杠铃哈克深蹲，库中同名条目
+腿部健身器械动作分类表.md,6,杠铃,前蹲,股四头肌,臀大肌、腘绳肌,Front Barbell Squat,free-exercise-db:Front_Barbell_Squat (Unlicense),fedb:Front_Barbell_Squat,Front Barbell Squat,high,前蹲=前架杠铃深蹲
+腿部健身器械动作分类表.md,7,杠铃,硬拉,竖脊肌,臀大肌、腘绳肌、股四头肌,Barbell Deadlift,free-exercise-db:Barbell_Deadlift (Unlicense),fedb:Barbell_Deadlift,Barbell Deadlift,high,常规硬拉，库中主肌肉为竖脊肌
+腿部健身器械动作分类表.md,8,杠铃,相扑硬拉,腘绳肌,臀大肌、内收肌、股四头肌,Sumo Deadlift,free-exercise-db:Sumo_Deadlift (Unlicense),fedb:Sumo_Deadlift,Sumo Deadlift,high,相扑硬拉，库中同名条目
+腿部健身器械动作分类表.md,9,杠铃,杠铃罗马尼亚硬拉,腘绳肌,臀大肌、竖脊肌,Romanian Deadlift,free-exercise-db:Romanian_Deadlift (Unlicense),fedb:Romanian_Deadlift,Romanian Deadlift,high,罗马尼亚硬拉，库中同名条目
+腿部健身器械动作分类表.md,10,杠铃,高翻,腘绳肌,股四头肌、臀大肌、斜方肌,Power Clean,free-exercise-db:Power_Clean (Unlicense),fedb:Power_Clean,Power Clean,high,高翻=Power Clean
+腿部健身器械动作分类表.md,11,杠铃,杰弗森深蹲,股四头肌,臀大肌、腘绳肌、竖脊肌,Jefferson Squats,free-exercise-db:Jefferson_Squats (Unlicense),fedb:Jefferson_Squats,Jefferson Squats,high,杰弗森深蹲，库中同名条目
+腿部健身器械动作分类表.md,12,杠铃,杠铃直腿硬拉,腘绳肌,臀大肌、竖脊肌,Stiff-Legged Barbell Deadlift,free-exercise-db:Stiff-Legged_Barbell_Deadlift (Unlicense),fedb:Stiff-Legged_Barbell_Deadlift,Stiff-Legged Barbell Deadlift,high,直腿硬拉=Stiff-Legged Deadlift
+腿部健身器械动作分类表.md,13,杠铃,保加利亚蹲,股四头肌,臀大肌、腘绳肌,Elevated Back Lunge,free-exercise-db:Elevated_Back_Lunge (Unlicense),fedb:Elevated_Back_Lunge,Elevated Back Lunge,medium,后脚抬高分腿蹲，近似保加利亚蹲
+腿部健身器械动作分类表.md,14,杠铃,杠铃箭步蹲,股四头肌,臀大肌、腘绳肌,Barbell Lunge,free-exercise-db:Barbell_Lunge (Unlicense),fedb:Barbell_Lunge,Barbell Lunge,high,杠铃箭步蹲，库中同名条目
+腿部健身器械动作分类表.md,15,杠铃,抓举,股四头肌,臀大肌、腘绳肌、斜方肌,Snatch,free-exercise-db:Snatch (Unlicense),fedb:Snatch,Snatch,high,抓举，库中同名条目
+腿部健身器械动作分类表.md,16,杠铃,杠铃火箭推,股四头肌、三角肌,臀大肌,Thruster,wger:650 (CC0),wger:650,Thruster,high,杠铃火箭推=Barbell Thruster；库标主肌肉为三角肌，腿部语境补股四头肌
+腿部健身器械动作分类表.md,17,杠铃,SSB 深蹲,股四头肌,臀大肌、腘绳肌,Barbell Squat,free-exercise-db:Barbell_Squat (Unlicense),fedb:Barbell_Squat,Barbell Squat,medium,SSB 为安全深蹲杆品牌器械，映射到通用杠铃深蹲条目
+腿部健身器械动作分类表.md,18,杠铃,杠铃过头深蹲,股四头肌,臀大肌、三角肌、竖脊肌,Overhead Squat,free-exercise-db:Overhead_Squat (Unlicense),fedb:Overhead_Squat,Overhead Squat,high,杠铃过头深蹲，库中同名条目
+腿部健身器械动作分类表.md,19,杠铃,杠铃停顿全蹲,股四头肌,臀大肌、腘绳肌,Paused Squats,wger:2662 (CC-BY-SA 4),wger:2662,Paused Squats,medium,停顿全蹲=杠铃暂停深蹲，库中为Paused Squats
+腿部健身器械动作分类表.md,20,杠铃,杠铃相扑深蹲,股四头肌,臀大肌、内收肌、腘绳肌,Wide Stance Barbell Squat,free-exercise-db:Wide_Stance_Barbell_Squat (Unlicense),fedb:Wide_Stance_Barbell_Squat,Wide Stance Barbell Squat,medium,相扑深蹲为宽站距深蹲，映射到宽站距杠铃深蹲
+腿部健身器械动作分类表.md,21,杠铃,杠铃箭步蹲 (反向),股四头肌,臀大肌,Barbell Step Back Lunge,wger:1830 (CC-BY-SA 4),wger:1830,Barbell Step Back Lunge,high,反向箭步蹲=Barbell Step Back Lunge
+腿部健身器械动作分类表.md,22,哑铃,哑铃二头弯举深蹲,股四头肌,臀大肌、肱二头肌,Dumbbell Squat,free-exercise-db:Dumbbell_Squat (Unlicense),fedb:Dumbbell_Squat,Dumbbell Squat,medium,深蹲+二头弯举组合动作，取哑铃深蹲主体并补肱二头肌
+腿部健身器械动作分类表.md,23,哑铃,罗马尼亚硬拉,腘绳肌、臀大肌,竖脊肌,Dumbbell Romanian Deadlift,wger:1652 (CC-BY-SA 4),wger:1652,Dumbbell Romanian Deadlift,high,哑铃罗马尼亚硬拉，库中同名条目
+腿部健身器械动作分类表.md,24,哑铃,哑铃深蹲,股四头肌,臀大肌、腘绳肌、竖脊肌,Dumbbell Squat,free-exercise-db:Dumbbell_Squat (Unlicense),fedb:Dumbbell_Squat,Dumbbell Squat,high,哑铃深蹲，库中同名条目
+腿部健身器械动作分类表.md,25,哑铃,哑铃酒杯深蹲,股四头肌,臀大肌、腘绳肌,Dumbbell Goblet Squat,wger:203 (CC-BY-SA 4),wger:203,Dumbbell Goblet Squat,high,酒杯深蹲，库中为哑铃版；库仅标股四头肌，按解剖补次要肌
+腿部健身器械动作分类表.md,26,哑铃,哑铃前蹲,股四头肌、臀大肌,腹肌,Dumbbell Front Squat,wger:1640 (CC-BY-SA 4),wger:1640,Dumbbell Front Squat,high,哑铃前蹲，库中同名条目
+腿部健身器械动作分类表.md,27,哑铃,俯卧哑铃腿弯举,腘绳肌,小腿肌,Lying Leg Curls,free-exercise-db:Lying_Leg_Curls (Unlicense),fedb:Lying_Leg_Curls,Lying Leg Curls,medium,俯卧哑铃腿弯举，映射到俯卧器械腿弯举条目
+腿部健身器械动作分类表.md,28,哑铃,哑铃直腿硬拉,腘绳肌,臀大肌、竖脊肌,Stiff-Legged Dumbbell Deadlift,free-exercise-db:Stiff-Legged_Dumbbell_Deadlift (Unlicense),fedb:Stiff-Legged_Dumbbell_Deadlift,Stiff-Legged Dumbbell Deadlift,high,哑铃直腿硬拉，库中同名条目
+腿部健身器械动作分类表.md,29,哑铃,哑铃箭步蹲,股四头肌,臀大肌、腘绳肌、小腿肌,Dumbbell Lunges,free-exercise-db:Dumbbell_Lunges (Unlicense),fedb:Dumbbell_Lunges,Dumbbell Lunges,high,哑铃箭步蹲，库中同名条目
+腿部健身器械动作分类表.md,30,哑铃,哑铃箭步蹲 (反向),股四头肌,臀大肌、腘绳肌,Dumbbell Rear Lunge,free-exercise-db:Dumbbell_Rear_Lunge (Unlicense),fedb:Dumbbell_Rear_Lunge,Dumbbell Rear Lunge,high,反向箭步蹲，库中为哑铃后撤箭步蹲
+腿部健身器械动作分类表.md,31,哑铃,哑铃保加利亚蹲,股四头肌、臀大肌,腘绳肌,Bulgarian Squat with Dumbbells,wger:1706 (CC-BY-SA 4),wger:1706,Bulgarian Squat with Dumbbells,high,哑铃保加利亚蹲，库中同名条目
+腿部健身器械动作分类表.md,32,哑铃,哑铃相扑蹲,股四头肌,臀大肌、内收肌、腘绳肌,Plie Dumbbell Squat,free-exercise-db:Plie_Dumbbell_Squat (Unlicense),fedb:Plie_Dumbbell_Squat,Plie Dumbbell Squat,medium,相扑蹲=plié 宽站距深蹲，映射到哑铃相扑深蹲
+腿部健身器械动作分类表.md,33,哑铃,哑铃火箭推,股四头肌、臀大肌、腘绳肌,三角肌,Dumbbell Thruster,wger:1684 (CC-BY-SA 4),wger:1684,Dumbbell Thruster,high,哑铃火箭推=哑铃深蹲推举
+腿部健身器械动作分类表.md,34,哑铃,哑铃行走箭步蹲,股四头肌,臀大肌,Dumbbell Lunges Walking,wger:206 (CC-BY-SA 3),wger:206,Dumbbell Lunges Walking,high,哑铃行走箭步蹲，库中同名条目
+腿部健身器械动作分类表.md,35,固定器械,哈克机深蹲,股四头肌,臀大肌、腘绳肌、小腿肌,Hack Squat,free-exercise-db:Hack_Squat (Unlicense),fedb:Hack_Squat,Hack Squat,high,哈克机深蹲，库中为通用Hack Squat
+腿部健身器械动作分类表.md,36,固定器械,硬拉器硬拉,股四头肌,臀大肌、腘绳肌,Leverage Deadlift,free-exercise-db:Leverage_Deadlift (Unlicense),fedb:Leverage_Deadlift,Leverage Deadlift,medium,硬拉器为品牌器械，映射到器械硬拉通用条目
+腿部健身器械动作分类表.md,37,固定器械,腿弯举,腘绳肌,小腿肌,Lying Leg Curls,free-exercise-db:Lying_Leg_Curls (Unlicense),fedb:Lying_Leg_Curls,Lying Leg Curls,high,腿弯举标准器械条目（俯卧腿弯举）
+腿部健身器械动作分类表.md,38,固定器械,坐姿腿弯举,腘绳肌,-,Seated Leg Curl,free-exercise-db:Seated_Leg_Curl (Unlicense),fedb:Seated_Leg_Curl,Seated Leg Curl,high,坐姿腿弯举，库中同名条目
+腿部健身器械动作分类表.md,39,固定器械,单边腿弯举 (器械),腘绳肌,-,Standing Leg Curl,free-exercise-db:Standing_Leg_Curl (Unlicense),fedb:Standing_Leg_Curl,Standing Leg Curl,medium,单边腿弯举，映射到单腿站姿器械腿弯举
+腿部健身器械动作分类表.md,40,固定器械,坐姿腿屈伸,股四头肌,-,Leg Extensions,free-exercise-db:Leg_Extensions (Unlicense),fedb:Leg_Extensions,Leg Extensions,high,坐姿腿屈伸=腿屈伸器械
+腿部健身器械动作分类表.md,41,固定器械,器械倒蹬,股四头肌,臀大肌、腘绳肌、小腿肌,Leg Press,free-exercise-db:Leg_Press (Unlicense),fedb:Leg_Press,Leg Press,high,器械倒蹬=腿举
+腿部健身器械动作分类表.md,42,固定器械,器械深蹲,股四头肌,臀大肌、腘绳肌,Lying Machine Squat,free-exercise-db:Lying_Machine_Squat (Unlicense),fedb:Lying_Machine_Squat,Lying Machine Squat,medium,通用器械深蹲，映射到仰卧器械深蹲条目
+腿部健身器械动作分类表.md,43,固定器械,坐姿髋外展,髋外展肌,臀大肌、臀中肌,Thigh Abductor,free-exercise-db:Thigh_Abductor (Unlicense),fedb:Thigh_Abductor,Thigh Abductor,high,坐姿髋外展器械，库中为Thigh Abductor；补臀中肌
+腿部健身器械动作分类表.md,44,固定器械,坐姿髋内收,内收肌,臀大肌、腘绳肌,Thigh Adductor,free-exercise-db:Thigh_Adductor (Unlicense),fedb:Thigh_Adductor,Thigh Adductor,high,坐姿髋内收器械，库中为Thigh Adductor
+腿部健身器械动作分类表.md,45,固定器械,腰带机深蹲,股四头肌、臀大肌,腘绳肌,Belt Squat,wger:1935 (CC-BY-SA 4),wger:1935,Belt Squat,high,腰带机深蹲=Belt Squat
+腿部健身器械动作分类表.md,46,固定器械,器械单腿屈伸,股四头肌,-,Single-Leg Leg Extension,free-exercise-db:Single-Leg_Leg_Extension (Unlicense),fedb:Single-Leg_Leg_Extension,Single-Leg Leg Extension,high,器械单腿屈伸，库中同名条目
+腿部健身器械动作分类表.md,47,史密斯机,史密斯机深蹲,股四头肌,臀大肌、腘绳肌、竖脊肌,Smith Machine Squat,free-exercise-db:Smith_Machine_Squat (Unlicense),fedb:Smith_Machine_Squat,Smith Machine Squat,high,史密斯机深蹲，库中同名条目
+腿部健身器械动作分类表.md,48,史密斯机,史密斯机箭步蹲,股四头肌、腘绳肌,臀大肌,Smith Machine Split Squat,wger:1593 (CC-BY-SA 4),wger:1593,Smith Machine Split Squat,medium,史密斯机箭步蹲以分腿蹲模式完成，映射到史密斯机分腿蹲
+腿部健身器械动作分类表.md,49,史密斯机,史密斯机保加利亚蹲,股四头肌,臀大肌、腘绳肌,Smith Single-Leg Split Squat,free-exercise-db:Smith_Single-Leg_Split_Squat (Unlicense),fedb:Smith_Single-Leg_Split_Squat,Smith Single-Leg Split Squat,medium,后脚抬高的史密斯机分腿蹲，近似保加利亚蹲
+腿部健身器械动作分类表.md,50,史密斯机,史密斯机坐蹲,股四头肌,臀大肌、腘绳肌、竖脊肌,Box Squat,free-exercise-db:Box_Squat (Unlicense),fedb:Box_Squat,Box Squat,medium,史密斯机坐蹲（箱式深蹲）近似箱式深蹲
+腿部健身器械动作分类表.md,51,史密斯机,史密斯机直腿硬拉,腘绳肌,臀大肌、竖脊肌,Smith Machine Stiff-Legged Deadlift,free-exercise-db:Smith_Machine_Stiff-Legged_Deadlift (Unlicense),fedb:Smith_Machine_Stiff-Legged_Deadlift,Smith Machine Stiff-Legged Deadlift,high,史密斯机直腿硬拉，库中同名条目
+腿部健身器械动作分类表.md,52,史密斯机,史密斯机上踢,臀大肌,腘绳肌,Glute Kickback (Machine),wger:1723 (CC-BY-SA 4),wger:1723,Glute Kickback (Machine),medium,史密斯机上踢（后踢腿），映射到器械后踢腿条目
+腿部健身器械动作分类表.md,53,六角杆,六角杆硬拉,股四头肌,臀大肌、腘绳肌,Trap Bar Deadlift,free-exercise-db:Trap_Bar_Deadlift (Unlicense),fedb:Trap_Bar_Deadlift,Trap Bar Deadlift,high,六角杆硬拉，库中同名条目
+腿部健身器械动作分类表.md,54,六角杆,六角杆深蹲,股四头肌,腘绳肌,Trap Bar Squat,wger:1803 (CC-BY-SA 4),wger:1803,Trap Bar Squat,high,六角杆深蹲=Trap Bar Squat
+腿部健身器械动作分类表.md,55,无,深蹲跳,股四头肌,臀大肌、腘绳肌、小腿肌,Freehand Jump Squat,free-exercise-db:Freehand_Jump_Squat (Unlicense),fedb:Freehand_Jump_Squat,Freehand Jump Squat,high,深蹲跳，库中为自重跳跃深蹲
+腿部健身器械动作分类表.md,56,无,自重深蹲,股四头肌,臀大肌、腘绳肌,Bodyweight Squat,free-exercise-db:Bodyweight_Squat (Unlicense),fedb:Bodyweight_Squat,Bodyweight Squat,high,自重深蹲，库中同名条目
+腿部健身器械动作分类表.md,57,无,自重保加利亚蹲,股四头肌、臀大肌,腘绳肌,Bulgarian split squats left,wger:988 (CC-BY-SA 4),wger:988,Bulgarian split squats left,medium,库中按左右分侧记录，取左侧条目代表自重保加利亚蹲
+腿部健身器械动作分类表.md,58,无,自重腿弯举,腘绳肌,臀大肌、小腿肌,Natural Glute Ham Raise,free-exercise-db:Natural_Glute_Ham_Raise (Unlicense),fedb:Natural_Glute_Ham_Raise,Natural Glute Ham Raise,medium,自重腿弯举，映射到自然臀腿抬高（腿弯举）条目
+腿部健身器械动作分类表.md,59,无,箭步蹲,股四头肌、臀大肌,腘绳肌,Lunges,wger:984 (CC-BY-SA 4),wger:984,Lunges,high,箭步蹲，库中同名条目
+腿部健身器械动作分类表.md,60,无,箭步踢腿,股四头肌、臀大肌,腘绳肌,Lunges,wger:984 (CC-BY-SA 4),wger:984,Lunges,medium,箭步+踢腿组合动作，取箭步蹲主体条目
+腿部健身器械动作分类表.md,61,无,手枪深蹲,股四头肌,臀大肌、腘绳肌,Pistol Squat,wger:456 (CC-BY-SA 3),wger:456,Pistol Squat,high,手枪深蹲；库标主肌肉为腘绳肌/臀大肌，按解剖以股四头肌为主
+腿部健身器械动作分类表.md,62,无,反向箭步蹲,股四头肌、臀大肌,腘绳肌,Reverse lunges,wger:999 (CC-BY-SA 4),wger:999,Reverse lunges,high,反向箭步蹲，库中同名条目
+腿部健身器械动作分类表.md,63,无,侧步深蹲,股四头肌,臀大肌、小腿肌,Side Slides + Squats,wger:1195 (CC-BY-SA 4),wger:1195,Side Slides + Squats,medium,侧步深蹲，映射到侧向滑步深蹲条目
+腿部健身器械动作分类表.md,64,无,相扑深蹲,股四头肌、臀大肌,内收肌,Sumo Squats,wger:632 (CC-BY-SA 4),wger:632,Sumo Squats,high,相扑深蹲，库中同名条目
+腿部健身器械动作分类表.md,65,无,手枪深蹲 (有支撑),股四头肌,臀大肌、腘绳肌,-,-,-,-,low,动作为徒手变式，库中仅有史密斯机版本，器材不符，按规则留空（肌肉按解剖常识填写）
+腿部健身器械动作分类表.md,66,悬挂带 & 弹力带,弹力带提腿,股四头肌,腹肌,Hip Flexion with Band,free-exercise-db:Hip_Flexion_with_Band (Unlicense),fedb:Hip_Flexion_with_Band,Hip Flexion with Band,medium,弹力带提腿=弹力带屈髋，映射到同名条目
+腿部健身器械动作分类表.md,67,悬挂带 & 弹力带,弹力带箭步蹲,股四头肌、臀大肌,腘绳肌,Lunges,wger:984 (CC-BY-SA 4),wger:984,Lunges,medium,库无弹力带箭步蹲，映射到自重箭步蹲条目
+腿部健身器械动作分类表.md,68,悬挂带 & 弹力带,弹力带平躺腿弯举,腘绳肌,小腿肌,Seated Band Hamstring Curl,free-exercise-db:Seated_Band_Hamstring_Curl (Unlicense),fedb:Seated_Band_Hamstring_Curl,Seated Band Hamstring Curl,medium,平躺弹力带腿弯举，映射到坐姿弹力带腿弯举条目
+腿部健身器械动作分类表.md,69,悬挂带 & 弹力带,弹力带站姿腿弯举,腘绳肌,小腿肌,Leg Curls (standing),wger:367 (CC-BY-SA 3),wger:367,Leg Curls (standing),medium,库无弹力带站姿腿弯举，映射到站姿腿弯举通用条目
+腿部健身器械动作分类表.md,70,悬挂带 & 弹力带,弹力带站姿踢腿,臀大肌,腘绳肌,Hip Extension with Bands,free-exercise-db:Hip_Extension_with_Bands (Unlicense),fedb:Hip_Extension_with_Bands,Hip Extension with Bands,high,弹力带站姿踢腿，改用弹力带髋伸条目
+腿部健身器械动作分类表.md,71,悬挂带 & 弹力带,弹力带站姿单腿内收,内收肌,-,Band Hip Adductions,free-exercise-db:Band_Hip_Adductions (Unlicense),fedb:Band_Hip_Adductions,Band Hip Adductions,high,弹力带站姿单腿内收，库中同名条目
+腿部健身器械动作分类表.md,72,悬挂带 & 弹力带,弹力带登山者,股四头肌,腘绳肌、三角肌,Mountain Climbers,free-exercise-db:Mountain_Climbers (Unlicense),fedb:Mountain_Climbers,Mountain Climbers,medium,库无弹力带登山者，映射到登山者条目
+腿部健身器械动作分类表.md,73,悬挂带 & 弹力带,弹力带仰卧登山者,腹肌,股四头肌,-,-,-,-,low,库中无仰卧登山者对应条目，按核心+屈髋常识填肌肉
+腿部健身器械动作分类表.md,74,悬挂带 & 弹力带,弹力带站姿单推外展,髋外展肌,臀大肌、臀中肌,Abduction while standing,wger:1096 (CC-BY-SA 4),wger:1096,Abduction while standing,medium,弹力带站姿外展，近似库中站姿外展条目
+腿部健身器械动作分类表.md,75,悬挂带 & 弹力带,弹力带箭步走,股四头肌,臀大肌、腘绳肌、小腿肌,Bodyweight Walking Lunge,free-exercise-db:Bodyweight_Walking_Lunge (Unlicense),fedb:Bodyweight_Walking_Lunge,Bodyweight Walking Lunge,medium,弹力带行走箭步蹲，映射到自重行走箭步蹲条目
+腿部健身器械动作分类表.md,76,悬挂带 & 弹力带,弹力带深蹲,股四头肌,臀大肌、腘绳肌、竖脊肌,Squats - With Bands,free-exercise-db:Squats_-_With_Bands (Unlicense),fedb:Squats_-_With_Bands,Squats - With Bands,high,弹力带深蹲，库中同名条目
+腿部健身器械动作分类表.md,77,悬挂带 & 弹力带,弹力带单腿深蹲,股四头肌,臀大肌、腘绳肌,Single-Leg High Box Squat,free-exercise-db:Single-Leg_High_Box_Squat (Unlicense),fedb:Single-Leg_High_Box_Squat,Single-Leg High Box Squat,medium,弹力带单腿深蹲，映射到单腿高位箱式深蹲条目
+腿部健身器械动作分类表.md,78,悬挂带 & 弹力带,弹力带坐姿腿外展,髋外展肌,臀大肌、臀中肌,Seated Hip Abduction,wger:1672 (CC-BY-SA 4),wger:1672,Seated Hip Abduction,medium,弹力带坐姿腿外展，映射到坐姿髋外展条目
+腿部健身器械动作分类表.md,79,悬挂带 & 弹力带,弹力带螃式走,髋外展肌,臀大肌、臀中肌,Monster Walk,free-exercise-db:Monster_Walk (Unlicense),fedb:Monster_Walk,Monster Walk,high,螃式走=弹力带横向行走，库中Monster Walk；补臀中肌
+腿部健身器械动作分类表.md,80,悬挂带 & 弹力带,弹力带鸭式前行,股四头肌,臀大肌,-,-,-,-,low,库中无弹力带鸭步（蹲走）对应条目
+腿部健身器械动作分类表.md,81,悬挂带 & 弹力带,弹力带仰卧腿外展,髋外展肌、臀大肌,股四头肌,Supine Hip Abduction,wger:1886 (CC-BY-SA 4),wger:1886,Supine Hip Abduction,medium,库中为哑铃仰卧外展，弹力带版近似
+腿部健身器械动作分类表.md,82,悬挂带 & 弹力带,悬吊带深蹲,股四头肌,臀大肌、腘绳肌,Bodyweight Squat,free-exercise-db:Bodyweight_Squat (Unlicense),fedb:Bodyweight_Squat,Bodyweight Squat,medium,悬吊带辅助深蹲，映射到自重深蹲条目
+腿部健身器械动作分类表.md,83,其他,保加利亚蹲（负重）,股四头肌、臀大肌,腘绳肌,Bulgarian Squat with Dumbbells,wger:1706 (CC-BY-SA 4),wger:1706,Bulgarian Squat with Dumbbells,medium,负重保加利亚蹲，映射到哑铃保加利亚蹲通用负重条目
+腿部健身器械动作分类表.md,84,其他,北欧腿弯举,腘绳肌,臀大肌,Nordic Curl,wger:910 (CC-BY-SA 4),wger:910,Nordic Curl,high,北欧腿弯举=Nordic Curl
+腿部健身器械动作分类表.md,85,其他,臀桥,臀大肌,腘绳肌,Glute Bridge,wger:265 (CC-BY-SA 4),wger:265,Glute Bridge,high,臀桥，库中同名条目
+腿部健身器械动作分类表.md,86,其他,跳箱,股四头肌、臀大肌,小腿肌,Box Jumps,wger:1373 (CC-BY-SA 4),wger:1373,box jumps,high,跳箱=box jumps；库标臀大肌为主，按解剖补股四头肌
+腿部健身器械动作分类表.md,87,无,热身 - 膝关节小幅环绕,小腿肌,腘绳肌、股四头肌,Knee Circles,free-exercise-db:Knee_Circles (Unlicense),fedb:Knee_Circles,Knee Circles,high,热身-膝关节环绕，库中同名条目
+腿部健身器械动作分类表.md,88,无,热身 - 腘后摆腿,腘绳肌,臀大肌、股四头肌,Leg Swings (Front-Back),wger:1670 (CC-BY-SA 4),wger:1670,Leg Swings (Front–Back),high,热身-腘后摆腿，库中前后向摆腿条目
+腿部健身器械动作分类表.md,89,无,拉伸 - 滑雪,腘绳肌,内收肌,-,-,-,-,low,库中无“滑雪”拉伸对应条目，按滑雪式体前屈拉伸判断
+腿部健身器械动作分类表.md,90,无,拉伸 - 坐姿腿拉,腘绳肌,小腿肌,Seated Floor Hamstring Stretch,free-exercise-db:Seated_Floor_Hamstring_Stretch (Unlicense),fedb:Seated_Floor_Hamstring_Stretch,Seated Floor Hamstring Stretch,high,坐姿腿拉=坐姿腘绳肌拉伸
+腿部健身器械动作分类表.md,91,无,拉伸 - 直腿弯腰,腘绳肌,小腿肌,Standing Toe Touches,free-exercise-db:Standing_Toe_Touches (Unlicense),fedb:Standing_Toe_Touches,Standing Toe Touches,high,直腿弯腰=站姿体前屈摸脚
+腿部健身器械动作分类表.md,92,无,拉伸 - 箭步蹲拉,股四头肌,臀大肌,Runners Lunge Stretch,wger:1874 (CC-BY-SA 4),wger:1874,Runners Lunge Stretch,high,箭步蹲拉=Runner's Lunge 拉伸
+腿部健身器械动作分类表.md,93,无,拉伸 - 单手扶墙,胸大肌、背阔肌,三角肌,One Arm Against Wall,free-exercise-db:One_Arm_Against_Wall (Unlicense),fedb:One_Arm_Against_Wall,One Arm Against Wall,medium,单手扶墙拉伸；库中主肌肉为背阔肌，胸部语境并列胸大肌
+腿部健身器械动作分类表.md,94,无,拉伸 - 仰卧抬腿,腘绳肌,-,Leg-Up Hamstring Stretch,free-exercise-db:Leg-Up_Hamstring_Stretch (Unlicense),fedb:Leg-Up_Hamstring_Stretch,Leg-Up Hamstring Stretch,high,仰卧抬腿拉伸，库中抬腿腘绳肌拉伸
+腿部健身器械动作分类表.md,95,无,拉伸 - 站姿腿拉,腘绳肌,小腿肌,Standing Hamstring and Calf Stretch,free-exercise-db:Standing_Hamstring_and_Calf_Stretch (Unlicense),fedb:Standing_Hamstring_and_Calf_Stretch,Standing Hamstring and Calf Stretch,high,站姿腿拉=站姿腘绳肌小腿拉伸
+腿部健身器械动作分类表.md,96,无,拉伸 - 跪姿青蛙,臀大肌,内收肌、腘绳肌,Frog Stretch,wger:1844 (CC-BY-SA 4),wger:1844,Frog Stretch,high,跪姿青蛙=Frog Stretch
+腿部健身器械动作分类表.md,97,无,拉伸 - 髋屈肌与股四头肌,股四头肌,-,Intermediate Hip Flexor and Quad Stretch,free-exercise-db:Intermediate_Hip_Flexor_and_Quad_Stretch (Unlicense),fedb:Intermediate_Hip_Flexor_and_Quad_Stretch,Intermediate Hip Flexor and Quad Stretch,high,髋屈肌与股四头肌拉伸，库中同名条目
+臀部健身器械动作分类表.md,3,哈克机,哈克机深蹲,股四头肌,臀大肌、腘绳肌,Hack Squat,free-exercise-db:Hack_Squat (Unlicense),fedb:Hack_Squat,Hack Squat,high,哈克机深蹲对应通用Hack Squat，股四头肌主导、臀大肌协同
+臀部健身器械动作分类表.md,4,固定器械,器械后踢,臀大肌,腘绳肌,Glute Kickback (Machine),wger:1723 (CC-BY-SA 4),wger:1723,Glute Kickback (Machine),high,器械后踢对应机械臀踢条目，补充腘绳肌协同
+臀部健身器械动作分类表.md,5,固定器械,器械髋冲,臀大肌,腘绳肌、股四头肌,Glute Drive,wger:1528 (CC-BY-SA 4),wger:1528,Glute Drive,high,器械髋冲对应臀冲机（Glute Drive）
+臀部健身器械动作分类表.md,6,固定器械,器械驴踢,臀大肌,腘绳肌,Glute Kickback (Machine),wger:1723 (CC-BY-SA 4),wger:1723,Glute Kickback (Machine),medium,器械驴踢属后踢变式，映射机械臀踢条目
+臀部健身器械动作分类表.md,7,固定器械,器械倒蹬,股四头肌,臀大肌、腘绳肌、小腿肌,Leg Press,free-exercise-db:Leg_Press (Unlicense),fedb:Leg_Press,Leg Press,high,器械倒蹬=腿举
+臀部健身器械动作分类表.md,8,固定器械,直腿内收（坐姿）,内收肌,臀大肌、腘绳肌,Thigh Adductor,free-exercise-db:Thigh_Adductor (Unlicense),fedb:Thigh_Adductor,Thigh Adductor,high,直腿坐姿内收对应器械内收条目
+臀部健身器械动作分类表.md,9,固定器械,直腿髋外展（坐姿）,髋外展肌,臀大肌,Thigh Abductor,free-exercise-db:Thigh_Abductor (Unlicense),fedb:Thigh_Abductor,Thigh Abductor,high,直腿坐姿髋外展对应器械外展条目
+臀部健身器械动作分类表.md,10,固定器械,水平山羊挺身,竖脊肌,臀大肌、腘绳肌,Hyperextensions (Back Extensions),free-exercise-db:Hyperextensions_Back_Extensions (Unlicense),fedb:Hyperextensions_Back_Extensions,Hyperextensions (Back Extensions),high,水平山羊挺身对应背伸/山羊挺身条目
+臀部健身器械动作分类表.md,11,杠铃,早安,腘绳肌,臀大肌、竖脊肌,Good Morning,free-exercise-db:Good_Morning (Unlicense),fedb:Good_Morning,Good Morning,high,杠铃早安式，腘绳肌主导、臀大肌协同
+臀部健身器械动作分类表.md,12,杠铃,杠铃臀桥,臀大肌,腘绳肌、小腿肌,Barbell Glute Bridge,free-exercise-db:Barbell_Glute_Bridge (Unlicense),fedb:Barbell_Glute_Bridge,Barbell Glute Bridge,high,杠铃臀桥，主要臀大肌、次要腘绳肌
+臀部健身器械动作分类表.md,13,杠铃,杠铃臀冲,臀大肌,腘绳肌、小腿肌,Barbell Hip Thrust,free-exercise-db:Barbell_Hip_Thrust (Unlicense),fedb:Barbell_Hip_Thrust,Barbell Hip Thrust,high,杠铃臀冲，主要臀大肌、次要腘绳肌
+臀部健身器械动作分类表.md,14,杠铃,地雷杆罗马尼亚硬拉,腘绳肌,臀大肌、竖脊肌,Romanian Deadlift,free-exercise-db:Romanian_Deadlift (Unlicense),fedb:Romanian_Deadlift,Romanian Deadlift,medium,地雷杆罗马尼亚硬拉为杠铃变式，映射通用罗马尼亚硬拉
+臀部健身器械动作分类表.md,15,杠铃,地雷杆硬拉,臀大肌,腘绳肌、竖脊肌,Barbell Deadlift,free-exercise-db:Barbell_Deadlift (Unlicense),fedb:Barbell_Deadlift,Barbell Deadlift,medium,地雷杆硬拉为杠铃硬拉变式，库中硬拉以竖脊肌为主，按臀部语境调整为臀大肌主导
+臀部健身器械动作分类表.md,16,杠铃,杠铃上凳,股四头肌,臀大肌、腘绳肌,Barbell Step Ups,free-exercise-db:Barbell_Step_Ups (Unlicense),fedb:Barbell_Step_Ups,Barbell Step Ups,high,杠铃上凳对应杠铃登台阶条目
+臀部健身器械动作分类表.md,17,杠铃,杠铃箱式深蹲,股四头肌,臀大肌、腘绳肌,Box Squat,free-exercise-db:Box_Squat (Unlicense),fedb:Box_Squat,Box Squat,high,杠铃箱式深蹲对应Box Squat
+臀部健身器械动作分类表.md,18,杠铃,杠铃单腿硬拉,腘绳肌,臀大肌,Single Leg RDL,wger:1388 (CC-BY-SA 4),wger:1388,Single Leg RDL,medium,杠铃单腿硬拉映射单腿罗马尼亚硬拉条目（库为自重）
+臀部健身器械动作分类表.md,19,史密斯机,史密斯臀冲,臀大肌,腘绳肌、小腿肌,-,-,-,-,low,动作在史密斯机上完成，库中仅有杠铃版本，器材不符，按规则留空（肌肉按解剖常识填写）
+臀部健身器械动作分类表.md,20,史密斯机,史密斯后踢,臀大肌,腘绳肌,Glute Kickback (Machine),wger:1723 (CC-BY-SA 4),wger:1723,Glute Kickback (Machine),medium,史密斯机后踢映射机械臀踢通用条目
+臀部健身器械动作分类表.md,21,史密斯机,史密斯机早安,腘绳肌,臀大肌、竖脊肌,Good Morning,free-exercise-db:Good_Morning (Unlicense),fedb:Good_Morning,Good Morning,medium,史密斯机早安为杠铃早安变式
+臀部健身器械动作分类表.md,22,史密斯机,史密斯罗马尼亚硬拉,腘绳肌,臀大肌、竖脊肌,Smith Machine Stiff-Legged Deadlift,free-exercise-db:Smith_Machine_Stiff-Legged_Deadlift (Unlicense),fedb:Smith_Machine_Stiff-Legged_Deadlift,Smith Machine Stiff-Legged Deadlift,medium,史密斯罗马尼亚硬拉对应最接近的史密斯直腿硬拉
+臀部健身器械动作分类表.md,23,史密斯机,史密斯机俯卧蛙,臀大肌,腘绳肌,-,-,-,-,low,库中无俯卧蛙式条目，按臀部激活动作填肌肉
+臀部健身器械动作分类表.md,24,哑铃,哑铃臀冲,臀大肌、股四头肌,腘绳肌,Dumbbell Hip Thrust,wger:1642 (CC-BY-SA 4),wger:1642,Dumbbell Hip Thrust,high,哑铃臀冲对应哑铃臀推条目
+臀部健身器械动作分类表.md,25,哑铃,单腿哑铃臀冲,臀大肌,腘绳肌、股四头肌,Dumbbell Single-leg Hip Thrust,wger:1234 (CC-BY-SA 4),wger:1234,Dumbbell Single-leg Hip Thrust,high,单腿哑铃臀冲对应哑铃单腿臀推
+臀部健身器械动作分类表.md,26,哑铃,单腿哑铃硬拉,腘绳肌、臀大肌,-,Single-Leg Deadlift with Dumbbell,wger:1736 (CC-BY-SA 4),wger:1736,Single-Leg Deadlift with Dumbbell,high,单腿哑铃硬拉对应哑铃单腿硬拉
+臀部健身器械动作分类表.md,27,哑铃,哑铃上凳,股四头肌,臀大肌、腘绳肌,Dumbbell Step Ups,free-exercise-db:Dumbbell_Step_Ups (Unlicense),fedb:Dumbbell_Step_Ups,Dumbbell Step Ups,high,哑铃上凳对应哑铃登台阶条目
+臀部健身器械动作分类表.md,28,哑铃,分腿硬拉,腘绳肌,臀大肌、竖脊肌,Romanian Deadlift,free-exercise-db:Romanian_Deadlift (Unlicense),fedb:Romanian_Deadlift,Romanian Deadlift,medium,分腿硬拉为分腿站姿髋铰链，映射罗马尼亚硬拉
+臀部健身器械动作分类表.md,29,哑铃,单手分腿硬拉,腘绳肌,臀大肌、竖脊肌,Romanian Deadlift,free-exercise-db:Romanian_Deadlift (Unlicense),fedb:Romanian_Deadlift,Romanian Deadlift,medium,单手分腿硬拉变式，映射罗马尼亚硬拉
+臀部健身器械动作分类表.md,30,哑铃,哑铃甩,腘绳肌,臀大肌、股四头肌,Vertical Swing,free-exercise-db:Vertical_Swing (Unlicense),fedb:Vertical_Swing,Vertical Swing,medium,哑铃甩对应哑铃直臂摆（Vertical Swing）
+臀部健身器械动作分类表.md,31,哑铃,哑铃单腿罗马尼亚硬拉,腘绳肌、臀大肌,-,Single-Leg Deadlift with Dumbbell,wger:1736 (CC-BY-SA 4),wger:1736,Single-Leg Deadlift with Dumbbell,high,哑铃单腿罗马尼亚硬拉对应哑铃单腿硬拉
+臀部健身器械动作分类表.md,32,哑铃,哑铃青蛙臀桥,臀大肌,腘绳肌,Dumbbell Frog Press,wger:1503 (CC-BY-SA 4),wger:1503,Dumbbell Frog Press,high,哑铃青蛙臀桥对应哑铃蛙式蹬压
+臀部健身器械动作分类表.md,33,无,后踢,臀大肌,腘绳肌,Glute Kickback,free-exercise-db:Glute_Kickback (Unlicense),fedb:Glute_Kickback,Glute Kickback,high,自重后踢对应Glute Kickback
+臀部健身器械动作分类表.md,34,无,自重臀冲,臀大肌,腘绳肌,Butt Lift (Bridge),free-exercise-db:Butt_Lift_Bridge (Unlicense),fedb:Butt_Lift_Bridge,Butt Lift (Bridge),high,自重臀冲对应自重臀桥条目
+臀部健身器械动作分类表.md,35,无,垫高自重臀冲,臀大肌,腘绳肌,Butt Lift (Bridge),free-exercise-db:Butt_Lift_Bridge (Unlicense),fedb:Butt_Lift_Bridge,Butt Lift (Bridge),medium,垫高自重臀冲为臀桥垫高变式
+臀部健身器械动作分类表.md,36,无,腿后侧臀桥,臀大肌,腘绳肌,Butt Lift (Bridge),free-exercise-db:Butt_Lift_Bridge (Unlicense),fedb:Butt_Lift_Bridge,Butt Lift (Bridge),medium,腿后侧臀桥为腘绳肌侧重变式
+臀部健身器械动作分类表.md,37,无,侧平板蛤壳,臀中肌,臀大肌、腹肌,Clamshell,wger:1823 (CC-BY-SA 4),wger:1823,Clamshell,medium,侧平板蛤壳映射蛤壳式，补充臀中肌
+臀部健身器械动作分类表.md,38,无,超人式,竖脊肌,臀大肌、腘绳肌,Superman,free-exercise-db:Superman (Unlicense),fedb:Superman,Superman,high,超人式对应Superman，竖脊肌主导、臀大肌协同
+臀部健身器械动作分类表.md,39,无,仰卧交叉腿,髋外展肌,臀大肌,Lying Crossover,free-exercise-db:Lying_Crossover (Unlicense),fedb:Lying_Crossover,Lying Crossover,high,仰卧交叉腿对应仰卧交叉拉伸
+臀部健身器械动作分类表.md,40,无,单腿臀桥,臀大肌,腘绳肌,Single Leg Glute Bridge,free-exercise-db:Single_Leg_Glute_Bridge (Unlicense),fedb:Single_Leg_Glute_Bridge,Single Leg Glute Bridge,high,单腿臀桥对应单腿臀桥条目
+臀部健身器械动作分类表.md,41,无,热身 - 侧向摆腿,髋外展肌,臀大肌,Leg Swings (Front-Back),wger:1670 (CC-BY-SA 4),wger:1670,Leg Swings (Front–Back),medium,侧向摆腿热身，库条目为前后向摆腿，肌肉按侧向动作调整
+臀部健身器械动作分类表.md,42,无,热身 - 摇摆青蛙式,臀大肌,内收肌,Frog Stretch,wger:1844 (CC-BY-SA 4),wger:1844,Frog Stretch,high,热身摇摆青蛙式对应青蛙拉伸
+臀部健身器械动作分类表.md,43,无,热身 - 交替抱膝提拉,竖脊肌,臀大肌,Hug Knees To Chest,free-exercise-db:Hug_Knees_To_Chest (Unlicense),fedb:Hug_Knees_To_Chest,Hug Knees To Chest,medium,交替抱膝提拉对应抱膝拉伸，为交替变式
+臀部健身器械动作分类表.md,44,无,拉伸 - 坐姿梨状肌,臀大肌,-,Seated Piriformis Stretch,wger:1959 (CC-BY-SA 4),wger:1959,Seated Piriformis Stretch,high,坐姿梨状肌拉伸，库条目未标肌肉，按臀部拉伸填
+臀部健身器械动作分类表.md,45,无,拉伸 - 仰卧四字臀肌,臀大肌,髋外展肌,Lying Figure Four Stretch,wger:1869 (CC-BY-SA 4),wger:1869,Lying Figure Four Stretch,high,仰卧四字臀肌拉伸对应仰卧四字拉伸
+臀部健身器械动作分类表.md,46,无,拉伸 - 泡沫轴臀冲,臀大肌,-,Foam Roller Gluteus,wger:1859 (CC-BY-SA 4),wger:1859,Foam Roller Gluteus,medium,泡沫轴臀冲为泡沫轴放松臀部
+臀部健身器械动作分类表.md,47,无,拉伸 - 滚轮腿交叉,臀大肌,-,Piriformis-SMR,free-exercise-db:Piriformis-SMR (Unlicense),fedb:Piriformis-SMR,Piriformis-SMR,medium,滚轮腿交叉为泡沫轴放松臀部/梨状肌变式
+臀部健身器械动作分类表.md,48,绳索,绳索直腿硬拉,腘绳肌、臀大肌,竖脊肌,Cable Deadlifts,free-exercise-db:Cable_Deadlifts (Unlicense),fedb:Cable_Deadlifts,Cable Deadlifts,medium,绳索直腿硬拉映射绳索硬拉，按直腿变式调整主肌肉
+臀部健身器械动作分类表.md,49,绳索,绳索站姿后踢,臀大肌,腘绳肌,One-Legged Cable Kickback,free-exercise-db:One-Legged_Cable_Kickback (Unlicense),fedb:One-Legged_Cable_Kickback,One-Legged Cable Kickback,high,绳索站姿后踢对应单腿绳索后踢
+臀部健身器械动作分类表.md,50,绳索,俯身驴踢,臀大肌,腘绳肌,One-Legged Cable Kickback,free-exercise-db:One-Legged_Cable_Kickback (Unlicense),fedb:One-Legged_Cable_Kickback,One-Legged Cable Kickback,medium,俯身驴踢为绳索后踢变式
+臀部健身器械动作分类表.md,51,绳索,站姿驴踢,臀大肌,腘绳肌,One-Legged Cable Kickback,free-exercise-db:One-Legged_Cable_Kickback (Unlicense),fedb:One-Legged_Cable_Kickback,One-Legged Cable Kickback,medium,站姿驴踢为绳索后踢变式
+臀部健身器械动作分类表.md,52,绳索,绳索侧踢,髋外展肌,臀大肌,Abduction while standing,wger:1096 (CC-BY-SA 4),wger:1096,Abduction while standing,medium,绳索侧踢为站姿髋外展变式，库条目未标肌肉，按外展动作填
+臀部健身器械动作分类表.md,53,绳索,绳索站姿臀冲,臀大肌,腘绳肌,Cable glute extension,wger:1131 (CC-BY-SA 4),wger:1131,Cable glute extension,high,绳索站姿臀冲对应绳索臀伸
+臀部健身器械动作分类表.md,54,弹力带,弹力带 - 跪姿腿屈伸,臀大肌,腘绳肌,Hip Extension with Bands,free-exercise-db:Hip_Extension_with_Bands (Unlicense),fedb:Hip_Extension_with_Bands,Hip Extension with Bands,high,弹力带跪姿腿屈伸对应弹力带臀伸
+臀部健身器械动作分类表.md,55,弹力带,弹力带 - 直腿硬拉,腘绳肌,臀大肌、竖脊肌,Band Good Morning,free-exercise-db:Band_Good_Morning (Unlicense),fedb:Band_Good_Morning,Band Good Morning,medium,弹力带直腿硬拉映射弹力带早安（同为弹力带髋铰链）
+臀部健身器械动作分类表.md,56,弹力带,弹力带 - 侧躺腿外展,髋外展肌,臀大肌,Side Lying Hip Abduction,wger:1202 (CC-BY-SA 4),wger:1202,Side Lying Hip Abduction,medium,弹力带侧躺腿外展映射自重侧躺髋外展条目
+臀部健身器械动作分类表.md,57,弹力带,弹力带 - 坐姿腿外展,髋外展肌,臀大肌,Seated Hip Abduction,wger:1672 (CC-BY-SA 4),wger:1672,Seated Hip Abduction,medium,弹力带坐姿腿外展映射自重坐姿髋外展条目
+臀部健身器械动作分类表.md,58,弹力带,弹力带 - 早安,腘绳肌,臀大肌、竖脊肌,Band Good Morning,free-exercise-db:Band_Good_Morning (Unlicense),fedb:Band_Good_Morning,Band Good Morning,high,弹力带早安对应弹力带早安条目
+臀部健身器械动作分类表.md,59,弹力带,弹力带 - 蚌式开合,臀中肌,臀大肌,Banded Clamshell,wger:1842 (CC-BY-SA 4),wger:1842,Banded Clamshell,high,弹力带蚌式开合对应弹力带蛤壳
+臀部健身器械动作分类表.md,60,弹力带,弹力带 - 螃蟹行走,髋外展肌,臀大肌,Monster Walk,free-exercise-db:Monster_Walk (Unlicense),fedb:Monster_Walk,Monster Walk,high,弹力带螃蟹行走对应弹力带侧向行走
+臀部健身器械动作分类表.md,61,弹力带,弹力带 - 跪姿臀冲,臀大肌,腘绳肌、小腿肌,Hip Lift with Band,free-exercise-db:Hip_Lift_with_Band (Unlicense),fedb:Hip_Lift_with_Band,Hip Lift with Band,high,弹力带跪姿臀冲对应弹力带臀桥
+臀部健身器械动作分类表.md,62,弹力带,弹力带 - 髋外展,髋外展肌,臀大肌,Quadruped Hip Abduction,wger:1915 (CC-BY-SA 4),wger:1915,Quadruped Hip Abduction,high,弹力带髋外展对应弹力带四点支撑髋外展
+臀部健身器械动作分类表.md,63,悍马机,悍马机臀冲,臀大肌,腘绳肌、股四头肌,Glute Drive,wger:1528 (CC-BY-SA 4),wger:1528,Glute Drive,medium,悍马机臀冲映射臀冲机通用条目
+臀部健身器械动作分类表.md,64,悍马机,悍马机外展,髋外展肌,臀大肌,Thigh Abductor,free-exercise-db:Thigh_Abductor (Unlicense),fedb:Thigh_Abductor,Thigh Abductor,medium,悍马机外展映射通用髋外展器械条目
+臀部健身器械动作分类表.md,65,悍马机,挂片后摆腿,臀大肌,腘绳肌,Glute Kickback (Machine),wger:1723 (CC-BY-SA 4),wger:1723,Glute Kickback (Machine),medium,挂片后摆腿映射机械臀踢通用条目
+臀部健身器械动作分类表.md,66,悍马机,挂片式罗马尼亚,腘绳肌,臀大肌、竖脊肌,Romanian Deadlift,free-exercise-db:Romanian_Deadlift (Unlicense),fedb:Romanian_Deadlift,Romanian Deadlift,medium,挂片式罗马尼亚为器械变式，映射通用罗马尼亚硬拉
+臀部健身器械动作分类表.md,67,悍马机,挂片站姿臀冲,臀大肌,腘绳肌,Machine glute extension,wger:1132 (CC-BY-SA 4),wger:1132,Machine glute extension,medium,挂片站姿臀冲映射器械臀伸条目
+臀部健身器械动作分类表.md,68,悍马机,站姿髋外展,髋外展肌,臀大肌,Abduction while standing,wger:1096 (CC-BY-SA 4),wger:1096,Abduction while standing,medium,悍马机站姿髋外展映射站姿外展条目
+臀部健身器械动作分类表.md,69,壶铃,壶铃甩,臀大肌,腘绳肌,Kettlebell Swings,wger:331 (CC-BY-SA 3),wger:331,Kettlebell Swings,high,壶铃甩对应壶铃摆荡，臀大肌主导、腘绳肌协同

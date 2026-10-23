@@ -135,6 +135,8 @@ final class ContrastHarnessTests: XCTestCase {
     func testTextDisabledOnSurfacePageIsWCAGExempt() throws {
         let ratio = WCAGContrast.contrastRatio(FCSemanticColors.textDisabledHex, FCSemanticColors.surfacePageHex)
         XCTAssertEqual(ratio, 2.51, accuracy: 0.005)
-        throw XCTSkip("§11: text.disabled is an explicit WCAG exemption (disabled state) — ratio recorded above, no threshold enforced")
+        throw XCTSkip(
+            "§11: text.disabled is an explicit WCAG exemption (disabled state) — ratio recorded above, no threshold enforced"
+        )
     }
 }

@@ -6,16 +6,28 @@ import SwiftUI
 public struct FCBodyPartChip: View {
     private let part: BodyPart
     private let isSelected: Bool
+    private let accessibilityIdentifier: String?
     private let action: () -> Void
 
-    public init(part: BodyPart, isSelected: Bool, action: @escaping () -> Void) {
+    public init(
+        part: BodyPart,
+        isSelected: Bool,
+        accessibilityIdentifier: String? = nil,
+        action: @escaping () -> Void
+    ) {
         self.part = part
         self.isSelected = isSelected
+        self.accessibilityIdentifier = accessibilityIdentifier
         self.action = action
     }
 
     public var body: some View {
-        Button(action: action) {
+        chipButton
+    }
+
+    @ViewBuilder
+    private var chipButton: some View {
+        let button = Button(action: action) {
             Text(part.displayName)
                 .fcFont(.chipLabel)
                 .foregroundStyle(isSelected ? FCSemanticColors.actionOn : FCSemanticColors.textPrimary)
@@ -29,6 +41,11 @@ public struct FCBodyPartChip: View {
         .frame(minWidth: 44, minHeight: 44)
         .contentShape(Rectangle())
         .accessibilityAddTraits(isSelected ? .isSelected : [])
+        if let accessibilityIdentifier {
+            button.accessibilityIdentifier(accessibilityIdentifier)
+        } else {
+            button
+        }
     }
 }
 
@@ -36,9 +53,14 @@ public struct FCBodyPartChip: View {
 /// `selection` (M1B-FR-033 training focus, `23-new-appointment-v2`).
 public struct FCBodyPartPicker: View {
     @Binding private var selection: Set<BodyPart>
+    private let accessibilityIdentifier: ((BodyPart) -> String)?
 
-    public init(selection: Binding<Set<BodyPart>>) {
+    public init(
+        selection: Binding<Set<BodyPart>>,
+        accessibilityIdentifier: ((BodyPart) -> String)? = nil
+    ) {
         self._selection = selection
+        self.accessibilityIdentifier = accessibilityIdentifier
     }
 
     public var body: some View {
@@ -47,7 +69,11 @@ public struct FCBodyPartPicker: View {
         // gap between capsules; hit areas of adjacent lines overlap by 8pt.
         FCFlowLayout(horizontalSpacing: FCPrimitives.space2, verticalSpacing: FCPrimitives.space2 - (44 - 28)) {
             ForEach(BodyPart.allCases) { part in
-                FCBodyPartChip(part: part, isSelected: selection.contains(part)) {
+                FCBodyPartChip(
+                    part: part,
+                    isSelected: selection.contains(part),
+                    accessibilityIdentifier: accessibilityIdentifier?(part)
+                ) {
                     if selection.contains(part) {
                         selection.remove(part)
                     } else {

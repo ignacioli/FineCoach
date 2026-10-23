@@ -258,8 +258,10 @@
 
             let restored = try makeHarness(rootDirectory: currentRoot)
             let after = try await archiveSettings(restored)
-            XCTAssertEqual(after["archive.sourceID"], currentSource.uuidString, "source identity keeps the current value")
-            XCTAssertEqual(after[studentKey(studentA)], currentArchiveA.uuidString, "present student keeps the current value")
+            XCTAssertEqual(
+                after["archive.sourceID"], currentSource.uuidString, "source identity keeps the current value")
+            XCTAssertEqual(
+                after[studentKey(studentA)], currentArchiveA.uuidString, "present student keeps the current value")
             XCTAssertNil(after[studentKey(studentB)], "student absent from the backup is not written")
             XCTAssertNil(after[studentKey(studentC)], "student without a current identity gets none invented")
             XCTAssertEqual(Set(after.keys), ["archive.sourceID", studentKey(studentA)])

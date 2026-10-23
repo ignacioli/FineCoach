@@ -29,6 +29,7 @@ struct AppRoot: View {
 
     @EnvironmentObject private var environment: AppEnvironment
     @EnvironmentObject private var privacyCoordinator: ScenePrivacyCoordinator
+    @EnvironmentObject private var restNotificationRouter: RestNotificationRouter
     @State private var installState: InstallState?
     @State private var archiveServices: ArchiveServices?
     @State private var firstLaunchRoute: FirstLaunchRoute = .choice
@@ -71,12 +72,37 @@ struct AppRoot: View {
                 return
             }
             installState = await resolveInstallState()
+            switch installState {
+            case .coach: RestNotificationDiagnostics.record(.installCoach)
+            case .viewer: RestNotificationDiagnostics.record(.installViewer)
+            case .unselected: RestNotificationDiagnostics.record(.installUnselected)
+            case nil: break
+            }
+            discardRestNotificationIfViewer()
             if let url = pendingOpenURL {
                 pendingOpenURL = nil
                 handleOpen(url)
             }
         }
         .onOpenURL { handleOpen($0) }
+        .onChange(of: restNotificationRouter.pendingRequest) { _, request in
+            guard request != nil else {
+                return
+            }
+            discardRestNotificationIfViewer()
+        }
+        .onChange(of: installState) { _, _ in
+            discardRestNotificationIfViewer()
+        }
+    }
+
+    /// Viewer mode must never route into the Coach side. Consume the request
+    /// (discard, not hold) so it cannot surface after a later install change.
+    private func discardRestNotificationIfViewer() {
+        guard installState == .viewer else {
+            return
+        }
+        restNotificationRouter.discardPendingRequest()
     }
 
     // MARK: First launch (M2-07)

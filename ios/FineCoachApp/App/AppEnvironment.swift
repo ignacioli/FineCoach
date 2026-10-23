@@ -19,6 +19,7 @@ public final class AppEnvironment: ObservableObject {
     public private(set) var archiveExportUseCases: ArchiveExportUseCases?
     public let startupErrorDescription: String?
     @Published public private(set) var catalogUnavailableMessage: String?
+    public private(set) var catalogSyncFailed = false
     private var studentRepository: CoreDataStudentRepository?
     private var sessionRepository: CoreDataSessionRepository?
     private var reportsRootURL: URL?
@@ -26,6 +27,10 @@ public final class AppEnvironment: ObservableObject {
     private let applicationRootURL: URL?
     private let clock: any Clock
     private let idGenerator: any IDGenerator
+    /// Injectable like the clock and ID generator: an automated test that drives the
+    /// debug seed must not reach the real notification center, where requesting
+    /// authorization presents a system prompt nothing can answer and hangs the run.
+    private let notificationCenter: any LocalNotificationScheduling
 
     public var isStorageAvailable: Bool {
         persistenceController != nil && persistenceWriter != nil && studentUseCases != nil
@@ -168,25 +173,41 @@ public final class AppEnvironment: ObservableObject {
         return backupCoordinator
     }
 
-    /// Seeds the built-in exercise catalog once local storage is open.
+    /// Synchronizes the built-in exercise catalog after local storage is open.
     /// Call from `RootNavigation.loadInitialState` alongside onboarding load; do not call from `init`.
     func prepareExerciseCatalog() async {
         guard let exerciseUseCases else {
             return
         }
+        await prepareExerciseCatalog(using: exerciseUseCases)
+    }
+
+    func prepareExerciseCatalog(using exerciseUseCases: ExerciseLibraryUseCases) async {
         do {
             try await exerciseUseCases.seedIfNeeded()
+            catalogSyncFailed = false
             catalogUnavailableMessage = nil
         } catch {
-            catalogUnavailableMessage =
-                (error as? LocalizedError)?.errorDescription ?? String(localized: "exercise.catalog.unavailable")
+            catalogSyncFailed = true
+            if let writerError = error as? PersistenceWriterError,
+                writerError == .postCommitProtectionAuditFailed
+            {
+                // The write may already be durable, but the protection audit
+                // failed after commit. Keep the catalog fail-closed until a
+                // later startup can prove the storage protection again.
+                catalogUnavailableMessage = String(localized: "exercise.catalog.unavailable")
+                return
+            }
+            let hasPreviousCatalog = (try? await exerciseUseCases.hasBuiltInCatalog()) == true
+            catalogUnavailableMessage = hasPreviousCatalog ? nil : String(localized: "exercise.catalog.unavailable")
         }
     }
 
     public init(
         rootURL: URL? = nil,
         clock: any Clock = SystemClock(),
-        idGenerator: any IDGenerator = SystemIDGenerator()
+        idGenerator: any IDGenerator = SystemIDGenerator(),
+        notificationCenter: any LocalNotificationScheduling = SystemNotificationAdapter()
     ) throws {
         let fileManager = FileManager.default
         let root: URL
@@ -330,6 +351,7 @@ public final class AppEnvironment: ObservableObject {
         self.applicationRootURL = root
         self.clock = clock
         self.idGenerator = idGenerator
+        self.notificationCenter = notificationCenter
         self.startupErrorDescription = nil
         self.catalogUnavailableMessage = nil
         try bindLiveStack(
@@ -366,6 +388,7 @@ public final class AppEnvironment: ObservableObject {
         self.applicationRootURL = nil
         self.clock = SystemClock()
         self.idGenerator = SystemIDGenerator()
+        self.notificationCenter = SystemNotificationAdapter()
         self.startupErrorDescription = (failure as? LocalizedError)?.errorDescription ?? "本地存储暂不可用。"
         self.catalogUnavailableMessage = nil
     }
@@ -452,7 +475,7 @@ public final class AppEnvironment: ObservableObject {
             studentRepository: repository,
             activeSession: sessionUseCases!,
             notifications: NotificationScheduler(
-                notificationCenter: SystemNotificationAdapter(),
+                notificationCenter: notificationCenter,
                 calendarProvider: SystemLocalCalendarProvider()
             ),
             clock: clock,

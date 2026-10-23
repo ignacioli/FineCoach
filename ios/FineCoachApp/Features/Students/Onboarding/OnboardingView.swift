@@ -115,7 +115,9 @@ struct OnboardingView: View {
                 isDataSheetPresented = true
             }
             .accessibilityIdentifier(FCAccessibilityID.onboardingDataLink)
-            .welcomeReveal(isRevealed, delay: EntryTiming.link, duration: EntryTiming.linkDuration, reduceMotion: reduceMotion)
+            .welcomeReveal(
+                isRevealed, delay: EntryTiming.link, duration: EntryTiming.linkDuration, reduceMotion: reduceMotion
+            )
             .padding(.top, FCPrimitives.space6)
         }
     }
@@ -253,10 +255,10 @@ private enum EntryTiming {
     static let reduceMotionDuration = 0.2
 }
 
-private extension View {
+extension View {
     /// Fade in and rise `space.2`; with Reduce Motion a plain 0.2 s fade, no offset, no delay.
     /// The view is in the accessibility tree from the first frame; only opacity/offset change.
-    func welcomeReveal(
+    fileprivate func welcomeReveal(
         _ isRevealed: Bool,
         delay: Double,
         duration: Double = EntryTiming.standardDuration,

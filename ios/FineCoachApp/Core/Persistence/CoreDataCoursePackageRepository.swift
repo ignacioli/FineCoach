@@ -153,7 +153,8 @@ public struct CoreDataCoursePackageRepository: Sendable {
                 packageID: packageID.rawValue,
                 in: context
             ).map { try CoursePackageManagedObjectMapping.makeAdjustment(from: $0) }
-            let currentBalance = CreditLedger.balance(totalCredits: package.totalCredits, adjustments: existingAdjustments)
+            let currentBalance = CreditLedger.balance(
+                totalCredits: package.totalCredits, adjustments: existingAdjustments)
 
             let adjustment = try makeAdjustment(currentBalance)
             guard adjustment.packageID == packageID, adjustment.sourceEventKey == sourceEventKey else {

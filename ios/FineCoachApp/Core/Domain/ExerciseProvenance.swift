@@ -92,6 +92,11 @@ public struct PlaceholderCatalogExercise: Hashable, Codable, Sendable {
     public var equipmentClass: String?
     /// Already present in `provenance.json`; decoded since T069c.
     public var secondaryMuscleGroups: [String]?
+    /// P0-D8: trained one side at a time by default. Absent means `false`.
+    public var unilateral: Bool?
+    /// A removed built-in remains addressable by stable id but is hidden from
+    /// browse and picker queries. Absent means active for older manifests.
+    public var retired: Bool?
 
     public init(
         id: String,
@@ -100,15 +105,19 @@ public struct PlaceholderCatalogExercise: Hashable, Codable, Sendable {
         provenanceRef: String,
         primaryMuscleGroup: String? = nil,
         equipmentClass: String? = nil,
-        secondaryMuscleGroups: [String]? = nil
+        secondaryMuscleGroups: [String]? = nil,
+        unilateral: Bool? = nil,
+        retired: Bool? = nil
     ) {
         self.secondaryMuscleGroups = secondaryMuscleGroups
+        self.unilateral = unilateral
         self.id = id
         self.canonicalName = canonicalName
         self.recordMode = recordMode
         self.provenanceRef = provenanceRef
         self.primaryMuscleGroup = primaryMuscleGroup
         self.equipmentClass = equipmentClass
+        self.retired = retired
     }
 }
 

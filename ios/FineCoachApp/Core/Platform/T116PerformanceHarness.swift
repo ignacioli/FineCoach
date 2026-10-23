@@ -45,15 +45,19 @@ enum T116PerformanceHarness {
         let student = try await studentUseCases.create(
             draft: StudentDraft(displayName: "林青", sex: .female)
         )
-        _ = try await sessionUseCases.startOrOpen(studentID: student.id)
-        let session = try await sessionUseCases.addCatalogExercise(itemID: squatID)
+        let activeSession = try await sessionUseCases.startOrOpen(studentID: student.id)
+        let session = try await sessionUseCases.addCatalogExercise(
+            sessionID: activeSession.id,
+            itemID: squatID
+        )
         let exerciseID = try unwrap(session.exercises.first?.id, "missing catalog exercise")
         let seeded = try await sessionUseCases.addSet(
+            sessionID: activeSession.id,
             exerciseID: exerciseID,
             input: weightRepsInput()
         )
         let firstSetID = try unwrap(seeded.exercises.first?.sets.last?.id, "missing seed set")
-        _ = try await sessionUseCases.confirmSet(setID: firstSetID)
+        _ = try await sessionUseCases.confirmSet(sessionID: activeSession.id, setID: firstSetID)
 
         let recovery = try await sample {
             _ = try await PerformanceSignposts.shared.measureRecovery {
@@ -69,13 +73,14 @@ enum T116PerformanceHarness {
         confirmMilliseconds.reserveCapacity(sampleCount)
         for index in 0..<(warmupCount + sampleCount) {
             let added = try await sessionUseCases.addSet(
+                sessionID: activeSession.id,
                 exerciseID: exerciseID,
                 input: weightRepsInput()
             )
             let setID = try unwrap(added.exercises.first?.sets.last?.id, "missing confirm set")
             let started = ContinuousClock.now
             _ = try await PerformanceSignposts.shared.measureSetConfirm {
-                try await sessionUseCases.confirmSet(setID: setID)
+                try await sessionUseCases.confirmSet(sessionID: activeSession.id, setID: setID)
             }
             let elapsed = milliseconds(ContinuousClock.now - started)
             if index >= warmupCount {

@@ -14,7 +14,7 @@ The shipped stack is native Swift/SwiftUI on iOS 18.0+, using Apple frameworks o
 
 In-repository authority:
 
-- `design/` is the visual source (product-owner decision, 2026-09-22). `design/design-system/README.md` defines color, typography, spacing, radius, icon, and component values. `design/m1-b-hifi/` holds the approved hi-fi screens, equipment icons, and design notes. `design/m2-hifi/` holds the M2 screens and the implementation map. `design/12d-visual-scorecard.md` is the visual quality bar.
+- `design/` is the visual source (product-owner decision, 2026-09-22). `design/design-system/README.md` defines color, typography, spacing, radius, icon, and component values. `design/m1-b-hifi/` holds the approved hi-fi screens, equipment icons, and design notes. `design/m2-hifi/` holds the M2 screens and the implementation map. `design/12d-visual-scorecard.md` is the visual quality bar. `design/11d-experience-scorecard.md` is the experience quality bar, scored by the product owner on a device; the overall score weights visual 40% and experience 60%.
 - `design/design-system/components.md` is the component anatomy: stable `DS-*` ids, parts and reading order, variants, states, invariants, reuse boundaries, code mapping, and the visual workflow. Token values stay in `design/design-system/README.md`; structure lives in `components.md`.
 - The Penpot file「M1-B G5 Design」must stay in sync with any design-system change. Code, `design/`, and that Penpot file must not drift apart.
 - `ios/VALIDATION.md` is the acceptance record. Simulator results and physical-device results are separate.
@@ -66,6 +66,22 @@ Ask the product owner one targeted question only for a real authority conflict, 
 
 When code is introduced, document the canonical setup, build, test, lint, and formatting commands here. Do not invent commands before the toolchain exists.
 
+## Operational constraints
+
+These apply to every coding tool and are not stated in the sections above.
+
+- No `Co-Authored-By` or other AI-attribution trailers in any commit message or pull request description.
+- Do not discard uncommitted changes without explicit confirmation.
+- Green unit and integration tests are not checkpoint completion without the entry and layout map in `design/design-system/components.md` §1.4. `VisionHarnessTests` asserts design-token hex values and WCAG contrast ratios only. Do not describe Feature UI as visually verified unless a human looked; say so when that has not happened.
+- Do not add a forced red/green test-order gate, a full UI automation matrix, a fault-injection matrix, a 20-restart matrix, or a new performance-stress matrix unless the product owner asks. Do not add ViewInspector structural assertions on Feature screens unless explicitly requested.
+- Do not accept UX or UI work with a screenshot-compare-fix loop unless the product owner asks for that instance.
+- A data-changing action must be reachable from a visible control (a button, a swipe action, or a visible menu). A long-press `.contextMenu` alone is not a UI path.
+- When a required behavior is ambiguous between an automatic side effect and an explicit coach confirmation, and the effect is hard to reverse (ending a course package's credits, deleting something, or changing billing-adjacent state), ask the product owner. Creating a new course package must not silently end the current package.
+- A design-system change goes into `design/` and is backfilled into the Penpot file「M1-B G5 Design」in the same round.
+- `project.pbxproj` and `.xcdatamodel` files are XML and do not merge. Do not edit them concurrently.
+- A specification or design revision lists what it removes as well as what it adds: one line per difference with location, current state, target, rationale, and whether it changes or is deliberately kept. A revision that only adds controls is incomplete.
+- Never launch the app with `-FineCoachResetStore` on the product owner's device; it erases their data. On a simulator it also erases existing test data.
+
 ## Project agents
 
 - Use `mobile-ux-designer` during discovery and approved feature design for iOS-first journeys, interaction states, accessibility, prototypes, and usability validation.
@@ -82,7 +98,7 @@ When code is introduced, document the canonical setup, build, test, lint, and fo
 - Keep commits and pull requests scoped to one concern and reference the relevant decision recorded in this repository.
 - Preserve unrelated and untracked work.
 
-**Protected primary branch.** Do not modify tracked files, stage, or commit on `main` or `master`. This repository currently has no remote: use the local `main` tip, then create a topic branch (prefer a dedicated git worktree) before changing tracked files. Direct commits to the primary branch are forbidden. Gitignored local state on the primary checkout is allowed.
+**Protected primary branch.** Do not modify tracked files, stage, or commit on `main` or `master`. The remote `origin` is the public GitHub repository. Do not push, merge into `main`, delete specs files, or rewrite history without product-owner approval. Use the local `main` tip, then create a topic branch (prefer a dedicated git worktree) before changing tracked files. Direct commits to the primary branch are forbidden. Gitignored local state on the primary checkout is allowed.
 
 **Local toolchain bootstrap.** After `git worktree add`, and before using project skills, `.handoff`, or subagents in that worktree, run `scripts/bootstrap-local-worktree.sh` with the worktree as `cwd`. The script links ignored runtime subtrees from the primary checkout and skips missing sources. Do not symlink entire ignored toolchain directories; the script chooses the subtrees. Agents: run `ig-worktree-gate` before tracked-file edits.
 

@@ -24,7 +24,8 @@ final class ArchiveExportScreenTests: XCTestCase {
 
     private func swiftSources(under relativePath: String) throws -> [(name: String, text: String)] {
         let enumerator = try XCTUnwrap(
-            FileManager.default.enumerator(at: appRoot.appendingPathComponent(relativePath), includingPropertiesForKeys: nil)
+            FileManager.default.enumerator(
+                at: appRoot.appendingPathComponent(relativePath), includingPropertiesForKeys: nil)
         )
         var result: [(String, String)] = []
         for case let url as URL in enumerator where url.pathExtension == "swift" {
@@ -40,10 +41,14 @@ final class ArchiveExportScreenTests: XCTestCase {
         var securePresenters: [String] = []
         // The export screens and the later archive import screens (M2-08, M2-19) live here.
         for file in try swiftSources(under: "Features/ArchiveExport") + swiftSources(under: "Features/ArchiveViewer") {
-            let stripped = file.text.components(separatedBy: "\n").filter { !$0.trimmingCharacters(in: .whitespaces).hasPrefix("//") }
-                .joined(separator: "\n")
-            XCTAssertFalse(stripped.contains("textContentType(.password"), "\(file.name) declares a password content type")
-            XCTAssertFalse(stripped.contains("textContentType(.newPassword"), "\(file.name) declares a password content type")
+            let stripped = file.text.components(separatedBy: "\n").filter {
+                !$0.trimmingCharacters(in: .whitespaces).hasPrefix("//")
+            }
+            .joined(separator: "\n")
+            XCTAssertFalse(
+                stripped.contains("textContentType(.password"), "\(file.name) declares a password content type")
+            XCTAssertFalse(
+                stripped.contains("textContentType(.newPassword"), "\(file.name) declares a password content type")
             if stripped.contains(".textContentType(") && file.text.contains("archivePasswordEntry") {
                 configuring.append(file.name)
             }
@@ -52,7 +57,8 @@ final class ArchiveExportScreenTests: XCTestCase {
             }
         }
         XCTAssertEqual(configuring, ["ArchivePasswordField.swift"])
-        XCTAssertEqual(securePresenters, ["ArchivePasswordField.swift"], "masked fields must go through ArchivePasswordField")
+        XCTAssertEqual(
+            securePresenters, ["ArchivePasswordField.swift"], "masked fields must go through ArchivePasswordField")
         let field = try source("Features/ArchiveExport/ArchivePasswordField.swift")
         XCTAssertTrue(field.contains(".autocorrectionDisabled(true)"))
         XCTAssertTrue(field.contains(".textInputAutocapitalization(.never)"))
@@ -91,7 +97,9 @@ final class ArchiveExportScreenTests: XCTestCase {
         for file in try swiftSources(under: "Features/ArchiveExport") {
             let presentsModal = file.text.contains(".sheet(") || file.text.contains(".fullScreenCover(")
             if presentsModal {
-                XCTAssertTrue(file.text.contains(".fcPrivacyCovered()"), "\(file.name) presents a modal without the privacy cover")
+                XCTAssertTrue(
+                    file.text.contains(".fcPrivacyCovered()"), "\(file.name) presents a modal without the privacy cover"
+                )
             }
         }
         let navigation = try source("App/RootNavigation.swift")
@@ -108,7 +116,8 @@ final class ArchiveExportScreenTests: XCTestCase {
         let pattern = try NSRegularExpression(pattern: "(?<![A-Za-z])Text\\(\"archive\\.export\\.[A-Za-z.]+\"\\)")
         for file in try swiftSources(under: "Features/ArchiveExport") {
             let range = NSRange(file.text.startIndex..., in: file.text)
-            XCTAssertEqual(pattern.numberOfMatches(in: file.text, range: range), 0, "\(file.name) has a literal-key Text")
+            XCTAssertEqual(
+                pattern.numberOfMatches(in: file.text, range: range), 0, "\(file.name) has a literal-key Text")
         }
     }
 
@@ -122,11 +131,13 @@ final class ArchiveExportScreenTests: XCTestCase {
     // MARK: Localization
 
     func testEveryExportLocalizationKeyUsedBySourceExists() throws {
-        let catalog = try JSONSerialization.jsonObject(
-            with: Data(contentsOf: appRoot.appendingPathComponent("Resources/Localizable.xcstrings"))
-        ) as? [String: Any]
+        let catalog =
+            try JSONSerialization.jsonObject(
+                with: Data(contentsOf: appRoot.appendingPathComponent("Resources/Localizable.xcstrings"))
+            ) as? [String: Any]
         let strings = try XCTUnwrap(catalog?["strings"] as? [String: Any])
-        let pattern = try NSRegularExpression(pattern: "\"((?:archive\\.export|student\\.detail\\.exportArchive)[A-Za-z.]*)\"")
+        let pattern = try NSRegularExpression(
+            pattern: "\"((?:archive\\.export|student\\.detail\\.exportArchive)[A-Za-z.]*)\"")
         var used = Set<String>()
         for file in try swiftSources(under: "Features/ArchiveExport") {
             let range = NSRange(file.text.startIndex..., in: file.text)
@@ -151,12 +162,12 @@ final class ArchiveExportScreenTests: XCTestCase {
         XCTAssertEqual(
             facts.map(\.text),
             [
-                "档案不是完整备份，不能用来恢复你的数据。",
+                "档案不是完整备份，不能用来恢复数据。",
                 "档案会包含刚才预览中的全部资料。",
                 "文件交出并被接收后，你和精练教练都无法撤回。",
                 "学员只能删除自己设备上的副本。",
                 "学员删除不会影响你的原始数据、已保存的文件或其他副本。",
-                "请通过其他方式把密码单独告诉学员，不要和档案一起发送。",
+                "通过其他方式把密码单独告诉学员，不要和档案一起发送。",
             ]
         )
     }
@@ -199,7 +210,8 @@ final class ArchiveExportScreenTests: XCTestCase {
         let source = try await seededSource()
         let all = X.selection(for: source, keeping: Set(source.availability.allItems))
         let preview = ArchivePreviewModel(
-            snapshot: try ArchiveExportPolicy.makeSnapshot(source: source, selection: all, identity: X.identity, now: X.now)
+            snapshot: try ArchiveExportPolicy.makeSnapshot(
+                source: source, selection: all, identity: X.identity, now: X.now)
         )
         XCTAssertEqual(preview.displayName, X.studentName)
         let customNames = preview.customExercises.map(\.text)
@@ -209,7 +221,8 @@ final class ArchiveExportScreenTests: XCTestCase {
         }
         XCTAssertEqual(Set(preview.summaries.map(\.text)), Set(X.summaries))
         XCTAssertTrue(preview.metrics.contains { $0.isCustom && $0.title == X.customMetricName })
-        let shown = ([preview.displayName ?? ""] + customNames + preview.summaries.map(\.text) + preview.metrics.map(\.title)
+        let shown =
+            ([preview.displayName ?? ""] + customNames + preview.summaries.map(\.text) + preview.metrics.map(\.title)
             + preview.metrics.map(\.detail)).joined(separator: "\n")
         for excluded in X.excludedValues {
             XCTAssertFalse(shown.contains(excluded), "preview leaks \(excluded)")
@@ -240,7 +253,10 @@ final class ArchiveExportScreenTests: XCTestCase {
                     primaryMuscles: ["胸"], secondaryMuscles: [], equipment: "杠铃", sourceName: "wger.de",
                     licenseName: "CC-BY-SA-3.0", licenseText: "示例许可文本"),
                 recordMode: .weightReps,
-                sets: [ArchiveSet(weightValue: try! DecimalValue("40"), repetitionCount: try! DecimalValue("8"), unit: .kilograms)])
+                sets: [
+                    ArchiveSet(
+                        weightValue: try! DecimalValue("40"), repetitionCount: try! DecimalValue("8"), unit: .kilograms)
+                ])
         }
         func session(day: Int, _ names: [String?]) -> ArchiveExportSource.Session {
             .init(
@@ -257,7 +273,8 @@ final class ArchiveExportScreenTests: XCTestCase {
             ],
             bodyMetrics: [])
         let all = X.selection(for: source, keeping: Set(source.availability.allItems))
-        let snapshot = try ArchiveExportPolicy.makeSnapshot(source: source, selection: all, identity: X.identity, now: X.now)
+        let snapshot = try ArchiveExportPolicy.makeSnapshot(
+            source: source, selection: all, identity: X.identity, now: X.now)
 
         let exported = try JSONDecoder().decode(ArchiveSnapshot.self, from: JSONEncoder().encode(snapshot))
         var seen = Set<String>()
@@ -294,7 +311,11 @@ final class ArchiveExportScreenTests: XCTestCase {
         let directory = try TemporaryProtectedDirectory()
         let environment = try AppEnvironment(
             rootURL: directory.url.appendingPathComponent("seed", isDirectory: true),
-            clock: ArchiveExportDebugSeed.makeClock()
+            clock: ArchiveExportDebugSeed.makeClock(),
+            // The seed creates appointments with reminders enabled, so the real
+            // notification center would present an authorization prompt that no
+            // automated run can answer. Keep this test off the system prompt.
+            notificationCenter: FakeNotificationScheduling()
         )
         let seeded = await ArchiveExportDebugSeed.seed(in: environment)
         XCTAssertTrue(seeded)
@@ -324,7 +345,11 @@ final class ArchiveExportScreenTests: XCTestCase {
         let directory = try TemporaryProtectedDirectory()
         let environment = try AppEnvironment(
             rootURL: directory.url.appendingPathComponent("roster", isDirectory: true),
-            clock: ArchiveExportDebugSeed.makeClock()
+            clock: ArchiveExportDebugSeed.makeClock(),
+            // The seed creates appointments with reminders enabled, so the real
+            // notification center would present an authorization prompt that no
+            // automated run can answer. Keep this test off the system prompt.
+            notificationCenter: FakeNotificationScheduling()
         )
         let seeded = await ArchiveExportDebugSeed.seed(in: environment)
         XCTAssertTrue(seeded, "seed stopped early")
@@ -335,11 +360,11 @@ final class ArchiveExportScreenTests: XCTestCase {
 
         let active = try await studentUseCases.searchActive(query: "")
         let archived = try await studentUseCases.listArchived()
-        XCTAssertEqual(active.count, 6)
+        XCTAssertEqual(active.count, 7)
         XCTAssertEqual(archived.map(\.displayName.value), ["孙已归档"])
         let longName = try XCTUnwrap(active.first { $0.displayName.value.hasPrefix("欧阳慕容") })
         XCTAssertGreaterThan(longName.displayName.value.count, 25)
-        let expectedActive = ["王小明", "李思远", "陈嘉怡", "张浩然", "赵无数"]
+        let expectedActive = ["王小明", "李思远", "陈嘉怡", "张浩然", "赵无数", "周十节"]
         for name in expectedActive {
             XCTAssertTrue(active.contains { $0.displayName.value == name }, "missing \(name)")
         }
@@ -356,7 +381,7 @@ final class ArchiveExportScreenTests: XCTestCase {
         }
         let expectedSessions = [
             "王小明": 6, "李思远": 5, "陈嘉怡": 3, longName.displayName.value: 1,
-            "张浩然": 4, "赵无数": 0, "孙已归档": 2,
+            "张浩然": 4, "赵无数": 0, "周十节": 9, "孙已归档": 2,
         ]
         for (name, count) in expectedSessions {
             let actual = try await sessionCount(name)
@@ -401,8 +426,8 @@ final class ArchiveExportScreenTests: XCTestCase {
         XCTAssertEqual(count(.absent), 1)
         XCTAssertEqual(count(.cancelled), 1)
         XCTAssertEqual(count(.inProgress), 0)
-        // 6 weekly + 4 every-two-days + today 13:00, 15:30 + in 2 days
-        XCTAssertEqual(count(.scheduled), 13)
+        // 6 weekly + 4 every-two-days + today 13:00, 15:30, 16:30 + in 2 days
+        XCTAssertEqual(count(.scheduled), 14)
         XCTAssertEqual(all.filter { $0.seriesID != nil }.count, 10)
         let cancelled = try XCTUnwrap(all.first { $0.status == .cancelled })
         XCTAssertEqual(cancelled.cancellationReason?.value, "合成测试：学员临时有事")
@@ -410,10 +435,10 @@ final class ArchiveExportScreenTests: XCTestCase {
         XCTAssertEqual(all.first { $0.status == .absent }?.absentCreditChoice, .notCharged)
         XCTAssertNotNil(all.first { $0.status == .completed }?.linkedSessionID)
 
-        // Today: completed, absent, cancelled, and three scheduled rows.
+        // Today: completed, absent, cancelled, and four scheduled rows.
         let today = try await appointmentUseCases.todayOrdering()
-        XCTAssertEqual(today.count, 6)
-        XCTAssertEqual(today.filter { $0.appointment.status == .scheduled }.count, 3)
+        XCTAssertEqual(today.count, 7)
+        XCTAssertEqual(today.filter { $0.appointment.status == .scheduled }.count, 4)
         XCTAssertTrue(all.contains { $0.date > appointmentUseCases.todayLocalDate() }, "no future appointments")
 
         // Templates: one saved from a session, one blank with exercises.

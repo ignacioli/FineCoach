@@ -392,8 +392,10 @@ final class ArchiveViewerQueryTests: XCTestCase {
     func testBuiltInLengthsConvertAndPercentagesDoNot() throws {
         let height = try ArchiveBodyMetric(key: "m1", kind: .builtIn(.height))
         let fat = try ArchiveBodyMetric(key: "m2", kind: .builtIn(.bodyFatPercent))
-        let heightValue = ArchiveBodyMeasurement(metricKey: "m1", localDay: F.day(2026, 9, 1), value: dec("170"), enteredUnit: "cm")
-        let fatValue = ArchiveBodyMeasurement(metricKey: "m2", localDay: F.day(2026, 9, 1), value: dec("18.5"), enteredUnit: "%")
+        let heightValue = ArchiveBodyMeasurement(
+            metricKey: "m1", localDay: F.day(2026, 9, 1), value: dec("170"), enteredUnit: "cm")
+        let fatValue = ArchiveBodyMeasurement(
+            metricKey: "m2", localDay: F.day(2026, 9, 1), value: dec("18.5"), enteredUnit: "%")
         XCTAssertEqual(
             settings(.kg, .inch).measurement(heightValue, of: height),
             ArchiveDisplayQuantity(value: dec("66.93"), unit: "in"))
@@ -407,8 +409,10 @@ final class ArchiveViewerQueryTests: XCTestCase {
 
     func testCustomMetricsKeepTheUnitTheyWereEnteredIn() throws {
         let custom = try ArchiveBodyMetric(key: "m2", kind: .custom, name: "示例围度", unit: "cm")
-        let neck = ArchiveBodyMeasurement(metricKey: "m2", localDay: F.day(2026, 9, 8), value: dec("34"), enteredUnit: "cm")
-        let pounds = ArchiveBodyMeasurement(metricKey: "m2", localDay: F.day(2026, 9, 9), value: dec("10"), enteredUnit: "kg")
+        let neck = ArchiveBodyMeasurement(
+            metricKey: "m2", localDay: F.day(2026, 9, 8), value: dec("34"), enteredUnit: "cm")
+        let pounds = ArchiveBodyMeasurement(
+            metricKey: "m2", localDay: F.day(2026, 9, 9), value: dec("10"), enteredUnit: "kg")
         for converter in [settings(.lb, .inch), settings(.kg, .cm)] {
             XCTAssertEqual(
                 converter.measurement(neck, of: custom), ArchiveDisplayQuantity(value: dec("34"), unit: "cm"))

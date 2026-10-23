@@ -144,7 +144,9 @@ final class AppointmentEditorViewModel: ObservableObject {
         if selectedStudentID == nil {
             selectedStudentID = students.first?.id
         }
-        guard let existingAppointmentID, let appointment = try? await appointmentUseCases.appointment(id: existingAppointmentID) else {
+        guard let existingAppointmentID,
+            let appointment = try? await appointmentUseCases.appointment(id: existingAppointmentID)
+        else {
             return
         }
         original = appointment
@@ -157,7 +159,8 @@ final class AppointmentEditorViewModel: ObservableObject {
         trainingFocus = appointment.trainingFocus
         if let seriesID = appointment.seriesID, !appointment.isDetachedException,
             let series = try? await appointmentUseCases.series(id: seriesID),
-            let count = try? await appointmentUseCases.thisAndFutureAffectedCount(seriesID: seriesID, boundaryDate: appointment.date)
+            let count = try? await appointmentUseCases.thisAndFutureAffectedCount(
+                seriesID: seriesID, boundaryDate: appointment.date)
         {
             seriesContext = SeriesContext(series: series, thisAndFutureCount: count)
         }
@@ -177,7 +180,8 @@ final class AppointmentEditorViewModel: ObservableObject {
             await run(repeatInterval == nil ? .createSingle : .createRecurring)
             return
         }
-        let scheduleChanged = original.date != date
+        let scheduleChanged =
+            original.date != date
             || original.startTime != startTime
             || original.durationMinutes != durationMinutes
             || original.reminderEnabled != reminderEnabled
@@ -229,7 +233,8 @@ final class AppointmentEditorViewModel: ObservableObject {
             conflictMessage = await conflictDescription(for: operation)
             pendingOverride = operation
         } catch {
-            errorMessage = (error as? LocalizedError)?.errorDescription ?? String(localized: "appointmentEditor.saveFailed")
+            errorMessage =
+                (error as? LocalizedError)?.errorDescription ?? String(localized: "appointmentEditor.saveFailed")
         }
     }
 
@@ -296,19 +301,21 @@ final class AppointmentEditorViewModel: ObservableObject {
             )
         case .trainingFocusOnly:
             guard let original else { return }
-            _ = try await appointmentUseCases.updateTrainingFocus(appointmentID: original.id, trainingFocus: trainingFocus)
+            _ = try await appointmentUseCases.updateTrainingFocus(
+                appointmentID: original.id, trainingFocus: trainingFocus)
         }
     }
 
     private func conflictDescription(for operation: Operation) async -> String {
         switch operation {
         case .createSingle, .reschedule:
-            let conflicts = (try? await appointmentUseCases.detectConflicts(
-                date: date,
-                startTime: startTime,
-                durationMinutes: durationMinutes,
-                excludingAppointmentID: existingAppointmentID
-            )) ?? []
+            let conflicts =
+                (try? await appointmentUseCases.detectConflicts(
+                    date: date,
+                    startTime: startTime,
+                    durationMinutes: durationMinutes,
+                    excludingAppointmentID: existingAppointmentID
+                )) ?? []
             return conflicts.map { conflict in
                 "\(conflict.conflictingStudentDisplayName) "
                     + AppointmentEditorFormatting.hourMinute(conflict.conflictingStartInstant, calendar: calendar)
@@ -322,12 +329,13 @@ final class AppointmentEditorViewModel: ObservableObject {
                 termination: termination,
                 calendar: calendar
             ) {
-                let conflicts = (try? await appointmentUseCases.detectConflicts(
-                    date: occurrence,
-                    startTime: startTime,
-                    durationMinutes: durationMinutes,
-                    excludingAppointmentID: nil
-                )) ?? []
+                let conflicts =
+                    (try? await appointmentUseCases.detectConflicts(
+                        date: occurrence,
+                        startTime: startTime,
+                        durationMinutes: durationMinutes,
+                        excludingAppointmentID: nil
+                    )) ?? []
                 if !conflicts.isEmpty {
                     conflictingCount += 1
                 }
@@ -404,8 +412,8 @@ enum AppointmentEditorFormatting {
     }
 }
 
-private extension LocalTime {
-    static let zero = (try? LocalTime(hour: 0, minute: 0))!
+extension LocalTime {
+    fileprivate static let zero = (try? LocalTime(hour: 0, minute: 0))!
 }
 
 /// 02 新建/编辑课程安排 (`23-new-appointment-v2`, `24-edit-occurrence-scope`;
@@ -563,19 +571,20 @@ struct AppointmentEditorView: View {
                 dismiss()
             }
         }
-        .confirmationDialog(
-            String(localized: "appointmentEditor.conflictTitle"),
-            isPresented: conflictPresented,
-            titleVisibility: .visible
-        ) {
-            Button(String(localized: "appointmentEditor.conflictOverride"), role: .destructive) {
-                Task { await viewModel.confirmOverrideAndSave() }
-            }
-            Button(String(localized: "appointmentEditor.conflictCancel"), role: .cancel) {
-                viewModel.dismissConflict()
-            }
-        } message: {
-            Text(viewModel.conflictMessage)
+        .fcConfirmationDialog(isPresented: conflictPresented) {
+            FCConfirmationDialog(
+                title: String(localized: "appointmentEditor.conflictTitle"),
+                message: viewModel.conflictMessage,
+                cancelAction: .init(title: String(localized: "appointmentEditor.conflictCancel")) {
+                    viewModel.dismissConflict()
+                },
+                confirmAction: .init(
+                    title: String(localized: "appointmentEditor.conflictOverride"),
+                    accessibilityIdentifier: FCAccessibilityID.appointmentEditorConflictOverride
+                ) {
+                    Task { await viewModel.confirmOverrideAndSave() }
+                }
+            )
         }
     }
 
@@ -594,7 +603,8 @@ struct AppointmentEditorView: View {
                     }
                 }
             } label: {
-                FCLabelValueRow(label: String(localized: "appointmentEditor.student"), value: name, showsDisclosure: true)
+                FCLabelValueRow(
+                    label: String(localized: "appointmentEditor.student"), value: name, showsDisclosure: true)
             }
             .buttonStyle(.plain)
         }
@@ -720,7 +730,9 @@ struct AppointmentEditorView: View {
                 } label: {
                     Text(AppointmentEditorFormatting.reminderLead(viewModel.reminderLeadMinutes))
                         .fcFont(.body)
-                        .foregroundStyle(viewModel.reminderEnabled ? FCSemanticColors.textPrimary : FCSemanticColors.textDisabled)
+                        .foregroundStyle(
+                            viewModel.reminderEnabled ? FCSemanticColors.textPrimary : FCSemanticColors.textDisabled
+                        )
                         .frame(minHeight: 44)
                 }
                 .disabled(!viewModel.reminderEnabled)
@@ -735,7 +747,8 @@ struct AppointmentEditorView: View {
     private var scopeSheet: some View {
         let original = viewModel.original
         let dayText = original.map { AppointmentEditorFormatting.monthDay($0.date) } ?? ""
-        let futureDetail = viewModel.isDateChanged
+        let futureDetail =
+            viewModel.isDateChanged
             ? String(localized: "appointmentEditor.scope.dateChangedDetail")
             : String(
                 format: String(localized: "appointmentEditor.scope.thisAndFutureDetailFormat"),
@@ -754,6 +767,7 @@ struct AppointmentEditorView: View {
                 ) {
                     Task { await viewModel.apply(scope: .thisInstanceOnly) }
                 }
+                .accessibilityIdentifier(FCAccessibilityID.appointmentEditorScopeThisOnly)
                 FCListRowDivider()
                 FCActionRow(
                     title: String(localized: "appointmentEditor.scope.thisAndFuture"),
@@ -762,6 +776,7 @@ struct AppointmentEditorView: View {
                 ) {
                     Task { await viewModel.apply(scope: .thisAndFuture) }
                 }
+                .accessibilityIdentifier(FCAccessibilityID.appointmentEditorScopeThisAndFuture)
                 FCListRowDivider()
                 FCLinkButton(title: String(localized: "appointmentEditor.scope.cancel")) {
                     viewModel.isScopeSheetPresented = false
@@ -780,7 +795,9 @@ struct AppointmentEditorView: View {
         }
     }
 
-    private func dateBinding(_ keyPath: ReferenceWritableKeyPath<AppointmentEditorViewModel, LocalDate>) -> Binding<Date> {
+    private func dateBinding(_ keyPath: ReferenceWritableKeyPath<AppointmentEditorViewModel, LocalDate>) -> Binding<
+        Date
+    > {
         Binding(
             get: { viewModel[keyPath: keyPath].startOfDay(calendar: calendar) },
             set: { newValue in

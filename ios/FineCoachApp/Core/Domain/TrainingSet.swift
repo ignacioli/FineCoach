@@ -197,8 +197,14 @@ public struct TrainingSet: Hashable, Codable, Sendable, Identifiable {
     }
 
     public func confirmed(now: Date) throws -> TrainingSet {
+        try confirmed(now: now, completedAtUTC: now)
+    }
+
+    /// Confirms keeping an earlier completion time (a completed set whose
+    /// values were edited, P0-D14).
+    public func confirmed(now: Date, completedAtUTC: Date) throws -> TrainingSet {
         try ParsedFields(self).validateForCompletion()
-        return replacing(state: .completed, orderIndex: orderIndex, updatedAtUTC: now, completedAtUTC: now)
+        return replacing(state: .completed, orderIndex: orderIndex, updatedAtUTC: now, completedAtUTC: completedAtUTC)
     }
 
     public func copiedAsPending(id: StableUUID, orderIndex: UInt32, now: Date) throws -> TrainingSet {

@@ -15,8 +15,16 @@ public struct ExerciseLibraryUseCases: Sendable {
         try await repository.seedPlaceholderCatalogIfNeeded(now: clock.nowUTC())
     }
 
+    public func hasBuiltInCatalog() async throws -> Bool {
+        try await repository.hasBuiltInCatalog()
+    }
+
     public func search(query: String, includeHidden: Bool = false) async throws -> [ExerciseLibraryEntry] {
         try await repository.searchActive(query: query, includeHidden: includeHidden)
+    }
+
+    public func assistedExerciseIDs() async throws -> Set<StableExerciseID> {
+        Set(try await search(query: "", includeHidden: true).filter { $0.preference?.isAssisted == true }.map(\.id))
     }
 
     public func createCustom(name: String, recordMode: RecordMode) async throws -> ExerciseCatalogItem {
@@ -72,6 +80,17 @@ public struct ExerciseLibraryUseCases: Sendable {
             isFavorite: nil,
             isHidden: nil,
             isAssisted: isAssisted
+        )
+    }
+
+    /// P0-D8: the coach's override of the library's unilateral default.
+    public func setUnilateral(id: StableExerciseID, isUnilateral: Bool) async throws {
+        _ = try await repository.setPreference(
+            exerciseID: id,
+            alias: nil,
+            isFavorite: nil,
+            isHidden: nil,
+            isUnilateral: isUnilateral
         )
     }
 }

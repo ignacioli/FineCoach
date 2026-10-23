@@ -12,8 +12,12 @@ final class StudentListViewModel: ObservableObject {
 
     @Published var students: [Student] = []
     @Published var query = ""
-    @Published var inProgress: InProgressTrainingSummary?
+    @Published var inProgress: [InProgressTrainingSummary] = []
     @Published var errorMessage: String?
+    /// False until the first successful reload. A recreated 学员 screen starts
+    /// with `students == []`, which is not an empty list until the load has
+    /// completed (same gate as Today).
+    @Published private(set) var hasCompletedInitialLoad = false
     @Published var archivedCount = 0
     @Published var rowInfo: [StableUUID: RowInfo] = [:]
 
@@ -41,17 +45,32 @@ final class StudentListViewModel: ObservableObject {
         showsArchived ? String(localized: "student.list.archivedTitle") : String(localized: "student.list.title")
     }
 
+    /// The full-page 16 empty state: only after a completed load, and only
+    /// when there is no active student, no search term, and no archive.
+    var isTrulyEmpty: Bool {
+        showsStudentEmptyState && query.isEmpty && archivedCount == 0
+    }
+
+    /// The in-list "no student" state (search results or the archived list).
+    var showsStudentEmptyState: Bool {
+        StudentListEmptyStatePresentation.showsEmptyState(
+            hasCompletedInitialLoad: hasCompletedInitialLoad,
+            studentCount: students.count
+        )
+    }
+
     func reload() async {
         do {
             if showsArchived {
                 students = try await useCases.listArchived()
-                inProgress = nil
+                inProgress = []
             } else {
                 students = try await useCases.searchActive(query: query)
-                inProgress = try await useCases.inProgressTraining()
+                inProgress = try await useCases.inProgressTrainings()
                 archivedCount = try await useCases.listArchived().count
                 await loadRowInfo()
             }
+            hasCompletedInitialLoad = true
             errorMessage = nil
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? String(localized: "student.error.generic")
@@ -89,6 +108,15 @@ final class StudentListViewModel: ObservableObject {
             info[student.id] = row
         }
         rowInfo = info
+    }
+}
+
+enum StudentListEmptyStatePresentation {
+    /// A freshly created list has zero students but is still loading; only a
+    /// completed load with zero students is an empty result. Split out so the
+    /// gate is unit-testable without building the Core Data-backed view model.
+    static func showsEmptyState(hasCompletedInitialLoad: Bool, studentCount: Int) -> Bool {
+        hasCompletedInitialLoad && studentCount == 0
     }
 }
 
@@ -180,10 +208,6 @@ struct StudentListView: View {
 
     // MARK: Root 学员 screen
 
-    private var isTrulyEmpty: Bool {
-        viewModel.students.isEmpty && viewModel.query.isEmpty && viewModel.archivedCount == 0
-    }
-
     private var rootBody: some View {
         VStack(spacing: FCPrimitives.space4) {
             VStack(alignment: .leading, spacing: FCPrimitives.space4) {
@@ -194,7 +218,7 @@ struct StudentListView: View {
             }
             .padding(.horizontal, FCPrimitives.space4)
 
-            if isTrulyEmpty {
+            if viewModel.isTrulyEmpty {
                 noStudentsEmptyState
             } else {
                 studentsScroll
@@ -212,8 +236,12 @@ struct StudentListView: View {
                         Task { await viewModel.reload() }
                     }
 
-                if let inProgress = viewModel.inProgress, viewModel.query.isEmpty {
-                    inTrainingBar(inProgress)
+                if !viewModel.inProgress.isEmpty, viewModel.query.isEmpty {
+                    VStack(spacing: FCPrimitives.space2) {
+                        ForEach(viewModel.inProgress, id: \.studentID) { summary in
+                            inTrainingBar(summary)
+                        }
+                    }
                 }
 
                 if let errorMessage = viewModel.errorMessage {
@@ -222,7 +250,7 @@ struct StudentListView: View {
                         .foregroundStyle(FCSemanticColors.statusDestructive)
                 }
 
-                if viewModel.students.isEmpty {
+                if viewModel.showsStudentEmptyState {
                     searchEmptyState
                 } else {
                     VStack(spacing: FCPrimitives.space1) {
@@ -288,7 +316,11 @@ struct StudentListView: View {
                 path.append(.activeSession(summary.studentID.rawValue))
             }
         }
-        .accessibilityIdentifier(FCAccessibilityID.studentListInProgress)
+        .accessibilityIdentifier(
+            viewModel.inProgress.count == 1
+                ? FCAccessibilityID.studentListInProgress
+                : FCAccessibilityID.studentListInProgressRow(summary.studentID)
+        )
     }
 
     /// Avatar initial + name + "训练重点 · …" + next class / package hint + ›.
@@ -385,7 +417,7 @@ struct StudentListView: View {
                         .foregroundStyle(FCSemanticColors.statusDestructive)
                 }
 
-                if viewModel.students.isEmpty {
+                if viewModel.showsStudentEmptyState {
                     VStack(spacing: FCPrimitives.space2) {
                         Text(String(localized: "student.list.archivedEmptyTitle"))
                             .fcFont(.headline)
@@ -428,10 +460,12 @@ struct StudentListView: View {
                         Text(student.displayName.value)
                             .fcFont(.headline)
                             .foregroundStyle(FCSemanticColors.textPrimary)
-                        Text(String(
-                            format: String(localized: "student.archived.archivedOnFormat"),
-                            StudentListPresentation.monthDay(student.updatedAtUTC)
-                        ))
+                        Text(
+                            String(
+                                format: String(localized: "student.archived.archivedOnFormat"),
+                                StudentListPresentation.monthDay(student.updatedAtUTC)
+                            )
+                        )
                         .fcFont(.caption)
                         .foregroundStyle(FCSemanticColors.textSecondary)
                     }
@@ -446,6 +480,7 @@ struct StudentListView: View {
                 Task { await viewModel.restore(student) }
             }
             .accessibilityLabel(Text("\(String(localized: "student.archived.restore")) \(student.displayName.value)"))
+            .accessibilityIdentifier(FCAccessibilityID.studentListRestore(student.id))
         }
         .padding(.vertical, FCPrimitives.space3)
     }

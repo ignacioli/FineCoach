@@ -14,6 +14,11 @@ public struct ShareReportDTO: Hashable, Sendable {
     /// generation starts without it, M1A-FR-035).
     public let personalBests: [ShareReportPersonalBestDTO]
 
+    /// One "上次 … → 本次 …" row per action, in session order (D-FR-022).
+    /// Records appear in this same row with `isNewRecord`, never as a separate row.
+    public let gainRows: [ShareReportGainRowDTO]
+    public let milestoneSessionNumber: Int?
+
     public init(
         schemaVersion: Int,
         studentDisplayName: String?,
@@ -23,7 +28,9 @@ public struct ShareReportDTO: Hashable, Sendable {
         studentFacingSummary: String?,
         trainingVolume: DecimalValue?,
         exercises: [ShareReportExerciseDTO],
-        personalBests: [ShareReportPersonalBestDTO] = []
+        personalBests: [ShareReportPersonalBestDTO] = [],
+        gainRows: [ShareReportGainRowDTO] = [],
+        milestoneSessionNumber: Int? = nil
     ) {
         self.schemaVersion = schemaVersion
         self.studentDisplayName = studentDisplayName
@@ -34,6 +41,8 @@ public struct ShareReportDTO: Hashable, Sendable {
         self.trainingVolume = trainingVolume
         self.exercises = exercises
         self.personalBests = personalBests
+        self.gainRows = gainRows
+        self.milestoneSessionNumber = milestoneSessionNumber
     }
 }
 
@@ -43,6 +52,8 @@ public struct ShareReportPersonalBestDTO: Hashable, Sendable {
         case highestWeight
         case longestDuration
         case longestDistance
+        /// `reps` mode record: strictly more repetitions (spec 004 Revision 1.5).
+        case mostReps
     }
 
     public let displayName: String
@@ -143,3 +154,22 @@ public struct ShareReportSetDTO: Hashable, Sendable {
 }
 
 extension ShareReportSetDTO: TrainingSetDisplayValues {}
+
+/// Allowlisted training performance only, shared with the summary's derived result.
+public struct ShareReportGainRowDTO: Hashable, Sendable {
+    public let displayName: String
+    /// True when this action also set a record in the shared session; the card
+    /// draws it as the row badge and never as a second row (D-FR-021).
+    public let isNewRecord: Bool
+    public let previous: ShareReportSetDTO
+    public let current: ShareReportSetDTO
+
+    public init(
+        displayName: String, isNewRecord: Bool, previous: ShareReportSetDTO, current: ShareReportSetDTO
+    ) {
+        self.displayName = displayName
+        self.isNewRecord = isNewRecord
+        self.previous = previous
+        self.current = current
+    }
+}

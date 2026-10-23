@@ -5,8 +5,12 @@ import SwiftUI
 /// 学员 title rows. No last-backup date is recorded anywhere, so the backup
 /// row has no subtitle rather than an invented one.
 struct SettingsView: View {
+    /// The public repository opened from 42「源代码」 in the system browser.
+    static let sourceCodeURL = URL(string: "https://github.com/ignacioli/FineCoach")!
+
     @Binding var path: [RootDestination]
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.openURL) private var openURL
     @State private var notificationStatus: NotificationAuthorizationStatus = .notDetermined
 
     var body: some View {
@@ -33,6 +37,26 @@ struct SettingsView: View {
                     )
                     .accessibilityIdentifier(FCAccessibilityID.settingsAbout)
                     FCListRowDivider()
+                    FCHubRow(
+                        icon: .symbol("chevron.left.forwardslash.chevron.right"),
+                        title: String(localized: "settings.sourceCode"),
+                        subtitle: .text("github.com/ignacioli/FineCoach"),
+                        mode: .action { openURL(Self.sourceCodeURL) }
+                    )
+                    .accessibilityIdentifier(FCAccessibilityID.settingsSourceCode)
+                    FCListRowDivider()
+                    #if DEBUG
+                        // 动效试验（开发版）: a visible settings row, DEBUG only
+                        // (README §14.1). It is not part of the approved 42/43
+                        // screens and never ships.
+                        FCHubRow(
+                            icon: .symbol("slider.horizontal.3"),
+                            title: String(localized: "settings.motionLab"),
+                            mode: .action { path.append(.motionLab) }
+                        )
+                        .accessibilityIdentifier(FCAccessibilityID.settingsMotionLab)
+                        FCListRowDivider()
+                    #endif
                 }
             }
             .padding(.horizontal, FCPrimitives.space4)

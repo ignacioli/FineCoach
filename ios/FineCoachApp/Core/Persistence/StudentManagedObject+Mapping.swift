@@ -98,11 +98,28 @@ enum StudentManagedObjectMapping {
         return try context.count(for: request) > 0
     }
 
-    static func inProgressSession(in context: NSManagedObjectContext) throws -> NSManagedObject? {
+    /// Every Student's in-progress Session, oldest start first (M1A-FR-018
+    /// revision: more than one Student may be training at the same time).
+    static func inProgressSessions(in context: NSManagedObjectContext) throws -> [NSManagedObject] {
         let request = NSFetchRequest<NSManagedObject>(entityName: sessionEntityName)
         request.predicate = NSPredicate(format: "state == %@", "inProgress")
+        request.sortDescriptors = [
+            NSSortDescriptor(key: "startedAtUTC", ascending: true),
+            NSSortDescriptor(key: "id", ascending: true),
+        ]
+        return try context.fetch(request)
+    }
+
+    static func inProgressSession(studentID: UUID, in context: NSManagedObjectContext) throws -> NSManagedObject? {
+        let request = NSFetchRequest<NSManagedObject>(entityName: sessionEntityName)
+        request.predicate = NSPredicate(format: "studentID == %@ AND state == %@", studentID as CVarArg, "inProgress")
         request.fetchLimit = 1
         return try context.fetch(request).first
+    }
+
+    /// Compatibility for the single-session call sites and tests.
+    static func inProgressSession(in context: NSManagedObjectContext) throws -> NSManagedObject? {
+        try inProgressSessions(in: context).first
     }
 
     static func sessionCount(studentID: UUID, in context: NSManagedObjectContext) throws -> Int {

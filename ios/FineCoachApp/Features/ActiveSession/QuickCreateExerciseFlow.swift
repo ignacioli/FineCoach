@@ -2,33 +2,50 @@ import SwiftUI
 
 struct QuickCreateExerciseFlow: View {
     @ObservedObject var viewModel: ActiveSessionViewModel
+    @Binding var isFilterSheetPresented: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: FCPrimitives.space2) {
-            FCTextField(String(localized: "session.field.exerciseName"), text: $viewModel.exerciseName)
-                .accessibilityIdentifier(FCAccessibilityID.activeSessionExerciseName)
-                .onChange(of: viewModel.exerciseName) { _, _ in
-                    viewModel.scheduleCatalogSearch()
-                }
-            if !viewModel.catalogMatches.isEmpty {
+            searchRow
+            muscleChips
+            if viewModel.showsRecentCatalogMatches {
                 VStack(alignment: .leading, spacing: FCPrimitives.space2) {
-                    ForEach(viewModel.catalogMatches) { entry in
-                        Button {
-                            Task { await viewModel.addCatalogMatch(entry.id) }
-                        } label: {
-                            HStack(spacing: FCPrimitives.space2) {
-                                if let icon = FCEquipmentIcon.icon(equipmentClass: entry.equipmentClass, primaryMuscleGroup: entry.primaryMuscleGroup) {
-                                    FCEquipmentIconView(icon)
-                                }
-                                Text(entry.displayedName)
-                                    .fcFont(.body)
-                                    .foregroundStyle(FCSemanticColors.textPrimary)
+                    FCSectionLabel(String(localized: "exercise.library.recent"))
+                        .accessibilityIdentifier(FCAccessibilityID.addExerciseRecent)
+                    VStack(alignment: .leading, spacing: 0) {
+                        FCListRowDivider()
+                        ForEach(viewModel.recentCatalogMatches) { entry in
+                            Button {
+                                Task { await viewModel.addCatalogMatch(entry.id) }
+                            } label: {
+                                FCExerciseLibraryRowLabel(entry: entry)
                             }
-                            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                            .buttonStyle(.borderless)
+                            .accessibilityIdentifier(FCAccessibilityID.addExerciseRecentRow(entry.id))
+                            FCListRowDivider()
                         }
-                        .buttonStyle(.borderless)
-                        .accessibilityIdentifier(FCAccessibilityID.activeSessionCatalogRow(entry.id))
-                        .accessibilityLabel(entry.displayedName)
+                    }
+                }
+                .padding(.bottom, FCPrimitives.space2)
+            }
+            LazyVStack(alignment: .leading, spacing: FCPrimitives.space4) {
+                ForEach(viewModel.catalogSections) { section in
+                    VStack(alignment: .leading, spacing: FCPrimitives.space2) {
+                        FCSectionLabel("\(catalogSectionTitle(section.id)) · \(section.entries.count)")
+                            .accessibilityIdentifier(FCAccessibilityID.activeSessionCatalogSection(section.id))
+                        VStack(spacing: 0) {
+                            FCListRowDivider()
+                            ForEach(section.entries) { entry in
+                                Button {
+                                    Task { await viewModel.addCatalogMatch(entry.id) }
+                                } label: {
+                                    FCExerciseLibraryRowLabel(entry: entry)
+                                }
+                                .buttonStyle(.borderless)
+                                .accessibilityIdentifier(FCAccessibilityID.activeSessionCatalogRow(entry.id))
+                                FCListRowDivider()
+                            }
+                        }
                     }
                 }
             }
@@ -53,6 +70,24 @@ struct QuickCreateExerciseFlow: View {
                     title: String(localized: "session.mode.cardio"),
                     id: FCAccessibilityID.activeSessionModeCardio
                 )
+            }
+            if viewModel.recordMode == .weightReps {
+                // P0-D8: chosen when the exercise is added; the set entry
+                // then offers per-side weights.
+                HStack {
+                    Text(String(localized: "session.field.unilateralExercise"))
+                        .fcFont(.body)
+                        .foregroundStyle(FCSemanticColors.textPrimary)
+                    Spacer(minLength: FCPrimitives.space2)
+                    Toggle(
+                        String(localized: "session.field.unilateralExercise"),
+                        isOn: $viewModel.newExerciseIsUnilateral
+                    )
+                    .toggleStyle(FCToggleStyle())
+                    .labelsHidden()
+                }
+                .frame(maxWidth: .infinity, minHeight: 44)
+                .accessibilityIdentifier(FCAccessibilityID.activeSessionNewExerciseUnilateral)
             }
             if let exerciseNameConflict = viewModel.exerciseNameConflict {
                 Text(exerciseNameConflict)
@@ -82,5 +117,63 @@ struct QuickCreateExerciseFlow: View {
             viewModel.recordMode = mode
         }
         .accessibilityIdentifier(id)
+    }
+
+    private var searchRow: some View {
+        HStack(spacing: FCPrimitives.space2) {
+            FCSearchField(String(localized: "exercise.library.search"), text: $viewModel.exerciseName)
+                .accessibilityIdentifier(FCAccessibilityID.activeSessionExerciseName)
+                .onChange(of: viewModel.exerciseName) { _, _ in
+                    viewModel.scheduleCatalogSearch()
+                }
+            FCTitleIconButton(
+                systemImage: viewModel.catalogEquipmentFilter == nil
+                    ? "line.3.horizontal.decrease.circle"
+                    : "line.3.horizontal.decrease.circle.fill",
+                accessibilityLabel: String(localized: "exercise.library.filter.title")
+            ) {
+                isFilterSheetPresented = true
+            }
+            .accessibilityValue(
+                Text(
+                    viewModel.catalogEquipmentFilter == nil
+                        ? ""
+                        : String(localized: "exercise.library.filter.active")
+                )
+            )
+            .accessibilityIdentifier(FCAccessibilityID.activeSessionCatalogFilter)
+        }
+    }
+
+    private var muscleChips: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: FCPrimitives.space2) {
+                FCFilterChip(
+                    title: String(localized: "exercise.library.filter.all"),
+                    isSelected: viewModel.catalogMuscleFilter == nil
+                ) {
+                    viewModel.selectCatalogMuscle(nil)
+                }
+                .accessibilityIdentifier(FCAccessibilityID.activeSessionCatalogMuscleAll)
+                ForEach(ExerciseCatalogBrowse.muscleGroupOrder, id: \.self) { muscle in
+                    FCFilterChip(title: muscle, isSelected: viewModel.catalogMuscleFilter == muscle) {
+                        viewModel.selectCatalogMuscle(muscle)
+                    }
+                    .accessibilityIdentifier(FCAccessibilityID.activeSessionCatalogMuscle(muscle))
+                }
+            }
+        }
+        .accessibilityLabel(Text("exercise.library.filter.muscle"))
+    }
+
+    private func catalogSectionTitle(_ id: String) -> String {
+        switch id {
+        case ExerciseCatalogBrowse.customSectionID:
+            return String(localized: "exercise.kind.custom")
+        case ExerciseCatalogBrowse.uncategorizedSectionID:
+            return String(localized: "exercise.library.section.uncategorized")
+        default:
+            return id
+        }
     }
 }

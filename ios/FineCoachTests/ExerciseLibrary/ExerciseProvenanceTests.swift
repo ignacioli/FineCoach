@@ -2,6 +2,64 @@ import FineCoach
 import XCTest
 
 final class ExerciseProvenanceTests: XCTestCase {
+    func testPinyinSearchMatchesFullPinyinInitialsSubstringsAndCase() {
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "卧推", query: "wotui"))
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "卧推", query: "wo tui"))
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "卧推", query: "wt"))
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "卧推", query: "TUI"))
+        XCTAssertFalse(ExercisePinyinSearch.matches(value: "卧推", query: "深蹲"))
+    }
+
+    func testPinyinSearchUsesFoundationSystemTransliterationForPolyphonicInput() {
+        let tokens = ExercisePinyinSearch.tokens(for: "杠铃弯举")
+
+        XCTAssertEqual(tokens.sourceValue, "杠铃弯举")
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "杠铃弯举", query: "glwj"))
+    }
+
+    func testPinyinSearchFixesTanForResistanceBandNames() {
+        let tokens = ExercisePinyinSearch.tokens(for: "弹力带")
+
+        XCTAssertEqual(tokens.fullPinyin, "tanlidai")
+        XCTAssertEqual(tokens.initials, "tld")
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "弹力带", query: "tanlidai"))
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "弹力带", query: "tan li dai"))
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "弹力带", query: "tld"))
+        XCTAssertFalse(ExercisePinyinSearch.matches(value: "弹力带", query: "danlidai"))
+    }
+
+    func testPinyinSearchFixesDiForBuiltInAndUserProvidedNames() {
+        let builtInTokens = ExercisePinyinSearch.tokens(for: "地雷管推举")
+
+        XCTAssertTrue(builtInTokens.fullPinyin.hasPrefix("dilei"))
+        XCTAssertTrue(builtInTokens.initials.hasPrefix("dl"))
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "地雷管推举", query: "dilei"))
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "地雷管推举", query: "dl"))
+
+        // Custom exercise and alias values use the same on-demand token path.
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "自定义弹力带动作", query: "tanli"))
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "自定义弹力带动作", query: "tld"))
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "地板别名", query: "diban"))
+        XCTAssertTrue(ExercisePinyinSearch.matches(value: "地板别名", query: "db"))
+        XCTAssertFalse(ExercisePinyinSearch.matches(value: "自定义弹力带动作", query: "danli"))
+        XCTAssertFalse(ExercisePinyinSearch.matches(value: "地板别名", query: "deban"))
+    }
+
+    func testPinyinSearchKeepsSyllableBoundariesForAdjacentOverrides() {
+        let expected: [(value: String, fullPinyin: String, initials: String)] = [
+            ("弹地", "tandi", "td"),
+            ("地弹", "ditan", "dt"),
+            ("弹弹", "tantan", "tt"),
+            ("地地", "didi", "dd"),
+        ]
+
+        for item in expected {
+            let tokens = ExercisePinyinSearch.tokens(for: item.value)
+            XCTAssertEqual(tokens.fullPinyin, item.fullPinyin, item.value)
+            XCTAssertEqual(tokens.initials, item.initials, item.value)
+        }
+    }
+
     func testMissingRequiredFieldIsRejectedWithNamedIssue() throws {
         var missingLicense = validPlaceholderManifest()
         missingLicense.records[0].licenseText = "   "
@@ -77,10 +135,10 @@ final class ExerciseProvenanceTests: XCTestCase {
         let catalog = try PlaceholderExerciseCatalogLoader.loadFromBundle(
             Bundle(for: PersistenceController.self)
         )
-        XCTAssertEqual(catalog.metadataVersion, "m1a.wger.2026-08-30")
+        XCTAssertEqual(catalog.metadataVersion, "m1a.catalog.2026-10-18")
         XCTAssertEqual(catalog.provenance.catalogID, "fc.m1a.wger")
-        XCTAssertEqual(catalog.exercises.count, 146)
-        XCTAssertEqual(catalog.provenance.records.count, 146)
+        XCTAssertEqual(catalog.exercises.count, 542)
+        XCTAssertEqual(catalog.provenance.records.count, 542)
         XCTAssertFalse(catalog.provenance.isFictionalPlaceholder)
         XCTAssertTrue(catalog.provenance.records.allSatisfy(\.redistributionAllowed))
 
@@ -130,6 +188,22 @@ final class ExerciseProvenanceTests: XCTestCase {
                 $0.primaryMuscleGroup != nil && $0.equipmentClass != nil
             }
         )
+        let exerciseIDs = catalog.exercises.map(\.id)
+        XCTAssertEqual(Set(exerciseIDs).count, 542, "all catalog ids must be unique")
+        XCTAssertEqual(Set(catalog.provenance.records.map(\.recordID)).count, 542)
+        XCTAssertEqual(
+            Set(catalog.exercises.map(\.provenanceRef)),
+            Set(catalog.provenance.records.map(\.recordID)),
+            "every catalog row must have exactly one provenance record"
+        )
+        XCTAssertEqual(catalog.exercises.filter { $0.retired == true }.count, 1)
+        XCTAssertTrue(catalog.exercises.allSatisfy { RecordMode.allCases.contains($0.recordMode) })
+        XCTAssertTrue(
+            catalog.exercises.allSatisfy {
+                ExerciseCatalogBrowse.muscleGroupOrder.contains($0.primaryMuscleGroup ?? "")
+                    && ExerciseCatalogBrowse.equipmentClassOrder.contains($0.equipmentClass ?? "")
+            }
+        )
         XCTAssertEqual(
             Set(catalog.exercises.compactMap(\.primaryMuscleGroup)),
             Set(ExerciseCatalogBrowse.muscleGroupOrder)
@@ -138,6 +212,35 @@ final class ExerciseProvenanceTests: XCTestCase {
             Set(catalog.exercises.compactMap(\.equipmentClass)),
             Set(ExerciseCatalogBrowse.equipmentClassOrder)
         )
+        XCTAssertEqual(
+            ExerciseCatalogBrowse.equipmentClassOrder,
+            [
+                "杠铃", "哑铃", "固定器械", "史密斯机", "绳索", "哈克机", "壶铃", "徒手", "悍马机", "弹力带", "悬挂带",
+                "单杠", "其他",
+            ]
+        )
+    }
+
+    func testBundledCatalogRetainsEveryBaselineIDAndRetiresTheBaselineExercise() throws {
+        let baseline = try loadBaselineCatalog()
+        XCTAssertEqual(baseline.metadataVersion, "m1a.wger.2026-08-30")
+        XCTAssertEqual(baseline.exercises.count, 146)
+        XCTAssertEqual(baseline.provenance.records.count, 146)
+
+        let current = try PlaceholderExerciseCatalogLoader.loadFromBundle(
+            Bundle(for: PersistenceController.self)
+        )
+        let baselineIDs = Set(baseline.exercises.map(\.id))
+        let currentIDs = Set(current.exercises.map(\.id))
+        XCTAssertEqual(baselineIDs.intersection(currentIDs), baselineIDs)
+
+        let retired = try XCTUnwrap(current.exercises.first(where: { $0.retired == true }))
+        let baselineRetired = try XCTUnwrap(
+            baseline.exercises.first(where: { $0.id == retired.id })
+        )
+        XCTAssertEqual(retired.id, "046fce45-69f2-46f7-a5b6-79a25a485af1")
+        XCTAssertEqual(retired.canonicalName, baselineRetired.canonicalName)
+        XCTAssertEqual(retired.canonicalName, "单腿腿屈伸")
     }
 
     func testInvalidJSONDataThrowsIncompatibleInput() {
@@ -188,5 +291,21 @@ final class ExerciseProvenanceTests: XCTestCase {
         var object = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
         try mutate(&object)
         return try JSONSerialization.data(withJSONObject: object)
+    }
+
+    private func loadBaselineCatalog() throws -> PlaceholderExerciseCatalog {
+        let testFileURL = URL(fileURLWithPath: #filePath)
+        let iosRoot =
+            testFileURL
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let fixtureURL = iosRoot.appendingPathComponent(
+            "TestSupport/Fixtures/ExerciseCatalog/provenance-baseline-146.json"
+        )
+        return try JSONDecoder().decode(
+            PlaceholderExerciseCatalog.self,
+            from: Data(contentsOf: fixtureURL)
+        )
     }
 }

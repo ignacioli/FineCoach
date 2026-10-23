@@ -1,6 +1,124 @@
 {
   "sourceLanguage": "zh-Hans",
   "strings": {
+    "session.gains.title": {"extractionState": "manual", "localizations": {"zh-Hans": {"stringUnit": {"state": "translated", "value": "本节收获"}}}},
+    "session.gains.progress.format": {"extractionState": "manual", "localizations": {"zh-Hans": {"stringUnit": {"state": "translated", "value": "上次 %@ → 本次 %@"}}}},
+    "session.gains.milestone.format": {"extractionState": "manual", "localizations": {"zh-Hans": {"stringUnit": {"state": "translated", "value": "第 %lld 节课"}}}},
+    "session.gains.milestone.subtitle": {"extractionState": "manual", "localizations": {"zh-Hans": {"stringUnit": {"state": "translated", "value": "累计完成的课程"}}}},
+    "session.set.newRecord": {
+      "extractionState": "manual",
+      "localizations": { "zh-Hans": { "stringUnit": { "state": "translated", "value": "新纪录" } } }
+    },
+    "settings.motionLab": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动效试验（开发版）"
+          }
+        }
+      }
+    },
+    "motionLab.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动效试验"
+          }
+        }
+      }
+    },
+    "motionLab.intro": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "点 A / B / C 播放一次新纪录数值浮起，并给一次确认触感；「普通确认」只给触感。正式代码当前用 B 档。"
+          }
+        }
+      }
+    },
+    "motionLab.sampleTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 3 组"
+          }
+        }
+      }
+    },
+    "motionLab.sampleValue": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "125 kg × 5"
+          }
+        }
+      }
+    },
+    "motionLab.optionA": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A 8pt · 0.5 s"
+          }
+        }
+      }
+    },
+    "motionLab.optionB": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "B 12pt · 0.6 s"
+          }
+        }
+      }
+    },
+    "motionLab.optionC": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "C 16pt · 0.8 s"
+          }
+        }
+      }
+    },
+    "motionLab.optionD": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "D 24pt · 1.5 s"
+          }
+        }
+      }
+    },
+    "motionLab.plainConfirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "普通确认"
+          }
+        }
+      }
+    },
     "app.title": {
       "comment": "Application title",
       "extractionState": "manual",
@@ -65,7 +183,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "操作失败，请重试。"
+            "value": "没有完成，再试一次。"
           }
         }
       }
@@ -263,7 +381,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "请填写显示名称"
+            "value": "还没填写显示名称"
           }
         }
       }
@@ -274,7 +392,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "请选择性别"
+            "value": "还没选择性别"
           }
         }
       }
@@ -296,7 +414,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "电话与微信由教练手输。不读取系统通讯录，不请求联系人权限。"
+            "value": "电话与微信由教练手输。不读取系统通讯录，不询问联系人权限。"
           }
         }
       }
@@ -417,7 +535,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "开始记录第一堂课吧"
+            "value": "开始记录第一堂课"
           }
         }
       }
@@ -879,7 +997,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "删除后无法从本页恢复。已分享的旧图片和你保存的备份不会被远程改写或删除。"
+            "value": "删除后无法从本页恢复。已分享的旧图片和自行保存的备份不会被远程改写或删除。"
           }
         }
       }
@@ -1121,7 +1239,161 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "重量"
+            "value": "重量 kg"
+          }
+        }
+      }
+    },
+    "session.field.weightStepHint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每次 ±2.5 kg · 点数字可直接输入"
+          }
+        }
+      }
+    },
+    "session.stepper.decrementFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "减少%@"
+          }
+        }
+      }
+    },
+    "session.stepper.incrementFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "增加%@"
+          }
+        }
+      }
+    },
+    "session.rest.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "组间休息"
+          }
+        }
+      }
+    },
+    "session.rest.minus": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "−15 秒"
+          }
+        }
+      }
+    },
+    "session.rest.plus": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+15 秒"
+          }
+        }
+      }
+    },
+    "session.rest.skip": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跳过"
+          }
+        }
+      }
+    },
+    "session.rest.ended": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "休息结束，可以开始下一组"
+          }
+        }
+      }
+    },
+    "session.rest.overdueFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已超时 %@"
+          }
+        }
+      }
+    },
+    "session.rest.close": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭"
+          }
+        }
+      }
+    },
+    "session.rest.notificationTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "休息结束"
+          }
+        }
+      }
+    },
+    "session.lastReferenceFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上次 %@ · %d 组"
+          }
+        }
+      }
+    },
+    "session.rest.notificationBody": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "可以开始下一组了"
+          }
+        }
+      }
+    },
+    "session.rest.notificationBodyExercise": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ · 可以开始下一组了"
           }
         }
       }
@@ -1143,7 +1415,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "时长（秒）"
+            "value": "训练时长"
           }
         }
       }
@@ -1154,7 +1426,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "时长，如 5分30秒 / 5m30s"
+            "value": "时长，如 5 分 30 秒 / 5m30s"
           }
         }
       }
@@ -1214,35 +1486,13 @@
         }
       }
     },
-    "session.side.none": {
+    "session.set.ordinal": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "不区分左右"
-          }
-        }
-      }
-    },
-    "session.side.bilateral": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "左右侧"
-          }
-        }
-      }
-    },
-    "session.set.label": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "组"
+            "value": "第 %lld 组"
           }
         }
       }
@@ -1291,17 +1541,6 @@
         }
       }
     },
-    "session.action.addSet": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "添加组"
-          }
-        }
-      }
-    },
     "session.action.confirmSet": {
       "extractionState": "manual",
       "localizations": {
@@ -1313,28 +1552,6 @@
         }
       }
     },
-    "session.action.copyPrevious": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "复制上一组"
-          }
-        }
-      }
-    },
-    "session.action.copyLastSame": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "复制上次同动作"
-          }
-        }
-      }
-    },
     "session.action.undo": {
       "extractionState": "manual",
       "localizations": {
@@ -1342,28 +1559,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "撤销"
-          }
-        }
-      }
-    },
-    "session.action.moveUp": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "上移"
-          }
-        }
-      }
-    },
-    "session.action.moveDown": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "下移"
           }
         }
       }
@@ -1506,7 +1701,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "请返回处理草稿和待完成组，或明确丢弃后再结束。"
+            "value": "返回处理草稿和待完成组，或明确丢弃后再结束。"
           }
         }
       }
@@ -1572,7 +1767,29 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "本次中断较长或时钟异常，请确认或修正训练时长后再结束。"
+            "value": "本次中断较长或时钟异常，确认或修正训练时长后再结束。"
+          }
+        }
+      }
+    },
+    "session.duration.inputHint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "例如 1 小时 12 分、1h12m、55 分钟、55m"
+          }
+        }
+      }
+    },
+    "session.duration.inputError": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练时长无效，按上面的例子填写。"
           }
         }
       }
@@ -1595,6 +1812,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "动作库"
+          }
+        }
+      }
+    },
+    "exercise.library.recent": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近练过"
           }
         }
       }
@@ -1869,7 +2097,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "时长 %@ 秒"
+            "value": "时长 %@"
           }
         }
       }
@@ -2155,7 +2383,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "本机数据已替换为备份中的版本。请到学员、课包、模板等页面检查数据是否正确。"
+            "value": "本机数据已替换为备份中的版本。到学员、课包、模板等页面检查数据是否正确。"
           }
         }
       }
@@ -2199,7 +2427,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "口令不可恢复，也无法找回。请自行妥善保存，应用不会记住口令。"
+            "value": "口令不可恢复，也无法找回。自行妥善保存，应用不会记住口令。"
           }
         }
       }
@@ -2320,7 +2548,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "请先选择备份文件。"
+            "value": "先选择备份文件。"
           }
         }
       }
@@ -2398,6 +2626,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "继续训练"
+          }
+        }
+      }
+    },
+    "today.inProgress.multiBadgeFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "进行中 · %d"
+          }
+        }
+      }
+    },
+    "today.inProgress.rowContinue": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "继续 ›"
           }
         }
       }
@@ -2573,7 +2823,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "加载今日安排失败，请重试。"
+            "value": "加载今日安排失败，再试一次。"
           }
         }
       }
@@ -2727,7 +2977,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "请先选择学员。"
+            "value": "先选择学员。"
           }
         }
       }
@@ -2738,7 +2988,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "请输入有效的预计时长。"
+            "value": "预计时长无效。"
           }
         }
       }
@@ -2749,7 +2999,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "保存失败，请重试。"
+            "value": "保存失败，再试一次。"
           }
         }
       }
@@ -2842,6 +3092,17 @@
         }
       }
     },
+    "settings.sourceCode": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "源代码"
+          }
+        }
+      }
+    },
     "today.addAppointment": {
       "extractionState": "manual",
       "localizations": {
@@ -2925,7 +3186,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "课包信息暂不可用，请重试。"
+            "value": "课包信息暂不可用，再试一次。"
           }
         }
       }
@@ -3145,7 +3406,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "保存失败，请重试。"
+            "value": "保存失败，再试一次。"
           }
         }
       }
@@ -3277,7 +3538,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "请说明本次调整的原因"
+            "value": "说明本次调整的原因"
           }
         }
       }
@@ -3299,7 +3560,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "请填写调整原因。"
+            "value": "还没填写调整原因。"
           }
         }
       }
@@ -3310,7 +3571,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "扣减后余额将为负，请检查课时数。"
+            "value": "扣减后余额将为负，检查课时数。"
           }
         }
       }
@@ -3321,7 +3582,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "保存失败，请重试。"
+            "value": "保存失败，再试一次。"
           }
         }
       }
@@ -3343,7 +3604,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "记录暂不可用，请重试。"
+            "value": "记录暂不可用，再试一次。"
           }
         }
       }
@@ -3541,7 +3802,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "操作失败，请重试。"
+            "value": "没有完成，再试一次。"
           }
         }
       }
@@ -3788,17 +4049,6 @@
         }
       }
     },
-    "applyTemplate.title": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "应用模板"
-          }
-        }
-      }
-    },
     "applyTemplate.empty": {
       "extractionState": "manual",
       "localizations": {
@@ -3871,7 +4121,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "操作失败，请重试。"
+            "value": "没有完成，再试一次。"
           }
         }
       }
@@ -4168,7 +4418,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "保存失败，请重试。"
+            "value": "保存失败，再试一次。"
           }
         }
       }
@@ -4180,6 +4430,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "历史记录"
+          }
+        }
+      }
+    },
+    "bodyMeasurementEntry.management": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "管理"
           }
         }
       }
@@ -4235,6 +4496,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "清空全部记录"
+          }
+        }
+      }
+    },
+    "bodyMeasurementEntry.deleteAllNote": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除这个指标的所有记录，需二次确认"
           }
         }
       }
@@ -4432,7 +4704,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "加载失败，请重试。"
+            "value": "加载失败，再试一次。"
           }
         }
       }
@@ -4531,7 +4803,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "相比上次：%@kg（%@）"
+            "value": "相比上次：%@ kg（%@）"
           }
         }
       }
@@ -4707,7 +4979,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "训练容量：%@kg vs %@kg"
+            "value": "训练容量：%@ kg vs %@ kg"
           }
         }
       }
@@ -5565,7 +5837,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "课包剩余 %d 次"
+            "value": "课包剩余 %d 课时"
           }
         }
       }
@@ -5576,7 +5848,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "训练中 · %1$@ · 已训练 %2$d 分钟"
+            "value": "%1$@ 训练中 · 已训练 %2$d 分钟"
           }
         }
       }
@@ -5587,7 +5859,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "训练中 · %@"
+            "value": "%@ 训练中"
           }
         }
       }
@@ -6676,7 +6948,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ kg × %2$@ 次"
+            "value": "%1$@ kg × %2$@"
           }
         }
       }
@@ -6780,28 +7052,8 @@
         }
       }
     },
-    "share.pb.hintFormat": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "本次刷新 %d 项"
-          }
-        }
-      }
-    },
-    "share.pb.none": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "本次无新纪录"
-          }
-        }
-      }
-    },
+    "share.gains.records.format": {"extractionState": "manual", "localizations": {"zh-Hans": {"stringUnit": {"state": "translated", "value": "%d 项新纪录"}}}},
+    "share.gains.progress.format": {"extractionState": "manual", "localizations": {"zh-Hans": {"stringUnit": {"state": "translated", "value": "%d 项进步"}}}},
     "share.defaultOff": {
       "extractionState": "manual",
       "localizations": {
@@ -6831,6 +7083,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "生成报告卡"
+          }
+        }
+      }
+    },
+    "share.done": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成"
           }
         }
       }
@@ -7116,7 +7379,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "档案尚未生成。请返回后重试。"
+            "value": "档案尚未生成。返回后再试一次。"
           }
         }
       }
@@ -7655,7 +7918,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "精练教练不会自动识别文字里的敏感内容，请逐条检查后再继续。"
+            "value": "精练教练不会自动识别文字里的敏感内容，逐条检查后再继续。"
           }
         }
       }
@@ -7688,7 +7951,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "请确认以下事实后再设置密码"
+            "value": "确认以下事实后再设置密码"
           }
         }
       }
@@ -7710,7 +7973,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "档案不是完整备份，不能用来恢复你的数据。"
+            "value": "档案不是完整备份，不能用来恢复数据。"
           }
         }
       }
@@ -7765,7 +8028,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "请通过其他方式把密码单独告诉学员，不要和档案一起发送。"
+            "value": "通过其他方式把密码单独告诉学员，不要和档案一起发送。"
           }
         }
       }
@@ -7820,7 +8083,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "密码不会被保存，也无法找回。请通过其他方式单独告诉学员。"
+            "value": "密码不会被保存，也无法找回。通过其他方式单独告诉学员。"
           }
         }
       }
@@ -7853,7 +8116,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "请重新输入。档案尚未生成。"
+            "value": "重新输入。档案尚未生成。"
           }
         }
       }
@@ -8018,7 +8281,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "你打算怎样使用精练教练？"
+            "value": "打算怎样使用精练教练？"
           }
         }
       }
@@ -8073,7 +8336,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "只读查看教练交给你的档案"
+            "value": "只读查看教练交付的档案"
           }
         }
       }
@@ -8480,7 +8743,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "请先确认档案信息"
+            "value": "先确认档案信息"
           }
         }
       }
@@ -8711,7 +8974,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ %2$@ × %3$@ 次"
+            "value": "%1$@ %2$@ × %3$@"
           }
         }
       }
@@ -8843,7 +9106,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "请稍后再试。"
+            "value": "稍后再试一次。"
           }
         }
       }
@@ -8942,7 +9205,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "本机档案没有删除完成，请重试。"
+            "value": "本机档案没有删除完成，再试一次。"
           }
         }
       }
@@ -9250,7 +9513,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "你的数据怎样保存"
+            "value": "数据怎样保存"
           }
         }
       }
@@ -9327,7 +9590,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "现在不会请求权限"
+            "value": "现在不会询问权限"
           }
         }
       }
@@ -9338,7 +9601,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "不会弹出通知、通讯录等系统权限。只有你为课程打开提醒时，才会询问通知权限。"
+            "value": "不会弹出通知、通讯录等系统权限。只有为课程打开提醒时，才会询问通知权限。"
           }
         }
       }
@@ -9350,6 +9613,248 @@
           "stringUnit": {
             "state": "translated",
             "value": "知道了"
+          }
+        }
+      }
+    },
+    "session.field.perSideWeight": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每侧重量 kg"
+          }
+        }
+      }
+    },
+    "session.field.leftWeight": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "左 kg"
+          }
+        }
+      }
+    },
+    "session.field.rightWeight": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "右 kg"
+          }
+        }
+      }
+    },
+    "session.action.sidesDiffer": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "左右不同"
+          }
+        }
+      }
+    },
+    "session.action.sidesEqual": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "左右相同"
+          }
+        }
+      }
+    },
+    "session.field.unilateralExercise": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "单侧动作"
+          }
+        }
+      }
+    },
+    "exercise.library.unilateral": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "单侧动作"
+          }
+        }
+      }
+    },
+    "session.keyboard.done": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成"
+          }
+        }
+      }
+    },
+    "designSystem.undo": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "撤销"
+          }
+        }
+      }
+    },
+    "designSystem.moreActions": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更多操作"
+          }
+        }
+      }
+    },
+    "section.delete.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除分区「%@」？"
+          }
+        }
+      }
+    },
+    "section.delete.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分区里的 %ld 个动作会移到「无分区」"
+          }
+        }
+      }
+    },
+    "section.delete.cancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        }
+      }
+    },
+    "backup.restore.replaceConfirm.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用备份替换当前数据？"
+          }
+        }
+      }
+    },
+    "backup.restore.replaceConfirm.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前所有学员和训练记录会被备份里的内容替换，无法撤销"
+          }
+        }
+      }
+    },
+    "backup.restore.replaceConfirm.cancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        }
+      }
+    },
+    "backup.restore.replaceConfirm.confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "替换"
+          }
+        }
+      }
+    },
+    "session.set.deleted": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %ld 组已删除"
+          }
+        }
+      }
+    },
+    "bodyMeasurementEntry.deletedFormat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ %@ 已删除"
+          }
+        }
+      }
+    },
+    "templateEditor.deleteExercise": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除"
+          }
+        }
+      }
+    },
+    "bodyMeasurementEntry.deleteMetric": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除指标"
+          }
+        }
+      }
+    },
+    "bodyMeasurementEntry.deleteMetricBlocked": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "先清空记录才能删除"
           }
         }
       }

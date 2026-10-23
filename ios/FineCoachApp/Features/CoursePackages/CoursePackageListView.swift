@@ -50,7 +50,8 @@ final class CoursePackageListViewModel: ObservableObject {
             }
             errorMessage = nil
         } catch {
-            errorMessage = (error as? LocalizedError)?.errorDescription
+            errorMessage =
+                (error as? LocalizedError)?.errorDescription
                 ?? String(localized: "coursePackages.error.generic")
         }
     }
@@ -67,7 +68,8 @@ final class CoursePackageListViewModel: ObservableObject {
             _ = try await useCases.endPackage(packageID: activePackage.id)
             await reload()
         } catch {
-            errorMessage = (error as? LocalizedError)?.errorDescription
+            errorMessage =
+                (error as? LocalizedError)?.errorDescription
                 ?? String(localized: "coursePackages.error.generic")
         }
     }
@@ -162,7 +164,10 @@ struct CoursePackageListView: View {
                 cancelAction: .init(title: String(localized: "packageDetail.endConfirm.keep")) {
                     isConfirmingEnd = false
                 },
-                confirmAction: .init(title: String(localized: "packageDetail.endConfirm.confirm")) {
+                confirmAction: .init(
+                    title: String(localized: "packageDetail.endConfirm.confirm"),
+                    accessibilityIdentifier: FCAccessibilityID.coursePackageListEndConfirm
+                ) {
                     isConfirmingEnd = false
                     Task { await viewModel.endActivePackage() }
                 }

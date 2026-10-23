@@ -16,12 +16,26 @@ public struct NotificationRequestDescriptor: Equatable, Sendable {
     public let title: String
     public let body: String
     public let fireDate: Date
+    /// Invisible routing data (Revision 1.3). Appointment reminders leave this
+    /// empty, so their tap behavior stays unchanged.
+    public let userInfo: [String: String]
+    /// Optional opaque grouping key; appointment reminders keep the system default.
+    public let threadIdentifier: String?
 
-    public init(identifier: String, title: String, body: String, fireDate: Date) {
+    public init(
+        identifier: String,
+        title: String,
+        body: String,
+        fireDate: Date,
+        userInfo: [String: String] = [:],
+        threadIdentifier: String? = nil
+    ) {
         self.identifier = identifier
         self.title = title
         self.body = body
         self.fireDate = fireDate
+        self.userInfo = userInfo
+        self.threadIdentifier = threadIdentifier
     }
 }
 
@@ -39,7 +53,9 @@ public protocol LocalNotificationScheduling: Sendable {
 
 /// UNUserNotificationCenter itself is not Sendable, but Apple documents it as safe
 /// to call from any thread/queue.
-public struct SystemNotificationAdapter: LocalNotificationScheduling, NotificationAuthorizationProvider, @unchecked Sendable {
+public struct SystemNotificationAdapter: LocalNotificationScheduling, NotificationAuthorizationProvider,
+    @unchecked Sendable
+{
     private let center: UNUserNotificationCenter
 
     public init(center: UNUserNotificationCenter = .current()) {
@@ -76,6 +92,10 @@ public struct SystemNotificationAdapter: LocalNotificationScheduling, Notificati
         content.title = descriptor.title
         content.body = descriptor.body
         content.sound = .default
+        content.userInfo = descriptor.userInfo
+        if let threadIdentifier = descriptor.threadIdentifier {
+            content.threadIdentifier = threadIdentifier
+        }
 
         let interval = descriptor.fireDate.timeIntervalSinceNow
         guard interval > 0 else {

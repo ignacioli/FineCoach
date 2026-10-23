@@ -86,12 +86,14 @@ final class TrendsViewModel: ObservableObject {
 
     func exerciseTrend() -> [Comparison.SetTrendPoint] {
         guard let (id, mode) = selectedTrendOption() else { return [] }
-        return Comparison.exerciseTrend(exerciseID: id, recordMode: mode, across: allSessions, loadDirection: loadDirection)
+        return Comparison.exerciseTrend(
+            exerciseID: id, recordMode: mode, across: allSessions, loadDirection: loadDirection)
     }
 
     func personalRecords() -> Comparison.PersonalRecordSet? {
         guard let (id, mode) = selectedTrendOption() else { return nil }
-        return Comparison.personalRecords(exerciseID: id, recordMode: mode, across: allSessions, loadDirection: loadDirection)
+        return Comparison.personalRecords(
+            exerciseID: id, recordMode: mode, across: allSessions, loadDirection: loadDirection)
     }
 
     /// Sets the trend/PR exercise selection (shared by both the "动作趋势"
@@ -375,9 +377,9 @@ struct TrendsView: View {
     private func trendValueText(_ point: Comparison.SetTrendPoint) -> String {
         switch point.recordMode {
         case .weightReps:
-            return point.maxWeight.map { "\($0.canonicalString)kg" } ?? "-"
+            return point.maxWeight.map { "\($0.canonicalString) kg" } ?? "-"
         case .reps:
-            return point.bestReps.map { "\($0.canonicalString)次" } ?? "-"
+            return point.bestReps.map { "\($0.canonicalString) 次" } ?? "-"
         case .duration:
             guard let duration = point.bestDurationSeconds else { return "-" }
             return DurationTextParser.formatForEditing(secondsText: duration.canonicalString)
@@ -387,7 +389,7 @@ struct TrendsView: View {
                 parts.append(DurationTextParser.formatForEditing(secondsText: duration.canonicalString))
             }
             if let distance = point.bestDistance {
-                parts.append("\(distance.canonicalString)km")
+                parts.append("\(distance.canonicalString) km")
             }
             return parts.isEmpty ? "-" : parts.joined(separator: " · ")
         }
@@ -421,7 +423,6 @@ struct TrendsView: View {
             }
         }
     }
-
 
     private func tabHint(_ text: String) -> some View {
         Text(text)

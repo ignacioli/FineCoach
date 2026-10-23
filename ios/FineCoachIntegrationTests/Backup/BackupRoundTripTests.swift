@@ -21,6 +21,49 @@
         private let sqliteHeader = Data("SQLite format 3".utf8)
         private let fcbkMagic = Data("FCBK".utf8)
 
+        @MainActor
+        func testRestoringOldCatalogImmediatelySyncsCurrentCatalog() async throws {
+            let source = try makeHarness(generationUUID: sourceGenerationID, ids: [])
+            let current = try PlaceholderExerciseCatalogLoader.loadFromBundle(
+                Bundle(for: PersistenceController.self)
+            )
+            let legacy = try Self.legacyCatalog(from: current)
+            try await Self.seedLegacyCatalog(legacy, writer: source.controller.writer, now: now)
+            let exported = try await Self.exportInventoryOnMainActor(
+                from: source,
+                backupFileID: backupFileID,
+                passwordText: exportPasswordText
+            )
+            try await source.controller.shutdownForTesting()
+
+            let destinationRoot = try TemporaryProtectedDirectory()
+            let environment = try AppEnvironment(
+                rootURL: destinationRoot.url,
+                clock: TestClock(utcDate: now),
+                idGenerator: TestIDGenerator(ids: [restoredGenerationID]),
+                notificationCenter: FakeNotificationScheduling()
+            )
+            let viewModel = BackupRestoreFlowViewModel(
+                coordinator: try environment.requireBackupCoordinator()
+            )
+            viewModel.password = exportPasswordText
+            viewModel.pickedFileURL = exported.fileURL
+            await viewModel.restoreNow(using: environment)
+
+            XCTAssertTrue(viewModel.succeeded)
+            XCTAssertFalse(viewModel.failed)
+            let visible = try await environment.requireExerciseUseCases().search(query: "")
+            XCTAssertEqual(visible.count, 541)
+            let expectedPullUpIDs: Set<StableExerciseID> = [
+                StableExerciseID(rawValue: "8e420408-0682-4ab6-89f5-2681e54c7ce0")!,
+                StableExerciseID(rawValue: "87e6abc5-a701-442a-b4fb-bb2a7598a754")!,
+            ]
+            let pullUps = try await environment.requireExerciseUseCases().search(query: "")
+                .filter { expectedPullUpIDs.contains($0.id) }
+            XCTAssertEqual(pullUps.count, 2)
+            XCTAssertTrue(pullUps.allSatisfy { $0.equipmentClass == "单杠" })
+        }
+
         func testFullInventoryRoundTripRestoresStudentSessionsAndRebuildsActivePointer() async throws {
             let source = try makeHarness(generationUUID: sourceGenerationID, ids: inventoryIDs(includeInProgress: true))
             try await seedLinQingInventory(on: source, includeInProgress: true)
@@ -200,6 +243,41 @@
                 fileURL: exported.fileURL,
                 expectedDisplayName: FictitiousFixtures.student.displayName
             )
+        }
+
+        @MainActor
+        func testRestoreRequestDoesNotStartUntilConfirmation() async throws {
+            let root = try TemporaryProtectedDirectory()
+            let clock = TestClock(utcDate: now)
+            let environment = try AppEnvironment(
+                rootURL: root.url,
+                clock: clock,
+                idGenerator: TestIDGenerator(ids: [destinationGenerationID])
+            )
+            let viewModel = BackupRestoreFlowViewModel(coordinator: try environment.requireBackupCoordinator())
+
+            viewModel.pickedFileURL = URL(fileURLWithPath: "/tmp/not-restored.fcbackup")
+            viewModel.password = exportPasswordText
+            viewModel.confirmRestore(using: environment)
+            for _ in 0..<3 {
+                await Task.yield()
+            }
+
+            XCTAssertFalse(viewModel.isConfirmingRestore)
+            XCTAssertFalse(viewModel.isRestoring)
+            XCTAssertFalse(viewModel.succeeded)
+            XCTAssertFalse(viewModel.failed)
+
+            viewModel.requestRestore()
+            for _ in 0..<3 {
+                await Task.yield()
+            }
+
+            XCTAssertTrue(viewModel.isConfirmingRestore)
+            XCTAssertFalse(viewModel.isRestoring)
+            XCTAssertFalse(viewModel.succeeded)
+            XCTAssertFalse(viewModel.failed)
+            viewModel.cancelInFlight()
         }
 
         @MainActor
@@ -436,6 +514,32 @@
             return ExportedBackup(destination: destination, result: result)
         }
 
+        @MainActor
+        private static func exportInventoryOnMainActor(
+            from harness: Harness,
+            backupFileID: UUID,
+            passwordText: String
+        ) async throws -> ExportedBackup {
+            let destination = try TemporaryProtectedDirectory()
+            let result = try await BackupCoordinator(
+                rootURL: harness.rootDirectory.url,
+                writer: harness.controller.writer,
+                clock: harness.clock,
+                ids: TestIDGenerator(ids: [backupFileID])
+            ).exportInventory(
+                BackupExportRequest(
+                    password: try BackupPassword(creating: passwordText),
+                    destinationDirectory: destination.url
+                )
+            )
+            XCTAssertEqual(
+                result.fileURL.deletingLastPathComponent().standardizedFileURL,
+                destination.url.standardizedFileURL
+            )
+            XCTAssertTrue(FileManager.default.fileExists(atPath: result.fileURL.path))
+            return ExportedBackup(destination: destination, result: result)
+        }
+
         private func assertRestoredLinQingInventory(on harness: Harness, expectInProgress: Bool) async throws {
             let student = try await harness.studentUseCases.student(id: studentID)
             XCTAssertEqual(student.displayName.value, FictitiousFixtures.student.displayName)
@@ -470,7 +574,7 @@
                 XCTAssertEqual(restoredActive.id, inProgressSessionID)
                 XCTAssertEqual(restoredActive.state, .inProgress)
                 XCTAssertEqual(restoredActive.studentID, studentID)
-                XCTAssertEqual(pointer?.singletonKey, ActiveSessionPointerKey.singleton)
+                XCTAssertEqual(pointer?.singletonKey, ActiveSessionPointerKey.student(studentID))
                 XCTAssertEqual(pointer?.sessionID, inProgressSessionID.rawValue)
             } else {
                 XCTAssertNil(active)
@@ -511,10 +615,6 @@
         ) async throws -> (singletonKey: String, sessionID: UUID)? {
             try await writer.read { context in
                 let request = NSFetchRequest<NSManagedObject>(entityName: "ActiveSessionPointerMO")
-                request.predicate = NSPredicate(
-                    format: "singletonKey == %@",
-                    ActiveSessionPointerKey.singleton
-                )
                 request.fetchLimit = 1
                 guard let object = try context.fetch(request).first else {
                     return nil
@@ -527,6 +627,58 @@
                 return (singletonKey, sessionID)
             }
         }
+
+        private static func seedLegacyCatalog(
+            _ catalog: PlaceholderExerciseCatalog,
+            writer: PersistenceWriter,
+            now: Date
+        ) async throws {
+            try await writer.transaction { context in
+                for loaded in catalog.exercises {
+                    let item = try ExerciseCatalogItem.makeBuiltIn(
+                        id: try StableExerciseID(loaded.id),
+                        canonicalName: loaded.canonicalName,
+                        recordMode: loaded.recordMode,
+                        metadataVersion: catalog.metadataVersion,
+                        provenanceRef: loaded.provenanceRef,
+                        now: now,
+                        isRetired: loaded.retired ?? false
+                    )
+                    _ = try ExerciseManagedObjectMapping.upsertCatalogItem(item, in: context)
+                    try ExerciseManagedObjectMapping.acquireUnifiedClaim(
+                        try ExerciseNameClaim(
+                            normalizedName: item.normalizedName,
+                            ownerKind: .builtIn,
+                            ownerID: item.id,
+                            scope: .activeCatalog
+                        ),
+                        in: context
+                    )
+                }
+            }
+        }
+
+        private static func legacyCatalog(from _: PlaceholderExerciseCatalog) throws -> PlaceholderExerciseCatalog {
+            // This is the exact pre-CX2a shipped manifest. Keep backup restore
+            // tests independent of the current catalog's projection or order.
+            let testFileURL = URL(fileURLWithPath: #filePath)
+            let iosRoot =
+                testFileURL
+                .deletingLastPathComponent()
+                .deletingLastPathComponent()
+                .deletingLastPathComponent()
+            let fixtureURL = iosRoot.appendingPathComponent(
+                "TestSupport/Fixtures/ExerciseCatalog/provenance-baseline-146.json"
+            )
+            let catalog = try JSONDecoder().decode(
+                PlaceholderExerciseCatalog.self,
+                from: Data(contentsOf: fixtureURL)
+            )
+            XCTAssertEqual(catalog.exercises.count, 146)
+            XCTAssertEqual(catalog.provenance.records.count, 146)
+            return catalog
+        }
+
     }
 #else
     import FineCoach

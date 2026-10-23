@@ -53,6 +53,9 @@ public struct FCListRow: View {
     private let leading: Leading
     private let isIndented: Bool
     private let note: String?
+    /// D-b/D-c "本节收获" action row: the shared 「新纪录」 badge after the title.
+    /// The containing row still owns the accessible name.
+    private let showsNewRecordBadge: Bool
     private let interaction: Interaction
 
     public init(
@@ -63,11 +66,12 @@ public struct FCListRow: View {
         isIndented: Bool = false,
         note: String? = nil,
         showsDisclosure: Bool = true,
+        showsNewRecordBadge: Bool = false,
         action: (() -> Void)? = nil
     ) {
         self.init(
             title: title, titleStyle: titleStyle, subtitle: subtitle, leading: leading,
-            isIndented: isIndented, note: note,
+            isIndented: isIndented, note: note, showsNewRecordBadge: showsNewRecordBadge,
             interaction: .plain(showsDisclosure: showsDisclosure, action: action)
         )
     }
@@ -85,7 +89,7 @@ public struct FCListRow: View {
     ) {
         self.init(
             title: title, titleStyle: titleStyle, subtitle: subtitle, leading: leading,
-            isIndented: isIndented, note: note,
+            isIndented: isIndented, note: note, showsNewRecordBadge: false,
             interaction: .selectable(isSelected: isSelected, toggle: toggle)
         )
     }
@@ -101,7 +105,8 @@ public struct FCListRow: View {
     ) -> FCListRow {
         FCListRow(
             title: title, titleStyle: titleStyle, subtitle: subtitle, leading: leading,
-            isIndented: isIndented, note: nil, interaction: .unavailable(reason: reason)
+            isIndented: isIndented, note: nil, showsNewRecordBadge: false,
+            interaction: .unavailable(reason: reason)
         )
     }
 
@@ -112,6 +117,7 @@ public struct FCListRow: View {
         leading: Leading,
         isIndented: Bool,
         note: String?,
+        showsNewRecordBadge: Bool,
         interaction: Interaction
     ) {
         self.title = title
@@ -120,6 +126,7 @@ public struct FCListRow: View {
         self.leading = leading
         self.isIndented = isIndented
         self.note = note
+        self.showsNewRecordBadge = showsNewRecordBadge
         self.interaction = interaction
     }
 
@@ -149,6 +156,16 @@ public struct FCListRow: View {
 
     @ViewBuilder
     private var content: some View {
+        if showsNewRecordBadge {
+            rowContent.modifier(GainsRowAccessibility(label: accessibilityText))
+        } else {
+            rowContent.accessibilityElement(children: .combine)
+        }
+    }
+
+    /// The row's drawn content, before its accessibility contract. A gains row
+    /// names itself explicitly so the hidden 「新纪录」 badge is still read.
+    private var rowContent: some View {
         HStack(spacing: FCPrimitives.space3) {
             if case .equipmentSlot(let icon) = leading {
                 Group {
@@ -162,9 +179,7 @@ public struct FCListRow: View {
             }
             HStack(spacing: FCPrimitives.space2) {
                 VStack(alignment: .leading, spacing: FCPrimitives.space1) {
-                    Text(title)
-                        .fcFont(titleStyle == .headline ? .headline : .body)
-                        .foregroundStyle(isUnavailable ? FCSemanticColors.textDisabled : FCSemanticColors.textPrimary)
+                    titleLine
                     if let subtitle {
                         Text(subtitle)
                             .fcFont(.caption)
@@ -187,7 +202,38 @@ public struct FCListRow: View {
             minHeight: isCompact ? FCListRowGeometry.compactMinHeight : FCListRowGeometry.minHeight
         )
         .contentShape(Rectangle())
-        .accessibilityElement(children: .combine)
+    }
+
+    /// Title, with the gains badge after it. At large Dynamic Type the badge
+    /// moves under the title rather than squeezing the title or the value.
+    @ViewBuilder
+    private var titleLine: some View {
+        if showsNewRecordBadge {
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .firstTextBaseline, spacing: FCPrimitives.space2) {
+                    titleText
+                    FCNewRecordBadge()
+                }
+                .fixedSize(horizontal: true, vertical: false)
+                VStack(alignment: .leading, spacing: FCPrimitives.space1) {
+                    titleText
+                    FCNewRecordBadge()
+                }
+            }
+        } else {
+            titleText
+        }
+    }
+
+    private var titleText: some View {
+        Text(title)
+            .fcFont(titleStyle == .headline ? .headline : .body)
+            .foregroundStyle(isUnavailable ? FCSemanticColors.textDisabled : FCSemanticColors.textPrimary)
+    }
+
+    private var accessibilityText: String {
+        [title, subtitle, showsNewRecordBadge ? String(localized: "session.set.newRecord") : nil]
+            .compactMap { $0 }.joined(separator: "，")
     }
 
     @ViewBuilder
@@ -202,6 +248,79 @@ public struct FCListRow: View {
         case .unavailable:
             EmptyView()
         }
+    }
+}
+
+/// D-b/D-c: the gains row owns the accessible name, so the visually hidden
+/// 「新纪录」 badge is still read after the action name (AC-D13).
+private struct GainsRowAccessibility: ViewModifier {
+    let label: String
+
+    func body(content: Content) -> some View {
+        content
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text(label))
+    }
+}
+
+/// The exercise-library variant of `DS-LIST-ROW`: equipment icon, headline,
+/// catalog subtitle, optional favorite mark, and disclosure. The row expands
+/// to the container width so its caller can use the entire 52pt row as the
+/// visible action target in both the library page and add-exercise sheet.
+public struct FCExerciseLibraryRowLabel: View {
+    public let entry: ExerciseLibraryEntry
+
+    public init(entry: ExerciseLibraryEntry) {
+        self.entry = entry
+    }
+
+    public var body: some View {
+        HStack(spacing: FCPrimitives.space4) {
+            if let icon = FCEquipmentIcon.icon(
+                equipmentClass: entry.equipmentClass, primaryMuscleGroup: entry.primaryMuscleGroup)
+            {
+                FCEquipmentIconView(icon)
+            }
+            VStack(alignment: .leading, spacing: FCPrimitives.space1) {
+                Text(entry.displayedName)
+                    .fcFont(.headline)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                Text(Self.subtitle(for: entry))
+                    .fcFont(.caption)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
+            }
+            Spacer(minLength: FCPrimitives.space2)
+            if entry.preference?.isFavorite == true {
+                Image(systemName: "star.fill")
+                    .foregroundStyle(FCSemanticColors.actionPrimary)
+                    .accessibilityLabel(Text("exercise.library.favorite"))
+            }
+            FCSymbol(.forward)
+        }
+        .padding(.vertical, FCPrimitives.space3)
+        .frame(maxWidth: .infinity, minHeight: FCListRowGeometry.minHeight, alignment: .leading)
+        .contentShape(Rectangle())
+    }
+
+    public static func subtitle(for entry: ExerciseLibraryEntry) -> String {
+        var parts: [String] = []
+        if entry.item.kind == .custom {
+            parts.append(String(localized: "exercise.kind.custom"))
+        } else {
+            parts.append(
+                entry.equipmentClass.flatMap { $0.isEmpty ? nil : $0 } ?? String(localized: "exercise.kind.builtIn"))
+            if !entry.secondaryMuscleGroups.isEmpty {
+                parts.append(
+                    String(
+                        format: String(localized: "exercise.library.secondaryFormat"),
+                        entry.secondaryMuscleGroups.joined(separator: "、")
+                    ))
+            }
+        }
+        if entry.preference?.isHidden == true {
+            parts.append(String(localized: "exercise.library.hiddenTag"))
+        }
+        return parts.joined(separator: " · ")
     }
 }
 
@@ -326,7 +445,8 @@ public struct FCListGroupRow: View {
         case .partiallySelected: selection = String(localized: "designSystem.listRow.state.partial")
         case .allSelected: selection = String(localized: "designSystem.listRow.state.all")
         }
-        let expansion = isExpanded
+        let expansion =
+            isExpanded
             ? String(localized: "designSystem.listRow.state.expanded")
             : String(localized: "designSystem.listRow.state.collapsed")
         return "\(selection)，\(expansion)"
@@ -367,11 +487,44 @@ struct FCListSelectionCircle: View {
 }
 
 #if DEBUG
+    #Preview("Exercise library rows") {
+        let now = Date(timeIntervalSince1970: 0)
+        let favoriteID = StableExerciseID(rawValue: "preview.exercise.favorite")!
+        let customID = StableExerciseID(rawValue: "preview.exercise.custom")!
+        let favorite = try! ExerciseCatalogItem.makeBuiltIn(
+            id: favoriteID,
+            canonicalName: "杠铃卧推",
+            recordMode: .weightReps,
+            metadataVersion: "preview",
+            provenanceRef: "preview.favorite",
+            now: now
+        )
+        let custom = try! ExerciseCatalogItem.makeCustom(
+            id: customID,
+            canonicalName: "我的动作",
+            recordMode: .reps,
+            now: now
+        )
+        VStack(spacing: 0) {
+            FCExerciseLibraryRowLabel(
+                entry: ExerciseLibraryEntry(
+                    item: favorite,
+                    preference: ExercisePreference(exerciseID: favoriteID, isFavorite: true),
+                    primaryMuscleGroup: "胸",
+                    equipmentClass: "杠铃"
+                )
+            )
+            FCListRowDivider()
+            FCExerciseLibraryRowLabel(entry: ExerciseLibraryEntry(item: custom, preference: nil))
+        }
+        .padding(.horizontal, FCPrimitives.space4)
+    }
+
     #Preview("List rows") {
         VStack(spacing: 0) {
             FCListRow(title: "学员资料", showsDisclosure: true) {}
             FCListRowDivider()
-            FCListRow(title: "上次训练", subtitle: "深蹲 5×5，感觉不错。\n下次加重 2.5kg，注意左膝。", note: "3 天前", action: {})
+            FCListRow(title: "上次训练", subtitle: "深蹲 5×5，感觉不错。\n下次加重 2.5 kg，注意左膝。", note: "3 天前", action: {})
             FCListRowDivider()
             FCListRow(
                 title: "杠铃卧推", leading: .equipmentSlot(.barbell), note: "12 次",
@@ -483,7 +636,10 @@ public struct FCLabelValueRow<Value: View>: View {
     private let showsDisclosure: Bool
     private let combinesAccessibility: Bool
 
-    private static var labelColumnWidth: CGFloat { 112 - FCPrimitives.space4 }
+    /// Width of the label column. The value column therefore starts at x=112
+    /// once the page's `space.4` margin is included. `FCStepperField` aligns
+    /// its caption to the same inset.
+    static var labelColumnWidth: CGFloat { 112 - FCPrimitives.space4 }
 
     public init(
         label: String,
@@ -491,7 +647,9 @@ public struct FCLabelValueRow<Value: View>: View {
         action: (() -> Void)? = nil,
         @ViewBuilder value: () -> Value
     ) {
-        self.init(label: label, showsDisclosure: showsDisclosure, action: action, combinesAccessibility: false, value: value())
+        self.init(
+            label: label, showsDisclosure: showsDisclosure, action: action, combinesAccessibility: false, value: value()
+        )
     }
 
     fileprivate init(
@@ -537,9 +695,9 @@ public struct FCLabelValueRow<Value: View>: View {
     }
 }
 
-public extension FCLabelValueRow where Value == FCLabelValueText {
+extension FCLabelValueRow where Value == FCLabelValueText {
     /// A row whose value is plain `body` `text.primary` text.
-    init(label: String, value: String, showsDisclosure: Bool? = nil, action: (() -> Void)? = nil) {
+    public init(label: String, value: String, showsDisclosure: Bool? = nil, action: (() -> Void)? = nil) {
         self.init(
             label: label,
             showsDisclosure: showsDisclosure,

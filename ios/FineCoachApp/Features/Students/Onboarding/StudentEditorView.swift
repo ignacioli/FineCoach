@@ -135,9 +135,13 @@ struct StudentEditorView: View {
                 FCListRowDivider()
 
                 FCLabelValueRow(label: String(localized: "student.field.sex")) {
-                    FCFlowLayout(horizontalSpacing: FCPrimitives.space2, verticalSpacing: FCPrimitives.space2 - (44 - 30)) {
+                    FCFlowLayout(
+                        horizontalSpacing: FCPrimitives.space2, verticalSpacing: FCPrimitives.space2 - (44 - 30)
+                    ) {
                         ForEach([StudentSex.male, .female, .other, .undisclosed], id: \.self) { sex in
-                            FCFilterChip(title: StudentSexPresentation.title(sex), isSelected: viewModel.draft.sex == sex) {
+                            FCFilterChip(
+                                title: StudentSexPresentation.title(sex), isSelected: viewModel.draft.sex == sex
+                            ) {
                                 viewModel.draft.sex = sex
                                 viewModel.sexError = nil
                             }

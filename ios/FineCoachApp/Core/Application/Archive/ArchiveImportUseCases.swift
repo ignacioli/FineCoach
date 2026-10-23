@@ -205,7 +205,9 @@ public actor ArchiveImportUseCases {
     /// memory, applies `ArchiveReplacementPolicy` against the installed snapshot and, when it
     /// accepts, keeps the candidate in memory for `confirmReplacement()`. Writes nothing; every
     /// failure leaves the installed snapshot untouched (M2-FR-039).
-    public func prepareReplacement(from fileURL: URL, password rawPassword: String) async throws -> ArchiveReplacementPreview {
+    public func prepareReplacement(from fileURL: URL, password rawPassword: String) async throws
+        -> ArchiveReplacementPreview
+    {
         guard !isRunning else {
             throw ArchiveReplaceFailure.importInProgress
         }
@@ -376,7 +378,9 @@ public actor ArchiveImportUseCases {
         )
     }
 
-    private func performPrepare(from fileURL: URL, password rawPassword: String) async throws -> ArchiveReplacementPreview {
+    private func performPrepare(from fileURL: URL, password rawPassword: String) async throws
+        -> ArchiveReplacementPreview
+    {
         try Task.checkCancellation()
 
         // The installed snapshot comes first: with nothing to replace the file is not read.

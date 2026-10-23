@@ -217,6 +217,28 @@ public enum Comparison {
         }
     }
 
+    /// Shared strict ordering for historical records and session gains. Ties are
+    /// deliberately handled by callers: history chooses the newest, gains do not.
+    public static func isStrictlyBetter(
+        _ candidate: DecimalValue,
+        than current: DecimalValue,
+        direction: LoadDirection = .increaseIsImprovement
+    ) -> Bool {
+        switch direction {
+        case .increaseIsImprovement: return candidate > current
+        case .decreaseIsImprovement: return candidate < current
+        }
+    }
+
+    public static func isStrictlyBetter(
+        weight: DecimalValue, reps: DecimalValue,
+        thanWeight: DecimalValue, reps currentReps: DecimalValue,
+        direction: LoadDirection
+    ) -> Bool {
+        isStrictlyBetter(weight, than: thanWeight, direction: direction)
+            || (weight == thanWeight && isStrictlyBetter(reps, than: currentReps))
+    }
+
     // MARK: - Personal Record (M1B-FR-029)
 
     /// ONLY these three explicit rules. There is INTENTIONALLY no estimated
@@ -253,26 +275,21 @@ public enum Comparison {
         var durationRecordAt: Date?
         var distanceRecordAt: Date?
 
-        func isBetterWeight(_ candidate: DecimalValue, than current: DecimalValue) -> Bool {
-            switch loadDirection {
-            case .increaseIsImprovement:
-                return candidate > current
-            case .decreaseIsImprovement:
-                return candidate < current
-            }
-        }
-
         for session in sessions {
             let matching = session.exercises.filter { $0.sourceID == exerciseID && $0.recordModeSnapshot == recordMode }
             for exercise in matching {
                 for set in exercise.sets where set.contributesToStatistics {
                     if let weight = set.weightValue {
-                        if highestWeight == nil || isBetterWeight(weight, than: highestWeight!.1) {
+                        if highestWeight == nil
+                            || isStrictlyBetter(weight, than: highestWeight!.1, direction: loadDirection)
+                        {
                             highestWeight = (session.id, weight)
                         }
                         if let reps = set.repetitionCount {
-                            if mostRepsAtWeight == nil || isBetterWeight(weight, than: mostRepsAtWeight!.1)
-                                || (weight == mostRepsAtWeight!.1 && reps > mostRepsAtWeight!.2)
+                            if mostRepsAtWeight == nil
+                                || isStrictlyBetter(
+                                    weight: weight, reps: reps, thanWeight: mostRepsAtWeight!.1,
+                                    reps: mostRepsAtWeight!.2, direction: loadDirection)
                                 || (weight == mostRepsAtWeight!.1 && reps == mostRepsAtWeight!.2
                                     && session.completedAtUTC > (repsRecordAt ?? .distantPast))
                             {
@@ -282,16 +299,18 @@ public enum Comparison {
                         }
                     }
                     if let duration = set.durationSeconds {
-                        if longestDuration == nil || duration > longestDuration!.1
-                            || (duration == longestDuration!.1 && session.completedAtUTC > (durationRecordAt ?? .distantPast))
+                        if longestDuration == nil || isStrictlyBetter(duration, than: longestDuration!.1)
+                            || (duration == longestDuration!.1
+                                && session.completedAtUTC > (durationRecordAt ?? .distantPast))
                         {
                             longestDuration = (session.id, duration)
                             durationRecordAt = session.completedAtUTC
                         }
                     }
                     if recordMode == .cardio, let distance = set.distanceValue {
-                        if longestDistance == nil || distance > longestDistance!.1
-                            || (distance == longestDistance!.1 && session.completedAtUTC > (distanceRecordAt ?? .distantPast))
+                        if longestDistance == nil || isStrictlyBetter(distance, than: longestDistance!.1)
+                            || (distance == longestDistance!.1
+                                && session.completedAtUTC > (distanceRecordAt ?? .distantPast))
                         {
                             longestDistance = (session.id, distance)
                             distanceRecordAt = session.completedAtUTC

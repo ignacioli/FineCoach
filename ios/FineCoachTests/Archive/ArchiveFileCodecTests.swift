@@ -504,7 +504,10 @@ final class ArchiveFileCodecTests: XCTestCase {
             ("student without displayName/sex", F.modules(displayName: false, sex: false), { $0 }),
             ("summary frames without summaries", F.modules(summaries: false), { $0 }),
             ("body data without bodyData", F.modules(bodyData: false), { $0 }),
-            ("training frames without trainingRecords", F.modules(trainingRecords: false, trends: false, exerciseInfo: false), { $0 }),
+            (
+                "training frames without trainingRecords",
+                F.modules(trainingRecords: false, trends: false, exerciseInfo: false), { $0 }
+            ),
             ("display name without displayName", F.modules(displayName: false), { $0 }),
             ("sex without sex", F.modules(sex: false), { $0 }),
         ]
@@ -527,7 +530,13 @@ final class ArchiveFileCodecTests: XCTestCase {
     func testManifestModuleRulesAreEnforcedOnDecode() throws {
         let invalidModules: [(String, (inout [String: Any]) -> Void)] = [
             ("trends without trainingRecords", { $0["trainingRecords"] = false }),
-            ("exerciseInfo without trainingRecords", { $0["trends"] = false; $0["trainingRecords"] = false }),
+            (
+                "exerciseInfo without trainingRecords",
+                {
+                    $0["trends"] = false
+                    $0["trainingRecords"] = false
+                }
+            ),
             ("module flag missing", { $0.removeValue(forKey: "exerciseInfo") }),
         ]
         for (name, mutate) in invalidModules {
@@ -575,18 +584,24 @@ final class ArchiveFileCodecTests: XCTestCase {
         }
         let cases: [(String, (UInt16, inout [String: Any]) -> Void)] = [
             ("non-decimal weight", { id, object in if id == 4 { mutateFirstSet(&object, "weightValue", "heavy") } }),
-            ("numeric weight instead of string", { id, object in if id == 4 { mutateFirstSet(&object, "weightValue", 60) } }),
+            (
+                "numeric weight instead of string",
+                { id, object in if id == 4 { mutateFirstSet(&object, "weightValue", 60) } }
+            ),
             ("unknown unit", { id, object in if id == 4 { mutateFirstSet(&object, "unit", "stones") } }),
             ("unknown side", { id, object in if id == 4 { mutateFirstSet(&object, "side", "diagonal") } }),
-            ("unknown record mode", { id, object in
-                if id == 4 {
-                    var sections = object["sections"] as! [[String: Any]]
-                    var exercises = sections[0]["exercises"] as! [[String: Any]]
-                    exercises[0]["recordMode"] = "teleport"
-                    sections[0]["exercises"] = exercises
-                    object["sections"] = sections
+            (
+                "unknown record mode",
+                { id, object in
+                    if id == 4 {
+                        var sections = object["sections"] as! [[String: Any]]
+                        var exercises = sections[0]["exercises"] as! [[String: Any]]
+                        exercises[0]["recordMode"] = "teleport"
+                        sections[0]["exercises"] = exercises
+                        object["sections"] = sections
+                    }
                 }
-            }),
+            ),
             ("unknown body part", { id, object in if id == 4 { object["trainingFocus"] = ["chest", "wings"] } }),
             ("impossible local date", { id, object in if id == 4 { object["localDate"] = "2026-02-30" } }),
             ("non-canonical local date", { id, object in if id == 4 { object["localDate"] = "2026-9-1" } }),
@@ -615,7 +630,10 @@ final class ArchiveFileCodecTests: XCTestCase {
                     sections: []
                 )
             }
-            return F.assemble(modules: F.modules(displayName: false, sex: false, bodyData: false, trends: false, summaries: false, exerciseInfo: false), sessions: sessions)
+            return F.assemble(
+                modules: F.modules(
+                    displayName: false, sex: false, bodyData: false, trends: false, summaries: false,
+                    exerciseInfo: false), sessions: sessions)
         }
     }
 
@@ -624,7 +642,10 @@ final class ArchiveFileCodecTests: XCTestCase {
             let exercises = (0..<count).map {
                 ArchiveExercise(key: "e\($0 + 1)", placeholderNumber: $0 + 1, kind: .custom, isAssisted: false)
             }
-            return F.assemble(modules: F.modules(displayName: false, sex: false, bodyData: false, trends: false, summaries: false, exerciseInfo: false), exercises: exercises)
+            return F.assemble(
+                modules: F.modules(
+                    displayName: false, sex: false, bodyData: false, trends: false, summaries: false,
+                    exerciseInfo: false), exercises: exercises)
         }
     }
 
@@ -633,24 +654,35 @@ final class ArchiveFileCodecTests: XCTestCase {
             let summaries = (0..<count).map { _ in
                 try! ArchiveSummary(localDate: F.day(2026, 9, 1), sessionKey: nil, text: "x")
             }
-            return F.assemble(modules: F.modules(displayName: false, sex: false, bodyData: false, trainingRecords: false, trends: false, exerciseInfo: false), summaries: summaries)
+            return F.assemble(
+                modules: F.modules(
+                    displayName: false, sex: false, bodyData: false, trainingRecords: false, trends: false,
+                    exerciseInfo: false), summaries: summaries)
         }
     }
 
     func testBodyMetricLimitBoundary() throws {
         try assertCountBoundary(limit: ArchiveLimits.maxBodyMetrics) { count in
-            let metrics = (0..<count).map { try! ArchiveBodyMetric(key: "m\($0 + 1)", kind: .custom, name: "n\($0)", unit: "u") }
-            return F.assemble(modules: F.modules(displayName: false, sex: false, trainingRecords: false, trends: false, summaries: false, exerciseInfo: false), bodyMetrics: metrics)
+            let metrics = (0..<count).map {
+                try! ArchiveBodyMetric(key: "m\($0 + 1)", kind: .custom, name: "n\($0)", unit: "u")
+            }
+            return F.assemble(
+                modules: F.modules(
+                    displayName: false, sex: false, trainingRecords: false, trends: false, summaries: false,
+                    exerciseInfo: false), bodyMetrics: metrics)
         }
     }
 
     func testBodyMeasurementLimitBoundary() throws {
         try assertCountBoundary(limit: ArchiveLimits.maxBodyMeasurements) { count in
             let measurements = (0..<count).map { _ in
-                ArchiveBodyMeasurement(metricKey: "m1", localDay: F.day(2026, 9, 1), value: F.decimal("1"), enteredUnit: "u")
+                ArchiveBodyMeasurement(
+                    metricKey: "m1", localDay: F.day(2026, 9, 1), value: F.decimal("1"), enteredUnit: "u")
             }
             return F.assemble(
-                modules: F.modules(displayName: false, sex: false, trainingRecords: false, trends: false, summaries: false, exerciseInfo: false),
+                modules: F.modules(
+                    displayName: false, sex: false, trainingRecords: false, trends: false, summaries: false,
+                    exerciseInfo: false),
                 bodyMetrics: [try! ArchiveBodyMetric(key: "m1", kind: .custom, name: "n", unit: "u")],
                 bodyMeasurements: measurements
             )
@@ -662,12 +694,14 @@ final class ArchiveFileCodecTests: XCTestCase {
         let frames = splitFrames(base.plaintext)
         for id: UInt16 in [2, 8] {
             let frame = frames.first { $0.id == id }!
-            assertPayloadFails(base.plaintext + F.frame(id, frame.json), frames: base.frameCount + 1, "second frame of section \(id)")
+            assertPayloadFails(
+                base.plaintext + F.frame(id, frame.json), frames: base.frameCount + 1, "second frame of section \(id)")
         }
     }
 
     func testSetLimitBoundary() throws {
-        let modules = F.modules(displayName: false, sex: false, bodyData: false, trends: false, summaries: false, exerciseInfo: false)
+        let modules = F.modules(
+            displayName: false, sex: false, bodyData: false, trends: false, summaries: false, exerciseInfo: false)
         let exercise = ArchiveExercise(key: "e1", placeholderNumber: 1, kind: .custom, isAssisted: false)
         func snapshot(sets: Int) -> ArchiveSnapshot {
             F.assemble(
@@ -709,13 +743,22 @@ final class ArchiveFileCodecTests: XCTestCase {
     func testTextLimitIs64KiBPerField() throws {
         let limit = ArchiveLimits.maxTextUTF8Bytes
         XCTAssertEqual(limit, 65_536)
-        XCTAssertNoThrow(try ArchiveSummary(localDate: F.day(2026, 9, 1), sessionKey: nil, text: String(repeating: "a", count: limit)))
-        XCTAssertThrowsError(try ArchiveSummary(localDate: F.day(2026, 9, 1), sessionKey: nil, text: String(repeating: "a", count: limit + 1))) {
+        XCTAssertNoThrow(
+            try ArchiveSummary(
+                localDate: F.day(2026, 9, 1), sessionKey: nil, text: String(repeating: "a", count: limit)))
+        XCTAssertThrowsError(
+            try ArchiveSummary(
+                localDate: F.day(2026, 9, 1), sessionKey: nil, text: String(repeating: "a", count: limit + 1))
+        ) {
             XCTAssertEqual($0 as? ArchiveSnapshotError, .textTooLong)
         }
         // Multi-byte characters count in UTF-8 bytes, not characters.
-        XCTAssertThrowsError(try ArchiveSummary(localDate: F.day(2026, 9, 1), sessionKey: nil, text: String(repeating: "练", count: limit / 3 + 1)))
-        XCTAssertNoThrow(try ArchiveSummary(localDate: F.day(2026, 9, 1), sessionKey: nil, text: String(repeating: "练", count: limit / 3)))
+        XCTAssertThrowsError(
+            try ArchiveSummary(
+                localDate: F.day(2026, 9, 1), sessionKey: nil, text: String(repeating: "练", count: limit / 3 + 1)))
+        XCTAssertNoThrow(
+            try ArchiveSummary(
+                localDate: F.day(2026, 9, 1), sessionKey: nil, text: String(repeating: "练", count: limit / 3)))
 
         // On the wire: summary text, student name, exercise name, section name.
         let long = String(repeating: "a", count: limit + 1)
@@ -736,7 +779,8 @@ final class ArchiveFileCodecTests: XCTestCase {
                 if id == section, object[key] != nil { object[key] = exact }
             }
             XCTAssertNoThrow(
-                try ArchiveFileCodec.decodePayload(plaintext: exactPayload.plaintext, recordCount: exactPayload.frameCount),
+                try ArchiveFileCodec.decodePayload(
+                    plaintext: exactPayload.plaintext, recordCount: exactPayload.frameCount),
                 "\(name) at exactly 64 KiB"
             )
         }
@@ -795,22 +839,22 @@ final class ArchiveFileCodecTests: XCTestCase {
     // MARK: Golden data
 
     private static let expectedFrames = #"""
-1:{"counts":{"attribution":1,"bodyMeasurement":3,"bodyMetric":2,"exercise":3,"session":2,"student":1,"summary":2},"modules":{"bodyData":true,"displayName":true,"exerciseInfo":true,"sex":true,"summaries":true,"trainingRecords":true,"trends":true},"snapshotAtUTC":"2026-10-09T08:00:00.500Z","sourceID":"11111111-2222-3333-4444-555555555555","studentArchiveID":"AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE"}
-2:{"displayName":"测试学员甲","sex":"female"}
-3:{"equipment":"杠铃","isAssisted":false,"key":"e1","kind":"builtIn","name":"杠铃卧推","placeholderNumber":1,"primaryMuscles":["胸"],"secondaryMuscles":["肱三头肌","三角肌前束"]}
-3:{"equipment":"固定器械","isAssisted":true,"key":"e2","kind":"custom","name":"辅助引体向上（示例）","placeholderNumber":2,"primaryMuscles":["背"],"secondaryMuscles":[]}
-3:{"equipment":"其他","isAssisted":false,"key":"e3","kind":"oneOff","name":"跑步机慢跑","placeholderNumber":3,"primaryMuscles":[],"secondaryMuscles":[]}
-4:{"completedAtUTC":"2026-09-01T07:00:00.250Z","durationMinutes":62,"key":"s1","localDate":"2026-09-01","sections":[{"exercises":[{"exerciseKey":"e1","recordMode":"weightReps","sets":[{"repetitionCount":"8","side":"none","unit":"kilograms","weightValue":"60"},{"repetitionCount":"6","side":"none","unit":"kilograms","weightValue":"62.5"}]},{"exerciseKey":"e2","recordMode":"weightReps","sets":[{"repetitionCount":"10","side":"bilateral","unit":"kilograms","weightValue":"20"}]}],"name":"热身与主项"},{"exercises":[{"exerciseKey":"e3","recordMode":"cardio","sets":[{"distanceValue":"2.4","durationSeconds":"900","resistanceValue":"3","side":"none","speedValue":"9.6","unit":"seconds"}]}]}],"trainingFocus":["chest","back"]}
-4:{"completedAtUTC":"2026-09-08T07:00:00.750Z","durationMinutes":45,"key":"s2","localDate":"2026-09-08","sections":[{"exercises":[{"exerciseKey":"e1","recordMode":"weightReps","sets":[{"leftValue":"12","rightValue":"12.5","side":"none","unit":"kilograms"}]}]}],"trainingFocus":[]}
-5:{"localDate":"2026-09-01","sessionKey":"s1","text":"本节课状态良好，注意呼吸节奏。"}
-5:{"localDate":"2026-09-05","text":"课外补充：多喝水 / hydrate."}
-6:{"key":"m1","kind":"weight"}
-6:{"key":"m2","kind":"custom","name":"颈围（示例）","unit":"cm"}
-7:{"enteredUnit":"kg","localDay":"2026-09-01","metricKey":"m1","value":"70.5"}
-7:{"enteredUnit":"kg","localDay":"2026-09-08","metricKey":"m1","value":"70"}
-7:{"enteredUnit":"cm","localDay":"2026-09-08","metricKey":"m2","value":"34"}
-8:{"exerciseKeys":["e1"],"licenseName":"示例许可证 1.0","licenseText":"https://example.invalid/license","sourceName":"示例动作库"}
-"""#
+        1:{"counts":{"attribution":1,"bodyMeasurement":3,"bodyMetric":2,"exercise":3,"session":2,"student":1,"summary":2},"modules":{"bodyData":true,"displayName":true,"exerciseInfo":true,"sex":true,"summaries":true,"trainingRecords":true,"trends":true},"snapshotAtUTC":"2026-10-09T08:00:00.500Z","sourceID":"11111111-2222-3333-4444-555555555555","studentArchiveID":"AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE"}
+        2:{"displayName":"测试学员甲","sex":"female"}
+        3:{"equipment":"杠铃","isAssisted":false,"key":"e1","kind":"builtIn","name":"杠铃卧推","placeholderNumber":1,"primaryMuscles":["胸"],"secondaryMuscles":["肱三头肌","三角肌前束"]}
+        3:{"equipment":"固定器械","isAssisted":true,"key":"e2","kind":"custom","name":"辅助引体向上（示例）","placeholderNumber":2,"primaryMuscles":["背"],"secondaryMuscles":[]}
+        3:{"equipment":"其他","isAssisted":false,"key":"e3","kind":"oneOff","name":"跑步机慢跑","placeholderNumber":3,"primaryMuscles":[],"secondaryMuscles":[]}
+        4:{"completedAtUTC":"2026-09-01T07:00:00.250Z","durationMinutes":62,"key":"s1","localDate":"2026-09-01","sections":[{"exercises":[{"exerciseKey":"e1","recordMode":"weightReps","sets":[{"repetitionCount":"8","side":"none","unit":"kilograms","weightValue":"60"},{"repetitionCount":"6","side":"none","unit":"kilograms","weightValue":"62.5"}]},{"exerciseKey":"e2","recordMode":"weightReps","sets":[{"repetitionCount":"10","side":"bilateral","unit":"kilograms","weightValue":"20"}]}],"name":"热身与主项"},{"exercises":[{"exerciseKey":"e3","recordMode":"cardio","sets":[{"distanceValue":"2.4","durationSeconds":"900","resistanceValue":"3","side":"none","speedValue":"9.6","unit":"seconds"}]}]}],"trainingFocus":["chest","back"]}
+        4:{"completedAtUTC":"2026-09-08T07:00:00.750Z","durationMinutes":45,"key":"s2","localDate":"2026-09-08","sections":[{"exercises":[{"exerciseKey":"e1","recordMode":"weightReps","sets":[{"leftValue":"12","rightValue":"12.5","side":"none","unit":"kilograms"}]}]}],"trainingFocus":[]}
+        5:{"localDate":"2026-09-01","sessionKey":"s1","text":"本节课状态良好，注意呼吸节奏。"}
+        5:{"localDate":"2026-09-05","text":"课外补充：多喝水 / hydrate."}
+        6:{"key":"m1","kind":"weight"}
+        6:{"key":"m2","kind":"custom","name":"颈围（示例）","unit":"cm"}
+        7:{"enteredUnit":"kg","localDay":"2026-09-01","metricKey":"m1","value":"70.5"}
+        7:{"enteredUnit":"kg","localDay":"2026-09-08","metricKey":"m1","value":"70"}
+        7:{"enteredUnit":"cm","localDay":"2026-09-08","metricKey":"m2","value":"34"}
+        8:{"exerciseKeys":["e1"],"licenseName":"示例许可证 1.0","licenseText":"https://example.invalid/license","sourceName":"示例动作库"}
+        """#
     /// SHA-256 of the whole golden file. Reproduced independently of the codec from the frame
     /// text above, the header layout (contract §2) and the AAD / nonce rules (contract §3).
     private static let expectedFileSHA256 = "213c17ddc7bf0fd81acaaca1cdb5dc65c93922c98cb7d3be5d584eb67e23bb37"

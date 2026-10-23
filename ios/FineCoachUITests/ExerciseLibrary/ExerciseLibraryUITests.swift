@@ -58,7 +58,7 @@ final class ExerciseLibraryUITests: XCTestCase {
         XCTAssertTrue(element(in: app, identifier: "customExercise.root").waitForExistence(timeout: 8))
         tapVisible(in: app, identifier: "customExercise.archive")
         XCTAssertTrue(element(in: app, identifier: "customExercise.restore").waitForExistence(timeout: 8))
-        app.navigationBars.buttons.element(boundBy: 0).tap()
+        tapVisible(in: app, identifier: "customExercise.back")
         XCTAssertTrue(element(in: app, identifier: "exerciseLibrary.root").waitForExistence(timeout: 8))
 
         createCustomExercise(in: app, name: "我的推举")

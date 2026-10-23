@@ -6,15 +6,18 @@ import SwiftUI
 /// surfaces that explicitly via `overwriteHint` rather than hiding it.
 @MainActor
 final class BodyMeasurementEntryViewModel: ObservableObject {
+    struct PendingDeletion: Equatable {
+        let measurement: BodyMeasurement
+        let originalIndex: Int
+    }
+
     @Published var metric: BodyMetricDefinition?
     @Published var history: [BodyMeasurement] = []
     @Published var valueText = ""
     @Published var unitText = ""
     @Published var errorMessage: String?
-    @Published var pendingDeleteID: StableUUID?
-    /// Confirmation gate for "clear all records" (a full-history delete for
-    /// this metric) -- mirrors `pendingDeleteID`'s single-row confirmation
-    /// pattern, just at metric scope.
+    @Published private(set) var pendingDeletion: PendingDeletion?
+    /// Confirmation gate for clearing every record of this metric.
     @Published var showingDeleteAllConfirm = false
     /// Confirmation gate for permanently deleting this custom metric (T069k:
     /// moved here from a long-press-only menu on the list row, now behind a
@@ -33,6 +36,12 @@ final class BodyMeasurementEntryViewModel: ObservableObject {
     let metricID: StableUUID
     private let useCases: BodyDataUseCases
     private let unitPreferences: BodyDataUnitPreferences
+    private var deletionExpiryTask: Task<Void, Never>?
+
+    /// The deletion window is owned by `FCUndoRow` and shared with the active
+    /// session's set undo. Keeping this forwarding property lets the body-data
+    /// view model use the same contract without minting a second duration.
+    static var undoWindow: Duration { FCUndoRow.undoWindow }
 
     init(
         studentID: StableUUID,
@@ -81,12 +90,14 @@ final class BodyMeasurementEntryViewModel: ObservableObject {
         switch metric.unitRuleKind {
         case .weight:
             let converted =
-                (try? BuiltInUnitConversion.weight(canonicalKilograms: measurement.value, displayedAs: weightDisplayUnit))
+                (try? BuiltInUnitConversion.weight(
+                    canonicalKilograms: measurement.value, displayedAs: weightDisplayUnit))
                 ?? measurement.value
             return "\(converted.canonicalString) \(weightDisplayUnit.rawValue)"
         case .length:
             let converted =
-                (try? BuiltInUnitConversion.length(canonicalCentimeters: measurement.value, displayedAs: lengthDisplayUnit))
+                (try? BuiltInUnitConversion.length(
+                    canonicalCentimeters: measurement.value, displayedAs: lengthDisplayUnit))
                 ?? measurement.value
             return "\(converted.canonicalString) \(lengthDisplayUnit.rawValue)"
         case .percent, .customUnit:
@@ -106,11 +117,13 @@ final class BodyMeasurementEntryViewModel: ObservableObject {
         switch metric.unitRuleKind {
         case .weight:
             let entered = try DecimalValue(valueText)
-            let canonical = try BuiltInUnitConversion.canonicalKilograms(fromDisplayed: entered, unit: weightDisplayUnit)
+            let canonical = try BuiltInUnitConversion.canonicalKilograms(
+                fromDisplayed: entered, unit: weightDisplayUnit)
             return (canonical.canonicalString, metric.currentUnit)
         case .length:
             let entered = try DecimalValue(valueText)
-            let canonical = try BuiltInUnitConversion.canonicalCentimeters(fromDisplayed: entered, unit: lengthDisplayUnit)
+            let canonical = try BuiltInUnitConversion.canonicalCentimeters(
+                fromDisplayed: entered, unit: lengthDisplayUnit)
             return (canonical.canonicalString, metric.currentUnit)
         case .percent, .customUnit:
             return (valueText, unitText)
@@ -121,9 +134,10 @@ final class BodyMeasurementEntryViewModel: ObservableObject {
         do {
             let metrics = try await useCases.metrics(studentID: studentID)
             metric = metrics.first { $0.id == metricID }
-            history = try await useCases.history(studentID: studentID, metricID: metricID).sorted {
+            let loadedHistory = try await useCases.history(studentID: studentID, metricID: metricID).sorted {
                 $0.localCalendarDay > $1.localCalendarDay
             }
+            history = historyWithPendingDeletion(from: loadedHistory)
             if unitText.isEmpty {
                 unitText = metric?.currentUnit ?? ""
             }
@@ -136,6 +150,7 @@ final class BodyMeasurementEntryViewModel: ObservableObject {
     }
 
     func save() async {
+        await finalizePendingDeletion()
         do {
             let (value, enteredUnit) = try canonicalInputForSave()
             _ = try await useCases.recordMeasurement(
@@ -153,16 +168,73 @@ final class BodyMeasurementEntryViewModel: ObservableObject {
         }
     }
 
-    func confirmDelete(_ id: StableUUID) async {
+    /// Starts the four-second undo window for one history row. The row is
+    /// removed from the in-memory list immediately, while the durable delete
+    /// is deferred until the window expires (or the view is interrupted).
+    func deleteMeasurement(_ measurement: BodyMeasurement) async {
+        await finalizePendingDeletion()
+        guard let index = history.firstIndex(where: { $0.id == measurement.id }) else { return }
+        history.remove(at: index)
+        pendingDeletion = PendingDeletion(measurement: measurement, originalIndex: index)
+        scheduleDeletionExpiry(for: measurement.id)
+    }
+
+    /// Restores the pending row at the exact position it occupied before the
+    /// swipe. Because persistence has not been touched yet, the original
+    /// identifier, value, unit and date all remain intact.
+    func undoPendingDeletion() {
+        guard let pending = pendingDeletion else { return }
+        deletionExpiryTask?.cancel()
+        deletionExpiryTask = nil
+        pendingDeletion = nil
+        insert(pending.measurement, at: pending.originalIndex)
+    }
+
+    /// Commits a pending deletion. This is called by the expiry task and when
+    /// the page disappears or the app enters the background, so an interrupted
+    /// undo window never leaves a deletion only in transient UI state.
+    func finalizePendingDeletion() async {
+        guard let pending = pendingDeletion else { return }
+        deletionExpiryTask?.cancel()
+        deletionExpiryTask = nil
+        pendingDeletion = nil
         do {
-            try await useCases.deleteMeasurement(id: id)
-            pendingDeleteID = nil
-            await reload()
+            try await useCases.deleteMeasurement(id: pending.measurement.id)
         } catch {
+            insert(pending.measurement, at: pending.originalIndex)
             errorMessage =
                 (error as? LocalizedError)?.errorDescription
                 ?? String(localized: "bodyMeasurementEntry.error.generic")
         }
+    }
+
+    deinit {
+        deletionExpiryTask?.cancel()
+    }
+
+    private func scheduleDeletionExpiry(for id: StableUUID) {
+        deletionExpiryTask?.cancel()
+        deletionExpiryTask = Task { @MainActor [weak self] in
+            do {
+                try await Task.sleep(for: Self.undoWindow)
+            } catch {
+                return
+            }
+            guard let self, self.pendingDeletion?.measurement.id == id else { return }
+            await self.finalizePendingDeletion()
+        }
+    }
+
+    private func historyWithPendingDeletion(from loadedHistory: [BodyMeasurement]) -> [BodyMeasurement] {
+        guard let pendingDeletion else { return loadedHistory }
+        // The pending object is rendered by the caller as an in-place
+        // `FCUndoRow`; keep it out of the fetched list until it is restored.
+        return loadedHistory.filter { $0.id != pendingDeletion.measurement.id }
+    }
+
+    private func insert(_ measurement: BodyMeasurement, at index: Int) {
+        guard !history.contains(where: { $0.id == measurement.id }) else { return }
+        history.insert(measurement, at: min(max(index, 0), history.count))
     }
 
     /// 停用 / 恢复 for a custom metric (M1B-FR-023); archived metrics keep
@@ -223,6 +295,9 @@ final class BodyMeasurementEntryViewModel: ObservableObject {
 struct BodyMeasurementEntryView: View {
     @StateObject private var viewModel: BodyMeasurementEntryViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var historyListHeight: CGFloat = 0
+    @ScaledMetric(relativeTo: .body) private var historyRowHeight: CGFloat = 76
 
     init(studentID: StableUUID, metricID: StableUUID, useCases: BodyDataUseCases) {
         _viewModel = StateObject(
@@ -233,6 +308,8 @@ struct BodyMeasurementEntryView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: FCPrimitives.space4) {
+                pageHeader
+
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage).foregroundStyle(FCSemanticColors.statusDestructive)
                 }
@@ -296,100 +373,128 @@ struct BodyMeasurementEntryView: View {
                         .fcFont(.sectionLabel)
                         .foregroundStyle(FCSemanticColors.textSecondary)
                     Spacer()
-                    if !viewModel.history.isEmpty {
-                        Button(String(localized: "bodyMeasurementEntry.deleteAll"), role: .destructive) {
-                            viewModel.showingDeleteAllConfirm = true
-                        }
-                        .fcFont(.caption)
-                        .frame(minHeight: 44)
-                        .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementDeleteAll)
-                    }
                 }
 
                 if viewModel.history.isEmpty {
                     Text(String(localized: "bodyMeasurementEntry.empty"))
                         .foregroundStyle(FCSemanticColors.textSecondary)
                 } else {
-                    ForEach(viewModel.history) { measurement in
-                        historyRow(measurement)
+                    historyList
+                }
+
+                if !viewModel.history.isEmpty || viewModel.isCustomMetric {
+                    FCListRowDivider()
+                    Text(String(localized: "bodyMeasurementEntry.management"))
+                        .fcFont(.sectionLabel)
+                        .foregroundStyle(FCSemanticColors.textSecondary)
+
+                    if !viewModel.history.isEmpty {
+                        FCActionRow(
+                            title: String(localized: "bodyMeasurementEntry.deleteAll"),
+                            note: String(localized: "bodyMeasurementEntry.deleteAllNote"),
+                            role: .destructive
+                        ) {
+                            viewModel.showingDeleteAllConfirm = true
+                        }
+                        .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementDeleteAll)
+                        FCListRowDivider()
+                    }
+
+                    if viewModel.isCustomMetric {
+                        let canDeleteMetric = viewModel.history.isEmpty && viewModel.pendingDeletion == nil
+                        FCActionRow(
+                            title: String(localized: "bodyMeasurementEntry.deleteMetric"),
+                            note: canDeleteMetric
+                                ? nil
+                                : String(localized: "bodyMeasurementEntry.deleteMetricBlocked"),
+                            role: .destructive,
+                            isEnabled: canDeleteMetric
+                        ) {
+                            viewModel.showingDeleteMetricConfirm = true
+                        }
+                        .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementDeleteMetric)
+                        FCListRowDivider()
                     }
                 }
+
             }
-            .padding(FCPrimitives.space4)
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.bottom, FCPrimitives.space4)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(viewModel.metric?.name.value ?? String(localized: "bodyMeasurementEntry.title"))
-        .navigationBarTitleDisplayMode(.inline)
+        .fcSecondaryPage()
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementEntryRoot)
         .task { await viewModel.reload() }
-        .toolbar {
-            if viewModel.isCustomMetric {
-                ToolbarItem(placement: .topBarTrailing) {
-                    metricActionsMenu
-                }
-            }
+        .onChange(of: scenePhase) { _, phase in
+            guard phase == .background else { return }
+            Task { await viewModel.finalizePendingDeletion() }
+        }
+        .onDisappear {
+            Task { await viewModel.finalizePendingDeletion() }
         }
         .onChange(of: viewModel.didDeleteMetric) { _, deleted in
             if deleted {
                 dismiss()
             }
         }
-        .confirmationDialog(
-            String(localized: "bodyData.deleteConfirmTitle"),
-            isPresented: $viewModel.showingDeleteMetricConfirm,
-            titleVisibility: .visible
-        ) {
-            Button(String(localized: "bodyData.delete"), role: .destructive) {
-                Task { await viewModel.confirmDeleteMetric() }
-            }
-            Button(String(localized: "bodyData.deleteCancel"), role: .cancel) {
-                viewModel.showingDeleteMetricConfirm = false
-            }
-        } message: {
-            Text(String(localized: "bodyData.deleteConfirmMessage"))
-        }
-        .confirmationDialog(
-            String(localized: "bodyMeasurementEntry.deleteConfirmTitle"),
-            isPresented: Binding(
-                get: { viewModel.pendingDeleteID != nil },
-                set: { if !$0 { viewModel.pendingDeleteID = nil } }
-            ),
-            titleVisibility: .visible
-        ) {
-            Button(String(localized: "bodyMeasurementEntry.delete"), role: .destructive) {
-                if let id = viewModel.pendingDeleteID {
-                    Task { await viewModel.confirmDelete(id) }
+        .fcConfirmationDialog(isPresented: $viewModel.showingDeleteMetricConfirm) {
+            FCConfirmationDialog(
+                title: String(localized: "bodyData.deleteConfirmTitle"),
+                message: String(localized: "bodyData.deleteConfirmMessage"),
+                cancelAction: .init(title: String(localized: "bodyData.deleteCancel")) {
+                    viewModel.showingDeleteMetricConfirm = false
+                },
+                confirmAction: .init(
+                    title: String(localized: "bodyData.delete"),
+                    accessibilityIdentifier: FCAccessibilityID.bodyMeasurementDeleteMetricConfirm
+                ) {
+                    viewModel.showingDeleteMetricConfirm = false
+                    Task { await viewModel.confirmDeleteMetric() }
                 }
-            }
-            .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementDeleteConfirm)
-            Button(String(localized: "bodyMeasurementEntry.cancel"), role: .cancel) {
-                viewModel.pendingDeleteID = nil
-            }
-        } message: {
-            Text(String(localized: "bodyMeasurementEntry.deleteConfirmMessage"))
+            )
         }
-        .confirmationDialog(
-            String(localized: "bodyMeasurementEntry.deleteAllConfirmTitle"),
-            isPresented: $viewModel.showingDeleteAllConfirm,
-            titleVisibility: .visible
-        ) {
-            Button(String(localized: "bodyMeasurementEntry.deleteAll"), role: .destructive) {
-                Task { await viewModel.confirmDeleteAll() }
+        .fcConfirmationDialog(isPresented: $viewModel.showingDeleteAllConfirm) {
+            FCConfirmationDialog(
+                title: String(localized: "bodyMeasurementEntry.deleteAllConfirmTitle"),
+                message: String(localized: "bodyMeasurementEntry.deleteAllConfirmMessage"),
+                cancelAction: .init(title: String(localized: "bodyMeasurementEntry.cancel")) {
+                    viewModel.showingDeleteAllConfirm = false
+                },
+                confirmAction: .init(
+                    title: String(localized: "bodyMeasurementEntry.deleteAll"),
+                    accessibilityIdentifier: FCAccessibilityID.bodyMeasurementDeleteAllConfirm
+                ) {
+                    viewModel.showingDeleteAllConfirm = false
+                    Task { await viewModel.confirmDeleteAll() }
+                }
+            )
+        }
+    }
+
+    /// Inline page title. Custom metrics keep 「…」 on the title's first line,
+    /// trailing, so a long name wraps in the width `FCPageHeader` has left
+    /// (`DS-MORE-MENU`, B-c). `FCPageHeader` has no menu slot; this row only
+    /// composes the existing header with `FCMoreMenu`.
+    @ViewBuilder
+    private var pageHeader: some View {
+        let title = viewModel.metric?.name.value ?? String(localized: "bodyMeasurementEntry.title")
+        if viewModel.isCustomMetric {
+            HStack(alignment: .top, spacing: FCPrimitives.space2) {
+                FCPageHeader(title: title, back: .init())
+                metricActionsMenu
+                    .padding(.top, FCPrimitives.space2)
             }
-            .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementDeleteAllConfirm)
-            Button(String(localized: "bodyMeasurementEntry.cancel"), role: .cancel) {
-                viewModel.showingDeleteAllConfirm = false
-            }
-        } message: {
-            Text(String(localized: "bodyMeasurementEntry.deleteAllConfirmMessage"))
+            .frame(maxWidth: .infinity, alignment: .leading)
+        } else {
+            FCPageHeader(title: title, back: .init())
         }
     }
 
     /// Visible "…" menu for a custom metric's lifecycle actions (CLAUDE.md
     /// "Discoverable affordances": never long-press only).
     private var metricActionsMenu: some View {
-        Menu {
+        FCMoreMenu(accessibilityIdentifier: FCAccessibilityID.bodyMeasurementMore) {
             Button(
                 viewModel.metric?.lifecycle == .archived
                     ? String(localized: "bodyData.restore")
@@ -397,31 +502,78 @@ struct BodyMeasurementEntryView: View {
             ) {
                 Task { await viewModel.toggleArchive() }
             }
-            Button(String(localized: "bodyData.delete"), role: .destructive) {
-                viewModel.showingDeleteMetricConfirm = true
-            }
-        } label: {
-            Image(systemName: "ellipsis")
-                .foregroundStyle(FCSemanticColors.textSecondary)
-                .frame(minWidth: 44, minHeight: 44)
-                .contentShape(Rectangle())
+            .accessibilityIdentifier(
+                viewModel.metric?.lifecycle == .archived
+                    ? FCAccessibilityID.bodyMeasurementRestore
+                    : FCAccessibilityID.bodyMeasurementArchive
+            )
         }
-        .accessibilityLabel(String(localized: "bodyData.moreActions"))
+    }
+
+    private var historyList: some View {
+        List {
+            historyListContent
+        }
+        .listStyle(.plain)
+        .scrollDisabled(true)
+        .scrollContentBackground(.hidden)
+        .environment(\.defaultMinListRowHeight, 52)
+        .frame(height: max(historyListHeight, historyRowHeight))
+        .onScrollGeometryChange(
+            for: CGFloat.self,
+            of: { $0.contentSize.height + $0.contentInsets.top + $0.contentInsets.bottom },
+            action: { _, height in
+                guard height > 1 else { return }
+                historyListHeight = height
+            }
+        )
+    }
+
+    @ViewBuilder
+    private var historyListContent: some View {
+        ForEach(Array(viewModel.history.enumerated()), id: \.element.id) { index, measurement in
+            if let pending = viewModel.pendingDeletion, pending.originalIndex == index {
+                undoRow(pending)
+            }
+            historyRow(measurement)
+        }
+        if let pending = viewModel.pendingDeletion, pending.originalIndex >= viewModel.history.count {
+            undoRow(pending)
+        }
     }
 
     private func historyRow(_ measurement: BodyMeasurement) -> some View {
         BodyMeasurementHistoryRow(
             dateText: measurement.localCalendarDay.canonicalString,
             valueText: viewModel.displayValue(for: measurement)
-        ) {
-            Button {
-                viewModel.pendingDeleteID = measurement.id
+        ) {}
+        .listRowInsets(EdgeInsets())
+        .listRowSeparator(.hidden)
+        .listRowBackground(FCSemanticColors.surfacePage)
+        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+            Button(role: .destructive) {
+                Task { await viewModel.deleteMeasurement(measurement) }
             } label: {
-                Image(systemName: "trash")
-                    .foregroundStyle(FCSemanticColors.statusDestructive)
+                Label(String(localized: "bodyMeasurementEntry.delete"), systemImage: "trash")
             }
-            .frame(minWidth: 44, minHeight: 44)
+            .tint(FCSemanticColors.statusDestructive)
+            .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementDeleteMeasurement(measurement.id))
         }
         .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementRow(measurement.id))
+    }
+
+    private func undoRow(_ pending: BodyMeasurementEntryViewModel.PendingDeletion) -> some View {
+        FCUndoRow(
+            message: String(
+                format: String(localized: "bodyMeasurementEntry.deletedFormat"),
+                pending.measurement.localCalendarDay.canonicalString,
+                viewModel.displayValue(for: pending.measurement)
+            ),
+            accessibilityIdentifier: FCAccessibilityID.bodyMeasurementUndo(pending.measurement.id),
+            onUndo: { viewModel.undoPendingDeletion() }
+        )
+        .listRowInsets(EdgeInsets())
+        .listRowSeparator(.hidden)
+        .listRowBackground(FCSemanticColors.surfacePage)
     }
 }

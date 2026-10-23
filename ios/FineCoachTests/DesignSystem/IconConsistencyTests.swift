@@ -1,10 +1,11 @@
-@testable import FineCoach
 import UIKit
 import XCTest
 
-/// T046 (plan §9-6): the 18 equipment icons in `Assets.xcassets` are
+@testable import FineCoach
+
+/// T046 (plan §9-6): the 21 equipment icons in `Assets.xcassets` are
 /// byte-identical to `design/m1-b-hifi/icons/*.svg`, use viewBox 24, stroke
-/// width 2 and no fill, and render as templates — replacing manual review.
+/// width 2 with the CX-D13 kettlebell fill exception, and render as templates — replacing manual review.
 /// T065: the §7.1 exercise → icon table.
 final class IconConsistencyTests: XCTestCase {
     // MARK: T046 — asset ↔ design original
@@ -15,7 +16,7 @@ final class IconConsistencyTests: XCTestCase {
             .filter { $0.hasSuffix(".svg") }
             .map { String($0.dropLast(4)) }
         XCTAssertEqual(Set(designNames), Set(FCEquipmentIcon.allCases.map(\.rawValue)))
-        XCTAssertEqual(FCEquipmentIcon.allCases.count, 18)
+        XCTAssertEqual(FCEquipmentIcon.allCases.count, 21)
     }
 
     func testAssetSVGsAreByteIdenticalToDesignOriginals() throws {
@@ -26,7 +27,8 @@ final class IconConsistencyTests: XCTestCase {
             let imported = try Data(
                 contentsOf: assets.appendingPathComponent("\(icon.assetName).imageset/\(icon.rawValue).svg")
             )
-            XCTAssertEqual(imported, original, "\(icon.assetName) differs from design/m1-b-hifi/icons/\(icon.rawValue).svg")
+            XCTAssertEqual(
+                imported, original, "\(icon.assetName) differs from design/m1-b-hifi/icons/\(icon.rawValue).svg")
         }
     }
 
@@ -38,14 +40,16 @@ final class IconConsistencyTests: XCTestCase {
             let strokeWidths = attributeValues("stroke-width", in: svg)
             XCTAssertFalse(strokeWidths.isEmpty, "\(icon.rawValue): no stroke-width")
             XCTAssertEqual(Set(strokeWidths), ["2"], "\(icon.rawValue): stroke widths \(strokeWidths)")
-            XCTAssertEqual(Set(attributeValues("fill", in: svg)), ["none"], "\(icon.rawValue): fill")
+            let expectedFills: Set<String> = icon == .kettlebell ? ["none", "#2A2822"] : ["none"]
+            XCTAssertEqual(Set(attributeValues("fill", in: svg)), expectedFills, "\(icon.rawValue): fill")
         }
     }
 
     func testAssetsRenderAsTemplatesAndLoadFromTheAppBundle() throws {
         let assets = try assetCatalogDirectory()
         for icon in FCEquipmentIcon.allCases {
-            let contents = try Data(contentsOf: assets.appendingPathComponent("\(icon.assetName).imageset/Contents.json"))
+            let contents = try Data(
+                contentsOf: assets.appendingPathComponent("\(icon.assetName).imageset/Contents.json"))
             let json = try XCTUnwrap(JSONSerialization.jsonObject(with: contents) as? [String: Any])
             let properties = try XCTUnwrap(json["properties"] as? [String: Any], icon.assetName)
             XCTAssertEqual(properties["template-rendering-intent"] as? String, "template", icon.assetName)
@@ -56,7 +60,7 @@ final class IconConsistencyTests: XCTestCase {
     // MARK: T065 — §7.1 exercise → icon table
 
     func testMappingTableMatchesDesignSystem() {
-        for equipmentClass in ["杠铃", "哑铃", "徒手", "龙门架", "史密斯机", "壶铃"] {
+        for equipmentClass in ["杠铃", "哑铃", "徒手", "绳索", "史密斯机", "壶铃", "哈克机", "悍马机", "悬挂带", "单杠", "弹力带"] {
             let muscles: [String?] = ExerciseCatalogBrowse.muscleGroupOrder.map { $0 } + [nil]
             for muscle in muscles {
                 XCTAssertNotNil(FCEquipmentIcon.icon(equipmentClass: equipmentClass, primaryMuscleGroup: muscle))
@@ -65,9 +69,10 @@ final class IconConsistencyTests: XCTestCase {
         XCTAssertEqual(FCEquipmentIcon.icon(equipmentClass: "杠铃", primaryMuscleGroup: "背"), .barbell)
         XCTAssertEqual(FCEquipmentIcon.icon(equipmentClass: "哑铃", primaryMuscleGroup: nil), .dumbbell)
         XCTAssertEqual(FCEquipmentIcon.icon(equipmentClass: "徒手", primaryMuscleGroup: "核心"), .bodyweight)
-        XCTAssertEqual(FCEquipmentIcon.icon(equipmentClass: "龙门架", primaryMuscleGroup: "胸"), .cableCrossover)
+        XCTAssertEqual(FCEquipmentIcon.icon(equipmentClass: "绳索", primaryMuscleGroup: "胸"), .cableCrossover)
         XCTAssertEqual(FCEquipmentIcon.icon(equipmentClass: "史密斯机", primaryMuscleGroup: "大腿"), .smithMachine)
         XCTAssertEqual(FCEquipmentIcon.icon(equipmentClass: "壶铃", primaryMuscleGroup: "臀"), .kettlebell)
+        XCTAssertEqual(FCEquipmentIcon.icon(equipmentClass: "哈克机", primaryMuscleGroup: "大腿"), .hackSquat)
 
         let machine: [String: FCEquipmentIcon?] = [
             "胸": .pecDeck, "肩": .shoulderPress, "大腿": .legExtension, "臀": .hipAdduction,
@@ -76,7 +81,13 @@ final class IconConsistencyTests: XCTestCase {
         for (muscle, expected) in machine {
             XCTAssertEqual(FCEquipmentIcon.icon(equipmentClass: "固定器械", primaryMuscleGroup: muscle), expected, muscle)
         }
-        XCTAssertNil(FCEquipmentIcon.icon(equipmentClass: "其他", primaryMuscleGroup: "胸"))
+        XCTAssertEqual(FCEquipmentIcon.icon(equipmentClass: "悍马机", primaryMuscleGroup: nil), .plateLoaded)
+        XCTAssertEqual(FCEquipmentIcon.icon(equipmentClass: "悬挂带", primaryMuscleGroup: nil), .suspensionTrainer)
+        XCTAssertEqual(FCEquipmentIcon.icon(equipmentClass: "单杠", primaryMuscleGroup: nil), .pullUpBar)
+        XCTAssertEqual(FCEquipmentIcon.icon(equipmentClass: "弹力带", primaryMuscleGroup: nil), .resistanceBand)
+        for equipmentClass in ["其他"] {
+            XCTAssertNil(FCEquipmentIcon.icon(equipmentClass: equipmentClass, primaryMuscleGroup: "胸"))
+        }
         XCTAssertNil(FCEquipmentIcon.icon(equipmentClass: nil, primaryMuscleGroup: nil))
     }
 
@@ -111,9 +122,9 @@ final class IconConsistencyTests: XCTestCase {
     /// skips — when unresolvable, because this is the T046 acceptance gate.
     private func iosRoot() throws -> URL {
         let root = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent() // DesignSystem/
-            .deletingLastPathComponent() // FineCoachTests/
-            .deletingLastPathComponent() // ios/
+            .deletingLastPathComponent()  // DesignSystem/
+            .deletingLastPathComponent()  // FineCoachTests/
+            .deletingLastPathComponent()  // ios/
         guard FileManager.default.fileExists(atPath: root.appendingPathComponent("FineCoachApp").path) else {
             XCTFail("cannot resolve ios/ from #filePath: \(root.path)")
             throw CocoaError(.fileNoSuchFile)

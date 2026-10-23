@@ -1,0 +1,9 @@
+---
+description: 改 Xcode 工程或 Core Data 模型前先停。这两个文件是合并不了的 XML。
+globs: "**/*.xcdatamodeld/**,**/*.xcdatamodel/**,**/project.pbxproj"
+alwaysApply: false
+---
+
+# 工程文件与数据模型
+
+- 改 `project.pbxproj` 或 `*.xcdatamodel` 前先停。它们是 XML，不能并行修改。模型、持久化或兼容性要变时，先问产品负责人。（AGENTS.md §Operational constraints、§Change workflow 第 2 步）

@@ -14,6 +14,7 @@ enum ExerciseManagedObjectMapping {
         object.setValue(item.recordMode.rawValue, forKey: "recordMode")
         object.setValue(item.metadataVersion, forKey: "metadataVersion")
         object.setValue(item.lifecycle.rawValue, forKey: "lifecycle")
+        object.setValue(item.isRetired, forKey: "isRetired")
         object.setValue(item.provenanceRef, forKey: "provenanceRef")
         object.setValue(item.createdAtUTC, forKey: "createdAtUTC")
         object.setValue(item.updatedAtUTC, forKey: "updatedAtUTC")
@@ -32,6 +33,7 @@ enum ExerciseManagedObjectMapping {
         object.setValue(preference.isFavorite, forKey: "isFavorite")
         object.setValue(preference.isHidden, forKey: "isHidden")
         object.setValue(preference.isAssisted, forKey: "isAssisted")
+        object.setValue(preference.isUnilateral, forKey: "isUnilateral")
     }
 
     static func makeCatalogItem(from object: NSManagedObject) throws -> ExerciseCatalogItem {
@@ -73,7 +75,8 @@ enum ExerciseManagedObjectMapping {
             lifecycle: lifecycle,
             provenanceRef: object.value(forKey: "provenanceRef") as? String,
             createdAtUTC: createdAtUTC,
-            updatedAtUTC: updatedAtUTC
+            updatedAtUTC: updatedAtUTC,
+            isRetired: object.value(forKey: "isRetired") as? Bool ?? false
         )
     }
 
@@ -117,12 +120,14 @@ enum ExerciseManagedObjectMapping {
         let isFavorite = object.value(forKey: "isFavorite") as? Bool ?? false
         let isHidden = object.value(forKey: "isHidden") as? Bool ?? false
         let isAssisted = object.value(forKey: "isAssisted") as? Bool ?? false
+        let isUnilateral = object.value(forKey: "isUnilateral") as? Bool
         return try ExercisePreference(
             exerciseID: StableExerciseID(exerciseID),
             alias: alias,
             isFavorite: isFavorite,
             isHidden: isHidden,
-            isAssisted: isAssisted
+            isAssisted: isAssisted,
+            isUnilateral: isUnilateral
         )
     }
 
@@ -181,6 +186,20 @@ enum ExerciseManagedObjectMapping {
     static func fetchClaims(scope: ExerciseClaimScope, in context: NSManagedObjectContext) throws -> [NSManagedObject] {
         let request = NSFetchRequest<NSManagedObject>(entityName: claimEntityName)
         request.predicate = NSPredicate(format: "scope == %@", scope.rawValue)
+        return try context.fetch(request)
+    }
+
+    static func fetchClaims(
+        ownerKind: ExerciseSourceKind,
+        scope: ExerciseClaimScope,
+        in context: NSManagedObjectContext
+    ) throws -> [NSManagedObject] {
+        let request = NSFetchRequest<NSManagedObject>(entityName: claimEntityName)
+        request.predicate = NSPredicate(
+            format: "ownerKind == %@ AND scope == %@",
+            ownerKind.rawValue,
+            scope.rawValue
+        )
         return try context.fetch(request)
     }
 

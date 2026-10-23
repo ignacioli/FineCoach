@@ -48,7 +48,8 @@ final class CoursePackageEditorViewModel: ObservableObject {
             return
         }
         existingActivePackage = active
-        existingActivePackageBalance = (try? await useCases.balance(packageID: active.id)) ?? active.remainingCreditsCache
+        existingActivePackageBalance =
+            (try? await useCases.balance(packageID: active.id)) ?? active.remainingCreditsCache
     }
 
     /// When the Student already has an active package that is STILL in
@@ -95,7 +96,8 @@ final class CoursePackageEditorViewModel: ObservableObject {
             )
             didSave = true
         } catch {
-            errorMessage = (error as? LocalizedError)?.errorDescription
+            errorMessage =
+                (error as? LocalizedError)?.errorDescription
                 ?? String(localized: "coursePackageEditor.saveFailed")
         }
     }
@@ -227,26 +229,31 @@ struct CoursePackageEditorView: View {
                 dismiss()
             }
         }
-        .confirmationDialog(
-            String(localized: "coursePackageEditor.confirmEndActive.title"),
-            isPresented: $viewModel.isConfirmingEndActive,
-            titleVisibility: .visible
-        ) {
-            Button(String(localized: "coursePackageEditor.confirmEndActive.confirm"), role: .destructive) {
-                Task { await viewModel.confirmEndActiveAndSave() }
-            }
-            Button(String(localized: "coursePackageEditor.confirmEndActive.cancel"), role: .cancel) {}
-        } message: {
-            if let existingActivePackage = viewModel.existingActivePackage {
-                Text(
-                    String(
-                        format: String(localized: "coursePackageEditor.confirmEndActive.messageFormat"),
-                        existingActivePackage.displayName,
-                        viewModel.existingActivePackageBalance
-                    )
-                )
-            }
+        .fcConfirmationDialog(isPresented: $viewModel.isConfirmingEndActive) {
+            FCConfirmationDialog(
+                title: String(localized: "coursePackageEditor.confirmEndActive.title"),
+                message: endActiveConfirmationMessage,
+                cancelAction: .init(title: String(localized: "coursePackageEditor.confirmEndActive.cancel")) {
+                    viewModel.isConfirmingEndActive = false
+                },
+                confirmAction: .init(
+                    title: String(localized: "coursePackageEditor.confirmEndActive.confirm"),
+                    accessibilityIdentifier: FCAccessibilityID.coursePackageEditorConfirmEndActive
+                ) {
+                    viewModel.isConfirmingEndActive = false
+                    Task { await viewModel.confirmEndActiveAndSave() }
+                }
+            )
         }
+    }
+
+    private var endActiveConfirmationMessage: String {
+        guard let existingActivePackage = viewModel.existingActivePackage else { return "" }
+        return String(
+            format: String(localized: "coursePackageEditor.confirmEndActive.messageFormat"),
+            existingActivePackage.displayName,
+            viewModel.existingActivePackageBalance
+        )
     }
 
     /// Which date row has its calendar expanded under it -- the same

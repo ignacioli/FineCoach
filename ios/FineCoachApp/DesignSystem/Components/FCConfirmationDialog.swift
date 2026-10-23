@@ -19,10 +19,16 @@ import SwiftUI
 public struct FCConfirmationDialog: View {
     public struct Action {
         public let title: String
+        public let accessibilityIdentifier: String?
         public let handler: () -> Void
 
-        public init(title: String, handler: @escaping () -> Void) {
+        public init(
+            title: String,
+            accessibilityIdentifier: String? = nil,
+            handler: @escaping () -> Void
+        ) {
             self.title = title
+            self.accessibilityIdentifier = accessibilityIdentifier
             self.handler = handler
         }
     }
@@ -88,7 +94,11 @@ public struct FCConfirmationDialog: View {
             // Measures 80% of the container height without affecting layout.
             Color.clear
                 .containerRelativeFrame(.vertical) { length, _ in length * 0.8 }
-                .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { maxCardHeight = $0 }
+                .onGeometryChange(for: CGFloat.self) {
+                    $0.size.height
+                } action: {
+                    maxCardHeight = $0
+                }
         }
     }
 
@@ -114,7 +124,7 @@ public struct FCConfirmationDialog: View {
 
     @ViewBuilder
     private func dialogButton(_ action: Action, isPrimary: Bool, wraps: Bool) -> some View {
-        Button(action: action.handler) {
+        let button = Button(action: action.handler) {
             Text(action.title)
                 .fcFont(.callout, weight: .semibold)
                 .foregroundStyle(isPrimary ? FCSemanticColors.actionOn : FCSemanticColors.actionPrimary)
@@ -130,6 +140,11 @@ public struct FCConfirmationDialog: View {
         .buttonStyle(.plain)
         .frame(minHeight: 44)
         .contentShape(Rectangle())
+        if let accessibilityIdentifier = action.accessibilityIdentifier {
+            button.accessibilityIdentifier(accessibilityIdentifier)
+        } else {
+            button
+        }
     }
 }
 
@@ -228,8 +243,8 @@ private struct FCConfirmationDialogModifier: ViewModifier {
     }
 }
 
-public extension View {
-    func fcConfirmationDialog(
+extension View {
+    public func fcConfirmationDialog(
         isPresented: Binding<Bool>,
         dialog: @escaping () -> FCConfirmationDialog
     ) -> some View {

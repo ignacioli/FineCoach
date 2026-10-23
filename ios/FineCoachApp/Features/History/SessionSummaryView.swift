@@ -11,11 +11,18 @@ final class SessionSummaryViewModel: ObservableObject {
     @Published var templateName = ""
     @Published var savedTemplateName: String?
 
+    @Published var gains: SessionGains = .empty
+    private let exerciseUseCases: ExerciseLibraryUseCases?
+
     let sessionID: StableUUID
     private let useCases: HistoryUseCases
     let templateUseCases: TemplateUseCases?
 
-    init(sessionID: StableUUID, useCases: HistoryUseCases, templateUseCases: TemplateUseCases? = nil) {
+    init(
+        sessionID: StableUUID, useCases: HistoryUseCases, templateUseCases: TemplateUseCases? = nil,
+        exerciseUseCases: ExerciseLibraryUseCases? = nil
+    ) {
+        self.exerciseUseCases = exerciseUseCases
         self.sessionID = sessionID
         self.useCases = useCases
         self.templateUseCases = templateUseCases
@@ -45,12 +52,17 @@ final class SessionSummaryViewModel: ObservableObject {
     func load() async {
         do {
             let completed = try await useCases.detail(sessionID: sessionID)
+            let history = try await useCases.listHistory(studentID: completed.studentID)
+            let assisted = (try? await exerciseUseCases?.assistedExerciseIDs()) ?? []
+            gains = SessionGains(current: completed, history: history, assistedExerciseIDs: assisted)
             focus = completed.trainingFocus
             privateNote = completed.notes.privateCoachNote?.value ?? ""
             studentSummary = completed.notes.studentFacingSummary?.value ?? ""
             durationText = String(
                 format: String(localized: "summary.duration.format"),
-                completed.statistics.displayedDurationSeconds.canonicalString
+                HistoryPresentation.duration(
+                    seconds: Double(completed.statistics.displayedDurationSeconds.canonicalString) ?? 0
+                )
             )
             completedSetsText = String(
                 format: String(localized: "summary.sets.format"),
@@ -81,6 +93,7 @@ final class SessionSummaryViewModel: ObservableObject {
 
 struct SessionSummaryView: View {
     @StateObject private var viewModel: SessionSummaryViewModel
+    @Binding var rootTab: RootTab
     @Binding var path: [RootDestination]
     @State private var isNamingTemplate = false
 
@@ -88,17 +101,24 @@ struct SessionSummaryView: View {
         sessionID: StableUUID,
         useCases: HistoryUseCases,
         templateUseCases: TemplateUseCases? = nil,
+        exerciseUseCases: ExerciseLibraryUseCases? = nil,
+        rootTab: Binding<RootTab>,
         path: Binding<[RootDestination]>
     ) {
         _viewModel = StateObject(
-            wrappedValue: SessionSummaryViewModel(sessionID: sessionID, useCases: useCases, templateUseCases: templateUseCases)
+            wrappedValue: SessionSummaryViewModel(
+                sessionID: sessionID, useCases: useCases, templateUseCases: templateUseCases,
+                exerciseUseCases: exerciseUseCases)
         )
+        _rootTab = rootTab
         _path = path
     }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: FCPrimitives.space4) {
+                FCPageHeader(title: String(localized: "summary.title"))
+
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage).foregroundStyle(FCSemanticColors.statusDestructive)
                 }
@@ -114,6 +134,8 @@ struct SessionSummaryView: View {
 
                 BodyPartMultiSelectView(title: String(localized: "summary.focus"), selection: $viewModel.focus)
                     .accessibilityIdentifier(FCAccessibilityID.sessionSummaryFocus)
+                SessionGainsSectionView(gains: viewModel.gains)
+                    .accessibilityIdentifier(FCAccessibilityID.sessionSummaryGains)
                 labeledField(
                     title: String(localized: "summary.privateNote"),
                     text: $viewModel.privateNote,
@@ -149,22 +171,21 @@ struct SessionSummaryView: View {
                 }
                 .accessibilityIdentifier(FCAccessibilityID.sessionSummaryGenerateReport)
 
-                FCButton(title: String(localized: "summary.skipShare")) {
+                FCSecondaryButton(title: String(localized: "summary.skipShare")) {
                     Task {
                         guard await viewModel.persistNotes() else { return }
-                        path.popToStudentDetail()
+                        path.returnToToday(tab: &rootTab)
                     }
                 }
                 .accessibilityIdentifier(FCAccessibilityID.sessionSummarySkipShare)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(FCPrimitives.space4)
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.bottom, FCPrimitives.space4)
         }
         .scrollDismissesKeyboard(.interactively)
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(String(localized: "summary.title"))
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
+        .fcSecondaryPage(swipeBackEnabled: false)
         .task { await viewModel.load() }
         .fcBottomSheet(isPresented: $isNamingTemplate) {
             FCBottomSheet(
@@ -172,8 +193,10 @@ struct SessionSummaryView: View {
                 subtitle: String(localized: "summary.saveAsTemplateNote")
             ) {
                 VStack(spacing: FCPrimitives.space3) {
-                    FCTextField(String(localized: "activeSession.saveAsTemplateNamePrompt"), text: $viewModel.templateName)
-                        .accessibilityIdentifier(FCAccessibilityID.activeSessionSaveAsTemplateName)
+                    FCTextField(
+                        String(localized: "activeSession.saveAsTemplateNamePrompt"), text: $viewModel.templateName
+                    )
+                    .accessibilityIdentifier(FCAccessibilityID.activeSessionSaveAsTemplateName)
                     FCButton(
                         title: String(localized: "activeSession.saveAsTemplateConfirm"),
                         isEnabled: !viewModel.templateName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty

@@ -120,22 +120,24 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 | ID | 代码 | 来源 | 消费者（feature） | 状态 |
 |---|---|---|---|---|
 | `DS-BASE` | `FCPrimitives`、`FCSemanticColors`、`FCFont`、`FCTextStyle`、`FCFontWeightVariant` | README §2–§5 | 全部 | L0 全自动 |
-| `DS-BUTTON` | `FCButton`、`FCSecondaryButton`、`FCLinkButton` | §8 主按钮 / 次按钮 / 链接式按钮 | 主按钮 27 个文件；次按钮 1 个；链接按钮 13 个 | 稳定 |
+| `DS-BUTTON` | `FCButton`、`FCSecondaryButton`、`FCLinkButton` | §8 主按钮 / 次按钮 / 链接式按钮 | 主按钮 27 个文件；次按钮 1 个（2026-10-22 起增加分享预览「完成」、训练总结「跳过分享」）；链接按钮 13 个 | 稳定 |
 | `DS-TITLE-ACTION` | `FCTitleIconButton`、`FCTitleAddButton` | §8.1 标题行图标按钮、标题行「＋」、设置入口；40/41 | Today、StudentList、ExerciseLibrary | 稳定 |
 | `DS-SEGMENTED` | `FCSegmentedSwitch` | §8 顶部分段切换；37；§10 C11 | RootNavigation、Trends、BodyMeasurementEntry、ManualCreditAdjustment | 稳定 |
 | `DS-CHIP` | `FCFilterChip`、`FCBodyPartChip`、`FCBodyPartPicker`、`FCFlowLayout` | §8 筛选胶囊；§8.1 部位多选胶囊 | 筛选胶囊 7 个文件；部位选择 3 个 | 稳定 |
 | `DS-TOGGLE` | `FCToggleStyle` | §8 开关；O7 | 4 个文件 | 稳定 |
-| `DS-STEPPER` | `FCStepper` | §8.1 数字步进器；36/37 | CoursePackageEditor、ManualCreditAdjustment | 稳定 |
+| `DS-STEPPER` | `FCStepper`、`FCStepperField` | §8.1 数字步进器；36/37；P0-a/P0-b 可输入变体 | CoursePackageEditor、ManualCreditAdjustment、ActiveSession | 稳定（可输入变体已回填 README §8.1；Penpot P0-a/P0-b 2026-10-14 已批准） |
 | `DS-TEXT-FIELD` | `FCTextField`、`FCSearchField` | §8 输入框、搜索框 | 输入框 14 个文件；搜索框 2 个 | 稳定 |
-| `DS-LIST-ROW` | `FCListRow`、`FCListGroupRow`、`FCListRowDivider` | §8 列表行；§6 分割线；M2 扩展（§4.7） | 分割线 26 个文件；`FCListRow` 0 个（M2 新页面使用） | 扩展已实现（M2 T004）；其余见 CG-1 |
+| `DS-LIST-ROW` | `FCListRow`、`FCListGroupRow`、`FCListRowDivider`、`FCExerciseLibraryRowLabel` | §8 列表行；§6 分割线；M2 扩展（§4.7） | 分割线 26 个文件；`FCListRow` 0 个（M2 新页面使用） | 扩展已实现（M2 T004）；其余见 CG-1 |
 | `DS-SECTION` | `FCSectionLabel`、`FCGroupEntryRow` | §8 区段标签；§8.1 列表分组入口行 | 区段标签 14 个文件；分组入口 2 个 | 稳定 |
 | `DS-LABEL-VALUE-ROW` | `FCLabelValueRow`、`FCLabelValueText` | §8.1 标签-值两栏行；23/26/27/36/37 | 6 个文件 | 见 CG-5 |
 | `DS-PAGE-HEADER` | `FCPageHeader` | §4.7；§4.6 `DS-PAGE-SECONDARY` 的页头部分；26 | StudentDetail（M2 新页面全部使用） | 已实现（M2 T001），人工项待首次走查 |
 | `DS-HUB-ROW` | `FCHubRow` | §4.7；19/42/43 | ResourceHub、Settings（M2 新页面使用） | 已实现（M2 T002），人工项待首次走查 |
 | `DS-INLINE-RESULT` | `FCInlineResult` | §4.7；38/39 | BackupRestoreFlow | 已实现（M2 T003），信息变体待 M2 页面首次使用 |
 | `DS-ACTION-ROW` | `FCActionRow` | §8.1 操作行；18/24；destructive 图标（§4.7） | 10 个文件 | 稳定；destructive 图标已实现（M2 T005） |
-| `DS-SET-ROW` | `FCSetRow`、`FCSetStateCircle` | §6 组圆圈；11/30 | ActiveSession；圆圈另用于 ShareReport、History | 见 CG-4 |
-| `DS-HERO-CARD` | `FCHeroCard` | §8 深色 hero 卡；01/18 | Today、StudentDetail | 见 CG-6 |
+| `DS-UNDO-ROW` | `FCUndoRow` | §8.1 删除后撤销行；B-b（2026-10-16 已批准） | ActiveSession（删组）、BodyMeasurementEntry（删单条测量） | 规格已定（§4.8），代码待 B2 |
+| `DS-MORE-MENU` | `FCMoreMenu` | §8.1 标题行「…」菜单；B-a / B-b（2026-10-16 已批准） | ActiveSession、TemplateEditor（分区标题）；BodyMeasurementEntry（页头，B2 迁移） | 规格已定（§4.8），代码待 B2 |
+| `DS-SET-ROW` | `FCSetRow`、`FCSetStateCircle`、`FCNewRecordBadge` | §6 组圆圈；11/30 | ActiveSession；圆圈另用于 ShareReport、History | 见 CG-4 |
+| `DS-HERO-CARD` | `FCHeroCard` | §8 深色 hero 卡；01/18；多行变体 Penpot `W08-a`（2026-10-22） | Today（单行 / 多行）、StudentDetail（单行） | 多行变体 2026-10-22 批准，代码待 W-08 |
 | `DS-HINT-BAR` | `FCHintBar`、`FCActiveSessionBar` | §8 提示条；§8.1 训练中提示条；21 | StudentDetail、StudentList | 稳定 |
 | `DS-BOTTOM-SHEET` | `FCBottomSheet`、`View.fcBottomSheet` | §8.1 底部面板；18/31/33/34 | 8 个文件 | 稳定 |
 | `DS-CONFIRM-DIALOG` | `FCConfirmationDialog`、`View.fcConfirmationDialog` | §8 确认弹窗；14 | CoursePackageList、CourseActionSheet、TemplateEditor | 内容变长规则已实现（M2 T006）；CG-6 |
@@ -189,6 +191,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
   - `FCBodyPartChip`：高 28、最小宽 48、水平内边距 `space.4`；`FCBodyPartPicker` 按 `BodyPart.allCases` 的 spec 顺序排出 8 个，通过 `FCFlowLayout` 自动换行。
 - **状态**：未选中 `surface.selected` 底 + `text.primary` 字；选中 `action.primary` 底 + `action.on` 字，并带 `.isSelected` 属性。
 - **不变量**：视觉高度保持 28/30，点击区补足到 ≥ 44（自动）；`FCBodyPartPicker` 胶囊之间的视觉行距为 8，通过负的布局行距抵消 44pt 点击区（`space.2 - (44 - 28)`，可自动）；部位顺序与 spec 一致（可自动）。
+- **可访问性标识扩展**：`FCBodyPartPicker` 可选接收 `BodyPart -> String` identifier factory，默认 `nil`；非 `nil` 时将结果赋给对应的真实 `FCBodyPartChip` Button，`nil` 时不设置 identifier。该扩展只增加自动化定位能力，不改变视觉、布局或默认消费者行为。
 - **复用边界**：多选与单选共用同一套外观；是单选还是多选由调用方的绑定决定。不要新造第三种胶囊尺寸；确实需要时按「扩展」流程处理。
 
 #### `DS-TOGGLE` 开关
@@ -203,7 +206,8 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 - **部件**：一个 `surface.canvas` 胶囊（默认字号下 112×36）：`−` → 数值 → `+`。符号使用 `FCSymbol(.minus/.plus)`；数值使用 `numeralLarge` `text.primary`、等宽数字，最小宽 40。
 - **状态**：到达下限或上限时，对应符号改为 `text.disabled` 并禁用。
 - **不变量**：每次只能 ±1，结果限制在范围内（自动：`FCStepperTests`）；VoiceOver 把整体读作一个可调节元素（label + value，上下滑动调节）（可自动）；每个符号的点击区 ≥ 44（自动）；字号放大时胶囊随之加宽，不截断数值（人工）。
-- **复用边界**：取代系统 `Stepper`。所有整数步进都必须用它。
+- **复用边界**：取代系统 `Stepper`。所有整数步进都必须用它。重量和次数的可输入步进用下面的变体，不要在页面里再拼一套「− 输入框 +」。
+- **变体 `FCStepperField`**（P0-a、P0-b，2026-10-14 审核通过）：放在 `DS-LABEL-VALUE-ROW` 的值 slot，只有训练页使用。胶囊高 48、`radius.capsule`、`surface.canvas` 底，宽度填满值列。部件是 `−`、居中的可输入数值（`numeralLarge`）、`+`；符号用 `FCSymbol(.minus/.plus)`，每个点击区 ≥ 44。到达下限时「−」改为 `text.disabled` 并禁用。键盘输入中，胶囊加 1.5pt 内描边 `action.primary`，「− / +」仍可点。步长、下限和文本解析由调用方按 P0-D4 / P0-D6 传入（`SetValueStepping`），组件本身不决定 ±2.5 或 ±1。现有 `FCStepper` 和它的两个消费者不变。
 
 ### 4.2 输入类
 
@@ -223,10 +227,15 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 - **不变量**：带 `action` 时整行可点；不可点时合并为一个无障碍元素（可自动）。
 - **复用边界**：见 CG-1。目前 feature 中的列表行都是各自拼装。新的普通列表行优先使用 `FCListRow`；需要头像、图标、状态等额外 slot 时，按「扩展」流程增加 slot，不要在页面里再复制一套。
 
+- **本节收获动作行 slot（2026-10-23，README §10 C16，B 类扩展）**：`FCListRow(…, showsNewRecordBadge:)`，默认关闭。开启时主文字后接 `FCNewRecordBadge`（`DS-SET-ROW` 的胶囊部件，间距 `space.2`），横向放不下时（大字体）用 `ViewThatFits` 换到主文字下方；整行读作「标题，元信息，新纪录」。只用于总结页、教练历史详情、分享卡片的「上次 → 本次」动作行（Penpot D-b、D-c2）；其他消费者默认关闭，不受影响。
+- **C′ 2b 复用位置与已有动作行变体**：动作库页面与训练中添加动作面板的「最近练过」行，和完整列表共用 `FCExerciseLibraryRowLabel`（`DesignSystem/Components/FCListRow.swift`），图标 → 名字 / 副文字 → 弹性空白 → 可选收藏星 → `›`；沿用动作库既有 `space.4` 横向间距、`space.1` 文字间距、`space.3` 上下内边距，不改变普通 `FCListRow` 的 leading slot。label 以 `.frame(maxWidth: .infinity)` 撑满，按钮由页面提供并复用原有 action。无图标时沿用既有动作行留空规则；模板编辑器不变。此为批准画板 C2b 的已有动作行复用，代码抽取而非新视觉决定；满宽和 slot 合同由组件源码测试验证。
+
 #### `DS-SECTION` 区段标签与分组入口
 
 - **部件**：`FCSectionLabel`：`sectionLabel` `text.secondary`，单独一行，位于区块的第一个元素之前。`FCGroupEntryRow`：「标题 · N」（`sectionLabel` `text.secondary`）→ 弹性空白 → `›`，整行可点，最小高 44。
 - **不变量**：区块之间的间距大于行内间距（README §4，人工）。
+
+- **C′ 2b 复用位置**：动作库页面、添加动作面板的「最近练过」标签，与部位区段同级。无搜索和部位/器械筛选且有历史时，显示最多 5 个当前可选的不同动作；按最后一次已完成训练时间倒序，库页面取全部学员，添加面板仅当前学员；Session-only 不计。末行分割线后以 `space.4`（16pt）接完整列表，不移除完整列表中的重复动作。分组和行使用独立 accessibility identifier。来源：批准的 `C2b-recent-group@1x.png`、设计交接「第二轮」「验收通过」。
 
 #### `DS-LABEL-VALUE-ROW` 标签-值两栏行
 
@@ -238,24 +247,28 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 #### `DS-ACTION-ROW` 操作行
 
 - **部件**：标题（无副标题时为 `body`，有副标题时为 `headline`）→ 可选副标题（`caption` `text.secondary`）→ 弹性空白 → 可选说明（`caption` `text.secondary`）→ `›`（仅普通操作行）。最小高 52；有副标题时上下内边距 `space.3`。
-- **变体**：`normal`；`destructive`（`status.destructive` 字、**没有** `›`）；禁用（文字和 `›` 都改为 `text.disabled`）。
+- **变体**：`normal`；`destructive`（`status.destructive` 字、**没有** `›`）；禁用（文字和 `›` 都改为 `text.disabled`）。destructive 行暂不可用时用禁用变体，并在说明 slot 写原因，整行不可点（B-c「删除指标」，2026-10-16 已批准）。
 - **不变量**：destructive 行自身不执行破坏性操作，调用方必须在 `action` 中弹出 `DS-CONFIRM-DIALOG`（§8.1，可自动：可以扫描调用方源码）；整行可点。
 - **复用边界**：放在底部面板和编辑页的操作区。普通内容浏览列表使用 `DS-LIST-ROW`。
 
 #### `DS-SET-ROW` 训练组行
 
-- **部件**：组状态圆圈（22×22，点击区 44）→ 标题（`body`；已完成为 `text.primary`，其余为 `text.secondary`）与数值（`callout` 400 `text.secondary`）上下排列 → 弹性空白 → 状态文字（`callout` 400 `text.secondary`）→ 可选编辑按钮（铅笔，44）。
+- **阶段 D 新纪录状态**：已批准的 D-a anatomy、标记外观、阅读顺序、换行与触感规则见 `design/progress-milestones/implementation-map.md` §2 D-a。`FCNewRecordBadge` 是本组件的胶囊部件（文字本地化，自身无障碍隐藏，由组行朗读），仅 completed 且持有纪录时显示；ShareReport 卡片复用该标记。2026-10-23 起（README §10 C16）每个动作最多一组持有标记，总结与分享卡片的胶囊放在「上次 → 本次」动作行的动作名后。确认触感不再挂在组行上：主确认路径插入的是已完成的新行，行状态没有变化，组行触感永远不响（真机走查 D1/D2）；现由 `ActiveSessionView` 上唯一的 `.sensoryFeedback(trigger: confirmationFeedback)` 发出，组行只负责徽标。
+- **新纪录数值浮起（2026-10-23，README §10 C17、§14.4；Penpot D-a3，B 类）**：确认事件的 `isRecordImprovement` 为真时，组行数值上方叠一个装饰副本（同字体、同颜色），上浮 `space.3`、透明度 1 → 0，`motion.duration.emphasis` + `motion.curve.standard`，只播一次；原数值、胶囊、行高不变，副本不改变布局、不被列表裁掉。不变量：只由确认事件触发，编辑、删除、撤销、恢复和重新载入不播（可自动）；「减弱动态效果」时不浮起（可自动）；副本对无障碍隐藏，行仍读作「…，新纪录，…」（可自动）；所有确认一组用同一个 `haptic.confirm`（可自动）；浮起幅度和快慢是否克制、够区分（人工，真机动效试验页 A/B/C 选定）。
+
+- **部件**：组状态圆圈（22×22，点击区 44）→ 一行内：标题「第 N 组」（`body`；已完成为 `text.primary`，其余为 `text.secondary`）→ 弹性空白 → 数值（`body` `text.primary`，单行，最小缩放 0.8）→ 状态文字（`callout` 400 `text.secondary`），刚确认的一组在 4 秒内换成「撤销」（`FCLinkButton`，P0-D11）→ 可选编辑按钮（铅笔，44）。2026-10-15 起由上下两行改为一行，与已批准的 D8 / P0-a2 稿一致（implementation-map Δ5）。
 - **`FCSetStateCircle` 状态**：待完成：1.5pt `border.control` 描边；草稿：1pt `text.secondary` 虚线（3/2）；已完成：`action.primary` 实心 + 白色 ✓。
-- **不变量**：长按编辑只作用于标题/数值区域，不能覆盖确认按钮和编辑按钮的点击（代码注释记录了真机上发生过的回归，人工）；每个可修改数据的操作都有可见按钮（✓ 确认、铅笔编辑），长按只是快捷方式（`CLAUDE.md`）；整行是一个无障碍元素，读作「标题，数值，状态」，并提供「确认」「编辑」两个动作（可自动）。
+- **不变量**：长按编辑只作用于标题/数值区域，不能覆盖确认按钮和编辑按钮的点击（代码注释记录了真机上发生过的回归，人工）；每个可修改数据的操作都有可见按钮（✓ 确认、铅笔编辑），长按只是快捷方式（`CLAUDE.md`）；整行是一个无障碍元素，读作「标题，数值，状态」，并提供「确认」「编辑」两个动作，撤销窗口内另有「撤销」动作（可自动）。
 - **复用边界**：比较选择模式（32）里的勾选圈复用 `FCSetStateCircle` 的外观（README §8.1）。
 
 ### 4.4 容器与浮层
 
 #### `DS-HERO-CARD` 深色 hero 卡
 
-- **部件**：徽标（56×24 胶囊、`surface.canvas` 底、`sectionLabel` `action.primary` 字）→ 标题行：左侧标题（`headline` `action.on`）+ 下方副文字（`callout` `text.onActionSecondary`）；右侧可选操作文字（`callout` 600 `action.on`，与标题首行基线对齐）。整卡 `action.primary` 底、`radius.lg`、内边距 `space.4`、最小高 100。
-- **不变量**：每屏最多一个（这是页面组合规则，组件本身无法保证；属于 L2 组合检查）；有 action 时整卡就是一个点击目标，操作文字是它的可见标签（人工）。
-- **复用边界**：见 CG-6（徽标宽度固定）。
+- **部件**：徽标（高 24 胶囊、最小宽 56、左右内边距 `space.2`，宽度随文字增长；`surface.canvas` 底、`sectionLabel` `action.primary` 字）→ 标题行：左侧标题（`headline` `action.on`）+ 下方副文字（`callout` `text.onActionSecondary`）；右侧可选操作文字（`callout` 600 `action.on`，与标题首行基线对齐）。整卡 `action.primary` 底、`radius.lg`、内边距 `space.4`、最小高 100。
+- **变体「多行」（2026-10-22 产品负责人批准，方案 A，W-08）**：同一张卡承载多名同时训练的学员。徽标文字「进行中 · N」→ 每名学员一行，行内部件、字号和颜色同单行变体的标题行（标题 = 学员名 · 部位，副文字 = 已训练 N 分钟，右侧操作「继续 ›」），行最小高 44，行间距 `space.3`，行与行之间 1pt `surface.dividerOnAction` 分割线（只在行之间，首行之上、末行之下不画）。行按开始时间升序（最早开始的在最上面），不设上限，卡片高度随行数增长。只有 1 名学员时就是原来的单行变体（徽标「进行中」、操作「继续训练」），外观与 01 完全一致。
+- **不变量**：每屏最多一个（这是页面组合规则，组件本身无法保证；属于 L2 组合检查）；单行变体有 action 时整卡就是一个点击目标，操作文字是它的可见标签（人工）；多行变体每一行是独立的点击目标（整行，最小高 44），各自进入对应学员，整卡不再是一个按钮（可自动：源码扫描每行一个 Button + accessibility identifier）；多行变体的行数等于传入的条目数，0 条时调用方不显示本组件（可自动）。
+- **复用边界**：多行变体只用于今日页「同时训练的学员」（W-08）；学员详情页只会有这名学员自己的一节，继续使用单行变体。学员列表的训练中提示仍是 `DS-HINT-BAR`，不用 hero。CG-6 的徽标宽度规则已随本次补上。
 
 #### `DS-HINT-BAR` 提示条
 
@@ -308,7 +321,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 
 #### `DS-EQUIPMENT-ICON` 器材图标
 
-- 18 个模板渲染图标，`action.primary` 着色，默认 24×24；没有对应图标的动作留空，不使用默认图标补位。L0 全自动（`IconConsistencyTests`）。
+- 21 个模板渲染图标，`action.primary` 着色，默认 24×24；没有对应图标的动作留空，不使用默认图标补位。壶铃铃身唯一允许实心填充 `#2A2822`（CX-D13，2026-10-19），其余仅 `none`；新增 plate-loaded、suspension-trainer、pull-up-bar。L0 全自动（`IconConsistencyTests`）。
 
 #### `DS-BODY-DIAGRAM` 训练部位示意图
 
@@ -322,7 +335,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 | ID | anatomy | 画板 | 当前实现 |
 |---|---|---|---|
 | `DS-PAGE-PRIMARY` 一级页 | 顶部 `FCSegmentedSwitch`（今日 / 学员）→ 标题行：`display` 大标题（`action.primary`）+ 右侧 `DS-TITLE-ACTION` → 内容；隐藏系统导航栏。**查看模式变体**（M2，2026-10-09 G7 批准）：没有顶部分段切换，标题行只有设置齿轮，其余相同 | 01/21/40/41；M2-11 | Today、StudentList 各自拼装 |
-| `DS-PAGE-SECONDARY` 二级页 | 隐藏系统导航栏（`.fcSecondaryPage()`，同时保持边缘右滑返回可用）→ 紧贴状态栏下方的页头：小号 `‹`（22/400 `text.secondary`）与页面内 `titleLarge` 标题在同一行、紧靠标题左侧（标题起点 x=32），整体由 `FCPageHeader` 绘制（带 header 属性）→ 可选副标题（`callout` 400 `text.secondary`）→ 内容 → 可选底部主按钮 | 23/26/28/36/37/38 | 约 20 个 feature 文件各自拼装；页头部分已有共享组件 `FCPageHeader`（§4.7），StudentDetail 已迁移 |
+| `DS-PAGE-SECONDARY` 二级页 | 隐藏系统导航栏（`.fcSecondaryPage()`，同时保持边缘右滑返回可用）→ 由 `fcSecondaryPage()` 提供的顶部零高度 `safeAreaInset` 遮盖（`surface.page`，背景延伸至顶部安全区；feature 不再复制遮盖）→ 紧贴状态栏下方的页头：小号 `‹`（22/400 `text.secondary`）与页面内 `titleLarge` 标题在同一行、紧靠标题左侧（标题起点 x=32），整体由 `FCPageHeader` 绘制（带 header 属性）→ 可选副标题（`callout` 400 `text.secondary`）→ 内容 → 可选底部主按钮 | 23/26/28/36/37/38 | 约 20 个 feature 文件各自拼装；页头部分已有共享组件 `FCPageHeader`（§4.7），StudentDetail 已迁移 |
 | `DS-HUB-ROW` 入口行 | 24pt 图标（`action.primary`）→ 标题（`headline`）/ 副标题（`caption` `text.secondary`）→ `›`；最小高 64，间距 `space.4` | 19/42/43 | 已提升为共享组件 `FCHubRow`（M2 T002/T010，2026-10-10）；ResourceHub、Settings 已迁移，规格见 §4.7 |
 | `DS-INLINE-RESULT` 就地结果 | 22×22 `FCStatusBadge` → 标题（`callout` 600；失败为 `status.destructive`，成功为 `text.primary`）→ 说明（`caption` `text.secondary`）→ 失败时显示居中「重试」`FCLinkButton` | 38/39 | 已提升为共享组件 `FCInlineResult`（M2 T003/T011，2026-10-10）；BackupRestoreFlow 已迁移，规格见 §4.7 |
 | `DS-EMPTY-STATE` 空态 | 吉祥物 220×220 居中 → 标题（`headline` `action.primary`）→ 说明（`caption` `text.secondary`）→ 底部主按钮 | 16 | StudentList |
@@ -339,15 +352,15 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 - **状态**：只有静态内容；尾部操作可禁用（`text.disabled`）。
 - **不变量**：标题带 header 无障碍属性（可自动）；尾部操作点击区 ≥ 44（可自动：`TouchTargetComponentTests` 扩展）；标题与副标题随动态字体换行，不截断（人工，组件引入时看一次）；尾部操作存在时标题宽度让出操作文字，标题换行而不是与操作重叠（人工）。
 - **页头位置**：页头行盒顶 = 安全区顶 + `space.2`（8pt，`FCPageHeader` 自带上边距），不伸进状态栏。画稿标题墨迹顶 y=58（行盒顶约 y=52，落在状态栏安全区内），这是画稿绘制时状态栏占位不准，不是设计意图；以实现为准（产品负责人 2026-10-10 授权由实施方定）。理由：①iOS 惯例，状态栏下方留白，不与状态栏争视觉；②44×44 返回点击区以 22pt 字形为中心向上延伸约 11pt，留白后不与状态栏触控区（点按回到顶部）重叠；③全部二级页统一一个值，灵动岛 / 非灵动岛机型都相对安全区计算。
-- **复用边界**：所有二级页页头都用它；一级页（今日、学员、查看模式首页）不用，见 `DS-PAGE-PRIMARY`。35 训练记录详情把「训练记录」放在导航栏 inline 标题、页面内是日期与训练标题，这是 35 自己的组合，不属于本组件。
-- **迁移范围**：M2 新页面全部使用；2026-10-10 产品负责人走查发现系统导航栏的返回按钮（iOS 26 液态玻璃大圆钮）单独占一行、标题被挤到下一行，与画稿不符，所有 `titleLarge` 二级页（动作库、设置、资料库、日历、课包、课时调整、预约编辑、学员编辑 / 详情 / 已归档、趋势、训练历史、模板、备份、身体数据、分享报告 2 页、M2 导出流程）统一迁移到 `FCPageHeader` + `.fcSecondaryPage()`。训练中（`ActiveSessionView`，11/30）同样改为内联返回，标题保持 22/700（`titleStyle: .titleEmphasis`，产品负责人 2026-10-10：返回方式全 App 一致，以后发现不一致直接改）。仍使用系统导航栏的只有标题放在导航栏的页面（35 训练记录详情等，返回与居中标题同一行）。
+- **复用边界**：所有二级页页头都用它；一级页（今日、学员、查看模式首页）不用，见 `DS-PAGE-PRIMARY`。35 训练记录详情与 M2-13 原先把「训练记录」放在导航栏 inline 标题，2026-10-23 起同样使用本组件（README §10 C18），页面内日期与训练标题在页头之下。
+- **迁移范围**：M2 新页面全部使用；2026-10-10 产品负责人走查发现系统导航栏的返回按钮（iOS 26 液态玻璃大圆钮）单独占一行、标题被挤到下一行，与画稿不符，所有 `titleLarge` 二级页（动作库、设置、资料库、日历、课包、课时调整、预约编辑、学员编辑 / 详情 / 已归档、趋势、训练历史、模板、备份、身体数据、分享报告 2 页、M2 导出流程）统一迁移到 `FCPageHeader` + `.fcSecondaryPage()`。训练中（`ActiveSessionView`，11/30）同样改为内联返回，标题保持 22/700（`titleStyle: .titleEmphasis`，产品负责人 2026-10-10：返回方式全 App 一致，以后发现不一致直接改）。仍使用系统导航栏的只有标题放在导航栏的页面（返回与居中标题同一行）。35 与 M2-13 原属此类，2026-10-23 起也迁移到本组件（README §10 C18）；2026-10-23 导航排查后第一批迁移：编辑训练重点、编辑模板、自定义动作（返回标识 `customExercise.back`）、记录指标（自定义指标的 `DS-MORE-MENU`「…」与页头并排在标题首行右侧，`bodyMeasurementEntry.more`；标题长时换行让出宽度）。第二批（README §10 C20）：训练总结改为页内页头、无返回；全屏确认流程（结束训练、复核时长、删除动作、归档 / 永久删除学员）不用本组件，统一为页内标题 + 页内「取消」，不挂系统导航栏；无入口的应用模板页删除。此后全 App 不再使用系统导航栏标题。
 
 #### `DS-HUB-ROW` 入口行（由组合模式提升为共享组件，CG-8）
 
 状态：**已实现**（`FCHubRow`；`mode` 取 `.action` / `.informational` / `.unavailable(reason:)`，不可用态在类型上没有 action 与 `›`）。外观沿用 19/42/43（C 类）；新增尾部说明与不可用态（B 类，M2-11 首次使用）。
 
 - **部件**：leading 24pt 线性图标（`action.primary`，装饰性）→ 标题（`headline`）/ 可选副标题（`caption` `text.secondary`，可换为 `FCStatusLabel`，如 43 通知被拒）→ 弹性空白 → 可选尾部说明（`caption` `text.secondary`，例如「24 次」）或尾部操作文字（`callout` 600 `action.primary`，如 43「前往设置」）→ 可选 `›`。最小高 64，图标与文字间距 `space.4`；行间由调用方放 `FCListRowDivider`。
-- **变体 / 状态**：可点（带 `›`）；不可点（无 `›`，如 42「关于」）；**不可用**（新）：图标与标题改为 `text.disabled`，尾部说明写原因（如「档案未包含」），无 `›`，整行不可点，读作「标题，原因」。
+- **变体 / 状态**：可点（带 `›`）；不可点（无 `›`，如 42「关于」）；打开外部链接的行同样用可点态（如 42「源代码」，README §10 C21）；**不可用**（新）：图标与标题改为 `text.disabled`，尾部说明写原因（如「档案未包含」），无 `›`，整行不可点，读作「标题，原因」。
 - **不变量**：带 action 时整行可点（可自动）；不可用态没有点击动作（可自动）；整行合并为一个无障碍元素，读出标题、副标题与尾部说明（可自动）；点击区 ≥ 44（自动）。
 - **复用边界**：用于入口列表页（资料库 19、设置 42、首次启动二选一 M2-07、查看模式首页 M2-11）。操作区里的单行操作用 `DS-ACTION-ROW`，普通内容列表用 `DS-LIST-ROW`。
 - **迁移范围（Phase 0）**：ResourceHub `hubRow`、Settings `row` 改用本组件，外观不得改变。
@@ -395,9 +408,32 @@ C 类，只补规则，默认字号下外观不变：
 - 两个按钮文字在动态字体放大后任一放不下一行时，按钮行改为上下堆叠：确认在上、取消在下，各自占满卡片内宽，视觉高度随文字增长，最小点击区仍为 44。
 - **不变量**：上述规则在组件内实现，调用方不传尺寸（可自动：源码扫描调用方没有 `.frame(width:)`）；堆叠时的视觉在组件修改时看一次（人工）。
 
+### 4.8 阶段 B 交互收敛（2026-10-16 已批准）
+
+来源：Penpot「M1-B G5 Design」/ Foundations 页 B-a、B-b、B-c，快照 `B boards approved 2026-10-16`；参考图 `design/experience-t2/boards/*@1x.png`；决定 `design/experience-t2/decisions.md` B-D1–B-D8。分类 B（改已批准的交互），画稿已审。
+
+#### 左滑删除（页面组合规则，无共享代码）
+
+- **规则**：列表里的单项（训练组、训练中的动作行、单条测量、模板动作行）用系统 `.swipeActions(edge: .trailing)` 删除，按钮「删除」`.tint(FCSemanticColors.statusDestructive)`。已完成的组 `allowsFullSwipe: false`，其余单项可以一滑到底。
+- **不变量**：每个左滑删除都有 accessibility identifier（可自动：静态扫描）；左滑不是唯一入口时，其他入口保持不变（如动作行的「移入分区」）。
+- **复用边界**：整个对象（模板、自定义指标、某指标的全部测量、本机档案）不用左滑，用页面底部 `DS-ACTION-ROW` destructive + `DS-CONFIRM-DIALOG`（B-D2 ②）。
+
+#### `DS-UNDO-ROW` 删除后撤销行
+
+- **部件**：说明文字（`body` `text.secondary`，单行，「<对象>已删除」）→ 弹性空白 → 「撤销」（`FCLinkButton`）。行高和分割线同被删的行，放在被删项原来的位置。
+- **状态**：只有一个可见状态；窗口结束后整行移除。
+- **不变量**：窗口时长只来自一个常量，与 P0-D11 的 `ActiveSessionViewModel.undoWindow`（4 秒）是同一个值（可自动）；撤销把对象放回原位置并恢复原状态，已完成的组撤销后仍是已完成，不再确认（可自动：view model 测试）；整行读作说明文字，提供「撤销」动作（可自动）；没有确认弹窗（B-D4、B-D8）。
+- **复用边界**：只用于左滑删除的单项。刚确认的组在 4 秒内显示的「撤销」属于 `DS-SET-ROW` 的状态文字，不用本组件。
+
+#### `DS-MORE-MENU` 「…」菜单
+
+- **部件**：`ellipsis` 线性图标（尺寸按 README §7.2 标题行图标），`text.secondary`，点击区 ≥ 44×44，包一个系统 `Menu`。破坏性菜单项用 `role: .destructive`，点了只弹 `DS-CONFIRM-DIALOG`，不直接执行。
+- **不变量**：图标有无障碍标签「更多操作」和 accessibility identifier（可自动）；菜单项本身不执行破坏性操作（可自动：扫描调用方）。
+- **复用边界**：分区标题行（训练中、模板编辑）只有「删除分区」一项（B-D3）；指标记录页右上角只留「停用指标 / 恢复指标」（Δ4）。普通的下一级导航不用菜单。
+
 ## 5. 缺口与偏差登记
 
-编号 CG-1–CG-9（Component Gap）是本文自己的登记编号（2026-10-05 盘点时建立），不来自 `roadmap.md` 或任何 spec / tasks；加前缀是为了不与路线图的评审门 G1–G7 混淆。处理方式按 §1.2 分类；需要改代码的条目安排在 M2 Phase 0（已写入当前交接文档）。
+编号 CG-1–CG-10（Component Gap）是本文自己的登记编号（2026-10-05 盘点时建立），不来自 `roadmap.md` 或任何 spec / tasks；加前缀是为了不与路线图的评审门 G1–G7 混淆。处理方式按 §1.2 分类；需要改代码的条目安排在 M2 Phase 0（已写入当前交接文档）。
 
 | # | 缺口 | 证据 | 状态 / 处理 |
 |---|---|---|---|
@@ -406,10 +442,11 @@ C 类，只补规则，默认字号下外观不变：
 | CG-3 | `FCSaveStatusView` 未显式声明字体（继承 App 根部 `.fcFont(.body)`，渲染为 Noto Sans SC 17/400）；状态文字是写死的中文 `rawValue`，不是本地化键 | `FineCoachApp.swift:20`、`FCSaveStatusView.swift` | 规格**已补**（§4.5、README §8，§10 C12）。**已解决（M2 T007，2026-10-10）**：显式写 `.fcFont(.body)` 并改用本地化键（D 类，外观不变） |
 | CG-4 | `FCSetRow` 的状态文字写死在 `rawValue` 中 | `FCSetRow.swift` | 本地化问题，与视觉无关；下次修改该组件时处理 |
 | CG-5 | CoursePackageEditor、ManualCreditAdjustment 各有私有 `editorRow`，与 `FCLabelValueRow` 职责重叠 | 两个文件中的 `editorRow` | 只在这两个页面被修改时迁移；M2 不涉及课包，不安排 |
-| CG-6 | `FCHeroCard` 徽标固定 56 宽、`FCConfirmationDialog` 固定 300 宽，字号放大时的规则没写 | 两个组件源码 | 下次涉及时先补「内容变长」规则（C 类）；M2 若使用确认弹窗（删除档案、替换档案），在 Phase 0 补规则。确认弹窗规则已起草（§4.7，2026-10-08）；M2 不使用 hero 卡，徽标规则不处理 |
+| CG-6 | `FCHeroCard` 徽标固定 56 宽、`FCConfirmationDialog` 固定 300 宽，字号放大时的规则没写 | 两个组件源码 | 下次涉及时先补「内容变长」规则（C 类）；M2 若使用确认弹窗（删除档案、替换档案），在 Phase 0 补规则。确认弹窗规则已起草（§4.7，2026-10-08）。**徽标已解决（2026-10-22，W-08）**：最小宽 56、随文字增长（`DS-HERO-CARD` 部件） |
 | CG-7 | `FCSegmentedSwitch` 在页内使用超出 README 原定义 | 37 画稿 | **已解决（2026-10-05）**：裁决为已批准的复用，限 2–3 个互斥短选项（README §10 C11） |
 | CG-8 | 二级页头 `DS-PAGE-SECONDARY` 约 20 处手工拼装；入口行 `DS-HUB-ROW` 有两份（ResourceHub、Settings） | 约 20 个 feature 文件直接写 `.fcFont(.titleLarge)` 页头；`hubRow` 与 Settings `row` | **M2 Phase 0**：抽取共享 `FCPageHeader`（及入口行，如 M2 设置页用到），补组件测试；只迁移 M2 改动的页面。`DS-PAGE-HEADER`、`DS-HUB-ROW` 规格已起草（§4.7，2026-10-08，随 G7 review 审定） |
 | CG-9 | 组件文件中没有任何 `#Preview` | `ios/FineCoachApp` 中搜索不到 `#Preview` | 规则而非一次性任务：新增或扩展组件时，在组件文件里加覆盖代表状态的 `#Preview`（只在 DEBUG 下编译，不新增 target），供 L3 查看组件时使用 |
+| CG-10 | C′ 2b 的完整动作行和两处最近练过需要同一 anatomy | ExerciseLibrary、QuickCreateExerciseFlow | 本轮收敛为 `DS-LIST-ROW` 既有动作行变体 `FCExerciseLibraryRowLabel`，迁移仅这两处，保留既有样式；普通行和模板编辑器不变 |
 
 **M2 影响（CG-1 / CG-8 为什么需要处理）**：M1 已验收不等于 M2 不碰这些代码。M2 spec（`specs/003-m2-personal-training-archive/spec.md`）明确要求：
 - 学员详情新增「导出个人训练档案」入口（M2-FR-006）——要改 `StudentDetailView`，它的各区块和页头都是手工拼装；

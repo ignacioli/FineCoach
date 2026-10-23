@@ -75,7 +75,8 @@
             let source = try await ArchiveExportSourceReader(
                 writer: h.store.writer, calendarProvider: TestCalendarProvider(timeZone: X.shanghai)
             ).read(studentID: X.studentID)
-            let identity = try await ArchiveIdentityService(writer: h.store.writer).ensureIdentity(forStudent: X.studentID)
+            let identity = try await ArchiveIdentityService(writer: h.store.writer).ensureIdentity(
+                forStudent: X.studentID)
             let expected = try ArchiveExportPolicy.makeSnapshot(
                 source: source, selection: ArchiveModuleSelection(availability: source.availability),
                 identity: identity, now: X.now)
@@ -151,7 +152,9 @@
             let flow = try await h.useCases.beginFlow(studentID: X.studentID)
             try await generate(flow)
             let marker = X.summaries + [X.studentName, X.customExerciseName, X.builtInName, "FCPA-plain", "sourceID"]
-            let urls = (FileManager.default.enumerator(at: h.tempRoot.url, includingPropertiesForKeys: nil)?.allObjects as? [URL]) ?? []
+            let urls =
+                (FileManager.default.enumerator(at: h.tempRoot.url, includingPropertiesForKeys: nil)?.allObjects
+                    as? [URL]) ?? []
             let files = urls.filter { $0.hasDirectoryPath == false }
             XCTAssertEqual(files.count, 1)
             for url in files {

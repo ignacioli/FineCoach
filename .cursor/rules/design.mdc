@@ -1,0 +1,10 @@
+---
+description: 改 design/ 时的补充约束；通用的设计权威和同步规则见 AGENTS.md。
+globs: design/**
+alwaysApply: false
+---
+
+# 设计
+
+- 代码和设计冲突时修代码，不要改设计来迁就已经偏掉的实现。数值冲突以 `design/design-system/README.md` §2–§9 为准。（`components.md` §1.1）
+- 训练页以 `design/experience-p0/implementation-map.md` 里已经写下的产品负责人决定为准，包含 P0-D7 的「上次」匹配规则。要改这些决定，先问产品负责人。（implementation-map §产品负责人决定）

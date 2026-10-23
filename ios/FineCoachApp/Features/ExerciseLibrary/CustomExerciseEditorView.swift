@@ -123,6 +123,11 @@ struct CustomExerciseEditorView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: FCPrimitives.space4) {
+                FCPageHeader(
+                    title: String(localized: "exercise.editor.title"),
+                    back: .init(accessibilityIdentifier: FCAccessibilityID.customExerciseBack)
+                )
+
                 Text(String(localized: "exercise.editor.name"))
                     .fcFont(.headline)
                 FCTextField(String(localized: "exercise.editor.name"), text: $viewModel.name)
@@ -192,11 +197,11 @@ struct CustomExerciseEditorView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(FCPrimitives.space4)
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.bottom, FCPrimitives.space4)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(String(localized: "exercise.editor.title"))
-        .navigationBarTitleDisplayMode(.inline)
+        .fcSecondaryPage()
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.customExerciseRoot)
     }

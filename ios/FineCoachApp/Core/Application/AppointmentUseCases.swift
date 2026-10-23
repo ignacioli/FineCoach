@@ -207,7 +207,8 @@ public struct AppointmentUseCases: Sendable {
             let active = try await appointmentRepository.activeAppointments(excluding: nil)
             var allConflicts: [AppointmentConflict] = []
             for appointment in appointments {
-                allConflicts.append(contentsOf: try await conflicts(for: appointment, against: active, calendar: calendar))
+                allConflicts.append(
+                    contentsOf: try await conflicts(for: appointment, against: active, calendar: calendar))
             }
             guard allConflicts.isEmpty else {
                 throw DomainError.conflict
@@ -423,7 +424,8 @@ public struct AppointmentUseCases: Sendable {
         return saved
     }
 
-    public func updateTrainingFocus(appointmentID: StableUUID, trainingFocus: Set<BodyPart>) async throws -> Appointment {
+    public func updateTrainingFocus(appointmentID: StableUUID, trainingFocus: Set<BodyPart>) async throws -> Appointment
+    {
         let current = try await appointmentRepository.appointment(id: appointmentID)
         let updated = try current.updatingTrainingFocus(trainingFocus, now: clock.nowUTC())
         return try await appointmentRepository.update(updated)
@@ -437,13 +439,11 @@ public struct AppointmentUseCases: Sendable {
         return saved
     }
 
-    /// "开始训练" (M1B-FR-007): reuses the M1-A single-active-session pointer
-    /// via `ActiveSessionUseCases.startOrOpen` so "at most one in-progress
-    /// Session globally, re-starting reopens the existing one" holds without
-    /// duplicating that invariant here. If a DIFFERENT student's session is
-    /// already active, this appointment is left `scheduled` (not silently
-    /// misattributed to a foreign session) and the existing session is
-    /// returned so the coach lands back on their in-progress training.
+    /// "开始训练" (M1B-FR-007, revised 2026-10-22): `ActiveSessionUseCases`
+    /// owns the per-Student invariant -- at most one in-progress Session for
+    /// THIS appointment's Student, and re-starting returns that Student's
+    /// existing one. Another Student's in-progress Session neither blocks this
+    /// start nor gets linked to this appointment.
     public func startTraining(appointmentID: StableUUID) async throws -> Session {
         let appointment = try await appointmentRepository.appointment(id: appointmentID)
         guard appointment.status == .scheduled else {

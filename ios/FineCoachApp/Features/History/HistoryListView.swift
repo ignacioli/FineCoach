@@ -82,7 +82,8 @@ final class HistoryListViewModel: ObservableObject {
             for exercise in session.exercises {
                 guard let sourceID = exercise.sourceID else { continue }
                 let key = "\(sourceID.rawValue)|\(exercise.recordModeSnapshot.rawValue)"
-                seen[key] = ExerciseOption(id: sourceID, name: exercise.displayNameSnapshot.value, mode: exercise.recordModeSnapshot)
+                seen[key] = ExerciseOption(
+                    id: sourceID, name: exercise.displayNameSnapshot.value, mode: exercise.recordModeSnapshot)
             }
         }
         return seen.values.sorted { $0.name < $1.name }
@@ -114,7 +115,9 @@ final class HistoryListViewModel: ObservableObject {
             exerciseID: exerciseFilter?.id
         )
         do {
-            switch try await useCases.filteredHistory(studentID: studentID, criteria: criteria, calendarProvider: calendarProvider) {
+            switch try await useCases.filteredHistory(
+                studentID: studentID, criteria: criteria, calendarProvider: calendarProvider)
+            {
             case .matches(let sessions):
                 results = sessions.sorted { $0.completedAtUTC > $1.completedAtUTC }
             case .noMatches:
@@ -145,7 +148,8 @@ final class HistoryListViewModel: ObservableObject {
             comparisonSelection = []
             return
         }
-        let partner = results.dropFirst().first { $0.trainingFocus == newest.trainingFocus } ?? results.dropFirst().first
+        let partner =
+            results.dropFirst().first { $0.trainingFocus == newest.trainingFocus } ?? results.dropFirst().first
         comparisonSelection = [newest.id] + (partner.map { [$0.id] } ?? [])
     }
 
@@ -191,7 +195,8 @@ final class HistoryListViewModel: ObservableObject {
                 let mode = exercise.recordModeSnapshot
                 let key = "\(sourceID.rawValue)|\(mode.rawValue)"
                 guard seen.insert(key).inserted else { continue }
-                let direction: Comparison.LoadDirection = assistedExerciseIDs.contains(sourceID)
+                let direction: Comparison.LoadDirection =
+                    assistedExerciseIDs.contains(sourceID)
                     ? .decreaseIsImprovement : .increaseIsImprovement
                 let records = Comparison.personalRecords(
                     exerciseID: sourceID,
@@ -199,7 +204,8 @@ final class HistoryListViewModel: ObservableObject {
                     across: allSessions,
                     loadDirection: direction
                 )
-                let completedAt = Dictionary(allSessions.map { ($0.id, $0.completedAtUTC) }, uniquingKeysWith: { first, _ in first })
+                let completedAt = Dictionary(
+                    allSessions.map { ($0.id, $0.completedAtUTC) }, uniquingKeysWith: { first, _ in first })
                 if let row = HistoryPresentation.bestRow(
                     key: key,
                     name: exercise.displayNameSnapshot.value,
@@ -229,7 +235,8 @@ enum HistoryPresentation {
         if let focus = BodyPart.joinedDisplayNames(for: session.trainingFocus, separator: "、") {
             parts.append(focus)
         }
-        parts.append(String(format: String(localized: "student.detail.setCountFormat"), session.statistics.completedSetCount))
+        parts.append(
+            String(format: String(localized: "student.detail.setCountFormat"), session.statistics.completedSetCount))
         parts.append(duration(seconds: Double(session.statistics.displayedDurationSeconds.canonicalString) ?? 0))
         return parts.joined(separator: " · ")
     }
@@ -257,7 +264,9 @@ enum HistoryPresentation {
     /// Exercises present in both sessions (same name, as `Comparison`'s
     /// 动作差异 matches), in the first session's order, with each side's
     /// merged set lines.
-    static func sharedExercises(_ a: CompletedSession, _ b: CompletedSession) -> [(name: String, a: [String], b: [String])] {
+    static func sharedExercises(_ a: CompletedSession, _ b: CompletedSession) -> [(
+        name: String, a: [String], b: [String]
+    )] {
         var seen = Set<String>()
         return a.exercises.compactMap { exercise in
             let name = exercise.displayNameSnapshot.value
@@ -425,11 +434,15 @@ struct HistoryListView: View {
                 FCFilterChip(title: String(localized: "history.filter.date"), isSelected: viewModel.dateRange != nil) {
                     filterSheet = .date
                 }
-                FCFilterChip(title: String(localized: "history.filter.focus"), isSelected: !viewModel.focusFilter.isEmpty) {
+                FCFilterChip(
+                    title: String(localized: "history.filter.focus"), isSelected: !viewModel.focusFilter.isEmpty
+                ) {
                     filterSheet = .focus
                 }
                 .accessibilityIdentifier(FCAccessibilityID.trendsFilterFocus)
-                FCFilterChip(title: String(localized: "history.filter.exercise"), isSelected: viewModel.exerciseFilter != nil) {
+                FCFilterChip(
+                    title: String(localized: "history.filter.exercise"), isSelected: viewModel.exerciseFilter != nil
+                ) {
                     filterSheet = .exercise
                 }
             }
@@ -472,7 +485,8 @@ struct HistoryListView: View {
         case .date:
             FCBottomSheet(title: String(localized: "history.filter.date")) {
                 FCFlowLayout(horizontalSpacing: FCPrimitives.space2, verticalSpacing: FCPrimitives.space2 - (44 - 30)) {
-                    FCFilterChip(title: String(localized: "history.filter.all"), isSelected: viewModel.dateRange == nil) {
+                    FCFilterChip(title: String(localized: "history.filter.all"), isSelected: viewModel.dateRange == nil)
+                    {
                         viewModel.dateRange = nil
                         applyAndClose()
                     }
@@ -485,7 +499,10 @@ struct HistoryListView: View {
                 }
             }
         case .focus:
-            FCBottomSheet(title: String(localized: "history.filter.focus"), subtitle: String(localized: "history.filter.focusHint")) {
+            FCBottomSheet(
+                title: String(localized: "history.filter.focus"),
+                subtitle: String(localized: "history.filter.focusHint")
+            ) {
                 VStack(spacing: FCPrimitives.space3) {
                     FCBodyPartPicker(selection: $viewModel.focusFilter)
                     FCButton(title: String(localized: "history.filter.done")) {
@@ -497,13 +514,20 @@ struct HistoryListView: View {
             FCBottomSheet(title: String(localized: "history.filter.exercise")) {
                 ScrollView {
                     VStack(spacing: 0) {
-                        FCActionRow(title: String(localized: "history.filter.allExercises"), note: viewModel.exerciseFilter == nil ? String(localized: "history.filter.selected") : nil) {
+                        FCActionRow(
+                            title: String(localized: "history.filter.allExercises"),
+                            note: viewModel.exerciseFilter == nil ? String(localized: "history.filter.selected") : nil
+                        ) {
                             viewModel.exerciseFilter = nil
                             applyAndClose()
                         }
                         FCListRowDivider()
                         ForEach(viewModel.exerciseOptions) { option in
-                            FCActionRow(title: option.name, note: viewModel.exerciseFilter == option ? String(localized: "history.filter.selected") : nil) {
+                            FCActionRow(
+                                title: option.name,
+                                note: viewModel.exerciseFilter == option
+                                    ? String(localized: "history.filter.selected") : nil
+                            ) {
                                 viewModel.exerciseFilter = option
                                 applyAndClose()
                             }
@@ -544,7 +568,11 @@ struct HistoryListView: View {
                     FCSectionLabel(String(format: String(localized: "history.countFormat"), viewModel.results.count))
                     Spacer(minLength: FCPrimitives.space2)
                     if viewModel.results.count >= 2 {
-                        FCLinkButton(title: String(localized: viewModel.isSelectingForComparison ? "history.compare.done" : "history.compare.select")) {
+                        FCLinkButton(
+                            title: String(
+                                localized: viewModel.isSelectingForComparison
+                                    ? "history.compare.done" : "history.compare.select")
+                        ) {
                             withAnimation(.easeOut(duration: 0.2)) {
                                 viewModel.isSelectingForComparison.toggle()
                             }
@@ -566,8 +594,10 @@ struct HistoryListView: View {
                         } label: {
                             HStack(spacing: FCPrimitives.space3) {
                                 if viewModel.isSelectingForComparison {
-                                    FCSetStateCircle(viewModel.isSelectedForComparison(session.id) ? .completed : .pending)
-                                        .transition(.move(edge: .leading).combined(with: .opacity))
+                                    FCSetStateCircle(
+                                        viewModel.isSelectedForComparison(session.id) ? .completed : .pending
+                                    )
+                                    .transition(.move(edge: .leading).combined(with: .opacity))
                                 }
                                 VStack(alignment: .leading, spacing: FCPrimitives.space1) {
                                     Text(HistoryPresentation.day(session.completedAtUTC))
@@ -593,7 +623,8 @@ struct HistoryListView: View {
                         }
                         .buttonStyle(.plain)
                         .accessibilityAddTraits(
-                            viewModel.isSelectingForComparison && viewModel.isSelectedForComparison(session.id) ? .isSelected : []
+                            viewModel.isSelectingForComparison && viewModel.isSelectedForComparison(session.id)
+                                ? .isSelected : []
                         )
                         .accessibilityIdentifier(FCAccessibilityID.historyRow(index))
                         FCListRowDivider()
@@ -609,7 +640,9 @@ struct HistoryListView: View {
         VStack(alignment: .leading, spacing: FCPrimitives.space3) {
             FCSectionLabel(
                 viewModel.isSelectingForComparison
-                    ? String(format: String(localized: "history.compare.selectedFormat"), viewModel.comparisonSelection.count)
+                    ? String(
+                        format: String(localized: "history.compare.selectedFormat"), viewModel.comparisonSelection.count
+                    )
                     : String(localized: "trends.comparisonTitle")
             )
             let pair = viewModel.comparedSessions
@@ -742,9 +775,12 @@ struct HistoryListView: View {
             if let volume {
                 Text(String(format: String(localized: "history.compare.volumeFormat"), volume.canonicalString))
             }
-            Text(onlyHere.isEmpty
-                ? String(localized: "history.compare.noDifference")
-                : String(format: String(localized: "history.compare.onlyHereFormat"), onlyHere.map(\.value).joined(separator: "、")))
+            Text(
+                onlyHere.isEmpty
+                    ? String(localized: "history.compare.noDifference")
+                    : String(
+                        format: String(localized: "history.compare.onlyHereFormat"),
+                        onlyHere.map(\.value).joined(separator: "、")))
         }
         .fcFont(.callout, weight: .regular)
         .foregroundStyle(FCSemanticColors.textSecondary)
@@ -761,7 +797,8 @@ struct HistoryListView: View {
                 FCSectionLabel(String(localized: "history.pb.title"))
                 VStack(spacing: 0) {
                     ForEach(rows) { row in
-                        PersonalBestRowView(name: row.name, kind: row.kind, value: row.value, day: row.day, detail: row.detail)
+                        PersonalBestRowView(
+                            name: row.name, kind: row.kind, value: row.value, day: row.day, detail: row.detail)
                         FCListRowDivider()
                     }
                 }

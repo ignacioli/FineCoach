@@ -122,6 +122,143 @@
             try await environment.controller.shutdownForTesting()
         }
 
+        /// B2 Δ9: deleting a completed set is immediately durable, while the
+        /// original slot remains available for a four-second undo. Restoring
+        /// must preserve the completed state and the other set's position.
+        func testDeletingCompletedSetOffersUndoAtOriginalSlot() async throws {
+            let environment = try makeEnvironment()
+            let viewModel = try await makeLoadedViewModel(environment: environment)
+
+            viewModel.weight = "40"
+            viewModel.reps = "10"
+            await viewModel.confirmActiveDraftSet()
+            viewModel.dismissRest()
+            let firstSet = try XCTUnwrap(
+                viewModel.session?.exercises.first(where: { $0.id == exerciseID })?.sets.first
+            )
+
+            viewModel.weight = "60"
+            viewModel.reps = "8"
+            await viewModel.confirmActiveDraftSet()
+            viewModel.dismissRest()
+            let secondSet = try XCTUnwrap(
+                viewModel.session?.exercises.first(where: { $0.id == exerciseID })?.sets.last
+            )
+
+            await viewModel.removeSet(setID: firstSet.id)
+
+            let afterDelete = try XCTUnwrap(
+                viewModel.session?.exercises.first(where: { $0.id == exerciseID })
+            )
+            XCTAssertEqual(afterDelete.sets.map(\.id), [secondSet.id])
+            XCTAssertEqual(viewModel.deletedSetUndo?.originalIndex, 0)
+
+            viewModel.beginEditingSet(secondSet)
+            viewModel.weight = "65"
+            await viewModel.saveEditingSet()
+
+            await viewModel.undoDeletedSet()
+
+            let afterUndo = try XCTUnwrap(
+                viewModel.session?.exercises.first(where: { $0.id == exerciseID })
+            )
+            XCTAssertEqual(afterUndo.sets.map(\.id), [firstSet.id, secondSet.id])
+            XCTAssertEqual(afterUndo.sets.first?.state, .completed)
+            XCTAssertEqual(afterUndo.sets.first?.completedAtUTC, firstSet.completedAtUTC)
+            XCTAssertEqual(afterUndo.sets.last?.weightValue?.canonicalString, "65")
+            XCTAssertNil(viewModel.deletedSetUndo)
+
+            await viewModel.removeSet(setID: firstSet.id)
+            viewModel.expireDeletedSetUndo()
+            await viewModel.undoDeletedSet()
+
+            let afterExpiry = try XCTUnwrap(
+                viewModel.session?.exercises.first(where: { $0.id == exerciseID })
+            )
+            XCTAssertEqual(afterExpiry.sets.map(\.id), [secondSet.id])
+            XCTAssertNil(viewModel.deletedSetUndo)
+
+            let persisted = try await environment.sessionUseCases.loadActive()
+            XCTAssertEqual(persisted?.exercises.first?.sets.map(\.id), [secondSet.id])
+            XCTAssertEqual(persisted?.exercises.first?.sets.first?.weightValue?.canonicalString, "65")
+
+            try await environment.controller.shutdownForTesting()
+        }
+
+        /// P0-D14: 「保存」 on a completed set is its confirmation; the set
+        /// stays completed and no rest starts.
+        func testSavingAnEditedCompletedSetKeepsItCompletedWithoutRest() async throws {
+            let environment = try makeEnvironment()
+            let viewModel = try await makeLoadedViewModel(environment: environment)
+
+            viewModel.weight = "40"
+            viewModel.reps = "10"
+            await viewModel.confirmActiveDraftSet()
+            let recorded = try XCTUnwrap(viewModel.session?.exercises.first(where: { $0.id == exerciseID })?.sets.last)
+            viewModel.dismissRest()
+
+            viewModel.beginEditingSet(recorded)
+            viewModel.weight = "42.5"
+            await viewModel.saveEditingSet()
+
+            let saved = try XCTUnwrap(
+                viewModel.session?.exercises.first(where: { $0.id == exerciseID })?.sets.first { $0.id == recorded.id }
+            )
+            XCTAssertEqual(saved.state, .completed)
+            XCTAssertEqual(saved.weightValue?.canonicalString, "42.5")
+            XCTAssertEqual(viewModel.session?.completedSetCount, 1)
+            XCTAssertNil(viewModel.restTimer, "saving an edit must not start a rest")
+            XCTAssertNil(viewModel.editingSetID)
+
+            try await environment.controller.shutdownForTesting()
+        }
+
+        /// P0-D11: the entry area only confirms; the just-recorded row offers
+        /// 「撤销」, which deletes that set, ends the rest and puts its values
+        /// back into the form.
+        func testUndoRemovesTheJustConfirmedSetAndRestoresItsValues() async throws {
+            let environment = try makeEnvironment()
+            let viewModel = try await makeLoadedViewModel(environment: environment)
+
+            viewModel.weight = "40"
+            viewModel.reps = "10"
+            await viewModel.confirmActiveDraftSet()
+
+            let recorded = try XCTUnwrap(viewModel.session?.exercises.first(where: { $0.id == exerciseID })?.sets.last)
+            XCTAssertEqual(recorded.state, .completed)
+            XCTAssertEqual(viewModel.undoableSetID, recorded.id)
+            XCTAssertNotNil(viewModel.restTimer)
+
+            viewModel.weight = ""
+            viewModel.reps = ""
+            await viewModel.undoRecentSet()
+
+            let afterUndo = try XCTUnwrap(viewModel.session?.exercises.first(where: { $0.id == exerciseID }))
+            XCTAssertTrue(afterUndo.sets.isEmpty, "undo must delete the just-recorded set")
+            XCTAssertNil(viewModel.undoableSetID)
+            XCTAssertNil(viewModel.restTimer, "undo must end the rest the set started")
+            XCTAssertEqual(viewModel.weight, "40")
+            XCTAssertEqual(viewModel.reps, "10")
+
+            try await environment.controller.shutdownForTesting()
+        }
+
+        func testDeletingTheUndoableSetWithdrawsTheUndo() async throws {
+            let environment = try makeEnvironment()
+            let viewModel = try await makeLoadedViewModel(environment: environment)
+
+            viewModel.weight = "40"
+            viewModel.reps = "10"
+            await viewModel.confirmActiveDraftSet()
+            let recorded = try XCTUnwrap(viewModel.undoableSetID)
+
+            await viewModel.removeSet(setID: recorded)
+
+            XCTAssertNil(viewModel.undoableSetID)
+
+            try await environment.controller.shutdownForTesting()
+        }
+
         // MARK: - Environment
 
         private struct Environment {

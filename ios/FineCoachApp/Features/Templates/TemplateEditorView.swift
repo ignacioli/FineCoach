@@ -162,6 +162,11 @@ struct TemplateEditorView: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var isConfirmingDelete = false
+    /// Native `.swipeActions` are only available on `List` rows. Each list is
+    /// non-scrolling and measured before its height is fixed so the page keeps
+    /// one outer scroll surface (the same pattern as ActiveSession).
+    @State private var listContentHeights: [StableUUID: CGFloat] = [:]
+    @ScaledMetric private var exerciseRowHeight: CGFloat = 52
 
     init(templateID: StableUUID, useCases: TemplateUseCases) {
         _viewModel = StateObject(wrappedValue: TemplateEditorViewModel(templateID: templateID, useCases: useCases))
@@ -170,6 +175,8 @@ struct TemplateEditorView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: FCPrimitives.space4) {
+                FCPageHeader(title: String(localized: "templateEditor.title"), back: .init())
+
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage).foregroundStyle(FCSemanticColors.statusDestructive)
                 }
@@ -179,15 +186,19 @@ struct TemplateEditorView: View {
                     .onChange(of: name) { _, newValue in
                         Task { await viewModel.rename(newValue) }
                     }
-                BodyPartMultiSelectView(title: String(localized: "templateEditor.trainingFocus"), selection: $trainingFocus)
-                    .onChange(of: trainingFocus) { _, newValue in
-                        Task { await viewModel.updateTrainingFocus(newValue) }
-                    }
+                BodyPartMultiSelectView(
+                    title: String(localized: "templateEditor.trainingFocus"),
+                    selection: $trainingFocus,
+                    chipAccessibilityIdentifier: FCAccessibilityID.templateEditorTrainingFocus
+                )
+                .onChange(of: trainingFocus) { _, newValue in
+                    Task { await viewModel.updateTrainingFocus(newValue) }
+                }
 
                 FCListRowDivider()
 
-                ForEach(viewModel.unsectionedExercises) { exercise in
-                    exerciseRow(exercise)
+                if !viewModel.unsectionedExercises.isEmpty {
+                    exerciseList(viewModel.unsectionedExercises, listID: viewModel.templateID)
                 }
 
                 ForEach(viewModel.orderedSections) { section in
@@ -215,11 +226,11 @@ struct TemplateEditorView: View {
                 }
                 .accessibilityIdentifier(FCAccessibilityID.templateListDelete)
             }
-            .padding(FCPrimitives.space4)
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.bottom, FCPrimitives.space4)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(String(localized: "templateEditor.title"))
-        .navigationBarTitleDisplayMode(.inline)
+        .fcSecondaryPage()
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.templateEditorRoot)
         .fcConfirmationDialog(isPresented: $isConfirmingDelete) {
@@ -229,7 +240,10 @@ struct TemplateEditorView: View {
                 cancelAction: .init(title: String(localized: "templateEditor.deleteTemplate.keep")) {
                     isConfirmingDelete = false
                 },
-                confirmAction: .init(title: String(localized: "templateEditor.deleteTemplate.confirm")) {
+                confirmAction: .init(
+                    title: String(localized: "templateEditor.deleteTemplate.confirm"),
+                    accessibilityIdentifier: FCAccessibilityID.templateEditorDeleteConfirm
+                ) {
                     isConfirmingDelete = false
                     Task {
                         if await viewModel.deleteTemplate() {
@@ -244,21 +258,36 @@ struct TemplateEditorView: View {
             name = viewModel.template?.name.value ?? name
             trainingFocus = viewModel.template?.trainingFocus ?? []
         }
-        .confirmationDialog(
-            String(localized: "templateEditor.deleteSection"),
+        .fcConfirmationDialog(
             isPresented: Binding(
                 get: { viewModel.pendingSectionDeletion != nil },
                 set: { if !$0 { viewModel.pendingSectionDeletion = nil } }
             ),
-            presenting: viewModel.pendingSectionDeletion
-        ) { section in
-            Button(String(localized: "templateEditor.deleteSection.moveOut")) {
+            dialog: sectionDeletionDialog
+        )
+    }
+
+    /// The closure passed to `fcConfirmationDialog` must return a dialog on
+    /// every path. The dialog is only presented while a section is pending.
+    private func sectionDeletionDialog() -> FCConfirmationDialog {
+        let section = viewModel.pendingSectionDeletion
+        return FCConfirmationDialog(
+            title: String(format: String(localized: "section.delete.title"), section?.name.value ?? ""),
+            message: String(
+                format: String(localized: "section.delete.message"),
+                section.map { viewModel.exercises(in: $0).count } ?? 0
+            ),
+            cancelAction: .init(title: String(localized: "section.delete.cancel")) {
+                viewModel.pendingSectionDeletion = nil
+            },
+            confirmAction: .init(
+                title: String(localized: "templateEditor.deleteSection"),
+                accessibilityIdentifier: FCAccessibilityID.templateEditorDeleteSectionMoveOut
+            ) {
+                guard let section else { return }
                 Task { await viewModel.deleteSection(section, disposition: .moveExercisesTo(sectionID: nil)) }
             }
-            Button(String(localized: "templateEditor.deleteSection.deleteExercises"), role: .destructive) {
-                Task { await viewModel.deleteSection(section, disposition: .deleteWithExercises) }
-            }
-        }
+        )
     }
 
     private func exerciseRow(_ exercise: TemplateExercise) -> some View {
@@ -270,23 +299,59 @@ struct TemplateEditorView: View {
                 Button(String(localized: "templateEditor.unsectioned")) {
                     Task { await viewModel.moveExercise(exercise.id, toSectionID: nil) }
                 }
+                .accessibilityIdentifier(FCAccessibilityID.templateEditorMoveToUnsectioned)
                 ForEach(viewModel.orderedSections) { section in
                     Button(section.name.value) {
                         Task { await viewModel.moveExercise(exercise.id, toSectionID: section.id) }
                     }
+                    .accessibilityIdentifier(FCAccessibilityID.templateEditorMoveToSection(section.id))
                 }
             }
             .frame(minHeight: 44)
-            Button(String(localized: "templateEditor.removeExercise")) {
-                Task { await viewModel.removeExercise(exercise.id) }
-            }
-            .frame(minHeight: 44)
-            .foregroundStyle(FCSemanticColors.statusDestructive)
         }
         .padding(FCPrimitives.space2)
         .background(FCSemanticColors.surfaceElevated)
         .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSm))
         .accessibilityIdentifier(FCAccessibilityID.templateExerciseRow(exercise.id))
+    }
+
+    @ViewBuilder
+    private func exerciseList(_ exercises: [TemplateExercise], listID: StableUUID) -> some View {
+        List {
+            ForEach(exercises) { exercise in
+                exerciseRow(exercise)
+                    .listRowInsets(EdgeInsets())
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(FCSemanticColors.surfacePage)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            Task { await viewModel.removeExercise(exercise.id) }
+                        } label: {
+                            Label(String(localized: "templateEditor.deleteExercise"), systemImage: "trash")
+                        }
+                        .tint(FCSemanticColors.statusDestructive)
+                        .accessibilityIdentifier(FCAccessibilityID.templateEditorRemoveExercise(exercise.id))
+                    }
+            }
+        }
+        .listStyle(.plain)
+        .scrollDisabled(true)
+        .scrollContentBackground(.hidden)
+        .environment(\.defaultMinListRowHeight, 44)
+        .onScrollGeometryChange(
+            for: CGFloat.self,
+            of: { $0.contentSize.height + $0.contentInsets.top + $0.contentInsets.bottom }
+        ) { _, height in
+            guard height >= 1 else {
+                return
+            }
+            listContentHeights[listID] = height
+        }
+        .frame(height: listContentHeights[listID] ?? estimatedExerciseListHeight(for: exercises.count))
+    }
+
+    private func estimatedExerciseListHeight(for count: Int) -> CGFloat {
+        max(44, CGFloat(count) * exerciseRowHeight)
     }
 
     private func sectionBlock(_ section: SessionSection) -> some View {
@@ -296,15 +361,17 @@ struct TemplateEditorView: View {
                     .fcFont(.sectionLabel)
                     .foregroundStyle(FCSemanticColors.textSecondary)
                 Spacer()
-                Button(String(localized: "templateEditor.deleteSection")) {
-                    viewModel.requestDeleteSection(section)
+                FCMoreMenu(accessibilityIdentifier: FCAccessibilityID.templateEditorSectionMore(section.id)) {
+                    Button(String(localized: "templateEditor.deleteSection"), role: .destructive) {
+                        viewModel.requestDeleteSection(section)
+                    }
+                    .accessibilityIdentifier(FCAccessibilityID.templateEditorDeleteSection(section.id))
                 }
-                .frame(minHeight: 44)
-                .foregroundStyle(FCSemanticColors.statusDestructive)
             }
             .accessibilityIdentifier(FCAccessibilityID.templateSectionRow(section.id))
-            ForEach(viewModel.exercises(in: section)) { exercise in
-                exerciseRow(exercise)
+            let exercises = viewModel.exercises(in: section)
+            if !exercises.isEmpty {
+                exerciseList(exercises, listID: section.id)
             }
         }
         .padding(FCPrimitives.space2)

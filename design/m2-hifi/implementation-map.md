@@ -29,7 +29,7 @@
 | R2 | 导出页过于复杂 | 三组（基本资料、训练内容、身体数据）、默认折叠、**默认全部选中**，组内可逐项取消。行为修订：PRD 修订 1.2、spec 1.1（M2-FR-007、M2-FR-049、AC-001、D-015） |
 | R3 | 线框次按钮与其他控件风格不一 | M2-06 只留一个主按钮「交给系统…」，打开 iOS 分享面板（含「存储到『文件』」）；M2-08 / M2-19b 把「选择档案文件」按钮与文件行合并为一行可点的 `DS-LABEL-VALUE-ROW`「档案文件 … ›」。M1 的 38 不改 |
 | R4 | M2-09 的进入路径 | 支持从系统（「文件」App、AirDrop、其他 App）用 FineCoach 打开档案文件，按安装状态分流；Coach 模式显示 M2-09。spec D-010 已修订 |
-| R5 | M2-13 页头与其他页面不一致是否符合预期 | 符合预期：M2-13 沿用 M1 已批准的 35 训练记录详情（导航栏 inline「训练记录」+ 页面内日期与训练标题），页面内大字是这次训练的标题而不是页面名，所以不用 `DS-PAGE-HEADER`；实现上复用 `SessionDetailView` 的只读形态，避免同一页面出现两种页头。不改 |
+| R5 | M2-13 页头与其他页面不一致是否符合预期 | 符合预期：M2-13 沿用 M1 已批准的 35 训练记录详情（导航栏 inline「训练记录」+ 页面内日期与训练标题），页面内大字是这次训练的标题而不是页面名，所以不用 `DS-PAGE-HEADER`；实现上复用 `SessionDetailView` 的只读形态，避免同一页面出现两种页头。不改。**2026-10-23 更新**：35 与 M2-13 一起改用 `DS-PAGE-HEADER`（行内 `‹` + 页面内「训练记录」），README §10 C18 |
 | R7 | 界面文案中的品牌名（2026-10-10，产品负责人） | 学员只读导入是「精练教练」App 的子功能，品牌统一：中文界面文案一律写「精练教练」（与主屏幕显示名 `CFBundleDisplayName` 一致），不写英文名 FineCoach。M2-03、M2-04 第 3 条、M2-06a–d、M2-07 标题、M2-09、导入失败「版本不兼容」文案已改；Penpot 快照 `welcome-r3-brand 2026-10-10 (…)`（revn 266）。对应 2 倍导出图待重新导出。**2026-10-11 产品负责人放宽**：中文场景下「精练教练」与「FineCoach」都可以用，不再强制统一；已改的文案保持现状，导出文件名保留 `FineCoach-档案-…` |
 | R6 | 整体 review | 2026-10-09 通过；核心页面定为 M2-02、M2-11。Penpot 画布布局由产品负责人手动调整过（M2-03 过长遮挡 M2-09），只改画板位置，不影响内容 |
 
@@ -86,7 +86,7 @@ feature 专有组件见 §4。共享组件的新增 / 扩展条目写在 `compon
 |---|---|---|---|---|
 | M2-11 | 档案首页 | `DS-PAGE-PRIMARY` 查看模式变体：标题行 `display` 大标题（导出了显示名称时为名称，否则「我的训练档案」）+ `DS-TITLE-ACTION` 设置齿轮 → `DS-STATUS` 自由文本「i」+「只读档案 · 来源 4821 · 9月25日」→ 分割线 → `DS-HUB-ROW` ×5：训练记录（尾部说明「24 次」）、身体数据（「3 项指标」）、趋势与个人最佳、动作资料（不可用态「档案未包含」）、关于本档案 | 未导出显示名称（通用标题）；动作资料未包含 | M2-FR-030、034；H1；spec §5 通用标题 |
 | M2-12 | 训练记录列表 · 已筛选 | `DS-PAGE-HEADER`（「训练记录」）→（档案含动作资料时，此处多一个 `DS-TEXT-FIELD` 搜索框「搜索动作名称」，位置同 M2-16；本画板与 M2-11 一致，按未含动作资料绘制，所以没有搜索框）→ `DS-CHIP` 筛选胶囊「日期范围」「训练重点」→ `caption`「已筛选：…」→ `DS-SECTION`「N 次训练」→ `DS-LIST-ROW`（标题 `headline` 日期，副文字「部位 · N 组 · N 分钟」，`›`）+ 分割线 | 已筛选；空结果时为一行 `caption`「没有符合条件的训练记录」 | M2-FR-031、035 |
-| M2-13 | 训练记录详情 · 动作占位 | 复用 35 的分区（导航栏 inline「训练记录」、日期 `caption`、训练标题、三项统计、动作块；学员名省略）；动作块名称为「动作 1」等占位、无器材图标；**去掉** 35 的「编辑训练重点」「另存为模板」和「生成训练报告」→ 末尾 `DS-STATUS` 自由文本「i」+「只读记录」。**未含动作资料时不显示「训练部位」示意图**：`DS-BODY-DIAGRAM` 的着色来自动作的主 / 次肌群，属于「动作资料」内容（M2-FR-045、M2-FR-009 的同理推论，产品负责人 2026-10-09 同意） | 未含动作资料（占位编号、无示意图）；含动作资料时同 35 显示名称、器材图标与训练部位示意图 | M2-FR-033、045；D-001 |
+| M2-13 | 训练记录详情 · 动作占位 | 复用 35 的分区（页头 2026-10-23 起为行内 `‹` + 页面内「训练记录」，README §10 C18；日期 `caption`、训练标题、三项统计、动作块；学员名省略）；动作块名称为「动作 1」等占位、无器材图标；**去掉** 35 的「编辑训练重点」「另存为模板」和「生成训练报告」→ 末尾 `DS-STATUS` 自由文本「i」+「只读记录」。**未含动作资料时不显示「训练部位」示意图**：`DS-BODY-DIAGRAM` 的着色来自动作的主 / 次肌群，属于「动作资料」内容（M2-FR-045、M2-FR-009 的同理推论，产品负责人 2026-10-09 同意） | 未含动作资料（占位编号、无示意图）；含动作资料时同 35 显示名称、器材图标与训练部位示意图 | M2-FR-033、045；D-001 |
 | M2-14 | 身体数据 | 复用 06 的结构（`DS-PAGE-HEADER` + `DS-SECTION` + 指标行：标签 `callout`、数值 `numeralLarge`、单位 `caption`）；**去掉**学员名和「＋ 自定义指标」；底部「单位 · kg / cm（可在设置中切换）」。单个指标的全部测量沿用 M1 身体数据历史列表的只读形态，不另画 | 只含已选指标（与 M2-02b 一致：体重、体脂率） | M2-FR-030、032 |
 | M2-15 | 趋势与个人最佳 | `DS-PAGE-HEADER`（「趋势与个人最佳」）→ `DS-LABEL-VALUE-ROW`「动作 / 动作 1 ›」→ `DS-SEGMENTED`「重量 / 次数 / 容量」→ 折线图（沿用 M1 `TrendsView` 现有 Swift Charts 实现；M1 没有该图的高保真画稿，画板中的折线只示意位置，图层标为 `M2-TREND-CHART`，不构成新的视觉规格）→ `DS-SECTION`「个人最佳」→ 32 的个人最佳行 | 未含动作资料（占位编号） | M2-FR-030、009 |
 | M2-16 | 动作资料 | `DS-PAGE-HEADER`（「动作资料」，副标题「本档案出现的 16 个动作」）→ `DS-TEXT-FIELD` 搜索框 → `DS-LIST-ROW`（leading `DS-EQUIPMENT-ICON`；标题 `headline` 动作名；副文字「主：胸 · 次：肩、臂 · 杠铃」；不可点）+ 分割线 | 内置动作与自定义动作混排；自定义动作没有器材图标时 leading 留空位 | M2-FR-045；AC-011 |
@@ -179,7 +179,11 @@ feature 专有组件见 §4。共享组件的新增 / 扩展条目写在 `compon
 资料库 19 → 「训练模板」入口行 → FCAccessibilityID.templatesEntry → 否（导航）→ FCHubRow（ResourceHubView.swift:31）
 设置 42/43 → 「通知」入口行（被拒时 FCStatusLabel 副标题 +「前往设置」）→ FCAccessibilityID.settingsNotifications → 否（打开系统设置）→ FCHubRow（SettingsView.swift:63，用于 :22）
 设置 42 → 「备份与恢复」入口行 → FCAccessibilityID.settingsBackup → 否（导航）→ FCHubRow（SettingsView.swift:24）
-设置 42 → 「关于」行（版本号，无 ›，不可点）→ FCAccessibilityID.settingsAbout → 否 → FCHubRow（SettingsView.swift:31）
+设置 42 → 「关于」行（版本号「版本 0.2.0（1）」，无 ›，不可点）→ FCAccessibilityID.settingsAbout → 否 → FCHubRow（SettingsView.swift:32）
+设置 42 → 「源代码」行（代码图标、网址副标题、›；README §10 C21）→ FCAccessibilityID.settingsSourceCode → 否（openURL 交给系统浏览器）→ FCHubRow .frame(maxWidth: .infinity, minHeight: 64)（SettingsView.swift:40）
+复核训练时长（全屏确认流程，README §10 C22）→ 「训练时长」输入框（预填「12 小时 5 分」）→ FCAccessibilityID.activeSessionDurationValue → 否（只改本页状态）→ FCTextField 撑满（FinishSessionFlow.swift:91）
+复核训练时长 → 格式提示 / 就地错误（只读文字）→ activeSession.durationHint / activeSession.durationError → 否 → 父 VStack，space4 边距（FinishSessionFlow.swift:93、:98）
+复核训练时长 → 「确认时长」→ FCAccessibilityID.activeSessionDurationConfirm → 是（有效输入才写入调整后的时长；无效不提交）→ FCButton maxWidth: .infinity（FinishSessionFlow.swift:104）
 备份与恢复 39 → 「恢复完成」就地结果 → FCAccessibilityID.restoreSucceeded → 否 → FCInlineResult .frame(maxWidth: .infinity)（BackupRestoreFlow.swift:164）
 备份与恢复 38 → 「恢复失败」就地结果 → FCAccessibilityID.restoreFailed → 否 → FCInlineResult（BackupRestoreFlow.swift:176）
 备份与恢复 38 → 「重试」可见链接按钮（恢复中禁用）→ FCAccessibilityID.restoreRetry → 是（重新执行恢复；可见按钮，非手势）→ FCInlineResult 内 FCLinkButton .frame(maxWidth: .infinity)（BackupRestoreFlow.swift:186）
@@ -263,7 +267,7 @@ M2-06b → 「完成」→ archiveExport.done → 是（leave() 并返回学员�
 | M2-11 | 训练记录 / 身体数据 / 趋势与个人最佳 | `archiveHome.records` / `.body` / `.trends` | 否 | `FCHubRow`（`:70,80,89`） |
 | M2-11 | 动作资料 / 关于本档案 | `archiveHome.exercises` / `.about` | 否（暂不可点，T062 接入） | `FCHubRow`（`:98,107`） |
 | M2-12 | `‹`、搜索、日期范围 / 训练重点胶囊、清除筛选、记录行 | `archiveRecords.back` / `.search` / `.filter.date` / `.filter.focus` / `.filter.clear` / `.row.N` | 否（内存筛选；行 push 详情） | `FCPageHeader` / `FCSearchField` / `FCFilterChip` / `FCListRow`（`ArchiveRecordsView.swift:41–109`） |
-| M2-13 | 系统返回（M1 35 口径） | — | 否 | `ShareReportCardView(.page)` |
+| M2-13 | 行内 `‹`（`FCPageHeader(back:)`，2026-10-23 起，README §10 C18） | — | 否 | `ShareReportCardView(.page)`；页头在页面 VStack 内，space4 边距 |
 | M2-14 | `‹`、指标行、历史页 `‹` | `archiveBody.back` / `.metric.<key>` / `archiveMetric.back` | 否 | `FCPageHeader` / `BodyMetricValueRow`（`ArchiveBodyDataView.swift:25,64,85`） |
 | M2-15 | `‹`、动作行、重量/次数/容量 | `archiveTrends.back` / `.exercise` / `.metric` | 否 | `FCPageHeader` / `FCLabelValueRow` / `FCSegmentedSwitch`（`ArchiveTrendsView.swift:49,58,116`） |
 | M2-18 | `‹`、重量 / 围度与身高 / 列表密度 | `archiveSettings.back` / `.weight` / `.length` / `.density` | **是**（只写本机显示设置，不写档案） | `FCLabelValueRow` + `FCSegmentedSwitch`（`ArchiveSettingsView.swift:25,34,46`） |

@@ -52,6 +52,42 @@
             try assertFullResolutionPage(pages[0])
         }
 
+        func testGainsWithProgressAndMilestoneRenderAtFullResolution() throws {
+            let base = try makeDTO(exerciseCount: 1)
+            let previous = try XCTUnwrap(base.exercises.first?.confirmedSets.first)
+            let current = ShareReportSetDTO(
+                orderIndex: 0, recordMode: .weightReps, weightValue: try DecimalValue("40"),
+                repetitionCount: try DecimalValue("10"), durationSeconds: nil,
+                unit: .kilograms, side: .none, leftValue: nil, rightValue: nil)
+            let dto = ShareReportDTO(
+                schemaVersion: ShareReportPolicy.schemaVersion, studentDisplayName: base.studentDisplayName,
+                sessionDateUTC: base.sessionDateUTC, durationSeconds: base.durationSeconds,
+                trainingFocus: base.trainingFocus, studentFacingSummary: base.studentFacingSummary,
+                trainingVolume: base.trainingVolume, exercises: base.exercises,
+                personalBests: [
+                    .init(displayName: "合成纪录动作", kind: .highestWeight, weightValue: try DecimalValue("45"))
+                ],
+                gainRows: [
+                    .init(
+                        displayName: "合成进步动作", isNewRecord: true, previous: previous, current: current)
+                ],
+                milestoneSessionNumber: 10)
+            let blocks = ShareReportCardView.blocks(for: dto)
+            XCTAssertEqual(blocks.filter { $0 == .personalBests }.count, 1)
+            let pages = try ShareReportCardRenderer.render(dto: dto)
+            XCTAssertEqual(pages.count, 1)
+            try assertFullResolutionPage(pages[0])
+            // Neither progress-only nor milestone-only reports may lose the section.
+            for milestone in [Int?.none, 10] {
+                let single = ShareReportDTO(
+                    schemaVersion: ShareReportPolicy.schemaVersion, studentDisplayName: nil,
+                    sessionDateUTC: nil, durationSeconds: nil, trainingFocus: nil,
+                    studentFacingSummary: nil, trainingVolume: nil, exercises: [],
+                    gainRows: milestone == nil ? dto.gainRows : [], milestoneSessionNumber: milestone)
+                XCTAssertTrue(ShareReportCardView.blocks(for: single).contains(.personalBests))
+            }
+        }
+
         private func assertFullResolutionPage(_ data: Data, file: StaticString = #filePath, line: UInt = #line) throws {
             XCTAssertEqual(Data(data.prefix(pngSignature.count)), pngSignature, file: file, line: line)
             let image = try XCTUnwrap(UIImage(data: data), file: file, line: line)

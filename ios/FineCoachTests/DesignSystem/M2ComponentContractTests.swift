@@ -1,7 +1,8 @@
-@testable import FineCoach
 import CoreText
 import SwiftUI
 import XCTest
+
+@testable import FineCoach
 
 /// M2 Phase 1 (T009): the "可自动" invariants of components.md §4.7, as pure
 /// logic checks on the public component types and plain source scans of the
@@ -21,32 +22,54 @@ final class M2ComponentContractTests: XCTestCase {
     func testPageHeaderBackIsAnInlineGlyphWith44ptHitAreaAndLabel() throws {
         let source = try componentSource("FCPageHeader.swift")
         XCTAssertTrue(source.contains("FCSymbol(.pageBack)"), "the back glyph is the Noto ‹ at 22/400")
-        XCTAssertTrue(source.contains("Color.clear\n                        .frame(width: 44, height: 44)"), "back needs a 44x44 hit area")
+        XCTAssertTrue(
+            source.contains("Color.clear\n                        .frame(width: 44, height: 44)"),
+            "back needs a 44x44 hit area")
         XCTAssertTrue(source.contains(".accessibilityLabel(Text(\"common.back\"))"))
         XCTAssertTrue(source.contains("HStack(alignment: .firstTextBaseline"), "back and title share the first line")
         XCTAssertEqual(FCPageHeader.backLayoutWidth, 16, "title starts at page margin (16) + 16 = x 32")
-        XCTAssertTrue(source.contains("interactivePopGestureRecognizer"), "hiding the bar must not lose the edge swipe-back")
+        XCTAssertTrue(
+            source.contains("interactivePopGestureRecognizer"), "hiding the bar must not lose the edge swipe-back")
     }
 
     /// Every secondary page hides the system bar through `fcSecondaryPage` and draws the inline
     /// back; none keeps the `.toolbarRole(.editor)` system back row (owner walkthrough 2026-10-10).
     /// Left on the system bar on purpose: only the nav-title pages whose title sits in the bar
     /// (ActiveSessionView moved to the inline back, owner 2026-10-10).
+    /// The training summary is the one page with no return at all (README §10 C20): it draws the
+    /// in-page header but no `back:`, and it must disable the edge swipe-back with it.
     func testEverySecondaryPageUsesTheInlineBack() throws {
+        let chrome = try componentSource("FCPageHeader.swift")
+        let chromeStart = try XCTUnwrap(chrome.range(of: "public func fcSecondaryPage("))
+        let chromeEnd = try XCTUnwrap(
+            chrome.range(of: "/// Re-enables", range: chromeStart.upperBound..<chrome.endIndex))
+        let secondaryPage = chrome[chromeStart.lowerBound..<chromeEnd.lowerBound]
+        XCTAssertTrue(secondaryPage.contains(".safeAreaInset(edge: .top, spacing: 0)"))
+        XCTAssertTrue(secondaryPage.contains(".frame(height: 0)"))
+        let topCover = ".background(FCSemanticColors.surfacePage, ignoresSafeAreaEdges: .top)"
+        XCTAssertTrue(secondaryPage.contains(topCover), "the shared chrome backs the status bar with the page surface")
         let features = appRoot().appendingPathComponent("Features")
         let enumerator = try XCTUnwrap(FileManager.default.enumerator(at: features, includingPropertiesForKeys: nil))
         let systemBackAllowed: Set<String> = []
+        let noBackAllowed: Set<String> = ["SessionSummaryView.swift"]
         var secondaryPages = 0
         for case let url as URL in enumerator where url.pathExtension == "swift" {
             let name = url.lastPathComponent
             let source = try String(contentsOf: url, encoding: .utf8)
+            XCTAssertFalse(source.contains(topCover), "\(name) duplicates the shared secondary-page status-bar cover")
             if source.contains(".toolbarRole(.editor)") {
                 XCTAssertTrue(systemBackAllowed.contains(name), "\(name) still uses the system back row")
             }
             if source.contains(".fcSecondaryPage(") {
                 secondaryPages += 1
                 XCTAssertTrue(source.contains("FCPageHeader("), "\(name) hides the bar but has no FCPageHeader")
-                XCTAssertTrue(source.contains("back:"), "\(name) hides the bar but draws no inline back")
+                if noBackAllowed.contains(name) {
+                    XCTAssertTrue(
+                        source.contains(".fcSecondaryPage(swipeBackEnabled: false)"),
+                        "\(name) has no inline back, so it must disable the edge swipe-back")
+                } else {
+                    XCTAssertTrue(source.contains("back:"), "\(name) hides the bar but draws no inline back")
+                }
             }
         }
         XCTAssertGreaterThanOrEqual(secondaryPages, 17, "found too few secondary pages; the scan is broken")
@@ -65,15 +88,19 @@ final class M2ComponentContractTests: XCTestCase {
             XCTAssertEqual(font.pointSize, size, accuracy: 0.6, "\(kind) size at the default Dynamic Type")
             var glyphs = [CGGlyph](repeating: 0, count: 1)
             let characters = Array(glyph.utf16)
-            XCTAssertTrue(CTFontGetGlyphsForCharacters(font, characters, &glyphs, 1), "\(kind): bundled font lacks \(glyph)")
-            XCTAssertGreaterThan(FCSymbol.glyphFont(kind, .accessibility3).pointSize, font.pointSize, "scales with Dynamic Type")
+            XCTAssertTrue(
+                CTFontGetGlyphsForCharacters(font, characters, &glyphs, 1), "\(kind): bundled font lacks \(glyph)")
+            XCTAssertGreaterThan(
+                FCSymbol.glyphFont(kind, .accessibility3).pointSize, font.pointSize, "scales with Dynamic Type")
         }
         for kind in [FCSymbol.Kind.minus, .plus, .collapse] {
             XCTAssertFalse(FCSymbol.rendersAsNotoGlyph(kind), "−, + and ▾ stay SF Symbols")
         }
         let source = try componentSource("FCSymbol.swift")
         XCTAssertTrue(source.contains("FCFont.uiFont"))
-        XCTAssertFalse(source.contains("\"chevron.left\"") || source.contains("\"chevron.right\"") || source.contains("\"checkmark\""))
+        XCTAssertFalse(
+            source.contains("\"chevron.left\"") || source.contains("\"chevron.right\"")
+                || source.contains("\"checkmark\""))
         // The other ✓ users inherit it instead of drawing an SF checkmark.
         XCTAssertFalse(try componentSource("FCSetStateCircle.swift").contains("systemName: \"checkmark\""))
         XCTAssertTrue(try componentSource("FCStatusLabel.swift").contains("FCSymbol(.checkOnFill)"))
@@ -89,23 +116,27 @@ final class M2ComponentContractTests: XCTestCase {
             let host = UIHostingController(rootView: SwipeBackHarness(swipeBackEnabled: enabled))
             // A window in the app's scene: a scene-less UIWindow never lays out the stack.
             let scene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first
-            let window = scene.map { UIWindow(windowScene: $0) } ?? UIWindow(frame: CGRect(x: 0, y: 0, width: 390, height: 844))
+            let window =
+                scene.map { UIWindow(windowScene: $0) } ?? UIWindow(frame: CGRect(x: 0, y: 0, width: 390, height: 844))
             window.frame = CGRect(x: 0, y: 0, width: 390, height: 844)
             window.rootViewController = host
             window.makeKeyAndVisible()
             host.view.layoutIfNeeded()
             try await Task.sleep(nanoseconds: 600_000_000)
-            let navigation = try XCTUnwrap(Self.findNavigationController(in: host), "no UINavigationController under NavigationStack")
+            let navigation = try XCTUnwrap(
+                Self.findNavigationController(in: host), "no UINavigationController under NavigationStack")
             XCTAssertEqual(navigation.viewControllers.count, 2, "harness page not pushed")
             let pop = try XCTUnwrap(navigation.interactivePopGestureRecognizer)
             let begins = pop.delegate?.gestureRecognizerShouldBegin?(pop) ?? false
             XCTAssertEqual(pop.isEnabled && begins, expectsBegin, "swipeBackEnabled: \(enabled)")
             if enabled {
-                XCTAssertTrue(navigation.isNavigationBarHidden || navigation.navigationBar.isHidden, "system bar is hidden")
+                XCTAssertTrue(
+                    navigation.isNavigationBarHidden || navigation.navigationBar.isHidden, "system bar is hidden")
             }
             navigation.popViewController(animated: false)
             try await Task.sleep(nanoseconds: 300_000_000)
-            XCTAssertTrue(navigation.interactivePopGestureRecognizer?.isEnabled ?? false, "state restored after leaving the page")
+            XCTAssertTrue(
+                navigation.interactivePopGestureRecognizer?.isEnabled ?? false, "state restored after leaving the page")
             window.isHidden = true
         }
     }
@@ -218,7 +249,9 @@ final class M2ComponentContractTests: XCTestCase {
         XCTAssertEqual(FCListRowGeometry.minHeight, 52)
         XCTAssertEqual(FCListRowGeometry.indent, 16)
         let source = try componentSource("FCListRow.swift")
-        XCTAssertFalse(source.contains(".padding(.leading, FCPrimitives.space4)\n                .frame(maxWidth: .infinity, minHeight"))
+        XCTAssertFalse(
+            source.contains(
+                ".padding(.leading, FCPrimitives.space4)\n                .frame(maxWidth: .infinity, minHeight"))
         XCTAssertTrue(source.contains(".padding(.leading, isIndented ? FCListRowGeometry.indent : 0)"))
     }
 
@@ -227,15 +260,52 @@ final class M2ComponentContractTests: XCTestCase {
     func testActionRowTrashIconIsDecorativeAndMatchesTitleColour() throws {
         let source = try componentSource("FCBottomSheet.swift")
         let iconStart = try XCTUnwrap(source.range(of: "Image(systemName: \"trash\")"))
-        let iconEnd = try XCTUnwrap(source.range(of: "VStack(alignment: .leading", range: iconStart.upperBound..<source.endIndex))
+        let iconEnd = try XCTUnwrap(
+            source.range(of: "VStack(alignment: .leading", range: iconStart.upperBound..<source.endIndex))
         let icon = source[iconStart.lowerBound..<iconEnd.lowerBound]
         XCTAssertTrue(icon.contains(".accessibilityHidden(true)"))
         XCTAssertTrue(icon.contains(".foregroundStyle(titleColor)"))
         XCTAssertTrue(icon.contains(".frame(width: 24, height: 24)"))
-        XCTAssertTrue(source.contains("showsTrashIcon: Bool = false"), "default keeps the 10 existing consumers unchanged")
+        XCTAssertTrue(
+            source.contains("showsTrashIcon: Bool = false"), "default keeps the 10 existing consumers unchanged")
+    }
+
+    // MARK: - DS-CHIP
+
+    func testBodyPartChipIdentifierFactoryTargetsTheFinalButtonAndDefaultsToNil() throws {
+        let chip = try componentSource("FCBodyPartChip.swift")
+        XCTAssertTrue(chip.contains("accessibilityIdentifier: String? = nil"))
+        XCTAssertTrue(chip.contains("if let accessibilityIdentifier"))
+        XCTAssertTrue(chip.contains("button.accessibilityIdentifier(accessibilityIdentifier)"))
+        XCTAssertTrue(chip.contains("FCBodyPartChip("))
+
+        let picker = try componentSource("FCBodyPartChip.swift")
+        XCTAssertTrue(picker.contains("private let accessibilityIdentifier: ((BodyPart) -> String)?"))
+        XCTAssertTrue(picker.contains("accessibilityIdentifier: ((BodyPart) -> String)? = nil"))
+        XCTAssertTrue(picker.contains("accessibilityIdentifier: accessibilityIdentifier?(part)"))
+
     }
 
     // MARK: - DS-CONFIRM-DIALOG
+
+    func testConfirmationDialogActionSupportsOptionalIdentifierAndPassesItToButton() throws {
+        let defaultAction = FCConfirmationDialog.Action(title: "Cancel") {}
+        XCTAssertNil(defaultAction.accessibilityIdentifier, "existing trailing-closure calls keep the default nil")
+
+        let identifiedAction = FCConfirmationDialog.Action(
+            title: "Confirm",
+            accessibilityIdentifier: "confirm-action"
+        ) {}
+        XCTAssertEqual(identifiedAction.accessibilityIdentifier, "confirm-action")
+
+        let dialog = try componentSource("FCConfirmationDialog.swift")
+        XCTAssertTrue(dialog.contains("public let accessibilityIdentifier: String?"))
+        XCTAssertTrue(dialog.contains("accessibilityIdentifier: String? = nil"))
+        XCTAssertTrue(dialog.contains("if let accessibilityIdentifier = action.accessibilityIdentifier"))
+        XCTAssertTrue(dialog.contains("button.accessibilityIdentifier(accessibilityIdentifier)"))
+        XCTAssertTrue(
+            dialog.contains("} else {\n            button"), "nil keeps the button free of an empty identifier")
+    }
 
     func testConfirmationDialogOwnsItsSizeAndCallersPassNone() throws {
         let dialog = try componentSource("FCConfirmationDialog.swift")
@@ -249,20 +319,54 @@ final class M2ComponentContractTests: XCTestCase {
         var callers = 0
         for case let url as URL in enumerator where url.pathExtension == "swift" {
             let source = try String(contentsOf: url, encoding: .utf8)
-            guard source.contains("FCConfirmationDialog(") || source.contains(".fcConfirmationDialog(") else { continue }
+            guard source.contains("FCConfirmationDialog(") || source.contains(".fcConfirmationDialog(") else {
+                continue
+            }
             callers += 1
             XCTAssertFalse(source.contains(".frame(width:"), "\(url.lastPathComponent) must not size the dialog")
         }
         XCTAssertGreaterThan(callers, 0, "found no dialog callers; scan path is wrong")
     }
 
+    // MARK: - DS-UNDO-ROW / DS-MORE-MENU
+
+    func testUndoRowOwnsTheSharedFourSecondWindowAndUndoControl() throws {
+        XCTAssertEqual(FCUndoRow.undoWindow, .seconds(4))
+        let undo = try componentSource("FCUndoRow.swift")
+        XCTAssertTrue(undo.contains("public static let undoWindow: Duration = .seconds(4)"))
+        XCTAssertTrue(undo.contains("FCLinkButton("), "undo must reuse the link-button hit target")
+        XCTAssertTrue(undo.contains("designSystem.undo"), "the undo label must be localized")
+        XCTAssertTrue(undo.contains(".frame(maxWidth: .infinity, minHeight: 52)"))
+        XCTAssertTrue(undo.contains(".accessibilityElement(children: .contain)"))
+        XCTAssertTrue(undo.contains(".accessibilityLabel(Text(message))"))
+        XCTAssertTrue(undo.contains(".accessibilityAction(named: Text(\"designSystem.undo\"), onUndo)"))
+        XCTAssertTrue(undo.contains("button.accessibilityIdentifier(accessibilityIdentifier)"))
+
+        let viewModel = try String(
+            contentsOf: appRoot().appendingPathComponent("Features/ActiveSession/ActiveSessionViewModel.swift"),
+            encoding: .utf8
+        )
+        XCTAssertTrue(viewModel.contains("static let undoWindow: Duration = FCUndoRow.undoWindow"))
+    }
+
+    func testMoreMenuUsesAnAccessibleEllipsisHitTargetAndSystemMenu() throws {
+        let menu = try componentSource("FCMoreMenu.swift")
+        XCTAssertTrue(menu.contains("public struct FCMoreMenu<MenuContent: View>"))
+        XCTAssertTrue(menu.contains("Menu {"), "the component must wrap a system Menu")
+        XCTAssertTrue(menu.contains("Image(systemName: \"ellipsis\")"))
+        XCTAssertTrue(menu.contains(".frame(minWidth: 44, minHeight: 44)"))
+        XCTAssertTrue(menu.contains("designSystem.moreActions"), "the label must be localized")
+        XCTAssertTrue(menu.contains("accessibilityIdentifier: String"))
+        XCTAssertTrue(menu.contains("menu.accessibilityIdentifier(accessibilityIdentifier)"))
+    }
+
     // MARK: - Sources
 
     private func appRoot() -> URL {
         URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent() // DesignSystem/
-            .deletingLastPathComponent() // FineCoachTests/
-            .deletingLastPathComponent() // ios/
+            .deletingLastPathComponent()  // DesignSystem/
+            .deletingLastPathComponent()  // FineCoachTests/
+            .deletingLastPathComponent()  // ios/
             .appendingPathComponent("FineCoachApp")
     }
 

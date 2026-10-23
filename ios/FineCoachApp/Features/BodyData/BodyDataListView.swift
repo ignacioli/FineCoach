@@ -175,7 +175,8 @@ struct BodyDataListView: View {
         path: Binding<[RootDestination]>
     ) {
         _viewModel = StateObject(
-            wrappedValue: BodyDataListViewModel(studentID: studentID, useCases: useCases, studentUseCases: studentUseCases)
+            wrappedValue: BodyDataListViewModel(
+                studentID: studentID, useCases: useCases, studentUseCases: studentUseCases)
         )
         _path = path
     }
@@ -251,6 +252,7 @@ struct BodyDataListView: View {
             FCButton(title: String(localized: "bodyData.newCustomMetric.save")) {
                 Task { await viewModel.createCustomMetric() }
             }
+            .accessibilityIdentifier(FCAccessibilityID.bodyDataNewCustomMetricSave)
             Button(String(localized: "bodyData.newCustomMetric.cancel")) {
                 viewModel.cancelNewCustomMetric()
             }

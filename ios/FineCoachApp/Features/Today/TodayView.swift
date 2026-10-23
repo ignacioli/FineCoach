@@ -5,10 +5,14 @@ final class TodayViewModel: ObservableObject {
     @Published var rows: [TodayOrderedAppointment] = []
     @Published var studentNames: [StableUUID: String] = [:]
     @Published var errorMessage: String?
+    /// False until the first successful reload. A freshly built view model has
+    /// empty `rows`/`inProgress`, so without this gate Today would render its
+    /// empty state before the first load returns (C15 walkthrough follow-up).
+    @Published private(set) var hasCompletedInitialLoad = false
     @Published var isResolvedExpanded = false
-    /// The training in progress, whether or not it started from an
-    /// appointment (T063 01 #1).
-    @Published var inProgress: InProgressTrainingSummary?
+    /// Every Student currently training, oldest start first (M1A-FR-018
+    /// revision; owner decision 2026-10-22: one hint-bar row per Student).
+    @Published var inProgress: [InProgressTrainingSummary] = []
     /// Students whose active 课包 is expired or out of credits (M1B-FR-014):
     /// today only warns briefly (NFR-005), never shows the balance.
     @Published var packageAlertStudentIDs: Set<StableUUID> = []
@@ -61,10 +65,20 @@ final class TodayViewModel: ObservableObject {
         studentNames[studentID] ?? ""
     }
 
+    /// The empty state is a load result, never a placeholder: before the first
+    /// successful load the conditional content stays empty instead.
+    var showsEmptyState: Bool {
+        TodayEmptyStatePresentation.showsEmptyState(
+            hasCompletedInitialLoad: hasCompletedInitialLoad,
+            visibleRows: visibleRows,
+            inProgress: inProgress
+        )
+    }
+
     func reload() async {
         do {
             rows = try await appointmentUseCases.todayOrdering()
-            inProgress = try await studentUseCases.inProgressTraining()
+            inProgress = try await studentUseCases.inProgressTrainings()
             var names = studentNames
             for row in rows where names[row.appointment.studentID] == nil {
                 if let student = try? await studentUseCases.student(id: row.appointment.studentID) {
@@ -73,6 +87,7 @@ final class TodayViewModel: ObservableObject {
             }
             studentNames = names
             await reloadPackageAlerts()
+            hasCompletedInitialLoad = true
             errorMessage = nil
         } catch {
             errorMessage = String(localized: "today.error.generic")
@@ -103,6 +118,19 @@ final class TodayViewModel: ObservableObject {
     }
 }
 
+enum TodayEmptyStatePresentation {
+    /// Only a completed load with nothing to show is an empty Today. Split out
+    /// so the first-load gate is unit-testable without building the Core
+    /// Data-backed view model.
+    static func showsEmptyState(
+        hasCompletedInitialLoad: Bool,
+        visibleRows: [TodayOrderedAppointment],
+        inProgress: [InProgressTrainingSummary]
+    ) -> Bool {
+        hasCompletedInitialLoad && visibleRows.isEmpty && inProgress.isEmpty
+    }
+}
+
 enum TodayRowStatusPresentation {
     static func title(for row: TodayOrderedAppointment) -> String {
         switch row.appointment.status {
@@ -124,9 +152,10 @@ enum TodayRowStatusPresentation {
 
 /// 01 今日 (T069a; `01-today`, `18-course-action-sheet`): display title +
 /// date with the calendar entry on the title row, the 今日/学员 switch
-/// below, the dark hero card for a training in progress, the large
-/// "下一节课" row, compact rows for the rest, "已处理 · N", and the D1
-/// course action sheet opened by tapping any scheduled row.
+/// below, one dark hero card for the Students training in progress (single-row
+/// for 1, W08-a multi-row for 2+; owner decision 2026-10-22), the large
+/// "下一节课" row, compact rows for the rest, "已处理 · N", and the D1 course
+/// action sheet opened by tapping any scheduled row.
 struct TodayView: View {
     @StateObject private var viewModel: TodayViewModel
     @Binding var rootTab: RootTab
@@ -163,11 +192,11 @@ struct TodayView: View {
                         .foregroundStyle(FCSemanticColors.statusDestructive)
                 }
 
-                if let inProgress = viewModel.inProgress {
-                    inProgressCard(inProgress)
+                if !viewModel.inProgress.isEmpty {
+                    inProgressHero(viewModel.inProgress)
                 }
 
-                if viewModel.visibleRows.isEmpty, viewModel.inProgress == nil {
+                if viewModel.showsEmptyState {
                     emptyState
                 } else {
                     appointmentSections
@@ -237,20 +266,60 @@ struct TodayView: View {
         .padding(.vertical, FCPrimitives.space4)
     }
 
-    private func inProgressCard(_ summary: InProgressTrainingSummary) -> some View {
+    /// 1 Student: the unchanged 01 single-row hero card. 2+: the W08-a
+    /// multi-row variant, one independent row per Student, oldest start first
+    /// (`inProgressTrainings()` already sorts by `startedAtUTC`, see
+    /// `StudentManagedObjectMapping.inProgressSessions`).
+    private func inProgressHero(_ summaries: [InProgressTrainingSummary]) -> some View {
         TimelineView(.periodic(from: .now, by: 60)) { context in
-            FCHeroCard(
-                badgeText: String(localized: "today.inProgress.badge"),
-                title: TodayRowPresentation.nameAndFocus(summary.studentDisplayName, summary.trainingFocus),
-                subtitle: summary.elapsedMinutes(now: context.date).map {
-                    String(format: String(localized: "today.inProgress.elapsedFormat"), $0)
-                } ?? "",
-                actionTitle: String(localized: "today.inProgress.continue")
-            ) {
-                path.append(.activeSession(summary.studentID.rawValue))
+            if summaries.count == 1, let summary = summaries.first {
+                FCHeroCard(
+                    badgeText: String(localized: "today.inProgress.badge"),
+                    title: TodayRowPresentation.nameAndFocus(
+                        summary.studentDisplayName,
+                        summary.trainingFocus
+                    ),
+                    subtitle: elapsedText(summary, now: context.date),
+                    actionTitle: String(localized: "today.inProgress.continue")
+                ) {
+                    path.append(.activeSession(summary.studentID.rawValue))
+                }
+                .accessibilityIdentifier(FCAccessibilityID.todayInProgress)
+            } else {
+                FCHeroCard(
+                    badgeText: String(
+                        format: String(localized: "today.inProgress.multiBadgeFormat"),
+                        summaries.count
+                    ),
+                    rows: summaries.map { summary in
+                        FCHeroCard.Row(
+                            id: summary.studentID.rawValue.uuidString,
+                            title: TodayRowPresentation.nameAndFocus(
+                                summary.studentDisplayName,
+                                summary.trainingFocus
+                            ),
+                            subtitle: elapsedText(summary, now: context.date),
+                            actionTitle: String(localized: "today.inProgress.rowContinue"),
+                            accessibilityIdentifier: FCAccessibilityID.todayInProgressRow(
+                                summary.studentID
+                            )
+                        )
+                    },
+                    onRowAction: { id in
+                        guard let studentID = UUID(uuidString: id) else { return }
+                        path.append(.activeSession(studentID))
+                    }
+                )
+                .accessibilityElement(children: .contain)
+                .accessibilityIdentifier(FCAccessibilityID.todayInProgress)
             }
         }
-        .accessibilityIdentifier(FCAccessibilityID.todayInProgress)
+    }
+
+    private func elapsedText(_ summary: InProgressTrainingSummary, now: Date) -> String {
+        summary.elapsedMinutes(now: now).map {
+            String(format: String(localized: "today.inProgress.elapsedFormat"), $0)
+        } ?? ""
     }
 
     // MARK: Appointment sections
@@ -297,7 +366,8 @@ struct TodayView: View {
                     viewModel.isResolvedExpanded.toggle()
                 }
                 .accessibilityIdentifier(FCAccessibilityID.todayResolvedFold)
-                .accessibilityValue(Text(viewModel.isResolvedExpanded ? "today.resolved.expanded" : "today.resolved.collapsed"))
+                .accessibilityValue(
+                    Text(viewModel.isResolvedExpanded ? "today.resolved.expanded" : "today.resolved.collapsed"))
                 if viewModel.isResolvedExpanded {
                     FCListRowDivider()
                     ForEach(viewModel.resolvedRows, id: \.appointment.id) { row in
@@ -355,10 +425,13 @@ struct TodayView: View {
                     .fcFont(.callout, weight: .semibold)
                     .foregroundStyle(FCSemanticColors.textPrimary)
                 VStack(alignment: .leading, spacing: FCPrimitives.space1) {
-                    Text(TodayRowPresentation.nameAndFocus(viewModel.displayName(for: appointment.studentID), appointment.trainingFocus))
-                        .fcFont(.body)
-                        .foregroundStyle(FCSemanticColors.textPrimary)
-                        .lineLimit(1)
+                    Text(
+                        TodayRowPresentation.nameAndFocus(
+                            viewModel.displayName(for: appointment.studentID), appointment.trainingFocus)
+                    )
+                    .fcFont(.body)
+                    .foregroundStyle(FCSemanticColors.textPrimary)
+                    .lineLimit(1)
                     if viewModel.packageAlertStudentIDs.contains(appointment.studentID) {
                         FCStatusLabel(.coursePackageInvalid)
                     }

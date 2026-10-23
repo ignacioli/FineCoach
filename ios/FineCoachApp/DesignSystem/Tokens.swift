@@ -110,6 +110,9 @@ public enum FCSemanticColors {
     /// §10 C9: not in the Penpot token set; backfilled from the artwork
     /// (dark hero-card secondary text, no primitive backing it).
     public static let textOnActionSecondaryHex = "#B0ABA2"
+    /// `color.surface.dividerOnAction` (§2.2, added 2026-10-22, W-08):
+    /// decorative 1pt line between hero-card rows on `action.primary`.
+    public static let surfaceDividerOnActionHex = "#4C4A45"
     public static let statusSuccessHex = FCPrimitives.green600Hex
     public static let statusWarningHex = FCPrimitives.amber700Hex
     public static let statusDestructiveHex = FCPrimitives.red700Hex
@@ -132,6 +135,7 @@ public enum FCSemanticColors {
     public static let textSecondary = Color(hex: textSecondaryHex)
     public static let textDisabled = Color(hex: textDisabledHex)
     public static let textOnActionSecondary = Color(hex: textOnActionSecondaryHex)
+    public static let surfaceDividerOnAction = Color(hex: surfaceDividerOnActionHex)
     public static let statusSuccess = Color(hex: statusSuccessHex)
     public static let statusWarning = Color(hex: statusWarningHex)
     public static let statusDestructive = Color(hex: statusDestructiveHex)

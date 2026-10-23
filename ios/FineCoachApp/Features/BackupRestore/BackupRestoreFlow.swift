@@ -13,6 +13,7 @@ final class BackupRestoreFlowViewModel: ObservableObject {
     @Published var isRestoring = false
     @Published var pickedFileURL: URL?
     @Published var pickedFileName: String?
+    @Published var isConfirmingRestore = false
 
     private let coordinator: BackupCoordinator
     private var restoreTask: Task<Void, Never>?
@@ -21,16 +22,25 @@ final class BackupRestoreFlowViewModel: ObservableObject {
         self.coordinator = coordinator
     }
 
-    func restore(using environment: AppEnvironment) {
+    func requestRestore() {
         guard !isRestoring else {
             return
         }
+        isConfirmingRestore = true
+    }
+
+    func confirmRestore(using environment: AppEnvironment) {
+        guard isConfirmingRestore, !isRestoring else {
+            return
+        }
+        isConfirmingRestore = false
         restoreTask?.cancel()
         restoreTask = Task { await restoreNow(using: environment) }
     }
 
     func cancelInFlight() {
         restoreTask?.cancel()
+        isConfirmingRestore = false
         isRestoring = false
         password = ""
     }
@@ -68,6 +78,11 @@ final class BackupRestoreFlowViewModel: ObservableObject {
                 BackupRestoreRequest(password: imported, sourceFileURL: sourceURL)
             )
             try environment.reloadAfterCommittedRestore()
+            // The restored generation is verified and opened before the
+            // current catalog comparison. The restore result is reported
+            // separately from catalogUnavailableMessage if this follow-up
+            // sync cannot complete; the next launch retries the same path.
+            await environment.prepareExerciseCatalog()
             succeeded = true
             password = ""
         } catch {
@@ -125,7 +140,7 @@ struct BackupRestoreFlowView: View {
                 title: String(localized: "backup.restore.confirm"),
                 isEnabled: !viewModel.isRestoring,
                 action: {
-                    viewModel.restore(using: environment)
+                    viewModel.requestRestore()
                 }
             )
             .padding(.top, FCPrimitives.space1)
@@ -142,6 +157,24 @@ struct BackupRestoreFlowView: View {
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.restoreRoot)
+        .fcConfirmationDialog(isPresented: $viewModel.isConfirmingRestore) {
+            FCConfirmationDialog(
+                title: String(localized: "backup.restore.replaceConfirm.title"),
+                message: String(localized: "backup.restore.replaceConfirm.message"),
+                cancelAction: .init(
+                    title: String(localized: "backup.restore.replaceConfirm.cancel"),
+                    accessibilityIdentifier: FCAccessibilityID.restoreReplaceCancel
+                ) {
+                    viewModel.isConfirmingRestore = false
+                },
+                confirmAction: .init(
+                    title: String(localized: "backup.restore.replaceConfirm.confirm"),
+                    accessibilityIdentifier: FCAccessibilityID.restoreReplaceConfirm
+                ) {
+                    viewModel.confirmRestore(using: environment)
+                }
+            )
+        }
         .onDisappear {
             viewModel.cancelInFlight()
         }
@@ -188,7 +221,7 @@ struct BackupRestoreFlowView: View {
             title: String(localized: "backup.retry"),
             isEnabled: !viewModel.isRestoring,
             accessibilityIdentifier: FCAccessibilityID.restoreRetry,
-            handler: { viewModel.restore(using: environment) }
+            handler: { viewModel.requestRestore() }
         )
     }
 }

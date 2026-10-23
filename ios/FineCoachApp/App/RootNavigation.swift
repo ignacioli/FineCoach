@@ -22,11 +22,14 @@ enum RootDestination: Hashable {
     case manualCreditAdjustment(UUID)
     case templates
     case templateEditor(UUID)
-    case applyTemplate
     case bodyData(UUID)
     case bodyMeasurementEntry(studentID: UUID, metricID: UUID)
     case trends(UUID)
     case archiveExport(UUID)
+    #if DEBUG
+        /// 动效试验（开发版）only exists in DEBUG builds (README §14.1).
+        case motionLab
+    #endif
     case placeholder(PlaceholderKind)
 }
 
@@ -59,9 +62,11 @@ enum RootTab: Hashable {
 @MainActor
 struct RootNavigation: View {
     @EnvironmentObject private var environment: AppEnvironment
+    @EnvironmentObject private var restNotificationRouter: RestNotificationRouter
     @State private var path: [RootDestination] = []
     @State private var onboardingCompleted = false
     @State private var didLoadOnboarding = false
+    @State private var isNavigationStackMounted = false
     @State private var rootTab: RootTab = .today
     /// Set by `AppRoot` while the install is `unselected`, so first-launch onboarding can go
     /// back to the Coach / import choice (M2-07).
@@ -148,13 +153,23 @@ struct RootNavigation: View {
                                     creditSettlement: environment.sessionCreditSettlement,
                                     path: $path
                                 )
+                                .id(studentID)
                             case .exerciseLibrary:
-                                ExerciseLibraryView(useCases: environment.requireExerciseUseCases())
+                                ExerciseLibraryView(
+                                    useCases: environment.requireExerciseUseCases(),
+                                    historyUseCases: environment.requireHistoryUseCases()
+                                )
+                            #if DEBUG
+                                case .motionLab:
+                                    MotionLabView()
+                            #endif
                             case .sessionSummary(let sessionID):
                                 SessionSummaryView(
                                     sessionID: StableUUID(sessionID),
                                     useCases: environment.requireHistoryUseCases(),
                                     templateUseCases: environment.templateUseCases,
+                                    exerciseUseCases: environment.requireExerciseUseCases(),
+                                    rootTab: $rootTab,
                                     path: $path
                                 )
                             case .history(let studentID):
@@ -170,6 +185,7 @@ struct RootNavigation: View {
                                     sessionID: StableUUID(sessionID),
                                     useCases: environment.requireHistoryUseCases(),
                                     templateUseCases: environment.templateUseCases,
+                                    exerciseUseCases: environment.requireExerciseUseCases(),
                                     path: $path
                                 )
                             case .sessionEdit(let sessionID):
@@ -185,6 +201,7 @@ struct RootNavigation: View {
                                     exerciseUseCases: environment.requireExerciseUseCases(),
                                     reportsRootURL: environment.requireReportsRootURL(),
                                     shareAdapter: environment.requireShareAdapter(),
+                                    rootTab: $rootTab,
                                     path: $path
                                 )
                             case .settings:
@@ -243,12 +260,6 @@ struct RootNavigation: View {
                                     templateID: StableUUID(templateID),
                                     useCases: environment.requireTemplateUseCases()
                                 )
-                            case .applyTemplate:
-                                ApplyTemplateView(
-                                    templateUseCases: environment.requireTemplateUseCases(),
-                                    sessionUseCases: environment.requireSessionUseCases(),
-                                    path: $path
-                                )
                             case .bodyData(let studentID):
                                 BodyDataListView(
                                     studentID: StableUUID(studentID),
@@ -283,15 +294,36 @@ struct RootNavigation: View {
                     }
                     .accessibilityElement(children: .contain)
                     .accessibilityIdentifier(FCAccessibilityID.studentList)
+                    .onAppear {
+                        // State loaded by the outer task only selects this branch;
+                        // it does not mean NavigationStack has been inserted yet.
+                        isNavigationStackMounted = true
+                        RestNotificationDiagnostics.record(.stackReady)
+                        Task { await consumePendingRestNotificationIfReady() }
+                    }
+                    .onDisappear {
+                        isNavigationStackMounted = false
+                        RestNotificationDiagnostics.record(.stackRemoved)
+                    }
                 }
             }
         }
         .task {
             await loadInitialState()
         }
+        .onChange(of: restNotificationRouter.pendingRequest) { _, request in
+            guard request != nil else {
+                return
+            }
+            Task { await consumePendingRestNotificationIfReady() }
+        }
+        .onChange(of: path) { _, nextPath in
+            RestNotificationDiagnostics.record(nextPath.isEmpty ? .pathEmpty : .pathNonempty)
+        }
     }
 
     private func loadInitialState() async {
+        RestNotificationDiagnostics.record(.rootLoading)
         #if DEBUG
             await environment.applyUITestSeedingIfNeeded()
         #endif
@@ -303,6 +335,62 @@ struct RootNavigation: View {
         }
         onboardingCompleted = (try? await useCases.isOnboardingCompleted()) ?? false
         didLoadOnboarding = true
+        RestNotificationDiagnostics.record(.rootLoaded)
+        // NavigationStack.onAppear consumes an early tap after insertion.
+        // Later taps are consumed by the pendingRequest observer.
+    }
+
+    /// Mirrors the branches that actually render `NavigationStack` below.
+    private var isReadyForRestNotification: Bool {
+        environment.isStorageAvailable && environment.catalogUnavailableMessage == nil
+            && didLoadOnboarding && onboardingCompleted && isNavigationStackMounted
+    }
+
+    /// Consume at most one request. The request is taken (cleared) before the
+    /// async reads, so it cannot be replayed; if the reads say "no route" the
+    /// tap only opened the app.
+    private func consumePendingRestNotificationIfReady() async {
+        guard let studentUseCases = environment.studentUseCases,
+            let sessionUseCases = environment.sessionUseCases
+        else {
+            return
+        }
+        guard let request = restNotificationRouter.takePendingRequest(ifReady: isReadyForRestNotification) else {
+            return
+        }
+        // Read-only lookups only: `startOrOpen` is never called here.
+        let studentExists = (try? await studentUseCases.student(id: request.studentID)) != nil
+        let activeSession = try? await sessionUseCases.loadActive(sessionID: request.sessionID)
+        let conditions = RestNotificationRouteConditions(
+            isCoachMode: true,
+            isStorageAvailable: environment.isStorageAvailable,
+            isOnboardingCompleted: onboardingCompleted,
+            isRootNavigationReady: isNavigationStackMounted
+        )
+        let decision = RestNotificationRouting.decide(
+            request: request,
+            conditions: conditions,
+            studentExists: studentExists,
+            activeSession: activeSession ?? nil
+        )
+        guard case .route(let routed) = decision else {
+            RestNotificationDiagnostics.record(.ignoredNoRoute)
+            return
+        }
+        showRestNotificationRoute(routed)
+    }
+
+    /// 今日 is the default root surface (M1B-FR-001) and hosts the in-progress
+    /// training entry; the destination replaces the stack instead of pushing a
+    /// duplicate when that Session is already on screen.
+    private func showRestNotificationRoute(_ request: RestNotificationRouteRequest) {
+        let nextPath = RestNotificationNavigation.path(current: path, studentID: request.studentID)
+        guard nextPath != path else {
+            return
+        }
+        rootTab = .today
+        path = nextPath
+        RestNotificationDiagnostics.record(.routed)
     }
 }
 
@@ -410,5 +498,14 @@ extension Array where Element == RootDestination {
             return
         }
         removeAll()
+    }
+
+    /// C15: 「完成」/「跳过分享」end the report flow at the 今日 root. The stack
+    /// and the top-level segment are separate state, so both move here:
+    /// clearing only the stack would leave the user on 学员, and switching
+    /// only the tab would keep the old flow alive behind it.
+    mutating func returnToToday(tab: inout RootTab) {
+        removeAll()
+        tab = .today
     }
 }

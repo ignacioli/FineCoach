@@ -9,9 +9,9 @@ import XCTest
 final class CapabilityManifestTests: XCTestCase {
     private var iosRoot: URL {
         URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent() // Privacy/
-            .deletingLastPathComponent() // FineCoachTests/
-            .deletingLastPathComponent() // ios/
+            .deletingLastPathComponent()  // Privacy/
+            .deletingLastPathComponent()  // FineCoachTests/
+            .deletingLastPathComponent()  // ios/
     }
 
     private func plist(_ name: String) throws -> [String: Any] {
@@ -86,7 +86,9 @@ final class CapabilityManifestTests: XCTestCase {
     /// T019 / M1B-FR-003: the calendar is the app's own month view; there is no
     /// system calendar sync (no EventKit, checked above) and no week or day view.
     func testNoWeekOrDayViewScreens() throws {
-        let enumerator = try XCTUnwrap(FileManager.default.enumerator(at: iosRoot.appendingPathComponent("FineCoachApp/Features"), includingPropertiesForKeys: nil))
+        let enumerator = try XCTUnwrap(
+            FileManager.default.enumerator(
+                at: iosRoot.appendingPathComponent("FineCoachApp/Features"), includingPropertiesForKeys: nil))
         let screens = enumerator.compactMap { ($0 as? URL)?.lastPathComponent }
             .filter { $0.hasSuffix(".swift") && ($0.contains("WeekView") || $0.contains("DayView")) }
         XCTAssertTrue(screens.isEmpty, "week/day view screens are out of scope: \(screens)")

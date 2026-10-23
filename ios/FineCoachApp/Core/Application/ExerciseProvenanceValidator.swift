@@ -269,7 +269,16 @@ public enum PlaceholderExerciseCatalogLoader {
         facetCache.facets()
     }
 
+    /// Returns the Foundation-derived search forms for built-in catalog items.
+    /// The catalog is immutable for the lifetime of a process, so this work is
+    /// performed once alongside the existing facet cache rather than during
+    /// every browse query.
+    public static func pinyinTokens(forExerciseID id: String) -> ExercisePinyinSearchTokens? {
+        pinyinCache.tokensByID()[id]
+    }
+
     private static let facetCache = FacetCache()
+    private static let pinyinCache = PinyinCache()
 
     private final class FacetCache: @unchecked Sendable {
         private let lock = NSLock()
@@ -298,11 +307,148 @@ public enum PlaceholderExerciseCatalogLoader {
                 loaded[exercise.id] = ExerciseCatalogBrowseFacet(
                     primaryMuscleGroup: muscle,
                     equipmentClass: equipment,
-                    secondaryMuscleGroups: exercise.secondaryMuscleGroups ?? []
+                    secondaryMuscleGroups: exercise.secondaryMuscleGroups ?? [],
+                    isUnilateral: exercise.unilateral ?? false
                 )
+            }
+            // Warm the built-in search forms with the same catalog read. A
+            // typed search must only look up these values, never transliterate
+            // the full built-in catalog on its hot path.
+            _ = pinyinCache.tokensByID()
+            cached = loaded
+            return loaded
+        }
+    }
+
+    private final class PinyinCache: @unchecked Sendable {
+        private let lock = NSLock()
+        private var cached: [String: ExercisePinyinSearchTokens]?
+
+        func tokensByID() -> [String: ExercisePinyinSearchTokens] {
+            lock.lock()
+            defer { lock.unlock() }
+            if let cached {
+                return cached
+            }
+            let catalog: PlaceholderExerciseCatalog
+            do {
+                catalog = try PlaceholderExerciseCatalogLoader.loadFromBundle(Bundle.main)
+            } catch {
+                cached = [:]
+                return [:]
+            }
+            var loaded: [String: ExercisePinyinSearchTokens] = [:]
+            loaded.reserveCapacity(catalog.exercises.count)
+            for exercise in catalog.exercises {
+                loaded[exercise.id] = ExercisePinyinSearch.tokens(for: exercise.canonicalName)
             }
             cached = loaded
             return loaded
+        }
+    }
+}
+
+/// Search forms derived from a display name using Foundation's Mandarin
+/// transliteration. `sourceValue` lets callers detect a catalog-content change
+/// before reusing an id-based precomputed token.
+public struct ExercisePinyinSearchTokens: Hashable, Sendable {
+    public let sourceValue: String
+    public let fullPinyin: String
+    public let initials: String
+
+    public init(sourceValue: String, fullPinyin: String, initials: String) {
+        self.sourceValue = sourceValue
+        self.fullPinyin = fullPinyin
+        self.initials = initials
+    }
+}
+
+public enum ExercisePinyinSearch {
+    // Product decision on 2026-10-19: fix these two polyphonic characters only.
+    // Keep the surrounding spaces to preserve syllable boundaries for adjacent overrides.
+    private static let fixedPolyphonicPinyin: [Character: String] = [
+        "弹": " tan ",
+        "地": " di ",
+    ]
+    private static let cache = TokenCache()
+
+    public static func tokens(for value: String) -> ExercisePinyinSearchTokens {
+        cache.tokens(for: value)
+    }
+
+    public static func normalizedQuery(_ query: String) -> String {
+        removeWhitespace(
+            query
+                .precomposedStringWithCanonicalMapping
+                .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: Locale(identifier: "en_US_POSIX"))
+        ).lowercased()
+    }
+
+    public static func matches(
+        tokens: ExercisePinyinSearchTokens,
+        normalizedQuery: String
+    ) -> Bool {
+        guard !normalizedQuery.isEmpty else {
+            return false
+        }
+        return tokens.fullPinyin.contains(normalizedQuery) || tokens.initials.contains(normalizedQuery)
+    }
+
+    public static func matches(value: String, query: String) -> Bool {
+        matches(tokens: tokens(for: value), normalizedQuery: normalizedQuery(query))
+    }
+
+    private static func removeWhitespace(_ value: String) -> String {
+        value.unicodeScalars
+            .filter { !CharacterSet.whitespacesAndNewlines.contains($0) }
+            .map(String.init)
+            .joined()
+    }
+
+    private static func makeTokens(for value: String) -> ExercisePinyinSearchTokens {
+        let sourceValue = value.precomposedStringWithCanonicalMapping
+        let transliterationInput =
+            sourceValue
+            .map { fixedPolyphonicPinyin[$0] ?? String($0) }
+            .joined()
+        let transformed =
+            transliterationInput.applyingTransform(.mandarinToLatin, reverse: false)
+            ?? transliterationInput
+        let folded = transformed.folding(
+            options: [.caseInsensitive, .diacriticInsensitive],
+            locale: Locale(identifier: "en_US_POSIX")
+        )
+        let fullPinyin = removeWhitespace(folded).lowercased()
+        let initials =
+            transformed
+            .split(whereSeparator: { $0.isWhitespace })
+            .compactMap { token in
+                token.first(where: { $0.isLetter || $0.isNumber }).map(String.init)
+            }
+            .joined()
+            .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: Locale(identifier: "en_US_POSIX"))
+            .lowercased()
+        return ExercisePinyinSearchTokens(
+            sourceValue: sourceValue,
+            fullPinyin: fullPinyin,
+            initials: initials
+        )
+    }
+
+    private final class TokenCache: @unchecked Sendable {
+        private let lock = NSLock()
+        private var values: [String: ExercisePinyinSearchTokens] = [:]
+
+        func tokens(for value: String) -> ExercisePinyinSearchTokens {
+            let key = value.precomposedStringWithCanonicalMapping
+            lock.lock()
+            defer { lock.unlock() }
+            if let cached = values[key] {
+                return cached
+            }
+            let computed = ExercisePinyinSearch.makeTokens(for: key)
+            values[key] = computed
+            return computed
         }
     }
 }

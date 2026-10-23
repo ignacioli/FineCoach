@@ -16,7 +16,7 @@ public struct FCHubRow: View {
     public enum Icon {
         /// An SF Symbol name, drawn 24×24.
         case symbol(String)
-        /// One of the 18 equipment icons, drawn 24×24.
+        /// One of the 21 equipment icons, drawn 24×24.
         case equipment(FCEquipmentIcon)
     }
 

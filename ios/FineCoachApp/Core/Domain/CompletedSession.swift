@@ -130,3 +130,57 @@ public struct CompletedSession: Hashable, Codable, Sendable, Identifiable {
         )
     }
 }
+
+/// Selects the most recently completed catalog exercises that are still
+/// selectable in the current exercise list. The caller supplies the history
+/// scope: a student id limits the result to that student's sessions, while
+/// `nil` considers all completed sessions for the coach.
+public enum RecentExerciseSelection {
+    public static func entries(
+        from sessions: [CompletedSession],
+        studentID: StableUUID? = nil,
+        availableEntries: [ExerciseLibraryEntry],
+        limit: Int = 5
+    ) -> [ExerciseLibraryEntry] {
+        guard limit > 0 else { return [] }
+
+        let availableByID = Dictionary(
+            availableEntries.compactMap { entry -> (StableExerciseID, ExerciseLibraryEntry)? in
+                guard entry.item.lifecycle == .active,
+                    !entry.item.isRetired,
+                    entry.preference?.isHidden != true
+                else {
+                    return nil
+                }
+                return (entry.id, entry)
+            },
+            uniquingKeysWith: { first, _ in first }
+        )
+        guard !availableByID.isEmpty else { return [] }
+
+        let scopedSessions =
+            sessions
+            .filter { studentID == nil || $0.studentID == studentID }
+            .sorted { $0.completedAtUTC > $1.completedAtUTC }
+        var seen = Set<StableExerciseID>()
+        var result: [ExerciseLibraryEntry] = []
+        result.reserveCapacity(min(limit, availableByID.count))
+
+        for session in scopedSessions {
+            for exercise in session.exercises {
+                guard exercise.sourceKind != .sessionOnly,
+                    let sourceID = exercise.sourceID,
+                    let entry = availableByID[sourceID],
+                    seen.insert(sourceID).inserted
+                else {
+                    continue
+                }
+                result.append(entry)
+                if result.count == limit {
+                    return result
+                }
+            }
+        }
+        return result
+    }
+}

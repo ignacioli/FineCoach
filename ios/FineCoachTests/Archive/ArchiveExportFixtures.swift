@@ -99,7 +99,8 @@ enum ArchiveExportFixtures {
         let writer = store.writer
         let clock = TestClock(utcDate: now)
         let repository = CoreDataStudentRepository(writer: writer)
-        let students = StudentUseCases(repository: repository, clock: clock, ids: TestIDGenerator(ids: [studentID.rawValue]))
+        let students = StudentUseCases(
+            repository: repository, clock: clock, ids: TestIDGenerator(ids: [studentID.rawValue]))
         _ = try await students.create(
             draft: StudentDraft(
                 displayName: studentName,
@@ -188,8 +189,10 @@ enum ArchiveExportFixtures {
         return try session(
             id, state: .completed, completedAt: completed1, summary: summaryOne, focus: [.chest, .arms],
             exercises: [
-                try exercise(id, order: 1, kind: .builtIn, sourceID: builtInID, name: builtInName, section: sectionID,
-                    note: excludedActionNote) { owner in
+                try exercise(
+                    id, order: 1, kind: .builtIn, sourceID: builtInID, name: builtInName, section: sectionID,
+                    note: excludedActionNote
+                ) { owner in
                     [
                         set(0, owner: owner, weight: "60", reps: "8", at: completed1),
                         set(1, owner: owner, weight: "62.5", reps: "6", at: completed1),
@@ -197,8 +200,10 @@ enum ArchiveExportFixtures {
                         set(3, owner: owner, state: .pending, weight: "98", reps: "2", at: completed1),
                     ]
                 },
-                try exercise(id, order: 2, kind: .custom, sourceID: customExerciseID.uuidString,
-                    name: customExerciseName, section: sectionID) { owner in
+                try exercise(
+                    id, order: 2, kind: .custom, sourceID: customExerciseID.uuidString,
+                    name: customExerciseName, section: sectionID
+                ) { owner in
                     [set(0, owner: owner, weight: "20", reps: "10", at: completed1)]
                 },
                 try exercise(id, order: 3, kind: .sessionOnly, sourceID: nil, name: oneOffNames[0]) { owner in
@@ -219,7 +224,8 @@ enum ArchiveExportFixtures {
                 try exercise(id, order: 0, kind: .builtIn, sourceID: builtInID, name: builtInName) { owner in
                     [set(0, owner: owner, weight: "65", reps: "5", at: completed2)]
                 },
-                try exercise(id, order: 1, kind: .builtIn, sourceID: secondBuiltInID, name: secondBuiltInName) { owner in
+                try exercise(id, order: 1, kind: .builtIn, sourceID: secondBuiltInID, name: secondBuiltInName) {
+                    owner in
                     [set(0, owner: owner, weight: "22", reps: "10", at: completed2)]
                 },
                 try exercise(id, order: 2, kind: .sessionOnly, sourceID: nil, name: oneOffNames[1]) { owner in
@@ -232,7 +238,8 @@ enum ArchiveExportFixtures {
     }
 
     private static func abandonedSession() throws -> Session {
-        try session(abandonedSessionID, state: .abandonedEmpty, completedAt: nil, summary: nil, focus: [], exercises: [])
+        try session(
+            abandonedSessionID, state: .abandonedEmpty, completedAt: nil, summary: nil, focus: [], exercises: [])
     }
 
     private static func inProgressSession() throws -> Session {
@@ -327,9 +334,17 @@ final class StubArchiveIdentity: ArchiveExportIdentityProviding, @unchecked Send
         self.failure = failure
     }
 
-    var calls: Int { lock.lock(); defer { lock.unlock() }; return count }
+    var calls: Int {
+        lock.lock()
+        defer { lock.unlock() }
+        return count
+    }
 
-    func setFailure(_ error: Error?) { lock.lock(); failure = error; lock.unlock() }
+    func setFailure(_ error: Error?) {
+        lock.lock()
+        failure = error
+        lock.unlock()
+    }
 
     func ensureIdentity(forStudent studentID: StableUUID) async throws -> ArchiveIdentity {
         let pending: Error? = lock.withLock {
@@ -350,14 +365,22 @@ struct StubSourceReader: ArchiveExportSourceReading {
 final class RecordingLogger: AppLogging, @unchecked Sendable {
     private let lock = NSLock()
     private var recorded: [String] = []
-    var events: [String] { lock.lock(); defer { lock.unlock() }; return recorded }
+    var events: [String] {
+        lock.lock()
+        defer { lock.unlock() }
+        return recorded
+    }
 
     func info(_ event: AppLogEvent, operation: AppLogOperation) {
-        lock.lock(); recorded.append(event.rawValue); lock.unlock()
+        lock.lock()
+        recorded.append(event.rawValue)
+        lock.unlock()
     }
 
     func failure(_ event: AppLogEvent, operation: AppLogOperation, category: AppLogErrorCategory) {
-        lock.lock(); recorded.append(event.rawValue); lock.unlock()
+        lock.lock()
+        recorded.append(event.rawValue)
+        lock.unlock()
     }
 }
 

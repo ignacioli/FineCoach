@@ -3,10 +3,12 @@ import SwiftUI
 @main
 @MainActor
 struct FineCoachApp: App {
+    @UIApplicationDelegateAdaptor(RestNotificationAppDelegate.self) private var appDelegate
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var environment: AppEnvironment
     @StateObject private var privacyCoordinator = ScenePrivacyCoordinator()
     @StateObject private var lifecycleCoordinator = AppLifecycleCoordinator()
+    @StateObject private var restNotificationRouter = RestNotificationRouter.shared
 
     init() {
         _environment = StateObject(wrappedValue: AppEnvironment.bootstrap())
@@ -20,6 +22,7 @@ struct FineCoachApp: App {
                 .fcFont(.body)
                 .environmentObject(environment)
                 .environmentObject(privacyCoordinator)
+                .environmentObject(restNotificationRouter)
                 .task {
                     await lifecycleCoordinator.sceneDidBecomeActive(environment: environment)
                 }

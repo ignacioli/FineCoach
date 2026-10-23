@@ -48,7 +48,7 @@ final class StudentDetailViewModel: ObservableObject {
     func reload() async {
         do {
             student = try await useCases.student(id: studentID)
-            inProgress = try await useCases.inProgressTraining()
+            inProgress = try await useCases.inProgressTraining(studentID: studentID)
             let history = try await historyUseCases.listHistory(studentID: studentID)
             mostRecentCompletedSession = CompletedSession.mostRecent(in: history)
             if let appointmentUseCases {
@@ -232,10 +232,12 @@ struct StudentDetailView: View {
                 if let next = viewModel.nextAppointment {
                     sheetAppointment = next
                 } else if student.lifecycle == .active {
-                    path.append(.appointmentEditor(.create(
-                        studentID: student.id.rawValue,
-                        date: LocalDate(date: Date(), calendar: .current)
-                    )))
+                    path.append(
+                        .appointmentEditor(
+                            .create(
+                                studentID: student.id.rawValue,
+                                date: LocalDate(date: Date(), calendar: .current)
+                            )))
                 }
             }
             FCListRowDivider()
@@ -348,13 +350,19 @@ struct StudentDetailView: View {
             FCSectionLabel(String(localized: "student.detail.profile"))
                 .padding(.bottom, FCPrimitives.space2)
             FCListRowDivider()
-            FCLabelValueRow(label: String(localized: "student.field.sex"), value: StudentSexPresentation.title(student.sex))
+            FCLabelValueRow(
+                label: String(localized: "student.field.sex"), value: StudentSexPresentation.title(student.sex))
             FCListRowDivider()
-            FCLabelValueRow(label: String(localized: "student.field.phone"), value: StudentDetailPresentation.filled(student.phone))
+            FCLabelValueRow(
+                label: String(localized: "student.field.phone"), value: StudentDetailPresentation.filled(student.phone))
             FCListRowDivider()
-            FCLabelValueRow(label: String(localized: "student.field.wechat"), value: StudentDetailPresentation.filled(student.wechatID))
+            FCLabelValueRow(
+                label: String(localized: "student.field.wechat"),
+                value: StudentDetailPresentation.filled(student.wechatID))
             FCListRowDivider()
-            FCLabelValueRow(label: String(localized: "student.field.privateNote"), value: StudentDetailPresentation.filled(student.privateCoachNote))
+            FCLabelValueRow(
+                label: String(localized: "student.field.privateNote"),
+                value: StudentDetailPresentation.filled(student.privateCoachNote))
             FCListRowDivider()
             notesRow(student)
             FCListRowDivider()
@@ -387,7 +395,8 @@ struct StudentDetailView: View {
             }
         }
         .accessibilityIdentifier(FCAccessibilityID.detailNotesFold)
-        .accessibilityValue(Text(viewModel.notesExpanded ? "student.detail.notesExpanded" : "student.detail.notesCollapsed"))
+        .accessibilityValue(
+            Text(viewModel.notesExpanded ? "student.detail.notesExpanded" : "student.detail.notesCollapsed"))
         if hasNotes, viewModel.notesExpanded {
             Text(String(localized: "student.detail.notesDisclaimer"))
                 .fcFont(.caption)
@@ -439,7 +448,8 @@ enum StudentDetailPresentation {
         guard let appointment else {
             return String(localized: "student.detail.noNextClass")
         }
-        let day = AppointmentEditorFormatting.monthDayWeekday(appointment.date).replacingOccurrences(of: " · ", with: " ")
+        let day = AppointmentEditorFormatting.monthDayWeekday(appointment.date).replacingOccurrences(
+            of: " · ", with: " ")
         let base = "\(day) \(appointment.startTime.canonicalString)"
         guard let parts = BodyPart.joinedDisplayNames(for: appointment.trainingFocus, separator: "、") else {
             return base
@@ -453,7 +463,8 @@ enum StudentDetailPresentation {
         guard let end = package.endDate else {
             return total
         }
-        return "\(total) · " + String(format: String(localized: "student.detail.validUntilFormat"), "\(end.month)月\(end.day)日")
+        return "\(total) · "
+            + String(format: String(localized: "student.detail.validUntilFormat"), "\(end.month)月\(end.day)日")
     }
 
     /// "9月25日 · 大腿、臀 · 12 组"
@@ -465,7 +476,8 @@ enum StudentDetailPresentation {
         if let focus = BodyPart.joinedDisplayNames(for: session.trainingFocus, separator: "、") {
             parts.append(focus)
         }
-        parts.append(String(format: String(localized: "student.detail.setCountFormat"), session.statistics.completedSetCount))
+        parts.append(
+            String(format: String(localized: "student.detail.setCountFormat"), session.statistics.completedSetCount))
         return parts.joined(separator: " · ")
     }
 }

@@ -25,8 +25,10 @@ struct ExerciseLibraryView: View {
     @State private var isFilterSheetPresented = false
     @State private var optionsEntryID: StableExerciseID?
 
-    init(useCases: ExerciseLibraryUseCases) {
-        _viewModel = StateObject(wrappedValue: ExerciseLibraryViewModel(useCases: useCases))
+    init(useCases: ExerciseLibraryUseCases, historyUseCases: HistoryUseCases) {
+        _viewModel = StateObject(
+            wrappedValue: ExerciseLibraryViewModel(useCases: useCases, historyUseCases: historyUseCases)
+        )
     }
 
     private var optionsEntry: ExerciseLibraryEntry? {
@@ -54,6 +56,10 @@ struct ExerciseLibraryView: View {
                     Text(errorMessage)
                         .fcFont(.caption)
                         .foregroundStyle(FCSemanticColors.statusDestructive)
+                }
+
+                if viewModel.showsRecentEntries {
+                    recentSection
                 }
 
                 ForEach(viewModel.sections) { section in
@@ -85,7 +91,7 @@ struct ExerciseLibraryView: View {
                 optionsSheet(entry)
             }
         }
-        .task { await viewModel.reload() }
+        .task { await viewModel.load() }
         .onChange(of: editorRoute) { _, newValue in
             if newValue == nil {
                 Task { await viewModel.reload() }
@@ -163,32 +169,31 @@ struct ExerciseLibraryView: View {
 
     // MARK: Rows
 
+    private var recentSection: some View {
+        VStack(alignment: .leading, spacing: FCPrimitives.space2) {
+            FCSectionLabel(String(localized: "exercise.library.recent"))
+                .accessibilityIdentifier(FCAccessibilityID.exerciseLibraryRecent)
+            VStack(spacing: 0) {
+                FCListRowDivider()
+                ForEach(viewModel.recentEntries) { entry in
+                    Button {
+                        optionsEntryID = entry.id
+                    } label: {
+                        FCExerciseLibraryRowLabel(entry: entry)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier(FCAccessibilityID.exerciseLibraryRecentRow(entry.id))
+                    FCListRowDivider()
+                }
+            }
+        }
+    }
+
     private func row(for entry: ExerciseLibraryEntry) -> some View {
         Button {
             optionsEntryID = entry.id
         } label: {
-            HStack(spacing: FCPrimitives.space4) {
-                if let icon = FCEquipmentIcon.icon(equipmentClass: entry.equipmentClass, primaryMuscleGroup: entry.primaryMuscleGroup) {
-                    FCEquipmentIconView(icon)
-                }
-                VStack(alignment: .leading, spacing: FCPrimitives.space1) {
-                    Text(entry.displayedName)
-                        .fcFont(.headline)
-                        .foregroundStyle(FCSemanticColors.textPrimary)
-                    Text(subtitle(for: entry))
-                        .fcFont(.caption)
-                        .foregroundStyle(FCSemanticColors.textSecondary)
-                }
-                Spacer(minLength: FCPrimitives.space2)
-                if entry.preference?.isFavorite == true {
-                    Image(systemName: "star.fill")
-                        .foregroundStyle(FCSemanticColors.actionPrimary)
-                        .accessibilityLabel(Text("exercise.library.favorite"))
-                }
-                FCSymbol(.forward)
-            }
-            .padding(.vertical, FCPrimitives.space3)
-            .contentShape(Rectangle())
+            FCExerciseLibraryRowLabel(entry: entry)
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier(FCAccessibilityID.exerciseLibraryRow(entry.id))
@@ -197,22 +202,7 @@ struct ExerciseLibraryView: View {
     /// "杠铃 · 次要：肩、臂"; custom exercises read "自定义"; hidden ones are
     /// marked when "显示已隐藏" is on.
     private func subtitle(for entry: ExerciseLibraryEntry) -> String {
-        var parts: [String] = []
-        if entry.item.kind == .custom {
-            parts.append(String(localized: "exercise.kind.custom"))
-        } else {
-            parts.append(entry.equipmentClass.flatMap { $0.isEmpty ? nil : $0 } ?? String(localized: "exercise.kind.builtIn"))
-            if !entry.secondaryMuscleGroups.isEmpty {
-                parts.append(String(
-                    format: String(localized: "exercise.library.secondaryFormat"),
-                    entry.secondaryMuscleGroups.joined(separator: "、")
-                ))
-            }
-        }
-        if entry.preference?.isHidden == true {
-            parts.append(String(localized: "exercise.library.hiddenTag"))
-        }
-        return parts.joined(separator: " · ")
+        FCExerciseLibraryRowLabel.subtitle(for: entry)
     }
 
     private func sectionTitle(_ id: String) -> String {
@@ -304,6 +294,15 @@ struct ExerciseLibraryView: View {
                     )
                 )
                 .accessibilityIdentifier(FCAccessibilityID.exerciseLibraryAssisted(entry.id))
+                FCListRowDivider()
+                toggleRow(
+                    String(localized: "exercise.library.unilateral"),
+                    isOn: Binding(
+                        get: { entry.isUnilateral },
+                        set: { _ in Task { await viewModel.toggleUnilateral(entry) } }
+                    )
+                )
+                .accessibilityIdentifier(FCAccessibilityID.exerciseLibraryUnilateral(entry.id))
                 if entry.item.kind == .custom {
                     FCListRowDivider()
                     FCActionRow(title: String(localized: "exercise.library.editCustom")) {

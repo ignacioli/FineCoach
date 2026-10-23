@@ -1,0 +1,14 @@
+---
+description: Swift 界面源码用设计 token 和统一数字格式；可见入口与入口和布局清单见 AGENTS.md。
+globs: ios/**/*.swift
+alwaysApply: false
+---
+
+# Swift
+
+- `ios/FineCoachApp` 里 `DesignSystem/` 以外的源码只用 `FCSemanticColors`、`FCPrimitives` 和 `.fcFont(_:)`。原始颜色、系统字体、非 0 间距字面量、圆角字面量会使 `DesignValueScanTests` 失败。（`design/design-system/components.md` §2 DS-BASE；`ios/FineCoachTests/DesignSystem/DesignValueScanTests.swift`）
+- 组件内部的 SF Symbol 可以用 `.font(.system(size:weight:))`，尺寸必须来自 `design/design-system/README.md` §7.2。（`components.md` §2 DS-BASE）
+- 可见文案用 `Text(String(localized:))` 或 verbatim 字符串。`Text("key")` 只用于无障碍标签。（`components.md` §2 DS-BASE）
+- 用户可见数字遵守 README §13。`NumberFormatScanTests` 只卡住 N1、N3、N4、N7。（README §13；`ios/FineCoachTests/DesignSystem/NumberFormatScanTests.swift`）
+- 训练页录入区（`SetEditor`、`FCSetRow`）只用设计系统按钮，不得出现裸系统 `Button`；非编辑态只有一个主按钮「确认」。违反会使 `TrainingEntryScanTests` 失败。要加入口先按差异清单问产品负责人。（`ios/FineCoachTests/DesignSystem/TrainingEntryScanTests.swift`；implementation-map §画稿与现状差异清单）
+- 用仓库根目录的 `.swift-format`：4 个空格、行宽 120、保留已有换行。（`.swift-format`）
