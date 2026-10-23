@@ -13,7 +13,7 @@ final class FCMotionTests: XCTestCase {
         XCTAssertEqual(FCMotion.durationFast, 0.2)
         XCTAssertEqual(FCMotion.durationStandard, 0.25)
         XCTAssertEqual(FCMotion.durationGentle, 0.35)
-        XCTAssertEqual(FCMotion.durationEmphasis, 0.6)
+        XCTAssertEqual(FCMotion.durationEmphasis, 1.5)
     }
 
     // MARK: §14.2 curves
@@ -54,13 +54,14 @@ final class FCMotionTests: XCTestCase {
 
     // MARK: §14.2 spacing + §14.4 record float
 
-    func testRecordFloatUsesTheApprovedEmphasisDurationAndSpace3Distance() throws {
-        // "新纪录数值浮起 space.3 (12pt)", `motion.duration.emphasis` (0.6).
-        XCTAssertEqual(FCPrimitives.space3, 12)
-        XCTAssertEqual(FCMotion.durationEmphasis, 0.6)
+    func testRecordFloatUsesTheApprovedEmphasisDurationAndSpace6Distance() throws {
+        // "新纪录数值浮起 space.6 (24pt)", `motion.duration.emphasis` (1.5):
+        // candidate D, picked on device by the product owner 2026-10-23.
+        XCTAssertEqual(FCPrimitives.space6, 24)
+        XCTAssertEqual(FCMotion.durationEmphasis, 1.5)
         // The distance is the spacing token, not a new number.
-        XCTAssertEqual(FCMotion.recordFloatDistance, FCPrimitives.space3)
-        XCTAssertEqual(FCMotion.recordFloatDistance, 12)
+        XCTAssertEqual(FCMotion.recordFloatDistance, FCPrimitives.space6)
+        XCTAssertEqual(FCMotion.recordFloatDistance, 24)
 
         // The public `FCSetRow` init takes those two tokens as its defaults;
         // the DEBUG test bench is the only caller that overrides them.

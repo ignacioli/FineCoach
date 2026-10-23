@@ -755,7 +755,7 @@ struct ActiveSessionView: View {
                     ? { Task { await viewModel.undoRecentSet() } }
                     : nil,
                 recordFloatSequence: recordFloatSequence(for: trainingSet),
-                // Production keeps the approved pair: `space.3` + `emphasis`.
+                // Production keeps the approved pair: `space.6` + `emphasis`.
                 recordFloatDistance: FCMotion.recordFloatDistance,
                 recordFloatDuration: FCMotion.durationEmphasis
             )

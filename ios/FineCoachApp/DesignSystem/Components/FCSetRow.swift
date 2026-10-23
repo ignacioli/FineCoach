@@ -64,8 +64,8 @@ public struct FCSetRow: View {
 
     /// Internal because the motion tokens are internal (§14 is the token
     /// source; `components.md` is not edited, so the tokens are not public).
-    /// Production callers use the defaults above -- `space3` and `emphasis`,
-    /// i.e. candidate B; only the DEBUG motion test bench overrides them.
+    /// Production callers use the defaults above -- `space6` and `emphasis`,
+    /// i.e. candidate D; only the DEBUG motion test bench overrides them.
     init(
         title: String,
         value: String,

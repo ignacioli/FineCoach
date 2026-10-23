@@ -97,6 +97,17 @@
         }
       }
     },
+    "motionLab.optionD": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "D 24pt · 1.5 s"
+          }
+        }
+      }
+    },
     "motionLab.plainConfirm": {
       "extractionState": "manual",
       "localizations": {

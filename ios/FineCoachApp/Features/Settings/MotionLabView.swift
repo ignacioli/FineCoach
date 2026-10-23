@@ -4,8 +4,9 @@
     /// 开发版动效试验页 (README §14.1, §14.4 ⑤; Penpot `D-a3`). DEBUG only.
     /// The product owner plays the three candidates on a device and picks the
     /// final float distance and duration; the chosen pair is then written back
-    /// into README §14. Production code keeps `FCMotion.durationEmphasis` +
-    /// `FCMotion.recordFloatDistance` (= `space.3`), which is candidate B.
+    /// into README §14. The owner picked D on 2026-10-23, so production
+    /// `FCMotion.durationEmphasis` + `FCMotion.recordFloatDistance` (= `space.6`)
+    /// are candidate D; A–C stay for comparison.
     ///
     /// It reads and writes no persisted data: one hard-coded example set row
     /// (`125 kg × 5`), no Student record.
@@ -16,22 +17,26 @@
             case a = "A"
             case b = "B"
             case c = "C"
+            /// Owner request 2026-10-23: a bolder candidate to compare.
+            case d = "D"
 
-            /// A 8pt / B 12pt / C 16pt — the approved spacing tokens.
+            /// A 8pt / B 12pt / C 16pt / D 24pt — the approved spacing tokens.
             var distance: CGFloat {
                 switch self {
                 case .a: return FCPrimitives.space2
-                case .b: return FCMotion.recordFloatDistance
+                case .b: return FCPrimitives.space3
                 case .c: return FCPrimitives.space4
+                case .d: return FCMotion.recordFloatDistance
                 }
             }
 
-            /// A 0.5 s / B 0.6 s (`motion.duration.emphasis`) / C 0.8 s.
+            /// A 0.5 s / B 0.6 s / C 0.8 s / D 1.5 s (`motion.duration.emphasis`).
             var duration: Double {
                 switch self {
                 case .a: return 0.5
-                case .b: return FCMotion.durationEmphasis
+                case .b: return 0.6
                 case .c: return 0.8
+                case .d: return FCMotion.durationEmphasis
                 }
             }
 
@@ -40,6 +45,7 @@
                 case .a: return String(localized: "motionLab.optionA")
                 case .b: return String(localized: "motionLab.optionB")
                 case .c: return String(localized: "motionLab.optionC")
+                case .d: return String(localized: "motionLab.optionD")
                 }
             }
         }

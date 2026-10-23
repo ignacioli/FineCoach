@@ -20,8 +20,9 @@ enum FCMotion {
     /// `motion.duration.gentle`: page-content arrival.
     static let durationGentle: Double = 0.35
     /// `motion.duration.emphasis`: one-shot emphasis; the new-record value
-    /// float (D-a3).
-    static let durationEmphasis: Double = 0.6
+    /// float (D-a3). 1.5 s: candidate D, picked on device by the product
+    /// owner 2026-10-23.
+    static let durationEmphasis: Double = 1.5
 
     // MARK: §14.2 — curves
 
@@ -39,9 +40,9 @@ enum FCMotion {
 
     // MARK: §14.2 — distance (a spacing token, never a new number)
 
-    /// 新纪录数值浮起 distance: §14.2 fixes it at `space.3` (12pt), so the
-    /// float cannot invent a distance of its own.
-    static let recordFloatDistance: CGFloat = FCPrimitives.space3
+    /// 新纪录数值浮起 distance: §14.2 fixes it at `space.6` (24pt, candidate
+    /// D), so the float cannot invent a distance of its own.
+    static let recordFloatDistance: CGFloat = FCPrimitives.space6
 
     /// `motion.spring.toggle` parameters: `spring(response: 0.25,
     /// dampingFraction: 0.55)`.
