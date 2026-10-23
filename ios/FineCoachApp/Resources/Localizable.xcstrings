@@ -3059,6 +3059,17 @@
         }
       }
     },
+    "settings.sourceCode": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "源代码"
+          }
+        }
+      }
+    },
     "today.addAppointment": {
       "extractionState": "manual",
       "localizations": {

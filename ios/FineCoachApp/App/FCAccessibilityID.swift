@@ -179,6 +179,7 @@ public enum FCAccessibilityID {
     public static let settingsNotifications = "settings.notifications"
     public static let settingsBackup = "settings.backup"
     public static let settingsAbout = "settings.about"
+    public static let settingsSourceCode = "settings.sourceCode"
 
     #if DEBUG
         // 动效试验（开发版）, the DEBUG-only motion test bench (README §14.1).
