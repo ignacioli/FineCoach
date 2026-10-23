@@ -308,6 +308,8 @@ struct BodyMeasurementEntryView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: FCPrimitives.space4) {
+                pageHeader
+
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage).foregroundStyle(FCSemanticColors.statusDestructive)
                 }
@@ -416,11 +418,11 @@ struct BodyMeasurementEntryView: View {
                 }
 
             }
-            .padding(FCPrimitives.space4)
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.bottom, FCPrimitives.space4)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(viewModel.metric?.name.value ?? String(localized: "bodyMeasurementEntry.title"))
-        .navigationBarTitleDisplayMode(.inline)
+        .fcSecondaryPage()
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.bodyMeasurementEntryRoot)
         .task { await viewModel.reload() }
@@ -430,13 +432,6 @@ struct BodyMeasurementEntryView: View {
         }
         .onDisappear {
             Task { await viewModel.finalizePendingDeletion() }
-        }
-        .toolbar {
-            if viewModel.isCustomMetric {
-                ToolbarItem(placement: .topBarTrailing) {
-                    metricActionsMenu
-                }
-            }
         }
         .onChange(of: viewModel.didDeleteMetric) { _, deleted in
             if deleted {
@@ -474,6 +469,25 @@ struct BodyMeasurementEntryView: View {
                     Task { await viewModel.confirmDeleteAll() }
                 }
             )
+        }
+    }
+
+    /// Inline page title. Custom metrics keep 「…」 on the title's first line,
+    /// trailing, so a long name wraps in the width `FCPageHeader` has left
+    /// (`DS-MORE-MENU`, B-c). `FCPageHeader` has no menu slot; this row only
+    /// composes the existing header with `FCMoreMenu`.
+    @ViewBuilder
+    private var pageHeader: some View {
+        let title = viewModel.metric?.name.value ?? String(localized: "bodyMeasurementEntry.title")
+        if viewModel.isCustomMetric {
+            HStack(alignment: .top, spacing: FCPrimitives.space2) {
+                FCPageHeader(title: title, back: .init())
+                metricActionsMenu
+                    .padding(.top, FCPrimitives.space2)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        } else {
+            FCPageHeader(title: title, back: .init())
         }
     }
 

@@ -175,6 +175,8 @@ struct TemplateEditorView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: FCPrimitives.space4) {
+                FCPageHeader(title: String(localized: "templateEditor.title"), back: .init())
+
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage).foregroundStyle(FCSemanticColors.statusDestructive)
                 }
@@ -224,11 +226,11 @@ struct TemplateEditorView: View {
                 }
                 .accessibilityIdentifier(FCAccessibilityID.templateListDelete)
             }
-            .padding(FCPrimitives.space4)
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.bottom, FCPrimitives.space4)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(String(localized: "templateEditor.title"))
-        .navigationBarTitleDisplayMode(.inline)
+        .fcSecondaryPage()
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.templateEditorRoot)
         .fcConfirmationDialog(isPresented: $isConfirmingDelete) {

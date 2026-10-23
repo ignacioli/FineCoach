@@ -533,6 +533,7 @@ public enum FCAccessibilityID {
     }
 
     public static let customExerciseRoot = "customExercise.root"
+    public static let customExerciseBack = "customExercise.back"
     public static let customExerciseName = "customExercise.name"
     public static let customExerciseModeWeightReps = "customExercise.mode.weightReps"
     public static let customExerciseModeReps = "customExercise.mode.reps"

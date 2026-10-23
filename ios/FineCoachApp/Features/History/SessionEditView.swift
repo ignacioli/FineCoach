@@ -49,6 +49,8 @@ struct SessionEditView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: FCPrimitives.space4) {
+                FCPageHeader(title: String(localized: "detail.edit"), back: .init())
+
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage).foregroundStyle(FCSemanticColors.statusDestructive)
                 }
@@ -65,12 +67,12 @@ struct SessionEditView: View {
                 }
                 .accessibilityIdentifier(FCAccessibilityID.sessionEditSave)
             }
-            .padding(FCPrimitives.space4)
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.bottom, FCPrimitives.space4)
         }
         .scrollDismissesKeyboard(.interactively)
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(String(localized: "detail.edit"))
-        .navigationBarTitleDisplayMode(.inline)
+        .fcSecondaryPage()
         .task { await viewModel.load() }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.sessionEditRoot)
