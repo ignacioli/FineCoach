@@ -4005,17 +4005,6 @@
         }
       }
     },
-    "applyTemplate.title": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "应用模板"
-          }
-        }
-      }
-    },
     "applyTemplate.empty": {
       "extractionState": "manual",
       "localizations": {

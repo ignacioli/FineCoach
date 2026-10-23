@@ -94,7 +94,7 @@ final class StudentLifecycleUITests: XCTestCase {
         tapVisible(in: app, identifier: "studentDetail.delete")
         let nameField = app.textFields["deleteStudent.confirmName"]
         XCTAssertTrue(nameField.waitForExistence(timeout: 8))
-        XCTAssertTrue(app.navigationBars["永久删除"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["永久删除"].waitForExistence(timeout: 2))
         XCTAssertTrue(app.buttons["deleteStudent.backup"].exists)
         XCTAssertTrue(
             app.staticTexts["删除后无法从本页恢复。已分享的旧图片和你保存的备份不会被远程改写或删除。"].exists

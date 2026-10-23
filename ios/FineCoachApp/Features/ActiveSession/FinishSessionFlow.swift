@@ -40,8 +40,7 @@ struct FinishSessionFlow: View {
         .padding(FCPrimitives.space4)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(title)
-        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .navigationBar)
     }
 
     private var title: String {
@@ -82,6 +81,8 @@ struct DurationReviewFlow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: FCPrimitives.space4) {
+            Text(String(localized: "session.duration.reviewTitle"))
+                .fcFont(.title)
             Text(String(localized: "session.duration.reviewLead"))
                 .foregroundStyle(FCSemanticColors.textSecondary)
             FCTextField(String(localized: "session.field.duration"), text: $durationText)
@@ -97,8 +98,7 @@ struct DurationReviewFlow: View {
         .padding(FCPrimitives.space4)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(String(localized: "session.duration.reviewTitle"))
-        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .navigationBar)
         .accessibilityIdentifier(FCAccessibilityID.activeSessionDurationReview)
     }
 }

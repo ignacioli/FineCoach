@@ -254,7 +254,6 @@ public enum FCAccessibilityID {
     public static let activeSessionDeleteSectionMoveOut = "activeSession.deleteSection.moveOut"
     public static let activeSessionMoveToUnsectioned = "activeSession.moveToUnsectioned"
     public static let activeSessionCreditDebitConfirm = "activeSession.credit.debitConfirm"
-    public static let applyTemplateRoot = "applyTemplate.root"
 
     public static func templateRow(_ id: StableUUID) -> String {
         "templates.row.\(id.rawValue.uuidString)"
@@ -391,8 +390,10 @@ public enum FCAccessibilityID {
     public static let detailTrends = "studentDetail.trends"
 
     public static let archiveConfirm = "archive.confirm"
+    public static let archiveCancel = "student.archive.cancel"
     public static let deleteName = "deleteStudent.confirmName"
     public static let deleteConfirm = "deleteStudent.confirm"
+    public static let deleteCancel = "student.delete.cancel"
     public static let deleteBlocked = "deleteStudent.blocked"
     public static let deleteBackup = "deleteStudent.backup"
 

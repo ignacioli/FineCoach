@@ -36,6 +36,8 @@ final class M2ComponentContractTests: XCTestCase {
     /// back; none keeps the `.toolbarRole(.editor)` system back row (owner walkthrough 2026-10-10).
     /// Left on the system bar on purpose: only the nav-title pages whose title sits in the bar
     /// (ActiveSessionView moved to the inline back, owner 2026-10-10).
+    /// The training summary is the one page with no return at all (README §10 C20): it draws the
+    /// in-page header but no `back:`, and it must disable the edge swipe-back with it.
     func testEverySecondaryPageUsesTheInlineBack() throws {
         let chrome = try componentSource("FCPageHeader.swift")
         let chromeStart = try XCTUnwrap(chrome.range(of: "public func fcSecondaryPage("))
@@ -49,6 +51,7 @@ final class M2ComponentContractTests: XCTestCase {
         let features = appRoot().appendingPathComponent("Features")
         let enumerator = try XCTUnwrap(FileManager.default.enumerator(at: features, includingPropertiesForKeys: nil))
         let systemBackAllowed: Set<String> = []
+        let noBackAllowed: Set<String> = ["SessionSummaryView.swift"]
         var secondaryPages = 0
         for case let url as URL in enumerator where url.pathExtension == "swift" {
             let name = url.lastPathComponent
@@ -60,7 +63,13 @@ final class M2ComponentContractTests: XCTestCase {
             if source.contains(".fcSecondaryPage(") {
                 secondaryPages += 1
                 XCTAssertTrue(source.contains("FCPageHeader("), "\(name) hides the bar but has no FCPageHeader")
-                XCTAssertTrue(source.contains("back:"), "\(name) hides the bar but draws no inline back")
+                if noBackAllowed.contains(name) {
+                    XCTAssertTrue(
+                        source.contains(".fcSecondaryPage(swipeBackEnabled: false)"),
+                        "\(name) has no inline back, so it must disable the edge swipe-back")
+                } else {
+                    XCTAssertTrue(source.contains("back:"), "\(name) hides the bar but draws no inline back")
+                }
             }
         }
         XCTAssertGreaterThanOrEqual(secondaryPages, 17, "found too few secondary pages; the scan is broken")

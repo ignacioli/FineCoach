@@ -117,6 +117,8 @@ struct SessionSummaryView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: FCPrimitives.space4) {
+                FCPageHeader(title: String(localized: "summary.title"))
+
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage).foregroundStyle(FCSemanticColors.statusDestructive)
                 }
@@ -178,13 +180,12 @@ struct SessionSummaryView: View {
                 .accessibilityIdentifier(FCAccessibilityID.sessionSummarySkipShare)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(FCPrimitives.space4)
+            .padding(.horizontal, FCPrimitives.space4)
+            .padding(.bottom, FCPrimitives.space4)
         }
         .scrollDismissesKeyboard(.interactively)
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(String(localized: "summary.title"))
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
+        .fcSecondaryPage(swipeBackEnabled: false)
         .task { await viewModel.load() }
         .fcBottomSheet(isPresented: $isNamingTemplate) {
             FCBottomSheet(

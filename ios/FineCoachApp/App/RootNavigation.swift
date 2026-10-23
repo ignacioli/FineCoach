@@ -22,7 +22,6 @@ enum RootDestination: Hashable {
     case manualCreditAdjustment(UUID)
     case templates
     case templateEditor(UUID)
-    case applyTemplate
     case bodyData(UUID)
     case bodyMeasurementEntry(studentID: UUID, metricID: UUID)
     case trends(UUID)
@@ -258,12 +257,6 @@ struct RootNavigation: View {
                                 TemplateEditorView(
                                     templateID: StableUUID(templateID),
                                     useCases: environment.requireTemplateUseCases()
-                                )
-                            case .applyTemplate:
-                                ApplyTemplateView(
-                                    templateUseCases: environment.requireTemplateUseCases(),
-                                    sessionUseCases: environment.requireSessionUseCases(),
-                                    path: $path
                                 )
                             case .bodyData(let studentID):
                                 BodyDataListView(

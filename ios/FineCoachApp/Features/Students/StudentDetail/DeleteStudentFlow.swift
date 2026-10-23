@@ -16,8 +16,9 @@ struct ArchiveStudentView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: FCPrimitives.space4) {
-            Text(String(localized: "student.archive.lead"))
+            Text(String(localized: "student.archive.title"))
                 .fcFont(.title)
+            Text(String(localized: "student.archive.lead"))
             VStack(alignment: .leading, spacing: FCPrimitives.space2) {
                 Text("• " + String(localized: "student.archive.effect.hidden"))
                 Text("• " + String(localized: "student.archive.effect.noSession"))
@@ -42,18 +43,14 @@ struct ArchiveStudentView: View {
                 }
             }
             .accessibilityIdentifier(FCAccessibilityID.archiveConfirm)
+            Button(String(localized: "student.flow.cancel"), action: onCancel)
+                .frame(minHeight: 44)
+                .accessibilityIdentifier(FCAccessibilityID.archiveCancel)
             Spacer()
         }
         .padding(FCPrimitives.space4)
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(String(localized: "student.archive.title"))
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button(String(localized: "student.flow.cancel"), action: onCancel)
-                    .frame(minWidth: 44, minHeight: 44)
-            }
-        }
+        .toolbar(.hidden, for: .navigationBar)
     }
 }
 
@@ -67,33 +64,32 @@ struct DeleteStudentFlow: View {
     @State private var didDelete = false
 
     var body: some View {
-        Group {
-            if didDelete {
-                deletedState
-            } else if let impact, impact.hasInProgressSession {
-                blockedState(impact)
-            } else if let impact {
-                confirmState(impact)
-            } else if let errorMessage {
-                Text(errorMessage).foregroundStyle(FCSemanticColors.statusDestructive)
-            } else {
-                ProgressView()
+        VStack(alignment: .leading, spacing: FCPrimitives.space4) {
+            Group {
+                if didDelete {
+                    deletedState
+                } else if let impact, impact.hasInProgressSession {
+                    blockedState(impact)
+                } else if let impact {
+                    confirmState(impact)
+                } else if let errorMessage {
+                    Text(errorMessage).foregroundStyle(FCSemanticColors.statusDestructive)
+                } else {
+                    ProgressView()
+                }
             }
+            Button(String(localized: "student.flow.cancel")) {
+                onFinish(.cancelled)
+            }
+            .frame(minHeight: 44)
+            .accessibilityIdentifier(FCAccessibilityID.deleteCancel)
+            Spacer()
         }
         .task { await load() }
         .padding(FCPrimitives.space4)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(String(localized: "student.delete.title"))
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button(String(localized: "student.flow.cancel")) {
-                    onFinish(.cancelled)
-                }
-                .frame(minWidth: 44, minHeight: 44)
-            }
-        }
+        .toolbar(.hidden, for: .navigationBar)
     }
 
     private var deletedState: some View {
@@ -128,6 +124,8 @@ struct DeleteStudentFlow: View {
 
     private func confirmState(_ impact: StudentDeletionImpact) -> some View {
         VStack(alignment: .leading, spacing: FCPrimitives.space4) {
+            Text(String(localized: "student.delete.title"))
+                .fcFont(.title)
             Text(String(format: String(localized: "student.delete.lead"), impact.displayName))
             Text(String(localized: "student.delete.affect"))
                 .fcFont(.headline)
