@@ -13,6 +13,8 @@ struct ArchiveSessionDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: FCPrimitives.space6) {
+                FCPageHeader(title: String(localized: "detail.title"), back: .init())
+
                 if let session = content.session(key: sessionKey),
                     let dto = ArchiveSessionRecord.dto(session: session, content: content, converter: model.converter)
                 {
@@ -31,11 +33,10 @@ struct ArchiveSessionDetailView: View {
                 }
             }
             .padding(.horizontal, FCPrimitives.space4)
-            .padding(.vertical, FCPrimitives.space4)
+            .padding(.bottom, FCPrimitives.space4)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(String(localized: "detail.title"))
-        .navigationBarTitleDisplayMode(.inline)
+        .fcSecondaryPage()
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(FCAccessibilityID.archiveSessionRoot)
     }

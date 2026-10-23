@@ -104,6 +104,8 @@ struct SessionDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: FCPrimitives.space6) {
+                FCPageHeader(title: String(localized: "detail.title"), back: .init())
+
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
                         .fcFont(.callout, weight: .regular)
@@ -151,7 +153,7 @@ struct SessionDetailView: View {
                 actions
             }
             .padding(.horizontal, FCPrimitives.space4)
-            .padding(.vertical, FCPrimitives.space4)
+            .padding(.bottom, FCPrimitives.space4)
         }
         .safeAreaInset(edge: .bottom) {
             FCButton(title: String(localized: "summary.generateReport")) {
@@ -163,8 +165,7 @@ struct SessionDetailView: View {
             .background(FCSemanticColors.surfacePage)
         }
         .background(FCSemanticColors.surfacePage)
-        .navigationTitle(String(localized: "detail.title"))
-        .navigationBarTitleDisplayMode(.inline)
+        .fcSecondaryPage()
         .task { await viewModel.load() }
         .onChange(of: path) { _, _ in
             Task { await viewModel.load() }
