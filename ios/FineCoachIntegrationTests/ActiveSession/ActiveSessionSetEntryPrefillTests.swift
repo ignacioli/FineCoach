@@ -148,6 +148,89 @@
             try await environment.controller.shutdownForTesting()
         }
 
+        // MARK: - Revision 1.3: rest-end notification copy and per-Session removal
+
+        func testRestNotificationUsesTheConfirmedSetsExerciseAndRemovesOnlyThisSession() async throws {
+            let environment = try makeEnvironment()
+            let center = FakeNotificationScheduling()
+            let viewModel = try await startSession(
+                environment,
+                exercises: ["杠铃深蹲", "哑铃卧推"],
+                notifications: center
+            )
+            let squat = try XCTUnwrap(
+                viewModel.session?.exercises.first { $0.displayNameSnapshot.value == "杠铃深蹲" }
+            )
+            let bench = try XCTUnwrap(
+                viewModel.session?.exercises.first { $0.displayNameSnapshot.value == "哑铃卧推" }
+            )
+            let sessionID = try XCTUnwrap(viewModel.session?.id)
+            let identifier = RestEndNotification.notificationIdentifier(for: sessionID)
+
+            // confirmSet(setID:) while another exercise is selected must use the
+            // set's own exercise, not `currentExercise`.
+            viewModel.selectExercise(squat.id)
+            viewModel.weight = "80"
+            viewModel.reps = "5"
+            await viewModel.addDraftSet()
+            let squatSetID = try XCTUnwrap(viewModel.currentExercise?.sets.last?.id)
+            viewModel.selectExercise(bench.id)
+            await viewModel.confirmSet(setID: squatSetID)
+
+            let squatCandidate = await waitForScheduled(center, identifier: identifier) {
+                $0.body.contains("杠铃深蹲")
+            }
+            let squatDescriptor = try XCTUnwrap(squatCandidate)
+            XCTAssertFalse(squatDescriptor.body.contains("哑铃卧推"))
+            XCTAssertFalse(squatDescriptor.body.contains("林青"))
+            XCTAssertEqual(squatDescriptor.title, String(localized: "session.rest.notificationTitle"))
+            XCTAssertEqual(
+                squatDescriptor.userInfo[RestNotificationPayload.sessionIDKey],
+                sessionID.rawValue.uuidString.lowercased()
+            )
+            XCTAssertEqual(
+                squatDescriptor.userInfo[RestNotificationPayload.studentIDKey],
+                studentID.rawValue.uuidString.lowercased()
+            )
+
+            // confirmActiveDraftSet() is the other confirmation entry; the ±15 s
+            // reschedule must keep the new exercise's name.
+            viewModel.weight = "60"
+            viewModel.reps = "8"
+            await viewModel.confirmActiveDraftSet()
+            let benchCandidate = await waitForScheduled(center, identifier: identifier) {
+                $0.body.contains("哑铃卧推")
+            }
+            let benchDescriptor = try XCTUnwrap(benchCandidate)
+            XCTAssertEqual(benchDescriptor.identifier, identifier)
+
+            viewModel.adjustRest(by: RestTimerState.adjustmentStep)
+            let adjustedCandidate = await waitForScheduled(center, identifier: identifier) {
+                $0.body.contains("哑铃卧推") && $0.fireDate > benchDescriptor.fireDate
+            }
+            let adjusted = try XCTUnwrap(adjustedCandidate)
+            XCTAssertTrue(adjusted.body.contains("哑铃卧推"))
+
+            // Another Student's pending notification must survive this Session's skip.
+            let otherSessionID = StableUUID(UUID(uuidString: "cccccccc-cccc-4ccc-8ccc-cccccccccccc")!)
+            let otherIdentifier = RestEndNotification.notificationIdentifier(for: otherSessionID)
+            try await center.schedule(
+                NotificationRequestDescriptor(
+                    identifier: otherIdentifier,
+                    title: "other",
+                    body: "other",
+                    fireDate: now.addingTimeInterval(600)
+                )
+            )
+            viewModel.dismissRest()
+            let removed = await waitUntilRemoved(center, identifier: identifier)
+            XCTAssertTrue(removed)
+            let stillPending = await center.scheduled[otherIdentifier]
+            XCTAssertNotNil(stillPending, "skipping one Session's rest must not cancel another Session's")
+
+            try await environment.controller.shutdownForTesting()
+        }
+
         // MARK: - Environment
 
         private struct Environment {
@@ -214,9 +297,11 @@
             _ = try await environment.sessionUseCases.finish()
         }
 
-        private func startSession(_ environment: Environment, exercises: [String]) async throws
-            -> ActiveSessionViewModel
-        {
+        private func startSession(
+            _ environment: Environment,
+            exercises: [String],
+            notifications: (any LocalNotificationScheduling)? = nil
+        ) async throws -> ActiveSessionViewModel {
             try await ensureStudent(environment)
             _ = try await environment.sessionUseCases.startOrOpen(studentID: studentID)
             for name in exercises {
@@ -226,10 +311,42 @@
             let viewModel = ActiveSessionViewModel(
                 studentID: studentID,
                 useCases: environment.sessionUseCases,
+                notifications: notifications,
                 now: { [now] in now }
             )
             await viewModel.load()
             return viewModel
+        }
+
+        /// The notification work is an async MainActor task; let it run and
+        /// return the first scheduled descriptor that matches.
+        private func waitForScheduled(
+            _ center: FakeNotificationScheduling,
+            identifier: String,
+            where predicate: (NotificationRequestDescriptor) -> Bool
+        ) async -> NotificationRequestDescriptor? {
+            for _ in 0..<500 {
+                if let descriptor = await center.scheduled[identifier],
+                    predicate(descriptor)
+                {
+                    return descriptor
+                }
+                await Task.yield()
+            }
+            return nil
+        }
+
+        private func waitUntilRemoved(
+            _ center: FakeNotificationScheduling,
+            identifier: String
+        ) async -> Bool {
+            for _ in 0..<500 {
+                if await center.scheduled[identifier] == nil {
+                    return true
+                }
+                await Task.yield()
+            }
+            return false
         }
     }
 #else

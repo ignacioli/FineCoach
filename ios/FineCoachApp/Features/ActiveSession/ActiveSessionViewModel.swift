@@ -191,6 +191,9 @@ final class ActiveSessionViewModel: ObservableObject {
     private let notifications: (any LocalNotificationScheduling)?
     private let now: () -> Date
     private var restNotificationTask: Task<Void, Never>?
+    /// The exercise that owned the set which started the current rest; fixed
+    /// for this rest so ±15 s reschedules keep the same notification body.
+    private var restExerciseName: String?
     private var undoExpiryTask: Task<Void, Never>?
     private var deletedSetUndoExpiryTask: Task<Void, Never>?
     private var catalogSearchGeneration = 0
@@ -559,7 +562,9 @@ final class ActiveSessionViewModel: ObservableObject {
             self.offerUndo(for: newSetID)
         }
         if confirmed {
-            startRest()
+            // The just-created set belongs to `exercise`; keep that exercise's
+            // snapshot name for the rest-end notification.
+            startRest(exerciseName: exercise.displayNameSnapshot.value)
         }
     }
 
@@ -577,7 +582,9 @@ final class ActiveSessionViewModel: ObservableObject {
             activeDraftSetID = nil
         }
         if confirmed {
-            startRest()
+            // Address by the set's own exercise: the coach may have confirmed a
+            // row from an exercise other than the currently selected one.
+            startRest(exerciseName: exercise(containingSetID: setID)?.displayNameSnapshot.value)
         }
     }
 
@@ -1060,7 +1067,8 @@ final class ActiveSessionViewModel: ObservableObject {
         undoableSetID = nil
     }
 
-    private func startRest() {
+    private func startRest(exerciseName: String?) {
+        restExerciseName = exerciseName
         restTimer = RestTimerState(startedAt: now())
         syncRestNotification()
     }
@@ -1069,11 +1077,13 @@ final class ActiveSessionViewModel: ObservableObject {
     private func clearRest() {
         restTimer = nil
         syncRestNotification()
+        restExerciseName = nil
     }
 
-    /// P0-D5: one generic local notification at the rest end. +15 / −15
-    /// replace it; skip, dismiss, abandon, and finish remove it. Requests
-    /// permission only through the existing not-yet-determined path.
+    /// P0-D5: one local notification at the rest end. +15 / −15 replace it
+    /// with the same exercise name; skip, dismiss, abandon, and finish remove
+    /// this Session's own request. Requests permission only through the
+    /// existing not-yet-determined path.
     private func syncRestNotification() {
         guard let notifications else {
             return
@@ -1081,7 +1091,9 @@ final class ActiveSessionViewModel: ObservableObject {
         let plan = RestEndNotification.plan(
             endsAt: restTimer?.endsAt,
             now: now(),
-            sessionID: sessionID
+            sessionID: sessionID,
+            studentID: studentID,
+            exerciseName: restExerciseName
         )
         let previous = restNotificationTask
         restNotificationTask = Task { @MainActor in

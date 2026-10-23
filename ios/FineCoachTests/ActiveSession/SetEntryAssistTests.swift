@@ -95,13 +95,19 @@ final class SetEntryAssistTests: XCTestCase {
         XCTAssertLessThan(bar.lowerBound, finish.lowerBound)
     }
 
-    func testRestEndNotificationIsGenericAndTracksTheEnd() {
+    func testRestEndNotificationTracksTheEndAndKeepsCopyRedacted() {
         XCTAssertNil(RestEndNotification.scheduler(arguments: ["-FineCoachUITesting"]))
         XCTAssertNotNil(RestEndNotification.scheduler(arguments: []))
 
-        XCTAssertEqual(RestEndNotification.plan(endsAt: nil, now: start), .remove)
+        XCTAssertEqual(
+            RestEndNotification.plan(endsAt: nil, now: start),
+            .remove(identifier: RestEndNotification.identifier)
+        )
         let ended = start.addingTimeInterval(120)
-        XCTAssertEqual(RestEndNotification.plan(endsAt: ended, now: ended), .remove)
+        XCTAssertEqual(
+            RestEndNotification.plan(endsAt: ended, now: ended),
+            .remove(identifier: RestEndNotification.identifier)
+        )
 
         let plan = RestEndNotification.plan(endsAt: ended, now: start)
         guard case .schedule(let descriptor) = plan else {
@@ -111,24 +117,151 @@ final class SetEntryAssistTests: XCTestCase {
         XCTAssertEqual(descriptor.fireDate, ended)
         XCTAssertEqual(descriptor.title, String(localized: "session.rest.notificationTitle"))
         XCTAssertEqual(descriptor.body, String(localized: "session.rest.notificationBody"))
+        XCTAssertTrue(descriptor.userInfo.isEmpty)
         XCTAssertFalse(descriptor.title.contains("%"))
         XCTAssertFalse(descriptor.body.contains("%"))
         XCTAssertFalse(descriptor.identifier.localizedCaseInsensitiveContains("student"))
     }
 
+    func testRestEndNotificationBodyNamesTheExerciseButNoStudent() {
+        XCTAssertEqual(
+            RestEndNotification.body(exerciseName: "杠铃深蹲"),
+            String(
+                format: String(localized: "session.rest.notificationBodyExercise"),
+                "杠铃深蹲"
+            )
+        )
+        XCTAssertTrue(RestEndNotification.body(exerciseName: "杠铃深蹲").contains("杠铃深蹲"))
+        XCTAssertEqual(
+            RestEndNotification.body(exerciseName: nil),
+            String(localized: "session.rest.notificationBody")
+        )
+        XCTAssertEqual(
+            RestEndNotification.body(exerciseName: ""),
+            String(localized: "session.rest.notificationBody")
+        )
+
+        let body = RestEndNotification.body(exerciseName: "杠铃深蹲")
+        for sentinel in ["林青", "女", "男", "60", "8 次", "第 3 组"] {
+            XCTAssertFalse(body.contains(sentinel), "notification body leaked sentinel: \(sentinel)")
+        }
+    }
+
+    func testRestEndNotificationUserInfoCarriesOnlyRoutingIdentifiers() throws {
+        let studentID = StableUUID(UUID(uuidString: "11111111-1111-4111-8111-111111111111")!)
+        let sessionID = StableUUID(UUID(uuidString: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa")!)
+        let fire = start.addingTimeInterval(120)
+        let plan = RestEndNotification.plan(
+            endsAt: fire,
+            now: start,
+            sessionID: sessionID,
+            studentID: studentID,
+            exerciseName: "杠铃深蹲"
+        )
+        guard case .schedule(let descriptor) = plan else {
+            return XCTFail("expected a scheduled notification")
+        }
+
+        XCTAssertEqual(
+            descriptor.userInfo,
+            [
+                RestNotificationPayload.kindKey: RestNotificationPayload.kindRestEnded,
+                RestNotificationPayload.studentIDKey: studentID.rawValue.uuidString.lowercased(),
+                RestNotificationPayload.sessionIDKey: sessionID.rawValue.uuidString.lowercased(),
+            ]
+        )
+        XCTAssertTrue(descriptor.body.contains("杠铃深蹲"))
+        XCTAssertFalse(descriptor.body.contains("林青"))
+        XCTAssertEqual(descriptor.identifier, RestEndNotification.notificationIdentifier(for: sessionID))
+
+        let request = try XCTUnwrap(RestNotificationRouteRequest(userInfo: descriptor.userInfo))
+        XCTAssertEqual(request.studentID, studentID)
+        XCTAssertEqual(request.sessionID, sessionID)
+    }
+
+    func testRestEndNotificationRescheduleKeepsTheSameExerciseName() {
+        let sessionID = StableUUID(UUID(uuidString: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa")!)
+        let fire = start.addingTimeInterval(120)
+        let first = RestEndNotification.plan(
+            endsAt: fire,
+            now: start,
+            sessionID: sessionID,
+            exerciseName: "杠铃深蹲"
+        )
+        let second = RestEndNotification.plan(
+            endsAt: fire.addingTimeInterval(RestTimerState.adjustmentStep),
+            now: start,
+            sessionID: sessionID,
+            exerciseName: "杠铃深蹲"
+        )
+
+        guard case .schedule(let firstDescriptor) = first,
+            case .schedule(let secondDescriptor) = second
+        else {
+            return XCTFail("expected two scheduled notifications")
+        }
+        XCTAssertEqual(firstDescriptor.body, secondDescriptor.body)
+        XCTAssertTrue(secondDescriptor.body.contains("杠铃深蹲"))
+        XCTAssertEqual(secondDescriptor.fireDate, fire.addingTimeInterval(RestTimerState.adjustmentStep))
+    }
+
+    func testRestEndNotificationRemovesThisSessionsIdentifierOnly() async {
+        let center = RecordingNotificationCenter()
+        let firstSession = StableUUID(UUID(uuidString: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa")!)
+        let secondSession = StableUUID(UUID(uuidString: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb")!)
+        let firstStudent = StableUUID(UUID(uuidString: "11111111-1111-4111-8111-111111111111")!)
+        let secondStudent = StableUUID(UUID(uuidString: "22222222-2222-4222-8222-222222222222")!)
+        let firstID = RestEndNotification.notificationIdentifier(for: firstSession)
+        let secondID = RestEndNotification.notificationIdentifier(for: secondSession)
+        let fire = start.addingTimeInterval(120)
+
+        await RestEndNotification.apply(
+            RestEndNotification.plan(
+                endsAt: fire,
+                now: start,
+                sessionID: firstSession,
+                studentID: firstStudent,
+                exerciseName: "杠铃深蹲"
+            ),
+            with: center
+        )
+        await RestEndNotification.apply(
+            RestEndNotification.plan(
+                endsAt: fire,
+                now: start,
+                sessionID: secondSession,
+                studentID: secondStudent,
+                exerciseName: "哑铃卧推"
+            ),
+            with: center
+        )
+        // Skipping the first rest removes only the first Session's request.
+        await RestEndNotification.apply(
+            RestEndNotification.plan(endsAt: nil, now: start, sessionID: firstSession),
+            with: center
+        )
+
+        let pending = await center.pending
+        XCTAssertEqual(pending, [secondID], "the other Session's pending notification must survive")
+        let removed = await center.removed
+        XCTAssertEqual(removed.last, [firstID])
+    }
+
     func testRestEndNotificationReplacesThenRemoves() async {
         let center = RecordingNotificationCenter()
+        let sessionID = StableUUID(UUID(uuidString: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa")!)
+        let identifier = RestEndNotification.notificationIdentifier(for: sessionID)
         let fire = start.addingTimeInterval(120)
-        let plan = RestEndNotification.plan(endsAt: fire, now: start)
+        let plan = RestEndNotification.plan(endsAt: fire, now: start, sessionID: sessionID)
         await RestEndNotification.apply(plan, with: center)
         let scheduled = await center.scheduled
         let authorizationRequests = await center.authorizationRequests
         XCTAssertEqual(scheduled.map(\.fireDate), [fire])
         XCTAssertEqual(authorizationRequests, 1)
 
-        await RestEndNotification.apply(.remove, with: center)
+        await RestEndNotification.apply(.remove(identifier: identifier), with: center)
         let removed = await center.removed
-        XCTAssertEqual(removed, [[RestEndNotification.identifier], [RestEndNotification.identifier]])
+        XCTAssertEqual(removed, [[identifier], [identifier]])
     }
 
     /// P0 motion table + README §14.4. The views are not rendered here; this
@@ -266,6 +399,7 @@ private actor RecordingNotificationCenter: LocalNotificationScheduling {
     private(set) var authorizationRequests = 0
     private(set) var scheduled: [NotificationRequestDescriptor] = []
     private(set) var removed: [[String]] = []
+    private(set) var pending: Set<String> = []
 
     func requestAuthorizationIfNeeded() async {
         authorizationRequests += 1
@@ -273,9 +407,13 @@ private actor RecordingNotificationCenter: LocalNotificationScheduling {
 
     func schedule(_ descriptor: NotificationRequestDescriptor) async throws {
         scheduled.append(descriptor)
+        pending.insert(descriptor.identifier)
     }
 
     func removePending(identifiers: [String]) async {
         removed.append(identifiers)
+        for identifier in identifiers {
+            pending.remove(identifier)
+        }
     }
 }

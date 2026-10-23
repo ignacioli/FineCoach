@@ -93,6 +93,7 @@
 		B192 /* ActiveSessionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A192 /* ActiveSessionCoordinator.swift */; };
 		B193 /* RecoveryReconciler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A193 /* RecoveryReconciler.swift */; };
 		B104 /* AppLifecycleCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A104 /* AppLifecycleCoordinator.swift */; };
+		B105 /* RestNotificationRouting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A105 /* RestNotificationRouting.swift */; };
 		B346 /* SaveStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A346 /* SaveStatusView.swift */; };
 		B140 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A140 /* PersistenceController.swift */; };
 		B141 /* PersistenceWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A141 /* PersistenceWriter.swift */; };
@@ -267,6 +268,7 @@
 		B239 /* ExercisePersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A239 /* ExercisePersistenceTests.swift */; };
 		B180 /* FCAccessibilityID.swift in Sources */ = {isa = PBXBuildFile; fileRef = A180 /* FCAccessibilityID.swift */; };
 		B181 /* RootNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A181 /* RootNavigation.swift */; };
+		B182 /* RestNotificationRoutingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A182 /* RestNotificationRoutingTests.swift */; };
 		B310 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A310 /* OnboardingView.swift */; };
 		B311 /* StudentEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A311 /* StudentEditorView.swift */; };
 		B320 /* StudentListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A320 /* StudentListView.swift */; };
@@ -445,6 +447,7 @@
 		A102 /* PrivacyCover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyCover.swift; sourceTree = "<group>"; };
 		A103 /* ScenePrivacyCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenePrivacyCoordinator.swift; sourceTree = "<group>"; };
 		A104 /* AppLifecycleCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLifecycleCoordinator.swift; sourceTree = "<group>"; };
+		A105 /* RestNotificationRouting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestNotificationRouting.swift; sourceTree = "<group>"; };
 		A110 /* DomainError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DomainError.swift; sourceTree = "<group>"; };
 		A111 /* Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; };
 		A112 /* ValidatedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidatedText.swift; sourceTree = "<group>"; };
@@ -686,6 +689,7 @@
 		A239 /* ExercisePersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExercisePersistenceTests.swift; sourceTree = "<group>"; };
 		A180 /* FCAccessibilityID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCAccessibilityID.swift; sourceTree = "<group>"; };
 		A181 /* RootNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootNavigation.swift; sourceTree = "<group>"; };
+		A182 /* RestNotificationRoutingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestNotificationRoutingTests.swift; sourceTree = "<group>"; };
 		A221 /* StudentLifecycleUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentLifecycleUITests.swift; sourceTree = "<group>"; };
 		A222 /* CoreTrainingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreTrainingUITests.swift; sourceTree = "<group>"; };
 		A223 /* RecoveryProcessDriver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryProcessDriver.swift; sourceTree = "<group>"; };
@@ -886,6 +890,7 @@
 				A102 /* PrivacyCover.swift */,
 				A103 /* ScenePrivacyCoordinator.swift */,
 				A104 /* AppLifecycleCoordinator.swift */,
+				A105 /* RestNotificationRouting.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -1701,6 +1706,7 @@
 				A252 /* ScenePrivacyCoordinatorTests.swift */,
 				A95A /* EmptyStateFirstLoadTests.swift */,
 				A95B /* RootNavigationReturnTests.swift */,
+				A182 /* RestNotificationRoutingTests.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -2073,6 +2079,7 @@
 				B102 /* PrivacyCover.swift in Sources */,
 				B103 /* ScenePrivacyCoordinator.swift in Sources */,
 				B104 /* AppLifecycleCoordinator.swift in Sources */,
+				B105 /* RestNotificationRouting.swift in Sources */,
 				B110 /* DomainError.swift in Sources */,
 				B111 /* Identifiers.swift in Sources */,
 				B112 /* ValidatedText.swift in Sources */,
@@ -2289,6 +2296,7 @@
 				B954 /* TrainedBodyPartsSummaryTests.swift in Sources */,
 				B95A /* EmptyStateFirstLoadTests.swift in Sources */,
 				B95B /* RootNavigationReturnTests.swift in Sources */,
+				B182 /* RestNotificationRoutingTests.swift in Sources */,
 				B500 /* VisionHarnessTests.swift in Sources */,
 				B982 /* FCMotionTests.swift in Sources */,
 				B956 /* IconConsistencyTests.swift in Sources */,

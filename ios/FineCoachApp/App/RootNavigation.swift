@@ -63,6 +63,7 @@ enum RootTab: Hashable {
 @MainActor
 struct RootNavigation: View {
     @EnvironmentObject private var environment: AppEnvironment
+    @EnvironmentObject private var restNotificationRouter: RestNotificationRouter
     @State private var path: [RootDestination] = []
     @State private var onboardingCompleted = false
     @State private var didLoadOnboarding = false
@@ -304,6 +305,18 @@ struct RootNavigation: View {
         .task {
             await loadInitialState()
         }
+        .onChange(of: restNotificationRouter.pendingRequest) { _, request in
+            guard request != nil else {
+                return
+            }
+            Task { await consumePendingRestNotificationIfReady() }
+        }
+        .onChange(of: onboardingCompleted) { _, completed in
+            guard completed else {
+                return
+            }
+            Task { await consumePendingRestNotificationIfReady() }
+        }
     }
 
     private func loadInitialState() async {
@@ -318,6 +331,63 @@ struct RootNavigation: View {
         }
         onboardingCompleted = (try? await useCases.isOnboardingCompleted()) ?? false
         didLoadOnboarding = true
+        // Cold start after a notification tap: the request waited in the
+        // router; consume it now that the root stack exists.
+        await consumePendingRestNotificationIfReady()
+    }
+
+    /// Mirrors the branches that actually render `NavigationStack` below.
+    private var isReadyForRestNotification: Bool {
+        environment.isStorageAvailable && environment.catalogUnavailableMessage == nil
+            && didLoadOnboarding && onboardingCompleted
+    }
+
+    /// Consume at most one request. The request is taken (cleared) before the
+    /// async reads, so it cannot be replayed; if the reads say "no route" the
+    /// tap only opened the app.
+    private func consumePendingRestNotificationIfReady() async {
+        guard isReadyForRestNotification else {
+            return
+        }
+        guard let request = restNotificationRouter.takePendingRequest() else {
+            return
+        }
+        guard let studentUseCases = environment.studentUseCases,
+            let sessionUseCases = environment.sessionUseCases
+        else {
+            return
+        }
+        // Read-only lookups only: `startOrOpen` is never called here.
+        let studentExists = (try? await studentUseCases.student(id: request.studentID)) != nil
+        let activeSession = try? await sessionUseCases.loadActive(sessionID: request.sessionID)
+        let conditions = RestNotificationRouteConditions(
+            isCoachMode: true,
+            isStorageAvailable: environment.isStorageAvailable,
+            isOnboardingCompleted: onboardingCompleted,
+            isRootNavigationReady: didLoadOnboarding
+        )
+        let decision = RestNotificationRouting.decide(
+            request: request,
+            conditions: conditions,
+            studentExists: studentExists,
+            activeSession: activeSession ?? nil
+        )
+        guard case .route(let routed) = decision else {
+            return
+        }
+        showRestNotificationRoute(routed)
+    }
+
+    /// 今日 is the default root surface (M1B-FR-001) and hosts the in-progress
+    /// training entry; the destination replaces the stack instead of pushing a
+    /// duplicate when that Session is already on screen.
+    private func showRestNotificationRoute(_ request: RestNotificationRouteRequest) {
+        let nextPath = RestNotificationNavigation.path(current: path, studentID: request.studentID)
+        guard nextPath != path else {
+            return
+        }
+        rootTab = .today
+        path = nextPath
     }
 }
 
