@@ -67,36 +67,16 @@ final class SetEntryAssistTests: XCTestCase {
         XCTAssertEqual(RestTimerState.text(seconds: 120), "2:00")
     }
 
-    func testStaysUpForThreeSecondsAfterItEnds() {
-        let timer = RestTimerState(startedAt: start)
-        XCTAssertEqual(timer.autoDismissDelay(at: start), 123, accuracy: 0.001)
-        let end = start.addingTimeInterval(RestTimerState.defaultDuration)
-        XCTAssertEqual(timer.autoDismissDelay(at: end), RestTimerState.finishedHold, accuracy: 0.001)
-        XCTAssertEqual(timer.autoDismissDelay(at: end.addingTimeInterval(1)), 2, accuracy: 0.001)
-        XCTAssertEqual(timer.autoDismissDelay(at: end.addingTimeInterval(3)), 0, accuracy: 0.001)
-        XCTAssertEqual(timer.autoDismissDelay(at: end.addingTimeInterval(10)), 0, accuracy: 0.001)
-    }
-
     func testOverdueSecondsAndTimerFormat() {
         let timer = RestTimerState(startedAt: start)
         XCTAssertEqual(timer.overdueSeconds(at: start), 0)
         XCTAssertEqual(timer.overdueSeconds(at: timer.endsAt), 0)
         XCTAssertEqual(timer.overdueSeconds(at: timer.endsAt.addingTimeInterval(0.9)), 0)
         XCTAssertEqual(timer.overdueSeconds(at: timer.endsAt.addingTimeInterval(1)), 1)
+        XCTAssertEqual(timer.overdueSeconds(at: timer.endsAt.addingTimeInterval(1.9)), 1)
         let seconds = timer.overdueSeconds(at: timer.endsAt.addingTimeInterval(80))
         XCTAssertEqual(seconds, 80)
         XCTAssertEqual(RestTimerState.text(seconds: seconds), "1:20")
-    }
-
-    func testOverdueAppearanceStartsExactlyAtEndOfHold() {
-        let timer = RestTimerState(startedAt: start)
-        let threshold = timer.endsAt.addingTimeInterval(RestTimerState.finishedHold)
-        XCTAssertFalse(timer.showsOverdueOnAppearance(at: start))
-        XCTAssertFalse(timer.showsOverdueOnAppearance(at: timer.endsAt))
-        XCTAssertFalse(timer.showsOverdueOnAppearance(at: threshold.addingTimeInterval(-0.001)))
-        XCTAssertTrue(timer.showsOverdueOnAppearance(at: threshold))
-        XCTAssertTrue(timer.showsOverdueOnAppearance(at: threshold.addingTimeInterval(80)))
-        XCTAssertEqual(timer.autoDismissDelay(at: threshold), 0)
     }
 
     @MainActor
@@ -132,7 +112,16 @@ final class SetEntryAssistTests: XCTestCase {
         XCTAssertTrue(source.contains("activeSessionRestOverdue"))
         XCTAssertTrue(source.contains("session.rest.overdueFormat"))
         XCTAssertTrue(source.contains(".accessibilityElement(children: .combine)"))
-        XCTAssertTrue(source.contains("guard delay > 0 else { return }"))
+        let timerBarStart = try XCTUnwrap(source.range(of: "struct RestTimerBar: View"))
+        let runningStart = try XCTUnwrap(
+            source.range(of: "private func running(", range: timerBarStart.upperBound..<source.endIndex)
+        )
+        let timerBarBody = source[timerBarStart.lowerBound..<runningStart.lowerBound]
+        XCTAssertFalse(timerBarBody.contains("Task.sleep"))
+        XCTAssertFalse(timerBarBody.contains("onDismiss()"))
+        XCTAssertFalse(timerBarBody.contains(".task("))
+        XCTAssertTrue(timerBarBody.contains("let overdue = timer.overdueSeconds(at: context.date)"))
+        XCTAssertTrue(timerBarBody.contains("overdueSeconds: overdue >= 1 ? overdue : nil"))
         let bar = try XCTUnwrap(source.range(of: "RestTimerBar("))
         let finish = try XCTUnwrap(source.range(of: "session.action.finish"))
         XCTAssertLessThan(bar.lowerBound, finish.lowerBound)

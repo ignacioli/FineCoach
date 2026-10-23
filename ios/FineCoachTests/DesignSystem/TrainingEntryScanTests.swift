@@ -106,18 +106,17 @@ final class TrainingEntryScanTests: XCTestCase {
         }
     }
 
-    /// B-D9 / Δ12: keyboard presentation only changes the page-local rest-bar
-    /// visibility. The view model's timer remains the source of truth so its
-    /// countdown and notification lifecycle are independent of the keyboard.
-    func testRestBarHidesForKeyboardWithoutChangingTimerState() throws {
+    /// B-D9 / Δ12: hide the bar for the keyboard, then clear an ended rest
+    /// through the view model on dismissal; an active rest can reappear.
+    func testRestBarHidesForKeyboardAndDismissesEndedRestOnKeyboardHide() throws {
         let text = try source("Features/ActiveSession/ActiveSessionView.swift").joined(separator: "\n")
         XCTAssertTrue(text.contains("@State private var isKeyboardVisible = false"))
-        XCTAssertTrue(text.contains("@State private var keyboardDismissedAt = Date.distantPast"))
+        XCTAssertFalse(text.contains("keyboardDismissedAt"))
         XCTAssertTrue(text.contains("UIResponder.keyboardWillShowNotification"))
         XCTAssertTrue(text.contains("UIResponder.keyboardWillHideNotification"))
         XCTAssertTrue(text.contains("if !isKeyboardVisible,"))
-        XCTAssertTrue(text.contains("!restTimer.isFinished(at: keyboardDismissedAt)"))
-        XCTAssertTrue(text.contains("viewModel.restTimer.map { !$0.isFinished(at: keyboardDismissedAt) } ?? false"))
+        XCTAssertTrue(text.contains("let restTimer = viewModel.restTimer"))
+        XCTAssertTrue(text.contains("!isKeyboardVisible && viewModel.restTimer != nil"))
         XCTAssertFalse(text.contains("!restTimer.isFinished(at: Date())"))
 
         let showStart = try XCTUnwrap(text.range(of: "UIResponder.keyboardWillShowNotification"))
@@ -127,9 +126,14 @@ final class TrainingEntryScanTests: XCTestCase {
         let hideEnd = afterHide.range(of: "\n        .onDisappear")?.lowerBound ?? afterHide.endIndex
         let hideHandler = afterHide[..<hideEnd]
         XCTAssertTrue(showHandler.contains("isKeyboardVisible = true"))
-        XCTAssertTrue(hideHandler.contains("keyboardDismissedAt = Date()"))
+        XCTAssertTrue(
+            hideHandler.contains(
+                "if viewModel.restTimer?.isFinished(at: Date()) == true {\n                viewModel.dismissRest()\n            }"
+            )
+        )
         XCTAssertTrue(hideHandler.contains("isKeyboardVisible = false"))
         XCTAssertFalse(showHandler.contains("restTimer = nil"))
+        XCTAssertFalse(showHandler.contains("dismissRest()"))
         XCTAssertFalse(hideHandler.contains("restTimer = nil"))
 
         let safeAreaStart = try XCTUnwrap(text.range(of: ".safeAreaInset(edge: .bottom)"))

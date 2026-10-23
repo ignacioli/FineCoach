@@ -1,15 +1,13 @@
 import Foundation
 
 /// The between-sets rest countdown (experience P0-D3: starts after a set is
-/// confirmed, 120 s). The countdown is kept per Session in memory only. The generic
-/// end notification (P0-D5) is a separate pending request and can still
-/// fire if the process is killed.
+/// confirmed, 120 s). The countdown is kept per Session in memory only and
+/// remains in its ended state until an explicit dismissal. The generic end
+/// notification (P0-D5) is a separate pending request and can still fire if
+/// the process is killed.
 struct RestTimerState: Equatable {
     static let defaultDuration: TimeInterval = 120
     static let adjustmentStep: TimeInterval = 15
-    /// How long the ended state stays up before the bar dismisses itself (P0-b).
-    static let finishedHold: TimeInterval = 3
-
     private(set) var endsAt: Date
 
     init(startedAt: Date, duration: TimeInterval = Self.defaultDuration) {
@@ -29,11 +27,6 @@ struct RestTimerState: Equatable {
         max(0, Int(floor(now.timeIntervalSince(endsAt))))
     }
 
-    /// Decide once on appearance; a bar already on screen keeps its normal hold.
-    func showsOverdueOnAppearance(at now: Date) -> Bool {
-        now >= endsAt.addingTimeInterval(Self.finishedHold)
-    }
-
     /// ±15 s; never moves the end before `now`.
     mutating func adjust(by seconds: TimeInterval, now: Date) {
         endsAt = max(now, endsAt.addingTimeInterval(seconds))
@@ -42,12 +35,6 @@ struct RestTimerState: Equatable {
     /// "1:45" / "0:07".
     static func text(seconds: Int) -> String {
         String(format: "%d:%02d", seconds / 60, seconds % 60)
-    }
-
-    /// Seconds from `now` until the bar should dismiss: the time still left,
-    /// plus `finishedHold` after `endsAt`. Already past the hold returns 0.
-    func autoDismissDelay(at now: Date) -> TimeInterval {
-        max(0, endsAt.addingTimeInterval(Self.finishedHold).timeIntervalSince(now))
     }
 }
 

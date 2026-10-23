@@ -281,7 +281,10 @@
             )
             await late.load()
             XCTAssertEqual(late.restTimer, restored.restTimer)
-            XCTAssertTrue(try XCTUnwrap(late.restTimer).showsOverdueOnAppearance(at: now.addingTimeInterval(250)))
+            let lateTimer = try XCTUnwrap(late.restTimer)
+            let lateNow = now.addingTimeInterval(250)
+            XCTAssertTrue(lateTimer.isFinished(at: lateNow))
+            XCTAssertEqual(lateTimer.overdueSeconds(at: lateNow), 100)
             let pendingAfterLateLoad = await expiredCenter.scheduled
             XCTAssertTrue(pendingAfterLateLoad.isEmpty, "a delivered notification must not be replayed")
 

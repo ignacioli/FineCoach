@@ -43,10 +43,6 @@ struct ActiveSessionView: View {
     /// timer remains alive while its bottom bar temporarily makes room for
     /// the keyboard.
     @State private var isKeyboardVisible = false
-    /// Snapshot used when the keyboard is dismissed. A rest that had already
-    /// ended at that moment must not flash back into view, while an active
-    /// rest keeps the normal ended-state hold when it finishes afterwards.
-    @State private var keyboardDismissedAt = Date.distantPast
     /// The record float this page claimed from the view model, kept only for
     /// one animation window (README §14.4). The view model's pending request
     /// is claimed in the same update, so a row that is built later (scroll,
@@ -132,10 +128,7 @@ struct ActiveSessionView: View {
         .safeAreaInset(edge: .bottom) {
             if viewModel.session?.state == .inProgress {
                 VStack(spacing: FCPrimitives.space2) {
-                    if !isKeyboardVisible,
-                        let restTimer = viewModel.restTimer,
-                        !restTimer.isFinished(at: keyboardDismissedAt)
-                    {
+                    if !isKeyboardVisible, let restTimer = viewModel.restTimer {
                         RestTimerBar(
                             timer: restTimer,
                             onAdjust: { viewModel.adjustRest(by: $0) },
@@ -230,7 +223,9 @@ struct ActiveSessionView: View {
             isKeyboardVisible = true
         }
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
-            keyboardDismissedAt = Date()
+            if viewModel.restTimer?.isFinished(at: Date()) == true {
+                viewModel.dismissRest()
+            }
             isKeyboardVisible = false
         }
         .onDisappear {
@@ -824,18 +819,17 @@ struct ActiveSessionView: View {
     }
 
     private var restBarVisible: Bool {
-        !isKeyboardVisible
-            && (viewModel.restTimer.map { !$0.isFinished(at: keyboardDismissedAt) } ?? false)
+        !isKeyboardVisible && viewModel.restTimer != nil
     }
 
 }
 
 /// The between-sets rest bar (P0-a / P0-b, feature-owned `DS-REST-TIMER`).
 /// Sits above 结束训练. Running: caption, countdown, −15 / +15 / 跳过.
-/// Finished: "✓ 休息结束，可以开始下一组" and 关闭, then it dismisses itself
-/// `finishedHold` seconds after `endsAt`. One `.warning` haptic when it
-/// finishes. The countdown rolls with `.numericText` unless Reduce Motion
-/// is on. A bar appearing after the hold shows elapsed overtime until closed.
+/// Finished: "✓ 休息结束，可以开始下一组", elapsed overtime when positive, and
+/// 关闭. It remains visible until explicitly dismissed. One `.warning` haptic
+/// when it finishes. The countdown rolls with `.numericText` unless Reduce
+/// Motion is on.
 struct RestTimerBar: View {
     let timer: RestTimerState
     let onAdjust: (TimeInterval) -> Void
@@ -843,17 +837,13 @@ struct RestTimerBar: View {
     let onDismiss: () -> Void
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var appearedAt = Date()
-
     var body: some View {
         TimelineView(.periodic(from: .now, by: 1)) { context in
             let finished = timer.isFinished(at: context.date)
             Group {
                 if finished {
-                    ended(
-                        overdueSeconds: timer.showsOverdueOnAppearance(at: appearedAt)
-                            ? timer.overdueSeconds(at: context.date) : nil
-                    )
+                    let overdue = timer.overdueSeconds(at: context.date)
+                    ended(overdueSeconds: overdue >= 1 ? overdue : nil)
                 } else {
                     running(seconds: timer.remainingSeconds(at: context.date))
                 }
@@ -861,18 +851,6 @@ struct RestTimerBar: View {
             .sensoryFeedback(FCHaptic.attention, trigger: finished) { _, isFinished in
                 isFinished
             }
-        }
-        .task(id: timer.endsAt) {
-            appearedAt = Date()
-            let delay = timer.autoDismissDelay(at: appearedAt)
-            guard delay > 0 else { return }
-            do {
-                try await Task.sleep(for: .seconds(delay))
-            } catch {
-                return
-            }
-            guard !Task.isCancelled else { return }
-            onDismiss()
         }
     }
 
