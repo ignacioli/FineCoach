@@ -3,6 +3,44 @@ import Foundation
 import UIKit
 import UserNotifications
 
+/// Tap-routing phases for on-device diagnosis (C19), logged through
+/// `AppLogger` as fixed event IDs: never a payload, identifier or name.
+enum RestNotificationDiagnostics {
+    enum Phase {
+        case delegateInstalled, responseReceived, ignoredPayload, received, rootLoading, rootLoaded
+        case stackReady, stackRemoved
+        case deferredNotReady, consumed, ignoredNoRoute, routed, pathEmpty, pathNonempty
+        case installCoach, installViewer, installUnselected, discarded
+
+        var event: AppLogEvent {
+            switch self {
+            case .delegateInstalled: return .restNotificationDelegateInstalled
+            case .responseReceived: return .restNotificationResponseReceived
+            case .ignoredPayload: return .restNotificationIgnoredPayload
+            case .received: return .restNotificationReceived
+            case .rootLoading: return .restNotificationRootLoading
+            case .rootLoaded: return .restNotificationRootLoaded
+            case .stackReady: return .restNotificationStackReady
+            case .stackRemoved: return .restNotificationStackRemoved
+            case .deferredNotReady: return .restNotificationDeferredNotReady
+            case .consumed: return .restNotificationConsumed
+            case .ignoredNoRoute: return .restNotificationIgnoredNoRoute
+            case .routed: return .restNotificationRouted
+            case .pathEmpty: return .restNotificationPathEmpty
+            case .pathNonempty: return .restNotificationPathNonempty
+            case .installCoach: return .restNotificationInstallCoach
+            case .installViewer: return .restNotificationInstallViewer
+            case .installUnselected: return .restNotificationInstallUnselected
+            case .discarded: return .restNotificationDiscarded
+            }
+        }
+    }
+
+    static func record(_ phase: Phase) {
+        AppLogger.standard.info(phase.event, operation: .restNotification)
+    }
+}
+
 /// The invisible routing request carried by a rest-end notification
 /// (Revision 1.3). Only technical identifiers are parsed; the visible body
 /// never contains a Student name or other sensitive field.
@@ -117,15 +155,26 @@ final class RestNotificationRouter: ObservableObject {
     }
 
     func receive(_ request: RestNotificationRouteRequest) {
+        RestNotificationDiagnostics.record(.received)
         pendingRequest = request
     }
 
-    func takePendingRequest() -> RestNotificationRouteRequest? {
+    func takePendingRequest(ifReady isReady: Bool = true) -> RestNotificationRouteRequest? {
+        guard isReady else {
+            RestNotificationDiagnostics.record(.deferredNotReady)
+            return nil
+        }
         defer { pendingRequest = nil }
+        if pendingRequest != nil {
+            RestNotificationDiagnostics.record(.consumed)
+        }
         return pendingRequest
     }
 
     func discardPendingRequest() {
+        if pendingRequest != nil {
+            RestNotificationDiagnostics.record(.discarded)
+        }
         pendingRequest = nil
     }
 }
@@ -140,6 +189,7 @@ final class RestNotificationAppDelegate: NSObject, UIApplicationDelegate, UNUser
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
         UNUserNotificationCenter.current().delegate = self
+        RestNotificationDiagnostics.record(.delegateInstalled)
         return true
     }
 
@@ -147,11 +197,13 @@ final class RestNotificationAppDelegate: NSObject, UIApplicationDelegate, UNUser
         _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse
     ) async {
+        RestNotificationDiagnostics.record(.responseReceived)
         guard
             let request = RestNotificationRouteRequest(
                 userInfo: response.notification.request.content.userInfo
             )
         else {
+            RestNotificationDiagnostics.record(.ignoredPayload)
             return
         }
         await RestNotificationRouter.shared.receive(request)

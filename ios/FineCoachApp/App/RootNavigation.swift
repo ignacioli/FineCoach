@@ -66,6 +66,7 @@ struct RootNavigation: View {
     @State private var path: [RootDestination] = []
     @State private var onboardingCompleted = false
     @State private var didLoadOnboarding = false
+    @State private var isNavigationStackMounted = false
     @State private var rootTab: RootTab = .today
     /// Set by `AppRoot` while the install is `unselected`, so first-launch onboarding can go
     /// back to the Coach / import choice (M2-07).
@@ -292,6 +293,17 @@ struct RootNavigation: View {
                     }
                     .accessibilityElement(children: .contain)
                     .accessibilityIdentifier(FCAccessibilityID.studentList)
+                    .onAppear {
+                        // State loaded by the outer task only selects this branch;
+                        // it does not mean NavigationStack has been inserted yet.
+                        isNavigationStackMounted = true
+                        RestNotificationDiagnostics.record(.stackReady)
+                        Task { await consumePendingRestNotificationIfReady() }
+                    }
+                    .onDisappear {
+                        isNavigationStackMounted = false
+                        RestNotificationDiagnostics.record(.stackRemoved)
+                    }
                 }
             }
         }
@@ -304,15 +316,13 @@ struct RootNavigation: View {
             }
             Task { await consumePendingRestNotificationIfReady() }
         }
-        .onChange(of: onboardingCompleted) { _, completed in
-            guard completed else {
-                return
-            }
-            Task { await consumePendingRestNotificationIfReady() }
+        .onChange(of: path) { _, nextPath in
+            RestNotificationDiagnostics.record(nextPath.isEmpty ? .pathEmpty : .pathNonempty)
         }
     }
 
     private func loadInitialState() async {
+        RestNotificationDiagnostics.record(.rootLoading)
         #if DEBUG
             await environment.applyUITestSeedingIfNeeded()
         #endif
@@ -324,30 +334,27 @@ struct RootNavigation: View {
         }
         onboardingCompleted = (try? await useCases.isOnboardingCompleted()) ?? false
         didLoadOnboarding = true
-        // Cold start after a notification tap: the request waited in the
-        // router; consume it now that the root stack exists.
-        await consumePendingRestNotificationIfReady()
+        RestNotificationDiagnostics.record(.rootLoaded)
+        // NavigationStack.onAppear consumes an early tap after insertion.
+        // Later taps are consumed by the pendingRequest observer.
     }
 
     /// Mirrors the branches that actually render `NavigationStack` below.
     private var isReadyForRestNotification: Bool {
         environment.isStorageAvailable && environment.catalogUnavailableMessage == nil
-            && didLoadOnboarding && onboardingCompleted
+            && didLoadOnboarding && onboardingCompleted && isNavigationStackMounted
     }
 
     /// Consume at most one request. The request is taken (cleared) before the
     /// async reads, so it cannot be replayed; if the reads say "no route" the
     /// tap only opened the app.
     private func consumePendingRestNotificationIfReady() async {
-        guard isReadyForRestNotification else {
-            return
-        }
-        guard let request = restNotificationRouter.takePendingRequest() else {
-            return
-        }
         guard let studentUseCases = environment.studentUseCases,
             let sessionUseCases = environment.sessionUseCases
         else {
+            return
+        }
+        guard let request = restNotificationRouter.takePendingRequest(ifReady: isReadyForRestNotification) else {
             return
         }
         // Read-only lookups only: `startOrOpen` is never called here.
@@ -357,7 +364,7 @@ struct RootNavigation: View {
             isCoachMode: true,
             isStorageAvailable: environment.isStorageAvailable,
             isOnboardingCompleted: onboardingCompleted,
-            isRootNavigationReady: didLoadOnboarding
+            isRootNavigationReady: isNavigationStackMounted
         )
         let decision = RestNotificationRouting.decide(
             request: request,
@@ -366,6 +373,7 @@ struct RootNavigation: View {
             activeSession: activeSession ?? nil
         )
         guard case .route(let routed) = decision else {
+            RestNotificationDiagnostics.record(.ignoredNoRoute)
             return
         }
         showRestNotificationRoute(routed)
@@ -381,6 +389,7 @@ struct RootNavigation: View {
         }
         rootTab = .today
         path = nextPath
+        RestNotificationDiagnostics.record(.routed)
     }
 }
 

@@ -145,6 +145,53 @@ final class RestNotificationRoutingTests: XCTestCase {
 
     // MARK: - Consume-once router
 
+    func testColdStartRequestWaitsForMountedRootAndIsConsumedOnce() {
+        let router = RestNotificationRouter()
+        let request = RestNotificationRouteRequest(studentID: studentID, sessionID: sessionID)
+        router.receive(request)
+
+        // Loading onboarding can complete before NavigationStack is mounted.
+        XCTAssertNil(router.takePendingRequest(ifReady: false))
+        XCTAssertEqual(router.pendingRequest, request)
+        XCTAssertNil(router.takePendingRequest(ifReady: false))
+        XCTAssertEqual(router.pendingRequest, request, "failed readiness guards must retain the tap")
+
+        let consumed = router.takePendingRequest(ifReady: true)
+        XCTAssertEqual(consumed, request)
+        XCTAssertEqual(
+            RestNotificationRouting.decide(
+                request: consumed,
+                conditions: RestNotificationRouteConditions(),
+                studentExists: true,
+                activeSession: makeSession(id: sessionID, studentID: studentID)
+            ),
+            .route(request)
+        )
+        XCTAssertNil(router.pendingRequest)
+        XCTAssertNil(router.takePendingRequest(ifReady: true), "later observers must not replay the tap")
+    }
+
+    func testRequestArrivingAfterRootIsReadyIsConsumedOnce() {
+        let router = RestNotificationRouter()
+        XCTAssertNil(router.takePendingRequest(ifReady: true))
+        let request = RestNotificationRouteRequest(studentID: studentID, sessionID: sessionID)
+        router.receive(request)
+
+        XCTAssertEqual(router.takePendingRequest(ifReady: true), request)
+        XCTAssertNil(router.takePendingRequest(ifReady: true))
+    }
+
+    func testViewerDiscardsADeferredRequestWithoutReplay() {
+        let router = RestNotificationRouter()
+        router.receive(RestNotificationRouteRequest(studentID: studentID, sessionID: sessionID))
+        XCTAssertNil(router.takePendingRequest(ifReady: false))
+
+        router.discardPendingRequest()
+
+        XCTAssertNil(router.pendingRequest)
+        XCTAssertNil(router.takePendingRequest(ifReady: true))
+    }
+
     func testRouterConsumesARequestOnceAndCanBeDiscarded() throws {
         let router = RestNotificationRouter()
         let request = RestNotificationRouteRequest(studentID: studentID, sessionID: sessionID)

@@ -72,6 +72,12 @@ struct AppRoot: View {
                 return
             }
             installState = await resolveInstallState()
+            switch installState {
+            case .coach: RestNotificationDiagnostics.record(.installCoach)
+            case .viewer: RestNotificationDiagnostics.record(.installViewer)
+            case .unselected: RestNotificationDiagnostics.record(.installUnselected)
+            case nil: break
+            }
             discardRestNotificationIfViewer()
             if let url = pendingOpenURL {
                 pendingOpenURL = nil

@@ -48,6 +48,26 @@ public enum AppLogEvent: String, CaseIterable, Sendable {
     case archiveDeleteCompleted = "archive.delete_completed"
     /// Deleting the local archive did not finish; the next launch resumes the cleanup.
     case archiveDeleteFailed = "archive.delete_failed"
+    /// Rest-end notification tap routing (C19): fixed phase names only, never
+    /// a Student, Session or notification identifier.
+    case restNotificationDelegateInstalled = "rest_notification.delegate_installed"
+    case restNotificationResponseReceived = "rest_notification.response_received"
+    case restNotificationIgnoredPayload = "rest_notification.ignored_payload"
+    case restNotificationReceived = "rest_notification.received"
+    case restNotificationRootLoading = "rest_notification.root_loading"
+    case restNotificationRootLoaded = "rest_notification.root_loaded"
+    case restNotificationStackReady = "rest_notification.stack_ready"
+    case restNotificationStackRemoved = "rest_notification.stack_removed"
+    case restNotificationDeferredNotReady = "rest_notification.deferred_not_ready"
+    case restNotificationConsumed = "rest_notification.consumed"
+    case restNotificationIgnoredNoRoute = "rest_notification.ignored_no_route"
+    case restNotificationRouted = "rest_notification.routed"
+    case restNotificationPathEmpty = "rest_notification.path_empty"
+    case restNotificationPathNonempty = "rest_notification.path_nonempty"
+    case restNotificationInstallCoach = "rest_notification.install_coach"
+    case restNotificationInstallViewer = "rest_notification.install_viewer"
+    case restNotificationInstallUnselected = "rest_notification.install_unselected"
+    case restNotificationDiscarded = "rest_notification.discarded"
 }
 
 public enum AppLogOperation: String, CaseIterable, Sendable {
@@ -60,6 +80,7 @@ public enum AppLogOperation: String, CaseIterable, Sendable {
     case archiveImport = "archive_import"
     case archiveReplace = "archive_replace"
     case archiveDelete = "archive_delete"
+    case restNotification = "rest_notification"
 }
 
 public enum AppLogErrorCategory: String, CaseIterable, Sendable {
