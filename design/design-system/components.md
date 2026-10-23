@@ -252,7 +252,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 
 #### `DS-SET-ROW` 训练组行
 
-- **阶段 D 新纪录状态**：已批准的 D-a anatomy、标记外观、阅读顺序、换行与触感规则见 `design/progress-milestones/implementation-map.md` §2 D-a。`FCNewRecordBadge` 是本组件的胶囊部件（文字本地化，自身无障碍隐藏，由组行朗读），仅 completed 且持有纪录时显示；ShareReport 卡片复用该标记。
+- **阶段 D 新纪录状态**：已批准的 D-a anatomy、标记外观、阅读顺序、换行与触感规则见 `design/progress-milestones/implementation-map.md` §2 D-a。`FCNewRecordBadge` 是本组件的胶囊部件（文字本地化，自身无障碍隐藏，由组行朗读），仅 completed 且持有纪录时显示；ShareReport 卡片复用该标记。2026-10-23 起（README §10 C16）每个动作最多一组持有标记，总结与分享卡片的胶囊放在「上次 → 本次」动作行的动作名后。
 
 - **部件**：组状态圆圈（22×22，点击区 44）→ 一行内：标题「第 N 组」（`body`；已完成为 `text.primary`，其余为 `text.secondary`）→ 弹性空白 → 数值（`body` `text.primary`，单行，最小缩放 0.8）→ 状态文字（`callout` 400 `text.secondary`），刚确认的一组在 4 秒内换成「撤销」（`FCLinkButton`，P0-D11）→ 可选编辑按钮（铅笔，44）。2026-10-15 起由上下两行改为一行，与已批准的 D8 / P0-a2 稿一致（implementation-map Δ5）。
 - **`FCSetStateCircle` 状态**：待完成：1.5pt `border.control` 描边；草稿：1pt `text.secondary` 虚线（3/2）；已完成：`action.primary` 实心 + 白色 ✓。
