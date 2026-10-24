@@ -2,7 +2,7 @@
 
 > 这是 finecoach-scoring-optimization 这条主线的**唯一总览**。人和各个 AI 工具开工前先看这里，弄清现在在哪、下一步是什么、谁来做。
 > 细节以各自的权威文件为准：评分方法见 [`11d-experience-scorecard.md`](11d-experience-scorecard.md)，P0 决定见 [`experience-p0/implementation-map.md`](experience-p0/implementation-map.md)，阶段 B 决定见 [`experience-t2/decisions.md`](experience-t2/decisions.md)，C′ 决定见 [`catalog-expansion/decisions.md`](catalog-expansion/decisions.md)。
-> 最后更新：2026-10-20（阶段 D 规则已裁决，spec 草稿已写）。每个阶段收尾时更新本文件的「状态」「决定队列」两节。
+> 最后更新：2026-10-24（阶段 D 和 2026-10-21～23 走查修订已合并并 push；仍无真人评分）。每个阶段收尾时更新本文件的「状态」「决定队列」两节。
 
 ## 1. 目标和怎么算赢
 
@@ -25,7 +25,8 @@
 | C | T3 对标素材库：训记、Too、Hevy、Todoist 的关键画面放进 Penpot 并标注 | 11、6 | ⏳ 没开始 | 等负责人截图，并确认「dotolist」就是 Todoist |
 | C′ | 动作库扩充：146 条扩到约 550 条 | 5（间接） | ✅ **已合并**（2026-10-19）。**2a**（main `e5c65d0`，specs `5b687ea`）：新增 396 条，共 542 条（1 条停用），13 个器械都有动作；启动时按 id 原位同步，Core Data V6；重名和失败规则 CX-D10–D15。**2b**（main `1a7c3a7`）：图标 18 → 21（壶铃实心例外 CX-D13），动作库和添加动作面板加「最近练过」，拼音和首字母搜索；Unit 504、Integration 187，0 失败。拼音字级修正（弹→tan、地→di）已合并（main `218d63a`，Unit 507、Integration 188，0 失败）；**还没人看过界面** | `design/catalog-expansion/decisions.md`；`.handoff/2026-10-18-cprime-step1-owner-decisions.md`；`.handoff/subagent/2026-10-19-cprime-step2b-e92b89f-handoff.md` |
 | 维度 5 | 拼音或首字母搜索，常用动作和最近练过的动作排前面 | 5 | ✅ 随 C′ 第 2b 步合并（排序按负责人决定改为顶部「最近练过」分组）；待真人评分 | 见 C′ 行 |
-| D | P1 收获感：破纪录当场提示、课程总结写出进步、里程碑 | 6、4、9 | 实现完成，待集中走查 | `specs/004-stage-d-progress-milestones/spec.md`（specs 分支 `docs/stage-d-pr-milestones`） |
+| D | P1 收获感：破纪录当场提示、课程总结写出进步、里程碑 | 6、4、9 | ✅ 已合并；2026-10-21 集中走查后修订：新纪录与比上次进步重新定义（C16）、新纪录数值浮起和动效 token（C17，负责人真机选定 D 档）；**还没真人评分** | `specs/004-stage-d-progress-milestones/spec.md`（Revision 1.5、1.6）；`progress-milestones/implementation-map.md` |
+| 走查修订 | 2026-10-21～23 真机走查发现的问题：多学员同时训练（W-08）、分享后回今日（C15）、页头统一（C18）、关于页（C21）、训练时长按小时分钟（C22）、休息结束通知路由 / 冷启动 / 主线程崩溃 / 分组和前台横幅（C19、C23）、休息倒计时按训练保存和已超时（C24、C25） | 1、2、4、10、11 | ✅ 已合并，负责人真机复测通过 | `design-system/README.md` §10；2026-10-23 PR ignacioli/FineCoach#4 合入 GitHub main |
 | E | P2 洞察：进步停滞、课包快用完、学员很久没约课 | 7 | ⏳ 要先写 spec | 先定展示哪些洞察 |
 | F | P3 系统级入口：小组件、Live Activity、快捷指令 | 8 | ⏳ 要先写 spec，并先做隐私威胁评估 | AGENTS.md 隐私红线 |
 
@@ -51,7 +52,7 @@ D 等 B3 合并之后再开工（都要改训练页和课程总结），也要�
 - **两种撤销实现并存。** 删组是「立即删除，撤销时插回去」，删测量是「4 秒后才真正删除」。两种都有测试，记为已知差异，以后改撤销逻辑时统一。
 - **UI 测试仍然没跑通。** `FineCoachUITests` 不是验收闸门。`CoreTrainingUITests` 已对齐 B1、B2 并合并，但卡在找不到第 0 个动作，原因未明（identifier 在代码里存在，见 `ActiveSessionView.swift` 的 `exerciseAt`）。调查已挂起；以后重启时，从 accessibility 层级和 List 懒加载查起。
 - **模拟器上的通知授权会让测试挂住。** 2026-10-18 查明：会创建带提醒约课的测试如果走真实的通知中心，在还没做过通知授权决定的模拟器上，会弹出系统授权框，没人点就一直挂着。B3 已经给 `AppEnvironment` 加了通知中心注入点，两条 seed 测试改用 `FakeNotificationScheduling`。以后新写这类测试也照这样注入；跑测试时要设硬时限（见 B3 一节「测试挂起修复」）。
-- **Δ12 的一个边界（不阻塞）。** 休息在键盘弹起期间结束时，休息条没有渲染，所以结束时那一次 `.warning` 触感不会触发，条上的 3 秒自动收起也不会跑，`restTimer` 会留着一个已结束、不显示的值，直到下一次休息覆盖它。用户看不到这个状态。系统通知不受影响。以后改休息条时一并处理。
+- ~~Δ12 的一个边界~~：2026-10-23 随 C25 解决。休息条不再自动收起；键盘收起时休息已结束就直接清除，不再留下已结束、不显示的计时。键盘弹起期间到点时那一次触感仍不会触发（条没有渲染），系统通知不受影响。
 
 ## 5. 工具分工
 
@@ -73,19 +74,18 @@ D 等 B3 合并之后再开工（都要改训练页和课程总结），也要�
 
 按紧急程度排：
 
-1. ~~真机签名~~：2026-10-17 已用 main `a81a9dd` 重签并覆盖安装（覆盖安装会保留数据，还没打开 App 核实），新签名到 **2026-10-25 10:45（北京时间）**。下次在这之前重签。
+1. **真机签名**：2026-10-23 已用 main `c27ec06` 装 Debug 版（7 天有效）。日常使用前要装一次 Release 版，在 Debug 版过期前完成。
 2. ~~Δ12 修法~~：2026-10-17 定为 B-D9，同日实现并合并（`5bd6774`）。
 3. **集中走查加真人评分**。A、B 两个阶段和 C′ 第 2a 步做完了，还没有人看过。这次要看的是：`FCUndoRow`、`FCMoreMenu`、删组和删测量的撤销、指标页底部两行、5 个共享确认框、状态栏遮盖；动作库 13 项器械筛选在小屏上的换行、两个改名动作、停用动作不出现。看完按标准任务打分。
 4. ~~C′ 候选清单审核~~：2026-10-18 批准，建议全部采纳；另定 CX-D9。之后 CX-D10 到 CX-D15 也已裁决（见决定单）。
 5. **T3 素材**：4 个 App 的截图，以及确认「dotolist」就是 Todoist。
 6. ~~D 的规则~~：2026-10-20 裁决 PD-D1～D5（沿用 M1B-FR-029 口径、组行当场标记、第 N 节课里程碑、总结页只读区块、跟随个人最佳开关）。**新增待定**：spec §9 Q-D1～Q-D5。
 7. **F 的隐私规则**：锁屏和通知里能显示什么。
-8. **push 到 GitHub**：本地 `main` 比 `origin/main` 超前约 70 个提交，仓库是公开的。
-9. ~~清理 worktree~~：2026-10-18 已删除已合并的 worktree 和分支；B1 未提交草稿备份在 `wip/b1-ui-test-draft`。
+8. ~~push 到 GitHub~~：2026-10-23 经 PR ignacioli/FineCoach#4（merge commit）合入，148 个提交；main 受保护，以后都走 PR。CodeQL 有 15 条 `swift/cleartext-storage-database` 告警，负责人决定暂不处理（Core Data 库已用 `completeUnlessOpen` 文件保护）。
+9. ~~清理 worktree~~：2026-10-24 再次删除已合并的 worktree 和分支；B1 未提交草稿备份仍在 `wip/b1-ui-test-draft`。
 
 ## 7. 接下来三步
 
-1. 负责人：
-   - 做一次集中走查，打第一次真人分（含动作库新内容、两处「最近练过」、新图标）；
-2. 负责人：review D 的 spec，回答 §9 Q-D1～Q-D5。
-3. Claude：spec 定稿后画 D-a/D-b/D-c，批准后写 plan、tasks 和 Codex 提示词。其他 agent 暂无。
+1. 负责人：按标准任务做第一次真人评分（含 A、B、C′、D 和走查修订），结果追加到评分卡末尾。这是现在最大的缺口，它决定先做 E 还是 F。
+2. Claude：在私有 specs 仓起草 E（P2 洞察）的 spec，列出要负责人拍板的问题（展示哪些洞察、阈值、入口位置）。只改 specs 仓，可以和第 1 步并行。
+3. 负责人：定 F 的隐私规则（锁屏和通知里能显示什么）；定了之后再写 F 的 spec 和威胁评估。
