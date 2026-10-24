@@ -176,7 +176,7 @@ public struct SessionGains: Hashable, Sendable {
     }
 
     /// The main metric value, or `nil` when this set does not record it.
-    private static func metricValue(_ set: TrainingSet, kind: RecordKind) -> DecimalValue? {
+    internal static func metricValue(_ set: TrainingSet, kind: RecordKind) -> DecimalValue? {
         switch kind {
         case .highestWeight: return set.weightValue
         case .longestDuration: return set.durationSeconds
@@ -186,7 +186,7 @@ public struct SessionGains: Hashable, Sendable {
 
     /// Strictly better on the main metric alone (Revision 1.5: reps never make
     /// a heavier weight a new record, and vice versa).
-    private static func isBetter(
+    internal static func isBetter(
         _ candidate: DecimalValue, than current: DecimalValue, kind: RecordKind, direction: Comparison.LoadDirection
     ) -> Bool {
         switch kind {
@@ -197,7 +197,7 @@ public struct SessionGains: Hashable, Sendable {
         }
     }
 
-    private static func bestMetricValue(
+    internal static func bestMetricValue(
         in sets: [TrainingSet], kind: RecordKind, direction: Comparison.LoadDirection
     ) -> DecimalValue? {
         var best: DecimalValue?

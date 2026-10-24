@@ -378,6 +378,14 @@
 		D004B /* ActiveSessionNewRecordTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D004A; };
 		D005B /* SessionGainsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D005A; };
 		D006B /* SessionGainsRebuildTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D006A; };
+		E00000000000000000000101 /* EstimatedOneRepMax.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00000000000000000000100; };
+		E00000000000000000000103 /* InsightEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00000000000000000000102; };
+		E00000000000000000000105 /* InsightSnoozeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00000000000000000000104; };
+		E00000000000000000000107 /* EstimatedOneRepMaxTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00000000000000000000106; };
+		E00000000000000000000109 /* InsightEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00000000000000000000108; };
+		E0000000000000000000010B /* InsightSnoozeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0000000000000000000010A; };
+		E00000000000000000000111 /* InsightUseCasesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00000000000000000000110; };
+		E00000000000000000000113 /* InsightUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00000000000000000000112; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -766,6 +774,14 @@
 		D004A /* ActiveSessionNewRecordTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionNewRecordTests.swift; sourceTree = "<group>"; };
 		D005A /* SessionGainsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionGainsSectionView.swift; sourceTree = "<group>"; };
 		D006A /* SessionGainsRebuildTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionGainsRebuildTests.swift; sourceTree = "<group>"; };
+		E00000000000000000000100 /* EstimatedOneRepMax.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EstimatedOneRepMax.swift; sourceTree = "<group>"; };
+		E00000000000000000000102 /* InsightEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightEngine.swift; sourceTree = "<group>"; };
+		E00000000000000000000104 /* InsightSnoozeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightSnoozeStore.swift; sourceTree = "<group>"; };
+		E00000000000000000000106 /* EstimatedOneRepMaxTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EstimatedOneRepMaxTests.swift; sourceTree = "<group>"; };
+		E00000000000000000000108 /* InsightEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightEngineTests.swift; sourceTree = "<group>"; };
+		E0000000000000000000010A /* InsightSnoozeStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightSnoozeStoreTests.swift; sourceTree = "<group>"; };
+		E00000000000000000000110 /* InsightUseCasesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightUseCasesTests.swift; sourceTree = "<group>"; };
+		E00000000000000000000112 /* InsightUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightUseCases.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1069,6 +1085,7 @@
 		A410 /* FineCoachTests */ = {
 			isa = PBXGroup;
 			children = (
+				E00000000000000000000001 /* Insights */,
 				A200 /* SetupSmokeTests.swift */,
 				A492 /* App */,
 				A473 /* Students */,
@@ -1093,6 +1110,8 @@
 		A411 /* Domain */ = {
 			isa = PBXGroup;
 			children = (
+				E00000000000000000000100 /* EstimatedOneRepMax.swift */,
+				E00000000000000000000102 /* InsightEngine.swift */,
 				A110 /* DomainError.swift */,
 				A111 /* Identifiers.swift */,
 				A112 /* ValidatedText.swift */,
@@ -1130,6 +1149,8 @@
 		A412 /* Application */ = {
 			isa = PBXGroup;
 			children = (
+				E00000000000000000000104 /* InsightSnoozeStore.swift */,
+				E00000000000000000000112 /* InsightUseCases.swift */,
 				A120 /* Protocols.swift */,
 				A121 /* FaultInjectionBoundary.swift */,
 				A122 /* StudentUseCases.swift */,
@@ -1240,6 +1261,7 @@
 		A420 /* FineCoachIntegrationTests */ = {
 			isa = PBXGroup;
 			children = (
+				E00000000000000000000002 /* Insights */,
 				A421 /* Foundation */,
 				A516 /* Appointments */,
 				A542 /* CoursePackages */,
@@ -1857,6 +1879,24 @@
 			path = ArchiveExport;
 			sourceTree = "<group>";
 		};
+		E00000000000000000000001 /* Insights */ = {
+			isa = PBXGroup;
+			children = (
+				E00000000000000000000106 /* EstimatedOneRepMaxTests.swift */,
+				E00000000000000000000108 /* InsightEngineTests.swift */,
+				E0000000000000000000010A /* InsightSnoozeStoreTests.swift */,
+			);
+			path = Insights;
+			sourceTree = "<group>";
+		};
+		E00000000000000000000002 /* Insights */ = {
+			isa = PBXGroup;
+			children = (
+				E00000000000000000000110 /* InsightUseCasesTests.swift */,
+			);
+			path = Insights;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -2024,6 +2064,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E00000000000000000000113 /* InsightUseCases.swift in Sources */,
+				E00000000000000000000105 /* InsightSnoozeStore.swift in Sources */,
+				E00000000000000000000103 /* InsightEngine.swift in Sources */,
+				E00000000000000000000101 /* EstimatedOneRepMax.swift in Sources */,
 				016E1128FF8B3A0A928741A8 /* ArchiveExportDebugSeed.swift in Sources */,
 				71F372DF4FD322366CEA4AF5 /* ArchiveDeliveryView.swift in Sources */,
 				7C2344D0C6D4067AD017C374 /* ArchivePasswordView.swift in Sources */,
@@ -2257,6 +2301,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E0000000000000000000010B /* InsightSnoozeStoreTests.swift in Sources */,
+				E00000000000000000000109 /* InsightEngineTests.swift in Sources */,
+				E00000000000000000000107 /* EstimatedOneRepMaxTests.swift in Sources */,
 				84D9618B61F2BC059C9B7FF6 /* ArchiveExportScreenTests.swift in Sources */,
 				8FE54578732674057F095EBA /* ArchiveExportFixtures.swift in Sources */,
 				CB905CFCA28988F304401F0A /* ArchiveExportPolicyTests.swift in Sources */,
@@ -2336,6 +2383,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E00000000000000000000111 /* InsightUseCasesTests.swift in Sources */,
 				83C0625A76E06855F0309F7F /* ArchiveExportFixtures.swift in Sources */,
 				8EE69B2A44B60DEA2D434676 /* ArchiveExportIntegrationTests.swift in Sources */,
 				80767B234DEBABF5598A510D /* ArchiveImportIntegrationTests.swift in Sources */,
