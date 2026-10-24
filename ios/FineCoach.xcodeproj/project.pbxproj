@@ -386,6 +386,7 @@
 		E00000000000000000000109 /* InsightEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00000000000000000000108; };
 		E0000000000000000000010B /* InsightSnoozeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0000000000000000000010A; };
 		E00000000000000000000111 /* InsightUseCasesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00000000000000000000110; };
+		E60000000000000000000001 /* InsightsDemoSeedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E60000000000000000000000; };
 		E00000000000000000000113 /* InsightUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00000000000000000000112; };
 		E20000000000000000000000 /* InsightRowContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000000000000000000000; };
 		E20000000000000000000001 /* InsightsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000000000000000000001; };
@@ -789,6 +790,7 @@
 		E00000000000000000000108 /* InsightEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightEngineTests.swift; sourceTree = "<group>"; };
 		E0000000000000000000010A /* InsightSnoozeStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightSnoozeStoreTests.swift; sourceTree = "<group>"; };
 		E00000000000000000000110 /* InsightUseCasesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightUseCasesTests.swift; sourceTree = "<group>"; };
+		E60000000000000000000000 /* InsightsDemoSeedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsDemoSeedTests.swift; sourceTree = "<group>"; };
 		E00000000000000000000112 /* InsightUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightUseCases.swift; sourceTree = "<group>"; };
 		E10000000000000000000000 /* InsightRowContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightRowContent.swift; sourceTree = "<group>"; };
 		E10000000000000000000001 /* InsightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsViewModel.swift; sourceTree = "<group>"; };
@@ -1911,6 +1913,7 @@
 			isa = PBXGroup;
 			children = (
 				E00000000000000000000110 /* InsightUseCasesTests.swift */,
+				E60000000000000000000000 /* InsightsDemoSeedTests.swift */,
 			);
 			path = Insights;
 			sourceTree = "<group>";
@@ -2420,6 +2423,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E00000000000000000000111 /* InsightUseCasesTests.swift in Sources */,
+				E60000000000000000000001 /* InsightsDemoSeedTests.swift in Sources */,
 				83C0625A76E06855F0309F7F /* ArchiveExportFixtures.swift in Sources */,
 				8EE69B2A44B60DEA2D434676 /* ArchiveExportIntegrationTests.swift in Sources */,
 				80767B234DEBABF5598A510D /* ArchiveImportIntegrationTests.swift in Sources */,

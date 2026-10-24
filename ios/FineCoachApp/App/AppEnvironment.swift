@@ -602,12 +602,17 @@ public final class AppEnvironment: ObservableObject {
             }
             return try AppEnvironment(
                 rootURL: root,
-                clock: ArchiveExportDebugSeed.isRequested ? ArchiveExportDebugSeed.makeClock() : SystemClock()
+                clock: ArchiveExportDebugSeed.isRequested || ArchiveExportDebugSeed.insightsRequested
+                    ? ArchiveExportDebugSeed.makeClock() : SystemClock()
             )
         }
 
         func applyUITestSeedingIfNeeded() async {
             let arguments = ProcessInfo.processInfo.arguments
+            if ArchiveExportDebugSeed.insightsRequested {
+                await ArchiveExportDebugSeed.seedInsightsDemo(in: self)
+                return
+            }
             if ArchiveExportDebugSeed.isRequested {
                 await ArchiveExportDebugSeed.seed(in: self)
                 return
