@@ -114,7 +114,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 
 - 产品负责人 2026-10-23 裁定（§10 C24）。分类 B：扩展 feature 专有 `DS-REST-TIMER`（`design/experience-p0/implementation-map.md`），复用现有 token，不新建组件。
 - Penpot（Foundations 页）：快照 `before-rest-overdue P0-b 2026-10-23` → `rest overdue state on P0-b 2026-10-23`。P0-b 组间休息新增第三态「已超时 1:20」，说明改为「停在本页看着结束：触感提醒，3 秒后收起。离开期间结束：切回时显示已超时，不自动收起」，画板加高 128。
-- 同日再修订（§10 C25）：取消 3 秒自动收起。Penpot 快照 `before-rest-no-auto-dismiss P0-b 2026-10-23` → `rest no auto-dismiss P0-b 2026-10-23`；分区标题改为「组间休息 · 进行中 / 刚结束 / 已超时」，说明改为「结束时触感提醒；不自动收起，一律显示已超时并每秒累加，点「关闭」或确认下一组才收起。App 在后台时发系统通知（P0-D5）」。2 倍导出待负责人导出。
+- 同日再修订（§10 C25）：取消 3 秒自动收起。Penpot 快照 `before-rest-no-auto-dismiss P0-b 2026-10-23` → `rest no auto-dismiss P0-b 2026-10-23`；2 倍导出 `design/experience-p0/boards/P0-b-component-states.png`（2026-10-24）；分区标题改为「组间休息 · 进行中 / 刚结束 / 已超时」，说明改为「结束时触感提醒；不自动收起，一律显示已超时并每秒累加，点「关闭」或确认下一组才收起。App 在后台时发系统通知（P0-D5）」。2 倍导出待负责人导出。
 
 ## 2. 颜色
 

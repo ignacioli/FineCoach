@@ -126,7 +126,7 @@ agent 按上述决定补充的细节（产品负责人在 P0-a2 画稿上确认�
 
 ### `DS-REST-TIMER` 组间休息条
 
-代码是 `RestTimerBar`，只在训练页、结束训练按钮上方。
+代码是 `RestTimerBar`，只在训练页、结束训练按钮上方。画板 2 倍导出：`boards/P0-b-component-states.png`（Penpot P0-b，2026-10-24 导出，含 C25 的「刚结束 / 已超时」两态）。
 
 - **部件（进行中）**：说明「组间休息」（`caption`、`text.secondary`）→ 倒计时（`numeralLarge`）→ 链接按钮「−15 秒」「+15 秒」「跳过」。
 - **部件（结束）**：✓ → 「休息结束，可以开始下一组」（`headline`）→ 「关闭」。
