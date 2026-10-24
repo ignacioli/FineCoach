@@ -123,12 +123,23 @@ final class TrendsViewModel: ObservableObject {
         }
     }
 
+    nonisolated static func initialOptionKey(exerciseID: StableExerciseID, sessions: [CompletedSession]) -> String? {
+        let latest = sessions.filter { session in
+            session.exercises.contains { $0.sourceID == exerciseID }
+        }.max {
+            if $0.completedAtUTC != $1.completedAtUTC { return $0.completedAtUTC < $1.completedAtUTC }
+            return $0.id.rawValue.uuidString < $1.id.rawValue.uuidString
+        }
+        guard let exercise = latest?.exercises.last(where: { $0.sourceID == exerciseID }) else { return nil }
+        return "\(exerciseID.rawValue)|\(exercise.recordModeSnapshot.rawValue)"
+    }
+
     func reload() async {
         do {
             allSessions = try await historyUseCases.listHistory(studentID: studentID)
             if selectedExerciseKey == nil, let initialExerciseID {
-                if let option = exerciseOptions.first(where: { $0.id == initialExerciseID }) {
-                    selectExercise(key: option.key)
+                if let key = Self.initialOptionKey(exerciseID: initialExerciseID, sessions: allSessions) {
+                    selectExercise(key: key)
                     selectedTab = .exerciseTrend
                 }
             }

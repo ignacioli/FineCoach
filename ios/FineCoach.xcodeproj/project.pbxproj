@@ -88,6 +88,7 @@
 		B723 /* ExercisePreferenceAssistedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A723 /* ExercisePreferenceAssistedTests.swift */; };
 		B979 /* ExercisePreferenceUnilateralTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A979 /* ExercisePreferenceUnilateralTests.swift */; };
 		B730 /* TrendsViewPointLabelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A730 /* TrendsViewPointLabelTests.swift */; };
+		E24000000000000000000002 /* TrendsInitialSelectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E24000000000000000000001 /* TrendsInitialSelectionTests.swift */; };
 		B190 /* ActiveSessionRecoverySnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A190 /* ActiveSessionRecoverySnapshot.swift */; };
 		B191 /* ActiveSessionRecoveryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A191 /* ActiveSessionRecoveryStore.swift */; };
 		B192 /* ActiveSessionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A192 /* ActiveSessionCoordinator.swift */; };
@@ -653,6 +654,7 @@
 		A723 /* ExercisePreferenceAssistedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExercisePreferenceAssistedTests.swift; sourceTree = "<group>"; };
 		A979 /* ExercisePreferenceUnilateralTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExercisePreferenceUnilateralTests.swift; sourceTree = "<group>"; };
 		A730 /* TrendsViewPointLabelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendsViewPointLabelTests.swift; sourceTree = "<group>"; };
+		E24000000000000000000001 /* TrendsInitialSelectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendsInitialSelectionTests.swift; sourceTree = "<group>"; };
 		A226 /* HistoryShareUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryShareUITests.swift; sourceTree = "<group>"; };
 		A227 /* BackupRestoreUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRestoreUITests.swift; sourceTree = "<group>"; };
 		A240 /* HistoryReportDomainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryReportDomainTests.swift; sourceTree = "<group>"; };
@@ -1675,6 +1677,7 @@
 			isa = PBXGroup;
 			children = (
 				A730 /* TrendsViewPointLabelTests.swift */,
+				E24000000000000000000001 /* TrendsInitialSelectionTests.swift */,
 			);
 			path = Trends;
 			sourceTree = "<group>";
@@ -2365,6 +2368,7 @@
 				B723 /* ExercisePreferenceAssistedTests.swift in Sources */,
 				B979 /* ExercisePreferenceUnilateralTests.swift in Sources */,
 				B730 /* TrendsViewPointLabelTests.swift in Sources */,
+				E24000000000000000000002 /* TrendsInitialSelectionTests.swift in Sources */,
 				B240 /* HistoryReportDomainTests.swift in Sources */,
 				D003B /* SessionGainsTests.swift in Sources */,
 				B944 /* HistoryFilterCriteriaTests.swift in Sources */,

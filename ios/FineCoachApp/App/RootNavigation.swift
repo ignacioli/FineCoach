@@ -123,7 +123,6 @@ struct RootNavigation: View {
                                     exerciseUseCases: environment.requireExerciseUseCases(),
                                     calendarProvider: SystemLocalCalendarProvider(), initialExerciseID: exerciseID)
                             case .resourceHub:
-
                                 ResourceHubView(
                                     exerciseUseCases: environment.requireExerciseUseCases(),
                                     templateUseCases: environment.requireTemplateUseCases(),

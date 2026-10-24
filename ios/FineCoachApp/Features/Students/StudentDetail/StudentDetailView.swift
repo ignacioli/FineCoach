@@ -122,7 +122,6 @@ struct StudentDetailView: View {
                 useCases: insightUseCases, students: useCases, exercises: exerciseUseCases,
                 history: historyUseCases, studentID: studentID))
         _path = path
-
     }
 
     var body: some View {
@@ -151,7 +150,6 @@ struct StudentDetailView: View {
                         Text(error).fcFont(.caption).foregroundStyle(FCSemanticColors.statusDestructive)
                     }
                     overviewSection(student)
-
                     recordsSection(student)
                     profileSection(student)
                 } else {
