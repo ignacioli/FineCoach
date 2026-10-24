@@ -193,6 +193,25 @@
             try await env.controller.shutdownForTesting()
         }
 
+        func testSnoozeRemovesSameInsightFromTodayAndStudentDetailSources() async throws {
+            let env = try makeEnvironment()
+            let person = try await student(env, age: 21, name: "虚构跨页学员")
+            _ = try await env.credits.createActivePackage(
+                studentID: person.id, name: nil, totalCredits: 2, startDate: nil, endDate: nil)
+            let todayBefore = try await env.insights.load(now: now)
+            let detailBefore = try await env.insights.studentInsights(studentID: person.id, now: now)
+            let target = try XCTUnwrap(todayBefore.first(where: { $0.kind == .packageLow }))
+            XCTAssertTrue(detailBefore.contains(target))
+            try await env.insights.snooze(target, now: now)
+            let todayAfter = try await env.insights.load(now: now)
+            let detailAfter = try await env.insights.studentInsights(studentID: person.id, now: now)
+            XCTAssertFalse(todayAfter.contains(where: { $0.id == target.id }))
+            XCTAssertFalse(detailAfter.contains(where: { $0.id == target.id }))
+            XCTAssertEqual(todayAfter.map(\.kind), [.inactive])
+            XCTAssertEqual(detailAfter, todayAfter)
+            try await env.controller.shutdownForTesting()
+        }
+
         @MainActor
         func testBackupExportExcludesSnoozeDocumentAndItsOpaqueIDs() async throws {
             let root = try TemporaryProtectedDirectory()

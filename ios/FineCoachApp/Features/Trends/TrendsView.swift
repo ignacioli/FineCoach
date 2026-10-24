@@ -16,6 +16,7 @@ final class TrendsViewModel: ObservableObject {
     @Published var focusFilter: Set<BodyPart> = []
     @Published var selectedForComparison: Set<StableUUID> = []
     @Published var selectedExerciseKey: String?
+    @Published var selectedTrendMetric: TrendMetric = .weight
     @Published var selectedTab: TrendsTab = .comparison
     @Published var errorMessage: String?
     /// Whether the currently-selected trend/PR exercise is marked as
@@ -25,6 +26,7 @@ final class TrendsViewModel: ObservableObject {
     @Published private(set) var isAssistedForSelectedExercise = false
 
     let studentID: StableUUID
+    private let initialExerciseID: StableExerciseID?
     private let historyUseCases: HistoryUseCases
     private let exerciseUseCases: ExerciseLibraryUseCases
     private let calendarProvider: any LocalCalendarProvider
@@ -33,8 +35,10 @@ final class TrendsViewModel: ObservableObject {
         studentID: StableUUID,
         historyUseCases: HistoryUseCases,
         exerciseUseCases: ExerciseLibraryUseCases,
-        calendarProvider: any LocalCalendarProvider
+        calendarProvider: any LocalCalendarProvider,
+        initialExerciseID: StableExerciseID? = nil
     ) {
+        self.initialExerciseID = initialExerciseID
         self.studentID = studentID
         self.historyUseCases = historyUseCases
         self.exerciseUseCases = exerciseUseCases
@@ -102,6 +106,7 @@ final class TrendsViewModel: ObservableObject {
     /// interpreted for both derived views above.
     func selectExercise(key: String) {
         selectedExerciseKey = key
+        selectedTrendMetric = selectedTrendMetric.resolved(for: selectedTrendOption()?.id)
         Task { await loadAssistedFlag() }
     }
 
@@ -121,6 +126,12 @@ final class TrendsViewModel: ObservableObject {
     func reload() async {
         do {
             allSessions = try await historyUseCases.listHistory(studentID: studentID)
+            if selectedExerciseKey == nil, let initialExerciseID {
+                if let option = exerciseOptions.first(where: { $0.id == initialExerciseID }) {
+                    selectExercise(key: option.key)
+                    selectedTab = .exerciseTrend
+                }
+            }
             await applyFilter()
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? String(localized: "trends.error.generic")
@@ -171,20 +182,21 @@ enum TrendsTab: String, CaseIterable, Identifiable {
 
 struct TrendsView: View {
     @StateObject private var viewModel: TrendsViewModel
-    @State private var selectedTrendMetric: TrendMetric = .weight
 
     init(
         studentID: StableUUID,
         historyUseCases: HistoryUseCases,
         exerciseUseCases: ExerciseLibraryUseCases,
-        calendarProvider: any LocalCalendarProvider
+        calendarProvider: any LocalCalendarProvider,
+        initialExerciseID: StableExerciseID? = nil
     ) {
         _viewModel = StateObject(
             wrappedValue: TrendsViewModel(
                 studentID: studentID,
                 historyUseCases: historyUseCases,
                 exerciseUseCases: exerciseUseCases,
-                calendarProvider: calendarProvider
+                calendarProvider: calendarProvider,
+                initialExerciseID: initialExerciseID
             )
         )
     }
@@ -229,19 +241,32 @@ struct TrendsView: View {
                     AssistedLoadBadge()
                 }
             }
-            let points = viewModel.exerciseTrend()
-            if points.first?.recordMode == .weightReps {
+            let points =
+                viewModel.selectedTrendMetric == .estimatedOneRepMax
+                ? EstimatedOneRepMaxTrend.points(
+                    exerciseID: viewModel.selectedTrendOption()?.id, sessions: viewModel.allSessions)
+                : viewModel.exerciseTrend()
+            if viewModel.selectedTrendOption()?.mode == .weightReps {
                 FCSegmentedSwitch(
-                    options: TrendMetric.allCases.map { .init(id: $0.rawValue, title: $0.label) },
+                    options: TrendMetric.options(for: viewModel.selectedTrendOption()?.id).map {
+                        .init(id: $0.rawValue, title: $0.label)
+                    },
                     selection: Binding(
-                        get: { selectedTrendMetric.rawValue },
-                        set: { selectedTrendMetric = TrendMetric(rawValue: $0) ?? selectedTrendMetric }
+                        get: { viewModel.selectedTrendMetric.rawValue },
+                        set: {
+                            viewModel.selectedTrendMetric = TrendMetric(rawValue: $0) ?? viewModel.selectedTrendMetric
+                        }
                     )
                 )
                 .accessibilityElement(children: .contain)
                 .accessibilityLabel(String(localized: "trends.metricPickerLabel"))
                 .accessibilityIdentifier(FCAccessibilityID.trendsMetricPicker)
-                if selectedTrendMetric == .volume {
+                if viewModel.selectedTrendMetric == .estimatedOneRepMax {
+                    Text(String(localized: "trends.e1rmCaption"))
+                        .fcFont(.caption)
+                        .foregroundStyle(FCSemanticColors.textSecondary)
+                }
+                if viewModel.selectedTrendMetric == .volume {
                     Text(String(localized: "trends.volumeCaption"))
                         .fcFont(.caption)
                         .foregroundStyle(FCSemanticColors.textSecondary)
@@ -250,37 +275,6 @@ struct TrendsView: View {
             trendContent(for: Comparison.TrendSampleDensity.classify(points))
         }
         .accessibilityIdentifier(FCAccessibilityID.trendsExerciseTrendSection)
-    }
-
-    private enum TrendMetric: String, CaseIterable, Identifiable {
-        case weight
-        case reps
-        case volume
-
-        var id: String { rawValue }
-
-        var label: String {
-            switch self {
-            case .weight: return String(localized: "trends.metric.weight")
-            case .reps: return String(localized: "trends.metric.reps")
-            case .volume: return String(localized: "trends.metric.volume")
-            }
-        }
-
-        var unit: String {
-            switch self {
-            case .weight, .volume: return "kg"
-            case .reps: return "次"
-            }
-        }
-
-        func value(for point: Comparison.SetTrendPoint) -> DecimalValue? {
-            switch self {
-            case .weight: return point.maxWeight
-            case .reps: return point.bestReps
-            case .volume: return point.volume
-            }
-        }
     }
 
     @ViewBuilder
@@ -306,7 +300,7 @@ struct TrendsView: View {
     private func trendBody(_ points: [Comparison.SetTrendPoint], dashed: Bool) -> some View {
         if points.first?.recordMode == .weightReps {
             metricTrendChart(points, dashed: dashed)
-            if selectedTrendMetric == .weight, viewModel.isAssistedForSelectedExercise,
+            if viewModel.selectedTrendMetric == .weight, viewModel.isAssistedForSelectedExercise,
                 let summary = trendDeltaSummary(points)
             {
                 Text(summary)
@@ -319,7 +313,7 @@ struct TrendsView: View {
     }
 
     private func metricTrendChart(_ points: [Comparison.SetTrendPoint], dashed: Bool) -> some View {
-        let metric = selectedTrendMetric
+        let metric = viewModel.selectedTrendMetric
         return TrendLineChart(
             points: points,
             metricLabel: metric.label,
@@ -347,13 +341,15 @@ struct TrendsView: View {
     }
 
     /// The metric-switcher's own value text for `.weightReps` points
-    /// (weight/reps/volume, driven by `selectedTrendMetric`) -- kept
+    /// (weight/reps/volume, driven by `viewModel.selectedTrendMetric`) -- kept
     /// separate from `trendValueText` below, which is the pre-existing
     /// fixed-field text for the other RecordModes the switcher doesn't
     /// apply to.
     private func metricSingleValueText(_ point: Comparison.SetTrendPoint) -> String {
-        let metric = selectedTrendMetric
-        return metric.value(for: point).map { "\($0.canonicalString)\(metric.unit)" } ?? "-"
+        let metric = viewModel.selectedTrendMetric
+        return metric.value(for: point).map {
+            TrendLineChart.pointLabel(NSDecimalNumber(decimal: $0.decimal).doubleValue, unit: metric.unit)
+        } ?? "-"
     }
 
     private func singlePointTrendView(_ point: Comparison.SetTrendPoint) -> some View {
@@ -434,5 +430,71 @@ struct TrendsView: View {
         Text(text)
             .fcFont(.sectionLabel)
             .foregroundStyle(FCSemanticColors.textSecondary)
+    }
+}
+
+enum TrendMetric: String, CaseIterable, Identifiable {
+    case weight
+    case reps
+    case volume
+    case estimatedOneRepMax
+
+    static func options(for exerciseID: StableExerciseID?) -> [Self] {
+        guard let exerciseID, EstimatedOneRepMax.exerciseIDs.contains(exerciseID) else {
+            return [.weight, .reps, .volume]
+        }
+        return allCases
+    }
+
+    func resolved(for exerciseID: StableExerciseID?) -> Self {
+        Self.options(for: exerciseID).contains(self) ? self : .weight
+    }
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .weight: return String(localized: "trends.metric.weight")
+        case .reps: return String(localized: "trends.metric.reps")
+        case .volume: return String(localized: "trends.metric.volume")
+        case .estimatedOneRepMax: return String(localized: "trends.metric.e1rm")
+        }
+    }
+
+    var unit: String {
+        switch self {
+        case .weight, .volume, .estimatedOneRepMax: return "kg"
+        case .reps: return "次"
+        }
+    }
+
+    func value(for point: Comparison.SetTrendPoint) -> DecimalValue? {
+        switch self {
+        case .weight, .estimatedOneRepMax: return point.maxWeight
+        case .reps: return point.bestReps
+        case .volume: return point.volume
+        }
+    }
+}
+
+/// Uses the approved domain calculation without changing PR or ordinary trend points.
+enum EstimatedOneRepMaxTrend {
+    static func points(exerciseID: StableExerciseID?, sessions: [CompletedSession]) -> [Comparison.SetTrendPoint] {
+        guard let exerciseID, EstimatedOneRepMax.exerciseIDs.contains(exerciseID) else { return [] }
+        return sessions.sorted {
+            if $0.completedAtUTC != $1.completedAtUTC { return $0.completedAtUTC < $1.completedAtUTC }
+            return $0.id.rawValue.uuidString < $1.id.rawValue.uuidString
+        }.compactMap { session in
+            let best = session.exercises.filter { $0.sourceID == exerciseID && $0.recordModeSnapshot == .weightReps }
+                .flatMap(\.sets).filter(\.contributesToStatistics).compactMap { set -> DecimalValue? in
+                    guard let weight = set.weightValue, let reps = set.repetitionCount else { return nil }
+                    return EstimatedOneRepMax.value(weight: weight, reps: reps, exerciseID: exerciseID)
+                }.max()
+            guard let best else { return nil }
+            return Comparison.SetTrendPoint(
+                sessionID: session.id, completedAtUTC: session.completedAtUTC, recordMode: .weightReps,
+                maxWeight: best, bestReps: nil, bestDurationSeconds: nil, bestDistance: nil, volume: nil,
+                weightDelta: nil, asymmetry: nil)
+        }
     }
 }

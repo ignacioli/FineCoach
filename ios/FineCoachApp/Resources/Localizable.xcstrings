@@ -1,6 +1,292 @@
 {
   "sourceLanguage": "zh-Hans",
   "strings": {
+    "insights.section.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要留意"
+          }
+        }
+      }
+    },
+    "insights.section.all": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全部"
+          }
+        }
+      }
+    },
+    "insights.group.package": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课包"
+          }
+        }
+      }
+    },
+    "insights.group.inactive": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "很久没来"
+          }
+        }
+      }
+    },
+    "insights.group.stagnant": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "进步停滞"
+          }
+        }
+      }
+    },
+    "insights.list.empty": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有需要留意的事"
+          }
+        }
+      }
+    },
+    "insights.action.snooze": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂不提醒 14 天"
+          }
+        }
+      }
+    },
+    "trends.metric.e1rm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "估算 1RM"
+          }
+        }
+      }
+    },
+    "trends.e1rmCaption": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "估算 1RM = 重量 × (1 + 次数 ÷ 30)，只算 1～10 次的组。这是推算值，不是实测的最大重量。"
+          }
+        }
+      }
+    },
+    "insights.package.exhausted": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课包已用完"
+          }
+        }
+      }
+    },
+    "insights.package.expired": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课包已过期"
+          }
+        }
+      }
+    },
+    "insights.package.balance": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "余额 %d 节"
+          }
+        }
+      }
+    },
+    "insights.package.validUntil": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有效期至 %@"
+          }
+        }
+      }
+    },
+    "insights.package.remaining": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课包剩 %d 节"
+          }
+        }
+      }
+    },
+    "insights.package.expiresToday": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课包今天到期"
+          }
+        }
+      }
+    },
+    "insights.package.expiresIn": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课包 %d 天后到期"
+          }
+        }
+      }
+    },
+    "insights.package.remainingBalance": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "剩 %d 节"
+          }
+        }
+      }
+    },
+    "insights.inactive.days": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d 天没来"
+          }
+        }
+      }
+    },
+    "insights.inactive.never": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "建档 %d 天还没上过课"
+          }
+        }
+      }
+    },
+    "insights.inactive.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "也没约下次课"
+          }
+        }
+      }
+    },
+    "insights.stagnant.unchanged": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连续 3 节没有创新高"
+          }
+        }
+      }
+    },
+    "insights.stagnant.e1rm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "估算 1RM %@"
+          }
+        }
+      }
+    },
+    "insights.stagnant.weight": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最大 %@"
+          }
+        }
+      }
+    },
+    "insights.stagnant.assistance": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最轻辅助 %@"
+          }
+        }
+      }
+    },
+    "insights.stagnant.reps": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最多 %@ 次"
+          }
+        }
+      }
+    },
+    "insights.stagnant.duration": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最长 %@"
+          }
+        }
+      }
+    },
     "session.gains.title": {"extractionState": "manual", "localizations": {"zh-Hans": {"stringUnit": {"state": "translated", "value": "本节收获"}}}},
     "session.gains.progress.format": {"extractionState": "manual", "localizations": {"zh-Hans": {"stringUnit": {"state": "translated", "value": "上次 %@ → 本次 %@"}}}},
     "session.gains.milestone.format": {"extractionState": "manual", "localizations": {"zh-Hans": {"stringUnit": {"state": "translated", "value": "第 %lld 节课"}}}},

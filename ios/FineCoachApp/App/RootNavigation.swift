@@ -25,6 +25,8 @@ enum RootDestination: Hashable {
     case bodyData(UUID)
     case bodyMeasurementEntry(studentID: UUID, metricID: UUID)
     case trends(UUID)
+    case insightTrend(studentID: UUID, exerciseID: StableExerciseID)
+    case insights
     case archiveExport(UUID)
     #if DEBUG
         /// 动效试验（开发版）only exists in DEBUG builds (README §14.1).
@@ -109,7 +111,19 @@ struct RootNavigation: View {
                         )
                         .navigationDestination(for: RootDestination.self) { destination in
                             switch destination {
+                            case .insights:
+                                InsightsListView(
+                                    useCases: environment.insightUseCases, students: environment.requireUseCases(),
+                                    exercises: environment.exerciseUseCases, history: environment.historyUseCases,
+                                    path: $path)
+                            case .insightTrend(let studentID, let exerciseID):
+                                TrendsView(
+                                    studentID: StableUUID(studentID),
+                                    historyUseCases: environment.requireHistoryUseCases(),
+                                    exerciseUseCases: environment.requireExerciseUseCases(),
+                                    calendarProvider: SystemLocalCalendarProvider(), initialExerciseID: exerciseID)
                             case .resourceHub:
+
                                 ResourceHubView(
                                     exerciseUseCases: environment.requireExerciseUseCases(),
                                     templateUseCases: environment.requireTemplateUseCases(),
@@ -128,6 +142,8 @@ struct RootNavigation: View {
                                     historyUseCases: environment.requireHistoryUseCases(),
                                     appointmentUseCases: environment.requireAppointmentUseCases(),
                                     creditLedgerUseCases: environment.creditLedgerUseCases,
+                                    insightUseCases: environment.insightUseCases,
+                                    exerciseUseCases: environment.exerciseUseCases,
                                     calendar: environment.requireCalendar(),
                                     path: $path
                                 )
@@ -410,6 +426,9 @@ struct RootTabContainer: View {
                     appointmentUseCases: environment.requireAppointmentUseCases(),
                     studentUseCases: environment.requireUseCases(),
                     creditLedgerUseCases: environment.creditLedgerUseCases,
+                    insightUseCases: environment.insightUseCases,
+                    exerciseUseCases: environment.exerciseUseCases,
+                    historyUseCases: environment.historyUseCases,
                     rootTab: $rootTab,
                     path: $path
                 )

@@ -1,6 +1,14 @@
 import Foundation
 
 public enum FCAccessibilityID {
+    static let todayInsights = "today.insights"
+    static let todayAllInsights = "today.insights.all"
+    static let insightsRoot = "insights.root"
+    static let detailInsights = "studentDetail.insights"
+    static let trendsEstimatedOneRepMax = "trends.metric.estimatedOneRepMax"
+    static func insightRow(_ id: String) -> String { "insights.row.\(id)" }
+    static func insightMore(_ id: String) -> String { "insights.more.\(id)" }
+    static func insightSnooze(_ id: String) -> String { "insights.snooze.\(id)" }
     static let sessionSummaryGains = "sessionSummary.gains"
     static let sessionDetailGains = "sessionDetail.gains"
     public static func setNewRecord(_ id: StableUUID) -> String {

@@ -73,6 +73,22 @@ public final class AppEnvironment: ObservableObject {
         return try AppEnvironment(rootURL: root)
     }
 
+    var insightUseCases: InsightUseCases? {
+        guard let studentUseCases, let historyUseCases, let appointmentUseCases,
+            let creditLedgerUseCases, let exerciseUseCases
+        else { return nil }
+        return InsightUseCases(
+            students: studentUseCases, history: historyUseCases, appointments: appointmentUseCases,
+            credits: creditLedgerUseCases, exercises: exerciseUseCases, snoozes: InsightSnoozeStore())
+    }
+
+    func requireInsightUseCases() -> InsightUseCases {
+        guard let insightUseCases else {
+            preconditionFailure("Insight use cases require available local storage.")
+        }
+        return insightUseCases
+    }
+
     func requireUseCases() -> StudentUseCases {
         guard let studentUseCases else {
             preconditionFailure("Student use cases require available local storage.")

@@ -386,6 +386,12 @@
 		E0000000000000000000010B /* InsightSnoozeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0000000000000000000010A; };
 		E00000000000000000000111 /* InsightUseCasesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00000000000000000000110; };
 		E00000000000000000000113 /* InsightUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00000000000000000000112; };
+		E20000000000000000000000 /* InsightRowContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000000000000000000000; };
+		E20000000000000000000001 /* InsightsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000000000000000000001; };
+		E20000000000000000000002 /* InsightRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000000000000000000002; };
+		E20000000000000000000003 /* InsightsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000000000000000000003; };
+		E50000000000000000000000 /* InsightPresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E40000000000000000000000; };
+		E50000000000000000000001 /* EstimatedOneRepMaxTrendTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E40000000000000000000001; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -782,6 +788,12 @@
 		E0000000000000000000010A /* InsightSnoozeStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightSnoozeStoreTests.swift; sourceTree = "<group>"; };
 		E00000000000000000000110 /* InsightUseCasesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightUseCasesTests.swift; sourceTree = "<group>"; };
 		E00000000000000000000112 /* InsightUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightUseCases.swift; sourceTree = "<group>"; };
+		E10000000000000000000000 /* InsightRowContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightRowContent.swift; sourceTree = "<group>"; };
+		E10000000000000000000001 /* InsightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsViewModel.swift; sourceTree = "<group>"; };
+		E10000000000000000000002 /* InsightRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightRowView.swift; sourceTree = "<group>"; };
+		E10000000000000000000003 /* InsightsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsListView.swift; sourceTree = "<group>"; };
+		E40000000000000000000000 /* InsightPresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightPresentationTests.swift; sourceTree = "<group>"; };
+		E40000000000000000000001 /* EstimatedOneRepMaxTrendTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EstimatedOneRepMaxTrendTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1005,6 +1017,7 @@
 		A404 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				E30000000000000000000000 /* Insights */,
 				7D3FEF9B40201DA58B26C698 /* ArchiveImport */,
 				6FAE837533B1926DF296B96A /* ArchiveExport */,
 				A446 /* Students */,
@@ -1882,6 +1895,8 @@
 		E00000000000000000000001 /* Insights */ = {
 			isa = PBXGroup;
 			children = (
+				E40000000000000000000001 /* EstimatedOneRepMaxTrendTests.swift */,
+				E40000000000000000000000 /* InsightPresentationTests.swift */,
 				E00000000000000000000106 /* EstimatedOneRepMaxTests.swift */,
 				E00000000000000000000108 /* InsightEngineTests.swift */,
 				E0000000000000000000010A /* InsightSnoozeStoreTests.swift */,
@@ -1893,6 +1908,17 @@
 			isa = PBXGroup;
 			children = (
 				E00000000000000000000110 /* InsightUseCasesTests.swift */,
+			);
+			path = Insights;
+			sourceTree = "<group>";
+		};
+		E30000000000000000000000 /* Insights */ = {
+			isa = PBXGroup;
+			children = (
+				E10000000000000000000000 /* InsightRowContent.swift */,
+				E10000000000000000000001 /* InsightsViewModel.swift */,
+				E10000000000000000000002 /* InsightRowView.swift */,
+				E10000000000000000000003 /* InsightsListView.swift */,
 			);
 			path = Insights;
 			sourceTree = "<group>";
@@ -2064,6 +2090,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E20000000000000000000000 /* InsightRowContent.swift in Sources */,
+				E20000000000000000000001 /* InsightsViewModel.swift in Sources */,
+				E20000000000000000000002 /* InsightRowView.swift in Sources */,
+				E20000000000000000000003 /* InsightsListView.swift in Sources */,
 				E00000000000000000000113 /* InsightUseCases.swift in Sources */,
 				E00000000000000000000105 /* InsightSnoozeStore.swift in Sources */,
 				E00000000000000000000103 /* InsightEngine.swift in Sources */,
@@ -2301,6 +2331,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E50000000000000000000001 /* EstimatedOneRepMaxTrendTests.swift in Sources */,
+				E50000000000000000000000 /* InsightPresentationTests.swift in Sources */,
 				E0000000000000000000010B /* InsightSnoozeStoreTests.swift in Sources */,
 				E00000000000000000000109 /* InsightEngineTests.swift in Sources */,
 				E00000000000000000000107 /* EstimatedOneRepMaxTests.swift in Sources */,
