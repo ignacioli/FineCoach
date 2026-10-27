@@ -401,6 +401,16 @@ struct BodyMeasurementEntryView: View {
                     }
 
                     if viewModel.isCustomMetric {
+                        FCActionRow(
+                            title: viewModel.metric?.lifecycle == .archived
+                                ? String(localized: "bodyData.restore")
+                                : String(localized: "bodyData.archive")
+                        ) { Task { await viewModel.toggleArchive() } }
+                        .accessibilityIdentifier(
+                            viewModel.metric?.lifecycle == .archived
+                                ? FCAccessibilityID.bodyMeasurementRestore
+                                : FCAccessibilityID.bodyMeasurementArchive)
+                        FCListRowDivider()
                         let canDeleteMetric = viewModel.history.isEmpty && viewModel.pendingDeletion == nil
                         FCActionRow(
                             title: String(localized: "bodyMeasurementEntry.deleteMetric"),
@@ -472,42 +482,9 @@ struct BodyMeasurementEntryView: View {
         }
     }
 
-    /// Inline page title. Custom metrics keep 「…」 on the title's first line,
-    /// trailing, so a long name wraps in the width `FCPageHeader` has left
-    /// (`DS-MORE-MENU`, B-c). `FCPageHeader` has no menu slot; this row only
-    /// composes the existing header with `FCMoreMenu`.
-    @ViewBuilder
     private var pageHeader: some View {
-        let title = viewModel.metric?.name.value ?? String(localized: "bodyMeasurementEntry.title")
-        if viewModel.isCustomMetric {
-            HStack(alignment: .top, spacing: FCPrimitives.space2) {
-                FCPageHeader(title: title, back: .init())
-                metricActionsMenu
-                    .padding(.top, FCPrimitives.space2)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-        } else {
-            FCPageHeader(title: title, back: .init())
-        }
-    }
-
-    /// Visible "…" menu for a custom metric's lifecycle actions (CLAUDE.md
-    /// "Discoverable affordances": never long-press only).
-    private var metricActionsMenu: some View {
-        FCMoreMenu(accessibilityIdentifier: FCAccessibilityID.bodyMeasurementMore) {
-            Button(
-                viewModel.metric?.lifecycle == .archived
-                    ? String(localized: "bodyData.restore")
-                    : String(localized: "bodyData.archive")
-            ) {
-                Task { await viewModel.toggleArchive() }
-            }
-            .accessibilityIdentifier(
-                viewModel.metric?.lifecycle == .archived
-                    ? FCAccessibilityID.bodyMeasurementRestore
-                    : FCAccessibilityID.bodyMeasurementArchive
-            )
-        }
+        FCPageHeader(
+            title: viewModel.metric?.name.value ?? String(localized: "bodyMeasurementEntry.title"), back: .init())
     }
 
     private var historyList: some View {

@@ -162,9 +162,13 @@ struct TemplateEditorView: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var isConfirmingDelete = false
+    /// The exercise whose row swipe asked to move it to a section (README §10 C27,
+    /// same flow as the training page, P0-D13).
+    @State private var movingExerciseID: StableUUID?
     /// Native `.swipeActions` are only available on `List` rows. Each list is
     /// non-scrolling and measured before its height is fixed so the page keeps
     /// one outer scroll surface (the same pattern as ActiveSession).
+    @State private var sectionHeaderHeights: [StableUUID: CGFloat] = [:]
     @State private var listContentHeights: [StableUUID: CGFloat] = [:]
     @ScaledMetric private var exerciseRowHeight: CGFloat = 52
 
@@ -265,6 +269,25 @@ struct TemplateEditorView: View {
             ),
             dialog: sectionDeletionDialog
         )
+        .confirmationDialog(
+            String(localized: "templateEditor.moveToSection"),
+            isPresented: Binding(
+                get: { movingExerciseID != nil },
+                set: { if !$0 { movingExerciseID = nil } }
+            ),
+            presenting: movingExerciseID
+        ) { exerciseID in
+            Button(String(localized: "templateEditor.unsectioned")) {
+                Task { await viewModel.moveExercise(exerciseID, toSectionID: nil) }
+            }
+            .accessibilityIdentifier(FCAccessibilityID.templateEditorMoveToUnsectioned)
+            ForEach(viewModel.orderedSections) { section in
+                Button(section.name.value) {
+                    Task { await viewModel.moveExercise(exerciseID, toSectionID: section.id) }
+                }
+                .accessibilityIdentifier(FCAccessibilityID.templateEditorMoveToSection(section.id))
+            }
+        }
     }
 
     /// The closure passed to `fcConfirmationDialog` must return a dialog on
@@ -295,20 +318,8 @@ struct TemplateEditorView: View {
             Text(exercise.displayNameSnapshot.value)
                 .foregroundStyle(FCSemanticColors.textPrimary)
             Spacer()
-            Menu(String(localized: "templateEditor.moveToUnsectioned")) {
-                Button(String(localized: "templateEditor.unsectioned")) {
-                    Task { await viewModel.moveExercise(exercise.id, toSectionID: nil) }
-                }
-                .accessibilityIdentifier(FCAccessibilityID.templateEditorMoveToUnsectioned)
-                ForEach(viewModel.orderedSections) { section in
-                    Button(section.name.value) {
-                        Task { await viewModel.moveExercise(exercise.id, toSectionID: section.id) }
-                    }
-                    .accessibilityIdentifier(FCAccessibilityID.templateEditorMoveToSection(section.id))
-                }
-            }
-            .frame(minHeight: 44)
         }
+        .frame(minHeight: 44)
         .padding(FCPrimitives.space2)
         .background(FCSemanticColors.surfaceElevated)
         .clipShape(RoundedRectangle(cornerRadius: FCPrimitives.radiusSm))
@@ -331,6 +342,15 @@ struct TemplateEditorView: View {
                         }
                         .tint(FCSemanticColors.statusDestructive)
                         .accessibilityIdentifier(FCAccessibilityID.templateEditorRemoveExercise(exercise.id))
+                        if !viewModel.orderedSections.isEmpty {
+                            Button {
+                                movingExerciseID = exercise.id
+                            } label: {
+                                Label(String(localized: "templateEditor.moveToSection"), systemImage: "folder")
+                            }
+                            .tint(FCSemanticColors.textSecondary)
+                            .accessibilityIdentifier(FCAccessibilityID.templateEditorMoveExercise(exercise.id))
+                        }
                     }
             }
         }
@@ -356,19 +376,40 @@ struct TemplateEditorView: View {
 
     private func sectionBlock(_ section: SessionSection) -> some View {
         VStack(alignment: .leading, spacing: FCPrimitives.space2) {
-            HStack {
-                Text(section.name.value)
-                    .fcFont(.sectionLabel)
-                    .foregroundStyle(FCSemanticColors.textSecondary)
-                Spacer()
-                FCMoreMenu(accessibilityIdentifier: FCAccessibilityID.templateEditorSectionMore(section.id)) {
-                    Button(String(localized: "templateEditor.deleteSection"), role: .destructive) {
+            List {
+                HStack {
+                    Text(section.name.value)
+                        .fcFont(.sectionLabel)
+                        .foregroundStyle(FCSemanticColors.textSecondary)
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                .accessibilityIdentifier(FCAccessibilityID.templateSectionRow(section.id))
+                .listRowInsets(EdgeInsets())
+                .listRowSeparator(.hidden)
+                .listRowBackground(FCSemanticColors.surfaceSelected)
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button {
                         viewModel.requestDeleteSection(section)
+                    } label: {
+                        Label(String(localized: "templateEditor.deleteSection"), systemImage: "trash")
                     }
+                    .tint(FCSemanticColors.statusDestructive)
                     .accessibilityIdentifier(FCAccessibilityID.templateEditorDeleteSection(section.id))
                 }
             }
-            .accessibilityIdentifier(FCAccessibilityID.templateSectionRow(section.id))
+            .listStyle(.plain)
+            .scrollDisabled(true)
+            .scrollContentBackground(.hidden)
+            .environment(\.defaultMinListRowHeight, 44)
+            .onScrollGeometryChange(
+                for: CGFloat.self,
+                of: { $0.contentSize.height + $0.contentInsets.top + $0.contentInsets.bottom }
+            ) { _, height in
+                guard height >= 1 else { return }
+                sectionHeaderHeights[section.id] = height
+            }
+            .frame(height: sectionHeaderHeights[section.id] ?? 44)
             let exercises = viewModel.exercises(in: section)
             if !exercises.isEmpty {
                 exerciseList(exercises, listID: section.id)

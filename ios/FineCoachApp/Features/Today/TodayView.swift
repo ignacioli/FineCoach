@@ -158,6 +158,7 @@ enum TodayRowStatusPresentation {
 /// action sheet opened by tapping any scheduled row.
 struct TodayView: View {
     @StateObject private var viewModel: TodayViewModel
+    @StateObject private var insightsModel: InsightsViewModel
     @Binding var rootTab: RootTab
     @Binding var path: [RootDestination]
     @State private var sheetAppointment: Appointment?
@@ -166,6 +167,9 @@ struct TodayView: View {
         appointmentUseCases: AppointmentUseCases,
         studentUseCases: StudentUseCases,
         creditLedgerUseCases: CreditLedgerUseCases? = nil,
+        insightUseCases: InsightUseCases? = nil,
+        exerciseUseCases: ExerciseLibraryUseCases? = nil,
+        historyUseCases: HistoryUseCases? = nil,
         rootTab: Binding<RootTab>,
         path: Binding<[RootDestination]>
     ) {
@@ -176,7 +180,12 @@ struct TodayView: View {
                 creditLedgerUseCases: creditLedgerUseCases
             )
         )
+        _insightsModel = StateObject(
+            wrappedValue: InsightsViewModel(
+                useCases: insightUseCases, students: studentUseCases,
+                exercises: exerciseUseCases, history: historyUseCases))
         _rootTab = rootTab
+
         _path = path
     }
 
@@ -201,6 +210,7 @@ struct TodayView: View {
                 } else {
                     appointmentSections
                 }
+                insightsSection
             }
             .padding(.horizontal, FCPrimitives.space4)
             .padding(.bottom, FCPrimitives.space6)
@@ -218,8 +228,39 @@ struct TodayView: View {
             onError: { viewModel.present($0) }
         )
         .task { await viewModel.reload() }
+        .task { await insightsModel.reload() }
+        .onDisappear { insightsModel.endUndoWindows() }
+        .onReceive(NotificationCenter.default.publisher(for: InsightsViewModel.didUnsnooze)) { _ in
+            Task { await insightsModel.reload() }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: InsightsViewModel.didSnooze)) {
+            insightsModel.removeSnoozed($0)
+        }
         .onChange(of: path) { _, _ in
+            Task { await insightsModel.reload() }
             Task { await viewModel.reload() }
+        }
+    }
+
+    @ViewBuilder
+    private var insightsSection: some View {
+        let selection = TodayInsightSelection(insightsModel.insights)
+        if !selection.rows.isEmpty {
+            VStack(alignment: .leading, spacing: 0) {
+                InsightSectionView(
+                    model: insightsModel, title: String(localized: "insights.section.title"),
+                    rows: selection.rows, context: .today, path: $path)
+                if selection.showsAll {
+                    FCGroupEntryRow(title: String(localized: "insights.section.all"), count: selection.totalCount) {
+                        path.append(.insights)
+                    }
+                    .accessibilityIdentifier(FCAccessibilityID.todayAllInsights)
+                }
+            }
+            .accessibilityIdentifier(FCAccessibilityID.todayInsights)
+        }
+        if let error = insightsModel.errorMessage {
+            Text(error).fcFont(.caption).foregroundStyle(FCSemanticColors.statusDestructive)
         }
     }
 

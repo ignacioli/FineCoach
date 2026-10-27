@@ -1,24 +1,25 @@
 import Foundation
 
 public enum FCAccessibilityID {
+    static let todayInsights = "today.insights"
+    static let todayAllInsights = "today.insights.all"
+    static let insightsRoot = "insights.root"
+    static let detailInsights = "studentDetail.insights"
+    static let trendsEstimatedOneRepMax = "trends.metric.estimatedOneRepMax"
+    static func insightRow(_ id: String) -> String { "insights.row.\(id)" }
+    static func insightUndo(_ id: String) -> String { "insights.undo.\(id)" }
+    static func insightSnooze(_ id: String) -> String { "insights.snooze.\(id)" }
     static let sessionSummaryGains = "sessionSummary.gains"
     static let sessionDetailGains = "sessionDetail.gains"
     public static func setNewRecord(_ id: StableUUID) -> String {
         "activeSession.set.newRecord.\(id.rawValue.uuidString.lowercased())"
     }
 
-    public static let bodyMeasurementMore = "bodyMeasurementEntry.more"
     public static func setUndoAt(_ index: Int) -> String {
         "activeSession.set.undo.at.\(index)"
     }
     public static func bodyMeasurementUndo(_ id: StableUUID) -> String {
         "bodyMeasurementEntry.undo.\(id.rawValue.uuidString.lowercased())"
-    }
-    public static func activeSessionSectionMore(_ id: StableUUID) -> String {
-        "activeSession.section.more.\(id.rawValue.uuidString.lowercased())"
-    }
-    public static func templateEditorSectionMore(_ id: StableUUID) -> String {
-        "templateEditor.section.more.\(id.rawValue.uuidString.lowercased())"
     }
     public static let privacyCover = "privacy.cover"
 
@@ -266,6 +267,10 @@ public enum FCAccessibilityID {
 
     public static func templateEditorTrainingFocus(_ part: BodyPart) -> String {
         "templateEditor.trainingFocus.\(part.rawValue)"
+    }
+
+    public static func templateEditorMoveExercise(_ id: StableUUID) -> String {
+        "templateEditor.moveExercise.\(id.rawValue.uuidString)"
     }
 
     public static func templateEditorMoveToSection(_ id: StableUUID) -> String {

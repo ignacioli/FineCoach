@@ -349,15 +349,17 @@ final class M2ComponentContractTests: XCTestCase {
         XCTAssertTrue(viewModel.contains("static let undoWindow: Duration = FCUndoRow.undoWindow"))
     }
 
-    func testMoreMenuUsesAnAccessibleEllipsisHitTargetAndSystemMenu() throws {
-        let menu = try componentSource("FCMoreMenu.swift")
-        XCTAssertTrue(menu.contains("public struct FCMoreMenu<MenuContent: View>"))
-        XCTAssertTrue(menu.contains("Menu {"), "the component must wrap a system Menu")
-        XCTAssertTrue(menu.contains("Image(systemName: \"ellipsis\")"))
-        XCTAssertTrue(menu.contains(".frame(minWidth: 44, minHeight: 44)"))
-        XCTAssertTrue(menu.contains("designSystem.moreActions"), "the label must be localized")
-        XCTAssertTrue(menu.contains("accessibilityIdentifier: String"))
-        XCTAssertTrue(menu.contains("menu.accessibilityIdentifier(accessibilityIdentifier)"))
+    func testMoreMenuIsRetiredFromDesignSystem() throws {
+        let directory = appRoot().appendingPathComponent("DesignSystem")
+        let files = try XCTUnwrap(FileManager.default.enumerator(at: directory, includingPropertiesForKeys: nil))
+        var scanned = 0
+        for case let url as URL in files where url.pathExtension == "swift" {
+            let source = try String(contentsOf: url, encoding: .utf8)
+            XCTAssertFalse(source.contains("FCMoreMenu"), url.lastPathComponent)
+            XCTAssertNotEqual(url.lastPathComponent, "FCMoreMenu.swift")
+            scanned += 1
+        }
+        XCTAssertGreaterThan(scanned, 0)
     }
 
     // MARK: - Sources

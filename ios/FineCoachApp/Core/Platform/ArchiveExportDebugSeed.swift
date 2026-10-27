@@ -8,6 +8,85 @@ import os
 #if DEBUG
     enum ArchiveExportDebugSeed {
         static let launchArgument = "-FineCoachSeedArchiveExport"
+        static let insightsLaunchArgument = "-FineCoachSeedInsightsDemo"
+
+        static var insightsRequested: Bool {
+            ProcessInfo.processInfo.arguments.contains(insightsLaunchArgument)
+        }
+
+        /// Appends fictional Stage E fixtures without resetting or editing existing records.
+        @MainActor
+        @discardableResult
+        static func seedInsightsDemo(in environment: AppEnvironment) async -> Bool {
+            defer { setDaysAgo(0) }
+            guard let students = environment.studentUseCases,
+                let sessions = environment.sessionUseCases,
+                let exercises = environment.exerciseUseCases,
+                let appointments = environment.appointmentUseCases,
+                let credits = environment.creditLedgerUseCases
+            else { return false }
+            do {
+                if try await students.searchActive(query: "吴停滞").contains(where: { $0.displayName.value == "吴停滞" }) {
+                    return true
+                }
+                try await exercises.seedIfNeeded()
+                try await students.completeOnboarding()
+                let calendar = Calendar.current
+                let today = appointments.todayLocalDate()
+                let stagnant = try await students.create(
+                    draft: StudentDraft(displayName: "吴停滞", sex: .undisclosed))
+                _ = try await credits.createActivePackage(
+                    studentID: stagnant.id, name: nil, totalCredits: 20, startDate: nil, endDate: nil)
+                for (index, days) in [40, 33, 20, 13, 6].enumerated() {
+                    setDaysAgo(days)
+                    let active = try await sessions.startOrOpen(studentID: stagnant.id)
+                    let squat = try await sessions.addCatalogExercise(sessionID: active.id, itemID: squatID)
+                    try await recordSets(squat, base: [60, 60, 56, 58, 60][index], using: sessions)
+                    let bench = try await sessions.addCatalogExercise(sessionID: active.id, itemID: benchID)
+                    try await recordSets(bench, base: 30 + index * 5, using: sessions)
+                    _ = try await sessions.finish(sessionID: active.id)
+                }
+                setDaysAgo(0)
+                let low = try await students.create(
+                    draft: StudentDraft(displayName: "郑快用完", sex: .undisclosed))
+                _ = try await credits.createActivePackage(
+                    studentID: low.id, name: nil, totalCredits: 1, startDate: nil, endDate: nil)
+                let expiring = try await students.create(
+                    draft: StudentDraft(displayName: "钱快到期", sex: .undisclosed))
+                _ = try await credits.createActivePackage(
+                    studentID: expiring.id, name: nil, totalCredits: 8, startDate: nil,
+                    endDate: today.addingDays(3, calendar: calendar))
+                let exhausted = try await students.create(
+                    draft: StudentDraft(displayName: "林已用完", sex: .undisclosed))
+                let package = try await credits.createActivePackage(
+                    studentID: exhausted.id, name: nil, totalCredits: 1, startDate: nil, endDate: nil)
+                setDaysAgo(1)
+                let appointment = try await appointments.createSingle(
+                    studentID: exhausted.id, date: today.addingDays(-1, calendar: calendar),
+                    startTime: LocalTime(hour: 8, minute: 0), reminderEnabled: false,
+                    reminderLeadMinutes: nil, overrideConflict: true)
+                _ = try await appointments.startTraining(appointmentID: appointment.id)
+                let completed = try await trainedSession(
+                    studentID: exhausted.id, exercises: [squatID], base: 20, using: sessions)
+                _ = try await appointments.completeSession(appointmentID: appointment.id)
+                try await credits.debitOnSessionComplete(packageID: package.id, sessionID: completed.id)
+                setDaysAgo(0)
+                for (index, student) in [stagnant, low, expiring, exhausted].enumerated() {
+                    _ = try await appointments.createSingle(
+                        studentID: student.id, date: today.addingDays(2, calendar: calendar),
+                        startTime: LocalTime(hour: 8 + index, minute: 0), reminderEnabled: false,
+                        reminderLeadMinutes: nil, overrideConflict: true)
+                }
+                let inactive = try await students.create(
+                    draft: StudentDraft(displayName: "冯很久没来", sex: .undisclosed))
+                setDaysAgo(20)
+                _ = try await trainedSession(
+                    studentID: inactive.id, exercises: [benchID], base: 20, using: sessions)
+                return true
+            } catch {
+                return false
+            }
+        }
 
         /// Seconds the seed clock runs behind real time while sessions are being recorded, so the
         /// completed sessions land on different days. Zero outside seeding.

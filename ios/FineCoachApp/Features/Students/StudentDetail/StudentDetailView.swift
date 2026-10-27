@@ -92,6 +92,7 @@ final class StudentDetailViewModel: ObservableObject {
 /// 注意事项 stays collapsed until tapped (M1-A spec: 伤病/注意事项默认不展开).
 struct StudentDetailView: View {
     @StateObject private var viewModel: StudentDetailViewModel
+    @StateObject private var insightsModel: InsightsViewModel
     @Binding var path: [RootDestination]
     @State private var sheetAppointment: Appointment?
 
@@ -101,6 +102,8 @@ struct StudentDetailView: View {
         historyUseCases: HistoryUseCases,
         appointmentUseCases: AppointmentUseCases? = nil,
         creditLedgerUseCases: CreditLedgerUseCases? = nil,
+        insightUseCases: InsightUseCases? = nil,
+        exerciseUseCases: ExerciseLibraryUseCases? = nil,
         calendar: Calendar = .current,
         path: Binding<[RootDestination]>
     ) {
@@ -114,6 +117,10 @@ struct StudentDetailView: View {
                 calendar: calendar
             )
         )
+        _insightsModel = StateObject(
+            wrappedValue: InsightsViewModel(
+                useCases: insightUseCases, students: useCases, exercises: exerciseUseCases,
+                history: historyUseCases, studentID: studentID))
         _path = path
     }
 
@@ -131,6 +138,16 @@ struct StudentDetailView: View {
                         archivedNotice
                     } else if let inProgress = viewModel.inProgress, viewModel.isTrainingThisStudent {
                         continueCard(inProgress)
+                    }
+                    if !insightsModel.insights.isEmpty {
+                        InsightSectionView(
+                            model: insightsModel, title: String(localized: "insights.section.title"),
+                            rows: insightsModel.insights, context: .studentDetail, path: $path
+                        )
+                        .accessibilityIdentifier(FCAccessibilityID.detailInsights)
+                    }
+                    if let error = insightsModel.errorMessage {
+                        Text(error).fcFont(.caption).foregroundStyle(FCSemanticColors.statusDestructive)
                     }
                     overviewSection(student)
                     recordsSection(student)
@@ -157,7 +174,16 @@ struct StudentDetailView: View {
             onError: { viewModel.present($0) }
         )
         .task { await viewModel.reload() }
+        .task { await insightsModel.reload() }
+        .onDisappear { insightsModel.endUndoWindows() }
+        .onReceive(NotificationCenter.default.publisher(for: InsightsViewModel.didUnsnooze)) { _ in
+            Task { await insightsModel.reload() }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: InsightsViewModel.didSnooze)) {
+            insightsModel.removeSnoozed($0)
+        }
         .onChange(of: path) { _, _ in
+            Task { await insightsModel.reload() }
             Task { await viewModel.reload() }
         }
         .accessibilityElement(children: .contain)

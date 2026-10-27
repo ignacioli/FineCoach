@@ -88,6 +88,7 @@
 		B723 /* ExercisePreferenceAssistedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A723 /* ExercisePreferenceAssistedTests.swift */; };
 		B979 /* ExercisePreferenceUnilateralTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A979 /* ExercisePreferenceUnilateralTests.swift */; };
 		B730 /* TrendsViewPointLabelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A730 /* TrendsViewPointLabelTests.swift */; };
+		E24000000000000000000002 /* TrendsInitialSelectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E24000000000000000000001 /* TrendsInitialSelectionTests.swift */; };
 		B190 /* ActiveSessionRecoverySnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A190 /* ActiveSessionRecoverySnapshot.swift */; };
 		B191 /* ActiveSessionRecoveryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A191 /* ActiveSessionRecoveryStore.swift */; };
 		B192 /* ActiveSessionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A192 /* ActiveSessionCoordinator.swift */; };
@@ -114,7 +115,6 @@
 		5F21772D9C8C226454B34246 /* FCHubRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4724C9B83F97BD6324CEE69 /* FCHubRow.swift */; };
 		66E40901340314406459ABC4 /* FCPageHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1555EA92BF1009B5B3EDFF1F /* FCPageHeader.swift */; };
 		8CE2B39A44D01CC9A1C72AD4 /* FCUndoRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D607F53F845BCEB0D7B8A2F /* FCUndoRow.swift */; };
-		4C2C6D7B2A1E49F087D31C5E /* FCMoreMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBC038A5D7E21C4E6A04B7D /* FCMoreMenu.swift */; };
 		B914 /* FCAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A914 /* FCAvatar.swift */; };
 		B915 /* FCHintBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A915 /* FCHintBar.swift */; };
 		B961 /* ShareReportCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A961 /* ShareReportCardView.swift */; };
@@ -378,6 +378,21 @@
 		D004B /* ActiveSessionNewRecordTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D004A; };
 		D005B /* SessionGainsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D005A; };
 		D006B /* SessionGainsRebuildTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D006A; };
+		E00000000000000000000101 /* EstimatedOneRepMax.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00000000000000000000100; };
+		E00000000000000000000103 /* InsightEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00000000000000000000102; };
+		E00000000000000000000105 /* InsightSnoozeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00000000000000000000104; };
+		E00000000000000000000107 /* EstimatedOneRepMaxTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00000000000000000000106; };
+		E00000000000000000000109 /* InsightEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00000000000000000000108; };
+		E0000000000000000000010B /* InsightSnoozeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0000000000000000000010A; };
+		E00000000000000000000111 /* InsightUseCasesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00000000000000000000110; };
+		E60000000000000000000001 /* InsightsDemoSeedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E60000000000000000000000; };
+		E00000000000000000000113 /* InsightUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00000000000000000000112; };
+		E20000000000000000000000 /* InsightRowContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000000000000000000000; };
+		E20000000000000000000001 /* InsightsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000000000000000000001; };
+		E20000000000000000000002 /* InsightRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000000000000000000002; };
+		E20000000000000000000003 /* InsightsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000000000000000000003; };
+		E50000000000000000000000 /* InsightPresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E40000000000000000000000; };
+		E50000000000000000000001 /* EstimatedOneRepMaxTrendTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E40000000000000000000001; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -483,7 +498,6 @@
 		D4724C9B83F97BD6324CEE69 /* FCHubRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCHubRow.swift; sourceTree = "<group>"; };
 		1555EA92BF1009B5B3EDFF1F /* FCPageHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCPageHeader.swift; sourceTree = "<group>"; };
 		7D607F53F845BCEB0D7B8A2F /* FCUndoRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCUndoRow.swift; sourceTree = "<group>"; };
-		9FBC038A5D7E21C4E6A04B7D /* FCMoreMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCMoreMenu.swift; sourceTree = "<group>"; };
 		A914 /* FCAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCAvatar.swift; sourceTree = "<group>"; };
 		A915 /* FCHintBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCHintBar.swift; sourceTree = "<group>"; };
 		A961 /* ShareReportCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareReportCardView.swift; sourceTree = "<group>"; };
@@ -639,6 +653,7 @@
 		A723 /* ExercisePreferenceAssistedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExercisePreferenceAssistedTests.swift; sourceTree = "<group>"; };
 		A979 /* ExercisePreferenceUnilateralTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExercisePreferenceUnilateralTests.swift; sourceTree = "<group>"; };
 		A730 /* TrendsViewPointLabelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendsViewPointLabelTests.swift; sourceTree = "<group>"; };
+		E24000000000000000000001 /* TrendsInitialSelectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendsInitialSelectionTests.swift; sourceTree = "<group>"; };
 		A226 /* HistoryShareUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryShareUITests.swift; sourceTree = "<group>"; };
 		A227 /* BackupRestoreUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRestoreUITests.swift; sourceTree = "<group>"; };
 		A240 /* HistoryReportDomainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryReportDomainTests.swift; sourceTree = "<group>"; };
@@ -766,6 +781,21 @@
 		D004A /* ActiveSessionNewRecordTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionNewRecordTests.swift; sourceTree = "<group>"; };
 		D005A /* SessionGainsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionGainsSectionView.swift; sourceTree = "<group>"; };
 		D006A /* SessionGainsRebuildTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionGainsRebuildTests.swift; sourceTree = "<group>"; };
+		E00000000000000000000100 /* EstimatedOneRepMax.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EstimatedOneRepMax.swift; sourceTree = "<group>"; };
+		E00000000000000000000102 /* InsightEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightEngine.swift; sourceTree = "<group>"; };
+		E00000000000000000000104 /* InsightSnoozeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightSnoozeStore.swift; sourceTree = "<group>"; };
+		E00000000000000000000106 /* EstimatedOneRepMaxTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EstimatedOneRepMaxTests.swift; sourceTree = "<group>"; };
+		E00000000000000000000108 /* InsightEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightEngineTests.swift; sourceTree = "<group>"; };
+		E0000000000000000000010A /* InsightSnoozeStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightSnoozeStoreTests.swift; sourceTree = "<group>"; };
+		E00000000000000000000110 /* InsightUseCasesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightUseCasesTests.swift; sourceTree = "<group>"; };
+		E60000000000000000000000 /* InsightsDemoSeedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsDemoSeedTests.swift; sourceTree = "<group>"; };
+		E00000000000000000000112 /* InsightUseCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightUseCases.swift; sourceTree = "<group>"; };
+		E10000000000000000000000 /* InsightRowContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightRowContent.swift; sourceTree = "<group>"; };
+		E10000000000000000000001 /* InsightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsViewModel.swift; sourceTree = "<group>"; };
+		E10000000000000000000002 /* InsightRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightRowView.swift; sourceTree = "<group>"; };
+		E10000000000000000000003 /* InsightsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsListView.swift; sourceTree = "<group>"; };
+		E40000000000000000000000 /* InsightPresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightPresentationTests.swift; sourceTree = "<group>"; };
+		E40000000000000000000001 /* EstimatedOneRepMaxTrendTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EstimatedOneRepMaxTrendTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -989,6 +1019,7 @@
 		A404 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				E30000000000000000000000 /* Insights */,
 				7D3FEF9B40201DA58B26C698 /* ArchiveImport */,
 				6FAE837533B1926DF296B96A /* ArchiveExport */,
 				A446 /* Students */,
@@ -1069,6 +1100,7 @@
 		A410 /* FineCoachTests */ = {
 			isa = PBXGroup;
 			children = (
+				E00000000000000000000001 /* Insights */,
 				A200 /* SetupSmokeTests.swift */,
 				A492 /* App */,
 				A473 /* Students */,
@@ -1093,6 +1125,8 @@
 		A411 /* Domain */ = {
 			isa = PBXGroup;
 			children = (
+				E00000000000000000000100 /* EstimatedOneRepMax.swift */,
+				E00000000000000000000102 /* InsightEngine.swift */,
 				A110 /* DomainError.swift */,
 				A111 /* Identifiers.swift */,
 				A112 /* ValidatedText.swift */,
@@ -1130,6 +1164,8 @@
 		A412 /* Application */ = {
 			isa = PBXGroup;
 			children = (
+				E00000000000000000000104 /* InsightSnoozeStore.swift */,
+				E00000000000000000000112 /* InsightUseCases.swift */,
 				A120 /* Protocols.swift */,
 				A121 /* FaultInjectionBoundary.swift */,
 				A122 /* StudentUseCases.swift */,
@@ -1240,6 +1276,7 @@
 		A420 /* FineCoachIntegrationTests */ = {
 			isa = PBXGroup;
 			children = (
+				E00000000000000000000002 /* Insights */,
 				A421 /* Foundation */,
 				A516 /* Appointments */,
 				A542 /* CoursePackages */,
@@ -1325,7 +1362,6 @@
 				D4724C9B83F97BD6324CEE69 /* FCHubRow.swift */,
 				1555EA92BF1009B5B3EDFF1F /* FCPageHeader.swift */,
 				7D607F53F845BCEB0D7B8A2F /* FCUndoRow.swift */,
-				9FBC038A5D7E21C4E6A04B7D /* FCMoreMenu.swift */,
 				A914 /* FCAvatar.swift */,
 				A915 /* FCHintBar.swift */,
 				A957 /* FCSymbol.swift */,
@@ -1640,6 +1676,7 @@
 			isa = PBXGroup;
 			children = (
 				A730 /* TrendsViewPointLabelTests.swift */,
+				E24000000000000000000001 /* TrendsInitialSelectionTests.swift */,
 			);
 			path = Trends;
 			sourceTree = "<group>";
@@ -1857,6 +1894,38 @@
 			path = ArchiveExport;
 			sourceTree = "<group>";
 		};
+		E00000000000000000000001 /* Insights */ = {
+			isa = PBXGroup;
+			children = (
+				E40000000000000000000001 /* EstimatedOneRepMaxTrendTests.swift */,
+				E40000000000000000000000 /* InsightPresentationTests.swift */,
+				E00000000000000000000106 /* EstimatedOneRepMaxTests.swift */,
+				E00000000000000000000108 /* InsightEngineTests.swift */,
+				E0000000000000000000010A /* InsightSnoozeStoreTests.swift */,
+			);
+			path = Insights;
+			sourceTree = "<group>";
+		};
+		E00000000000000000000002 /* Insights */ = {
+			isa = PBXGroup;
+			children = (
+				E00000000000000000000110 /* InsightUseCasesTests.swift */,
+				E60000000000000000000000 /* InsightsDemoSeedTests.swift */,
+			);
+			path = Insights;
+			sourceTree = "<group>";
+		};
+		E30000000000000000000000 /* Insights */ = {
+			isa = PBXGroup;
+			children = (
+				E10000000000000000000000 /* InsightRowContent.swift */,
+				E10000000000000000000001 /* InsightsViewModel.swift */,
+				E10000000000000000000002 /* InsightRowView.swift */,
+				E10000000000000000000003 /* InsightsListView.swift */,
+			);
+			path = Insights;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -2024,6 +2093,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E20000000000000000000000 /* InsightRowContent.swift in Sources */,
+				E20000000000000000000001 /* InsightsViewModel.swift in Sources */,
+				E20000000000000000000002 /* InsightRowView.swift in Sources */,
+				E20000000000000000000003 /* InsightsListView.swift in Sources */,
+				E00000000000000000000113 /* InsightUseCases.swift in Sources */,
+				E00000000000000000000105 /* InsightSnoozeStore.swift in Sources */,
+				E00000000000000000000103 /* InsightEngine.swift in Sources */,
+				E00000000000000000000101 /* EstimatedOneRepMax.swift in Sources */,
 				016E1128FF8B3A0A928741A8 /* ArchiveExportDebugSeed.swift in Sources */,
 				71F372DF4FD322366CEA4AF5 /* ArchiveDeliveryView.swift in Sources */,
 				7C2344D0C6D4067AD017C374 /* ArchivePasswordView.swift in Sources */,
@@ -2199,7 +2276,6 @@
 				5F21772D9C8C226454B34246 /* FCHubRow.swift in Sources */,
 				66E40901340314406459ABC4 /* FCPageHeader.swift in Sources */,
 				8CE2B39A44D01CC9A1C72AD4 /* FCUndoRow.swift in Sources */,
-				4C2C6D7B2A1E49F087D31C5E /* FCMoreMenu.swift in Sources */,
 				B914 /* FCAvatar.swift in Sources */,
 				B915 /* FCHintBar.swift in Sources */,
 				B957 /* FCSymbol.swift in Sources */,
@@ -2257,6 +2333,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E50000000000000000000001 /* EstimatedOneRepMaxTrendTests.swift in Sources */,
+				E50000000000000000000000 /* InsightPresentationTests.swift in Sources */,
+				E0000000000000000000010B /* InsightSnoozeStoreTests.swift in Sources */,
+				E00000000000000000000109 /* InsightEngineTests.swift in Sources */,
+				E00000000000000000000107 /* EstimatedOneRepMaxTests.swift in Sources */,
 				84D9618B61F2BC059C9B7FF6 /* ArchiveExportScreenTests.swift in Sources */,
 				8FE54578732674057F095EBA /* ArchiveExportFixtures.swift in Sources */,
 				CB905CFCA28988F304401F0A /* ArchiveExportPolicyTests.swift in Sources */,
@@ -2286,6 +2367,7 @@
 				B723 /* ExercisePreferenceAssistedTests.swift in Sources */,
 				B979 /* ExercisePreferenceUnilateralTests.swift in Sources */,
 				B730 /* TrendsViewPointLabelTests.swift in Sources */,
+				E24000000000000000000002 /* TrendsInitialSelectionTests.swift in Sources */,
 				B240 /* HistoryReportDomainTests.swift in Sources */,
 				D003B /* SessionGainsTests.swift in Sources */,
 				B944 /* HistoryFilterCriteriaTests.swift in Sources */,
@@ -2336,6 +2418,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E00000000000000000000111 /* InsightUseCasesTests.swift in Sources */,
+				E60000000000000000000001 /* InsightsDemoSeedTests.swift in Sources */,
 				83C0625A76E06855F0309F7F /* ArchiveExportFixtures.swift in Sources */,
 				8EE69B2A44B60DEA2D434676 /* ArchiveExportIntegrationTests.swift in Sources */,
 				80767B234DEBABF5598A510D /* ArchiveImportIntegrationTests.swift in Sources */,
