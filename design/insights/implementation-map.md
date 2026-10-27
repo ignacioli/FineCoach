@@ -1,17 +1,19 @@
 # 阶段 E 洞察：设计改动与实施映射
 
 > 状态：**画稿已批准（E-a1、E-a2、E-b、E-c，2026-10-24）；待实现。**本文是 `components.md` §6 要求的里程碑实施映射，不重复 token 数值。
-> 行为权威：`specs/005-stage-e-insights/spec.md`（`1.0-approved`）、`plan.md`、`tasks.md`。视觉权威：`design/design-system/README.md`、`components.md`；本轮记录见 README §1.11、§10 C26。
-> Penpot：E-a1、E-a2、E-b 在 Foundations 页（x=13090 / 13530 / 13970）；E-c 在「M2 G7 Design」页（x=4960，M2-15 右侧）。快照 `before-stage-e-boards 2026-10-24` → `stage E boards aligned to implementation map (text fixed) 2026-10-24 b`。
+> 行为权威：`specs/005-stage-e-insights/spec.md`（`1.0-approved`）、`plan.md`、`tasks.md`。视觉权威：`design/design-system/README.md`、`components.md`；本轮记录见 README §1.11、§10 C26；走查修订（左滑取代「…」）见 README §1.12、§10 C27。
+> Penpot：E-a1、E-a2、E-b 在 Foundations 页（x=13090 / 13530 / 13970）；E-c 在「M2 G7 Design」页（x=4960，M2-15 右侧）。快照 `before-stage-e-boards 2026-10-24` → `stage E boards aligned to implementation map (text fixed) 2026-10-24 b`。走查修订：E-d 在 Foundations 页 x=14410；快照 `before swipe revision (retire DS-MORE-MENU) 2026-10-27` → `swipe capsules redrawn to iOS 26 look (E-d, B-b) 2026-10-27`。
 
 ## 1. 按设计变化分类（`components.md` §1.2）
 
 | 组件 / 位置 | 分类 | 范围 | 理由与依据 |
 |---|---|---|---|
-| 今日页「需要留意」区块（E-a1） | **B** 修订 | 页面组合：复用 `FCSectionLabel`、`FCListRow`、`FCListRowDivider`、`FCMoreMenu`、`FCGroupEntryRow`；不新增共享组件 | 已批准的今日页（01 / W08-a）多了一个区块 |
+| 今日页「需要留意」区块（E-a1） | **B** 修订 | 页面组合：复用 `FCSectionLabel`、`FCListRow`、`FCListRowDivider`、`FCUndoRow`、`FCGroupEntryRow`（2026-10-27 起不再用 `FCMoreMenu`）；不新增共享组件 | 已批准的今日页（01 / W08-a）多了一个区块 |
 | 「需要留意」完整列表页（E-a2） | **B** 新页面，组合现有组件 | `DS-PAGE-SECONDARY`（`FCPageHeader`）+ 按类型分组的同一提示行 | 新的二级页，没有新视觉语言 |
 | 学员详情提示区（E-b） | **B** 修订 | 同一提示行，主文字不带学员名 | 已批准的学员详情（M2-03）多了一个区块 |
 | 训练趋势指标切换第 4 段「估算 1RM」（E-c） | **B** 修订 | `DS-SEGMENTED` 使用范围扩到 4 段（README §10 C26）；`TrendLineChart` 外观不改 | 已批准的 M2-15 多一个指标与一行说明 |
+| 提示行暂不提醒改左滑 + 撤销 + 首次轻推（E-d，2026-10-27） | **B** 修订 | 左滑操作扩展（`components.md` §4.8）；`DS-UNDO-ROW` 复用边界扩到暂不提醒；`DS-MORE-MENU` 退役 | 集中走查：「…」系统菜单在 iOS 26 / 18 都太大（README §10 C27） |
+| 分区标题左滑删除、指标停用移到底部（B-b、B-c 修订，2026-10-27） | **B** 修订 | 训练中、模板编辑、记录指标三页；复用 `DS-CONFIRM-DIALOG`、`DS-ACTION-ROW` | 同上，`FCMoreMenu` 的另外两处用法 |
 
 不涉及 A 类，没有新 token、新图标、新颜色。趋势线沿用 `action.primary`（README §2：大面积强调只用深色或中性色；虚线已表示「数据点稀疏」，不能再用来表示「估算」）。
 
@@ -19,11 +21,13 @@
 
 ### 2.1 提示行 `InsightRowView`（feature 专有，E-a1 / E-a2 / E-b 共用）
 
-- **部件顺序**：`FCListRow`（`titleStyle: .body`，主文字 + `subtitle`，`showsDisclosure: false`，整行是一个跳转按钮）→ 右侧 `FCMoreMenu`（独立可点，44×44 热区）。两者放在一个 `HStack`，`FCListRow` 以 `.frame(maxWidth: .infinity)` 撑满剩余宽度。行与行之间的 `FCListRowDivider` 由区块放置。
-- **没有** `›`：行尾位置给了「…」。
-- **「…」菜单**只有一项「暂不提醒 14 天」，非破坏性，不弹确认。**不做左滑**：今日页与学员详情是 `ScrollView`，SwiftUI 左滑只在 `List` 中可用；「…」已是可见入口（spec E-FR-014）。
-- **无障碍**：跳转部分读作「主文字，副文字」，trait 按钮；「…」另为一个元素，标签沿用 `designSystem.moreActions`（AC-E10）。
-- **最大字体**：主文字与副文字都可换行，不截断数字；「…」不缩小。
+- **部件**：`FCListRow`（`titleStyle: .body`，主文字 + `subtitle`，`showsDisclosure: false`，整行是一个跳转按钮），`.frame(maxWidth: .infinity)` 撑满。行与行之间的 `FCListRowDivider` 由区块放置。没有 `›`，也没有「…」（2026-10-27 起）。
+- **容器**：三个页面的提示行放在不滚动的 `List` 里（左滑只在 `List` 中可用），去掉 `List` 自带的背景、分割线与行内边距，外观与改之前一致（plan §3.10）。
+- **左滑**：`.swipeActions(edge: .trailing, allowsFullSwipe: true)`，按钮「暂不提醒」+ `bell.slash`，`.tint(FCSemanticColors.textSecondary)`，非破坏性，不弹确认（E-d，spec E-FR-014 Rev 1.1）。
+- **撤销**：左滑后原位置换成 `FCUndoRow`「<学员名> · 已暂不提醒 14 天」（学员详情不带学员名）+「撤销」，`FCUndoRow.undoWindow`（4 秒）后移除；今日页随后补上下一条。
+- **首次轻推**：今日页第一次出现提示时第一行向左轻推 72 pt、露出装饰性的灰色胶囊，停 0.6 s 后弹回；每台设备一次；「减弱动态效果」时不播（README §10 C27）。
+- **无障碍**：跳转部分读作「主文字，副文字」，trait 按钮；「暂不提醒」是该行的自定义操作（AC-E10）；轻推露出的胶囊对无障碍隐藏。
+- **最大字体**：主文字与副文字都可换行，不截断数字。
 - **不变量**：文字只用 §3 文案键拼出；不出现「请」；数字与单位之间有空格（README §13）。
 
 ### 2.2 今日页区块（E-a1）
@@ -59,7 +63,9 @@
 | `insights.group.inactive` | 很久没来 | 列表页分组 |
 | `insights.group.stagnant` | 进步停滞 | 列表页分组 |
 | `insights.list.empty` | 没有需要留意的事 | 列表页空 |
-| `insights.action.snooze` | 暂不提醒 14 天 | 「…」菜单 |
+| `insights.action.snooze` | 暂不提醒 | 左滑按钮（2026-10-27 前为「…」菜单项「暂不提醒 14 天」） |
+| `insights.snoozed.withName` | %@ · 已暂不提醒 14 天 | 撤销行（今日页、列表页） |
+| `insights.snoozed` | 已暂不提醒 14 天 | 撤销行（学员详情） |
 | `trends.metric.e1rm` | 估算 1RM | 趋势指标第 4 段 |
 | `trends.e1rmCaption` | 估算 1RM = 重量 × (1 + 次数 ÷ 30)，只算 1～10 次的组。这是推算值，不是实测的最大重量。 | 趋势图下 |
 
@@ -78,20 +84,36 @@
 - 〈数值〉= 这 3 节**之前**历史的最好值（没被超过的那个「新高」）：清单动作「估算 1RM %@」；其他动作按主指标「最大 %@」/「最多 %d 次」/「最长 %@」，辅助类「最轻辅助 %@」。格式按 README §13（kg 最多 1 位小数，整数不带 `.0`）。
 - 画稿没画出的文案（已过期、快到期、从没上过课、非重量主指标）以本表为准。
 
-## 4. 执行记录（五行，实施时填写）
+## 4. 执行记录
 
 | 行 | 内容 |
 |---|---|
 | 分类和依据 | 四处均为 B；画稿 E-a1、E-a2、E-b、E-c（2026-10-24 批准）；快照见文首 |
-| 范围 | 复用 `DS-LIST-ROW`、`DS-SECTION`、`DS-MORE-MENU`、`DS-SEGMENTED`、`DS-PAGE-HEADER`；feature 专有 `InsightRowView`；`DS-SEGMENTED` 使用范围扩到 4 段（C26） |
-| 设计决定 | 不做左滑；「全部 · N」复用 `FCGroupEntryRow`（画稿原为「全部 5 条」，已改）；趋势线保持 `action.primary`；说明文案改为「这是推算值，不是实测的最大重量」（负责人 2026-10-24 指出原句不清楚） |
-| 实现和检查 | 待填 |
-| 结果 | 待填 |
+| 范围 | 复用 `DS-LIST-ROW`、`DS-SECTION`、`DS-MORE-MENU`、`DS-SEGMENTED`、`DS-PAGE-HEADER`、`FCGroupEntryRow`；feature 专有 `InsightRowView`、`InsightSectionView`；`DS-SEGMENTED` 使用范围扩到 4 段（C26）；`DesignSystem/` 下没有文件改动 |
+| 设计决定 | 不做左滑；「全部 · N」复用 `FCGroupEntryRow`（画稿原为「全部 5 条」，已改）；趋势线保持 `action.primary`；说明文案改为「这是推算值，不是实测的最大重量」（负责人 2026-10-24 指出原句不清楚）；「估算 1RM」段不单独绑 identifier，用整个分段控件的 `trends.metricPicker`，不为此扩展共享组件（2026-10-24 编排方决定）；列表页返回沿用 `FCPageHeader` 自带控件 |
+| 实现和检查 | 分支 `feature/stage-e-insights`：`c4ecde6`（判定、估算 1RM、暂不提醒存储）、`a412bb2`（界面）、`07dd5b9`（趋势预选按最近一节课的记录模式；T012 预览；T020 测试）。文案、导航、今日页最多 3 行的选取、估算 1RM 点和回落都是纯函数，有单元测试（`InsightPresentationTests`、`EstimatedOneRepMaxTrendTests`、`TrendsInitialSelectionTests`）；暂不提醒后今日页和学员详情的数据源都不再含该条，有集成测试。入口与布局见 §5 |
+| 结果 | 主机门禁 PASS（2026-10-24，`07dd5b9` 的工作区）：lint、Debug、Release、build-for-testing 均 0；FineCoachTests 602（1 个原有跳过），FineCoachIntegrationTests 210，0 失败；日志 `.handoff/logs/2026-10-23-stage-e-patch-accept-*.log`。**界面还没人看过**，L3 集中走查待做；预览只验证了能编译 |
 
 L3（spec §7.4）：集中走查看今日页区块（有 / 无提示）、完整列表、学员详情提示、三类直达、「…」菜单、趋势第 4 段。另点名一个疑问：最大字体下 4 段切换是否放得下（放不下按 C26 改用筛选胶囊）。
 
-## 5. 入口与布局清单（`components.md` §1.4，实施时填写）
+## 5. 入口与布局清单（`components.md` §1.4）
+
+`K` 是该行 `Insight.id`。三个页面的行都由 `InsightSectionView` → `InsightRowView` 生成，点击目的地由 `InsightNavigation.destination(for:today:)`（`Features/Insights/InsightRowContent.swift:108`）决定：课包类 → 课包页；没来上课 → 新建预约，预填该学员和今天；停滞 → 训练趋势「动作趋势」页，预选该动作最近一节课的记录模式。
 
 | 画面 | 可见控件 | identifier | 改数据 | 撑满宽度的组件 / 容器 |
 |---|---|---|---|---|
-| （实现后按报告回填） | | | | |
+| 今日页 | 「需要留意」区块（排在约课区块之后） | `today.insights` | 否 | `InsightSectionView` 的 `.frame(maxWidth: .infinity)`；`TodayView.swift:256` |
+| 今日页 | 提示行（最多 3 行，整行可点） | `insights.row.K` | 否 | `FCListRow` + `.frame(maxWidth: .infinity)`；`InsightRowView.swift:11` |
+| 今日页 | 「全部 · N」（超过 3 条才出现） | `today.insights.all` | 否 | `FCGroupEntryRow`；`TodayView.swift:250` |
+| 完整列表 | 页面根，按课包 / 没来上课 / 停滞分组 | `insights.root` | 否 | 页面 VStack `.frame(maxWidth: .infinity)`；`InsightsListView.swift:41` |
+| 完整列表 | 提示行 | `insights.row.K` | 否 | `FCListRow`；`InsightsListView.swift:51` |
+| 完整列表 | 「‹」返回 | `FCPageHeader` 自带 | 否 | `FCPageHeader`；`InsightsListView.swift:20` |
+| 学员详情 | 「需要留意」区块（排在「概览」之前） | `studentDetail.insights` | 否 | `InsightSectionView`；`StudentDetailView.swift:147` |
+| 学员详情 | 提示行（不重复学员名） | `insights.row.K` | 否 | `FCListRow`；`StudentDetailView.swift:143` |
+| 三个页面 | 行尾「…」 | `insights.more.K` | 否 | 与 `FCListRow` 同一 HStack；`InsightRowView.swift:20` |
+| 三个页面 | 「…」菜单里「暂不提醒 14 天」 | `insights.snooze.K` | **是**（写暂不提醒文件，三个页面同时移除该行） | `FCMoreMenu` 菜单项；`InsightRowView.swift:22` |
+| 训练趋势 | 第 4 段「估算 1RM」（仅 §12.1 清单动作） | 容器 `trends.metricPicker` | 否（只是视图状态） | `FCSegmentedSwitch`；`TrendsView.swift:261` |
+
+唯一改数据的操作「暂不提醒 14 天」在可见的「…」菜单里，没有长按或左滑入口。
+
+> 2026-10-27 走查修订（README §10 C27）后，上表「…」两行由左滑「暂不提醒」与撤销行取代；新行与分区左滑、指标底部停用行在修订实现后回填（tasks T038）。
