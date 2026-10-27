@@ -73,7 +73,29 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "暂不提醒 14 天"
+            "value": "暂不提醒"
+          }
+        }
+      }
+    },
+    "insights.snoozed.withName": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ · 已暂不提醒 14 天"
+          }
+        }
+      }
+    },
+    "insights.snoozed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已暂不提醒 14 天"
           }
         }
       }
@@ -9998,17 +10020,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "撤销"
-          }
-        }
-      }
-    },
-    "designSystem.moreActions": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "更多操作"
           }
         }
       }

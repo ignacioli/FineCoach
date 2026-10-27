@@ -7,7 +7,7 @@ public enum FCAccessibilityID {
     static let detailInsights = "studentDetail.insights"
     static let trendsEstimatedOneRepMax = "trends.metric.estimatedOneRepMax"
     static func insightRow(_ id: String) -> String { "insights.row.\(id)" }
-    static func insightMore(_ id: String) -> String { "insights.more.\(id)" }
+    static func insightUndo(_ id: String) -> String { "insights.undo.\(id)" }
     static func insightSnooze(_ id: String) -> String { "insights.snooze.\(id)" }
     static let sessionSummaryGains = "sessionSummary.gains"
     static let sessionDetailGains = "sessionDetail.gains"
@@ -15,18 +15,11 @@ public enum FCAccessibilityID {
         "activeSession.set.newRecord.\(id.rawValue.uuidString.lowercased())"
     }
 
-    public static let bodyMeasurementMore = "bodyMeasurementEntry.more"
     public static func setUndoAt(_ index: Int) -> String {
         "activeSession.set.undo.at.\(index)"
     }
     public static func bodyMeasurementUndo(_ id: StableUUID) -> String {
         "bodyMeasurementEntry.undo.\(id.rawValue.uuidString.lowercased())"
-    }
-    public static func activeSessionSectionMore(_ id: StableUUID) -> String {
-        "activeSession.section.more.\(id.rawValue.uuidString.lowercased())"
-    }
-    public static func templateEditorSectionMore(_ id: StableUUID) -> String {
-        "templateEditor.section.more.\(id.rawValue.uuidString.lowercased())"
     }
     public static let privacyCover = "privacy.cover"
 

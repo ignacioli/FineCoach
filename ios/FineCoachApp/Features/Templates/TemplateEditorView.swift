@@ -165,6 +165,7 @@ struct TemplateEditorView: View {
     /// Native `.swipeActions` are only available on `List` rows. Each list is
     /// non-scrolling and measured before its height is fixed so the page keeps
     /// one outer scroll surface (the same pattern as ActiveSession).
+    @State private var sectionHeaderHeights: [StableUUID: CGFloat] = [:]
     @State private var listContentHeights: [StableUUID: CGFloat] = [:]
     @ScaledMetric private var exerciseRowHeight: CGFloat = 52
 
@@ -356,19 +357,40 @@ struct TemplateEditorView: View {
 
     private func sectionBlock(_ section: SessionSection) -> some View {
         VStack(alignment: .leading, spacing: FCPrimitives.space2) {
-            HStack {
-                Text(section.name.value)
-                    .fcFont(.sectionLabel)
-                    .foregroundStyle(FCSemanticColors.textSecondary)
-                Spacer()
-                FCMoreMenu(accessibilityIdentifier: FCAccessibilityID.templateEditorSectionMore(section.id)) {
-                    Button(String(localized: "templateEditor.deleteSection"), role: .destructive) {
+            List {
+                HStack {
+                    Text(section.name.value)
+                        .fcFont(.sectionLabel)
+                        .foregroundStyle(FCSemanticColors.textSecondary)
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                .accessibilityIdentifier(FCAccessibilityID.templateSectionRow(section.id))
+                .listRowInsets(EdgeInsets())
+                .listRowSeparator(.hidden)
+                .listRowBackground(FCSemanticColors.surfaceSelected)
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button {
                         viewModel.requestDeleteSection(section)
+                    } label: {
+                        Label(String(localized: "templateEditor.deleteSection"), systemImage: "trash")
                     }
+                    .tint(FCSemanticColors.statusDestructive)
                     .accessibilityIdentifier(FCAccessibilityID.templateEditorDeleteSection(section.id))
                 }
             }
-            .accessibilityIdentifier(FCAccessibilityID.templateSectionRow(section.id))
+            .listStyle(.plain)
+            .scrollDisabled(true)
+            .scrollContentBackground(.hidden)
+            .environment(\.defaultMinListRowHeight, 44)
+            .onScrollGeometryChange(
+                for: CGFloat.self,
+                of: { $0.contentSize.height + $0.contentInsets.top + $0.contentInsets.bottom }
+            ) { _, height in
+                guard height >= 1 else { return }
+                sectionHeaderHeights[section.id] = height
+            }
+            .frame(height: sectionHeaderHeights[section.id] ?? 44)
             let exercises = viewModel.exercises(in: section)
             if !exercises.isEmpty {
                 exerciseList(exercises, listID: section.id)

@@ -54,6 +54,10 @@ public struct InsightUseCases: Sendable {
         try await snoozes.snooze(insight, now: now, calendar: calendarProvider.currentCalendar())
     }
 
+    public func unsnooze(_ insight: Insight) async throws {
+        try await snoozes.unsnooze(insight)
+    }
+
     private struct StudentRead: Sendable {
         let studentID: StableUUID
         let package: InsightEngine.PackageBalance?

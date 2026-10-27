@@ -229,6 +229,10 @@ struct TodayView: View {
         )
         .task { await viewModel.reload() }
         .task { await insightsModel.reload() }
+        .onDisappear { insightsModel.endUndoWindows() }
+        .onReceive(NotificationCenter.default.publisher(for: InsightsViewModel.didUnsnooze)) { _ in
+            Task { await insightsModel.reload() }
+        }
         .onReceive(NotificationCenter.default.publisher(for: InsightsViewModel.didSnooze)) {
             insightsModel.removeSnoozed($0)
         }

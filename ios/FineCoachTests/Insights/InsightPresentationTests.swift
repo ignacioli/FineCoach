@@ -6,6 +6,63 @@ final class InsightPresentationTests: XCTestCase {
     private let studentID = StableUUID(UUID(uuidString: "aaaaaaaa-1111-4111-8111-111111111111")!)
     private let exerciseID = try! StableExerciseID("a2f5b6ef-b780-49c0-8d96-fdaff23e27ce")
 
+    func testUndoWindowRetainsSlotsUntilExpiryThenTodayBackfills() {
+        let rows = (0..<5).map { _ in Insight(kind: .inactive, studentID: StableUUID(UUID())) }
+        let now = Date(timeIntervalSince1970: 1000)
+        var state = InsightUndoState()
+        state.begin(rows[1], in: rows, now: now)
+        let fresh = rows.filter { $0.id != rows[1].id }
+        XCTAssertEqual(state.reconcile(fresh), rows)
+        XCTAssertEqual(TodayInsightSelection(state.reconcile(fresh)).rows, Array(rows.prefix(3)))
+        XCTAssertTrue(state.expire(now: now.addingTimeInterval(3.999)).isEmpty)
+        XCTAssertEqual(state.expire(now: now.addingTimeInterval(4)), [rows[1].snoozeKey])
+        XCTAssertEqual(TodayInsightSelection(state.reconcile(fresh)).rows, [rows[0], rows[2], rows[3]])
+        XCTAssertEqual(FCUndoRow.undoWindow, .seconds(4))
+    }
+
+    func testMultipleUndoSlotsSurviveReloadAndUndoRestoresOriginalOrder() {
+        let rows = (0..<5).map { _ in Insight(kind: .inactive, studentID: StableUUID(UUID())) }
+        var state = InsightUndoState()
+        state.begin(rows[0], in: rows, now: Date(timeIntervalSince1970: 1000))
+        state.begin(rows[2], in: rows, now: Date(timeIntervalSince1970: 1001))
+        let fresh = rows.filter { $0.id != rows[0].id && $0.id != rows[2].id }
+        XCTAssertEqual(state.reconcile(fresh), rows)
+        state.undo(rows[0])
+        XCTAssertEqual(state.reconcile([rows[0]] + fresh), rows)
+        XCTAssertEqual(state.expire(now: Date(timeIntervalSince1970: 1005)), [rows[2].snoozeKey])
+        XCTAssertEqual(state.reconcile([rows[0]] + fresh), [rows[0], rows[1], rows[3], rows[4]])
+    }
+
+    func testExpiringEarlierSlotKeepsLaterUndoAtItsRemainingPosition() {
+        let rows = (0..<5).map { _ in Insight(kind: .inactive, studentID: StableUUID(UUID())) }
+        let now = Date(timeIntervalSince1970: 1000)
+        var state = InsightUndoState()
+        state.begin(rows[0], in: rows, now: now)
+        state.begin(rows[2], in: rows, now: now.addingTimeInterval(1))
+        let fresh = rows.filter { $0.id != rows[0].id && $0.id != rows[2].id }
+        XCTAssertEqual(state.expire(now: now.addingTimeInterval(4)), [rows[0].snoozeKey])
+        XCTAssertEqual(state.reconcile(fresh), Array(rows.dropFirst()))
+        XCTAssertTrue(state.expire(now: now.addingTimeInterval(5), excluding: [rows[2].snoozeKey]).isEmpty)
+        state.undo(rows[2])
+        XCTAssertEqual(state.reconcile(Array(rows.dropFirst())), Array(rows.dropFirst()))
+    }
+
+    func testSwipeHintOnlyPlaysOnTodayWithRowsUntilShownAndWithoutReducedMotion() {
+        for today in [false, true] {
+            for hasRows in [false, true] {
+                for shown in [false, true] {
+                    for reduced in [false, true] {
+                        XCTAssertEqual(
+                            InsightSwipeHint.shouldPlay(
+                                isToday: today, hasRows: hasRows, shown: shown, reduceMotion: reduced),
+                            today && hasRows && !shown && !reduced)
+                    }
+                }
+            }
+        }
+        XCTAssertEqual(InsightSwipeHint.defaultsKey, "insights.swipeHintShown")
+    }
+
     private func check(
         _ insight: Insight, title: String, subtitle: String?,
         file: StaticString = #filePath, line: UInt = #line

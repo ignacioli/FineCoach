@@ -57,6 +57,27 @@ final class InsightSnoozeStoreTests: XCTestCase {
         }
     }
 
+    func testUnsnoozeMissingAndAbsentKeyAreNoOpsAndOnlyTargetIsRemovedDurably() async throws {
+        let directory = try TemporaryProtectedDirectory()
+        let store = InsightSnoozeStore(directory: directory.url)
+        let now = Date()
+        let target = Insight(kind: .packageLow, studentID: StableUUID(UUID()))
+        let other = Insight(kind: .inactive, studentID: target.studentID)
+        try await store.unsnooze(target)
+        XCTAssertFalse(
+            FileManager.default.fileExists(atPath: directory.url.appendingPathComponent("Insights/snoozes.json").path))
+        try await store.snooze(target, now: now, calendar: calendar)
+        try await store.snooze(other, now: now, calendar: calendar)
+        try await store.unsnooze(target)
+        let reopened = InsightSnoozeStore(directory: directory.url)
+        let keys = await reopened.activeKeys(now: now, calendar: calendar)
+        XCTAssertEqual(keys, [other.snoozeKey])
+        let url = directory.url.appendingPathComponent("Insights/snoozes.json")
+        let before = try Data(contentsOf: url)
+        try await reopened.unsnooze(target)
+        XCTAssertEqual(try Data(contentsOf: url), before)
+    }
+
     func testWriteFailurePropagates() async throws {
         let directory = try TemporaryProtectedDirectory()
         let occupied = directory.url.appendingPathComponent("occupied")

@@ -161,6 +161,28 @@
             try await reopened.controller.shutdownForTesting()
         }
 
+        func testUnsnoozeRestoresInsightAcrossSourcesAndUseCaseRecreation() async throws {
+            let env = try makeEnvironment()
+            let person = try await student(env, age: 21, name: "虚构撤销学员")
+            _ = try await env.credits.createActivePackage(
+                studentID: person.id, name: nil, totalCredits: 2, startDate: nil, endDate: nil)
+            let initial = try await env.insights.load(now: now)
+            let target = try XCTUnwrap(initial.first { $0.kind == .packageLow })
+            try await env.insights.snooze(target, now: now)
+            let snoozed = try await env.insights.load(now: now)
+            XCTAssertFalse(snoozed.contains(target))
+            try await env.insights.unsnooze(target)
+            let restored = try await env.insights.load(now: now)
+            let detail = try await env.insights.studentInsights(studentID: person.id, now: now)
+            XCTAssertEqual(restored, initial)
+            XCTAssertEqual(detail, initial)
+            try await env.controller.shutdownForTesting()
+            let reopened = try makeEnvironment(root: env.root)
+            let rebuilt = try await reopened.insights.load(now: now)
+            XCTAssertEqual(rebuilt, initial)
+            try await reopened.controller.shutdownForTesting()
+        }
+
         func testLoadReadsCurrentAssistedPreferenceIncludingHiddenExercises() async throws {
             let env = try makeEnvironment()
             let student = try await student(env, age: 60, name: "虚构辅助庚")

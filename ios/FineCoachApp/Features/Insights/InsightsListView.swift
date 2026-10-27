@@ -41,6 +41,10 @@ struct InsightsListView: View {
         .accessibilityIdentifier(FCAccessibilityID.insightsRoot)
         .task { await model.reload() }
         .onChange(of: path) { _, _ in Task { await model.reload() } }
+        .onDisappear { model.endUndoWindows() }
+        .onReceive(NotificationCenter.default.publisher(for: InsightsViewModel.didUnsnooze)) { _ in
+            Task { await model.reload() }
+        }
         .onReceive(NotificationCenter.default.publisher(for: InsightsViewModel.didSnooze)) { model.removeSnoozed($0) }
     }
 

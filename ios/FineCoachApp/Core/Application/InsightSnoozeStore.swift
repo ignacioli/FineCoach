@@ -38,6 +38,17 @@ public actor InsightSnoozeStore {
         _ = try files.writeData(data, to: url, policy: .business)
     }
 
+    public func unsnooze(_ insight: Insight) throws {
+        guard Self.isOpaqueKey(insight.snoozeKey) else { throw DomainError.invalidIdentifier }
+        guard FileManager.default.fileExists(atPath: url.path) else { return }
+        let data = try files.readData(from: url)
+        guard let document = try? JSONDecoder().decode(Document.self, from: data), document.version == 1 else { return }
+        guard document.entries.contains(where: { $0.key == insight.snoozeKey }) else { return }
+        let entries = document.entries.filter { $0.key != insight.snoozeKey && Self.isOpaqueKey($0.key) }
+        let updated = try JSONEncoder().encode(Document(version: 1, entries: entries))
+        _ = try files.writeData(updated, to: url, policy: .business)
+    }
+
     private func entries(now: Date, calendar: Calendar) -> [Entry] {
         guard let data = try? files.readData(from: url),
             let document = try? JSONDecoder().decode(Document.self, from: data), document.version == 1
