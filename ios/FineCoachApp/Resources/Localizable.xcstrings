@@ -4258,13 +4258,13 @@
         }
       }
     },
-    "templateEditor.moveToUnsectioned": {
+    "templateEditor.moveToSection": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "移出分区"
+            "value": "移入分区"
           }
         }
       }

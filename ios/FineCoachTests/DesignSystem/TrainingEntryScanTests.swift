@@ -53,10 +53,12 @@ final class TrainingEntryScanTests: XCTestCase {
         )
     }
 
-    /// Section deletion uses shared confirmation; move-to-section remains a choice menu.
+    /// Section deletion uses shared confirmation; move-to-section remains a choice menu,
+    /// on the training page and (README §10 C27) the template editor.
     func testOnlyMoveSectionSystemDialogRemains() throws {
         let expected: Set<String> = [
-            #"Features/ActiveSession/ActiveSessionView.swift|String(localized: "activeSession.moveToSection")"#
+            #"Features/ActiveSession/ActiveSessionView.swift|String(localized: "activeSession.moveToSection")"#,
+            #"Features/Templates/TemplateEditorView.swift|String(localized: "templateEditor.moveToSection")"#,
         ]
         let features = appRoot().appendingPathComponent("Features")
         let enumerator = try XCTUnwrap(FileManager.default.enumerator(at: features, includingPropertiesForKeys: nil))
@@ -150,7 +152,8 @@ final class TrainingEntryScanTests: XCTestCase {
     }
 
     /// Template exercises are list items: deletion is exposed by the native
-    /// trailing swipe action, while the move-to-section menu remains visible.
+    /// trailing swipe action; moving to a section is a second swipe action
+    /// that opens the section choice, as on the training page (README §10 C27).
     func testTemplateExerciseRowsUseDestructiveSwipeDelete() throws {
         let text = try source("Features/Templates/TemplateEditorView.swift").joined(separator: "\n")
         let start = try XCTUnwrap(text.range(of: "private func exerciseList(")).lowerBound
@@ -168,7 +171,12 @@ final class TrainingEntryScanTests: XCTestCase {
         XCTAssertTrue(list.contains("templateEditor.deleteExercise"))
 
         XCTAssertFalse(list.contains("Button(String(localized: \"templateEditor.removeExercise\"))"))
-        XCTAssertTrue(text.contains("templateEditor.moveToUnsectioned"), "the move menu remains available")
+        XCTAssertTrue(list.contains("movingExerciseID = exercise.id"))
+        XCTAssertTrue(list.contains("systemImage: \"folder\""))
+        XCTAssertTrue(list.contains(".tint(FCSemanticColors.textSecondary)"))
+        XCTAssertTrue(list.contains("FCAccessibilityID.templateEditorMoveExercise(exercise.id)"))
+        XCTAssertTrue(text.contains("FCAccessibilityID.templateEditorMoveToUnsectioned"), "the section choice remains")
+        XCTAssertFalse(text.contains("Menu("), "no inline system menu on template rows")
     }
 
     /// B-D2 keeps the pre-existing full-screen typed-name student deletion;

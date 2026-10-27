@@ -269,6 +269,10 @@ public enum FCAccessibilityID {
         "templateEditor.trainingFocus.\(part.rawValue)"
     }
 
+    public static func templateEditorMoveExercise(_ id: StableUUID) -> String {
+        "templateEditor.moveExercise.\(id.rawValue.uuidString)"
+    }
+
     public static func templateEditorMoveToSection(_ id: StableUUID) -> String {
         "templateEditor.moveToSection.\(id.rawValue.uuidString)"
     }
