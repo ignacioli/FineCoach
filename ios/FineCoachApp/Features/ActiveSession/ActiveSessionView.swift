@@ -571,19 +571,40 @@ struct ActiveSessionView: View {
         if let sectionID = exercise.sectionID, sectionID != previousSectionID,
             let section = viewModel.sections.first(where: { $0.id == sectionID })
         {
-            HStack {
-                FCSectionLabel(section.name.value)
-                Spacer()
-                if viewModel.session?.state == .inProgress {
-                    FCMoreMenu(accessibilityIdentifier: FCAccessibilityID.activeSessionSectionMore(section.id)) {
-                        Button(String(localized: "activeSession.deleteSection"), role: .destructive) {
+            List {
+                HStack {
+                    FCSectionLabel(section.name.value)
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                .accessibilityIdentifier(FCAccessibilityID.activeSessionSectionHeader(section.id))
+                .listRowInsets(EdgeInsets())
+                .listRowSeparator(.hidden)
+                .listRowBackground(FCSemanticColors.surfacePage)
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    if viewModel.session?.state == .inProgress {
+                        Button {
                             viewModel.requestDeleteSection(section)
+                        } label: {
+                            Label(String(localized: "activeSession.deleteSection"), systemImage: "trash")
                         }
+                        .tint(FCSemanticColors.statusDestructive)
                         .accessibilityIdentifier(FCAccessibilityID.activeSessionDeleteSection(section.id))
                     }
                 }
             }
-            .accessibilityIdentifier(FCAccessibilityID.activeSessionSectionHeader(section.id))
+            .listStyle(.plain)
+            .scrollDisabled(true)
+            .scrollContentBackground(.hidden)
+            .environment(\.defaultMinListRowHeight, 44)
+            .onScrollGeometryChange(
+                for: CGFloat.self,
+                of: { $0.contentSize.height + $0.contentInsets.top + $0.contentInsets.bottom }
+            ) { _, height in
+                guard height >= 1 else { return }
+                listContentHeights[section.id] = height
+            }
+            .frame(height: listContentHeights[section.id] ?? 44)
         }
     }
 

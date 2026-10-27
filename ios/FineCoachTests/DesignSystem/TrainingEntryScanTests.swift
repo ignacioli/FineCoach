@@ -53,10 +53,12 @@ final class TrainingEntryScanTests: XCTestCase {
         )
     }
 
-    /// Section deletion uses shared confirmation; move-to-section remains a choice menu.
+    /// Section deletion uses shared confirmation; move-to-section remains a choice menu,
+    /// on the training page and (README §10 C27) the template editor.
     func testOnlyMoveSectionSystemDialogRemains() throws {
         let expected: Set<String> = [
-            #"Features/ActiveSession/ActiveSessionView.swift|String(localized: "activeSession.moveToSection")"#
+            #"Features/ActiveSession/ActiveSessionView.swift|String(localized: "activeSession.moveToSection")"#,
+            #"Features/Templates/TemplateEditorView.swift|String(localized: "templateEditor.moveToSection")"#,
         ]
         let features = appRoot().appendingPathComponent("Features")
         let enumerator = try XCTUnwrap(FileManager.default.enumerator(at: features, includingPropertiesForKeys: nil))
@@ -87,22 +89,23 @@ final class TrainingEntryScanTests: XCTestCase {
         }
     }
 
-    func testSectionHeadersOfferDeletionOnlyInsideMoreMenu() throws {
+    func testSectionHeadersOfferConfirmedDeletionViaSwipe() throws {
         for (path, function, identifier) in [
             (
                 "Features/ActiveSession/ActiveSessionView.swift", "private func sectionHeaderIfNeeded",
-                "activeSessionSectionMore"
+                "activeSessionDeleteSection"
             ),
-            ("Features/Templates/TemplateEditorView.swift", "private func sectionBlock", "templateEditorSectionMore"),
+            ("Features/Templates/TemplateEditorView.swift", "private func sectionBlock", "templateEditorDeleteSection"),
         ] {
             let text = try source(path).joined(separator: "\n")
             let start = try XCTUnwrap(text.range(of: function)).lowerBound
             let end = text.range(of: "\n    private ", range: start..<text.endIndex)?.lowerBound ?? text.endIndex
             let header = text[start..<end]
-            XCTAssertTrue(header.contains("FCMoreMenu(accessibilityIdentifier: FCAccessibilityID.\(identifier)"))
-            XCTAssertTrue(header.contains("role: .destructive"))
+            XCTAssertTrue(header.contains("FCAccessibilityID.\(identifier)(section.id)"))
+            XCTAssertTrue(header.contains(".swipeActions(edge: .trailing, allowsFullSwipe: false)"))
+            XCTAssertFalse(header.contains("role: .destructive"))
             XCTAssertTrue(header.contains("viewModel.requestDeleteSection(section)"))
-            XCTAssertFalse(header.contains("foregroundStyle(FCSemanticColors.statusDestructive)"))
+            XCTAssertTrue(header.contains(".tint(FCSemanticColors.statusDestructive)"))
         }
     }
 
@@ -149,7 +152,8 @@ final class TrainingEntryScanTests: XCTestCase {
     }
 
     /// Template exercises are list items: deletion is exposed by the native
-    /// trailing swipe action, while the move-to-section menu remains visible.
+    /// trailing swipe action; moving to a section is a second swipe action
+    /// that opens the section choice, as on the training page (README §10 C27).
     func testTemplateExerciseRowsUseDestructiveSwipeDelete() throws {
         let text = try source("Features/Templates/TemplateEditorView.swift").joined(separator: "\n")
         let start = try XCTUnwrap(text.range(of: "private func exerciseList(")).lowerBound
@@ -167,7 +171,12 @@ final class TrainingEntryScanTests: XCTestCase {
         XCTAssertTrue(list.contains("templateEditor.deleteExercise"))
 
         XCTAssertFalse(list.contains("Button(String(localized: \"templateEditor.removeExercise\"))"))
-        XCTAssertTrue(text.contains("templateEditor.moveToUnsectioned"), "the move menu remains available")
+        XCTAssertTrue(list.contains("movingExerciseID = exercise.id"))
+        XCTAssertTrue(list.contains("systemImage: \"folder\""))
+        XCTAssertTrue(list.contains(".tint(FCSemanticColors.textSecondary)"))
+        XCTAssertTrue(list.contains("FCAccessibilityID.templateEditorMoveExercise(exercise.id)"))
+        XCTAssertTrue(text.contains("FCAccessibilityID.templateEditorMoveToUnsectioned"), "the section choice remains")
+        XCTAssertFalse(text.contains("Menu("), "no inline system menu on template rows")
     }
 
     /// B-D2 keeps the pre-existing full-screen typed-name student deletion;
@@ -209,7 +218,29 @@ final class TrainingEntryScanTests: XCTestCase {
         XCTAssertTrue(text.contains(".tint(FCSemanticColors.statusDestructive)"))
         XCTAssertFalse(text.contains("bodyMeasurementDeleteConfirm"))
         XCTAssertFalse(text.contains("pendingDeleteID"))
-        XCTAssertTrue(text.contains("FCMoreMenu(accessibilityIdentifier: FCAccessibilityID.bodyMeasurementMore)"))
+        XCTAssertFalse(text.contains("FCMoreMenu"))
+        let start = try XCTUnwrap(text.range(of: "bodyMeasurementEntry.management")).lowerBound
+        let end = try XCTUnwrap(text.range(of: ".padding(.horizontal", range: start..<text.endIndex)).lowerBound
+        let management = text[start..<end]
+        XCTAssertTrue(management.contains("FCActionRow("))
+        XCTAssertTrue(management.contains("bodyMeasurementArchive"))
+        XCTAssertTrue(management.contains("bodyMeasurementRestore"))
+        XCTAssertTrue(management.contains("viewModel.toggleArchive()"))
+    }
+
+    func testInsightRowsUseReversibleNonDestructiveSwipesAndMeasuredLists() throws {
+        let text = try source("Features/Insights/InsightRowView.swift").joined(separator: "\n")
+        XCTAssertTrue(text.contains(".swipeActions(edge: .trailing, allowsFullSwipe: true)"))
+        XCTAssertTrue(text.contains("systemImage: \"bell.slash\""))
+        XCTAssertTrue(text.contains("FCUndoRow("))
+        XCTAssertTrue(text.contains("FCAccessibilityID.insightSnooze(insight.id)"))
+        XCTAssertTrue(text.contains("FCAccessibilityID.insightUndo(insight.id)"))
+        XCTAssertTrue(text.contains(".tint(FCSemanticColors.textSecondary)"))
+        XCTAssertTrue(text.contains(".scrollDisabled(true)"))
+        XCTAssertTrue(text.contains(".onScrollGeometryChange("))
+        XCTAssertFalse(text.contains("FCMoreMenu"))
+        XCTAssertFalse(text.contains("role: .destructive"))
+        XCTAssertTrue(text.contains(".accessibilityHidden(true)"))
     }
 
     /// B-D7 / Δ11: every translated zh-Hans value follows the approved direct,
