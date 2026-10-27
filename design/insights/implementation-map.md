@@ -1,7 +1,7 @@
 # 阶段 E 洞察：设计改动与实施映射
 
-> 状态：**画稿已批准（E-a1、E-a2、E-b、E-c，2026-10-24）；待实现。**本文是 `components.md` §6 要求的里程碑实施映射，不重复 token 数值。
-> 行为权威：`specs/005-stage-e-insights/spec.md`（`1.0-approved`）、`plan.md`、`tasks.md`。视觉权威：`design/design-system/README.md`、`components.md`；本轮记录见 README §1.11、§10 C26；走查修订（左滑取代「…」）见 README §1.12、§10 C27。
+> 状态：**已实现，集中走查与左滑复看通过（2026-10-27）；待合并。**画稿 E-a1、E-a2、E-b、E-c 2026-10-24 批准，E-d 与 B-b、B-c 修订 2026-10-27 批准。本文是 `components.md` §6 要求的里程碑实施映射，不重复 token 数值。
+> 行为权威：`specs/005-stage-e-insights/spec.md`（`1.1-approved`）、`plan.md`、`tasks.md`。视觉权威：`design/design-system/README.md`、`components.md`；本轮记录见 README §1.11、§10 C26；走查修订（左滑取代「…」）见 README §1.12、§10 C27。
 > Penpot：E-a1、E-a2、E-b 在 Foundations 页（x=13090 / 13530 / 13970）；E-c 在「M2 G7 Design」页（x=4960，M2-15 右侧）。快照 `before-stage-e-boards 2026-10-24` → `stage E boards aligned to implementation map (text fixed) 2026-10-24 b`。走查修订：E-d 在 Foundations 页 x=14410；快照 `before swipe revision (retire DS-MORE-MENU) 2026-10-27` → `swipe capsules redrawn to iOS 26 look (E-d, B-b) 2026-10-27`。
 
 ## 1. 按设计变化分类（`components.md` §1.2）
@@ -96,24 +96,38 @@
 
 L3（spec §7.4）：集中走查看今日页区块（有 / 无提示）、完整列表、学员详情提示、三类直达、「…」菜单、趋势第 4 段。另点名一个疑问：最大字体下 4 段切换是否放得下（放不下按 C26 改用筛选胶囊）。
 
+**走查与修订（2026-10-27）**
+
+| 行 | 内容 |
+|---|---|
+| 走查结果 | 负责人在模拟器 EFE2D5A0（iOS 26）与 iPhone XS Max（iOS 18）上看完 `.handoff/2026-10-24-stage-e-walkthrough-checklist.md`：全部通过，只有「…」不行（iOS 26 弹出大胶囊、iOS 18 灰色菜单太大；训练页分区「…」同源，非回归）。最大字体下 4 段切换放得下 |
+| 分类和依据 | B：E-d（新）、B-b、B-c 修订，2026-10-27 批准；README §1.12、§10 C27；快照见文首 |
+| 范围 | 退役 `DS-MORE-MENU`（删除 `FCMoreMenu`）；`DS-UNDO-ROW` 复用到暂不提醒；左滑操作扩展（`components.md` §4.8）；训练中、模板编辑、记录指标三页同时改 |
+| 设计决定 | 否决底部面板、行内文字按钮、自绘白底浮层；分区左滑用 `.tint` 不用 `role: .destructive`（否则行先被移走）；复看时补：模板编辑动作行的蓝色系统 `Menu`「移出分区」（M1-B 起就有）改为左滑「移入分区」，与训练页一致；今日页暂不提醒后学员详情同步消失，负责人确认符合预期 |
+| 实现和检查 | `336f465`（Codex：左滑、撤销、轻推、分区左滑、指标底部行、删 `FCMoreMenu`；Claude 删掉误加的 en 文案并补撤销行等高）、`c368bcc`（Claude：模板编辑左滑移入分区）。新增测试：`InsightSnoozeStoreTests`（unsnooze）、`InsightPresentationTests`（撤销窗口、补位、轻推判定）、`InsightUseCasesTests`（撤销后重建一致）；`TrainingEntryScanTests`、`M2ComponentContractTests` 的「…」断言改为断言左滑与退役 |
+| 结果 | 主机门禁 PASS（`c368bcc` 的工作区）：lint、Debug、Release、build-for-testing 均 0；FineCoachTests 608（1 个原有跳过），FineCoachIntegrationTests 212；日志 `.handoff/logs/2026-10-23-stage-e-tplmove2-accept-*.log`。负责人复看 `336f465`（`.handoff/2026-10-27-stage-e-swipe-recheck-checklist.md`）全部通过；`c368bcc` 的模板编辑左滑「移入分区」随后在模拟器上复看通过（2026-10-27） |
+
 ## 5. 入口与布局清单（`components.md` §1.4）
 
 `K` 是该行 `Insight.id`。三个页面的行都由 `InsightSectionView` → `InsightRowView` 生成，点击目的地由 `InsightNavigation.destination(for:today:)`（`Features/Insights/InsightRowContent.swift:108`）决定：课包类 → 课包页；没来上课 → 新建预约，预填该学员和今天；停滞 → 训练趋势「动作趋势」页，预选该动作最近一节课的记录模式。
 
 | 画面 | 可见控件 | identifier | 改数据 | 撑满宽度的组件 / 容器 |
 |---|---|---|---|---|
-| 今日页 | 「需要留意」区块（排在约课区块之后） | `today.insights` | 否 | `InsightSectionView` 的 `.frame(maxWidth: .infinity)`；`TodayView.swift:256` |
-| 今日页 | 提示行（最多 3 行，整行可点） | `insights.row.K` | 否 | `FCListRow` + `.frame(maxWidth: .infinity)`；`InsightRowView.swift:11` |
-| 今日页 | 「全部 · N」（超过 3 条才出现） | `today.insights.all` | 否 | `FCGroupEntryRow`；`TodayView.swift:250` |
+| 今日页 | 「需要留意」区块（排在约课区块之后） | `today.insights` | 否 | `InsightSectionView` 的 `.frame(maxWidth: .infinity)`；`TodayView.swift:260` |
+| 今日页 | 提示行（最多 3 行，整行可点） | `insights.row.K` | 否 | `FCListRow` + `.frame(maxWidth: .infinity)`；`InsightRowView.swift:13` |
+| 今日页 | 「全部 · N」（超过 3 条才出现） | `today.insights.all` | 否 | `FCGroupEntryRow`；`TodayView.swift:254` |
+| 今日页 | 首次轻推（第一行左移 72 pt，露出装饰胶囊） | 无（对无障碍隐藏） | 只写本机标记 | 同一行的容器；`InsightRowView.swift:106` |
 | 完整列表 | 页面根，按课包 / 没来上课 / 停滞分组 | `insights.root` | 否 | 页面 VStack `.frame(maxWidth: .infinity)`；`InsightsListView.swift:41` |
-| 完整列表 | 提示行 | `insights.row.K` | 否 | `FCListRow`；`InsightsListView.swift:51` |
+| 完整列表 | 提示行 | `insights.row.K` | 否 | `InsightSectionView`；`InsightsListView.swift:55` |
 | 完整列表 | 「‹」返回 | `FCPageHeader` 自带 | 否 | `FCPageHeader`；`InsightsListView.swift:20` |
 | 学员详情 | 「需要留意」区块（排在「概览」之前） | `studentDetail.insights` | 否 | `InsightSectionView`；`StudentDetailView.swift:147` |
 | 学员详情 | 提示行（不重复学员名） | `insights.row.K` | 否 | `FCListRow`；`StudentDetailView.swift:143` |
-| 三个页面 | 行尾「…」 | `insights.more.K` | 否 | 与 `FCListRow` 同一 HStack；`InsightRowView.swift:20` |
-| 三个页面 | 「…」菜单里「暂不提醒 14 天」 | `insights.snooze.K` | **是**（写暂不提醒文件，三个页面同时移除该行） | `FCMoreMenu` 菜单项；`InsightRowView.swift:22` |
-| 训练趋势 | 第 4 段「估算 1RM」（仅 §12.1 清单动作） | 容器 `trends.metricPicker` | 否（只是视图状态） | `FCSegmentedSwitch`；`TrendsView.swift:261` |
+| 三个页面 | 左滑「暂不提醒」（可一滑到底） | `insights.snooze.K` | **是**（写暂不提醒文件，三个页面同时移除该行） | 不滚动的 `List`，行内边距为 0；`InsightRowView.swift:47`、`:74` |
+| 三个页面 | 撤销行「撤销」（4 秒，与原行同高） | `insights.undo.K` | **是**（删掉暂不提醒记录，三个页面重新读取） | `FCUndoRow`（自带 `.frame(maxWidth: .infinity)`）；`InsightRowView.swift:51` |
+| 训练中 | 分区标题左滑「删除分区」（不能一滑到底，弹确认） | `activeSessionDeleteSection(id)` | 确认后是 | 不滚动的 `List` + `.frame(maxWidth: .infinity)` 的 HStack；`ActiveSessionView.swift:584` |
+| 模板编辑 | 分区标题左滑「删除分区」（不能一滑到底，弹确认） | `templateEditorDeleteSection(id)` | 确认后是 | 同上；`TemplateEditorView.swift:398` |
+| 模板编辑 | 动作行左滑「移入分区」（有分区时才有） | `templateEditorMoveExercise(id)` | 选分区后是 | 动作行 `List`；分区选择 `TemplateEditorView.swift:272`；按钮 `:352` |
+| 记录指标（自定义） | 「管理」里「停用指标」/「恢复指标」 | `bodyMeasurementArchive` / `bodyMeasurementRestore` | 是（可恢复，不确认） | `FCActionRow`；`BodyMeasurementEntryView.swift:404` |
+| 训练趋势 | 第 4 段「估算 1RM」（仅 §12.1 清单动作） | 容器 `trends.metricPicker` | 否（只是视图状态） | `FCSegmentedSwitch`；`TrendsView.swift:273` |
 
-唯一改数据的操作「暂不提醒 14 天」在可见的「…」菜单里，没有长按或左滑入口。
-
-> 2026-10-27 走查修订（README §10 C27）后，上表「…」两行由左滑「暂不提醒」与撤销行取代；新行与分区左滑、指标底部停用行在修订实现后回填（tasks T038）。
+所有改数据的操作都有可见按钮或左滑入口，没有只靠长按或 `.contextMenu` 的入口；App 里不再有「…」菜单。
