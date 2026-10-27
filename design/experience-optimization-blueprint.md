@@ -2,7 +2,7 @@
 
 > 这是 finecoach-scoring-optimization 这条主线的**唯一总览**。人和各个 AI 工具开工前先看这里，弄清现在在哪、下一步是什么、谁来做。
 > 细节以各自的权威文件为准：评分方法见 [`11d-experience-scorecard.md`](11d-experience-scorecard.md)，P0 决定见 [`experience-p0/implementation-map.md`](experience-p0/implementation-map.md)，阶段 B 决定见 [`experience-t2/decisions.md`](experience-t2/decisions.md)，C′ 决定见 [`catalog-expansion/decisions.md`](catalog-expansion/decisions.md)。
-> 最后更新：2026-10-24（阶段 D 和 2026-10-21～23 走查修订已合并并 push；仍无真人评分）。每个阶段收尾时更新本文件的「状态」「决定队列」两节。
+> 最后更新：2026-10-24（A、B、C′、D 和走查修订都已合并，负责人审核通过；C 的 T3 素材库未开始；E 实现中；仍无真人评分）。每个阶段收尾时更新本文件的「状态」「决定队列」两节。
 
 ## 1. 目标和怎么算赢
 
@@ -19,15 +19,15 @@
 | A′ | T2 交互一致性审计（只读） | 11 | ✅ 完成，已合并 | `ae27671`；`experience-t2/audit.md` |
 | B1 | 机械收敛：identifier、5 处确认框改共享组件、状态栏遮盖 | 4、10、11 | ⚠️ 第 1–4 项已合并；第 5 项 **BLOCKED，挂起**：UI 测试已对齐 B1、B2 并合并（`23eceb9`），但两轮都找不到 `activeSession.exercise.at.0`，原因未查明。2026-10-17 负责人决定先挂起调查 | `4a47f5f`；`experience-t2/implementation-map.md` 末节 |
 | B 画稿 | B-a、B-b、B-c | 4、11 | ✅ 2026-10-16 通过 | `cf86c13`；Penpot 快照 `B boards approved 2026-10-16` |
-| B2 | 交互改动 Δ1–Δ5、Δ8–Δ10：删分区、左滑删除、4 秒撤销、「…」菜单、恢复前确认 | 4、10、11 | ✅ 已合并；**还没人看过** | `9b2df06`；Codex 做，Cursor 收尾 |
-| B3 | T1 称呼和语气（Δ11）：不用「您」和「请」，不用「操作失败」，不用语气词，并加扫描测试 | 11 | ✅ 已合并；**还没人看过**；Penpot 已回填，10 张画板的 PNG 待负责人 2x 导出 | 合并提交 `363beff`；对照表和 Penpot 回填记录在 `experience-t2/implementation-map.md` 的 B3 一节 |
-| Δ12 | 键盘弹起时，休息条盖住「确认」按钮 | 1、2 | ✅ 已合并（B-D9）；**还没人看过**，也没在 UI 测试里跑到 | 合并提交 `5bd6774`（`237078d`）；Codex gpt-6.1-sol 做 |
-| C | T3 对标素材库：训记、Too、Hevy、Todoist 的关键画面放进 Penpot 并标注 | 11、6 | ⏳ 没开始 | 等负责人截图，并确认「dotolist」就是 Todoist |
-| C′ | 动作库扩充：146 条扩到约 550 条 | 5（间接） | ✅ **已合并**（2026-10-19）。**2a**（main `e5c65d0`，specs `5b687ea`）：新增 396 条，共 542 条（1 条停用），13 个器械都有动作；启动时按 id 原位同步，Core Data V6；重名和失败规则 CX-D10–D15。**2b**（main `1a7c3a7`）：图标 18 → 21（壶铃实心例外 CX-D13），动作库和添加动作面板加「最近练过」，拼音和首字母搜索；Unit 504、Integration 187，0 失败。拼音字级修正（弹→tan、地→di）已合并（main `218d63a`，Unit 507、Integration 188，0 失败）；**还没人看过界面** | `design/catalog-expansion/decisions.md`；`.handoff/2026-10-18-cprime-step1-owner-decisions.md`；`.handoff/subagent/2026-10-19-cprime-step2b-e92b89f-handoff.md` |
+| B2 | 交互改动 Δ1–Δ5、Δ8–Δ10：删分区、左滑删除、4 秒撤销、「…」菜单、恢复前确认 | 4、10、11 | ✅ 已合并；负责人审核通过 | `9b2df06`；Codex 做，Cursor 收尾 |
+| B3 | T1 称呼和语气（Δ11）：不用「您」和「请」，不用「操作失败」，不用语气词，并加扫描测试 | 11 | ✅ 已合并；负责人审核通过；Penpot 已回填，10 张画板的 PNG 待负责人 2x 导出 | 合并提交 `363beff`；对照表和 Penpot 回填记录在 `experience-t2/implementation-map.md` 的 B3 一节 |
+| Δ12 | 键盘弹起时，休息条盖住「确认」按钮 | 1、2 | ✅ 已合并（B-D9）；负责人审核通过；没在 UI 测试里跑到 | 合并提交 `5bd6774`（`237078d`）；Codex gpt-6.1-sol 做 |
+| C | T3 对标素材库：训记、Too、Hevy、Todoist 的关键画面放进 Penpot 并标注 | 11、6 | ⏳ 没开始 | 等负责人截图（2026-10-24 确认「dotolist」就是 Todoist） |
+| C′ | 动作库扩充：146 条扩到约 550 条 | 5（间接） | ✅ **已合并**（2026-10-19）。**2a**（main `e5c65d0`，specs `5b687ea`）：新增 396 条，共 542 条（1 条停用），13 个器械都有动作；启动时按 id 原位同步，Core Data V6；重名和失败规则 CX-D10–D15。**2b**（main `1a7c3a7`）：图标 18 → 21（壶铃实心例外 CX-D13），动作库和添加动作面板加「最近练过」，拼音和首字母搜索；Unit 504、Integration 187，0 失败。拼音字级修正（弹→tan、地→di）已合并（main `218d63a`，Unit 507、Integration 188，0 失败）；负责人审核通过 | `design/catalog-expansion/decisions.md`；`.handoff/2026-10-18-cprime-step1-owner-decisions.md`；`.handoff/subagent/2026-10-19-cprime-step2b-e92b89f-handoff.md` |
 | 维度 5 | 拼音或首字母搜索，常用动作和最近练过的动作排前面 | 5 | ✅ 随 C′ 第 2b 步合并（排序按负责人决定改为顶部「最近练过」分组）；待真人评分 | 见 C′ 行 |
-| D | P1 收获感：破纪录当场提示、课程总结写出进步、里程碑 | 6、4、9 | ✅ 已合并；2026-10-21 集中走查后修订：新纪录与比上次进步重新定义（C16）、新纪录数值浮起和动效 token（C17，负责人真机选定 D 档）；**还没真人评分** | `specs/004-stage-d-progress-milestones/spec.md`（Revision 1.5、1.6）；`progress-milestones/implementation-map.md` |
+| D | P1 收获感：破纪录当场提示、课程总结写出进步、里程碑 | 6、4、9 | ✅ 已合并；2026-10-21 集中走查后修订：新纪录与比上次进步重新定义（C16）、新纪录数值浮起和动效 token（C17，负责人真机选定 D 档）；负责人审核通过；**还没真人评分** | `specs/004-stage-d-progress-milestones/spec.md`（Revision 1.5、1.6）；`progress-milestones/implementation-map.md` |
 | 走查修订 | 2026-10-21～23 真机走查发现的问题：多学员同时训练（W-08）、分享后回今日（C15）、页头统一（C18）、关于页（C21）、训练时长按小时分钟（C22）、休息结束通知路由 / 冷启动 / 主线程崩溃 / 分组和前台横幅（C19、C23）、休息倒计时按训练保存和已超时（C24、C25） | 1、2、4、10、11 | ✅ 已合并，负责人真机复测通过 | `design-system/README.md` §10；2026-10-23 PR ignacioli/FineCoach#4 合入 GitHub main |
-| E | P2 洞察：进步停滞、课包快用完、学员很久没约课 | 7 | ⏳ 要先写 spec | 先定展示哪些洞察 |
+| E | P2 洞察：进步停滞、课包快用完、学员很久没约课 | 7 | 🚧 实现中：spec `1.0-approved`，plan、tasks 已定，E-a1、E-a2、E-b、E-c 四张画稿通过；判定逻辑和全部界面已在 `feature/stage-e-insights` 提交（`c4ecde6`、`a412bb2`），小补丁进行中；**未合并，还没人看过界面** | `specs/005-stage-e-insights/`；`insights/implementation-map.md`；`design-system/README.md` C26 |
 | F | P3 系统级入口：小组件、Live Activity、快捷指令 | 8 | ⏳ 要先写 spec，并先做隐私威胁评估 | AGENTS.md 隐私红线 |
 
 按分差排，最大的短板仍然是第 9 维「动效与质感」和第 11 维「产品调性与品味」，两维满分合计 25，2026-10-14 估分只有约 11。A、B 两个阶段都改到了这两维，改善了多少要等真人评分才知道。
@@ -38,12 +38,12 @@
 
 | 泳道 | 内容（按顺序） | 写入方 | 和别的泳道冲不冲突 |
 |---|---|---|---|
-| 1 交互和文案（热点） | ~~Δ12~~、~~B3~~ 已合并 →（挂起）B1 第 5 项 UI 测试调查 → D | 一次只派一个工具 | 训练页等 Feature 页面现在空闲；C′ 第 2 步要改动作库页面，开工时这条泳道不要再派动作库相关改动 |
-| 2 动作库数据 | ~~C′ 第 1、2a、2b 步、拼音字级修正~~ 全部已合并 | 一次只派一个工具 | 空闲，可以接 D |
+| 1 交互和文案（热点） | ~~Δ12~~、~~B3~~、~~D~~、~~走查修订~~ 已合并 →（挂起）B1 第 5 项 UI 测试调查 → E 界面（进行中） | 一次只派一个工具 | E 改今日页、学员详情、训练趋势；E 合并前这几页不要再派别的改动 |
+| 2 动作库数据 | ~~C′ 第 1、2a、2b 步、拼音字级修正~~ 全部已合并 | 一次只派一个工具 | 空闲 |
 | 3 负责人 | 真机重签 → 集中走查 → 真人评分 → 素材截图 | 产品负责人 | 不改代码 |
-| 4 spec | D、E、F 的 spec 写在私有 specs 仓：spec → clarify → plan → tasks | Claude 起草，负责人拍板 | 只改 specs 仓，可以随时并行 |
+| 4 spec | ~~D、E~~ 已定；F 的 spec 写在私有 specs 仓：spec → clarify → plan → tasks | Claude 起草，负责人拍板 | 只改 specs 仓，可以随时并行；F 要先定隐私规则 |
 
-D 等 B3 合并之后再开工（都要改训练页和课程总结），也要等 D 的 spec 和画稿通过。
+D 已合并；E 的界面在 `feature/stage-e-insights`，合并前走一次集中走查（含 4 段分段控件在最大字号下的显示）。
 
 ## 4. 架构和工程层面的判断
 
@@ -76,9 +76,9 @@ D 等 B3 合并之后再开工（都要改训练页和课程总结），也要�
 
 1. **真机签名**：2026-10-23 已用 main `c27ec06` 装 Debug 版（7 天有效）。日常使用前要装一次 Release 版，在 Debug 版过期前完成。
 2. ~~Δ12 修法~~：2026-10-17 定为 B-D9，同日实现并合并（`5bd6774`）。
-3. **集中走查加真人评分**。A、B 两个阶段和 C′ 第 2a 步做完了，还没有人看过。这次要看的是：`FCUndoRow`、`FCMoreMenu`、删组和删测量的撤销、指标页底部两行、5 个共享确认框、状态栏遮盖；动作库 13 项器械筛选在小屏上的换行、两个改名动作、停用动作不出现。看完按标准任务打分。
+3. **真人评分**：A、B、C′、D 和走查修订的集中走查已完成，负责人审核通过（2026-10-24 确认）。剩下的是按标准任务打分。
 4. ~~C′ 候选清单审核~~：2026-10-18 批准，建议全部采纳；另定 CX-D9。之后 CX-D10 到 CX-D15 也已裁决（见决定单）。
-5. **T3 素材**：4 个 App 的截图，以及确认「dotolist」就是 Todoist。
+5. **T3 素材**：4 个 App 的截图（「dotolist」即 Todoist，负责人 2026-10-24 确认）。
 6. ~~D 的规则~~：2026-10-20 裁决 PD-D1～D5（沿用 M1B-FR-029 口径、组行当场标记、第 N 节课里程碑、总结页只读区块、跟随个人最佳开关）。**新增待定**：spec §9 Q-D1～Q-D5。
 7. **F 的隐私规则**：锁屏和通知里能显示什么。
 8. ~~push 到 GitHub~~：2026-10-23 经 PR ignacioli/FineCoach#4（merge commit）合入，148 个提交；main 受保护，以后都走 PR。CodeQL 有 15 条 `swift/cleartext-storage-database` 告警，负责人决定暂不处理（Core Data 库已用 `completeUnlessOpen` 文件保护）。
@@ -87,5 +87,5 @@ D 等 B3 合并之后再开工（都要改训练页和课程总结），也要�
 ## 7. 接下来三步
 
 1. 负责人：按标准任务做第一次真人评分（含 A、B、C′、D 和走查修订），结果追加到评分卡末尾。这是现在最大的缺口，它决定先做 E 还是 F。
-2. Claude：在私有 specs 仓起草 E（P2 洞察）的 spec，列出要负责人拍板的问题（展示哪些洞察、阈值、入口位置）。只改 specs 仓，可以和第 1 步并行。
+2. Claude：完成 E 的小补丁和主机门禁，回填实施映射 §4、§5，准备种子数据，交负责人做 E 的集中走查；通过后合并 `docs/stage-e-insights` 和 `feature/stage-e-insights`。
 3. 负责人：定 F 的隐私规则（锁屏和通知里能显示什么）；定了之后再写 F 的 spec 和威胁评估。
