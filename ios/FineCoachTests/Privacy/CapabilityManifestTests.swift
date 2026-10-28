@@ -3,9 +3,11 @@ import XCTest
 /// T050c (NFR-002 / NFR-007): the shipped capability manifests declare no
 /// network, Contacts, Photos, camera, location or telemetry capability, and
 /// no third-party package or networking API is linked. Static scan of
-/// `FineCoach-Info.plist`, `FineCoach.entitlements`, `PrivacyInfo.xcprivacy`,
-/// the project file and the app sources; it proves what is declared, not
+/// `FineCoach-Info.plist`, the app and widget entitlements, `PrivacyInfo.xcprivacy`,
+/// the project file and the app and widget sources; it proves what is declared, not
 /// runtime behaviour (that stays a device / binary check in T051).
+/// Specs 006 (research R2, R6) approves only the `group.com.finecoach.app`
+/// App Group for widgets to read snapshots containing only allowlisted fields.
 final class CapabilityManifestTests: XCTestCase {
     private var iosRoot: URL {
         URL(fileURLWithPath: #filePath)
@@ -14,8 +16,8 @@ final class CapabilityManifestTests: XCTestCase {
             .deletingLastPathComponent()  // ios/
     }
 
-    private func plist(_ name: String) throws -> [String: Any] {
-        let url = iosRoot.appendingPathComponent("FineCoachApp").appendingPathComponent(name)
+    private func plist(_ name: String, directory: String = "FineCoachApp") throws -> [String: Any] {
+        let url = iosRoot.appendingPathComponent(directory).appendingPathComponent(name)
         let data = try Data(contentsOf: url)
         let object = try PropertyListSerialization.propertyList(from: data, format: nil)
         return try XCTUnwrap(object as? [String: Any], "\(name) must be a dictionary plist")
@@ -33,9 +35,16 @@ final class CapabilityManifestTests: XCTestCase {
         XCTAssertTrue(forbidden.isEmpty, "Info.plist declares \(forbidden.sorted())")
     }
 
-    func testEntitlementsDeclareNoCapabilities() throws {
-        let entitlements = try plist("FineCoach.entitlements")
-        XCTAssertTrue(entitlements.isEmpty, "entitlements declare \(entitlements.keys.sorted())")
+    func testEntitlementsDeclareOnlyTheApprovedAppGroup() throws {
+        for (directory, name) in [
+            ("FineCoachApp", "FineCoach.entitlements"),
+            ("FineCoachWidgets", "FineCoachWidgets.entitlements"),
+        ] {
+            let entitlements = try plist(name, directory: directory)
+            XCTAssertEqual(Set(entitlements.keys), ["com.apple.security.application-groups"], name)
+            XCTAssertEqual(
+                entitlements["com.apple.security.application-groups"] as? [String], ["group.com.finecoach.app"], name)
+        }
     }
 
     func testPrivacyManifestDeclaresNoTrackingOrCollection() throws {
@@ -63,21 +72,24 @@ final class CapabilityManifestTests: XCTestCase {
             "FirebaseCore", "FirebaseAnalytics", "FirebaseCrashlytics", "Sentry", "Amplitude", "Mixpanel",
         ]
         let forbiddenAPIs = ["URLSession", "NWConnection", "URLRequest"]
-        let appRoot = iosRoot.appendingPathComponent("FineCoachApp")
-        let enumerator = try XCTUnwrap(FileManager.default.enumerator(at: appRoot, includingPropertiesForKeys: nil))
         var violations: [String] = []
-        for case let url as URL in enumerator where url.pathExtension == "swift" {
-            let source = try String(contentsOf: url, encoding: .utf8)
-            for line in source.split(separator: "\n") {
-                let trimmed = line.trimmingCharacters(in: .whitespaces)
-                if trimmed.hasPrefix("import "), let module = trimmed.dropFirst(7).split(separator: " ").first,
-                    forbiddenImports.contains(String(module))
-                {
-                    violations.append("\(url.lastPathComponent): import \(module)")
+        for directory in ["FineCoachApp", "FineCoachWidgets"] {
+            let sourceRoot = iosRoot.appendingPathComponent(directory)
+            let enumerator = try XCTUnwrap(
+                FileManager.default.enumerator(at: sourceRoot, includingPropertiesForKeys: nil))
+            for case let url as URL in enumerator where url.pathExtension == "swift" {
+                let source = try String(contentsOf: url, encoding: .utf8)
+                for line in source.split(separator: "\n") {
+                    let trimmed = line.trimmingCharacters(in: .whitespaces)
+                    if trimmed.hasPrefix("import "), let module = trimmed.dropFirst(7).split(separator: " ").first,
+                        forbiddenImports.contains(String(module))
+                    {
+                        violations.append("\(url.lastPathComponent): import \(module)")
+                    }
                 }
-            }
-            for api in forbiddenAPIs where source.contains(api) {
-                violations.append("\(url.lastPathComponent): \(api)")
+                for api in forbiddenAPIs where source.contains(api) {
+                    violations.append("\(url.lastPathComponent): \(api)")
+                }
             }
         }
         XCTAssertTrue(violations.isEmpty, "forbidden usage: \(violations.sorted())")

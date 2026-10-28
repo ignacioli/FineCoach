@@ -393,6 +393,9 @@
 		E20000000000000000000003 /* InsightsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000000000000000000003; };
 		E50000000000000000000000 /* InsightPresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E40000000000000000000000; };
 		E50000000000000000000001 /* EstimatedOneRepMaxTrendTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E40000000000000000000001; };
+		F60000000000000000000009 /* FineCoachWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000003 /* FineCoachWidgetsBundle.swift */; };
+		F6000000000000000000000A /* SystemEntryConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000006 /* SystemEntryConfigurationTests.swift */; };
+		F6000000000000000000000B /* FineCoachWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F60000000000000000000002 /* FineCoachWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -417,7 +420,28 @@
 			remoteGlobalIDString = A020;
 			remoteInfo = FineCoach;
 		};
+		F60000000000000000000011 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A000 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F60000000000000000000001;
+			remoteInfo = FineCoachWidgets;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F6000000000000000000000F /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				F6000000000000000000000B /* FineCoachWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		C6128566D2A6F0494C3A37F0 /* ArchiveHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveHomeView.swift; sourceTree = "<group>"; };
@@ -796,6 +820,11 @@
 		E10000000000000000000003 /* InsightsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsListView.swift; sourceTree = "<group>"; };
 		E40000000000000000000000 /* InsightPresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightPresentationTests.swift; sourceTree = "<group>"; };
 		E40000000000000000000001 /* EstimatedOneRepMaxTrendTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EstimatedOneRepMaxTrendTests.swift; sourceTree = "<group>"; };
+		F60000000000000000000002 /* FineCoachWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FineCoachWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		F60000000000000000000003 /* FineCoachWidgetsBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FineCoachWidgetsBundle.swift; sourceTree = "<group>"; };
+		F60000000000000000000004 /* FineCoachWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FineCoachWidgets.entitlements; sourceTree = "<group>"; };
+		F60000000000000000000005 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F60000000000000000000006 /* SystemEntryConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemEntryConfigurationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -837,6 +866,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F6000000000000000000000D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -874,6 +910,7 @@
 			isa = PBXGroup;
 			children = (
 				A400 /* FineCoachApp */,
+				F60000000000000000000007 /* FineCoachWidgets */,
 				A410 /* FineCoachTests */,
 				A420 /* FineCoachIntegrationTests */,
 				A430 /* FineCoachUITests */,
@@ -887,6 +924,7 @@
 			isa = PBXGroup;
 			children = (
 				A003 /* FineCoach.app */,
+				F60000000000000000000002 /* FineCoachWidgets.appex */,
 				A004 /* FineCoachTests.xctest */,
 				A005 /* FineCoachIntegrationTests.xctest */,
 				A006 /* FineCoachUITests.xctest */,
@@ -1100,6 +1138,7 @@
 		A410 /* FineCoachTests */ = {
 			isa = PBXGroup;
 			children = (
+				F60000000000000000000008 /* SystemEntry */,
 				E00000000000000000000001 /* Insights */,
 				A200 /* SetupSmokeTests.swift */,
 				A492 /* App */,
@@ -1926,6 +1965,24 @@
 			path = Insights;
 			sourceTree = "<group>";
 		};
+		F60000000000000000000007 /* FineCoachWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				F60000000000000000000003 /* FineCoachWidgetsBundle.swift */,
+				F60000000000000000000004 /* FineCoachWidgets.entitlements */,
+				F60000000000000000000005 /* Info.plist */,
+			);
+			path = FineCoachWidgets;
+			sourceTree = "<group>";
+		};
+		F60000000000000000000008 /* SystemEntry */ = {
+			isa = PBXGroup;
+			children = (
+				F60000000000000000000006 /* SystemEntryConfigurationTests.swift */,
+			);
+			path = SystemEntry;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1936,10 +1993,12 @@
 				A050 /* Sources */,
 				A051 /* Frameworks */,
 				A052 /* Resources */,
+				F6000000000000000000000F /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				F60000000000000000000010 /* PBXTargetDependency */,
 			);
 			name = FineCoach;
 			productName = FineCoach;
@@ -2000,6 +2059,23 @@
 			productReference = A006 /* FineCoachUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		F60000000000000000000001 /* FineCoachWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F60000000000000000000014 /* Build configuration list for PBXNativeTarget "FineCoachWidgets" */;
+			buildPhases = (
+				F6000000000000000000000C /* Sources */,
+				F6000000000000000000000D /* Frameworks */,
+				F6000000000000000000000E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FineCoachWidgets;
+			productName = FineCoachWidgets;
+			productReference = F60000000000000000000002 /* FineCoachWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -2008,6 +2084,9 @@
 			attributes = {
 				LastUpgradeCheck = 2660;
 				TargetAttributes = {
+					F60000000000000000000001 = {
+						CreatedOnToolsVersion = 26.6;
+					};
 					A020 = {
 						CreatedOnToolsVersion = 26.6;
 						LastSwiftMigration = 2660;
@@ -2040,6 +2119,7 @@
 			projectRoot = "";
 			targets = (
 				A020 /* FineCoach */,
+				F60000000000000000000001 /* FineCoachWidgets */,
 				A021 /* FineCoachTests */,
 				A022 /* FineCoachIntegrationTests */,
 				A023 /* FineCoachUITests */,
@@ -2080,6 +2160,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		A05B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F6000000000000000000000E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -2333,6 +2420,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F6000000000000000000000A /* SystemEntryConfigurationTests.swift in Sources */,
 				E50000000000000000000001 /* EstimatedOneRepMaxTrendTests.swift in Sources */,
 				E50000000000000000000000 /* InsightPresentationTests.swift in Sources */,
 				E0000000000000000000010B /* InsightSnoozeStoreTests.swift in Sources */,
@@ -2483,6 +2571,14 @@
 					);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F6000000000000000000000C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F60000000000000000000009 /* FineCoachWidgetsBundle.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -2500,6 +2596,11 @@
 			isa = PBXTargetDependency;
 			target = A020 /* FineCoach */;
 			targetProxy = C003 /* PBXContainerItemProxy */;
+		};
+		F60000000000000000000010 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F60000000000000000000001 /* FineCoachWidgets */;
+			targetProxy = F60000000000000000000011 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2548,6 +2649,7 @@
 				INFOPLIST_KEY_CFBundleDevelopmentRegion = "zh-Hans";
 				INFOPLIST_KEY_CFBundleDisplayName = "精练教练";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				MARKETING_VERSION = 0.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app;
@@ -2571,6 +2673,7 @@
 				INFOPLIST_KEY_CFBundleDevelopmentRegion = "zh-Hans";
 				INFOPLIST_KEY_CFBundleDisplayName = "精练教练";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				MARKETING_VERSION = 0.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app;
@@ -2654,6 +2757,48 @@
 			};
 			name = Release;
 		};
+		F60000000000000000000012 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = FineCoachWidgets/FineCoachWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9Z7427RG9X;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FineCoachWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "精练教练";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", "@executable_path/../../Frameworks", );
+				MARKETING_VERSION = 0.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app.widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		F60000000000000000000013 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = FineCoachWidgets/FineCoachWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9Z7427RG9X;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FineCoachWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "精练教练";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", "@executable_path/../../Frameworks", );
+				MARKETING_VERSION = 0.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app.widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -2698,6 +2843,15 @@
 			buildConfigurations = (
 				A03A /* Debug */,
 				A03B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F60000000000000000000014 /* Build configuration list for PBXNativeTarget "FineCoachWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F60000000000000000000012 /* Debug */,
+				F60000000000000000000013 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
