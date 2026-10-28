@@ -3,16 +3,19 @@ import Foundation
 public struct StudentUseCases: Sendable {
     private let repository: CoreDataStudentRepository
     private let clock: any Clock
+    private let widgetSnapshots: any WidgetSnapshotPublishing
     private let ids: any IDGenerator
 
     public init(
         repository: CoreDataStudentRepository,
         clock: any Clock,
-        ids: any IDGenerator
+        ids: any IDGenerator,
+        widgetSnapshots: any WidgetSnapshotPublishing = NoopWidgetSnapshotPublisher()
     ) {
         self.repository = repository
         self.clock = clock
         self.ids = ids
+        self.widgetSnapshots = widgetSnapshots
     }
 
     public func create(draft: StudentDraft) async throws -> Student {
@@ -23,7 +26,9 @@ public struct StudentUseCases: Sendable {
     public func update(id: StableUUID, draft: StudentDraft) async throws -> Student {
         let current = try await repository.student(id: id)
         let updated = try current.updating(from: draft, now: clock.nowUTC())
-        return try await repository.update(updated)
+        let saved = try await repository.update(updated)
+        if saved.displayName != current.displayName { await widgetSnapshots.refresh() }
+        return saved
     }
 
     public func student(id: StableUUID) async throws -> Student {
@@ -40,7 +45,9 @@ public struct StudentUseCases: Sendable {
 
     public func archive(id: StableUUID) async throws -> Student {
         let current = try await repository.student(id: id)
-        return try await repository.archive(current, now: clock.nowUTC())
+        let saved = try await repository.archive(current, now: clock.nowUTC())
+        await widgetSnapshots.refresh()
+        return saved
     }
 
     public func restore(id: StableUUID) async throws -> Student {

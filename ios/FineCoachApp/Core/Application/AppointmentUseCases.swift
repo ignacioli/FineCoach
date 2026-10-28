@@ -58,6 +58,7 @@ public struct AppointmentUseCases: Sendable {
     private let notifications: NotificationScheduler
     private let clock: any Clock
     private let calendarProvider: any LocalCalendarProvider
+    private let widgetSnapshots: any WidgetSnapshotPublishing
     private let ids: any IDGenerator
 
     public init(
@@ -67,7 +68,8 @@ public struct AppointmentUseCases: Sendable {
         notifications: NotificationScheduler,
         clock: any Clock,
         calendarProvider: any LocalCalendarProvider,
-        ids: any IDGenerator
+        ids: any IDGenerator,
+        widgetSnapshots: any WidgetSnapshotPublishing = NoopWidgetSnapshotPublisher()
     ) {
         self.appointmentRepository = appointmentRepository
         self.studentRepository = studentRepository
@@ -76,6 +78,7 @@ public struct AppointmentUseCases: Sendable {
         self.clock = clock
         self.calendarProvider = calendarProvider
         self.ids = ids
+        self.widgetSnapshots = widgetSnapshots
     }
 
     // MARK: - Conflict detection (M1B-FR-006)
@@ -158,6 +161,7 @@ public struct AppointmentUseCases: Sendable {
         try await ensureNoConflict(draft, overrideConflict: overrideConflict, excludingAppointmentID: nil)
         let created = try await appointmentRepository.create(draft)
         await notifications.sync(appointment: created)
+        await widgetSnapshots.refresh()
         return created
     }
 
@@ -218,6 +222,7 @@ public struct AppointmentUseCases: Sendable {
         for appointment in appointments {
             await notifications.sync(appointment: appointment)
         }
+        await widgetSnapshots.refresh()
         return appointments
     }
 
@@ -306,6 +311,7 @@ public struct AppointmentUseCases: Sendable {
         try await ensureNoConflict(updated, overrideConflict: overrideConflict, excludingAppointmentID: appointmentID)
         let saved = try await appointmentRepository.update(updated)
         await notifications.sync(appointment: saved)
+        await widgetSnapshots.refresh()
         return saved
     }
 
@@ -410,6 +416,7 @@ public struct AppointmentUseCases: Sendable {
         for appointment in newAppointments {
             await notifications.sync(appointment: appointment)
         }
+        await widgetSnapshots.refresh()
         return newAppointments
     }
 
@@ -421,6 +428,7 @@ public struct AppointmentUseCases: Sendable {
         let updated = try current.cancelling(reason: reasonText, now: clock.nowUTC())
         let saved = try await appointmentRepository.update(updated)
         await notifications.remove(appointmentID: appointmentID)
+        await widgetSnapshots.refresh()
         return saved
     }
 
@@ -436,6 +444,7 @@ public struct AppointmentUseCases: Sendable {
         let updated = try current.markingAbsent(creditChoice: creditChoice, now: clock.nowUTC())
         let saved = try await appointmentRepository.update(updated)
         await notifications.remove(appointmentID: appointmentID)
+        await widgetSnapshots.refresh()
         return saved
     }
 
@@ -462,6 +471,7 @@ public struct AppointmentUseCases: Sendable {
         let updated = try appointment.startingTraining(sessionID: session.id, now: clock.nowUTC())
         _ = try await appointmentRepository.update(updated)
         await notifications.remove(appointmentID: appointmentID)
+        await widgetSnapshots.refresh()
         return session
     }
 
@@ -470,6 +480,7 @@ public struct AppointmentUseCases: Sendable {
         let updated = try current.abandoningEmptySession(now: clock.nowUTC())
         let saved = try await appointmentRepository.update(updated)
         await notifications.sync(appointment: saved)
+        await widgetSnapshots.refresh()
         return saved
     }
 
@@ -478,6 +489,7 @@ public struct AppointmentUseCases: Sendable {
         let updated = try current.completingSession(now: clock.nowUTC())
         let saved = try await appointmentRepository.update(updated)
         await notifications.remove(appointmentID: appointmentID)
+        await widgetSnapshots.refresh()
         return saved
     }
 
@@ -487,6 +499,7 @@ public struct AppointmentUseCases: Sendable {
         let calendar = calendarProvider.currentCalendar()
         try await appointmentRepository.delete(id: appointmentID, now: clock.nowUTC(), calendar: calendar)
         await notifications.remove(appointmentID: appointmentID)
+        await widgetSnapshots.refresh()
     }
 
     // MARK: - Queries

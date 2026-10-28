@@ -1,6 +1,105 @@
 {
   "sourceLanguage": "zh-Hans",
   "strings": {
+    "widget.today.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天的课"
+          }
+        }
+      }
+    },
+    "widget.today.description": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "查看今天的课与下一节开始时间"
+          }
+        }
+      }
+    },
+    "widget.today.remaining": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天还有 %lld 节"
+          }
+        }
+      }
+    },
+    "widget.today.nextTime": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下一节 %@"
+          }
+        }
+      }
+    },
+    "widget.today.nextClass": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下一节课"
+          }
+        }
+      }
+    },
+    "widget.today.empty": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天没有课"
+          }
+        }
+      }
+    },
+    "widget.today.finished": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天的课都上完了"
+          }
+        }
+      }
+    },
+    "widget.today.placeholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开 App 查看今天的课"
+          }
+        }
+      }
+    },
+    "widget.today.inlinePlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开 App 查看"
+          }
+        }
+      }
+    },
     "insights.section.title": {
       "extractionState": "manual",
       "localizations": {

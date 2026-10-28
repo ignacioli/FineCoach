@@ -7,6 +7,7 @@ public struct ActiveSessionUseCases: Sendable {
     private let sectionRepository: CoreDataSessionSectionRepository
     private let coordinator: ActiveSessionCoordinator
     private let clock: any Clock
+    private let widgetSnapshots: any WidgetSnapshotPublishing
     private let ids: any IDGenerator
 
     /// Aggregate status for the single-Session call sites.
@@ -26,7 +27,8 @@ public struct ActiveSessionUseCases: Sendable {
         recoveryStore: ActiveSessionRecoveryStore,
         storeGenerationUUID: UUID,
         clock: any Clock,
-        ids: any IDGenerator
+        ids: any IDGenerator,
+        widgetSnapshots: any WidgetSnapshotPublishing = NoopWidgetSnapshotPublisher()
     ) {
         self.sessionRepository = sessionRepository
         self.studentRepository = studentRepository
@@ -34,6 +36,7 @@ public struct ActiveSessionUseCases: Sendable {
         self.sectionRepository = sectionRepository
         self.clock = clock
         self.ids = ids
+        self.widgetSnapshots = widgetSnapshots
         self.coordinator = ActiveSessionCoordinator(
             sessionRepository: sessionRepository,
             recoveryStore: recoveryStore,
@@ -512,6 +515,7 @@ public struct ActiveSessionUseCases: Sendable {
         if let active = try? await sessionRepository.loadAllActive() {
             await reconcileSessionScopeClaimsBestEffort(for: active)
         }
+        await widgetSnapshots.refresh()
         return finished
     }
 
@@ -526,6 +530,7 @@ public struct ActiveSessionUseCases: Sendable {
         if let active = try? await sessionRepository.loadAllActive() {
             await reconcileSessionScopeClaimsBestEffort(for: active)
         }
+        await widgetSnapshots.refresh()
         return abandoned
     }
 

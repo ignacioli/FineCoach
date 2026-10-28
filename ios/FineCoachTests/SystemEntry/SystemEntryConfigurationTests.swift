@@ -55,6 +55,39 @@ final class SystemEntryConfigurationTests: XCTestCase {
         XCTAssertGreaterThan(count, 0)
     }
 
+    func testWidgetStudentNameRenderingIsPrivacySensitiveAndLockScreenFamiliesOmitNames() throws {
+        let source = try String(
+            contentsOf: iosRoot.appendingPathComponent("FineCoachWidgets/TodayWidget.swift"), encoding: .utf8)
+        let nameLines = source.components(separatedBy: .newlines).filter {
+            $0.contains("Text(") && $0.contains("studentDisplayName")
+        }
+        XCTAssertEqual(nameLines.count, 2)
+        XCTAssertTrue(nameLines.allSatisfy { $0.contains(".privacySensitive()") })
+        let inline = try XCTUnwrap(source.range(of: "private struct InlineTodayView"))
+        let end = try XCTUnwrap(source.range(of: "private struct RectangularTodayView"))
+        XCTAssertFalse(source[inline.lowerBound..<end.lowerBound].contains("studentDisplayName"))
+        // R1 device evidence 2026-10-28: the locked lock screen did not redact the name.
+        let home = try XCTUnwrap(source.range(of: "private struct HomeTodayView"))
+        XCTAssertFalse(source[end.lowerBound..<home.lowerBound].contains("studentDisplayName"))
+        // StandBy (no container background) did not redact either: names render only on the home screen.
+        XCTAssertTrue(source.contains("@Environment(\\.showsWidgetContainerBackground) private var showsNames"))
+        let homeSource = source[home.lowerBound...]
+        XCTAssertEqual(homeSource.components(separatedBy: "if showsNames {").count - 1, 2)
+    }
+
+    func testWidgetsHaveOnlyReadOnlyWholeWidgetNavigation() throws {
+        let directory = iosRoot.appendingPathComponent("FineCoachWidgets")
+        for url in try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)
+        where url.pathExtension == "swift" {
+            let source = try String(contentsOf: url, encoding: .utf8)
+            for forbidden in ["Button(", "Link(", "AppIntent"] {
+                XCTAssertFalse(source.contains(forbidden), url.lastPathComponent)
+            }
+        }
+        let source = try String(contentsOf: directory.appendingPathComponent("TodayWidget.swift"), encoding: .utf8)
+        XCTAssertTrue(source.contains(".widgetURL(URL(string: \"finecoach://today\"))"))
+    }
+
     private var iosRoot: URL {
         URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()  // SystemEntry/

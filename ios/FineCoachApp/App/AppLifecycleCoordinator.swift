@@ -15,6 +15,7 @@ public final class AppLifecycleCoordinator: ObservableObject {
         // Settles a linked finish interrupted before its Appointment and
         // credit were written (idempotent; settled ones are skipped).
         await environment.sessionCreditSettlement?.repairInterruptedLinkedSessions()
+        await environment.widgetSnapshotPublisher?.refresh()
     }
 
     public func sceneWillResignActive(environment: AppEnvironment) async {

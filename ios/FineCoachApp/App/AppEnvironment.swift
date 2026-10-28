@@ -27,6 +27,9 @@ public final class AppEnvironment: ObservableObject {
     private let applicationRootURL: URL?
     private let clock: any Clock
     private let idGenerator: any IDGenerator
+    private let injectedWidgetSnapshotPublisher: (any WidgetSnapshotPublishing)?
+    public private(set) var widgetSnapshotPublisher: (any WidgetSnapshotPublishing)?
+
     /// Injectable like the clock and ID generator: an automated test that drives the
     /// debug seed must not reach the real notification center, where requesting
     /// authorization presents a system prompt nothing can answer and hangs the run.
@@ -223,7 +226,8 @@ public final class AppEnvironment: ObservableObject {
         rootURL: URL? = nil,
         clock: any Clock = SystemClock(),
         idGenerator: any IDGenerator = SystemIDGenerator(),
-        notificationCenter: any LocalNotificationScheduling = SystemNotificationAdapter()
+        notificationCenter: any LocalNotificationScheduling = SystemNotificationAdapter(),
+        widgetSnapshotPublisher: (any WidgetSnapshotPublishing)? = nil
     ) throws {
         let fileManager = FileManager.default
         let root: URL
@@ -367,6 +371,7 @@ public final class AppEnvironment: ObservableObject {
         self.applicationRootURL = root
         self.clock = clock
         self.idGenerator = idGenerator
+        self.injectedWidgetSnapshotPublisher = widgetSnapshotPublisher
         self.notificationCenter = notificationCenter
         self.startupErrorDescription = nil
         self.catalogUnavailableMessage = nil
@@ -404,6 +409,7 @@ public final class AppEnvironment: ObservableObject {
         self.applicationRootURL = nil
         self.clock = SystemClock()
         self.idGenerator = SystemIDGenerator()
+        self.injectedWidgetSnapshotPublisher = nil
         self.notificationCenter = SystemNotificationAdapter()
         self.startupErrorDescription = (failure as? LocalizedError)?.errorDescription ?? "本地存储暂不可用。"
         self.catalogUnavailableMessage = nil
@@ -457,10 +463,26 @@ public final class AppEnvironment: ObservableObject {
         let exercises = CoreDataExerciseRepository(writer: controller.writer)
         studentRepository = repository
         sessionRepository = sessions
+        let appointments = CoreDataAppointmentRepository(writer: controller.writer)
+        let publisher =
+            injectedWidgetSnapshotPublisher
+            ?? WidgetSnapshotPublisher {
+                let now = clock.nowUTC()
+                let calendar = SystemLocalCalendarProvider().currentCalendar()
+                let todays = try await appointments.appointments(localDates: [LocalDate(date: now, calendar: calendar)])
+                var names: [StableUUID: String] = [:]
+                for id in Set(todays.filter { $0.status == .scheduled || $0.status == .inProgress }.map(\.studentID)) {
+                    names[id] = try await repository.student(id: id).displayName.value
+                }
+                return WidgetTodaySnapshot.build(
+                    appointments: todays, studentDisplayName: { names[$0] ?? "" }, now: now, calendar: calendar)
+            }
+        widgetSnapshotPublisher = publisher
         studentUseCases = StudentUseCases(
             repository: repository,
             clock: clock,
-            ids: idGenerator
+            ids: idGenerator,
+            widgetSnapshots: publisher
         )
         exerciseUseCases = ExerciseLibraryUseCases(
             repository: exercises,
@@ -479,7 +501,8 @@ public final class AppEnvironment: ObservableObject {
             recoveryStore: recoveryStore,
             storeGenerationUUID: generationUUID,
             clock: clock,
-            ids: idGenerator
+            ids: idGenerator,
+            widgetSnapshots: publisher
         )
         historyUseCases = HistoryUseCases(
             sessionRepository: sessions,
@@ -496,7 +519,8 @@ public final class AppEnvironment: ObservableObject {
             ),
             clock: clock,
             calendarProvider: SystemLocalCalendarProvider(),
-            ids: idGenerator
+            ids: idGenerator,
+            widgetSnapshots: publisher
         )
         creditLedgerUseCases = CreditLedgerUseCases(
             repository: CoreDataCoursePackageRepository(writer: controller.writer),

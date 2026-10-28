@@ -401,6 +401,16 @@
 		F60000000000000000000032 /* SystemEntryRoutingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000022 /* SystemEntryRoutingTests.swift */; };
 		F60000000000000000000033 /* SystemEntryInfrastructureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000023 /* SystemEntryInfrastructureTests.swift */; };
 		F60000000000000000000034 /* SharedContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000020 /* SharedContainer.swift */; };
+		5A36BF5108C356DF5C9E7A7D /* WidgetTodaySnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA86A4EFBB7D0C2487B74E4C /* WidgetTodaySnapshot.swift */; };
+		9389417782BF26DE5AABB06D /* WidgetTodaySnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA86A4EFBB7D0C2487B74E4C /* WidgetTodaySnapshot.swift */; };
+		DDE0BC2BC6124C7E47372AF8 /* WidgetSnapshotReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7F6EBF2B2FEA80EE9C8EC25 /* WidgetSnapshotReader.swift */; };
+		8F550160763C09D2A321AFD9 /* WidgetSnapshotReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7F6EBF2B2FEA80EE9C8EC25 /* WidgetSnapshotReader.swift */; };
+		118BDF7DB6278B04B5D07350 /* WidgetSnapshotPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E0293BE7B99F311B02E2A0 /* WidgetSnapshotPublisher.swift */; };
+		0662726F7F0E9DC10FCDBC6C /* TodayWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7B0DD32B499057EACD634B8 /* TodayWidget.swift */; };
+		729EFB0C1478E6BAC8B800C5 /* WidgetTodaySnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06D4F64F06ED3776BBFFB28C /* WidgetTodaySnapshotTests.swift */; };
+		0B687C32BA198F06D4F7649C /* WidgetSnapshotPublisherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2E932546811B535CA39626 /* WidgetSnapshotPublisherTests.swift */; };
+		2410868D5F801F6D3B2393BA /* Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = A150 /* Tokens.swift */; };
+		1916280FE55154F5AF7EE83F /* Localizable.xcstrings in Sources */ = {isa = PBXBuildFile; fileRef = A172 /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -834,6 +844,12 @@
 		F60000000000000000000021 /* SystemEntryRouting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemEntryRouting.swift; sourceTree = "<group>"; };
 		F60000000000000000000022 /* SystemEntryRoutingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemEntryRoutingTests.swift; sourceTree = "<group>"; };
 		F60000000000000000000023 /* SystemEntryInfrastructureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemEntryInfrastructureTests.swift; sourceTree = "<group>"; };
+		CA86A4EFBB7D0C2487B74E4C /* WidgetTodaySnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FineCoachApp/Core/Domain/WidgetTodaySnapshot.swift; sourceTree = SOURCE_ROOT; };
+		E7F6EBF2B2FEA80EE9C8EC25 /* WidgetSnapshotReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FineCoachApp/Core/Platform/WidgetSnapshotReader.swift; sourceTree = SOURCE_ROOT; };
+		13E0293BE7B99F311B02E2A0 /* WidgetSnapshotPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FineCoachApp/Core/Application/WidgetSnapshotPublisher.swift; sourceTree = SOURCE_ROOT; };
+		C7B0DD32B499057EACD634B8 /* TodayWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FineCoachWidgets/TodayWidget.swift; sourceTree = SOURCE_ROOT; };
+		06D4F64F06ED3776BBFFB28C /* WidgetTodaySnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FineCoachTests/SystemEntry/WidgetTodaySnapshotTests.swift; sourceTree = SOURCE_ROOT; };
+		CD2E932546811B535CA39626 /* WidgetSnapshotPublisherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FineCoachIntegrationTests/SystemEntry/WidgetSnapshotPublisherTests.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -918,6 +934,12 @@
 		A001 = {
 			isa = PBXGroup;
 			children = (
+				CA86A4EFBB7D0C2487B74E4C,
+				E7F6EBF2B2FEA80EE9C8EC25,
+				13E0293BE7B99F311B02E2A0,
+				C7B0DD32B499057EACD634B8,
+				06D4F64F06ED3776BBFFB28C,
+				CD2E932546811B535CA39626,
 				A400 /* FineCoachApp */,
 				F60000000000000000000007 /* FineCoachWidgets */,
 				A410 /* FineCoachTests */,
@@ -2183,6 +2205,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1916280FE55154F5AF7EE83F /* Localizable.xcstrings */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2193,6 +2216,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				118BDF7DB6278B04B5D07350 /* WidgetSnapshotPublisher.swift */,
+				DDE0BC2BC6124C7E47372AF8 /* WidgetSnapshotReader.swift */,
+				5A36BF5108C356DF5C9E7A7D /* WidgetTodaySnapshot.swift */,
 				E20000000000000000000000 /* InsightRowContent.swift in Sources */,
 				E20000000000000000000001 /* InsightsViewModel.swift in Sources */,
 				E20000000000000000000002 /* InsightRowView.swift in Sources */,
@@ -2435,6 +2461,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				729EFB0C1478E6BAC8B800C5 /* WidgetTodaySnapshotTests.swift */,
 				F6000000000000000000000A /* SystemEntryConfigurationTests.swift in Sources */,
 				F60000000000000000000032 /* SystemEntryRoutingTests.swift in Sources */,
 				F60000000000000000000033 /* SystemEntryInfrastructureTests.swift in Sources */,
@@ -2523,6 +2550,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0B687C32BA198F06D4F7649C /* WidgetSnapshotPublisherTests.swift */,
 				E00000000000000000000111 /* InsightUseCasesTests.swift in Sources */,
 				E60000000000000000000001 /* InsightsDemoSeedTests.swift in Sources */,
 				83C0625A76E06855F0309F7F /* ArchiveExportFixtures.swift in Sources */,
@@ -2592,6 +2620,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2410868D5F801F6D3B2393BA /* Tokens.swift */,
+				0662726F7F0E9DC10FCDBC6C /* TodayWidget.swift */,
+				8F550160763C09D2A321AFD9 /* WidgetSnapshotReader.swift */,
+				9389417782BF26DE5AABB06D /* WidgetTodaySnapshot.swift */,
 				F60000000000000000000009 /* FineCoachWidgetsBundle.swift in Sources */,
 				F60000000000000000000034 /* SharedContainer.swift in Sources */,
 			);
@@ -2779,6 +2811,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) FINECOACH_WIDGET_EXTENSION";
 				CODE_SIGN_ENTITLEMENTS = FineCoachWidgets/FineCoachWidgets.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -2800,6 +2833,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) FINECOACH_WIDGET_EXTENSION";
 				CODE_SIGN_ENTITLEMENTS = FineCoachWidgets/FineCoachWidgets.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
