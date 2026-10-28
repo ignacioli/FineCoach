@@ -2,7 +2,7 @@
 
 > 这是 finecoach-scoring-optimization 这条主线的**唯一总览**。人和各个 AI 工具开工前先看这里，弄清现在在哪、下一步是什么、谁来做。
 > 细节以各自的权威文件为准：评分方法见 [`11d-experience-scorecard.md`](11d-experience-scorecard.md)，P0 决定见 [`experience-p0/implementation-map.md`](experience-p0/implementation-map.md)，阶段 B 决定见 [`experience-t2/decisions.md`](experience-t2/decisions.md)，C′ 决定见 [`catalog-expansion/decisions.md`](catalog-expansion/decisions.md)。
-> 最后更新：2026-10-24（A、B、C′、D 和走查修订都已合并，负责人审核通过；C 的 T3 素材库未开始；E 实现中；仍无真人评分）。每个阶段收尾时更新本文件的「状态」「决定队列」两节。
+> 最后更新：2026-10-27（F 隐私规则已定，spec 006 批准）；此前 2026-10-24（A、B、C′、D 和走查修订都已合并，负责人审核通过；C 的 T3 素材库未开始；E 实现中；仍无真人评分）。每个阶段收尾时更新本文件的「状态」「决定队列」两节。
 
 ## 1. 目标和怎么算赢
 
@@ -28,7 +28,7 @@
 | D | P1 收获感：破纪录当场提示、课程总结写出进步、里程碑 | 6、4、9 | ✅ 已合并；2026-10-21 集中走查后修订：新纪录与比上次进步重新定义（C16）、新纪录数值浮起和动效 token（C17，负责人真机选定 D 档）；负责人审核通过；**还没真人评分** | `specs/004-stage-d-progress-milestones/spec.md`（Revision 1.5、1.6）；`progress-milestones/implementation-map.md` |
 | 走查修订 | 2026-10-21～23 真机走查发现的问题：多学员同时训练（W-08）、分享后回今日（C15）、页头统一（C18）、关于页（C21）、训练时长按小时分钟（C22）、休息结束通知路由 / 冷启动 / 主线程崩溃 / 分组和前台横幅（C19、C23）、休息倒计时按训练保存和已超时（C24、C25） | 1、2、4、10、11 | ✅ 已合并，负责人真机复测通过 | `design-system/README.md` §10；2026-10-23 PR ignacioli/FineCoach#4 合入 GitHub main |
 | E | P2 洞察：进步停滞、课包快用完、学员很久没约课 | 7 | 🚧 实现中：spec `1.0-approved`，plan、tasks 已定，E-a1、E-a2、E-b、E-c 四张画稿通过；判定逻辑和全部界面已在 `feature/stage-e-insights` 提交（`c4ecde6`、`a412bb2`），小补丁进行中；**未合并，还没人看过界面** | `specs/005-stage-e-insights/`；`insights/implementation-map.md`；`design-system/README.md` C26 |
-| F | P3 系统级入口：小组件、Live Activity、快捷指令 | 8 | ⏳ 要先写 spec，并先做隐私威胁评估 | AGENTS.md 隐私红线 |
+| F | P3 系统级入口：小组件、Live Activity、快捷指令 | 8 | 📝 隐私规则已定（2026-10-27 F-P1～F-P5）；spec `1.0-approved`（2026-10-27，含威胁评估），plan、tasks 已定；**下一步**：F-a～F-c 画稿与签名验证（tasks Phase 1），画稿批准前不开工界面 | `specs/006-stage-f-system-entry/`（§2 隐私规则、§8 威胁评估）；`design-system/README.md` §8「系统入口」、§10 C28 |
 
 按分差排，最大的短板仍然是第 9 维「动效与质感」和第 11 维「产品调性与品味」，两维满分合计 25，2026-10-14 估分只有约 11。A、B 两个阶段都改到了这两维，改善了多少要等真人评分才知道。
 
@@ -80,7 +80,7 @@ D 已合并；E 的界面在 `feature/stage-e-insights`，合并前走一次集�
 4. ~~C′ 候选清单审核~~：2026-10-18 批准，建议全部采纳；另定 CX-D9。之后 CX-D10 到 CX-D15 也已裁决（见决定单）。
 5. **T3 素材**：4 个 App 的截图（「dotolist」即 Todoist，负责人 2026-10-24 确认）。
 6. ~~D 的规则~~：2026-10-20 裁决 PD-D1～D5（沿用 M1B-FR-029 口径、组行当场标记、第 N 节课里程碑、总结页只读区块、跟随个人最佳开关）。**新增待定**：spec §9 Q-D1～Q-D5。
-7. **F 的隐私规则**：锁屏和通知里能显示什么。
+7. ~~F 的隐私规则~~：2026-10-27 裁决 F-P1～F-P5（小组件可显示学员名、锁着由系统打码；Live Activity 只写动作名、组序号、倒计时；快捷指令只开页面、须解锁；不做 Spotlight），见 README §10 C28 与 specs 006 §2。spec 006 于 2026-10-27 批准（含 §8 接受的剩余风险 T-02、T-04、T-12），002 同轮升为 Revision 1.5。
 8. ~~push 到 GitHub~~：2026-10-23 经 PR ignacioli/FineCoach#4（merge commit）合入，148 个提交；main 受保护，以后都走 PR。CodeQL 有 15 条 `swift/cleartext-storage-database` 告警，负责人决定暂不处理（Core Data 库已用 `completeUnlessOpen` 文件保护）。
 9. ~~清理 worktree~~：2026-10-24 再次删除已合并的 worktree 和分支；B1 未提交草稿备份仍在 `wip/b1-ui-test-draft`。
 
@@ -88,4 +88,4 @@ D 已合并；E 的界面在 `feature/stage-e-insights`，合并前走一次集�
 
 1. 负责人：按标准任务做第一次真人评分（含 A、B、C′、D 和走查修订），结果追加到评分卡末尾。这是现在最大的缺口，它决定先做 E 还是 F。
 2. Claude：完成 E 的小补丁和主机门禁，回填实施映射 §4、§5，准备种子数据，交负责人做 E 的集中走查；通过后合并 `docs/stage-e-insights` 和 `feature/stage-e-insights`。
-3. 负责人：定 F 的隐私规则（锁屏和通知里能显示什么）；定了之后再写 F 的 spec 和威胁评估。
+3. Claude：画 F-a～F-c（spec 006 已于 2026-10-27 批准）；同时派 tasks Phase 1（空扩展 target + App Group），负责人真机装一次验证签名。
