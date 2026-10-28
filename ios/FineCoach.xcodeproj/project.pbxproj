@@ -396,6 +396,11 @@
 		F60000000000000000000009 /* FineCoachWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000003 /* FineCoachWidgetsBundle.swift */; };
 		F6000000000000000000000A /* SystemEntryConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000006 /* SystemEntryConfigurationTests.swift */; };
 		F6000000000000000000000B /* FineCoachWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F60000000000000000000002 /* FineCoachWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		F60000000000000000000030 /* SharedContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000020 /* SharedContainer.swift */; };
+		F60000000000000000000031 /* SystemEntryRouting.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000021 /* SystemEntryRouting.swift */; };
+		F60000000000000000000032 /* SystemEntryRoutingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000022 /* SystemEntryRoutingTests.swift */; };
+		F60000000000000000000033 /* SystemEntryInfrastructureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000023 /* SystemEntryInfrastructureTests.swift */; };
+		F60000000000000000000034 /* SharedContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60000000000000000000020 /* SharedContainer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -825,6 +830,10 @@
 		F60000000000000000000004 /* FineCoachWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FineCoachWidgets.entitlements; sourceTree = "<group>"; };
 		F60000000000000000000005 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F60000000000000000000006 /* SystemEntryConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemEntryConfigurationTests.swift; sourceTree = "<group>"; };
+		F60000000000000000000020 /* SharedContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedContainer.swift; sourceTree = "<group>"; };
+		F60000000000000000000021 /* SystemEntryRouting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemEntryRouting.swift; sourceTree = "<group>"; };
+		F60000000000000000000022 /* SystemEntryRoutingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemEntryRoutingTests.swift; sourceTree = "<group>"; };
+		F60000000000000000000023 /* SystemEntryInfrastructureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemEntryInfrastructureTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -959,6 +968,7 @@
 				A103 /* ScenePrivacyCoordinator.swift */,
 				A104 /* AppLifecycleCoordinator.swift */,
 				A105 /* RestNotificationRouting.swift */,
+				F60000000000000000000021 /* SystemEntryRouting.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -1234,6 +1244,7 @@
 				A517 /* NotificationAdapter.swift */,
 				A131 /* SecureRandomGenerator.swift */,
 				A132 /* ProtectedFileStore.swift */,
+				F60000000000000000000020 /* SharedContainer.swift */,
 				A133 /* AppLogger.swift */,
 				A134 /* PerformanceSignposts.swift */,
 				A185 /* T116PerformanceHarness.swift */,
@@ -1979,6 +1990,8 @@
 			isa = PBXGroup;
 			children = (
 				F60000000000000000000006 /* SystemEntryConfigurationTests.swift */,
+				F60000000000000000000022 /* SystemEntryRoutingTests.swift */,
+				F60000000000000000000023 /* SystemEntryInfrastructureTests.swift */,
 			);
 			path = SystemEntry;
 			sourceTree = "<group>";
@@ -2244,6 +2257,8 @@
 				B103 /* ScenePrivacyCoordinator.swift in Sources */,
 				B104 /* AppLifecycleCoordinator.swift in Sources */,
 				B105 /* RestNotificationRouting.swift in Sources */,
+				F60000000000000000000031 /* SystemEntryRouting.swift in Sources */,
+				F60000000000000000000030 /* SharedContainer.swift in Sources */,
 				B110 /* DomainError.swift in Sources */,
 				B111 /* Identifiers.swift in Sources */,
 				B112 /* ValidatedText.swift in Sources */,
@@ -2421,6 +2436,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				F6000000000000000000000A /* SystemEntryConfigurationTests.swift in Sources */,
+				F60000000000000000000032 /* SystemEntryRoutingTests.swift in Sources */,
+				F60000000000000000000033 /* SystemEntryInfrastructureTests.swift in Sources */,
 				E50000000000000000000001 /* EstimatedOneRepMaxTrendTests.swift in Sources */,
 				E50000000000000000000000 /* InsightPresentationTests.swift in Sources */,
 				E0000000000000000000010B /* InsightSnoozeStoreTests.swift in Sources */,
@@ -2576,6 +2593,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F60000000000000000000009 /* FineCoachWidgetsBundle.swift in Sources */,
+				F60000000000000000000034 /* SharedContainer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -65,6 +65,7 @@ enum RootTab: Hashable {
 struct RootNavigation: View {
     @EnvironmentObject private var environment: AppEnvironment
     @EnvironmentObject private var restNotificationRouter: RestNotificationRouter
+    @EnvironmentObject private var systemEntryRouter: SystemEntryRouter
     @State private var path: [RootDestination] = []
     @State private var onboardingCompleted = false
     @State private var didLoadOnboarding = false
@@ -315,6 +316,7 @@ struct RootNavigation: View {
                         isNavigationStackMounted = true
                         RestNotificationDiagnostics.record(.stackReady)
                         Task { await consumePendingRestNotificationIfReady() }
+                        Task { await consumePendingSystemEntryIfReady() }
                     }
                     .onDisappear {
                         isNavigationStackMounted = false
@@ -331,6 +333,10 @@ struct RootNavigation: View {
                 return
             }
             Task { await consumePendingRestNotificationIfReady() }
+        }
+        .onChange(of: systemEntryRouter.pendingRequest) { _, request in
+            guard request != nil else { return }
+            Task { await consumePendingSystemEntryIfReady() }
         }
         .onChange(of: path) { _, nextPath in
             RestNotificationDiagnostics.record(nextPath.isEmpty ? .pathEmpty : .pathNonempty)
@@ -393,6 +399,41 @@ struct RootNavigation: View {
             return
         }
         showRestNotificationRoute(routed)
+    }
+
+    private func consumePendingSystemEntryIfReady() async {
+        guard let useCases = environment.sessionUseCases,
+            let request = systemEntryRouter.takePendingRequest(ifReady: isReadyForRestNotification)
+        else { return }
+        let session: Session?
+        let activeSessions: [Session]
+        switch request {
+        case .today:
+            session = nil
+            activeSessions = []
+        case .session(let id):
+            session = try? await useCases.loadActive(sessionID: id)
+            activeSessions = []
+        case .continueTraining:
+            // A failed read must not be interpreted as permission to start anything.
+            guard let sessions = try? await useCases.loadAllActive() else { return }
+            session = nil
+            activeSessions = sessions
+        }
+        let decision = SystemEntryRouting.decide(
+            request: request,
+            conditions: SystemEntryRouteConditions(
+                isCoachMode: true,
+                isStorageAvailable: environment.isStorageAvailable,
+                isOnboardingCompleted: onboardingCompleted,
+                isRootNavigationReady: isNavigationStackMounted
+            ),
+            session: session,
+            activeSessions: activeSessions
+        )
+        guard decision != .ignore else { return }
+        rootTab = .today
+        path = SystemEntryNavigation.path(current: path, decision: decision)
     }
 
     /// 今日 is the default root surface (M1B-FR-001) and hosts the in-progress

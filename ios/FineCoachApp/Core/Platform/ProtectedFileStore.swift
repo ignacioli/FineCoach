@@ -9,11 +9,16 @@ public enum ProtectedFilePolicy: String, CaseIterable, Sendable {
     case business
     case ephemeralReport
     case backupCandidate
+    case widgetSnapshot
+
+    var isExcludedFromBackup: Bool { true }
 
     var fileProtection: FileProtectionType {
         switch self {
         case .business, .backupCandidate:
             return .completeUnlessOpen
+        case .widgetSnapshot:
+            return .completeUntilFirstUserAuthentication
         case .ephemeralReport:
             return .complete
         }
@@ -104,13 +109,13 @@ public final class ProtectedFileStore: @unchecked Sendable {
             ofItemAtPath: url.path
         )
         var resourceValues = URLResourceValues()
-        resourceValues.isExcludedFromBackup = true
+        resourceValues.isExcludedFromBackup = policy.isExcludedFromBackup
         var mutableURL = url
         try mutableURL.setResourceValues(resourceValues)
         let result = try audit(url: url)
         let expected = FileProtectionAudit(
             protectionRawValue: policy.fileProtection.rawValue,
-            isExcludedFromBackup: true
+            isExcludedFromBackup: policy.isExcludedFromBackup
         )
         #if targetEnvironment(simulator)
             // Simulator file systems do not reliably emulate iOS Data Protection.

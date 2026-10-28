@@ -9,6 +9,7 @@ struct FineCoachApp: App {
     @StateObject private var privacyCoordinator = ScenePrivacyCoordinator()
     @StateObject private var lifecycleCoordinator = AppLifecycleCoordinator()
     @StateObject private var restNotificationRouter = RestNotificationRouter.shared
+    @StateObject private var systemEntryRouter = SystemEntryRouter.shared
 
     init() {
         _environment = StateObject(wrappedValue: AppEnvironment.bootstrap())
@@ -23,6 +24,7 @@ struct FineCoachApp: App {
                 .environmentObject(environment)
                 .environmentObject(privacyCoordinator)
                 .environmentObject(restNotificationRouter)
+                .environmentObject(systemEntryRouter)
                 .task {
                     await lifecycleCoordinator.sceneDidBecomeActive(environment: environment)
                 }
