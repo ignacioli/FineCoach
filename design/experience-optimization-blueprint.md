@@ -83,6 +83,7 @@ D 已合并；E 的界面在 `feature/stage-e-insights`，合并前走一次集�
 7. ~~F 的隐私规则~~：2026-10-27 裁决 F-P1～F-P5（小组件可显示学员名、锁着由系统打码；Live Activity 只写动作名、组序号、倒计时；快捷指令只开页面、须解锁；不做 Spotlight），见 README §10 C28 与 specs 006 §2。spec 006 于 2026-10-27 批准（含 §8 接受的剩余风险 T-02、T-04、T-12），002 同轮升为 Revision 1.5。
 8. ~~push 到 GitHub~~：2026-10-23 经 PR ignacioli/FineCoach#4（merge commit）合入，148 个提交；main 受保护，以后都走 PR。CodeQL 有 15 条 `swift/cleartext-storage-database` 告警，负责人决定暂不处理（Core Data 库已用 `completeUnlessOpen` 文件保护）。
 9. ~~清理 worktree~~：2026-10-24 再次删除已合并的 worktree 和分支；B1 未提交草稿备份仍在 `wip/b1-ui-test-draft`。
+10. **开屏页（2026-10-28 真机发现，待排期，不属阶段 F）**：点 App 图标后有一瞬黑屏。原因：工程只开了 `INFOPLIST_KEY_UILaunchScreen_Generation = YES`，没有配置开屏内容，系统显示空白底。负责人希望加开屏页，用吉祥物图标（README §9.2），约 0.3 秒后进入首页。建议拆两步：① 静态开屏（`UILaunchScreen` 配底色 + 吉祥物图片），去掉黑屏，不增加等待；② 若仍要 0.3 秒过场，在 SwiftUI 根视图上叠一层同样画面再淡出，「减弱动态效果」时直接跳过（README §14）。属类 A 新视觉，需先在 Penpot 出稿。
 
 ## 7. 接下来三步
 
