@@ -105,6 +105,16 @@ final class SystemEntryConfigurationTests: XCTestCase {
         XCTAssertTrue(bundle.contains("SessionLiveActivity()"))
     }
 
+    func testIntentsDoNotIndexDonateExposeParametersOrReturnDialog() throws {
+        let source = try String(
+            contentsOf: iosRoot.appendingPathComponent("FineCoachApp/App/SystemEntryIntents.swift"), encoding: .utf8)
+        for forbidden in [
+            "IndexedEntity", "AppEntity", "NSUserActivity", "CSSearchableIndex", "IntentDialog", "@Parameter",
+        ] {
+            XCTAssertFalse(source.contains(forbidden), forbidden)
+        }
+    }
+
     private var iosRoot: URL {
         URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()  // SystemEntry/

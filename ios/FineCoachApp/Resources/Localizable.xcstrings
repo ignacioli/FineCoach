@@ -1,6 +1,61 @@
 {
   "sourceLanguage": "zh-Hans",
   "strings": {
+    "shortcut.today.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日"
+          }
+        }
+      }
+    },
+    "shortcut.startTraining.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始训练"
+          }
+        }
+      }
+    },
+    "shortcut.continueTraining.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "继续训练"
+          }
+        }
+      }
+    },
+    "settings.systemEntry.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "小组件与实时活动"
+          }
+        }
+      }
+    },
+    "settings.systemEntry.description": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加小组件后，锁屏和主屏会显示今天的上课时间；学员名只在解锁后显示。训练进行中，锁屏和灵动岛会显示当前动作和休息倒计时，不显示学员名。\n不想显示：不添加小组件；或在 iPhone「设置」中找到「精练教练」，关闭「实时活动」。"
+          }
+        }
+      }
+    },
     "activity.session.generic": {
       "extractionState": "manual",
       "localizations": {

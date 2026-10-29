@@ -1,0 +1,39 @@
+{
+  "sourceLanguage": "zh-Hans",
+  "strings": {
+    "${applicationName} 今日": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "${applicationName} 今日"
+          }
+        }
+      }
+    },
+    "${applicationName} 开始训练": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "${applicationName} 开始训练"
+          }
+        }
+      }
+    },
+    "${applicationName} 继续训练": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "${applicationName} 继续训练"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

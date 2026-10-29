@@ -177,6 +177,7 @@ public enum FCAccessibilityID {
     public static let todayAbsentCharged = "today.absentCharged"
     public static let settingsEntry = "settings.entry"
     public static let settingsRoot = "settings.root"
+    public static let settingsSystemEntryDescription = "settings.systemEntry.description"
     public static let settingsNotifications = "settings.notifications"
     public static let settingsBackup = "settings.backup"
     public static let settingsAbout = "settings.about"
