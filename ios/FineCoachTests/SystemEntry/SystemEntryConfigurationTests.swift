@@ -96,7 +96,7 @@ final class SystemEntryConfigurationTests: XCTestCase {
         ] {
             XCTAssertFalse(source.contains(forbidden), forbidden)
         }
-        XCTAssertTrue(source.contains("Text(timerInterval:"))
+        XCTAssertTrue(source.contains("style: .timer)"))
         XCTAssertTrue(source.contains("context.isStale"))
         XCTAssertEqual(source.components(separatedBy: ".widgetURL(SessionActivityContent.url(").count - 1, 2)
         let bundle = try String(

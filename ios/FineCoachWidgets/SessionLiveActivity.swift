@@ -84,31 +84,52 @@ private struct SessionActivityTimer: View {
         Group {
             if let end = content.restEndsAt {
                 if SessionActivityContent.isOverdue(content, now: now) {
+                    // Counts down to `end`, then keeps counting up on its own, so the number
+                    // never freezes at 0:00 while the system delays the stale re-render.
+                    let countUp = Text(end, style: .timer)
                     if compact {
-                        HStack(spacing: 0) {
-                            Text(verbatim: "+")
-                            Text(timerInterval: end...Date.distantFuture, countsDown: false, showsHours: false)
-                        }
+                        SessionActivityTimerSlot(
+                            timer: Text(verbatim: "+") + countUp, template: "+00:00", style: .caption)
                     } else {
                         VStack(alignment: .trailing, spacing: FCPrimitives.space1) {
                             Text(SessionActivityContent.overdueLabel).modifier(ActivityTextStyle(.caption))
                                 .foregroundStyle(FCSemanticColors.textOnActionSecondary)
-                            Text(timerInterval: end...Date.distantFuture, countsDown: false, showsHours: false)
-                                .modifier(ActivityTextStyle(.numeralLarge))
+                            SessionActivityTimerSlot(timer: countUp, template: "00:00", style: .numeralLarge)
                         }
                     }
                 } else {
-                    Text(timerInterval: now...end, countsDown: true, showsHours: false)
-                        .modifier(ActivityTextStyle(compact ? .caption : .numeralLarge))
+                    SessionActivityTimerSlot(
+                        timer: Text(end, style: .timer),
+                        template: "00:00", style: compact ? .caption : .numeralLarge)
                 }
             } else if compact {
                 Text(SessionActivityContent.compactTrailingText(content, now: now))
                     .modifier(ActivityTextStyle(.caption))
+                    .monospacedDigit()
             }
         }
-        .monospacedDigit()
         .foregroundStyle(FCSemanticColors.actionOn)
-        .fixedSize(horizontal: true, vertical: false)
+    }
+}
+
+/// A system timer text greedily takes all offered width inside a Live Activity,
+/// pushing its neighbours out of view; a hidden template fixes the slot instead.
+private struct SessionActivityTimerSlot: View {
+    let timer: Text
+    let template: String
+    let style: ActivityTextStyle.Style
+
+    var body: some View {
+        Text(verbatim: template)
+            .modifier(ActivityTextStyle(style))
+            .monospacedDigit()
+            .hidden()
+            .overlay(alignment: .trailing) {
+                timer
+                    .modifier(ActivityTextStyle(style))
+                    .monospacedDigit()
+                    .multilineTextAlignment(.trailing)
+            }
     }
 }
 
