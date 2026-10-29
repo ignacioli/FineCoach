@@ -84,6 +84,7 @@ D 已合并；E 的界面在 `feature/stage-e-insights`，合并前走一次集�
 8. ~~push 到 GitHub~~：2026-10-23 经 PR ignacioli/FineCoach#4（merge commit）合入，148 个提交；main 受保护，以后都走 PR。CodeQL 有 15 条 `swift/cleartext-storage-database` 告警，负责人决定暂不处理（Core Data 库已用 `completeUnlessOpen` 文件保护）。
 9. ~~清理 worktree~~：2026-10-24 再次删除已合并的 worktree 和分支；B1 未提交草稿备份仍在 `wip/b1-ui-test-draft`。
 10. **开屏页（2026-10-28 真机发现，待排期，不属阶段 F）**：点 App 图标后有一瞬黑屏。原因：工程只开了 `INFOPLIST_KEY_UILaunchScreen_Generation = YES`，没有配置开屏内容，系统显示空白底。负责人希望加开屏页，用吉祥物图标（README §9.2），约 0.3 秒后进入首页。建议拆两步：① 静态开屏（`UILaunchScreen` 配底色 + 吉祥物图片），去掉黑屏，不增加等待；② 若仍要 0.3 秒过场，在 SwiftUI 根视图上叠一层同样画面再淡出，「减弱动态效果」时直接跳过（README §14）。属类 A 新视觉，需先在 Penpot 出稿。
+11. **系统入口跳转后可能新建训练（2026-10-29 阶段 F 隐私审查 N3，待排期）**：`finecoach://session/<id>` 与休息通知都把教练送进训练页，训练页加载走 `ActiveSessionUseCases.startOrOpen`，找不到进行中的训练就新建一节。路由判断时训练还在进行、进页面前恰好被结束或放弃（例如点了过期的实时活动）时，会新建一节训练，与 specs 006 F-FR-023「不新建训练」字面不符。属阶段 F 之前已有的行为（通知入口同样如此），窗口很窄。建议：系统入口与通知进入时用「只打开已有训练」的入口，找不到就留在今日页；补一条测试。负责人 2026-10-29 决定记待办，不在阶段 F 修。
 
 ## 7. 接下来三步
 
