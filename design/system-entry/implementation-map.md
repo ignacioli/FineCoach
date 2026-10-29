@@ -1,6 +1,6 @@
 # 阶段 F 系统级入口：设计改动与实施映射
 
-> 状态：**Phase 5 完成（2026-10-29）：US1 小组件、US2 Live Activity、US3 快捷指令与 T032 设置说明段均主机门禁全绿并取得真机证据（§4.1）。R1 已按 T-03 降级（学员名只在解锁后的主屏显示）。下一步 Phase 6：T033 设计记录与 Penpot 回填、T034 隐私安全审查、T035 集中走查。**本文是 `components.md` §6 要求的里程碑实施映射，不重复 token 数值。
+> 状态：**Phase 5 完成（2026-10-29）：US1 小组件、US2 Live Activity、US3 快捷指令与 T032 设置说明段均主机门禁全绿并取得真机证据（§4.1）。R1 已按 T-03 降级（学员名只在解锁后的主屏显示）。**阶段 F 全部完成（2026-10-29）**：T033、T034 完成，T035 集中走查负责人全部通过，2x 导出已入库。待推送与 PR 合入 main。**本文是 `components.md` §6 要求的里程碑实施映射，不重复 token 数值。
 > 行为权威：`specs/006-stage-f-system-entry/spec.md`（`1.0-approved`）、`plan.md`、`tasks.md`、`research.md`、`data-model.md`。字段白名单只认 spec §2.2。视觉权威：`design/design-system/README.md`（§8「系统入口」、§10 C28）、`components.md`。
 > 分支：本文件在设计文档分支 `topic/docs-stage-f-system-entry-590290`；代码在实现分支 `feature/stage-f-system-entry`（worktree `.worktrees/stage-f-system-entry`）。
 
@@ -86,6 +86,7 @@ Penpot「M1-B G5 Design」/ Foundations 页 y=3750：F-a（x=14850）、F-b（x=
 | 2026-10-29 | T026 真机修复：休息中 / 已超时锁屏整块空白——系统计时文字会占满可给的宽度，`.fixedSize` 把整行挤出可视区 → 计时放进隐藏模板「00:00」定宽的槽位；倒计时到点停在 0:00、要等系统按 `staleDate` 重绘 → 改用 `Text(_:style: .timer)`，到点后自行向上计时（research R4 已列此写法）。`SystemEntryConfigurationTests` 的计时断言由 `Text(timerInterval:` 改为 `style: .timer)`（意图不变：用系统计时） | `e3d9e45` | 主机 `gate.sh`：lint、Debug / Release 真机构建、build-for-testing 均 0；Unit 674（1 skip，既有）0 失败；Integration 218 0 失败 | Claude 直接修改（类 D：代码偏离 F-b）；Phase 4、Phase 5 checkpoint 完成（T027、T031） |
 | 2026-10-29 | T033：README §1.13（画稿与实现回填）、§8「系统入口」行改为真机后规则、§10 C28 补 10-28 修订与 10-29 剩余限制；Penpot F-a～F-c 下方各加「实现回填」说明（快照 `before stage F implementation backfill 2026-10-29` → `stage F implementation backfill notes F-a F-b F-c 2026-10-29`） | 本文档分支 | 文档 | 2x 导出待 T035 走查后 |
 | 2026-10-29 | T034：`mobile-privacy-security-reviewer`（只读，sonnet）审 `main..HEAD`，结论 **PASS WITH NOTES**，无高 / 中危。N1 覆盖式恢复后快照仍是旧学员名 → 恢复成功后立即重建（`BackupRestoreFlow`）；N2 重建失败保留旧快照 → 删除旧文件并刷新，小组件显示占位（`WidgetSnapshotPublisher`）；N3 跳转后训练页 `startOrOpen` 可能新建训练（阶段 F 前已有，通知入口同样）→ 负责人记待办（blueprint §6 第 11 项）；N4 扩展共享源文件不在静态扫描范围、N5 扩展无单独隐私清单 → 信息级，上架前处理。未采纳：viewer / 存储不可用时删快照（快照仍是本机真实数据，不是残留） | `76f87e2` | 主机 `gate.sh`：lint、Debug / Release 真机构建、build-for-testing 均 0；Unit 674（1 skip，既有）0 失败；Integration 219 0 失败 | 新增 `testFailedRebuildRemovesThePreviousSnapshotAndReloadsOnce`；`BackupRoundTripTests` 页面恢复断言快照刷新 1 次 |
+| 2026-10-29 | T035 集中走查（spec §7.4 L3）：模拟器 iPhone 17 `EFE2D5A0`，版本 `76f87e2`，清单 `.handoff/2026-10-29-stage-f-walkthrough-checklist.md` F1～F12（灵动岛紧凑 / 最小 / 展开与点击、两节同时进行、主屏中号与两种空态、设置说明段、最大字号） | `76f87e2` | 负责人走查**全部通过** | 负责人实际看过；2x 导出（负责人 2026-10-29）已导入 `design/system-entry/screens/`：`F-a-widgets.png` 1880×1760、`F-b-live-activity.png` 1880×1520、`F-c-settings-note.png` 780×1688 |
 
 ### 4.1 真机证据
 

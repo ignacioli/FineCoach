@@ -133,7 +133,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 
 - 产品负责人 2026-10-28 批准 F-a（小组件）、F-b（实时活动）、F-c（设置说明段），分类 C（feature 专有 `SE-*`），设置说明段复用 `DS-SECTION`。同日真机后修订 F-a：主屏改炭黑底，锁屏矩形与 StandBy 不放学员名（§10 C28）。实施映射、执行记录、真机证据与入口清单见 `design/system-entry/implementation-map.md`。
 - Penpot（Foundations 页 y=3750；F-a x=14850、F-b x=15850、F-c x=16850）：快照 `before-stage-F boards 2026-10-28` → `stage-F boards F-a F-b F-c approved 2026-10-28` → F-a 修订与清理快照（见实施映射 §3）→ `before stage F implementation backfill 2026-10-29` → `stage F implementation backfill notes F-a F-b F-c 2026-10-29`（三块画稿下方各加「实现回填」说明：代码文件、提交、真机结论）。
-- 2 倍导出待负责人在集中走查后导出到 `design/system-entry/screens/`（specs 006 T035）。
+- 2 倍导出：负责人 2026-10-29 集中走查后导出，已入库 `design/system-entry/screens/`（F-a、F-b、F-c）。
 
 ## 2. 颜色
 
