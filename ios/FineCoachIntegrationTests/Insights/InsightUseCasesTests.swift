@@ -240,7 +240,8 @@
             let destination = try TemporaryProtectedDirectory()
             let environment = try AppEnvironment(
                 rootURL: root.url, clock: TestClock(utcDate: now),
-                notificationCenter: FakeNotificationScheduling())
+                notificationCenter: FakeNotificationScheduling(),
+                sessionActivityController: NoopSessionActivityController())
             // These IDs intentionally belong only to the snooze file, not to business records.
             let studentID = StableUUID(UUID(uuidString: "aaaaaaaa-1111-4111-8111-111111111111")!)
             let exerciseID = try StableExerciseID("bbbbbbbb-2222-4222-8222-222222222222")

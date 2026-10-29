@@ -30,6 +30,7 @@ struct AppRoot: View {
     @EnvironmentObject private var environment: AppEnvironment
     @EnvironmentObject private var privacyCoordinator: ScenePrivacyCoordinator
     @EnvironmentObject private var restNotificationRouter: RestNotificationRouter
+    @EnvironmentObject private var systemEntryRouter: SystemEntryRouter
     @State private var installState: InstallState?
     @State private var archiveServices: ArchiveServices?
     @State private var firstLaunchRoute: FirstLaunchRoute = .choice
@@ -79,12 +80,24 @@ struct AppRoot: View {
             case nil: break
             }
             discardRestNotificationIfViewer()
+            discardSystemEntryIfViewer()
             if let url = pendingOpenURL {
                 pendingOpenURL = nil
                 handleOpen(url)
             }
         }
-        .onOpenURL { handleOpen($0) }
+        .onOpenURL { url in
+            if url.scheme?.lowercased() == "finecoach" {
+                systemEntryRouter.receive(url: url)
+                discardSystemEntryIfViewer()
+            } else {
+                handleOpen(url)
+            }
+        }
+        .onChange(of: systemEntryRouter.pendingRequest) { _, request in
+            guard request != nil else { return }
+            discardSystemEntryIfViewer()
+        }
         .onChange(of: restNotificationRouter.pendingRequest) { _, request in
             guard request != nil else {
                 return
@@ -93,6 +106,7 @@ struct AppRoot: View {
         }
         .onChange(of: installState) { _, _ in
             discardRestNotificationIfViewer()
+            discardSystemEntryIfViewer()
         }
     }
 
@@ -103,6 +117,11 @@ struct AppRoot: View {
             return
         }
         restNotificationRouter.discardPendingRequest()
+    }
+
+    private func discardSystemEntryIfViewer() {
+        guard installState == .viewer else { return }
+        systemEntryRouter.discardPendingRequest()
     }
 
     // MARK: First launch (M2-07)

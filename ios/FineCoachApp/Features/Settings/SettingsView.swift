@@ -58,6 +58,13 @@ struct SettingsView: View {
                         FCListRowDivider()
                     #endif
                 }
+
+                FCSectionLabel(String(localized: "settings.systemEntry.title"))
+                Text(String(localized: "settings.systemEntry.description"))
+                    .fcFont(.callout, weight: .regular)
+                    .foregroundStyle(FCSemanticColors.textSecondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .accessibilityIdentifier(FCAccessibilityID.settingsSystemEntryDescription)
             }
             .padding(.horizontal, FCPrimitives.space4)
             .padding(.bottom, FCPrimitives.space6)

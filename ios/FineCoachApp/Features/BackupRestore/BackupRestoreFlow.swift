@@ -78,6 +78,9 @@ final class BackupRestoreFlowViewModel: ObservableObject {
                 BackupRestoreRequest(password: imported, sourceFileURL: sourceURL)
             )
             try environment.reloadAfterCommittedRestore()
+            // The widget snapshot still names the replaced data's Students;
+            // rebuild it from the restored store now, not on next foreground.
+            await environment.widgetSnapshotPublisher?.refresh()
             // The restored generation is verified and opened before the
             // current catalog comparison. The restore result is reported
             // separately from catalogUnavailableMessage if this follow-up

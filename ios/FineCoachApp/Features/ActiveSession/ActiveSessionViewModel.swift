@@ -192,6 +192,7 @@ final class ActiveSessionViewModel: ObservableObject {
     private let now: () -> Date
     private let restTimerStore: RestTimerStore
     private var restNotificationTask: Task<Void, Never>?
+    private(set) var sessionActivityTask: Task<Void, Never>?
     /// The exercise that owned the set which started the current rest; fixed
     /// for this rest so ±15 s reschedules keep the same notification body.
     private var restExerciseName: String?
@@ -268,6 +269,7 @@ final class ActiveSessionViewModel: ObservableObject {
             restTimer = rest?.timer
             restExerciseName = rest?.exerciseName
             selectedExerciseID = session?.exercises.last?.id
+            syncSessionActivity()
             errorMessage = nil
             saveStatus = resolvedSaveStatus
             await loadSections()
@@ -467,6 +469,7 @@ final class ActiveSessionViewModel: ObservableObject {
 
     func selectExercise(_ id: StableUUID) {
         selectedExerciseID = id
+        syncSessionActivity()
         if let exercise = session?.exercises.first(where: { $0.id == id }) {
             prefillSetFields(for: exercise)
         }
@@ -515,6 +518,7 @@ final class ActiveSessionViewModel: ObservableObject {
             return
         }
         selectedExerciseID = session?.exercises.last?.id
+        syncSessionActivity()
         if let exercise = currentExercise {
             prefillSetFields(for: exercise)
         }
@@ -950,6 +954,7 @@ final class ActiveSessionViewModel: ObservableObject {
     private func applySavedExercise(_ updated: Session, mode: RecordMode) {
         session = updated
         selectedExerciseID = updated.exercises.last?.id
+        syncSessionActivity()
         exerciseName = ""
         exerciseNameConflict = nil
         newExerciseIsUnilateral = false
@@ -1032,6 +1037,7 @@ final class ActiveSessionViewModel: ObservableObject {
         restTimer?.adjust(by: seconds, now: now())
         storeRest()
         syncRestNotification()
+        syncSessionActivity()
     }
 
     func dismissRest() {
@@ -1079,6 +1085,7 @@ final class ActiveSessionViewModel: ObservableObject {
         restTimer = RestTimerState(startedAt: now())
         storeRest()
         syncRestNotification()
+        syncSessionActivity()
     }
 
     /// Drops the in-app bar and the pending end notification together.
@@ -1088,7 +1095,23 @@ final class ActiveSessionViewModel: ObservableObject {
         }
         restTimer = nil
         syncRestNotification()
+        syncSessionActivity()
         restExerciseName = nil
+    }
+
+    private func syncSessionActivity() {
+        guard let session, session.state == .inProgress else { return }
+        let content = SessionActivityAttributes.ContentState(
+            exerciseName: currentExercise?.displayNameSnapshot.value ?? "",
+            completedSetCount: currentExercise?.sets.filter { $0.state == .completed }.count ?? 0,
+            restEndsAt: restTimer?.endsAt)
+        let previous = sessionActivityTask
+        let controller = useCases.sessionActivities
+        let id = session.id.rawValue.uuidString.lowercased()
+        sessionActivityTask = Task {
+            await previous?.value
+            await controller.update(sessionID: id, content: content)
+        }
     }
 
     private func storeRest() {

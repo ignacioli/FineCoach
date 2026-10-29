@@ -1,6 +1,226 @@
 {
   "sourceLanguage": "zh-Hans",
   "strings": {
+    "shortcut.today.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日"
+          }
+        }
+      }
+    },
+    "shortcut.startTraining.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始训练"
+          }
+        }
+      }
+    },
+    "shortcut.continueTraining.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "继续训练"
+          }
+        }
+      }
+    },
+    "settings.systemEntry.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "小组件与实时活动"
+          }
+        }
+      }
+    },
+    "settings.systemEntry.description": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加小组件后，锁屏和主屏会显示今天的上课时间；学员名只在解锁后显示。训练进行中，锁屏和灵动岛会显示当前动作和休息倒计时，不显示学员名。\n不想显示：不添加小组件；或在 iPhone「设置」中找到「精练教练」，关闭「实时活动」。"
+          }
+        }
+      }
+    },
+    "activity.session.generic": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练中"
+          }
+        }
+      }
+    },
+    "activity.session.completed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已完成 %lld 组"
+          }
+        }
+      }
+    },
+    "activity.session.resting": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %lld 组 · 休息"
+          }
+        }
+      }
+    },
+    "activity.session.restEnded": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %lld 组 · 休息结束"
+          }
+        }
+      }
+    },
+    "activity.session.overdue": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已超时"
+          }
+        }
+      }
+    },
+    "activity.session.setCount": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 组"
+          }
+        }
+      }
+    },
+    "widget.today.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天的课"
+          }
+        }
+      }
+    },
+    "widget.today.description": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "查看今天的课与下一节开始时间"
+          }
+        }
+      }
+    },
+    "widget.today.remaining": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天还有 %lld 节"
+          }
+        }
+      }
+    },
+    "widget.today.nextTime": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下一节 %@"
+          }
+        }
+      }
+    },
+    "widget.today.nextClass": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下一节课"
+          }
+        }
+      }
+    },
+    "widget.today.empty": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天没有课"
+          }
+        }
+      }
+    },
+    "widget.today.finished": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天的课都上完了"
+          }
+        }
+      }
+    },
+    "widget.today.placeholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开 App 查看今天的课"
+          }
+        }
+      }
+    },
+    "widget.today.inlinePlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开 App 查看"
+          }
+        }
+      }
+    },
     "insights.section.title": {
       "extractionState": "manual",
       "localizations": {

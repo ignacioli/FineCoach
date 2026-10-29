@@ -35,7 +35,8 @@ final class FoundationIntegrationTests: XCTestCase {
             let directory = try TemporaryProtectedDirectory()
             let environment = try AppEnvironment(
                 rootURL: directory.url.appendingPathComponent("app"),
-                notificationCenter: FakeNotificationScheduling()
+                notificationCenter: FakeNotificationScheduling(),
+                sessionActivityController: NoopSessionActivityController()
             )
             let injector = TestFaultInjector()
             let controller = try PersistenceController(
@@ -71,7 +72,8 @@ final class FoundationIntegrationTests: XCTestCase {
             let directory = try TemporaryProtectedDirectory()
             let environment = try AppEnvironment(
                 rootURL: directory.url.appendingPathComponent("app"),
-                notificationCenter: FakeNotificationScheduling()
+                notificationCenter: FakeNotificationScheduling(),
+                sessionActivityController: NoopSessionActivityController()
             )
             let injector = TestFaultInjector()
             let controller = try PersistenceController(
@@ -109,7 +111,8 @@ final class FoundationIntegrationTests: XCTestCase {
             let directory = try TemporaryProtectedDirectory()
             let environment = try AppEnvironment(
                 rootURL: directory.url.appendingPathComponent("app"),
-                notificationCenter: FakeNotificationScheduling()
+                notificationCenter: FakeNotificationScheduling(),
+                sessionActivityController: NoopSessionActivityController()
             )
             let injector = TestFaultInjector(failingPoints: [.persistenceWriterSave])
             let controller = try PersistenceController(
@@ -136,7 +139,8 @@ final class FoundationIntegrationTests: XCTestCase {
             let directory = try TemporaryProtectedDirectory()
             let environment = try AppEnvironment(
                 rootURL: directory.url.appendingPathComponent("app"),
-                notificationCenter: FakeNotificationScheduling()
+                notificationCenter: FakeNotificationScheduling(),
+                sessionActivityController: NoopSessionActivityController()
             )
             let student = try await environment.requireUseCases().create(
                 draft: StudentDraft(displayName: "启动重名测试学员", sex: .female)
@@ -420,7 +424,10 @@ final class FoundationIntegrationTests: XCTestCase {
                 with: try CurrentGenerationPointer(generationUUID: generationUUID)
             )
 
-            XCTAssertThrowsError(try AppEnvironment(rootURL: temporaryDirectory.url)) { error in
+            XCTAssertThrowsError(
+                try AppEnvironment(
+                    rootURL: temporaryDirectory.url, sessionActivityController: NoopSessionActivityController())
+            ) { error in
                 XCTAssertEqual(error as? StoreGenerationError, .invalidGeneration)
             }
         }

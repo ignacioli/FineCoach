@@ -9,7 +9,8 @@
             let root = try TemporaryProtectedDirectory()
             let clock = ArchiveExportDebugSeed.makeClock()
             let environment = try AppEnvironment(
-                rootURL: root.url, clock: clock, notificationCenter: FakeNotificationScheduling())
+                rootURL: root.url, clock: clock, notificationCenter: FakeNotificationScheduling(),
+                sessionActivityController: NoopSessionActivityController())
             let students = try XCTUnwrap(environment.studentUseCases)
             let unrelated = try await students.create(
                 draft: StudentDraft(displayName: "虚构无关学员", sex: .undisclosed))

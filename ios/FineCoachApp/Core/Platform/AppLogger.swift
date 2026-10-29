@@ -68,6 +68,12 @@ public enum AppLogEvent: String, CaseIterable, Sendable {
     case restNotificationInstallViewer = "rest_notification.install_viewer"
     case restNotificationInstallUnselected = "rest_notification.install_unselected"
     case restNotificationDiscarded = "rest_notification.discarded"
+    case systemEntrySnapshotWritten = "system_entry.snapshot_written"
+    case systemEntrySnapshotFailed = "system_entry.snapshot_failed"
+    case systemEntryActivityStarted = "system_entry.activity_started"
+    case systemEntryActivityEnded = "system_entry.activity_ended"
+    case systemEntryActivityUnavailable = "system_entry.activity_unavailable"
+    case systemEntryShortcutOpened = "system_entry.shortcut_opened"
 }
 
 public enum AppLogOperation: String, CaseIterable, Sendable {
@@ -81,6 +87,7 @@ public enum AppLogOperation: String, CaseIterable, Sendable {
     case archiveReplace = "archive_replace"
     case archiveDelete = "archive_delete"
     case restNotification = "rest_notification"
+    case systemEntry = "system_entry"
 }
 
 public enum AppLogErrorCategory: String, CaseIterable, Sendable {
