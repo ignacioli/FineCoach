@@ -135,6 +135,15 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 - Penpot（Foundations 页 y=3750；F-a x=14850、F-b x=15850、F-c x=16850）：快照 `before-stage-F boards 2026-10-28` → `stage-F boards F-a F-b F-c approved 2026-10-28` → F-a 修订与清理快照（见实施映射 §3）→ `before stage F implementation backfill 2026-10-29` → `stage F implementation backfill notes F-a F-b F-c 2026-10-29`（三块画稿下方各加「实现回填」说明：代码文件、提交、真机结论）。
 - 2 倍导出：负责人 2026-10-29 集中走查后导出，已入库 `design/system-entry/screens/`（F-a、F-b、F-c）。
 
+### 1.14 开屏页画稿（2026-10-29，过渡版）
+
+- 蓝图 §6 第 10 项：点图标后黑屏一瞬（工程只有 `UILaunchScreen_Generation`，没有开屏内容）。规格见 §9.3、§14.4，组合见 `components.md` §4.6 `DS-LAUNCH`。
+- 经过：负责人先否决「白底 + 居中圆角图标」，选「米色满版吉祥物」并批准 G-a（类 A，实现 `f522805`）；真机看后认为吉祥物半身贴底、屏幕上部太空，改回白底居中图标 G-b（类 B），真机对比 120pt 与 180pt 后定 180pt。`color.surface.launch` 随 G-a 一起删除。
+- **过渡版**：负责人 2026-10-29 表示白底加居中图标仍不好看，只用来先去掉黑屏。阶段 C 结束后重新决定开屏：要么像 iOS 自带 App 那样白屏直接进首页（不放图标），要么设计自己的开屏过场动画。
+- Penpot（Foundations 页 y=3750；G-a x=17290、G-b x=17730）：快照 `before launch screen G-a 2026-10-29` → `G-a launch screen draft 2026-10-29` → `G-a launch screen approved 2026-10-29` → `G-a implementation backfill note 2026-10-29` → `G-b launch screen comparison draft 2026-10-29` → `G-b 180pt interim approved 2026-10-29`（G-a 标为已否决）。
+- 入口与布局：① 系统静态开屏 → 白底 + 正中圆角图标 → 非 accessibility 元素 → 不改数据 → 图片约束居中、宽高 180；② `AppRoot` 叠层 → 同 ① → `accessibilityHidden`、不接收点击 → 不改数据 → `LaunchOverlay` 忽略安全区、居中。L3：负责人真机看过 G-a、G-b 120pt、G-b 180pt（2026-10-29）。
+- 2 倍导出：过渡版不导出，阶段 C 定稿后再导出。
+
 ## 2. 颜色
 
 ### 2.1 原子色（FC Primitives）
@@ -406,6 +415,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 |---|---|---|
 | App 图标 | `assets/app-icon-{light,dark,tinted}.png`，1024×1024 | 见 §9.2 |
 | 吉祥物（空态） | `assets/mascot-empty-state.jpeg`，1024×1024 | 与 Penpot 内嵌原图 `inset-warm2.jpeg` 逐字节一致（276383 字节，SHA-256 `aca587ee…d87395b`） |
+| 开屏页图标 | 由 `assets/app-icon-light.png` 按主屏图标圆角（边长 22.37%）裁成带透明通道的方图，工程内 `launch-icon` @2x 360px / @3x 540px | 见 §9.3 |
 | 吉祥物贴纸「比心」（阶段 D） | `assets/mascot-heart-sticker.png`，1254×1254，RGBA 透明底 | 产品负责人 2026-10-20 用 ChatGPT image 以 `mascot-avatar`、`mascot-empty-state` 为参考生成（提示词见产品仓 `.handoff/prompt/2026-10-20-stage-d-mascot-heart-sticker-prompt.md`）：胸像，耳朵下垂，比心手势加一颗小橙色心，无道具无文字。SHA-256 `7b697f1b…09064bc24`。Penpot D-c2 内嵌 80×80 缩小版 |
 
 吉祥物只用于空态插图，画稿显示尺寸为 220×220。例外：28 分享设置页隐私说明与 M2 首次说明页 W-01b 使用 `mascot-avatar` 头像（装饰），分别为 44×44（`radius.md`）与 64×64（`radius.lg`）；M2-07 首次启动二选一使用全身吉祥物 220×220（见 `m2-hifi/welcome-redesign.md` §2）。阶段 D：分享报告卡片「本节收获」区块的里程碑行使用 `mascot-heart-sticker` 贴纸，40×40，无底色无圆角裁切，只用于分享卡片，教练端页面不用（spec 004 D-FR-034）。贴纸内的橙色属于插图，同 §9.2 规则，不得用于界面元素。
@@ -426,6 +436,15 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 - dark / tinted 只是 iOS 18 主屏图标外观，随用户在主屏「自定」中的选择切换；App 界面本身仍未适配深色模式，不因此引入界面深色主题。
 - Penpot：「M1-B G5 Design」Foundations 页画板「AppIcon options (2026-10-11) — REJECTED A / B / C」底部的 `AppIcon / approved / {light,dark,tinted}` 已于 2026-10-14 回填为新三张图（快照 `before-app-icon-v2 2026-10-14` → `app-icon v2 backfill 2026-10-14 (mascot original, light/dark/tinted)`，`File.validate()` 0 个错误），并更新了画板内的「已批准」说明；上方几何兔头 / 「练」字标 / 哑铃片三案为 2026-10-11 否决方案，保留作记录。
 - 验收：2026-10-14 产品负责人在真机体验，反馈审核通过（light / dark / tinted 三个外观）。
+
+### 9.3 开屏页（2026-10-29 过渡版，Penpot G-b）
+
+- 画面：整屏 `color.surface.page` 白底（与首页第一帧同色）；正中一块 180×180 圆角吉祥物图标（`launch-icon`，圆角与主屏图标同形）；不放文字、logo 字样或进度指示。
+- ① 静态开屏：由系统在进程启动时显示，不增加等待。用 `LaunchScreen.storyboard`（只有底色与一张图，§10 C29），取代 `UILaunchScreen_Generation`。
+- ② 过场：App 根视图最上层叠一层与 ① 同样的画面，自显示起保持约 0.3 s，再淡出到首页（§14.4）。叠层不拦截已就绪的首页，也不等待数据。
+- 「减弱动态效果」开启时不叠 ②，静态开屏直接切到首页（§14.1 第 5 条）。
+- 深色模式：App 界面未适配深色，开屏始终用浅色。
+- 过渡版：阶段 C 结束后重新决定（见 §1.14）。G-a（米色满版吉祥物）已否决。
 
 ## 10. 来源冲突裁决记录
 
@@ -466,6 +485,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 | C26 | 阶段 E 画稿 E-c 在训练趋势指标切换里放了 4 段（重量 / 次数 / 容量 / 估算 1RM），C11 只允许 2–3 段；E-a2 说明写「…」和左滑都能暂不提醒，但今日页、学员详情是 `ScrollView`，SwiftUI 左滑只在 `List` 中可用 | `FCSegmentedSwitch` 页内用法放宽到 2–4 段，条件是每段都是短词且 375 宽默认字号一行放得下；最大字体放不下时改用筛选胶囊（集中走查确认）。提示行只用可见「…」菜单，不做左滑；E-a2 说明已改（「…」部分已被 C27 取代） | 已定（Claude，2026-10-24；负责人已批准 E-c 4 段画稿） |
 | C27 | 阶段 E 集中走查 2026-10-27：「…」打开的系统菜单在 iOS 26 是浮起的大胶囊、在 iOS 18 是大块灰色菜单，体验不好；训练页分区「…」同样如此（2026-10-21 走查 W-01 一直没定）。全 App 只有三处「…」：提示行暂不提醒、分区删除、指标停用 / 恢复 | 退役 `DS-MORE-MENU`（删除 `FCMoreMenu`），关闭 W-01。提示行左滑「暂不提醒」（`text.secondary`、`bell.slash`，可一滑到底，之后 4 秒撤销行，撤销即取消暂不提醒）；今日页第一次出现提示时第一行轻推一次（72 pt、0.6 s，每台设备一次，「减弱动态效果」时不播）。分区标题行左滑「删除分区」（`status.destructive`、`trash`，不能一滑到底，点了弹现有确认弹窗）。指标「停用 / 恢复」移到记录指标页底部「管理」的普通操作行，不弹确认。复看（2026-10-27）补充：模板编辑动作行的行内系统 `Menu`「移出分区」（系统强调蓝，名不副实）改为与训练页相同的左滑「移入分区」（`text.secondary`、`folder`），弹分区选择。今日页、学员详情、完整列表的提示行放进不滚动的 `List`（左滑只在 `List` 中可用，同训练页做法）。否决：底部面板（多一步）；行内文字按钮（文字多，页面乱）；自绘白底浮层（风险大、仍不满意） | 已定（产品负责人 2026-10-27），Penpot E-d、B-b、B-c 已回填 |
 | C28 | 阶段 F 系统级入口（小组件、Live Activity、快捷指令）上锁屏和系统界面，旁人可见；M1B-FR-011 禁止锁屏出现学员名 | 产品负责人 2026-10-27 裁决 F-P1～F-P5：锁屏 / 主屏小组件（含 StandBy）可显示学员名，锁着时只靠系统打码（`privacySensitive`），不做文件保护硬隔离；Live Activity 只写动作名、组序号、休息倒计时，不写学员名、重量、次数；快捷指令无参数、须解锁、不朗读；不做 Spotlight。剩余风险（解锁后旁人可见、快照首次解锁后可读、系统打码覆盖面待真机确认）见 specs 006 §8。否决：小组件不显示学员名（Claude 建议）；名字另存 `complete` 保护的快照硬隔离（Claude 建议） | 已定（产品负责人 2026-10-27；specs 006 `1.0-approved` §2，002 Revision 1.5）。画稿 F-a～F-c 2026-10-28 批准。**2026-10-28 真机修订**：R1 显示锁屏与 StandBy 系统不打码，按 specs 006 §8 T-03 降级为锁屏 / StandBy 不放学员名（负责人确认，不追查原因）；主屏小组件改炭黑底；扩展用系统字体。**2026-10-29**：Live Activity「休息结束」「已超时」文字随系统 stale 重绘出现、可能滞后，负责人接受 |
+| C29 | 开屏页要固定图标尺寸，并与 SwiftUI 叠层用同一布局；系统 `UILaunchScreen` 字典只能放居中图片、按图片原始尺寸显示，且做不到 G-a 的底部贴宽 | 改用 `LaunchScreen.storyboard`（Apple 自带，只含底色与一张图片，Auto Layout 约束），去掉 `UILaunchScreen_Generation`。不引入其他框架。G-b 改为白底居中图标后沿用 | 已定（产品负责人 2026-10-29） |
 | O6 | 吉祥物造型与知名动画角色是否存在版权关联 | 产品负责人确认：吉祥物为其自行生成的原创形象，与该角色无关，不涉及版权问题 | 已定（产品负责人） |
 
 ## 11. 对比度核验（WCAG 2.x）
@@ -585,5 +605,6 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 | 休息倒计时 | 每秒 `.numericText` 滚动 | 直接切换数字 |
 | 休息结束 | 文字换成「✓ 休息结束」；`haptic.attention`；不自动收起，超时满 1 秒起显示「已超时 m:ss」（§10 C25） | 同左，收起不带位移 |
 | 底部面板、确认框出现 | `standard` / `fast` + `standard` 曲线 | 只淡入淡出 |
+| 启动进入首页（§9.3 ②） | 开屏叠层保持约 0.3 s 后淡出，`fast` + `standard`；只在冷启动播一次 | 不叠这一层，直接显示首页 |
 
 迁移范围：本轮只有训练页（ActiveSession 与 `FCSetRow`、`FCSetStateCircle`）改用 `FCMotion`；其他页面的现有数值与 token 相同，改到哪页再迁哪页（`components.md` §1.3）。

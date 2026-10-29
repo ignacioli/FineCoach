@@ -148,7 +148,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 | `DS-EQUIPMENT-ICON` | `FCEquipmentIcon`、`FCEquipmentIconView` | §7.1；17 | 5 个文件 | L0 全自动 |
 | `DS-BODY-DIAGRAM` | `FCBodyDiagram` | §9.1；29 | ShareReportCard | 稳定 |
 
-页面组合模式（没有共享代码，由 feature 拼装）：`DS-PAGE-PRIMARY`、`DS-PAGE-SECONDARY`（页头部分已有共享组件 `DS-PAGE-HEADER`）、`DS-EMPTY-STATE`，见 §4.6。`DS-HUB-ROW`、`DS-INLINE-RESULT` 已提升为共享组件。
+页面组合模式（没有共享代码，由 feature 拼装）：`DS-PAGE-PRIMARY`、`DS-PAGE-SECONDARY`（页头部分已有共享组件 `DS-PAGE-HEADER`）、`DS-EMPTY-STATE`、`DS-LAUNCH`（App 级，只有一处使用），见 §4.6。`DS-HUB-ROW`、`DS-INLINE-RESULT` 已提升为共享组件。
 
 ## 4. 组件 anatomy
 
@@ -338,6 +338,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 | `DS-HUB-ROW` 入口行 | 24pt 图标（`action.primary`）→ 标题（`headline`）/ 副标题（`caption` `text.secondary`）→ `›`；最小高 64，间距 `space.4` | 19/42/43 | 已提升为共享组件 `FCHubRow`（M2 T002/T010，2026-10-10）；ResourceHub、Settings 已迁移，规格见 §4.7 |
 | `DS-INLINE-RESULT` 就地结果 | 22×22 `FCStatusBadge` → 标题（`callout` 600；失败为 `status.destructive`，成功为 `text.primary`）→ 说明（`caption` `text.secondary`）→ 失败时显示居中「重试」`FCLinkButton` | 38/39 | 已提升为共享组件 `FCInlineResult`（M2 T003/T011，2026-10-10）；BackupRestoreFlow 已迁移，规格见 §4.7 |
 | `DS-EMPTY-STATE` 空态 | 吉祥物 220×220 居中 → 标题（`headline` `action.primary`）→ 说明（`caption` `text.secondary`）→ 底部主按钮 | 16 | StudentList |
+| `DS-LAUNCH` 开屏页（2026-10-29，过渡版） | 整屏 `surface.page` 底 → 正中 180×180 圆角吉祥物图标（`launch-icon`）；无文字、无可交互控件。两处呈现同一画面：① `LaunchScreen.storyboard`（系统静态开屏）；② App 根视图最上层的一次性叠层，约 0.3 s 后 `motion.duration.fast` 淡出。不变式：① ② 资源、尺寸与底色一致，「减弱动态效果」时不创建 ②，叠层不响应点击、不读写数据（`auto`：`LaunchScreenConfigurationTests`）；画面观感（`manual`：负责人真机看过，2026-10-29） | G-b | 已实现；阶段 C 后重新决定（README §1.14） |
 
 ### 4.7 已定稿规格（M2 Phase 0，T001–T012 已实现）
 
