@@ -143,8 +143,12 @@ enum RestNotificationNavigation {
         current: [RootDestination],
         studentID: StableUUID
     ) -> [RootDestination] {
-        let destination = RootDestination.activeSession(studentID.rawValue)
-        return current.last == destination ? current : [destination]
+        switch current.last {
+        case .activeSession(let id), .existingSession(let id):
+            if id == studentID.rawValue { return current }
+        default: break
+        }
+        return [.existingSession(studentID.rawValue)]
     }
 }
 

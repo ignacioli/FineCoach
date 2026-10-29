@@ -121,6 +121,15 @@ public struct ActiveSessionUseCases: Sendable {
         }
     }
 
+    /// Opens an in-progress Session without creating or persisting one.
+    public func openExisting(studentID: StableUUID) async throws -> Session? {
+        guard let active = try await coordinator.workingCopy(studentID: studentID),
+            active.state == .inProgress
+        else { return nil }
+        await ensureSessionActivity(for: active)
+        return active
+    }
+
     /// Compatibility for single-Session call sites. With several Sessions in
     /// progress this throws rather than returning a different Student's class.
     public func loadActive() async throws -> Session? {

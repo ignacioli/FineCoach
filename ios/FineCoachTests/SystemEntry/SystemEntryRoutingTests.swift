@@ -131,10 +131,16 @@ final class SystemEntryRoutingTests: XCTestCase {
     }
 
     func testTrainingNavigationDoesNotDuplicateTopPage() {
-        let destination = RootDestination.activeSession(studentID.rawValue)
+        let destination = RootDestination.existingSession(studentID.rawValue)
         let decision = SystemEntryRouteDecision.activeSession(studentID)
         XCTAssertEqual(SystemEntryNavigation.path(current: [.settings], decision: decision), [destination])
         let current = [RootDestination.studentDetail(studentID.rawValue), destination]
+        XCTAssertEqual(SystemEntryNavigation.path(current: current, decision: decision), current)
+    }
+
+    func testDeepLinkPreservesTopActiveSessionForTheSameStudent() {
+        let current: [RootDestination] = [.studentDetail(studentID.rawValue), .activeSession(studentID.rawValue)]
+        let decision = decide(.session(sessionID), session: makeSession())
         XCTAssertEqual(SystemEntryNavigation.path(current: current, decision: decision), current)
     }
 

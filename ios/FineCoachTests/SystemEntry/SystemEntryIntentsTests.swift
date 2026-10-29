@@ -58,7 +58,7 @@ final class SystemEntryIntentsTests: XCTestCase {
             XCTAssertEqual(decision, count == 1 ? .activeSession(studentID) : .today)
             XCTAssertEqual(
                 SystemEntryNavigation.path(current: [.settings], decision: decision),
-                count == 1 ? [.activeSession(studentID.rawValue)] : [])
+                count == 1 ? [.existingSession(studentID.rawValue)] : [])
             XCTAssertNil(SystemEntryRouter.shared.takePendingRequest())
         }
     }

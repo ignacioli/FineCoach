@@ -7,6 +7,7 @@ enum RootDestination: Hashable {
     case studentDetail(UUID)
     case editor(StudentEditorMode)
     case activeSession(UUID)
+    case existingSession(UUID)
     case exerciseLibrary
     case sessionSummary(UUID)
     case history(UUID)
@@ -164,6 +165,17 @@ struct RootNavigation: View {
                                 ActiveSessionView(
                                     studentID: StableUUID(studentID),
                                     useCases: environment.requireSessionUseCases(),
+                                    templateUseCases: environment.templateUseCases,
+                                    studentUseCases: environment.requireUseCases(),
+                                    creditSettlement: environment.sessionCreditSettlement,
+                                    path: $path
+                                )
+                                .id(studentID)
+                            case .existingSession(let studentID):
+                                ActiveSessionView(
+                                    studentID: StableUUID(studentID),
+                                    useCases: environment.requireSessionUseCases(),
+                                    entryMode: .openExisting,
                                     templateUseCases: environment.templateUseCases,
                                     studentUseCases: environment.requireUseCases(),
                                     creditSettlement: environment.sessionCreditSettlement,

@@ -317,7 +317,7 @@ final class RestNotificationRoutingTests: XCTestCase {
     // MARK: - Navigation stack
 
     func testRouteReplacesTheStackButDoesNotDuplicateTheSameTrainingPage() {
-        let destination = RootDestination.activeSession(studentID.rawValue)
+        let destination = RootDestination.existingSession(studentID.rawValue)
         XCTAssertEqual(
             RestNotificationNavigation.path(current: [], studentID: studentID),
             [destination]
@@ -345,6 +345,11 @@ final class RestNotificationRoutingTests: XCTestCase {
             ),
             [destination]
         )
+    }
+
+    func testRoutePreservesTopActiveSessionForTheSameStudent() {
+        let current: [RootDestination] = [.studentDetail(studentID.rawValue), .activeSession(studentID.rawValue)]
+        XCTAssertEqual(RestNotificationNavigation.path(current: current, studentID: studentID), current)
     }
 
     // MARK: - Appointment reminders stay plain

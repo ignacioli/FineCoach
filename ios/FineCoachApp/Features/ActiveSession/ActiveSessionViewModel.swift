@@ -1,6 +1,11 @@
 import Combine
 import Foundation
 
+enum ActiveSessionEntryMode {
+    case startOrOpen
+    case openExisting
+}
+
 enum ActiveSessionSheet: Identifiable, Equatable {
     case finish(SessionFinishGate)
     case deleteExercise(StableUUID)
@@ -125,6 +130,7 @@ final class ActiveSessionViewModel: ObservableObject {
     }
 
     @Published var errorMessage: String?
+    @Published private(set) var sessionUnavailable = false
     @Published var saveStatus: PersistenceProjectionStatus = .saved(revision: 0)
     @Published var exerciseName = ""
     @Published var exerciseNameConflict: String?
@@ -185,6 +191,7 @@ final class ActiveSessionViewModel: ObservableObject {
 
     let studentID: StableUUID
     let useCases: ActiveSessionUseCases
+    private let entryMode: ActiveSessionEntryMode
     let templateUseCases: TemplateUseCases?
     private let creditSettlement: SessionCreditSettlement?
     private let signposts: PerformanceSignposts
@@ -208,6 +215,7 @@ final class ActiveSessionViewModel: ObservableObject {
     init(
         studentID: StableUUID,
         useCases: ActiveSessionUseCases,
+        entryMode: ActiveSessionEntryMode = .startOrOpen,
         templateUseCases: TemplateUseCases? = nil,
         creditSettlement: SessionCreditSettlement? = nil,
         signposts: PerformanceSignposts = .shared,
@@ -217,6 +225,7 @@ final class ActiveSessionViewModel: ObservableObject {
     ) {
         self.studentID = studentID
         self.useCases = useCases
+        self.entryMode = entryMode
         self.templateUseCases = templateUseCases
         self.creditSettlement = creditSettlement
         self.signposts = signposts
@@ -262,9 +271,20 @@ final class ActiveSessionViewModel: ObservableObject {
         // A reload is not a confirmation: anything still pending from an
         // earlier confirmation is dropped, never replayed.
         recordFloatRequest = nil
+        sessionUnavailable = false
         do {
             _ = try await useCases.reconcileOnLaunch()
-            session = try await useCases.startOrOpen(studentID: studentID)
+            switch entryMode {
+            case .startOrOpen:
+                session = try await useCases.startOrOpen(studentID: studentID)
+            case .openExisting:
+                session = try await useCases.openExisting(studentID: studentID)
+                guard session != nil else {
+                    errorMessage = nil
+                    sessionUnavailable = true
+                    return
+                }
+            }
             let rest = sessionID.flatMap { restTimerStore.entry(for: $0) }
             restTimer = rest?.timer
             restExerciseName = rest?.exerciseName

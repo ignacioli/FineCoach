@@ -296,6 +296,7 @@
 		B9A8 /* PerStudentSessionIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A8 /* PerStudentSessionIntegrationTests.swift */; };
 		B710 /* ActiveSessionSetRowInteractionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A710 /* ActiveSessionSetRowInteractionTests.swift */; };
 		B975 /* ActiveSessionSetEntryPrefillTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A975 /* ActiveSessionSetEntryPrefillTests.swift */; };
+		D011B /* ActiveSessionOpenExistingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D011A /* ActiveSessionOpenExistingTests.swift */; };
 		B711 /* ActiveSessionCardioDurationConversionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A711 /* ActiveSessionCardioDurationConversionTests.swift */; };
 		B720 /* BodyDataPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A720 /* BodyDataPersistenceTests.swift */; };
 		B234 /* ActiveSessionRecoveryCodecTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A234 /* ActiveSessionRecoveryCodecTests.swift */; };
@@ -771,6 +772,7 @@
 		A9A8 /* PerStudentSessionIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerStudentSessionIntegrationTests.swift; sourceTree = "<group>"; };
 		A710 /* ActiveSessionSetRowInteractionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionSetRowInteractionTests.swift; sourceTree = "<group>"; };
 		A975 /* ActiveSessionSetEntryPrefillTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionSetEntryPrefillTests.swift; sourceTree = "<group>"; };
+		D011A /* ActiveSessionOpenExistingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionOpenExistingTests.swift; sourceTree = "<group>"; };
 		A711 /* ActiveSessionCardioDurationConversionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionCardioDurationConversionTests.swift; sourceTree = "<group>"; };
 		A720 /* BodyDataPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyDataPersistenceTests.swift; sourceTree = "<group>"; };
 		A234 /* ActiveSessionRecoveryCodecTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionRecoveryCodecTests.swift; sourceTree = "<group>"; };
@@ -1657,6 +1659,7 @@
 				A710 /* ActiveSessionSetRowInteractionTests.swift */,
 				D004A /* ActiveSessionNewRecordTests.swift */,
 				A975 /* ActiveSessionSetEntryPrefillTests.swift */,
+				D011A /* ActiveSessionOpenExistingTests.swift */,
 				A711 /* ActiveSessionCardioDurationConversionTests.swift */,
 			);
 			path = ActiveSession;
@@ -2615,6 +2618,7 @@
 				B710 /* ActiveSessionSetRowInteractionTests.swift in Sources */,
 				D004B /* ActiveSessionNewRecordTests.swift in Sources */,
 				B975 /* ActiveSessionSetEntryPrefillTests.swift in Sources */,
+				D011B /* ActiveSessionOpenExistingTests.swift in Sources */,
 				B711 /* ActiveSessionCardioDurationConversionTests.swift in Sources */,
 				B720 /* BodyDataPersistenceTests.swift in Sources */,
 				B236 /* RecoveryProjectionTests.swift in Sources */,
