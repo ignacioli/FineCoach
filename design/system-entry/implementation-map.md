@@ -1,6 +1,6 @@
 # 阶段 F 系统级入口：设计改动与实施映射
 
-> 状态：**Phase 3 完成（2026-10-28）：US1 小组件，主机门禁全绿；真机 R1 显示锁屏与 StandBy 系统不打码，已按 T-03 降级（学员名只在解锁后的主屏显示）。负责人同意不再追查原因、R1 到此为止。下一步 Phase 4（US2 Live Activity）。**本文是 `components.md` §6 要求的里程碑实施映射，不重复 token 数值。
+> 状态：**Phase 5 完成（2026-10-29）：US1 小组件、US2 Live Activity、US3 快捷指令与 T032 设置说明段均主机门禁全绿并取得真机证据（§4.1）。R1 已按 T-03 降级（学员名只在解锁后的主屏显示）。下一步 Phase 6：T033 设计记录与 Penpot 回填、T034 隐私安全审查、T035 集中走查。**本文是 `components.md` §6 要求的里程碑实施映射，不重复 token 数值。
 > 行为权威：`specs/006-stage-f-system-entry/spec.md`（`1.0-approved`）、`plan.md`、`tasks.md`、`research.md`、`data-model.md`。字段白名单只认 spec §2.2。视觉权威：`design/design-system/README.md`（§8「系统入口」、§10 C28）、`components.md`。
 > 分支：本文件在设计文档分支 `topic/docs-stage-f-system-entry-590290`；代码在实现分支 `feature/stage-f-system-entry`（worktree `.worktrees/stage-f-system-entry`）。
 
@@ -81,6 +81,9 @@ Penpot「M1-B G5 Design」/ Foundations 页 y=3750：F-a（x=14850）、F-b（x=
 | 2026-10-28 | T005～T007：文件策略 `widgetSnapshot`、`SharedContainer`（App 与扩展共用）、R7 六个日志事件、`SystemEntryRouting`（只认两种 URL，「开始训练」→ 今日页，spec Rev 1.1）；新增 `SystemEntryInfrastructureTests`、`SystemEntryRoutingTests` 共 19 项 | 未提交 | 主机 `gate.sh`：lint、Debug / Release 真机构建、build-for-testing 均 0；Unit 630（1 skip，既有）0 失败；Integration 212 0 失败 | Codex gpt-6.1-sol 一轮 8 分钟；未注册 URL scheme，`widgetURL` 能否送达待 Phase 3/4 真机确认；画稿当天批准，Phase 2 checkpoint 完成（T010） |
 | 2026-10-28 | T011～T017：`WidgetTodaySnapshot`（含 `finishedCount`，data-model §1 2026-10-28 修订）、`WidgetSnapshotReader`（两 target 共用的只读入口）、`WidgetSnapshotPublisher`（刷新挂点：预约、学员改名 / 归档、训练完成 / 放弃、回到前台）、`TodayWidget` 四种形态替换占位小组件；文案进同一份 `Localizable.xcstrings`（加入扩展资源），`Tokens.swift` 共享 target membership，系统字体 | 未提交 | 主机 `gate.sh`（改字重后重跑）：lint、Debug / Release 真机构建、build-for-testing 均 0；Unit 649（1 skip，既有）0 失败；Integration 218 0 失败 | Codex gpt-6.1-sol 一轮约 11 分钟，无报错无重试；Claude 审 diff 后修一处偏离 F-a：空态 / 占位文字字重改为 600（类 D）。R1 真机证据未取得 |
 | 2026-10-28 | T018～T019：真机 R1 后的改动——锁屏矩形与 StandBy 不放学员名（`showsWidgetContainerBackground` 识别 StandBy）、主屏改炭黑底（负责人）、时间等宽数字；`SystemEntryConfigurationTests` 加两条断言 | 未提交 | 主机 `gate.sh`：lint、Debug / Release 真机构建、build-for-testing 均 0；Unit 649（1 skip，既有）0 失败；Integration 218 0 失败 | Claude 直接修改（每处几行）；Phase 3 checkpoint 完成 |
+| 2026-10-28 | T020～T025：`SessionActivityAttributes`（Attributes 只有 `sessionID`；ContentState 为动作名、当前动作已完成组数、休息结束时刻）、`SessionActivityController`（本地 request，`pushType: nil`，`staleDate` = 休息结束，启动清理）、挂点（用例：开始 / 完成 / 放弃；VM：确认组、±15 秒、清除休息、切换动作、恢复休息，均在原通知调用旁，通知不变）、`SessionLiveActivity`（锁屏 + 灵动岛三形态，按 F-b）；新增 `SessionActivityContentTests` 6 项、`SessionActivityHookTests` 10 项 | `a7fa023` | 主机 `gate.sh`：lint、Debug / Release 真机构建、build-for-testing 均 0；Unit 666（1 skip，既有）0 失败；Integration 218 0 失败 | Codex gpt-6.1-sol 一轮；其内部 dsh-gate 一直 75，最终版本由主机 gate 补证。T026 真机证据未做，T027 待 T026 |
+| 2026-10-28 | T028、T029、T032：三个无参数 `AppIntent`（`requiresAuthentication`、`openAppWhenRun`，`perform()` 只交页面请求给 `SystemEntryRouter.shared`，无对话文字）、`AppShortcutsProvider`（`AppShortcuts.xcstrings` 三条 zh-Hans 短语含 App 名）；设置页「小组件与实时活动」说明段（F-c 原文，`FCSectionLabel` + `callout`）；新增 `SystemEntryIntentsTests` 7 项与静态断言（无索引、捐赠、参数、对话） | `d26ce35` | 主机 `gate.sh`：lint、Debug / Release 真机构建、build-for-testing 均 0；Unit 674（1 skip，既有）0 失败；Integration 218 0 失败 | Codex gpt-6.1-sol 一轮，自报计数与主机一致 |
+| 2026-10-29 | T026 真机修复：休息中 / 已超时锁屏整块空白——系统计时文字会占满可给的宽度，`.fixedSize` 把整行挤出可视区 → 计时放进隐藏模板「00:00」定宽的槽位；倒计时到点停在 0:00、要等系统按 `staleDate` 重绘 → 改用 `Text(_:style: .timer)`，到点后自行向上计时（research R4 已列此写法）。`SystemEntryConfigurationTests` 的计时断言由 `Text(timerInterval:` 改为 `style: .timer)`（意图不变：用系统计时） | `e3d9e45` | 主机 `gate.sh`：lint、Debug / Release 真机构建、build-for-testing 均 0；Unit 674（1 skip，既有）0 失败；Integration 218 0 失败 | Claude 直接修改（类 D：代码偏离 F-b）；Phase 4、Phase 5 checkpoint 完成（T027、T031） |
 
 ### 4.1 真机证据
 
@@ -88,8 +91,9 @@ Penpot「M1-B G5 Design」/ Foundations 页 y=3750：F-a（x=14850）、F-b（x=
 |---|---|---|
 | 签名：带 App Group 的 Debug 版能装上并运行 | research R6，tasks T004 | **通过**（2026-10-27，iPhone XS Max）：自动签名（个人团队，描述文件 7 天，至 2026-11-04）为 App 与扩展签入 `group.com.finecoach.app`；首次启动需在手机上重新信任开发者；负责人确认 App 能打开，占位小组件能加到锁屏（矩形）与主屏（小号）。构建日志 `.handoff/logs/2026-10-27-stage-f-phase1-device-build.log` |
 | 小组件锁着打码（各形态、StandBy、VoiceOver） | research R1，tasks T018 | **部分**（2026-10-28，iPhone XS Max）：主屏小 / 中号解锁显示正常、点击可用；**锁屏矩形锁着时学员名没有打码**（锁屏截图，锁头为关闭状态）→ 按 spec §8 T-03 降级为不放学员名，代码、测试、Penpot F-a 同轮修改。**StandBy 小号锁着时学员名也没有打码**（StandBy 截图）→ 同样降级：StandBy 不放学员名，只有解锁后的主屏显示学员名；代码、静态断言、Penpot F-a 同轮修改（快照 `before F-a StandBy without name 2026-10-28` → `F-a: StandBy small without name (R1) 2026-10-28`）。结论：本机上系统打码（F-P5）对锁屏与 StandBy 都不生效，学员名现在只出现在解锁后可见的主屏。VoiceOver 锁着朗读不再适用（锁着可见的形态都不含学员名）。点击进今日页（未注册 URL scheme）、缺席后课数变化未专门验证。负责人 2026-10-28 决定 R1 到此为止，不追查系统不打码的原因 |
-| Live Activity 出现 / 更新 / 结束、划掉后倒计时、残留清理 | research R4，tasks T026 | 未取得 |
-| 快捷指令锁着先要求解锁、不朗读 | research R5，tasks T030 | 未取得 |
+| Live Activity 出现 / 更新 / 结束、划掉后倒计时、残留清理 | research R4，tasks T026 | **通过，有剩余限制**（2026-10-29，iPhone XS Max，负责人）：锁屏出现；未确认任何一组、不在休息两态正常；首轮休息中 / 已超时整块空白、超时停在 0:00（代码问题，`e3d9e45` 修复）；复验休息中显示动作名、「第 N 组 · 休息」、倒计时，到点后数字继续向上计时；两名学员各一条、各自显示。**剩余限制**：到点后「第 N 组 · 休息结束」与「已超时」文字依赖系统按 `staleDate` 重绘，本机休息结束 1 分钟后仍未出现，负责人接受（数字始终正确）。负责人另确认：点击进入对应训练页（未注册 URL scheme 也能送达）、划掉 App 后倒计时继续、完成 / 放弃后活动消失。启动残留清理：负责人多次试验未见残留，记为通过（需训练已结束而活动未结束才会触发，例如结束途中 App 崩溃，难以有意制造；逻辑由 `testLaunchCleanupReceivesOnlyPersistedActiveSessionIDs` 覆盖）。灵动岛三形态本机没有，留 T035 模拟器走查 |
+| 快捷指令锁着先要求解锁、不朗读 | research R5，tasks T030 | **通过**（2026-10-29，iPhone XS Max，负责人验收） |
+| 锁屏休息结束通知只显示「Notification」 | 负责人走查中发现，疑似回归 | **不是回归**：本分支通知代码改动 0 行；iOS「显示预览：解锁时」导致锁着不显示正文，解锁后正文为「休息结束 / 动作名 · 可以开始下一组了」，负责人改系统设置后符合预期 |
 
 ## 5. 入口与布局清单（`components.md` §1.4）
 
@@ -101,3 +105,7 @@ Penpot「M1-B G5 Design」/ Foundations 页 y=3750：F-a（x=14850）、F-b（x=
 | 锁屏单行 `SE-LOCK-INLINE` | 整行文字 → 今日页 | 同上 | 否 | 系统 inline 槽位 |
 | 主屏小号 `SE-HOME-SMALL` | 整块 → 今日页（StandBy 不放学员名） | 同上 | 否 | `HomeTodayView` 的 `VStack` `.frame(maxWidth: .infinity, maxHeight: .infinity)` |
 | 主屏中号 `SE-HOME-MEDIUM` | 整块 → 今日页（最多 3 行） | 同上 | 否 | `HomeTodayView`，每行 `HStack` `.frame(maxWidth: .infinity)` |
+| Live Activity 锁屏 `SE-ACTIVITY` | 整块（动作名、次行、倒计时 / 已超时）→ 该训练页 | 系统实时活动，无 identifier；`widgetURL finecoach://session/<小写 id>`（`SessionLiveActivity.swift`） | 否 | `SessionActivityLockView` 的 `HStack` `.frame(maxWidth: .infinity)` |
+| 灵动岛紧凑 / 最小 / 展开 | 计时图标、倒计时 / 组数 / 超时；展开含动作名与次行 → 该训练页 | 同上 | 否 | 系统槽位；展开底部 `.frame(maxWidth: .infinity)` |
+| 快捷指令「今日」「开始训练」「继续训练」 | 系统快捷指令 / Siri 短语「精练教练 …」→ 今日页 / 今日页 / 唯一进行中训练或今日页 | 系统，无 identifier（`SystemEntryIntents.swift`） | 否 | 系统界面 |
+| 设置页说明段 | 区段标签「小组件与实时活动」+ 两段说明（不可点击） | `settings.systemEntry.description`（`SettingsView.swift`） | 否 | 正文 `.frame(maxWidth: .infinity, alignment: .leading)`，父 `VStack` `space.4` 边距 |
