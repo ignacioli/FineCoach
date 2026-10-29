@@ -2,15 +2,11 @@ import SwiftUI
 
 struct LaunchOverlay: View {
     var body: some View {
-        GeometryReader { geometry in
-            ZStack(alignment: .bottom) {
-                FCSemanticColors.surfaceLaunch
-                Image("launch-mascot")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: geometry.size.width, height: geometry.size.width)
-            }
-            .frame(width: geometry.size.width, height: geometry.size.height)
+        ZStack {
+            FCSemanticColors.surfacePage
+            Image("launch-icon")
+                .resizable()
+                .frame(width: 180, height: 180)
         }
         .ignoresSafeArea()
         .accessibilityHidden(true)

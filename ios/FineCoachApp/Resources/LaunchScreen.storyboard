@@ -14,21 +14,21 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" image="launch-mascot" translatesAutoresizingMaskIntoConstraints="NO" id="launch-image">
-                                <rect key="frame" x="0.0" y="459" width="393" height="393"/>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" image="launch-icon" translatesAutoresizingMaskIntoConstraints="NO" id="launch-image">
+                                <rect key="frame" x="106.5" y="336" width="180" height="180"/>
                                 <accessibility key="accessibilityConfiguration">
                                     <bool key="isElement" value="NO"/>
                                 </accessibility>
                                 <constraints>
-                                    <constraint firstAttribute="height" secondItem="launch-image" secondAttribute="width" multiplier="1:1" id="launch-square"/>
+                                    <constraint firstAttribute="width" constant="180" id="launch-width"/>
+                                    <constraint firstAttribute="height" constant="180" id="launch-height"/>
                                 </constraints>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" name="LaunchBackground"/>
                         <constraints>
-                            <constraint firstItem="launch-image" firstAttribute="leading" secondItem="launch-view" secondAttribute="leading" id="launch-leading"/>
-                            <constraint firstItem="launch-image" firstAttribute="trailing" secondItem="launch-view" secondAttribute="trailing" id="launch-trailing"/>
-                            <constraint firstItem="launch-image" firstAttribute="bottom" secondItem="launch-view" secondAttribute="bottom" id="launch-bottom"/>
+                            <constraint firstItem="launch-image" firstAttribute="centerX" secondItem="launch-view" secondAttribute="centerX" id="launch-center-x"/>
+                            <constraint firstItem="launch-image" firstAttribute="centerY" secondItem="launch-view" secondAttribute="centerY" id="launch-center-y"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -37,9 +37,9 @@
         </scene>
     </scenes>
     <resources>
-        <image name="launch-mascot" width="1024" height="1024"/>
+        <image name="launch-icon" width="180" height="180"/>
         <namedColor name="LaunchBackground">
-            <color red="0.9725490196078431" green="0.9411764705882353" blue="0.8901960784313725" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>

@@ -2,6 +2,9 @@ import Foundation
 import XCTest
 
 final class LaunchScreenConfigurationTests: XCTestCase {
+    /// README §9.3: the launch icon side in points, shared by the storyboard and the overlay.
+    private static let iconSide = 180
+
     func testAppDebugAndReleaseUseLaunchStoryboard() throws {
         let data = try Data(contentsOf: iosRoot.appendingPathComponent("FineCoach.xcodeproj/project.pbxproj"))
         let project = try XCTUnwrap(
@@ -24,23 +27,24 @@ final class LaunchScreenConfigurationTests: XCTestCase {
         XCTAssertEqual(names.sorted(), ["Debug", "Release"])
     }
 
-    func testStoryboardUsesApprovedResourcesAndSuperviewLayoutWithoutText() throws {
+    func testStoryboardCentersTheIconWithoutText() throws {
         let source = try source(at: "FineCoachApp/Resources/LaunchScreen.storyboard")
         let parser = XMLParser(data: Data(source.utf8))
         XCTAssertTrue(parser.parse(), parser.parserError?.localizedDescription ?? "")
         XCTAssertTrue(source.contains("launchScreen=\"YES\""))
         XCTAssertTrue(source.contains("userInterfaceStyle=\"light\""))
         XCTAssertTrue(source.contains("<color key=\"backgroundColor\" name=\"LaunchBackground\""))
-        XCTAssertTrue(source.contains("image=\"launch-mascot\""))
+        XCTAssertTrue(source.contains("image=\"launch-icon\""))
         XCTAssertTrue(source.contains("contentMode=\"scaleAspectFit\""))
         XCTAssertEqual(source.components(separatedBy: "<imageView ").count - 1, 1)
         XCTAssertEqual(source.components(separatedBy: "<view ").count - 1, 1)
         XCTAssertFalse(source.contains("<label"))
-        for attribute in ["leading", "trailing", "bottom"] {
+        for attribute in ["centerX", "centerY"] {
             XCTAssertTrue(source.contains("secondItem=\"launch-view\" secondAttribute=\"\(attribute)\""))
         }
-        XCTAssertTrue(
-            source.contains("firstAttribute=\"height\" secondItem=\"launch-image\" secondAttribute=\"width\""))
+        for attribute in ["width", "height"] {
+            XCTAssertTrue(source.contains("firstAttribute=\"\(attribute)\" constant=\"\(Self.iconSide)\""))
+        }
         XCTAssertFalse(source.contains("safeArea\""))
     }
 
@@ -54,7 +58,7 @@ final class LaunchScreenConfigurationTests: XCTestCase {
         let color = try XCTUnwrap(entry["color"] as? [String: Any])
         XCTAssertEqual(color["color-space"] as? String, "srgb")
         let components = try XCTUnwrap(color["components"] as? [String: String])
-        for (name, value) in ["red": 0xF8, "green": 0xF0, "blue": 0xE3] {
+        for (name, value) in ["red": 0xFF, "green": 0xFF, "blue": 0xFF] {
             let component = try XCTUnwrap(components[name])
             let actual: Double
             if component.hasPrefix("0x") {
@@ -67,26 +71,33 @@ final class LaunchScreenConfigurationTests: XCTestCase {
         XCTAssertEqual(try XCTUnwrap(Double(try XCTUnwrap(components["alpha"]))), 1)
     }
 
-    func testLaunchMascotIsUnmodifiedApprovedAsset() throws {
-        let json = try assetJSON("launch-mascot.imageset")
+    func testLaunchIconHasRetinaRenditionsAtTheLaunchSize() throws {
+        let json = try assetJSON("launch-icon.imageset")
         let images = try XCTUnwrap(json["images"] as? [[String: Any]])
-        XCTAssertEqual(images.count, 1)
-        let entry = try XCTUnwrap(images.first)
-        XCTAssertEqual(entry["idiom"] as? String, "universal")
-        let filename = try XCTUnwrap(entry["filename"] as? String)
-        let copy = try Data(contentsOf: assetsRoot.appendingPathComponent("launch-mascot.imageset/\(filename)"))
-        let original = try Data(
-            contentsOf: iosRoot.deletingLastPathComponent().appendingPathComponent(
-                "design/design-system/assets/app-icon-light.png"))
-        XCTAssertEqual(copy, original)
+        let files = images.reduce(into: [String: String]()) { result, entry in
+            if let scale = entry["scale"] as? String, let filename = entry["filename"] as? String {
+                result[scale] = filename
+            }
+        }
+        XCTAssertEqual(Set(files.keys), ["2x", "3x"])
+        for (scale, factor) in [("2x", 2), ("3x", 3)] {
+            let filename = try XCTUnwrap(files[scale])
+            let data = try Data(contentsOf: assetsRoot.appendingPathComponent("launch-icon.imageset/\(filename)"))
+            // PNG IHDR: width and height are big-endian UInt32 at bytes 16 and 20; color type 6 is RGBA.
+            let width = data[16..<20].reduce(0) { $0 << 8 | Int($1) }
+            let height = data[20..<24].reduce(0) { $0 << 8 | Int($1) }
+            XCTAssertEqual(width, Self.iconSide * factor)
+            XCTAssertEqual(height, Self.iconSide * factor)
+            XCTAssertEqual(data[25], 6, "rounded corners need an alpha channel")
+        }
     }
 
-    func testOverlayIsDecorativeFullWidthAndDoesNotAccessData() throws {
+    func testOverlayIsDecorativeCenteredIconAndDoesNotAccessData() throws {
         let source = try source(at: "FineCoachApp/App/LaunchOverlay.swift")
         for required in [
-            "FCSemanticColors.surfaceLaunch", "Image(\"launch-mascot\")", ".resizable()", ".scaledToFit()",
-            "ZStack(alignment: .bottom)", ".frame(width: geometry.size.width, height: geometry.size.width)",
-            ".ignoresSafeArea()", ".accessibilityHidden(true)", ".allowsHitTesting(false)",
+            "FCSemanticColors.surfacePage", "Image(\"launch-icon\")", ".resizable()",
+            ".frame(width: \(Self.iconSide), height: \(Self.iconSide))", ".ignoresSafeArea()",
+            ".accessibilityHidden(true)", ".allowsHitTesting(false)",
         ] {
             XCTAssertTrue(source.contains(required), required)
         }
