@@ -88,6 +88,23 @@ final class SystemEntryConfigurationTests: XCTestCase {
         XCTAssertTrue(source.contains(".widgetURL(URL(string: \"finecoach://today\"))"))
     }
 
+    func testLiveActivityContainsOnlyAllowlistedContentAndSystemTimers() throws {
+        let source = try String(
+            contentsOf: iosRoot.appendingPathComponent("FineCoachWidgets/SessionLiveActivity.swift"), encoding: .utf8)
+        for forbidden in [
+            "studentDisplayName", "studentID", "weightValue", "repetitionCount", "bodyMeasurement", "trainingFocus",
+        ] {
+            XCTAssertFalse(source.contains(forbidden), forbidden)
+        }
+        XCTAssertTrue(source.contains("Text(timerInterval:"))
+        XCTAssertTrue(source.contains("context.isStale"))
+        XCTAssertEqual(source.components(separatedBy: ".widgetURL(SessionActivityContent.url(").count - 1, 2)
+        let bundle = try String(
+            contentsOf: iosRoot.appendingPathComponent("FineCoachWidgets/FineCoachWidgetsBundle.swift"), encoding: .utf8
+        )
+        XCTAssertTrue(bundle.contains("SessionLiveActivity()"))
+    }
+
     private var iosRoot: URL {
         URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()  // SystemEntry/

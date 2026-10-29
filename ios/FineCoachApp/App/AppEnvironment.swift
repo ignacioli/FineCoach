@@ -29,6 +29,7 @@ public final class AppEnvironment: ObservableObject {
     private let idGenerator: any IDGenerator
     private let injectedWidgetSnapshotPublisher: (any WidgetSnapshotPublishing)?
     public private(set) var widgetSnapshotPublisher: (any WidgetSnapshotPublishing)?
+    public let sessionActivityController: any SessionActivityControlling
 
     /// Injectable like the clock and ID generator: an automated test that drives the
     /// debug seed must not reach the real notification center, where requesting
@@ -227,7 +228,8 @@ public final class AppEnvironment: ObservableObject {
         clock: any Clock = SystemClock(),
         idGenerator: any IDGenerator = SystemIDGenerator(),
         notificationCenter: any LocalNotificationScheduling = SystemNotificationAdapter(),
-        widgetSnapshotPublisher: (any WidgetSnapshotPublishing)? = nil
+        widgetSnapshotPublisher: (any WidgetSnapshotPublishing)? = nil,
+        sessionActivityController: any SessionActivityControlling = SessionActivityController()
     ) throws {
         let fileManager = FileManager.default
         let root: URL
@@ -372,6 +374,7 @@ public final class AppEnvironment: ObservableObject {
         self.clock = clock
         self.idGenerator = idGenerator
         self.injectedWidgetSnapshotPublisher = widgetSnapshotPublisher
+        self.sessionActivityController = sessionActivityController
         self.notificationCenter = notificationCenter
         self.startupErrorDescription = nil
         self.catalogUnavailableMessage = nil
@@ -410,6 +413,7 @@ public final class AppEnvironment: ObservableObject {
         self.clock = SystemClock()
         self.idGenerator = SystemIDGenerator()
         self.injectedWidgetSnapshotPublisher = nil
+        self.sessionActivityController = NoopSessionActivityController()
         self.notificationCenter = SystemNotificationAdapter()
         self.startupErrorDescription = (failure as? LocalizedError)?.errorDescription ?? "本地存储暂不可用。"
         self.catalogUnavailableMessage = nil
@@ -502,7 +506,8 @@ public final class AppEnvironment: ObservableObject {
             storeGenerationUUID: generationUUID,
             clock: clock,
             ids: idGenerator,
-            widgetSnapshots: publisher
+            widgetSnapshots: publisher,
+            sessionActivities: sessionActivityController
         )
         historyUseCases = HistoryUseCases(
             sessionRepository: sessions,

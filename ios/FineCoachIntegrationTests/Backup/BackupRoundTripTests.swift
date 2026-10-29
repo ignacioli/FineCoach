@@ -41,7 +41,8 @@
                 rootURL: destinationRoot.url,
                 clock: TestClock(utcDate: now),
                 idGenerator: TestIDGenerator(ids: [restoredGenerationID]),
-                notificationCenter: FakeNotificationScheduling()
+                notificationCenter: FakeNotificationScheduling(),
+                sessionActivityController: NoopSessionActivityController()
             )
             let viewModel = BackupRestoreFlowViewModel(
                 coordinator: try environment.requireBackupCoordinator()
@@ -212,7 +213,7 @@
             let environment = try AppEnvironment(
                 rootURL: rootURL,
                 clock: clock,
-                idGenerator: ids
+                idGenerator: ids, sessionActivityController: NoopSessionActivityController()
             )
             XCTAssertTrue(environment.isStorageAvailable)
             try await environment.requireBackupCoordinator().restoreReplacingCurrent(
@@ -252,7 +253,8 @@
             let environment = try AppEnvironment(
                 rootURL: root.url,
                 clock: clock,
-                idGenerator: TestIDGenerator(ids: [destinationGenerationID])
+                idGenerator: TestIDGenerator(ids: [destinationGenerationID]),
+                sessionActivityController: NoopSessionActivityController()
             )
             let viewModel = BackupRestoreFlowViewModel(coordinator: try environment.requireBackupCoordinator())
 
@@ -289,7 +291,9 @@
             fileURL: URL,
             expectedDisplayName: String
         ) async throws {
-            let environment = try AppEnvironment(rootURL: rootURL, clock: clock, idGenerator: ids)
+            let environment = try AppEnvironment(
+                rootURL: rootURL, clock: clock, idGenerator: ids,
+                sessionActivityController: NoopSessionActivityController())
             let viewModel = BackupRestoreFlowViewModel(coordinator: try environment.requireBackupCoordinator())
             viewModel.password = passwordText
             viewModel.pickedFileURL = fileURL

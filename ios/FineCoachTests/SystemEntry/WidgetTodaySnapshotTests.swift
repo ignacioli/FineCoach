@@ -387,7 +387,7 @@ final class WidgetTodaySnapshotTests: XCTestCase {
             let publisher = FakeWidgetSnapshotPublisher()
             let environment = try AppEnvironment(
                 rootURL: directory.url, notificationCenter: FakeNotificationScheduling(),
-                widgetSnapshotPublisher: publisher)
+                widgetSnapshotPublisher: publisher, sessionActivityController: NoopSessionActivityController())
             await AppLifecycleCoordinator().sceneDidBecomeActive(environment: environment)
             let count = await publisher.refreshCount
             XCTAssertEqual(count, 1)

@@ -5,5 +5,6 @@ import WidgetKit
 struct FineCoachWidgetsBundle: WidgetBundle {
     var body: some Widget {
         TodayWidget()
+        SessionLiveActivity()
     }
 }

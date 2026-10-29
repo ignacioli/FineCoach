@@ -74,7 +74,8 @@ final class WidgetSnapshotPublisherTests: XCTestCase {
             snapshotURL: { nil }, logger: events, reload: { events.reload() })
         let environment = try AppEnvironment(
             rootURL: directory.url,
-            notificationCenter: FakeNotificationScheduling(), widgetSnapshotPublisher: publisher)
+            notificationCenter: FakeNotificationScheduling(), widgetSnapshotPublisher: publisher,
+            sessionActivityController: NoopSessionActivityController())
         let students = try XCTUnwrap(environment.studentUseCases)
         let appointments = try XCTUnwrap(environment.appointmentUseCases)
         let student = try await students.create(draft: StudentDraft(displayName: "虚构学员甲", sex: .undisclosed))

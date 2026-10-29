@@ -315,7 +315,7 @@ final class ArchiveExportScreenTests: XCTestCase {
             // The seed creates appointments with reminders enabled, so the real
             // notification center would present an authorization prompt that no
             // automated run can answer. Keep this test off the system prompt.
-            notificationCenter: FakeNotificationScheduling()
+            notificationCenter: FakeNotificationScheduling(), sessionActivityController: NoopSessionActivityController()
         )
         let seeded = await ArchiveExportDebugSeed.seed(in: environment)
         XCTAssertTrue(seeded)
@@ -349,7 +349,7 @@ final class ArchiveExportScreenTests: XCTestCase {
             // The seed creates appointments with reminders enabled, so the real
             // notification center would present an authorization prompt that no
             // automated run can answer. Keep this test off the system prompt.
-            notificationCenter: FakeNotificationScheduling()
+            notificationCenter: FakeNotificationScheduling(), sessionActivityController: NoopSessionActivityController()
         )
         let seeded = await ArchiveExportDebugSeed.seed(in: environment)
         XCTAssertTrue(seeded, "seed stopped early")

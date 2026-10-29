@@ -1,6 +1,72 @@
 {
   "sourceLanguage": "zh-Hans",
   "strings": {
+    "activity.session.generic": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练中"
+          }
+        }
+      }
+    },
+    "activity.session.completed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已完成 %lld 组"
+          }
+        }
+      }
+    },
+    "activity.session.resting": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %lld 组 · 休息"
+          }
+        }
+      }
+    },
+    "activity.session.restEnded": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %lld 组 · 休息结束"
+          }
+        }
+      }
+    },
+    "activity.session.overdue": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已超时"
+          }
+        }
+      }
+    },
+    "activity.session.setCount": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 组"
+          }
+        }
+      }
+    },
     "widget.today.title": {
       "extractionState": "manual",
       "localizations": {

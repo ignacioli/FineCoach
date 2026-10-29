@@ -411,6 +411,12 @@
 		0B687C32BA198F06D4F7649C /* WidgetSnapshotPublisherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2E932546811B535CA39626 /* WidgetSnapshotPublisherTests.swift */; };
 		2410868D5F801F6D3B2393BA /* Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = A150 /* Tokens.swift */; };
 		1916280FE55154F5AF7EE83F /* Localizable.xcstrings in Sources */ = {isa = PBXBuildFile; fileRef = A172 /* Localizable.xcstrings */; };
+		14FC8DCB0C4E0F4B8A6B2E89 /* SessionActivityContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1C8F9037E7C523547C8F299 /* SessionActivityContent.swift */; };
+		8D24FB4031B7AE1D346F6404 /* SessionActivityContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1C8F9037E7C523547C8F299 /* SessionActivityContent.swift */; };
+		7F194C3141F5EDCFEB81B1EA /* SessionActivityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9D228FBBF69B4604ACDDEC /* SessionActivityController.swift */; };
+		45FD7425C3B82E93534031F6 /* SessionLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52955A2B4D438AABEBC77EC0 /* SessionLiveActivity.swift */; };
+		F709294534CEE0A1752D5DEC /* SessionActivityContentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3DD0A70CE10A8B104708EFE /* SessionActivityContentTests.swift */; };
+		897B33B21430F12C579574AE /* SessionActivityHookTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5D0B5A1D3F10627248216C /* SessionActivityHookTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -850,6 +856,11 @@
 		C7B0DD32B499057EACD634B8 /* TodayWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FineCoachWidgets/TodayWidget.swift; sourceTree = SOURCE_ROOT; };
 		06D4F64F06ED3776BBFFB28C /* WidgetTodaySnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FineCoachTests/SystemEntry/WidgetTodaySnapshotTests.swift; sourceTree = SOURCE_ROOT; };
 		CD2E932546811B535CA39626 /* WidgetSnapshotPublisherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FineCoachIntegrationTests/SystemEntry/WidgetSnapshotPublisherTests.swift; sourceTree = SOURCE_ROOT; };
+		E1C8F9037E7C523547C8F299 /* SessionActivityContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FineCoachApp/Core/Domain/SessionActivityContent.swift; sourceTree = SOURCE_ROOT; };
+		CE9D228FBBF69B4604ACDDEC /* SessionActivityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FineCoachApp/Core/Application/SessionActivityController.swift; sourceTree = SOURCE_ROOT; };
+		52955A2B4D438AABEBC77EC0 /* SessionLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FineCoachWidgets/SessionLiveActivity.swift; sourceTree = SOURCE_ROOT; };
+		C3DD0A70CE10A8B104708EFE /* SessionActivityContentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FineCoachTests/SystemEntry/SessionActivityContentTests.swift; sourceTree = SOURCE_ROOT; };
+		5B5D0B5A1D3F10627248216C /* SessionActivityHookTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FineCoachTests/ActiveSession/SessionActivityHookTests.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1196,6 +1207,7 @@
 		A411 /* Domain */ = {
 			isa = PBXGroup;
 			children = (
+				E1C8F9037E7C523547C8F299 /* SessionActivityContent.swift */,
 				E00000000000000000000100 /* EstimatedOneRepMax.swift */,
 				E00000000000000000000102 /* InsightEngine.swift */,
 				A110 /* DomainError.swift */,
@@ -1235,6 +1247,7 @@
 		A412 /* Application */ = {
 			isa = PBXGroup;
 			children = (
+				CE9D228FBBF69B4604ACDDEC /* SessionActivityController.swift */,
 				E00000000000000000000104 /* InsightSnoozeStore.swift */,
 				E00000000000000000000112 /* InsightUseCases.swift */,
 				A120 /* Protocols.swift */,
@@ -1618,6 +1631,7 @@
 		A476 /* ActiveSession */ = {
 			isa = PBXGroup;
 			children = (
+				5B5D0B5A1D3F10627248216C /* SessionActivityHookTests.swift */,
 				A232 /* SessionSetDomainTests.swift */,
 				A714 /* DurationTextParserTests.swift */,
 				A712 /* TrainingSetDisplaySummaryTests.swift */,
@@ -2001,6 +2015,7 @@
 		F60000000000000000000007 /* FineCoachWidgets */ = {
 			isa = PBXGroup;
 			children = (
+				52955A2B4D438AABEBC77EC0 /* SessionLiveActivity.swift */,
 				F60000000000000000000003 /* FineCoachWidgetsBundle.swift */,
 				F60000000000000000000004 /* FineCoachWidgets.entitlements */,
 				F60000000000000000000005 /* Info.plist */,
@@ -2011,6 +2026,7 @@
 		F60000000000000000000008 /* SystemEntry */ = {
 			isa = PBXGroup;
 			children = (
+				C3DD0A70CE10A8B104708EFE /* SessionActivityContentTests.swift */,
 				F60000000000000000000006 /* SystemEntryConfigurationTests.swift */,
 				F60000000000000000000022 /* SystemEntryRoutingTests.swift */,
 				F60000000000000000000023 /* SystemEntryInfrastructureTests.swift */,
@@ -2216,6 +2232,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7F194C3141F5EDCFEB81B1EA /* SessionActivityController.swift in Sources */,
+				14FC8DCB0C4E0F4B8A6B2E89 /* SessionActivityContent.swift in Sources */,
 				118BDF7DB6278B04B5D07350 /* WidgetSnapshotPublisher.swift */,
 				DDE0BC2BC6124C7E47372AF8 /* WidgetSnapshotReader.swift */,
 				5A36BF5108C356DF5C9E7A7D /* WidgetTodaySnapshot.swift */,
@@ -2461,6 +2479,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				897B33B21430F12C579574AE /* SessionActivityHookTests.swift in Sources */,
+				F709294534CEE0A1752D5DEC /* SessionActivityContentTests.swift in Sources */,
 				729EFB0C1478E6BAC8B800C5 /* WidgetTodaySnapshotTests.swift */,
 				F6000000000000000000000A /* SystemEntryConfigurationTests.swift in Sources */,
 				F60000000000000000000032 /* SystemEntryRoutingTests.swift in Sources */,
@@ -2620,6 +2640,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				45FD7425C3B82E93534031F6 /* SessionLiveActivity.swift in Sources */,
+				8D24FB4031B7AE1D346F6404 /* SessionActivityContent.swift in Sources */,
 				2410868D5F801F6D3B2393BA /* Tokens.swift */,
 				0662726F7F0E9DC10FCDBC6C /* TodayWidget.swift */,
 				8F550160763C09D2A321AFD9 /* WidgetSnapshotReader.swift */,

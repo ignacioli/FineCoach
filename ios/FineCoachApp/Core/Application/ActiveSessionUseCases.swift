@@ -9,6 +9,7 @@ public struct ActiveSessionUseCases: Sendable {
     private let clock: any Clock
     private let widgetSnapshots: any WidgetSnapshotPublishing
     private let ids: any IDGenerator
+    public let sessionActivities: any SessionActivityControlling
 
     /// Aggregate status for the single-Session call sites.
     public var saveStatus: PersistenceProjectionStatus {
@@ -28,7 +29,8 @@ public struct ActiveSessionUseCases: Sendable {
         storeGenerationUUID: UUID,
         clock: any Clock,
         ids: any IDGenerator,
-        widgetSnapshots: any WidgetSnapshotPublishing = NoopWidgetSnapshotPublisher()
+        widgetSnapshots: any WidgetSnapshotPublishing = NoopWidgetSnapshotPublisher(),
+        sessionActivities: any SessionActivityControlling = NoopSessionActivityController()
     ) {
         self.sessionRepository = sessionRepository
         self.studentRepository = studentRepository
@@ -37,6 +39,7 @@ public struct ActiveSessionUseCases: Sendable {
         self.clock = clock
         self.ids = ids
         self.widgetSnapshots = widgetSnapshots
+        self.sessionActivities = sessionActivities
         self.coordinator = ActiveSessionCoordinator(
             sessionRepository: sessionRepository,
             recoveryStore: recoveryStore,
@@ -90,6 +93,7 @@ public struct ActiveSessionUseCases: Sendable {
 
     public func startOrOpen(studentID: StableUUID, trainingFocus: Set<BodyPart> = []) async throws -> Session {
         if let active = try await coordinator.workingCopy(studentID: studentID) {
+            await ensureSessionActivity(for: active)
             return active
         }
         let student = try await studentRepository.student(id: studentID)
@@ -103,11 +107,14 @@ public struct ActiveSessionUseCases: Sendable {
             now: clock.nowUTC()
         )
         do {
-            return try await coordinator.persist(session)
+            let saved = try await coordinator.persist(session)
+            await ensureSessionActivity(for: saved)
+            return saved
         } catch DomainError.conflict {
             // A concurrent start for the same Student won; return his Session
             // instead of creating a second one.
             if let existing = try await coordinator.workingCopy(studentID: studentID) {
+                await ensureSessionActivity(for: existing)
                 return existing
             }
             throw DomainError.conflict
@@ -515,6 +522,7 @@ public struct ActiveSessionUseCases: Sendable {
         if let active = try? await sessionRepository.loadAllActive() {
             await reconcileSessionScopeClaimsBestEffort(for: active)
         }
+        await sessionActivities.end(sessionID: finished.id.rawValue.uuidString.lowercased())
         await widgetSnapshots.refresh()
         return finished
     }
@@ -530,8 +538,20 @@ public struct ActiveSessionUseCases: Sendable {
         if let active = try? await sessionRepository.loadAllActive() {
             await reconcileSessionScopeClaimsBestEffort(for: active)
         }
+        await sessionActivities.end(sessionID: abandoned.id.rawValue.uuidString.lowercased())
         await widgetSnapshots.refresh()
         return abandoned
+    }
+
+    private func ensureSessionActivity(for session: Session) async {
+        guard session.state == .inProgress, case .saved = coordinator.saveStatus(sessionID: session.id) else { return }
+        let exercise = session.exercises.last
+        await sessionActivities.start(
+            sessionID: session.id.rawValue.uuidString.lowercased(),
+            content: SessionActivityAttributes.ContentState(
+                exerciseName: exercise?.displayNameSnapshot.value ?? "",
+                completedSetCount: exercise?.sets.filter { $0.state == .completed }.count ?? 0,
+                restEndsAt: nil))
     }
 
     private func mutate(
