@@ -56,7 +56,16 @@ public actor WidgetSnapshotPublisher: WidgetSnapshotPublishing {
             logger.info(.systemEntrySnapshotWritten, operation: .systemEntry)
         } catch {
             logger.failure(.systemEntrySnapshotFailed, operation: .systemEntry, category: .persistenceFailed)
+            discardStaleSnapshot()
         }
+    }
+
+    /// A failed rebuild must not leave an older snapshot (and its names) on
+    /// screen; without a file the widget falls back to its placeholder.
+    private func discardStaleSnapshot() {
+        guard let url = snapshotURL(), FileManager.default.fileExists(atPath: url.path) else { return }
+        guard (try? FileManager.default.removeItem(at: url)) != nil else { return }
+        reload()
     }
 }
 

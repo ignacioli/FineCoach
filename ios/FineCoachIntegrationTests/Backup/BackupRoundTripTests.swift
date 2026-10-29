@@ -291,15 +291,20 @@
             fileURL: URL,
             expectedDisplayName: String
         ) async throws {
+            let snapshots = FakeWidgetSnapshotPublisher()
             let environment = try AppEnvironment(
-                rootURL: rootURL, clock: clock, idGenerator: ids,
+                rootURL: rootURL, clock: clock, idGenerator: ids, widgetSnapshotPublisher: snapshots,
                 sessionActivityController: NoopSessionActivityController())
             let viewModel = BackupRestoreFlowViewModel(coordinator: try environment.requireBackupCoordinator())
             viewModel.password = passwordText
             viewModel.pickedFileURL = fileURL
+            let refreshesBefore = await snapshots.refreshCount
             await viewModel.restoreNow(using: environment)
 
             XCTAssertTrue(viewModel.succeeded)
+            // N1 (stage F privacy review): the restored data replaces the widget's names at once.
+            let refreshesAfter = await snapshots.refreshCount
+            XCTAssertEqual(refreshesAfter - refreshesBefore, 1)
             XCTAssertFalse(viewModel.failed)
             XCTAssertNil(viewModel.errorMessage)
             let students = try await environment.requireUseCases().searchActive(query: "")

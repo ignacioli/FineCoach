@@ -131,6 +131,22 @@ final class WidgetSnapshotPublisherTests: XCTestCase {
         }
     }
 
+    func testFailedRebuildRemovesThePreviousSnapshotAndReloadsOnce() async throws {
+        let directory = try TemporaryProtectedDirectory()
+        let url = directory.url.appendingPathComponent("widget-today.json")
+        try JSONEncoder().encode(snapshot()).write(to: url)
+        let events = Events()
+        let publisher = WidgetSnapshotPublisher(
+            rebuild: { throw CocoaError(.fileReadUnknown) }, snapshotURL: { url }, logger: events,
+            reload: { events.reload() })
+        await publisher.refresh()
+        await publisher.flush()
+        XCTAssertFalse(FileManager.default.fileExists(atPath: url.path))
+        XCTAssertNil(WidgetSnapshotReader.read(at: url))
+        XCTAssertEqual(events.recorded, [.systemEntrySnapshotFailed])
+        XCTAssertEqual(events.reloadCount, 1)
+    }
+
     func testQueuedRefreshesWriteSeriallyAndLeaveLatestSnapshot() async throws {
         actor Source {
             var count = 0
