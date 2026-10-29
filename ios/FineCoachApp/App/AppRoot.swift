@@ -15,6 +15,8 @@ import SwiftUI
 /// can forget it (NFR-003). Modal content still covers itself with `fcPrivacyCovered()`.
 @MainActor
 struct AppRoot: View {
+    private static var hasPresentedLaunch = false
+
     private enum FirstLaunchRoute {
         case choice
         case coach
@@ -31,6 +33,9 @@ struct AppRoot: View {
     @EnvironmentObject private var privacyCoordinator: ScenePrivacyCoordinator
     @EnvironmentObject private var restNotificationRouter: RestNotificationRouter
     @EnvironmentObject private var systemEntryRouter: SystemEntryRouter
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var showsLaunchOverlay = !Self.hasPresentedLaunch
+    @State private var launchOpacity = 1.0
     @State private var installState: InstallState?
     @State private var archiveServices: ArchiveServices?
     @State private var firstLaunchRoute: FirstLaunchRoute = .choice
@@ -64,8 +69,33 @@ struct AppRoot: View {
                 systemOpenLayer(request, services: archiveServices)
             }
 
+            if showsLaunchOverlay && !reduceMotion {
+                LaunchOverlay()
+                    .opacity(launchOpacity)
+            }
+
             if privacyCoordinator.isCovered {
                 PrivacyCover()
+            }
+        }
+        .task {
+            guard !Self.hasPresentedLaunch else {
+                showsLaunchOverlay = false
+                return
+            }
+            Self.hasPresentedLaunch = true
+            defer { showsLaunchOverlay = false }
+            guard !reduceMotion else { return }
+            do {
+                try await Task.sleep(for: .seconds(0.3))
+                withAnimation(FCMotion.curveStandard(duration: FCMotion.durationFast)) {
+                    launchOpacity = 0
+                }
+                try await Task.sleep(for: .seconds(FCMotion.durationFast))
+            } catch is CancellationError {
+                // A removed root must not replay the overlay when it returns.
+            } catch {
+                assertionFailure("Unexpected launch delay failure: \(error)")
             }
         }
         .task {

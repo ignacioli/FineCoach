@@ -296,6 +296,7 @@
 		B9A8 /* PerStudentSessionIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A8 /* PerStudentSessionIntegrationTests.swift */; };
 		B710 /* ActiveSessionSetRowInteractionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A710 /* ActiveSessionSetRowInteractionTests.swift */; };
 		B975 /* ActiveSessionSetEntryPrefillTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A975 /* ActiveSessionSetEntryPrefillTests.swift */; };
+		D011B /* ActiveSessionOpenExistingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D011A /* ActiveSessionOpenExistingTests.swift */; };
 		B711 /* ActiveSessionCardioDurationConversionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A711 /* ActiveSessionCardioDurationConversionTests.swift */; };
 		B720 /* BodyDataPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A720 /* BodyDataPersistenceTests.swift */; };
 		B234 /* ActiveSessionRecoveryCodecTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A234 /* ActiveSessionRecoveryCodecTests.swift */; };
@@ -420,6 +421,9 @@
 		F65000000000000000000011 /* SystemEntryIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = F65000000000000000000001 /* SystemEntryIntents.swift */; };
 		F65000000000000000000012 /* SystemEntryIntentsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F65000000000000000000002 /* SystemEntryIntentsTests.swift */; };
 		F65000000000000000000013 /* AppShortcuts.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F65000000000000000000003 /* AppShortcuts.xcstrings */; };
+		F71000000000000000000011 /* LaunchOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71000000000000000000001 /* LaunchOverlay.swift */; };
+		F71000000000000000000012 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F71000000000000000000002 /* LaunchScreen.storyboard */; };
+		F71000000000000000000013 /* LaunchScreenConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71000000000000000000003 /* LaunchScreenConfigurationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -771,6 +775,7 @@
 		A9A8 /* PerStudentSessionIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerStudentSessionIntegrationTests.swift; sourceTree = "<group>"; };
 		A710 /* ActiveSessionSetRowInteractionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionSetRowInteractionTests.swift; sourceTree = "<group>"; };
 		A975 /* ActiveSessionSetEntryPrefillTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionSetEntryPrefillTests.swift; sourceTree = "<group>"; };
+		D011A /* ActiveSessionOpenExistingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionOpenExistingTests.swift; sourceTree = "<group>"; };
 		A711 /* ActiveSessionCardioDurationConversionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionCardioDurationConversionTests.swift; sourceTree = "<group>"; };
 		A720 /* BodyDataPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyDataPersistenceTests.swift; sourceTree = "<group>"; };
 		A234 /* ActiveSessionRecoveryCodecTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionRecoveryCodecTests.swift; sourceTree = "<group>"; };
@@ -867,6 +872,9 @@
 		F65000000000000000000001 /* SystemEntryIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemEntryIntents.swift; sourceTree = "<group>"; };
 		F65000000000000000000002 /* SystemEntryIntentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemEntryIntentsTests.swift; sourceTree = "<group>"; };
 		F65000000000000000000003 /* AppShortcuts.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = AppShortcuts.xcstrings; sourceTree = "<group>"; };
+		F71000000000000000000001 /* LaunchOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchOverlay.swift; sourceTree = "<group>"; };
+		F71000000000000000000002 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		F71000000000000000000003 /* LaunchScreenConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreenConfigurationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -998,6 +1006,7 @@
 		A401 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				F71000000000000000000001 /* LaunchOverlay.swift */,
 				A100 /* AppEnvironment.swift */,
 				A180 /* FCAccessibilityID.swift */,
 				A181 /* RootNavigation.swift */,
@@ -1159,6 +1168,7 @@
 		A405 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				F71000000000000000000002 /* LaunchScreen.storyboard */,
 				A173 /* Assets.xcassets */,
 				F65000000000000000000003 /* AppShortcuts.xcstrings */,
 				A172 /* Localizable.xcstrings */,
@@ -1657,6 +1667,7 @@
 				A710 /* ActiveSessionSetRowInteractionTests.swift */,
 				D004A /* ActiveSessionNewRecordTests.swift */,
 				A975 /* ActiveSessionSetEntryPrefillTests.swift */,
+				D011A /* ActiveSessionOpenExistingTests.swift */,
 				A711 /* ActiveSessionCardioDurationConversionTests.swift */,
 			);
 			path = ActiveSession;
@@ -1833,6 +1844,7 @@
 		A492 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				F71000000000000000000003 /* LaunchScreenConfigurationTests.swift */,
 				A252 /* ScenePrivacyCoordinatorTests.swift */,
 				A95A /* EmptyStateFirstLoadTests.swift */,
 				A95B /* RootNavigationReturnTests.swift */,
@@ -2192,6 +2204,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F71000000000000000000012 /* LaunchScreen.storyboard in Resources */,
 				F65000000000000000000013 /* AppShortcuts.xcstrings in Resources */,
 				B170 /* Localizable.xcstrings in Resources */,
 				B171 /* Assets.xcassets in Resources */,
@@ -2242,6 +2255,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F71000000000000000000011 /* LaunchOverlay.swift in Sources */,
 				7F194C3141F5EDCFEB81B1EA /* SessionActivityController.swift in Sources */,
 				14FC8DCB0C4E0F4B8A6B2E89 /* SessionActivityContent.swift in Sources */,
 				118BDF7DB6278B04B5D07350 /* WidgetSnapshotPublisher.swift */,
@@ -2490,6 +2504,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F71000000000000000000013 /* LaunchScreenConfigurationTests.swift in Sources */,
 				897B33B21430F12C579574AE /* SessionActivityHookTests.swift in Sources */,
 				F709294534CEE0A1752D5DEC /* SessionActivityContentTests.swift in Sources */,
 				729EFB0C1478E6BAC8B800C5 /* WidgetTodaySnapshotTests.swift */,
@@ -2615,6 +2630,7 @@
 				B710 /* ActiveSessionSetRowInteractionTests.swift in Sources */,
 				D004B /* ActiveSessionNewRecordTests.swift in Sources */,
 				B975 /* ActiveSessionSetEntryPrefillTests.swift in Sources */,
+				D011B /* ActiveSessionOpenExistingTests.swift in Sources */,
 				B711 /* ActiveSessionCardioDurationConversionTests.swift in Sources */,
 				B720 /* BodyDataPersistenceTests.swift in Sources */,
 				B236 /* RecoveryProjectionTests.swift in Sources */,
@@ -2734,7 +2750,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "精练教练";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				MARKETING_VERSION = 0.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app;
 				PRODUCT_NAME = FineCoach;
@@ -2758,7 +2774,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "精练教练";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				MARKETING_VERSION = 0.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app;
 				PRODUCT_NAME = FineCoach;

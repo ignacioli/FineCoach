@@ -52,6 +52,7 @@ struct ActiveSessionView: View {
     init(
         studentID: StableUUID,
         useCases: ActiveSessionUseCases,
+        entryMode: ActiveSessionEntryMode = .startOrOpen,
         templateUseCases: TemplateUseCases? = nil,
         studentUseCases: StudentUseCases? = nil,
         creditSettlement: SessionCreditSettlement? = nil,
@@ -65,6 +66,7 @@ struct ActiveSessionView: View {
             wrappedValue: ActiveSessionViewModel(
                 studentID: studentID,
                 useCases: useCases,
+                entryMode: entryMode,
                 templateUseCases: templateUseCases,
                 creditSettlement: creditSettlement,
                 notifications: notifications
@@ -212,6 +214,11 @@ struct ActiveSessionView: View {
             let resolvedStudentID = viewModel.session?.studentID ?? viewModel.studentID
             if let studentUseCases, let student = try? await studentUseCases.student(id: resolvedStudentID) {
                 studentName = student.displayName.value
+            }
+        }
+        .onChange(of: viewModel.sessionUnavailable) { _, unavailable in
+            if unavailable {
+                path.removeAll()
             }
         }
         .onChange(of: scenePhase) { _, phase in
