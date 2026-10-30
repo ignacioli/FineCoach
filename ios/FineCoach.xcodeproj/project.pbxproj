@@ -374,6 +374,7 @@
 		016E1128FF8B3A0A928741A8 /* ArchiveExportDebugSeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38987A9BE9D66B2A01BC2302 /* ArchiveExportDebugSeed.swift */; };
 		84D9618B61F2BC059C9B7FF6 /* ArchiveExportScreenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 359027FF7430F369D5495762 /* ArchiveExportScreenTests.swift */; };
 		D001B /* FCNewRecordBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D001A; };
+		FC3000000000000000000002 /* FCAmbientEmptyScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC3000000000000000000001; };
 		D002B /* SessionGains.swift in Sources */ = {isa = PBXBuildFile; fileRef = D002A; };
 		D003B /* SessionGainsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D003A; };
 		D004B /* ActiveSessionNewRecordTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D004A; };
@@ -421,9 +422,9 @@
 		F65000000000000000000011 /* SystemEntryIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = F65000000000000000000001 /* SystemEntryIntents.swift */; };
 		F65000000000000000000012 /* SystemEntryIntentsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F65000000000000000000002 /* SystemEntryIntentsTests.swift */; };
 		F65000000000000000000013 /* AppShortcuts.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F65000000000000000000003 /* AppShortcuts.xcstrings */; };
-		F71000000000000000000011 /* LaunchOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71000000000000000000001 /* LaunchOverlay.swift */; };
 		F71000000000000000000012 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F71000000000000000000002 /* LaunchScreen.storyboard */; };
 		F71000000000000000000013 /* LaunchScreenConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71000000000000000000003 /* LaunchScreenConfigurationTests.swift */; };
+		FC3000000000000000000004 /* FCAmbientEmptySceneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC3000000000000000000003 /* FCAmbientEmptySceneTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -829,6 +830,7 @@
 		38987A9BE9D66B2A01BC2302 /* ArchiveExportDebugSeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportDebugSeed.swift; sourceTree = "<group>"; };
 		359027FF7430F369D5495762 /* ArchiveExportScreenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExportScreenTests.swift; sourceTree = "<group>"; };
 		D001A /* FCNewRecordBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCNewRecordBadge.swift; sourceTree = "<group>"; };
+		FC3000000000000000000001 /* FCAmbientEmptyScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCAmbientEmptyScene.swift; sourceTree = "<group>"; };
 		D002A /* SessionGains.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionGains.swift; sourceTree = "<group>"; };
 		D003A /* SessionGainsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionGainsTests.swift; sourceTree = "<group>"; };
 		D004A /* ActiveSessionNewRecordTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionNewRecordTests.swift; sourceTree = "<group>"; };
@@ -872,9 +874,9 @@
 		F65000000000000000000001 /* SystemEntryIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemEntryIntents.swift; sourceTree = "<group>"; };
 		F65000000000000000000002 /* SystemEntryIntentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemEntryIntentsTests.swift; sourceTree = "<group>"; };
 		F65000000000000000000003 /* AppShortcuts.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = AppShortcuts.xcstrings; sourceTree = "<group>"; };
-		F71000000000000000000001 /* LaunchOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchOverlay.swift; sourceTree = "<group>"; };
 		F71000000000000000000002 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F71000000000000000000003 /* LaunchScreenConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreenConfigurationTests.swift; sourceTree = "<group>"; };
+		FC3000000000000000000003 /* FCAmbientEmptySceneTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCAmbientEmptySceneTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1006,7 +1008,6 @@
 		A401 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				F71000000000000000000001 /* LaunchOverlay.swift */,
 				A100 /* AppEnvironment.swift */,
 				A180 /* FCAccessibilityID.swift */,
 				A181 /* RootNavigation.swift */,
@@ -1456,6 +1457,7 @@
 				A161 /* FCTextField.swift */,
 				A162 /* FCSetRow.swift */,
 				D001A /* FCNewRecordBadge.swift */,
+				FC3000000000000000000001 /* FCAmbientEmptyScene.swift */,
 				A163 /* FCSaveStatusView.swift */,
 				A910 /* FCSegmentedSwitch.swift */,
 				A911 /* FCChip.swift */,
@@ -1845,6 +1847,7 @@
 			isa = PBXGroup;
 			children = (
 				F71000000000000000000003 /* LaunchScreenConfigurationTests.swift */,
+				FC3000000000000000000003 /* FCAmbientEmptySceneTests.swift */,
 				A252 /* ScenePrivacyCoordinatorTests.swift */,
 				A95A /* EmptyStateFirstLoadTests.swift */,
 				A95B /* RootNavigationReturnTests.swift */,
@@ -2255,7 +2258,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F71000000000000000000011 /* LaunchOverlay.swift in Sources */,
 				7F194C3141F5EDCFEB81B1EA /* SessionActivityController.swift in Sources */,
 				14FC8DCB0C4E0F4B8A6B2E89 /* SessionActivityContent.swift in Sources */,
 				118BDF7DB6278B04B5D07350 /* WidgetSnapshotPublisher.swift */,
@@ -2468,6 +2470,7 @@
 				B162 /* FCSetRow.swift in Sources */,
 				B981 /* FCMotion.swift in Sources */,
 				D001B /* FCNewRecordBadge.swift in Sources */,
+				FC3000000000000000000002 /* FCAmbientEmptyScene.swift in Sources */,
 				B163 /* FCSaveStatusView.swift in Sources */,
 				B310 /* OnboardingView.swift in Sources */,
 				B311 /* StudentEditorView.swift in Sources */,
@@ -2505,6 +2508,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F71000000000000000000013 /* LaunchScreenConfigurationTests.swift in Sources */,
+				FC3000000000000000000004 /* FCAmbientEmptySceneTests.swift in Sources */,
 				897B33B21430F12C579574AE /* SessionActivityHookTests.swift in Sources */,
 				F709294534CEE0A1752D5DEC /* SessionActivityContentTests.swift in Sources */,
 				729EFB0C1478E6BAC8B800C5 /* WidgetTodaySnapshotTests.swift */,

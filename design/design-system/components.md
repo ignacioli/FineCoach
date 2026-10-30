@@ -119,6 +119,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 
 | ID | 代码 | 来源 | 消费者（feature） | 状态 |
 |---|---|---|---|---|
+| `DS-AMBIENT-SCENE` | `FCAmbientEmptyScene` | README §9 / §14.2 / C30 | Today、Calendar | 已实现，负责人 2026-10-30 模拟器走查通过 |
 | `DS-BASE` | `FCPrimitives`、`FCSemanticColors`、`FCFont`、`FCTextStyle`、`FCFontWeightVariant` | README §2–§5 | 全部 | L0 全自动 |
 | `DS-BUTTON` | `FCButton`、`FCSecondaryButton`、`FCLinkButton` | §8 主按钮 / 次按钮 / 链接式按钮 | 主按钮 27 个文件；次按钮 1 个（2026-10-22 起增加分享预览「完成」、训练总结「跳过分享」）；链接按钮 13 个 | 稳定 |
 | `DS-TITLE-ACTION` | `FCTitleIconButton`、`FCTitleAddButton` | §8.1 标题行图标按钮、标题行「＋」、设置入口；40/41 | Today、StudentList、ExerciseLibrary | 稳定 |
@@ -449,7 +450,7 @@ C 类，只补规则，默认字号下外观不变：
 
 #### `DS-AMBIENT-SCENE` 空态环境场景
 
-- **部件**：方形插画框，自下而上四层：`mascot-cafe-rabbit` → `mascot-cafe-blink`（平时隐藏）→ `mascot-cafe-table` → 代码画的三缕热气。三张图同一画布坐标，`resizable` + `scaledToFit` 铺满插画框，不另行偏移。尺寸由调用方给：今日 220×220；课程日历 160×160（与月历同屏，220 会把当天列表挤出首屏；负责人走查时确认）。
+- **部件**：方形插画框，自下而上四层：`mascot-cafe-rabbit` → `mascot-cafe-blink`（平时隐藏）→ `mascot-cafe-table` → 代码画的三缕热气。三张图同一画布坐标，`resizable` + `scaledToFit` 铺满插画框，不另行偏移。尺寸由调用方给：今日 220×220；课程日历 160×160（与月历同屏，220 会把当天列表挤出首屏；负责人 2026-10-30 走查确认）。
 - **动作**：只用 README §14.2 的 `motion.ambient.steam`、`breath`、`blink`；呼吸只缩放兔子两层。用 `TimelineView` 按时间算出每一帧（纯函数，可单测），不用 `repeatForever` 动画。
 - **不变量**：整个插画框是一个装饰元素，`accessibilityHidden(true)`，文字由页面自己的标题、说明承担；不响应点击，不改数据，无触感；「减弱动态效果」时画 §14.2 规定的静止帧；页面不可见（`onDisappear`）、App 不在前台（`scenePhase != .active`）、低电量模式时停止计时。
 - **复用边界**：只用于没课的空态。学员列表等其他空态继续用静态 `mascot-empty-state`。
