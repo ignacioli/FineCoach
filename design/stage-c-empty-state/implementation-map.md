@@ -1,6 +1,6 @@
 # 阶段 C 空态环境动效与白屏开屏：实施映射
 
-> 状态：**实现完成，主机门禁全绿；负责人模拟器走查通过（2026-10-30）。**本文是 `components.md` §1.4 要求的执行记录，不重复 token 数值。
+> 状态：**实现完成，主机门禁全绿；负责人模拟器与真机走查通过（2026-10-30）。**本文是 `components.md` §1.4 要求的执行记录，不重复 token 数值。
 > 设计权威：`design/design-system/README.md` §9「咖啡兔」、§9.3 定稿、§10 C30 / C31、§14.1 第 6 条、§14.2 `motion.ambient.*`；`components.md` §4.9 `DS-AMBIENT-SCENE`、§4.6 `DS-EMPTY-STATE` / `DS-LAUNCH`。Penpot「M1-B G5 Design」Foundations 页 C-c 关键帧、G-b 说明。
 > 分支：设计文档在 `topic/docs-stage-c-reference-library-ebfe5a`；代码在 `topic/empty-state-cafe-scene`。
 
@@ -36,4 +36,4 @@
 
 ## 4. 人工（L3）
 
-触发：新组件 `DS-AMBIENT-SCENE` 首次落地（L3 第 2 条）。2026-10-30 负责人在 iPhone 17 模拟器（空数据库，Debug 版）走查，**通过**：动效观感与原型一致；课程日历 160 不挤出首屏，确认采用；最大动态字号布局可接受；冷启动白屏直接进首页。真机证据未单独记录。
+触发：新组件 `DS-AMBIENT-SCENE` 首次落地（L3 第 2 条）。2026-10-30 负责人在 iPhone 17 模拟器（空数据库，Debug 版）走查，**通过**：动效观感与原型一致；课程日历 160 不挤出首屏，确认采用；最大动态字号布局可接受；冷启动白屏直接进首页。同日 Release 版覆盖安装到负责人真机（iPhone XS Max，保留原有数据）走查，**通过**，符合预期。

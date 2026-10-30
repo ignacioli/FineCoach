@@ -119,7 +119,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 
 | ID | 代码 | 来源 | 消费者（feature） | 状态 |
 |---|---|---|---|---|
-| `DS-AMBIENT-SCENE` | `FCAmbientEmptyScene` | README §9 / §14.2 / C30 | Today、Calendar | 已实现，负责人 2026-10-30 模拟器走查通过 |
+| `DS-AMBIENT-SCENE` | `FCAmbientEmptyScene` | README §9 / §14.2 / C30 | Today、Calendar | 已实现，负责人 2026-10-30 模拟器与真机走查通过 |
 | `DS-BASE` | `FCPrimitives`、`FCSemanticColors`、`FCFont`、`FCTextStyle`、`FCFontWeightVariant` | README §2–§5 | 全部 | L0 全自动 |
 | `DS-BUTTON` | `FCButton`、`FCSecondaryButton`、`FCLinkButton` | §8 主按钮 / 次按钮 / 链接式按钮 | 主按钮 27 个文件；次按钮 1 个（2026-10-22 起增加分享预览「完成」、训练总结「跳过分享」）；链接按钮 13 个 | 稳定 |
 | `DS-TITLE-ACTION` | `FCTitleIconButton`、`FCTitleAddButton` | §8.1 标题行图标按钮、标题行「＋」、设置入口；40/41 | Today、StudentList、ExerciseLibrary | 稳定 |
