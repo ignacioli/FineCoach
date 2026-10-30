@@ -295,16 +295,19 @@ struct TodayView: View {
     }
 
     private var emptyState: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.space2) {
+        VStack(spacing: FCPrimitives.space2) {
+            FCAmbientEmptyScene(side: 220)
             Text(String(localized: "today.empty.title"))
                 .fcFont(.headline)
-                .foregroundStyle(FCSemanticColors.textPrimary)
+                .foregroundStyle(FCSemanticColors.actionPrimary)
             Text(String(localized: "today.empty.body"))
-                .fcFont(.callout, weight: .regular)
+                .fcFont(.caption)
                 .foregroundStyle(FCSemanticColors.textSecondary)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .multilineTextAlignment(.center)
+        .frame(maxWidth: .infinity)
         .padding(.vertical, FCPrimitives.space4)
+        .accessibilityIdentifier(FCAccessibilityID.todayEmptyState)
     }
 
     /// 1 Student: the unchanged 01 single-row hero card. 2+: the W08-a

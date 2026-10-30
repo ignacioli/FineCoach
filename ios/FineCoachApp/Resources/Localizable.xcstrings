@@ -3329,7 +3329,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "今日暂无安排"
+            "value": "今天没课，休息一下吧～"
           }
         }
       }
@@ -3340,7 +3340,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "今天还没有课程安排。"
+            "value": "有新课程时会显示在这里"
           }
         }
       }
@@ -3384,7 +3384,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "这一天暂无安排"
+            "value": "这天没课，歇一歇吧～"
           }
         }
       }

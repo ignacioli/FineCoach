@@ -14,7 +14,7 @@ The shipped stack is native Swift/SwiftUI on iOS 18.0+, using Apple frameworks o
 
 In-repository authority:
 
-- `design/` is the visual source (product-owner decision, 2026-09-22). `design/design-system/README.md` defines color, typography, spacing, radius, icon, and component values. `design/m1-b-hifi/` holds the approved hi-fi screens, equipment icons, and design notes. `design/m2-hifi/` holds the M2 screens and the implementation map. `design/12d-visual-scorecard.md` is the visual quality bar. `design/11d-experience-scorecard.md` is the experience quality bar, scored by the product owner on a device; the overall score weights visual 40% and experience 60%.
+- `design/` is the visual source (product-owner decision, 2026-09-22). `design/design-system/README.md` defines color, typography, spacing, radius, icon, and component values. `design/m1-b-hifi/` holds the approved hi-fi screens, equipment icons, and design notes. `design/m2-hifi/` holds the M2 screens and the implementation map. `design/12d-visual-scorecard.md` is the visual quality bar. The experience scorecard is the product owner's private working document and is not part of this repository.
 - `design/design-system/components.md` is the component anatomy: stable `DS-*` ids, parts and reading order, variants, states, invariants, reuse boundaries, code mapping, and the visual workflow. Token values stay in `design/design-system/README.md`; structure lives in `components.md`.
 - The Penpot file「M1-B G5 Design」must stay in sync with any design-system change. Code, `design/`, and that Penpot file must not drift apart.
 - `ios/VALIDATION.md` is the acceptance record. Simulator results and physical-device results are separate.
