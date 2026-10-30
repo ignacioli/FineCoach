@@ -244,7 +244,7 @@ final class TrainingEntryScanTests: XCTestCase {
     }
 
     /// B-D7 / Δ11: every translated zh-Hans value follows the approved direct,
-    /// specific tone. The catalog is intentionally scanned without a whitelist.
+    /// specific tone. C30 permits particles only in non-accessibility empty-state catalog entries.
     func testChineseLocalizationsUseB7Tone() throws {
         let url = appRoot().appendingPathComponent("Resources/Localizable.xcstrings")
         let catalog = try XCTUnwrap(
@@ -259,7 +259,7 @@ final class TrainingEntryScanTests: XCTestCase {
             let values = Self.localizedValues(in: zhHans)
             XCTAssertFalse(values.isEmpty, "missing zh-Hans value for \(key)")
             for value in values {
-                assertB7Tone(value, source: "Localizable.xcstrings:\(key)")
+                assertB7Tone(value, source: "Localizable.xcstrings:\(key)", localizationKey: key)
                 scannedValues += 1
             }
         }
@@ -328,7 +328,7 @@ final class TrainingEntryScanTests: XCTestCase {
         return values
     }
 
-    private func assertB7Tone(_ value: String, source: String) {
+    private func assertB7Tone(_ value: String, source: String, localizationKey: String? = nil) {
         let forbidden: [(String, String)] = [
             ("您", "称呼必须使用「你」或省略人称"),
             ("请", "避免使用「请」"),
@@ -339,15 +339,33 @@ final class TrainingEntryScanTests: XCTestCase {
         for (needle, rule) in forbidden where value.contains(needle) {
             XCTFail("\(source) contains \(needle): \(rule); value=\(value)")
         }
-        if let particle = Self.toneParticle(in: value) {
+        if let particle = Self.disallowedToneEnding(in: value, localizationKey: localizationKey) {
             XCTFail("\(source) contains \(particle): 避免语气词; value=\(value)")
         }
+    }
+
+    private static func disallowedToneEnding(in value: String, localizationKey: String?) -> String? {
+        if let key = localizationKey, key.contains("empty"), !key.contains("accessibility") {
+            return nil
+        }
+        return toneParticle(in: value)
+            ?? (value.range(of: #"～(?=$|[\s。，、；：？！?!,.;:）)」』…])"#, options: .regularExpression) == nil ? nil : "～")
+    }
+
+    func testEmptyStateToneExceptionDoesNotPermitOtherKeysOrSwiftLiterals() {
+        let value = "今天没课，休息一下吧～"
+        XCTAssertNil(Self.disallowedToneEnding(in: value, localizationKey: "today.empty.title"))
+        XCTAssertEqual(Self.disallowedToneEnding(in: value, localizationKey: "today.title"), "吧")
+        XCTAssertEqual(Self.disallowedToneEnding(in: value, localizationKey: "today.empty.accessibility"), "吧")
+        XCTAssertEqual(Self.disallowedToneEnding(in: value, localizationKey: nil), "吧")
+        XCTAssertEqual(Self.disallowedToneEnding(in: "休息～", localizationKey: "today.title"), "～")
+        XCTAssertNil(Self.disallowedToneEnding(in: "只算 1～10 次的组", localizationKey: "today.title"))
     }
 
     /// Sentence-final particles only: a particle followed by the end of the
     /// text, whitespace or punctuation. Words such as 哈克机 stay legal.
     private static func toneParticle(in value: String) -> String? {
-        let pattern = "[吧呢哦啦呀哈](?=$|[\\s。，、；：？！?!,.;:）)」』…~])"
+        let pattern = "[吧呢哦啦呀哈](?=$|[\\s。，、；：？！?!,.;:）)」』…~～])"
         guard let range = value.range(of: pattern, options: .regularExpression) else { return nil }
         return String(value[range])
     }
