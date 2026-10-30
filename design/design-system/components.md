@@ -337,8 +337,8 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 | `DS-PAGE-SECONDARY` 二级页 | 隐藏系统导航栏（`.fcSecondaryPage()`，同时保持边缘右滑返回可用）→ 由 `fcSecondaryPage()` 提供的顶部零高度 `safeAreaInset` 遮盖（`surface.page`，背景延伸至顶部安全区；feature 不再复制遮盖）→ 紧贴状态栏下方的页头：小号 `‹`（22/400 `text.secondary`）与页面内 `titleLarge` 标题在同一行、紧靠标题左侧（标题起点 x=32），整体由 `FCPageHeader` 绘制（带 header 属性）→ 可选副标题（`callout` 400 `text.secondary`）→ 内容 → 可选底部主按钮 | 23/26/28/36/37/38 | 约 20 个 feature 文件各自拼装；页头部分已有共享组件 `FCPageHeader`（§4.7），StudentDetail 已迁移 |
 | `DS-HUB-ROW` 入口行 | 24pt 图标（`action.primary`）→ 标题（`headline`）/ 副标题（`caption` `text.secondary`）→ `›`；最小高 64，间距 `space.4` | 19/42/43 | 已提升为共享组件 `FCHubRow`（M2 T002/T010，2026-10-10）；ResourceHub、Settings 已迁移，规格见 §4.7 |
 | `DS-INLINE-RESULT` 就地结果 | 22×22 `FCStatusBadge` → 标题（`callout` 600；失败为 `status.destructive`，成功为 `text.primary`）→ 说明（`caption` `text.secondary`）→ 失败时显示居中「重试」`FCLinkButton` | 38/39 | 已提升为共享组件 `FCInlineResult`（M2 T003/T011，2026-10-10）；BackupRestoreFlow 已迁移，规格见 §4.7 |
-| `DS-EMPTY-STATE` 空态 | 吉祥物 220×220 居中 → 标题（`headline` `action.primary`）→ 说明（`caption` `text.secondary`）→ 底部主按钮 | 16 | StudentList |
-| `DS-LAUNCH` 开屏页（2026-10-29，过渡版） | 整屏 `surface.page` 底 → 正中 180×180 圆角吉祥物图标（`launch-icon`）；无文字、无可交互控件。两处呈现同一画面：① `LaunchScreen.storyboard`（系统静态开屏）；② App 根视图最上层的一次性叠层，约 0.3 s 后 `motion.duration.fast` 淡出。不变式：① ② 资源、尺寸与底色一致，「减弱动态效果」时不创建 ②，叠层不响应点击、不读写数据（`auto`：`LaunchScreenConfigurationTests`）；画面观感（`manual`：负责人真机看过，2026-10-29） | G-b | 已实现；阶段 C 后重新决定（README §1.14） |
+| `DS-EMPTY-STATE` 空态 | 吉祥物 220×220 居中 → 标题（`headline` `action.primary`）→ 说明（`caption` `text.secondary`）→ 底部主按钮。**动画变体**（2026-10-30 决定并定稿，README §10 C30）：插画换成「咖啡兔」分层素材（README §9）加环境动效（README §14.1 第 6 条、§14.2 `motion.ambient.*`），第一轮只用在今日、课程日历没课时；文案见 C30 | 16 | StudentList |
+| `DS-LAUNCH` 开屏页（2026-10-29，过渡版） | 整屏 `surface.page` 底 → 正中 180×180 圆角吉祥物图标（`launch-icon`）；无文字、无可交互控件。两处呈现同一画面：① `LaunchScreen.storyboard`（系统静态开屏）；② App 根视图最上层的一次性叠层，约 0.3 s 后 `motion.duration.fast` 淡出。不变式：① ② 资源、尺寸与底色一致，「减弱动态效果」时不创建 ②，叠层不响应点击、不读写数据（`auto`：`LaunchScreenConfigurationTests`）；画面观感（`manual`：负责人真机看过，2026-10-29） | G-b | 已实现；2026-10-30 定稿为只用白屏、不放图标、不加叠层（README §10 C31），实现待做 |
 
 ### 4.7 已定稿规格（M2 Phase 0，T001–T012 已实现）
 
@@ -442,6 +442,17 @@ C 类，只补规则，默认字号下外观不变：
 #### 已退役：`DS-MORE-MENU` 「…」菜单（2026-10-27）
 
 `FCMoreMenu` 已删除（README §10 C27，同时关闭 2026-10-21 走查 W-01）。原来的三处用法：分区标题行「删除分区」→ 左滑；提示行「暂不提醒 14 天」→ 左滑；记录指标页头「停用 / 恢复指标」→ 页面底部操作行。以后不要再加「…」菜单：改数据的操作用可见按钮、左滑或页面底部操作行。同类的行内系统 `Menu`（模板编辑动作行的蓝字「移出分区」，自 M1-B 起使用系统强调蓝）同时改为左滑「移入分区」。
+
+### 4.9 阶段 C 空态环境动效（2026-10-30 已定稿）
+
+来源：README §9「咖啡兔」、§10 C30、§14.1 第 6 条、§14.2 `motion.ambient.*`；动画原型负责人手机上看过（2026-10-30）。分类 B（扩展已批准的 `DS-EMPTY-STATE`）。今日、课程日历两处共用，所以做成共享组件。
+
+#### `DS-AMBIENT-SCENE` 空态环境场景
+
+- **部件**：方形插画框，自下而上四层：`mascot-cafe-rabbit` → `mascot-cafe-blink`（平时隐藏）→ `mascot-cafe-table` → 代码画的三缕热气。三张图同一画布坐标，`resizable` + `scaledToFit` 铺满插画框，不另行偏移。尺寸由调用方给：今日 220×220；课程日历 160×160（与月历同屏，220 会把当天列表挤出首屏；负责人走查时确认）。
+- **动作**：只用 README §14.2 的 `motion.ambient.steam`、`breath`、`blink`；呼吸只缩放兔子两层。用 `TimelineView` 按时间算出每一帧（纯函数，可单测），不用 `repeatForever` 动画。
+- **不变量**：整个插画框是一个装饰元素，`accessibilityHidden(true)`，文字由页面自己的标题、说明承担；不响应点击，不改数据，无触感；「减弱动态效果」时画 §14.2 规定的静止帧；页面不可见（`onDisappear`）、App 不在前台（`scenePhase != .active`）、低电量模式时停止计时。
+- **复用边界**：只用于没课的空态。学员列表等其他空态继续用静态 `mascot-empty-state`。
 
 ## 5. 缺口与偏差登记
 
