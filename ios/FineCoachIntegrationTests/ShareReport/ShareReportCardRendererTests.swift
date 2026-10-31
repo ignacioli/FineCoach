@@ -88,6 +88,20 @@
             }
         }
 
+        func testAttendanceStreakOnlyAndCombinedMilestonesRenderAtFullResolution() throws {
+            for number in [Int?.none, 25] {
+                let dto = ShareReportDTO(
+                    schemaVersion: ShareReportPolicy.schemaVersion, studentDisplayName: nil,
+                    sessionDateUTC: sessionDate, durationSeconds: nil, trainingFocus: nil,
+                    studentFacingSummary: nil, trainingVolume: nil, exercises: [],
+                    milestoneSessionNumber: number, attendanceStreakWeeks: 8)
+                XCTAssertEqual(ShareReportCardView.blocks(for: dto).filter { $0 == .personalBests }.count, 1)
+                let pages = try ShareReportCardRenderer.render(dto: dto)
+                XCTAssertEqual(pages.count, 1)
+                try assertFullResolutionPage(pages[0])
+            }
+        }
+
         private func assertFullResolutionPage(_ data: Data, file: StaticString = #filePath, line: UInt = #line) throws {
             XCTAssertEqual(Data(data.prefix(pngSignature.count)), pngSignature, file: file, line: line)
             let image = try XCTUnwrap(UIImage(data: data), file: file, line: line)

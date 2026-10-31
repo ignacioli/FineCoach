@@ -530,6 +530,8 @@
       }
     },
     "session.gains.title": {"extractionState": "manual", "localizations": {"zh-Hans": {"stringUnit": {"state": "translated", "value": "本节收获"}}}},
+    "session.gains.streak.format": {"extractionState": "manual", "localizations": {"zh-Hans": {"stringUnit": {"state": "translated", "value": "连续 %lld 周"}}}},
+    "session.gains.streak.subtitle": {"extractionState": "manual", "localizations": {"zh-Hans": {"stringUnit": {"state": "translated", "value": "每周练 2 次及以上"}}}},
     "session.gains.progress.format": {"extractionState": "manual", "localizations": {"zh-Hans": {"stringUnit": {"state": "translated", "value": "上次 %@ → 本次 %@"}}}},
     "session.gains.milestone.format": {"extractionState": "manual", "localizations": {"zh-Hans": {"stringUnit": {"state": "translated", "value": "第 %lld 节课"}}}},
     "session.gains.milestone.subtitle": {"extractionState": "manual", "localizations": {"zh-Hans": {"stringUnit": {"state": "translated", "value": "累计完成的课程"}}}},

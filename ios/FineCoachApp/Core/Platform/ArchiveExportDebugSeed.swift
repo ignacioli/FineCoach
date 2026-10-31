@@ -91,13 +91,16 @@ import os
         /// Seconds the seed clock runs behind real time while sessions are being recorded, so the
         /// completed sessions land on different days. Zero outside seeding.
         private static let offsetSeconds = OSAllocatedUnfairLock(initialState: 0.0)
+        private static let attendanceSeedDate = OSAllocatedUnfairLock<Date?>(initialState: nil)
 
         static var isRequested: Bool {
             ProcessInfo.processInfo.arguments.contains(launchArgument)
         }
 
         static func makeClock() -> SystemClock {
-            SystemClock(wallClock: { Date().addingTimeInterval(-offsetSeconds.withLock { $0 }) })
+            SystemClock(wallClock: {
+                attendanceSeedDate.withLock { $0 } ?? Date().addingTimeInterval(-offsetSeconds.withLock { $0 })
+            })
         }
 
         private static func setDaysAgo(_ days: Int) {
@@ -139,6 +142,7 @@ import os
                 try await seedMoreStudents(
                     students: students, sessions: sessions, history: history, body: body,
                     appointments: appointments, credits: credits, templates: templates)
+                try await seedAttendanceStudent(students: students, sessions: sessions)
                 // A leftover in-progress training would block every other flow.
                 return try await students.inProgressTraining() == nil
             } catch {
@@ -433,6 +437,34 @@ import os
             }
             setDaysAgo(0)
             _ = try await students.archive(id: archived.id)
+        }
+
+        @MainActor
+        private static func seedAttendanceStudent(students: StudentUseCases, sessions: ActiveSessionUseCases)
+            async throws
+        {
+            defer { attendanceSeedDate.withLock { $0 = nil } }
+            let student = try await students.create(
+                draft: StudentDraft(displayName: "林小禾", sex: .undisclosed))
+            var calendar = Calendar(identifier: .gregorian)
+            calendar.timeZone = .current
+            calendar.firstWeekday = 2
+            guard let currentWeek = calendar.dateInterval(of: .weekOfYear, for: Date())?.start else {
+                throw DomainError.invalidState
+            }
+            for week in 0..<8 {
+                guard let start = calendar.date(byAdding: .weekOfYear, value: week - 8, to: currentWeek),
+                    let nextWeek = calendar.date(byAdding: .weekOfYear, value: 1, to: start),
+                    let first = calendar.date(byAdding: .hour, value: 12, to: start)
+                else { throw DomainError.invalidState }
+                // Pin the clock so persistence work cannot move the Sunday session into Monday.
+                for (index, date) in [first, nextWeek.addingTimeInterval(-0.001)].enumerated() {
+                    attendanceSeedDate.withLock { $0 = date }
+                    _ = try await trainedSession(
+                        studentID: student.id, exercises: [squatID], base: 30 + (week * 2 + index) * 2,
+                        using: sessions)
+                }
+            }
         }
 
         /// Starts (or reopens) the active session, records three confirmed sets per catalog

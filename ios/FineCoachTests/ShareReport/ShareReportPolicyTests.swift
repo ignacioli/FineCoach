@@ -37,6 +37,7 @@ final class ShareReportPolicyTests: XCTestCase {
         "personalBests",
         "gainRows",
         "milestoneSessionNumber",
+        "attendanceStreakWeeks",
     ]
 
     // T069j (schema 2): catalog-derived icon and body parts per exercise —
@@ -84,7 +85,7 @@ final class ShareReportPolicyTests: XCTestCase {
         let completed = try makeCompleted(includingNotes: true, includingUnresolvedSets: false)
         let dto = try ShareReportPolicy.makeDTO(from: completed)
         XCTAssertEqual(dto.schemaVersion, ShareReportPolicy.schemaVersion)
-        XCTAssertEqual(ShareReportPolicy.schemaVersion, 4)
+        XCTAssertEqual(ShareReportPolicy.schemaVersion, 5)
 
         XCTAssertEqual(propertyLabels(dto), Self.allowedShareReportDTOPropertyNames)
         XCTAssertEqual(propertyLabels(dto), ShareReportPolicy.allowedDTOPropertyNames)
@@ -422,10 +423,56 @@ final class ShareReportPolicyTests: XCTestCase {
         XCTAssertNil(ShareReportPolicy.gainsHint(for: .empty))
     }
 
-    private func gainsSession(number: Int, recordWeight: String = "80", progressReps: String = "5") throws
+    func testAttendanceHintPriorityAndOptInDTOAllowlist() throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "Asia/Shanghai")!
+        let start = calendar.date(from: DateComponents(year: 2026, month: 10, day: 5, hour: 12))!
+        let offsets = [0, 1, 2, 7, 8, 9, 14, 15, 21, 22]
+        let history = try offsets.dropLast().enumerated().map { index, day in
+            try gainsSession(number: index + 1, at: calendar.date(byAdding: .day, value: day, to: start)!)
+        }
+        let date = calendar.date(byAdding: .day, value: offsets.last!, to: start)!
+        let twiceWeekly = history.enumerated().filter { ![2, 5].contains($0.offset) }.map(\.element)
+        for record in [false, true] {
+            let current = try gainsSession(
+                number: 10, recordWeight: record ? "85" : "80", progressReps: "7", at: date)
+            for milestone in [false, true] {
+                let baseline = milestone ? history : twiceWeekly
+                let gains = SessionGains(
+                    current: current, history: baseline, calendar: calendar, timeZone: calendar.timeZone)
+                XCTAssertEqual(gains.attendanceStreakWeeks, 4)
+                let expected: String
+                switch (record, milestone) {
+                case (true, true): expected = "1 项新纪录 · 第 10 节课"
+                case (true, false): expected = "1 项新纪录 · 连续 4 周"
+                case (false, true): expected = "第 10 节课 · 连续 4 周"
+                case (false, false): expected = "连续 4 周 · 1 项进步"
+                }
+                XCTAssertEqual(ShareReportPolicy.gainsHint(for: gains), expected)
+                let off = try ShareReportPolicy.makeDTO(from: current)
+                XCTAssertNil(off.attendanceStreakWeeks)
+                let on = try ShareReportPolicy.makeDTO(from: current, gains: gains)
+                XCTAssertEqual(on.attendanceStreakWeeks, 4)
+                XCTAssertEqual(on.schemaVersion, 5)
+                XCTAssertEqual(propertyLabels(on), Self.allowedShareReportDTOPropertyNames)
+                for token in Self.requiredForbiddenIdentifierTokens {
+                    XCTAssertFalse(identifierSurface(dto: on).lowercased().contains(token.lowercased()))
+                }
+            }
+        }
+        let current = try gainsSession(number: 10, at: date)
+        let only = SessionGains(
+            current: current, history: twiceWeekly, calendar: calendar, timeZone: calendar.timeZone)
+        XCTAssertFalse(only.isEmpty)
+        XCTAssertEqual(ShareReportPolicy.gainsHint(for: only), "连续 4 周")
+    }
+
+    private func gainsSession(
+        number: Int, recordWeight: String = "80", progressReps: String = "5", at: Date? = nil
+    ) throws
         -> CompletedSession
     {
-        let date = now.addingTimeInterval(Double(number * 1000))
+        let date = at ?? now.addingTimeInterval(Double(number * 1000))
         let id = StableUUID(UUID())
         let exercises = try (0..<2).map { index in
             let exerciseID = StableUUID(UUID())

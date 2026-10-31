@@ -1,9 +1,8 @@
 import Foundation
 
 public enum ShareReportPolicy {
-    /// 4: opt-in session gains as one "上次 → 本次" row per action (spec 004
-    /// Revision 1.5), plus the session milestone.
-    public static let schemaVersion = 4
+    /// 5: opt-in attendance streak milestone alongside session gains.
+    public static let schemaVersion = 5
 
     public static let allowedDTOPropertyNames: Set<String> = [
         "schemaVersion",
@@ -17,6 +16,7 @@ public enum ShareReportPolicy {
         "personalBests",
         "gainRows",
         "milestoneSessionNumber",
+        "attendanceStreakWeeks",
     ]
 
     public static let forbiddenIdentifierTokens: [String] = [
@@ -124,7 +124,8 @@ public enum ShareReportPolicy {
                     displayName: $0.displayName, isNewRecord: $0.isNewRecord, previous: reportSet($0.previous),
                     current: reportSet($0.current))
             } ?? [],
-            milestoneSessionNumber: gains?.milestoneSessionNumber
+            milestoneSessionNumber: gains?.milestoneSessionNumber,
+            attendanceStreakWeeks: gains?.attendanceStreakWeeks
         )
     }
 
@@ -168,6 +169,9 @@ public enum ShareReportPolicy {
         }
         if let number = gains.milestoneSessionNumber {
             parts.append(String(format: String(localized: "session.gains.milestone.format"), Int64(number)))
+        }
+        if let weeks = gains.attendanceStreakWeeks {
+            parts.append(String(format: String(localized: "session.gains.streak.format"), Int64(weeks)))
         }
         if !gains.progress.isEmpty {
             parts.append(String(format: String(localized: "share.gains.progress.format"), gains.progress.count))

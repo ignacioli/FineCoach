@@ -158,12 +158,23 @@ Penpot 版本：`before-stage-D 2026-10-20` → `stage-D boards D-a D-a2 D-b D-b
 - 结果：PASS（宿主标准门禁，无 `-disable-sandbox`）。strict lint 无输出；iphoneos Debug 与 Release build 均 BUILD SUCCEEDED（Release 证明 DEBUG 试验页不进正式包）；build-for-testing TEST BUILD SUCCEEDED；FineCoachTests 543 项 / 1 既有 skip / 0 failed；FineCoachIntegrationTests 202 项 / 0 failed。每个测试 target 前重启模拟器 4DD81BE1。日志 `.handoff/logs/2026-10-23-float-accept-{lint,build,release,bft,unit,integ}.log`。
 - 未经人工检查：浮起观感与是否被列表行裁切、light 触感强度、Reduce Motion 下无浮起、A/B/C 选档。并入回归走查 D1、D2、D7、D8、D10～D13。
 
+### Phase 9（T040–T044，Revision 1.7，2026-10-31）
+
+- 分类与依据：B 类修订，README §10 C32；已批准 Penpot D-b2 状态 ③、D-c2，快照 `attendance-streak D-b2 D-c2 2026-10-31`；行为依据 spec 004 PD-D7、AC-D14、D-FR-026、027、031、032、034，plan §3.11。
+- 范围：复用 `DS-LIST-ROW`、`DS-SECTION` 与卡片既有 `MascotHeartSticker`。新增连续出勤派生字段、两条本地化文案、总结 / 详情 / 卡片里程碑行及 DEBUG 虚构学员「林小禾」；DTO schema 4 → 5，白名单同步。移除：无；累计课次行、005 主指标 helper、原有学员种子、档案查看与系统入口内容有意保持现状。
+- 设计决定：复用 C32 已批准的行顺序、副标题和贴纸，不增加 token、组件或交互；新字段仅由已完成课程现算，分享开关关闭时不传入 gains，档案查看调用不传新字段。
+- 实现和检查：`SessionGainsTests` 20 项、`ShareReportPolicyTests` 12 项、`TrainingEntryScanTests` 15 项、`ComponentCatalogTests` 6 项、`DesignValueScanTests` 1 项、`VisionHarnessTests` 8 项均通过；新增连续出勤边界、断档、时区 / 同时间排序、双里程碑、提示优先级 / 门控 / 白名单与卡片渲染用例。既有领域断言不变；分享白名单新增字段，冻结 schema 断言 4 → 5。§5 新增三行入口与布局清单。命令：`dsh-gate build`、`dsh-gate test --scope unit`、`dsh-gate test --scope integration`；`xcrun swift-format lint --configuration .swift-format --strict` 覆盖本轮全部 9 个 Swift 文件；`git diff --check`；Release 补门为 `xcodebuild -project ios/FineCoach.xcodeproj -scheme FineCoach -configuration Release -sdk iphoneos -derivedDataPath /tmp/FineCoachDD-AttendanceStreakRelease CODE_SIGNING_ALLOWED=NO build`。
+- 结果：PASS（2026-10-31 宿主标准门禁 `.handoff/gate.sh`，无 `-disable-sandbox`）。strict lint、iphoneos Debug 与 Release build、build-for-testing 均 exit 0；FineCoachTests 693 项 / 1 既有 skip / 0 failed；FineCoachIntegrationTests 224 项 / 0 failed。日志 `.handoff/logs/2026-10-23-attendance-streak-accept-*.log`（gate.sh 的文件名日期前缀写死为 2026-10-23，实际运行于 2026-10-31）。实现者沙箱内的中间结果：Release 因沙箱禁止加载 Swift macro 无法构建；unit 唯一失败是 `ArchiveExportScreenTests.testDebugSeedBuildsTheFullReviewRoster` 固定活跃学员 7 人，主会话按新增种子学员改为 8 人并把「林小禾」加入期望名单后通过；首轮曾因额外写入 en 翻译致 Bundle 选中不完整英文资源，已移除（基线只有 zh-Hans）。总结页、课程详情、分享卡片（含最大 Dynamic Type）未经人工视觉检查，留待集中走查；未运行 UITests。
+
 ## 5. 入口与布局清单（`components.md` §1.4，实施时填写）
 
 每条新交互一行：画面 → 控件 → accessibility identifier → 是否改数据 → 宽度由谁撑满。每行必须指向真实代码。
 
 | 画面 | 控件 | identifier | 改数据 | 宽度 |
 |---|---|---|---|---|
+| 课程总结页 | 只读「连续 K 周」／「每周练 2 次及以上」，位于「第 N 节课」之后 | `FCAccessibilityID.sessionSummaryGains`（`sessionSummary.gains`）；`SessionSummaryView.swift` → `SessionGainsSectionView.body`（`ios/FineCoachApp/Features/History/SessionGainsSectionView.swift`） | 否 | 页面 VStack 与区块 `maxWidth: .infinity`，space4 边距；`FCListRow` 撑满 |
+| 课程详情页（教练端） | 同一只读「连续 K 周」行及副标题，位于「第 N 节课」之后 | `FCAccessibilityID.sessionDetailGains`（`sessionDetail.gains`）；`SessionDetailView.swift` → `SessionGainsSectionView.body`（`ios/FineCoachApp/Features/History/SessionGainsSectionView.swift`） | 否 | 详情 VStack 与区块 `maxWidth: .infinity`，space4 边距；`FCListRow` 撑满 |
+| 分享卡片 / 预览 | 只读「连续 K 周」行及副标题，左侧比心贴纸，位于「第 N 节课」之后；渲染图无交互 | `FCAccessibilityID.shareReportGains`（`shareReport.gains`）；`ShareReportCardView.content(for:)`（`ios/FineCoachApp/Features/ShareReport/ShareReportCardView.swift`） | 否 | `CardFrame` 固定 cardWidth、space6 边距；section、HStack 与 `FCListRow` 撑满 |
 | 课程总结页 | 只读「本节收获」：每个动作一行「上次 → 本次」，新纪录动作在动作名后带胶囊（Revision 1.5） | `FCAccessibilityID.sessionSummaryGains`；`SessionSummaryView.swift` → `SessionGainsSectionView` | 否 | 页面满宽 VStack，space4 边距 |
 | 课程详情页（教练端） | 同一只读区块；在 card 的 summary 之前 | `FCAccessibilityID.sessionDetailGains`；`SessionDetailView.swift` → `SessionGainsSectionView` | 否 | 详情 VStack 与区块 maxWidth infinity，space4 边距 |
 | 训练页 | 组行「新纪录」（只读）；确认触感由页面级 `.sensoryFeedback(trigger: confirmationFeedback)` 发出（Revision 1.5） | `FCAccessibilityID.setNewRecord(set.id)`；`ActiveSessionView.swift` → `FCSetRow.recordBadge` | 否 | `FCSetRow` 的 HStack 与训练页列表容器；胶囊在标题后，空间不足换到标题下方 |
