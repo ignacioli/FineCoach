@@ -1,6 +1,8 @@
 import Foundation
 
 public enum FCAccessibilityID {
+    static let todayEmptyState = "today.emptyState"
+    static let calendarEmptyState = "calendar.emptyState"
     static let todayInsights = "today.insights"
     static let todayAllInsights = "today.insights.all"
     static let insightsRoot = "insights.root"

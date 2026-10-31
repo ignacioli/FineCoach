@@ -24,6 +24,39 @@ enum FCMotion {
     /// owner 2026-10-23.
     static let durationEmphasis: Double = 1.5
 
+    // MARK: README §14.2 — motion.ambient.steam / breath / blink
+
+    static func ambientEase(_ progress: Double) -> Double {
+        UnitCurve.easeInOut.value(at: progress)
+    }
+
+    static let ambientReferenceSide: CGFloat = 220
+    static let ambientSteamPeriod = 3.6
+    static let ambientSteamPhase = 1.2
+    static let ambientSteamPeakTime = 0.25
+    static let ambientSteamTailTime = 0.7
+    static let ambientSteamPeakOpacity = 0.6
+    static let ambientSteamTailOpacity = 0.35
+    static let ambientSteamStaticOpacity = 0.45
+    static let ambientSteamRise: CGFloat = 20
+    static let ambientSteamDrift: CGFloat = 1.5
+    static let ambientSteamLineWidth: CGFloat = 2.2
+    static let ambientSteamOrigins: [CGPoint] = [
+        CGPoint(x: 125, y: 104), CGPoint(x: 131, y: 103), CGPoint(x: 137, y: 104),
+    ]
+    static let ambientSteamControlX: CGFloat = 3
+    static let ambientSteamControlY1: CGFloat = 5
+    static let ambientSteamControlY2: CGFloat = 9
+    static let ambientSteamHalfHeight: CGFloat = 14
+    static let ambientSteamFinalHeights: [CGFloat] = [13, 14, 13]
+    static let ambientBreathPeriod = 4.2
+    static let ambientBreathScale = 1.008
+    static let ambientBreathAnchor = UnitPoint(x: 0.44, y: 0.78)
+    static let ambientBlinkInterval = 4.0...7.0
+    static let ambientBlinkDuration = 0.14
+    static let ambientBlinkDoubleProbability = 0.2
+    static let ambientBlinkDoubleDelay = 0.32
+
     // MARK: §14.2 — curves
 
     /// `motion.curve.standard` (`easeOut`): the default for appear, leave and

@@ -12,7 +12,7 @@ Penpot 文件「M1-B G5 Design」→「Foundations」页：
 
 ## 设计方向：暖炭黑素雅
 
-参考 Too 健身打卡，重构自 M1-A 的 MD3 默认紫：
+重构自 M1-A 的 MD3 默认紫：
 
 - 主色 `#2A2822`（暖炭黑）、主文字 `#211F1B`
 - 次文字 `#5C5A52`（暖灰褐）
@@ -38,4 +38,4 @@ Penpot 文件「M1-B G5 Design」→「Foundations」页：
 
 ## 视觉评分
 
-12 维评分卡的方法论与本次 88/100 的评分结果见 [`../12d-visual-scorecard.md`](../12d-visual-scorecard.md)。
+本次按 12 维视觉评分卡评分，得 88/100。评分卡是产品负责人的私有工作文档，不在本仓库。

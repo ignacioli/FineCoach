@@ -266,9 +266,15 @@ struct CalendarView: View {
             }
 
             if viewModel.selectedDateAppointments.isEmpty {
-                Text(String(localized: "calendar.empty"))
-                    .fcFont(.callout, weight: .regular)
-                    .foregroundStyle(FCSemanticColors.textSecondary)
+                VStack(spacing: FCPrimitives.space2) {
+                    FCAmbientEmptyScene(side: 160)
+                    Text(String(localized: "calendar.empty"))
+                        .fcFont(.headline)
+                        .foregroundStyle(FCSemanticColors.actionPrimary)
+                }
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity)
+                .accessibilityIdentifier(FCAccessibilityID.calendarEmptyState)
             } else {
                 VStack(spacing: 0) {
                     ForEach(viewModel.selectedDateAppointments, id: \.id) { appointment in
