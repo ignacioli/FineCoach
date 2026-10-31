@@ -282,7 +282,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "没有需要留意的事"
+            "value": "学员都在正轨上，没有需要留意的事"
           }
         }
       }
@@ -1195,7 +1195,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "暂无已完成训练"
+            "value": "上完第一节课后会显示在这里"
           }
         }
       }
@@ -3747,7 +3747,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "暂无有效课包。"
+            "value": "新建课包后，上完课会按课时扣减"
           }
         }
       }
@@ -4154,7 +4154,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "暂无课时调整记录。"
+            "value": "完成训练、缺席扣课和人工调整都会记在这里"
           }
         }
       }
@@ -4286,7 +4286,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "暂无模板"
+            "value": "把常用的动作安排存成模板，开课时直接套用"
           }
         }
       }
@@ -4583,7 +4583,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "暂无可用模板"
+            "value": "还没有模板，新建后就能在这里直接套用"
           }
         }
       }
@@ -4770,7 +4770,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "暂无身体数据，点击指标即可开始记录。"
+            "value": "点一个指标记下第一笔，之后的变化都会留在这里"
           }
         }
       }
@@ -4979,7 +4979,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "暂无记录"
+            "value": "记下第一笔后，历史会按日期列在这里"
           }
         }
       }
@@ -5199,7 +5199,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "该动作暂无可对比的历史记录。"
+            "value": "练过这个动作后，这里会显示它的变化"
           }
         }
       }
@@ -5309,7 +5309,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "仅 1 次记录，暂无法看出趋势"
+            "value": "再练一次就能看出趋势"
           }
         }
       }
@@ -6926,7 +6926,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "暂无安排"
+            "value": "还没排下一节课"
           }
         }
       }
