@@ -13,7 +13,7 @@
 | 1 | 器材图标 SVG：`design/m1-b-hifi/icons/*.svg`（App 内副本：`ios/FineCoachApp/Resources/Assets.xcassets/equipment-*.imageset`） | 重新绘制后的定稿版本，**优先于**任何屏幕里的图标画法 |
 | 2 | Penpot 文件「M1-B G5 Design」的 17 屏画稿（`01 今日` … `17 器材 icon 库`） | 除器材图标外，一切视觉以画稿为准 |
 | 3 | 同一文件的 token 集 `FC Primitives`（回填后 25）+ `FC Semantic Color`（回填后 17）与 Foundations 样张 | 画稿没有覆盖的地方以 token 和样张为准 |
-| 4 | `design/m1-b-hifi/screens/*.png`（§1.1）、`design/m1-b-hifi/README.md`、[`design/12d-visual-scorecard.md`](../12d-visual-scorecard.md) | 导出物、设计过程说明与评分卡，与上面各项冲突时以上面为准。这些物料 2026-09-22 前存放在私有 specs 仓，已全部迁入本仓库；specs 仓只保留设计 discovery 证据（`design/prototypes/evidence/`） |
+| 4 | `design/m1-b-hifi/screens/*.png`（§1.1）、`design/m1-b-hifi/README.md` | 导出物与设计过程说明，与上面各项冲突时以上面为准。视觉评分卡 2026-10-31 移回私有 specs 仓。这些物料 2026-09-22 前存放在私有 specs 仓，已全部迁入本仓库；specs 仓只保留设计 discovery 证据（`design/prototypes/evidence/`） |
 
 各来源之间的冲突和裁决见 §10「来源冲突裁决记录」。
 
@@ -81,13 +81,13 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 - 产品负责人 2026-10-22 选定方案 A（一张 hero 卡多行，§10 C14）。分类 B：修订已批准的 01 今日页 hero 卡。
 - Penpot：Foundations 页 y=3750 一行末尾（x=11770，D-c2 右侧）新增画板「W08-a 今日 · 多人训练 hero（方案 A，2026-10-22）」，含 1 人 / 2 人 / 3 人三种状态。之前：该位置为空；之后：画板 390×772，字号、颜色取自 01 hero 卡原图层。
 - 已知差异（本轮不处理，记录待查）：01 原图层的副文字是 13/400（`caption`），本文件 §8 和 `components.md` 写的是 `callout`。W08-a 照 01 原图层画；代码实现时副文字沿用 `FCHeroCard` 现有样式，不在本轮改。
-- 导出：`design/w08-concurrent-sessions/W08-a-today-multi-hero@1x.png`（MCP 1x 参考图；2x 正式导出待做）。
+- 导出：只在 Penpot 画板里（1x 参考图 2026-10-31 从仓库删除，负责人认为用处不大）。
 
 ### 1.7 分享预览「完成」（2026-10-22）
 
 - 产品负责人 2026-10-22 选定（§10 C15）。分类 B：在已批准的 29 预览页上新增控件；组件复用 `DS-BUTTON` 次按钮，不新建。
 - Penpot：Foundations 页 y=3750 一行末尾（x=12210，W08-a 右侧）新增画板「D7b-r 分享预览 · 底部「完成」（走查修订 2026-10-22）」，含未分享、已交给系统、取消或失败三种状态。D7b 原画板不改。快照 `before-share-done 2026-10-22` → `share-done D7b-r 2026-10-22`。
-- 导出：`design/walkthrough-2026-10-22/D7b-r-share-preview-done@1x.png`（MCP 1x 参考图）。
+- 导出：只在 Penpot 画板里（1x 参考图 2026-10-31 从仓库删除）。
 
 ### 1.8 阶段 D 新纪录与比上次进步重新定义（2026-10-23）
 

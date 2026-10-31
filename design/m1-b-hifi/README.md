@@ -38,4 +38,4 @@ Penpot 文件「M1-B G5 Design」→「Foundations」页：
 
 ## 视觉评分
 
-12 维评分卡的方法论与本次 88/100 的评分结果见 [`../12d-visual-scorecard.md`](../12d-visual-scorecard.md)。
+本次按 12 维视觉评分卡评分，得 88/100。评分卡是产品负责人的私有工作文档，不在本仓库。
