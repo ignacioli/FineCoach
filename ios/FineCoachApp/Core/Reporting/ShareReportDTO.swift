@@ -18,6 +18,7 @@ public struct ShareReportDTO: Hashable, Sendable {
     /// Records appear in this same row with `isNewRecord`, never as a separate row.
     public let gainRows: [ShareReportGainRowDTO]
     public let milestoneSessionNumber: Int?
+    public let attendanceStreakWeeks: Int?
 
     public init(
         schemaVersion: Int,
@@ -30,7 +31,8 @@ public struct ShareReportDTO: Hashable, Sendable {
         exercises: [ShareReportExerciseDTO],
         personalBests: [ShareReportPersonalBestDTO] = [],
         gainRows: [ShareReportGainRowDTO] = [],
-        milestoneSessionNumber: Int? = nil
+        milestoneSessionNumber: Int? = nil,
+        attendanceStreakWeeks: Int? = nil
     ) {
         self.schemaVersion = schemaVersion
         self.studentDisplayName = studentDisplayName
@@ -43,6 +45,7 @@ public struct ShareReportDTO: Hashable, Sendable {
         self.personalBests = personalBests
         self.gainRows = gainRows
         self.milestoneSessionNumber = milestoneSessionNumber
+        self.attendanceStreakWeeks = attendanceStreakWeeks
     }
 }
 

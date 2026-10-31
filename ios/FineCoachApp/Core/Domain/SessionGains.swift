@@ -56,38 +56,47 @@ public struct SessionGains: Hashable, Sendable {
     /// Action rows in the order the exercises appear in this session.
     public let rows: [GainRow]
     public let milestoneSessionNumber: Int?
+    public let attendanceStreakWeeks: Int?
 
     /// 比上次进步 rows: actions that improved without setting a record, so the
     /// share hint never counts an action twice (D-FR-031).
     public var progress: [GainRow] { rows.filter { !$0.isNewRecord } }
 
-    public var isEmpty: Bool { rows.isEmpty && milestoneSessionNumber == nil }
+    public var isEmpty: Bool { rows.isEmpty && milestoneSessionNumber == nil && attendanceStreakWeeks == nil }
 
     public static let empty = SessionGains(
         recordHolderSetIDs: [], strictRecordHolderSetIDs: [], records: [], rows: [], milestoneSessionNumber: nil)
 
     private init(
         recordHolderSetIDs: Set<StableUUID>, strictRecordHolderSetIDs: Set<StableUUID>, records: [Record],
-        rows: [GainRow], milestoneSessionNumber: Int?
+        rows: [GainRow], milestoneSessionNumber: Int?, attendanceStreakWeeks: Int? = nil
     ) {
         self.recordHolderSetIDs = recordHolderSetIDs
         self.strictRecordHolderSetIDs = strictRecordHolderSetIDs
         self.records = records
         self.rows = rows
         self.milestoneSessionNumber = milestoneSessionNumber
+        self.attendanceStreakWeeks = attendanceStreakWeeks
     }
 
-    public init(current: CompletedSession, history: [CompletedSession], assistedExerciseIDs: Set<StableExerciseID> = [])
-    {
+    public init(
+        current: CompletedSession, history: [CompletedSession], assistedExerciseIDs: Set<StableExerciseID> = [],
+        calendar: Calendar = Calendar(identifier: .gregorian), timeZone: TimeZone = .current
+    ) {
         self = Self.evaluate(
             id: current.id, studentID: current.studentID, at: current.completedAtUTC,
-            exercises: current.exercises, history: history, assistedExerciseIDs: assistedExerciseIDs)
+            exercises: current.exercises, history: history, assistedExerciseIDs: assistedExerciseIDs,
+            attendanceDate: current.completedAtUTC, calendar: calendar, timeZone: timeZone)
     }
 
-    public init(current: Session, history: [CompletedSession], assistedExerciseIDs: Set<StableExerciseID> = []) {
+    public init(
+        current: Session, history: [CompletedSession], assistedExerciseIDs: Set<StableExerciseID> = [],
+        calendar: Calendar = Calendar(identifier: .gregorian), timeZone: TimeZone = .current
+    ) {
         self = Self.evaluate(
             id: current.id, studentID: current.studentID, at: current.completedAtUTC ?? .distantFuture,
-            exercises: current.exercises, history: history, assistedExerciseIDs: assistedExerciseIDs)
+            exercises: current.exercises, history: history, assistedExerciseIDs: assistedExerciseIDs,
+            attendanceDate: current.completedAtUTC, calendar: calendar, timeZone: timeZone)
     }
 
     private struct Key: Hashable {
@@ -97,7 +106,8 @@ public struct SessionGains: Hashable, Sendable {
 
     private static func evaluate(
         id: StableUUID, studentID: StableUUID, at date: Date, exercises: [SessionExercise],
-        history: [CompletedSession], assistedExerciseIDs: Set<StableExerciseID>
+        history: [CompletedSession], assistedExerciseIDs: Set<StableExerciseID>, attendanceDate: Date?,
+        calendar: Calendar, timeZone: TimeZone
     ) -> SessionGains {
         let baseline = history.filter {
             $0.studentID == studentID && $0.id != id
@@ -172,7 +182,37 @@ public struct SessionGains: Hashable, Sendable {
         let milestone = [10, 25, 50, 100].contains(number) || (number > 100 && number % 50 == 0)
         return SessionGains(
             recordHolderSetIDs: holders, strictRecordHolderSetIDs: strictHolders, records: records, rows: rows,
-            milestoneSessionNumber: milestone ? number : nil)
+            milestoneSessionNumber: milestone ? number : nil,
+            attendanceStreakWeeks: attendanceDate.flatMap {
+                attendanceMilestone(at: $0, baseline: baseline, calendar: calendar, timeZone: timeZone)
+            })
+    }
+
+    private static func attendanceMilestone(
+        at date: Date, baseline: [CompletedSession], calendar: Calendar, timeZone: TimeZone
+    ) -> Int? {
+        var calendar = calendar
+        calendar.timeZone = timeZone
+        calendar.firstWeekday = 2
+        guard let week = calendar.dateInterval(of: .weekOfYear, for: date)?.start else { return nil }
+        var counts: [Date: Int] = [:]
+        for session in baseline {
+            guard let start = calendar.dateInterval(of: .weekOfYear, for: session.completedAtUTC)?.start else {
+                continue
+            }
+            counts[start, default: 0] += 1
+        }
+        guard counts[week, default: 0] == 1 else { return nil }
+        var weeks = 1
+        var cursor = week
+        while let previous = calendar.date(byAdding: .weekOfYear, value: -1, to: cursor),
+            counts[previous, default: 0] >= 2
+        {
+            weeks += 1
+            cursor = previous
+        }
+        return [4, 8, 12, 26, 52].contains(weeks) || (weeks > 52 && (weeks - 52).isMultiple(of: 26))
+            ? weeks : nil
     }
 
     /// The main metric value, or `nil` when this set does not record it.

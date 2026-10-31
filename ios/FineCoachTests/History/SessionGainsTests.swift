@@ -261,6 +261,131 @@ final class SessionGainsTests: XCTestCase {
         XCTAssertNil(SessionGains(current: ninth, history: history + [tenth]).milestoneSessionNumber)
     }
 
+    func testAttendanceMilestoneBoundariesOnlyAppearOnSecondSessionOfWeek() throws {
+        for weeks in [3, 4, 5, 8, 12, 26, 52, 78, 104] {
+            let history = try attendanceSessions(weeks: weeks, sessionsPerWeek: 3)
+            for position in 0..<3 {
+                let current = history[(weeks - 1) * 3 + position]
+                let gains = SessionGains(
+                    current: current, history: history.reversed(), calendar: attendanceCalendar,
+                    timeZone: attendanceCalendar.timeZone)
+                let expected = position == 1 && [4, 8, 12, 26, 52, 78, 104].contains(weeks) ? weeks : nil
+                XCTAssertEqual(gains.attendanceStreakWeeks, expected, "weeks=\(weeks), position=\(position + 1)")
+                if expected != nil {
+                    XCTAssertFalse(gains.isEmpty)
+                    XCTAssertTrue(gains.rows.isEmpty)
+                }
+            }
+        }
+        let onceWeekly = try attendanceSessions(weeks: 8, sessionsPerWeek: 1)
+        for current in onceWeekly {
+            XCTAssertNil(
+                SessionGains(
+                    current: current, history: onceWeekly, calendar: attendanceCalendar,
+                    timeZone: attendanceCalendar.timeZone
+                ).attendanceStreakWeeks)
+        }
+    }
+
+    func testAttendanceRestartsAfterMissingOrSingleSessionWeek() throws {
+        let all = try attendanceSessions(weeks: 9)
+        for retained in 0...1 {
+            let history = Array(all.prefix(8)) + Array(all[8..<(8 + retained)]) + Array(all.suffix(8))
+            let beforeFourth = SessionGains(
+                current: all[15], history: history, calendar: attendanceCalendar,
+                timeZone: attendanceCalendar.timeZone)
+            XCTAssertNil(beforeFourth.attendanceStreakWeeks)
+            let fourth = SessionGains(
+                current: all[17], history: history, calendar: attendanceCalendar,
+                timeZone: attendanceCalendar.timeZone)
+            XCTAssertEqual(fourth.attendanceStreakWeeks, 4)
+        }
+    }
+
+    func testAttendanceUsesLocalSundayMondayBoundaryAndIgnoresWeekNumberSettings() throws {
+        let calendar = attendanceCalendar
+        let monday = calendar.date(from: DateComponents(year: 2026, month: 10, day: 26))!
+        let history = try (0..<3).flatMap { week in
+            try (0..<2).map { offset in
+                try session(
+                    number: week * 2 + offset + 1, values: [],
+                    at: calendar.date(byAdding: .day, value: week * 7 + offset, to: monday)!)
+            }
+        }
+        let sunday = calendar.date(byAdding: .day, value: 27, to: monday)!.addingTimeInterval(86_340)
+        let first = try session(number: 7, values: [], at: calendar.date(byAdding: .day, value: 21, to: monday)!)
+        let second = try session(number: 8, values: [], at: sunday)
+        let nextMonday = try session(number: 9, values: [], at: sunday.addingTimeInterval(60))
+        let all = history + [first, second, nextMonday]
+        var unusual = calendar
+        unusual.firstWeekday = 1
+        unusual.minimumDaysInFirstWeek = 7
+        XCTAssertEqual(
+            SessionGains(current: second, history: all, calendar: unusual, timeZone: calendar.timeZone)
+                .attendanceStreakWeeks, 4)
+        XCTAssertNil(
+            SessionGains(current: nextMonday, history: all, calendar: unusual, timeZone: calendar.timeZone)
+                .attendanceStreakWeeks)
+        XCTAssertNil(
+            SessionGains(current: second, history: all, calendar: unusual, timeZone: TimeZone(secondsFromGMT: 0)!)
+                .attendanceStreakWeeks)
+    }
+
+    func testAttendanceEqualTimeIDOrderFutureAndOtherStudentDoNotRewriteMilestone() throws {
+        let history = try attendanceSessions(weeks: 4)
+        let date = history[7].completedAtUTC
+        let first = try session(number: 20, values: [], at: date)
+        let second = try session(number: 21, values: [], at: date)
+        let third = try session(number: 22, values: [], at: date)
+        let other = try session(number: 19, values: [], studentID: StableUUID(UUID()), at: date)
+        let all = Array(history.prefix(6)) + [third, other, second, first]
+        for (current, expected) in [(first, Int?.none), (second, 4), (third, Int?.none)] {
+            XCTAssertEqual(
+                SessionGains(
+                    current: current, history: all, calendar: attendanceCalendar,
+                    timeZone: attendanceCalendar.timeZone
+                ).attendanceStreakWeeks, expected)
+        }
+        let active = Session.start(id: second.id, studentID: student, now: date)
+        XCTAssertNil(
+            SessionGains(
+                current: active, history: all, calendar: attendanceCalendar,
+                timeZone: attendanceCalendar.timeZone
+            ).attendanceStreakWeeks)
+    }
+
+    func testAttendanceAndTenthSessionMilestonesCanCoexist() throws {
+        var history = try attendanceSessions(weeks: 4)
+        let firstDate = history[0].completedAtUTC
+        history += try (0..<2).map {
+            try session(number: 20 + $0, values: [], at: firstDate.addingTimeInterval(Double($0 + 1)))
+        }
+        let gains = SessionGains(
+            current: history[7], history: history, calendar: attendanceCalendar,
+            timeZone: attendanceCalendar.timeZone)
+        XCTAssertEqual(gains.milestoneSessionNumber, 10)
+        XCTAssertEqual(gains.attendanceStreakWeeks, 4)
+    }
+
+    private var attendanceCalendar: Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "Asia/Shanghai")!
+        calendar.firstWeekday = 2
+        return calendar
+    }
+
+    private func attendanceSessions(weeks: Int, sessionsPerWeek: Int = 2) throws -> [CompletedSession] {
+        let calendar = attendanceCalendar
+        let start = calendar.date(from: DateComponents(year: 2025, month: 12, day: 22, hour: 12))!
+        return try (0..<weeks).flatMap { week in
+            try (0..<sessionsPerWeek).map { offset in
+                try session(
+                    number: week * sessionsPerWeek + offset + 1, values: [],
+                    at: calendar.date(byAdding: .day, value: week * 7 + offset, to: start)!)
+            }
+        }
+    }
+
     private func session(
         number: Int, values: [(String, String)], mode: RecordMode = .weightReps,
         stable: Bool = true, studentID: StableUUID? = nil, at: Date? = nil

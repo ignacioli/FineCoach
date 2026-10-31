@@ -26,6 +26,12 @@ struct SessionGainsSectionView: View {
                             title: SessionGainsPresentation.milestone(number),
                             subtitle: String(localized: "session.gains.milestone.subtitle"), showsDisclosure: false)
                     }
+                    if let weeks = gains.attendanceStreakWeeks {
+                        if !gains.rows.isEmpty || gains.milestoneSessionNumber != nil { FCListRowDivider() }
+                        FCListRow(
+                            title: SessionGainsPresentation.streak(weeks),
+                            subtitle: String(localized: "session.gains.streak.subtitle"), showsDisclosure: false)
+                    }
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -34,6 +40,10 @@ struct SessionGainsSectionView: View {
 }
 
 enum SessionGainsPresentation {
+    static func streak(_ weeks: Int) -> String {
+        String(format: String(localized: "session.gains.streak.format"), Int64(weeks))
+    }
+
     static func progress(previous: String, current: String) -> String {
         String(format: String(localized: "session.gains.progress.format"), previous, current)
     }

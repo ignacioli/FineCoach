@@ -360,11 +360,11 @@ final class ArchiveExportScreenTests: XCTestCase {
 
         let active = try await studentUseCases.searchActive(query: "")
         let archived = try await studentUseCases.listArchived()
-        XCTAssertEqual(active.count, 7)
+        XCTAssertEqual(active.count, 8)
         XCTAssertEqual(archived.map(\.displayName.value), ["孙已归档"])
         let longName = try XCTUnwrap(active.first { $0.displayName.value.hasPrefix("欧阳慕容") })
         XCTAssertGreaterThan(longName.displayName.value.count, 25)
-        let expectedActive = ["王小明", "李思远", "陈嘉怡", "张浩然", "赵无数", "周十节"]
+        let expectedActive = ["王小明", "李思远", "陈嘉怡", "张浩然", "赵无数", "周十节", "林小禾"]
         for name in expectedActive {
             XCTAssertTrue(active.contains { $0.displayName.value == name }, "missing \(name)")
         }

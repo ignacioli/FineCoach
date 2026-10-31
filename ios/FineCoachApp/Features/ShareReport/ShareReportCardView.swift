@@ -43,7 +43,7 @@ struct ShareReportCardView: View {
         if !ShareReportCardPresentation.stats(dto).isEmpty { result.append(.stats) }
         if let parts = trainedParts(dto), !parts.isEmpty { result.append(.trainedParts) }
         result.append(contentsOf: dto.exercises.indices.map(Block.exercise))
-        if !dto.gainRows.isEmpty || dto.milestoneSessionNumber != nil {
+        if !dto.gainRows.isEmpty || dto.milestoneSessionNumber != nil || dto.attendanceStreakWeeks != nil {
             result.append(.personalBests)
         }
         if let summary = dto.studentFacingSummary, !summary.isEmpty { result.append(.summary) }
@@ -114,6 +114,18 @@ struct ShareReportCardView: View {
                             FCListRow(
                                 title: SessionGainsPresentation.milestone(number),
                                 subtitle: String(localized: "session.gains.milestone.subtitle"), showsDisclosure: false)
+                        }
+                    }
+                    if let weeks = dto.attendanceStreakWeeks {
+                        HStack(spacing: FCPrimitives.space3) {
+                            Image("MascotHeartSticker")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 40, height: 40)
+                                .accessibilityHidden(true)
+                            FCListRow(
+                                title: SessionGainsPresentation.streak(weeks),
+                                subtitle: String(localized: "session.gains.streak.subtitle"), showsDisclosure: false)
                         }
                     }
                 }
