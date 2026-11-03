@@ -371,7 +371,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 状态：**已实现**（`FCHubRow`；`mode` 取 `.action` / `.informational` / `.unavailable(reason:)`，不可用态在类型上没有 action 与 `›`）。外观沿用 19/42/43（C 类）；新增尾部说明与不可用态（B 类，M2-11 首次使用）。
 
 - **部件**：leading 24pt 线性图标（`action.primary`，装饰性）→ 标题（`headline`）/ 可选副标题（`caption` `text.secondary`，可换为 `FCStatusLabel`，如 43 通知被拒）→ 弹性空白 → 可选尾部说明（`caption` `text.secondary`，例如「24 次」）或尾部操作文字（`callout` 600 `action.primary`，如 43「前往设置」）→ 可选 `›`。最小高 64，图标与文字间距 `space.4`；行间由调用方放 `FCListRowDivider`。
-- **变体 / 状态**：可点（带 `›`）；不可点（无 `›`，如 42「关于」）；打开外部链接的行同样用可点态（如 42「源代码」，README §10 C21）；**不可用**（新）：图标与标题改为 `text.disabled`，尾部说明写原因（如「档案未包含」），无 `›`，整行不可点，读作「标题，原因」。
+- **变体 / 状态**：可点（带 `›`）；不可点（无 `›`，用于纯信息行）；42「关于」自 C33 起改用可点态；打开外部链接的行同样用可点态（如 42「源代码」，README §10 C21）；**不可用**（新）：图标与标题改为 `text.disabled`，尾部说明写原因（如「档案未包含」），无 `›`，整行不可点，读作「标题，原因」。
 - **不变量**：带 action 时整行可点（可自动）；不可用态没有点击动作（可自动）；整行合并为一个无障碍元素，读出标题、副标题与尾部说明（可自动）；点击区 ≥ 44（自动）。
 - **复用边界**：用于入口列表页（资料库 19、设置 42、首次启动二选一 M2-07、查看模式首页 M2-11）。操作区里的单行操作用 `DS-ACTION-ROW`，普通内容列表用 `DS-LIST-ROW`。
 - **迁移范围（Phase 0）**：ResourceHub `hubRow`、Settings `row` 改用本组件，外观不得改变。
@@ -503,3 +503,18 @@ C 类，只补规则，默认字号下外观不变：
 实施映射不复制 README 的数值，也不复制本文的共享 anatomy；需要时用 ID 引用。
 
 新画板在 Penpot 中绘制时，组件图层按 README §1.3 的方式标注（图层名「DS-xxx · 部件」，shared plugin data `finecoach.component` / `part`），feature 专有组件用实施映射中的 ID。这样 Agent 读取 Penpot 时可以直接按 ID 找到对应的组件规格。
+
+## 7. 分发准备 D6「关于」页组合（README §10 C33）
+
+产品负责人 2026-11-02 已批准类别 B：设置「关于」由 informational 改为 action，保留版本副标题并增加 disclosure；移除旧的不可点用法。复用 DS-PAGE-HEADER、DS-LABEL-VALUE-ROW、DS-HUB-ROW、DS-SECTION 与 FCListRowDivider，不扩展组件、不加 token。
+页面顺序：页头「关于」与行内返回 → 版本标签值行 →「动作资料来源」与按动作数降序的来源信息行（来源名 · N 条 · 规范化并去重的许可）→ caption/textSecondary 翻译说明 → 三个固定外链入口 →「字体」与 Noto Sans SC 许可信息行。来源读取失败时以 caption 显示不可用说明，不显示伪造统计。Penpot 回填待做。
+
+入口与布局清单（代码路径相对 ios/FineCoachApp）：
+
+```text
+设置 → 关于 → settings.about → 否 → FCHubRow（Features/Settings/SettingsView.swift）
+关于 → ‹ 返回 → about.back → 否 → FCPageHeader 与外层满宽 VStack（Features/Settings/CoachAboutView.swift）
+关于 → 逐条来源（provenance.json） → about.provenance → 否 → FCHubRow（Features/Settings/CoachAboutView.swift）
+关于 → CC BY-SA 4.0 → about.ccBySA4 → 否 → FCHubRow（Features/Settings/CoachAboutView.swift）
+关于 → CC BY-SA 3.0 → about.ccBySA3 → 否 → FCHubRow（Features/Settings/CoachAboutView.swift）
+```

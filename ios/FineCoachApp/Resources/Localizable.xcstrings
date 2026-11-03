@@ -1,6 +1,94 @@
 {
   "sourceLanguage": "zh-Hans",
   "strings": {
+    "about.source.built": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FineCoach 自建"
+          }
+        }
+      }
+    },
+    "about.source.format": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ · %d 条 · %@"
+          }
+        }
+      }
+    },
+    "about.version": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "版本"
+          }
+        }
+      }
+    },
+    "about.sources": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动作资料来源"
+          }
+        }
+      }
+    },
+    "about.sources.unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动作资料来源暂不可用"
+          }
+        }
+      }
+    },
+    "about.translation": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动作中文名称由 FineCoach 翻译整理。wger 动作的逐条作者与许可见源代码中的 provenance.json。"
+          }
+        }
+      }
+    },
+    "about.provenance": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "逐条来源（provenance.json）"
+          }
+        }
+      }
+    },
+    "about.fonts": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "字体"
+          }
+        }
+      }
+    },
     "shortcut.today.title": {
       "extractionState": "manual",
       "localizations": {

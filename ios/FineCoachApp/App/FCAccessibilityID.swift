@@ -182,6 +182,12 @@ public enum FCAccessibilityID {
     public static let settingsSystemEntryDescription = "settings.systemEntry.description"
     public static let settingsNotifications = "settings.notifications"
     public static let settingsBackup = "settings.backup"
+    public static let aboutRoot = "about.root"
+    public static let aboutBack = "about.back"
+    public static let aboutProvenance = "about.provenance"
+    public static let aboutCCBySA4 = "about.ccBySA4"
+    public static let aboutCCBySA3 = "about.ccBySA3"
+
     public static let settingsAbout = "settings.about"
     public static let settingsSourceCode = "settings.sourceCode"
 
