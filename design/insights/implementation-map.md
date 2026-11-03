@@ -10,7 +10,7 @@
 |---|---|---|---|
 | 今日页「需要留意」区块（E-a1） | **B** 修订 | 页面组合：复用 `FCSectionLabel`、`FCListRow`、`FCListRowDivider`、`FCUndoRow`、`FCGroupEntryRow`（2026-10-27 起不再用 `FCMoreMenu`）；不新增共享组件 | 已批准的今日页（01 / W08-a）多了一个区块 |
 | 「需要留意」完整列表页（E-a2） | **B** 新页面，组合现有组件 | `DS-PAGE-SECONDARY`（`FCPageHeader`）+ 按类型分组的同一提示行 | 新的二级页，没有新视觉语言 |
-| 学员详情提示区（E-b） | **B** 修订 | 同一提示行，主文字不带学员名 | 已批准的学员详情（M2-03）多了一个区块 |
+| 学员详情提示区（E-b） | **B** 修订 | 同一提示行，主文字不带学员名 | 已批准的学员详情（26-student-detail；M2-01 导出入口）多了一个区块 |
 | 训练趋势指标切换第 4 段「估算 1RM」（E-c） | **B** 修订 | `DS-SEGMENTED` 使用范围扩到 4 段（README §10 C26）；`TrendLineChart` 外观不改 | 已批准的 M2-15 多一个指标与一行说明 |
 | 提示行暂不提醒改左滑 + 撤销 + 首次轻推（E-d，2026-10-27） | **B** 修订 | 左滑操作扩展（`components.md` §4.8）；`DS-UNDO-ROW` 复用边界扩到暂不提醒；`DS-MORE-MENU` 退役 | 集中走查：「…」系统菜单在 iOS 26 / 18 都太大（README §10 C27） |
 | 分区标题左滑删除、指标停用移到底部（B-b、B-c 修订，2026-10-27） | **B** 修订 | 训练中、模板编辑、记录指标三页；复用 `DS-CONFIRM-DIALOG`、`DS-ACTION-ROW` | 同上，`FCMoreMenu` 的另外两处用法 |
@@ -49,6 +49,7 @@
 
 ### 2.5 训练趋势第 4 段（E-c）
 
+- 负责人 2026-11-03 已裁定：教练端以 M2-15 的页面结构 + E-c 第 4 段「估算 1RM」为目标；学员查看模式（`ArchiveTrendsView`）保持 3 段。
 - `FCSegmentedSwitch` 选项：重量 / 次数 / 容量 / 估算 1RM。只有所选动作在 spec §12.1 清单中时出现第 4 段；其他动作仍是 3 段。
 - 选中「估算 1RM」时，图下显示一行 `caption` `text.secondary` 说明（`trends.e1rmCaption`），位置与现有容量说明（`trends.volumeCaption`）相同。
 - y 轴最大值标签沿用现有格式；点的取值见 plan §3.7。「个人最佳」区块不变。

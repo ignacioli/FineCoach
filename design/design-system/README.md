@@ -1,6 +1,7 @@
 # FineCoach 设计系统（G5「暖炭黑素雅」）
 
 > 状态：v1.0（2026-09-22 产品负责人批准）。修订历史：v0.2 按产品负责人决定修复了评分卡的定量扣分项（O1/O2/O3/O5、C10），全部待确认项已关闭；v0.3 已把全部画稿修改回填到 Penpot 源文件，并在本仓库重新导出 17 屏（§1.1）。
+> 当前范围：上述 v1.0 与 17 屏是初版批准和导出记录；后续 M2、P0、阶段 B–F 与开屏修订来源见 §1，逐页当前目标见 [`screens.md`](screens.md)。
 > 作用：FineCoach iOS 界面视觉的**唯一实现依据**。后续 spec / plan / tasks 与代码（`ios/FineCoachApp/DesignSystem/`）都引用本文，不再各自转述设计数值。
 > 组件结构（anatomy、变体、状态、不变量、代码映射）与视觉工作流见 [`components.md`](components.md)；数值仍以本文为准。
 
@@ -11,9 +12,9 @@
 | 优先级 | 来源 | 说明 |
 |---|---|---|
 | 1 | 器材图标 SVG：`design/m1-b-hifi/icons/*.svg`（App 内副本：`ios/FineCoachApp/Resources/Assets.xcassets/equipment-*.imageset`） | 重新绘制后的定稿版本，**优先于**任何屏幕里的图标画法 |
-| 2 | Penpot 文件「M1-B G5 Design」的 17 屏画稿（`01 今日` … `17 器材 icon 库`） | 除器材图标外，一切视觉以画稿为准 |
+| 2 | Penpot 文件「M1-B G5 Design」的批准画稿（初版 `01 今日` … `17 器材 icon 库`；后续 M2、P0、阶段 B–F 与开屏修订见 §1.2–§1.14，逐页入口见 [`screens.md`](screens.md)） | 除器材图标外，一切视觉以画稿为准 |
 | 3 | 同一文件的 token 集 `FC Primitives`（回填后 25）+ `FC Semantic Color`（回填后 17）与 Foundations 样张 | 画稿没有覆盖的地方以 token 和样张为准 |
-| 4 | `design/m1-b-hifi/screens/*.png`（§1.1）、`design/m1-b-hifi/README.md` | 导出物与设计过程说明，与上面各项冲突时以上面为准。视觉评分卡 2026-10-31 移回私有 specs 仓。这些物料 2026-09-22 前存放在私有 specs 仓，已全部迁入本仓库；specs 仓只保留设计 discovery 证据（`design/prototypes/evidence/`） |
+| 4 | `design/m1-b-hifi/`（§1.1–§1.3）、`design/m2-hifi/`（§1.4）、`design/experience-p0/`（§1.5）、`design/experience-t2/`、`design/insights/`（§1.11–§1.12）、`design/progress-milestones/`（§1.8–§1.9）、`design/stage-c-empty-state/`、`design/system-entry/`（§1.13）；各目录的画稿、README 与实施映射统一由 [`screens.md`](screens.md) 索引 | 导出物与设计过程说明，与上面各项冲突时以上面为准。视觉评分卡 2026-10-31 移回私有 specs 仓。这些物料 2026-09-22 前存放在私有 specs 仓，已全部迁入本仓库；specs 仓只保留设计 discovery 证据（`design/prototypes/evidence/`） |
 
 各来源之间的冲突和裁决见 §10「来源冲突裁决记录」。
 
@@ -80,14 +81,14 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 
 - 产品负责人 2026-10-22 选定方案 A（一张 hero 卡多行，§10 C14）。分类 B：修订已批准的 01 今日页 hero 卡。
 - Penpot：Foundations 页 y=3750 一行末尾（x=11770，D-c2 右侧）新增画板「W08-a 今日 · 多人训练 hero（方案 A，2026-10-22）」，含 1 人 / 2 人 / 3 人三种状态。之前：该位置为空；之后：画板 390×772，字号、颜色取自 01 hero 卡原图层。
-- 已知差异（本轮不处理，记录待查）：01 原图层的副文字是 13/400（`caption`），本文件 §8 和 `components.md` 写的是 `callout`。W08-a 照 01 原图层画；代码实现时副文字沿用 `FCHeroCard` 现有样式，不在本轮改。
-- 导出：只在 Penpot 画板里（1x 参考图 2026-10-31 从仓库删除，负责人认为用处不大）。
+- 已裁定（负责人 2026-11-03）：hero 卡副文字以代码为准，使用 `callout`（15pt）。01 与 W08-a 的副文字图层已改为 15/500；Penpot 已回填（快照 `before hero subtitle callout + notification copy 2026-11-03` → `hero subtitle callout 15/500 on 01 + W08-a; notification preview copy = code 2026-11-03`），2 倍图 `01-today.png`、`W08-a-today-multi-session.png` 已重新导出入库。
+- 导出：原 1x 参考图于 2026-10-31 删除；当前 2 倍正式图已入库 `design/m1-b-hifi/screens/W08-a-today-multi-session.png`（`d0163ad` 明确记录新增 2x Penpot 导出）。
 
 ### 1.7 分享预览「完成」（2026-10-22）
 
 - 产品负责人 2026-10-22 选定（§10 C15）。分类 B：在已批准的 29 预览页上新增控件；组件复用 `DS-BUTTON` 次按钮，不新建。
 - Penpot：Foundations 页 y=3750 一行末尾（x=12210，W08-a 右侧）新增画板「D7b-r 分享预览 · 底部「完成」（走查修订 2026-10-22）」，含未分享、已交给系统、取消或失败三种状态。D7b 原画板不改。快照 `before-share-done 2026-10-22` → `share-done D7b-r 2026-10-22`。
-- 导出：只在 Penpot 画板里（1x 参考图 2026-10-31 从仓库删除）。
+- 导出：2 倍正式图已入库 `design/m1-b-hifi/screens/D7b-r-share-preview-done.png`；该图取代 2026-10-31 从仓库删除的 1x 参考图。
 
 ### 1.8 阶段 D 新纪录与比上次进步重新定义（2026-10-23）
 
@@ -97,7 +98,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
   - D-c2：卡片深蹲行同样改为「上次 → 本次」，删去右侧「125 kg × 5」。
   - D-a2：新增「⑤ 判定口径（2026-10-23 修订）」六行说明，画板高 772。
   - D-a 不改。
-- 导出：三块画板均以 MCP 1x 导出看过（未入库）；2x 正式导出与其他 D 画板一并待做。
+- 导出：当时三块画板均以 MCP 1x 导出看过（未入库）；当前 D-b 已有 2 倍图 `design/progress-milestones/screens/D-b-session-gains.png`（`d0163ad`），D-a2、D-c2 的 2 倍正式图已入库 `design/progress-milestones/screens/D-a2-record-partial-states.png`、`design/progress-milestones/screens/D-c2-share-toggle-hint-card.png`；后续 C32 的状态见 `screens.md`。
 - 代码已按新口径修改（分支 `fix/gains-redefine`，2026-10-23）：`SessionGains` 主指标判定、每个动作一行、`DS-LIST-ROW` 新增新纪录胶囊 slot；确认触感改由训练页级确认事件触发（修复真机走查 D1/D2 无触感）。执行记录见 `design/progress-milestones/implementation-map.md` §4 Phase 7。
 
 ### 1.9 新纪录数值浮起与动效 token（2026-10-23）
@@ -114,20 +115,20 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 
 - 产品负责人 2026-10-23 裁定（§10 C24）。分类 B：扩展 feature 专有 `DS-REST-TIMER`（`design/experience-p0/implementation-map.md`），复用现有 token，不新建组件。
 - Penpot（Foundations 页）：快照 `before-rest-overdue P0-b 2026-10-23` → `rest overdue state on P0-b 2026-10-23`。P0-b 组间休息新增第三态「已超时 1:20」，说明改为「停在本页看着结束：触感提醒，3 秒后收起。离开期间结束：切回时显示已超时，不自动收起」，画板加高 128。
-- 同日再修订（§10 C25）：取消 3 秒自动收起。Penpot 快照 `before-rest-no-auto-dismiss P0-b 2026-10-23` → `rest no auto-dismiss P0-b 2026-10-23`；2 倍导出 `design/experience-p0/boards/P0-b-component-states.png`（2026-10-24）；分区标题改为「组间休息 · 进行中 / 刚结束 / 已超时」，说明改为「结束时触感提醒；不自动收起，一律显示已超时并每秒累加，点「关闭」或确认下一组才收起。App 在后台时发系统通知（P0-D5）」。2 倍导出待负责人导出。
+- 同日再修订（§10 C25）：取消 3 秒自动收起。Penpot 快照 `before-rest-no-auto-dismiss P0-b 2026-10-23` → `rest no auto-dismiss P0-b 2026-10-23`；2 倍导出 `design/experience-p0/boards/P0-b-component-states.png`（2026-10-24）；分区标题改为「组间休息 · 进行中 / 刚结束 / 已超时」，说明改为「结束时触感提醒；不自动收起，一律显示已超时并每秒累加，点「关闭」或确认下一组才收起。App 在后台时发系统通知（P0-D5）」。2 倍图已按上述路径入库（同目录 `implementation-map.md`「`DS-REST-TIMER` 组间休息条」亦确认 2026-10-24 导出）。
 
 ### 1.11 阶段 E 洞察画稿（2026-10-24）
 
 - 产品负责人 2026-10-24 批准 E-a1、E-a2、E-b、E-c（specs 005 §7.1）。分类 B：今日页、学员详情各多一个「需要留意」区块，新增完整列表二级页，训练趋势多一个指标段；全部由现有组件组合，不新增 token、图标、颜色。页面组合与文案见 `design/insights/implementation-map.md`。
 - Penpot：E-a1、E-a2、E-b 在 Foundations 页（x=13090 / 13530 / 13970），E-c 在「M2 G7 Design」页（x=4960）。快照 `before-stage-e-boards 2026-10-24` → `stage E boards E-a1 E-a2 E-b draft 2026-10-24` → `stage E board E-c 1RM trend draft 2026-10-24` → `stage E board E-c caption: estimate not measured max 2026-10-24` → `stage E boards aligned to implementation map (text fixed) 2026-10-24 b`。
 - 同轮调整（负责人同意由 Claude 定）：E-c 说明末句由「只看趋势，不是建议重量」改为「这是推算值，不是实测的最大重量」；趋势线保持 `action.primary`；E-a1「全部 5 条」改为「全部 · 5」以复用 `FCGroupEntryRow`；E-a2 说明去掉左滑（§10 C26）。
-- 2 倍导出待负责人导出（预设已设好），导入 `design/insights/screens/`。
+- 2 倍导出：E-a1 已入库 `design/insights/screens/E-a1-today-insights.png`（`d0163ad`）；E-a2、E-b、E-c 已分别入库 `design/insights/screens/E-a2-insights-list.png`、`design/insights/screens/E-b-student-detail-insights.png`、`design/insights/screens/E-c-trend-estimated-1rm.png`。
 
 ### 1.12 「…」菜单退役，改为左滑（2026-10-27）
 
 - 阶段 E 集中走查（2026-10-27）：模拟器（iOS 26）上「…」弹出系统胶囊菜单，菜单偏大；真机（iOS 18）的灰色菜单也太大。训练页分区「…」的胶囊外观同源（iOS 26 系统 `Menu` 样式，代码自 2026-10-16 未变，不是回归）。负责人否决底部面板（多一步）和行内文字按钮（页面变乱），选左滑（§10 C27）。分类 B。
-- Penpot（Foundations 页）：快照 `before swipe revision (retire DS-MORE-MENU) 2026-10-27` → `swipe revision drawn: E-a1/E-a2/E-b/B-a/B-b/B-c + E-d 2026-10-27` → `swipe capsules redrawn to iOS 26 look (E-d, B-b) 2026-10-27`。E-a1、E-a2、E-b、B-a 去掉「…」；B-b 顶部改为「分区标题 · 左滑后」红色胶囊；B-c 页头去掉「…」，「管理」加「停用指标」行；新增 E-d（x=14410）：灰色「暂不提醒」胶囊、撤销行、首次轻推。B-b 其余三个左滑示例仍是旧的矩形画法，是否统一为胶囊未定。
-- 2 倍导出待负责人导出。
+- Penpot（Foundations 页）：快照 `before swipe revision (retire DS-MORE-MENU) 2026-10-27` → `swipe revision drawn: E-a1/E-a2/E-b/B-a/B-b/B-c + E-d 2026-10-27` → `swipe capsules redrawn to iOS 26 look (E-d, B-b) 2026-10-27`。E-a1、E-a2、E-b、B-a 去掉「…」；B-b 顶部改为「分区标题 · 左滑后」红色胶囊；B-c 页头去掉「…」，「管理」加「停用指标」行；新增 E-d（x=14410）：灰色「暂不提醒」胶囊、撤销行、首次轻推。B-b 其余三个左滑示例保持现状，不统一胶囊（负责人 2026-11-03 已裁定）。
+- 2 倍导出：E-a1 已由 `d0163ad` 入库；E-a2、E-b、E-d、B-a、B-b、B-c 已分别入库 `design/insights/screens/E-a2-insights-list.png`、`design/insights/screens/E-b-student-detail-insights.png`、`design/insights/screens/E-d-insights-swipe-snooze.png`、`design/experience-t2/screens/B-a-section-swipe-delete-confirm.png`、`design/experience-t2/screens/B-b-partial-states.png`、`design/experience-t2/screens/B-c-metric-history-manage.png`。本节其余画板的导出状态见 `screens.md`。
 
 ### 1.13 阶段 F 系统入口画稿与实现回填（2026-10-28～29）
 
@@ -143,7 +144,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 - Penpot（Foundations 页 y=3750；G-a x=17290、G-b x=17730）：快照 `before launch screen G-a 2026-10-29` → `G-a launch screen draft 2026-10-29` → `G-a launch screen approved 2026-10-29` → `G-a implementation backfill note 2026-10-29` → `G-b launch screen comparison draft 2026-10-29` → `G-b 180pt interim approved 2026-10-29`（G-a 标为已否决）。
 - 入口与布局：① 系统静态开屏 → 白底 + 正中圆角图标 → 非 accessibility 元素 → 不改数据 → 图片约束居中、宽高 180；② `AppRoot` 叠层 → 同 ① → `accessibilityHidden`、不接收点击 → 不改数据 → `LaunchOverlay` 忽略安全区、居中。L3：负责人真机看过 G-a、G-b 120pt、G-b 180pt（2026-10-29）。
 - 2 倍导出：过渡版不导出，阶段 C 定稿后再导出。
-- **阶段 C 定稿（负责人 2026-10-30，§10 C31）**：开屏只用白屏，直接进首页，不放图标，不加过场叠层，不做开屏动画。待实现：`LaunchScreen.storyboard` 去掉图片、删除 `AppRoot` 叠层和 `launch-icon` 资源，`LaunchScreenConfigurationTests` 随之改写。G-b 实现前保持现状。
+- **阶段 C 定稿（负责人 2026-10-30，§10 C31）**：开屏只用白屏，直接进首页，不放图标，不加过场叠层，不做开屏动画。已实现（`654e1b8`）：`LaunchScreen.storyboard` 已去掉图片，`AppRoot` 叠层和 `launch-icon` 资源已删除，`LaunchScreenConfigurationTests` 已改为验证白底、无图无字和无叠层；实现与走查记录见 `design/stage-c-empty-state/implementation-map.md` §3–§4。G-b 已被本定稿取代。
 
 ## 2. 颜色
 
@@ -360,7 +361,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 | 主按钮（页面底部） | 358×52，`radius.md`，底色 `action.primary`，按下 `action.pressed`；文字 `headline` 白色 |
 | 次按钮（样张） | 白底，1.5pt `action.primary` 描边，`radius.md`；文字 `headline` `action.primary` |
 | 链接式按钮 | 无底色，文字 `callout` 600 `action.primary`（例：「＋ 添加动作」「＋ 自定义指标」「重试」） |
-| 顶部分段切换（今日 / 学员） | 选中项 50×32 胶囊，`action.primary` 底 + `headline` 白字；未选中项为纯文字 `body` `text.secondary`。同一外观也用于页内 2–3 个互斥短选项（37「扣减 / 返还」；趋势指标、身体数据录入单位），选项更多或文字较长时改用筛选胶囊（2026-10-05，§10 C11） |
+| 顶部分段切换（今日 / 学员） | 选中项 50×32 胶囊，`action.primary` 底 + `headline` 白字；未选中项为纯文字 `body` `text.secondary`。同一外观也用于页内 2–4 段（C26）的互斥短选项（37「扣减 / 返还」；趋势指标、身体数据录入单位），选项更多或文字较长时改用筛选胶囊（2026-10-05，§10 C11） |
 | 筛选胶囊（07） | 高 30 胶囊；未选中 `surface.selected` 底 + `chipLabel` `text.primary`；选中 `action.primary` 底 + 白字 |
 | 开关 | 44×26 胶囊，滑块 18×18 白色圆，**左关右开**（iOS 惯例，与画稿 02/12 一致）。开启：轨道 `action.primary`。关闭：轨道 `surface.divider` 底 + 1.5pt `border.control` 内描边（O7）。实现为系统原生 `Toggle` + 自定义外观样式，保留系统开关的无障碍语义；可点击区域不小于 44×44 |
 | 深色 hero 卡（01） | 358×100，`radius.lg`，`action.primary` 底；内含徽标（高 24 胶囊，最小宽 56、随文字增长，`surface.canvas` 底，`sectionLabel` `action.primary` 字）、`headline` 白字标题、`text.onActionSecondary` 副文字、`callout` 600 白字操作。每屏最多一个。**多行变体（W08-a，2026-10-22）**：多名学员同时训练时仍是一张卡，徽标「进行中 · N」，每人一行（学员名 · 部位 / 已训练 N 分钟 / 「继续 ›」），行最小高 44，行间 `surface.dividerOnAction` 分割线，按开始时间升序；每行单独可点。1 人时与 01 相同 |
@@ -416,7 +417,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 |---|---|---|
 | App 图标 | `assets/app-icon-{light,dark,tinted}.png`，1024×1024 | 见 §9.2 |
 | 吉祥物（空态） | `assets/mascot-empty-state.jpeg`，1024×1024 | 与 Penpot 内嵌原图 `inset-warm2.jpeg` 逐字节一致（276383 字节，SHA-256 `aca587ee…d87395b`） |
-| 开屏页图标 | 由 `assets/app-icon-light.png` 按主屏图标圆角（边长 22.37%）裁成带透明通道的方图，工程内 `launch-icon` @2x 360px / @3x 540px | 见 §9.3 |
+| 开屏页图标（G-b 历史资产，C31 已停用） | 由 `assets/app-icon-light.png` 按主屏图标圆角（边长 22.37%）裁成带透明通道的方图，原工程内 `launch-icon` @2x 360px / @3x 540px（`654e1b8` 已删除） | 见 §9.3 |
 | 吉祥物贴纸「比心」（阶段 D） | `assets/mascot-heart-sticker.png`，1254×1254，RGBA 透明底 | 产品负责人 2026-10-20 用 ChatGPT image 以 `mascot-avatar`、`mascot-empty-state` 为参考生成（提示词见产品仓 `.handoff/prompt/2026-10-20-stage-d-mascot-heart-sticker-prompt.md`）：胸像，耳朵下垂，比心手势加一颗小橙色心，无道具无文字。SHA-256 `7b697f1b…09064bc24`。Penpot D-c2 内嵌 80×80 缩小版 |
 | 吉祥物空态场景「咖啡兔」（阶段 C，§10 C30） | `assets/mascot-cafe-{rabbit,blink,table}.png`，三张同为 1254×1254 RGBA 透明底，同一画布坐标，直接叠放 | 产品负责人 2026-10-30 用 ChatGPT image 以 `mascot-avatar`、`mascot-empty-state` 为参考分层生成（提示词见产品仓 `.handoff/prompt/2026-10-30-stage-c-empty-state-scene-prompt.md`）。生成的分层图位置互相对不上，由 Claude 重新合成：`rabbit` 为兔子与凳子层左移 110 px；`table` 为桌子与杯子层缩到 77%、放在 (570, 600)；`blink` 只含闭眼的眼部区域（闭眼图整张重画过，按头部最佳偏移对齐后羽化裁出），盖在 `rabbit` 上即为闭眼。SHA-256：rabbit `6c1ec1c9…2de9516dc`、blink `ed72e824…2a40e5af44`、table `c0cf07f3…a0f4f09f6`。插画里没有热气，热气由代码绘制（§14.2） |
 
@@ -447,7 +448,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 - 「减弱动态效果」开启时不叠 ②，静态开屏直接切到首页（§14.1 第 5 条）。
 - 深色模式：App 界面未适配深色，开屏始终用浅色。
 - 过渡版：阶段 C 结束后重新决定（见 §1.14）。G-a（米色满版吉祥物）已否决。
-- **定稿（2026-10-30，§10 C31）**：只保留白底，去掉 ① 里的图标和整个 ②；冷启动从白屏直接进首页。上面 ①② 的描述在实现落地前仍对应现有代码。
+- **定稿（2026-10-30，§10 C31）**：只保留白底，去掉 ① 里的图标和整个 ②；冷启动从白屏直接进首页。上面 ①② 仅保留过渡版历史描述；`654e1b8` 已落地本定稿（`LaunchScreenConfigurationTests`，实施映射见 §1.14）。
 
 ## 10. 来源冲突裁决记录
 
@@ -470,7 +471,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 | I1 | Penpot 17 屏、11 屏里的器材图标是旧画法（描边 3pt/2pt 混用），与 `icons/` 目录的重绘版不一致 | 以 `icons/` 为准，已替换 | 已定，已回填 |
 | O5 | 画稿只覆盖了空态和训练三种状态，缺少加载、错误、离线状态（评分卡维度 9 扣分项） | 不另出设计稿，用本文的组件与颜色组合实现，并在逐屏走查时人工确认 | 已定（产品负责人） |
 | O7 | 关闭态开关轨道 `#ECE9E2` 对白底 1.21:1，开关状态只靠轨道体现，低于非文本元素 3:1（spec NFR-010；2026-09-23 对抗性审查 #1） | 保留画稿外观，轨道加 1.5pt `border.control` 内描边（3.48:1），与 O2 同一处理方式；已回填 Penpot 12 屏（快照 `before-switch-off-outline 2026-09-23` → `switch-off-outline 2026-09-23 (…)`）并重新导出 `12-share-report.png` | 已定（产品负责人 2026-09-23），已回填 |
-| C11 | `FCSegmentedSwitch` 在 README 中只定义为「今日 / 学员」顶部切换，代码另用于人工调整、趋势指标、身体数据录入单位 | 37 画稿（D13b，2026-09-29 批准）已在页内用同一胶囊表达「扣减 / 返还」，属于已批准的复用；限定为 2–3 个互斥短选项。不用系统分段 `Picker`（色板外，与 D13 取代系统 `Stepper` 同理），也不用筛选胶囊（筛选 / 多选语义） | 已定（产品负责人授权 AI 裁决，2026-10-05） |
+| C11 | `FCSegmentedSwitch` 在 README 中只定义为「今日 / 学员」顶部切换，代码另用于人工调整、趋势指标、身体数据录入单位 | 37 画稿（D13b，2026-09-29 批准）已在页内用同一胶囊表达「扣减 / 返还」，属于已批准的复用；限定为 2–4 段（C26）的互斥短选项。不用系统分段 `Picker`（色板外，与 D13 取代系统 `Stepper` 同理），也不用筛选胶囊（筛选 / 多选语义） | 已定（产品负责人授权 AI 裁决，2026-10-05） |
 | C12 | 保存状态组件没有画稿行，组件代码也未显式声明字体（继承 App 根部 `body`） | 按 M1 已验收的实际呈现补规格（§8「保存状态」）；非核心链路，不出画稿 | 已定（产品负责人 2026-10-05） |
 | C13 | §8「星期多选（02）」「类型标签（15「有氧」）」对应组件没有任何界面使用：02 已被 23（D4 重复规则）取代；15 的「有氧」标签从未实现，训练中用记录方式选择表达有氧 | 作为废弃设计删除这两行，并删除 `FCWeekdayChip`、`FCTypeTag` 代码；02、15 画板保留为历史画稿，其中这两处不再是实现依据，Penpot 已加评论标注。D6b 编辑资料的「男 / 女」也画成 64×28 胶囊，但实现为 4 个选项的 `FCFilterChip`（G6 已验收），按筛选胶囊对待，64 固定宽不作为规格 | 已定（产品负责人 2026-10-05） |
 | C14 | 多名学员可同时训练（M1A-FR-018 2026-10-22 修订，W-08）后，今日页需要同时展示多节进行中的课；§2.4「每屏最多一个深色 hero 面板」不变 | 采用方案 A：一张 hero 卡的多行变体（见 §8 深色 hero 卡、`components.md` `DS-HERO-CARD`）；新增 `surface.dividerOnAction`；徽标改为最小宽 56、随文字增长（CG-6）。否决横向翻页（他人被隐藏、同屏露出两张深色卡）和 hero + 提示条（同为上课学员却主次不等） | 已定（产品负责人 2026-10-22） |
@@ -483,17 +484,35 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 | C21 | 产品负责人 2026-10-23：设置 42「关于」一直显示「版本 —（—）」（工程从未设置版本号）；需要能找到源代码 | App 版本 0.2.0、构建号 1（pbxproj `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION`，生成的 Info.plist 带出），「关于」行显示「版本 0.2.0（1）」；「关于」下方新增可点的「源代码」行（`DS-HUB-ROW`，代码图标、副标题 `github.com/ignacioli/FineCoach`、带 `›`），用系统浏览器打开公开仓库，App 不发任何网络请求。Penpot D15c/D15d（42/43）已回填，快照 `before-about-source-row 2026-10-23` → `about version 0.2.0 + source code row (42/43) 2026-10-23`；`screens/` 的 42/43 已于 2026-10-23 按 2 倍重导出替换 | 已定（产品负责人 2026-10-23） |
 | C22 | 真机走查 2026-10-23：结束训练时的「复核训练时长」输入框标签是「时长（秒）」，预填原始秒数，中断十几个小时就是五位数秒，教练无法读也无法改 | 标签改为「训练时长」；预填「12 小时 5 分」格式（秒四舍五入到分钟；不满 1 小时写「55 分」，整小时写「2 小时」）；输入框下方提示「例如 1 小时 12 分、1h12m、55 分钟、55m」（按 N3 加空格，产品负责人 2026-10-23 选定）；解析接受带不带空格的 `小时/h`、`分/分钟/m`，只输一个整数按分钟；无法识别时留在本页并显示「训练时长无效，按上面的例子填写。」，不提交。组的「时长」记录模式不变（纯数字仍按秒）。`DurationTextParser.parseSessionDurationSeconds` / `formatSessionDurationForEditing`。无画稿（全屏确认流程无 Penpot 画板，见 C20） | 已定（产品负责人 2026-10-23） |
 | C23 | 真机走查 2026-10-23：多名学员同时训练，锁屏上已有几条休息结束通知，点其中一条进入 App 后其余全部消失；另外 P0-D5「前台不显示系统通知」是只有一人训练时定的，教练看着学员 A 时学员 B 的休息结束没有任何提醒 | 每节训练的休息通知单独成组（`threadIdentifier` 用通知标识本身，只含不透明的训练 ID）；App 在前台时，屏幕上正在看的学员仍只用 App 内休息条，其他学员的休息结束弹系统横幅、响提示音并留在通知中心，点横幅进入该学员训练页；预约提醒前台仍不显示。`willPresent` / `didReceive` 都用带完成回调的写法并在主线程完成（见 C19 冷启动崩溃）。分组能否阻止系统连带清除，待真机确认 | 已定（产品负责人 2026-10-23） |
-| C24 | 真机走查 2026-10-23：两名学员同时训练，从 A 切到 B 再切回 A，休息倒计时全部消失；停在 A 时点 B 的休息结束横幅，仍停在 A | 休息倒计时按每节训练存在内存（`RestTimerStore`，不写磁盘，App 被系统结束后不恢复，系统通知照常），换页、换学员后恢复，恢复时不重排通知；结束、放弃训练时清除。离开期间已结束的，切回时休息条显示结束态加「已超时 m:ss」，不自动收起；停在本页看着结束的仍 3 秒后收起。训练页按学员 `.id`，点横幅换学员时重建页面，不再沿用 A 的页面状态 | 已定（产品负责人 2026-10-23） |
+| C24 | 真机走查 2026-10-23：两名学员同时训练，从 A 切到 B 再切回 A，休息倒计时全部消失；停在 A 时点 B 的休息结束横幅，仍停在 A | 休息倒计时按每节训练存在内存（`RestTimerStore`，不写磁盘，App 被系统结束后不恢复，系统通知照常），换页、换学员后恢复，恢复时不重排通知；结束、放弃训练时清除。离开期间已结束的，切回时休息条显示结束态加「已超时 m:ss」，不自动收起；停在本页看着结束的仍 3 秒后收起。训练页按学员 `.id`，点横幅换学员时重建页面，不再沿用 A 的页面状态。本页 3 秒收起已被 C25 取代 | 已定（产品负责人 2026-10-23） |
 | C25 | 真机走查 2026-10-23（C24 复测）：A、B 都休息结束，停在 B 页看着 B 结束，B 的休息条 3 秒后收起并清掉；切到 A 显示「已超时」，切回 B 什么都没有，两名学员的超时提醒不一致 | 取消「休息结束 3 秒后自动收起」：结束后一律显示结束态，超时满 1 秒起加一行「已超时 m:ss」并每秒累加，直到点「关闭」、确认下一组开始新休息、结束或放弃训练。键盘规则随之改为：键盘收起时休息已结束则直接清除（不再只是本页隐藏），尚未结束的照常恢复。触感仍只在看着到点时一次 | 已定（产品负责人 2026-10-23） |
 | C26 | 阶段 E 画稿 E-c 在训练趋势指标切换里放了 4 段（重量 / 次数 / 容量 / 估算 1RM），C11 只允许 2–3 段；E-a2 说明写「…」和左滑都能暂不提醒，但今日页、学员详情是 `ScrollView`，SwiftUI 左滑只在 `List` 中可用 | `FCSegmentedSwitch` 页内用法放宽到 2–4 段，条件是每段都是短词且 375 宽默认字号一行放得下；最大字体放不下时改用筛选胶囊（集中走查确认）。提示行只用可见「…」菜单，不做左滑；E-a2 说明已改（「…」部分已被 C27 取代） | 已定（Claude，2026-10-24；负责人已批准 E-c 4 段画稿） |
 | C27 | 阶段 E 集中走查 2026-10-27：「…」打开的系统菜单在 iOS 26 是浮起的大胶囊、在 iOS 18 是大块灰色菜单，体验不好；训练页分区「…」同样如此（2026-10-21 走查 W-01 一直没定）。全 App 只有三处「…」：提示行暂不提醒、分区删除、指标停用 / 恢复 | 退役 `DS-MORE-MENU`（删除 `FCMoreMenu`），关闭 W-01。提示行左滑「暂不提醒」（`text.secondary`、`bell.slash`，可一滑到底，之后 4 秒撤销行，撤销即取消暂不提醒）；今日页第一次出现提示时第一行轻推一次（72 pt、0.6 s，每台设备一次，「减弱动态效果」时不播）。分区标题行左滑「删除分区」（`status.destructive`、`trash`，不能一滑到底，点了弹现有确认弹窗）。指标「停用 / 恢复」移到记录指标页底部「管理」的普通操作行，不弹确认。复看（2026-10-27）补充：模板编辑动作行的行内系统 `Menu`「移出分区」（系统强调蓝，名不副实）改为与训练页相同的左滑「移入分区」（`text.secondary`、`folder`），弹分区选择。今日页、学员详情、完整列表的提示行放进不滚动的 `List`（左滑只在 `List` 中可用，同训练页做法）。否决：底部面板（多一步）；行内文字按钮（文字多，页面乱）；自绘白底浮层（风险大、仍不满意） | 已定（产品负责人 2026-10-27），Penpot E-d、B-b、B-c 已回填 |
 | C28 | 阶段 F 系统级入口（小组件、Live Activity、快捷指令）上锁屏和系统界面，旁人可见；M1B-FR-011 禁止锁屏出现学员名 | 产品负责人 2026-10-27 裁决 F-P1～F-P5：锁屏 / 主屏小组件（含 StandBy）可显示学员名，锁着时只靠系统打码（`privacySensitive`），不做文件保护硬隔离；Live Activity 只写动作名、组序号、休息倒计时，不写学员名、重量、次数；快捷指令无参数、须解锁、不朗读；不做 Spotlight。剩余风险（解锁后旁人可见、快照首次解锁后可读、系统打码覆盖面待真机确认）见 specs 006 §8。否决：小组件不显示学员名（Claude 建议）；名字另存 `complete` 保护的快照硬隔离（Claude 建议） | 已定（产品负责人 2026-10-27；specs 006 `1.0-approved` §2，002 Revision 1.5）。画稿 F-a～F-c 2026-10-28 批准。**2026-10-28 真机修订**：R1 显示锁屏与 StandBy 系统不打码，按 specs 006 §8 T-03 降级为锁屏 / StandBy 不放学员名（负责人确认，不追查原因）；主屏小组件改炭黑底；扩展用系统字体。**2026-10-29**：Live Activity「休息结束」「已超时」文字随系统 stale 重绘出现、可能滞后，负责人接受 |
 | C29 | 开屏页要固定图标尺寸，并与 SwiftUI 叠层用同一布局；系统 `UILaunchScreen` 字典只能放居中图片、按图片原始尺寸显示，且做不到 G-a 的底部贴宽 | 改用 `LaunchScreen.storyboard`（Apple 自带，只含底色与一张图片，Auto Layout 约束），去掉 `UILaunchScreen_Generation`。不引入其他框架。G-b 改为白底居中图标后沿用 | 已定（产品负责人 2026-10-29） |
-| C30 | 阶段 C：今日、课程日历没课时的空态表现力不足，负责人希望加一段安静的动画增加调性（兔子教练坐在圆桌旁，杯子冒热气）；§14.1 规定动效不循环，B-D7 禁止句末语气词 | ① §14.1 增加第 6 条「空态环境动效」例外：可循环，慢、幅度小，不可见时停止，「减弱动态效果」时静止。用 SwiftUI 原生实现（`TimelineView`、`Canvas`），不引入 Lottie 等第三方库。插画需要新的分层素材（透明底，兔子与桌子、杯子分层），热气用代码绘制。② 文案例外：空态的标题和说明（`Localizable.xcstrings` 里 key 含 `empty`、不含 `accessibility` 的条目）可以用句末语气词和全角「～」；「您」「请」「操作失败」、感叹号仍然禁止。扫描测试 `TrainingEntryScanTests` 按此改写 | 已定（产品负责人 2026-10-30）；原型与素材 2026-10-30 定稿（§9、§14.2），文案定稿：今日标题「今天没课，休息一下吧～」、说明「有新课程时会显示在这里」，课程日历「这天没课，歇一歇吧～」；实现待做 |
-| C31 | 开屏过渡版（G-b，§1.14）负责人认为不好看，阶段 C 再定 | 开屏只用白屏，直接进首页，不放图标，不加过场叠层，不做开屏动画（不做闪屏） | 已定（产品负责人 2026-10-30）；实现待做 |
-| C32 | 「第 N 节课」只奖励累计量，规律训练本身没有被看见；健身不是严格按课表上课 | 增加「连续 N 周」里程碑（specs 004 Revision 1.7、PD-D7）：每周（周一开始，本地时间）完成 ≥2 节算出勤周，连续 4、8、12、26、52 周，之后每 26 周显示；挂在本周第 2 节课上；与「第 N 节课」同节达到时两行都显示，「第 N 节课」在前；副标题「每周练 2 次及以上」；分享卡片同样带「比心」贴纸；开关提示顺序为新纪录 → 第 N 节课 → 连续 N 周 → 进步。分类 B：复用里程碑行（`FCListRow`）与贴纸，不新建组件，不加 token。否决：其他页面显示当前连续周数、断档提醒、请假豁免 | 已定（产品负责人 2026-10-31），已回填 Penpot D-b2 状态 ③、D-c2（快照 `attendance-streak D-b2 D-c2 2026-10-31`）；实现待做 |
+| C30 | 阶段 C：今日、课程日历没课时的空态表现力不足，负责人希望加一段安静的动画增加调性（兔子教练坐在圆桌旁，杯子冒热气）；§14.1 规定动效不循环，B-D7 禁止句末语气词 | ① §14.1 增加第 6 条「空态环境动效」例外：可循环，慢、幅度小，不可见时停止，「减弱动态效果」时静止。用 SwiftUI 原生实现（`TimelineView`、`Canvas`），不引入 Lottie 等第三方库。插画需要新的分层素材（透明底，兔子与桌子、杯子分层），热气用代码绘制。② 文案例外：空态的标题和说明（`Localizable.xcstrings` 里 key 含 `empty`、不含 `accessibility` 的条目）可以用句末语气词和全角「～」；「您」「请」「操作失败」、感叹号仍然禁止。扫描测试 `TrainingEntryScanTests` 按此改写 | 已定（产品负责人 2026-10-30）；原型与素材 2026-10-30 定稿（§9、§14.2），文案定稿：今日标题「今天没课，休息一下吧～」、说明「有新课程时会显示在这里」，课程日历「这天没课，歇一歇吧～」；已实现（`654e1b8`；`TodayView.emptyState`、`CalendarView`、`FCAmbientEmptyScene`；执行与走查见 `design/stage-c-empty-state/implementation-map.md` §3–§4） |
+| C31 | 开屏过渡版（G-b，§1.14）负责人认为不好看，阶段 C 再定 | 开屏只用白屏，直接进首页，不放图标，不加过场叠层，不做开屏动画（不做闪屏） | 已定（产品负责人 2026-10-30）；已实现（`654e1b8`，`LaunchScreenConfigurationTests`；执行与走查见 `design/stage-c-empty-state/implementation-map.md` §3–§4） |
+| C32 | 「第 N 节课」只奖励累计量，规律训练本身没有被看见；健身不是严格按课表上课 | 增加「连续 N 周」里程碑（specs 004 Revision 1.7、PD-D7）：每周（周一开始，本地时间）完成 ≥2 节算出勤周，连续 4、8、12、26、52 周，之后每 26 周显示；挂在本周第 2 节课上；与「第 N 节课」同节达到时两行都显示，「第 N 节课」在前；副标题「每周练 2 次及以上」；分享卡片同样带「比心」贴纸；开关提示顺序为新纪录 → 第 N 节课 → 连续 N 周 → 进步。分类 B：复用里程碑行（`FCListRow`）与贴纸，不新建组件，不加 token。否决：其他页面显示当前连续周数、断档提醒、请假豁免 | 已定（产品负责人 2026-10-31），已回填 Penpot D-b2 状态 ③、D-c2（快照 `attendance-streak D-b2 D-c2 2026-10-31`）；已实现（`3ea069e`，`SessionGains.attendanceStreakWeeks`、`ShareReportCardView`；负责人模拟器走查记录 `b0a3785`） |
 | C33 | TestFlight 分发前教练端缺动作库与字体署名 | 设置 42「关于」改为可点并保留版本副标题；新「关于」页复用现有组件，显示版本、从 provenance.json 运行时统计并按条数降序的来源与规范化去重许可、中文翻译说明、逐条来源及 CC BY-SA 4.0 / 3.0 固定系统外链、Noto Sans SC 的 SIL Open Font License 1.1；学员端许可显示共用规范化函数并在规范化后去重；不改 provenance.json、不加 token 或共享组件 | 已定（产品负责人 2026-11-02）。Penpot 已回填：D15c/D15d（42/43）「关于」行加 `›`，新增画板「D15e 关于」，快照 `before-about-page 2026-11-02` → `about page D15e + 42/43 about chevron (C33) 2026-11-02`；`design/m1-b-hifi/screens/` 的 42/43 已于 2026-11-02 按 2 倍重导出替换，新增 `44-about.png`（D15e） |
 | O6 | 吉祥物造型与知名动画角色是否存在版权关联 | 产品负责人确认：吉祥物为其自行生成的原创形象，与该角色无关，不涉及版权问题 | 已定（产品负责人） |
+
+## 当前有效的全局规则（汇总，不另编号）
+
+本节仅索引已有裁决与跨页面规则；历史条目保留原文，已被取代的部分不作为当前要求。
+
+- 页面用白底、无阴影，浅米底只作小面积填充，每屏最多一个深色 hero（§2.2、§2.4、§6；C4、C14）。
+- 状态同时用文字和图标表达，交互点击区不小于 44×44，文字支持 Dynamic Type（§2.4、§3.1、§7.2、§11）。
+- App 内字体使用 Noto Sans SC，小组件与 Live Activity 使用系统字体，扩展不另打包该字体（§3.1；C28 真机修订）。
+- 页内分段允许 2–4 个互斥短词，375 宽默认字号须一行放下，最大字体放不下时改用筛选胶囊（C26 取代 C11 的 2–3 段上限）。
+- 全 App 不挂系统导航栏，二级页统一行内返回与页内标题，全屏确认流程用页内标题和「取消」，训练总结无返回（C18、C20；`components.md` §4.7）。
+- 数据操作须有可见入口，退役「…」菜单；提示行暂不提醒与分区删除用左滑，指标停用 / 恢复移到页底操作行，模板动作移入分区用左滑（C27 取代 C26 的菜单方案；`components.md` §2、§4.8）。
+- 列表单项左滑删除，整个对象在页底使用 destructive 操作行并确认，永久删除学员保留全屏输名确认（`design/experience-t2/decisions.md` B-D2；`components.md` §4.8）。
+- 通知不显示学员身份、重量或次数，休息通知可写动作名，预约提醒前台不显示，其他学员的休息通知前台可弹横幅（§8；C19、C23）。
+- 锁屏小组件与 StandBy 不放学员名，只有解锁后主屏小组件显示并标记隐私敏感，Live Activity 不写学员名、重量、次数，快捷指令无参数、须解锁且不朗读，不建 Spotlight 索引（§8；C28 真机修订取代原锁屏靠系统打码的方案）。
+- App 进入后台或多任务界面时显示全屏隐私遮罩，使用 `action.primary`；无独立画稿（§8，T068）。
+- 文案与数字格式遵循 §13 及 B-D7，空态标题与说明仅在 C30 指定范围内可用句末语气词和全角「～」（§13；C30；`design/experience-t2/decisions.md` B-D7）。
+- 动效与触感只取 §14 的 token，「减弱动态效果」时降级，空态环境动效是唯一循环例外并在不可见、后台或低电量时停止（§14.1；C17、C30）。
+- 开屏只用白屏直接进首页，无图标、无叠层、无开屏动画（C31 取代 §9.3 过渡版；C29 只保留 storyboard 载体）。
 
 ## 11. 对比度核验（WCAG 2.x）
 
@@ -519,21 +538,21 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 
 触控目标：所有可交互元素不小于 44×44（09 屏）。
 
-## 12. 与现有实现（`002-m1-b` @ `1ef606f`）的差距
+## 12. 历史记录：与当时实现（`002-m1-b` @ `1ef606f`）的差距
 
-本节只记录差距，作为修订 plan/tasks 的输入，本轮不改代码。
+本节保留 M1-B `1ef606f` 时期的差距原文，是历史记录，不是当前要求；当前要求见 §1、§2–§9、§10 后的全局规则汇总与 `screens.md`。下列「当前核对」只报告 2026-11-02 的静态源码事实，不代表本轮运行测试或视觉验收。
 
-| 领域 | 现状 | 设计系统要求 |
-|---|---|---|
-| 颜色 | 9 色；缺 `#2A2822`、`#1F1E1B`、`#F0EEE9`、`#A8A39A`、`#B0ABA2`；另有 UI 可用的 `brand #E08A5C` | 按 §2 补全；橙色移出 UI token |
-| 页面底色 | `background = #F7F4EE`（41 处） | `#FFFFFF`（C4） |
-| 主按钮 `FCButton` | 底色 `#211F1B`、圆角 8、高 44、按下态用透明度 0.82 | `#2A2822`、圆角 12、高 52、按下态 `#1F1E1B` |
-| 排版 | 没有排版 token；系统字体 + `.footnote` / `.headline` 等约 20 种写法 | Noto Sans SC；§3 的 7 级阶梯 + 7 个具名例外 |
-| 间距 | 8 / 16 | 4 / 8 / 12 / 16 / 24 / 32 |
-| 圆角 | 8 / 14（14 不在刻度内） | 8 / 12 / 16 / 20 + 胶囊 + 弹窗按钮 10 |
-| 器材图标 | 已导入 15 个，代码中 0 处引用；新增 3 个未导入 | 导入新增 3 个，按 §7.1 对应表接入动作相关界面 |
-| 吉祥物 | 不存在 | 空态使用（§9） |
-| 自动化校验 | `VisionHarnessTests` 只锁定 9 个颜色和 2 个间距 | 扩展到 §2–§5 的全部 token 值和 §11 的对比度 |
+| 领域 | 现状 | 设计系统要求 | 当前核对（路径相对 `ios/FineCoachApp/`，另注除外） |
+|---|---|---|---|
+| 颜色 | 9 色；缺 `#2A2822`、`#1F1E1B`、`#F0EEE9`、`#A8A39A`、`#B0ABA2`；另有 UI 可用的 `brand #E08A5C` | 按 §2 补全；橙色移出 UI token | 已补齐；`DesignSystem/Tokens.swift:33–53`、`:100–118`，UI token 无橙色。 |
+| 页面底色 | `background = #F7F4EE`（41 处） | `#FFFFFF`（C4） | 根页面已用 `surfacePage`：`App/AppRoot.swift:50`、`App/RootNavigation.swift:88–98`；token 为白色（`DesignSystem/Tokens.swift:101`）；未逐屏渲染。 |
+| 主按钮 `FCButton` | 底色 `#211F1B`、圆角 8、高 44、按下态用透明度 0.82 | `#2A2822`、圆角 12、高 52、按下态 `#1F1E1B` | 已满足组件实现：`DesignSystem/Components/FCButton.swift:41`（高度 52）、`:79`（按下色）。 |
+| 排版 | 没有排版 token；系统字体 + `.footnote` / `.headline` 等约 20 种写法 | Noto Sans SC；§3 的 7 级阶梯 + 7 个具名例外 | 已建立 14 个样式及字体入口：`DesignSystem/Typography.swift:21`、`:90–106`、`:118–151`；字体解析与样式值由 `TypographyHarnessTests` 覆盖，本轮未运行。 |
+| 间距 | 8 / 16 | 4 / 8 / 12 / 16 / 24 / 32 | 已补齐：`DesignSystem/Tokens.swift:70–75`。 |
+| 圆角 | 8 / 14（14 不在刻度内） | 8 / 12 / 16 / 20 + 胶囊 + 弹窗按钮 10 | 已补齐：`DesignSystem/Tokens.swift:84–90`；胶囊语义见同文件注释。 |
+| 器材图标 | 已导入 15 个，代码中 0 处引用；新增 3 个未导入 | 导入新增 3 个，按 §7.1 对应表接入动作相关界面 | 新增 3 个已在 `DesignSystem/Components/FCEquipmentIcon.swift:13–25`、`:51–54` 映射；`Features/ActiveSession/ActiveSessionView.swift:544`、`Features/ShareReport/ShareReportCardView.swift:230` 已引用；完整动作行 label 见 `DesignSystem/Components/FCListRow.swift`。 |
+| 吉祥物 | 不存在 | 空态使用（§9） | 已使用：`Features/Students/StudentList/StudentListView.swift:378`；今日、日历已扩展为咖啡兔（`654e1b8`）。 |
+| 自动化校验 | `VisionHarnessTests` 只锁定 9 个颜色和 2 个间距 | 扩展到 §2–§5 的全部 token 值和 §11 的对比度 | 覆盖代码已扩展：`ios/FineCoachTests/DesignSystem/VisionHarnessTests.swift`、`ContrastHarnessTests.swift`、`TypographyHarnessTests.swift`；本轮未运行，不能据此声称全量通过。 |
 
 ## 13. 文案与数字格式（T1，2026-10-14 产品负责人确定）
 
@@ -625,6 +644,6 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 | 休息结束 | 文字换成「✓ 休息结束」；`haptic.attention`；不自动收起，超时满 1 秒起显示「已超时 m:ss」（§10 C25） | 同左，收起不带位移 |
 | 底部面板、确认框出现 | `standard` / `fast` + `standard` 曲线 | 只淡入淡出 |
 | 空态环境动效（今日、课程日历没课时；C30） | 「咖啡兔」分层插画（§9）：杯口热气 `motion.ambient.steam`、兔子呼吸 `motion.ambient.breath`、眨眼 `motion.ambient.blink`，循环；不可见、后台、低电量时暂停；无触感 | 静止的一帧（§14.2） |
-| 启动进入首页（§9.3 ②；C31 定稿后删除） | 开屏叠层保持约 0.3 s 后淡出，`fast` + `standard`；只在冷启动播一次 | 不叠这一层，直接显示首页 |
+| 启动进入首页（§9.3 ② 历史记录；C31 已由 `654e1b8` 删除，不再生效） | 开屏叠层保持约 0.3 s 后淡出，`fast` + `standard`；只在冷启动播一次 | 不叠这一层，直接显示首页 |
 
 迁移范围：本轮只有训练页（ActiveSession 与 `FCSetRow`、`FCSetStateCircle`）改用 `FCMotion`；其他页面的现有数值与 token 相同，改到哪页再迁哪页（`components.md` §1.3）。

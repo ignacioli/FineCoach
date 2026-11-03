@@ -32,7 +32,7 @@
 | ActiveSession | 创建分区提交按钮（M03） | `activeSessionCreateSectionSubmit` | 是 | `FCButton` 在 `FCBottomSheet` 内容 `VStack` 中；按钮填满可用宽度；`ios/FineCoachApp/Features/ActiveSession/ActiveSessionView.swift:563` |
 | ActiveSession | 删除分区入口（M04） | `activeSessionDeleteSection(section.id)` | 是（打开确认/分支流程） | 分区标题 `HStack` / 页面内容列；按钮自身没有填满宽度的约束；`ios/FineCoachApp/Features/ActiveSession/ActiveSessionView.swift:479` |
 | ActiveSession | 删除分区确认：将成员移出（M05） | `activeSessionDeleteSectionMoveOut` | 是 | 系统拥有的 `.confirmationDialog` 选项面板；`ios/FineCoachApp/Features/ActiveSession/ActiveSessionView.swift:180` |
-| ActiveSession | 删除分区确认：连同动作删除（M06） | `activeSessionDeleteSectionDeleteExercises` | 是 | 系统拥有的 `.confirmationDialog` 选项面板；`ios/FineCoachApp/Features/ActiveSession/ActiveSessionView.swift:184` |
+| ActiveSession | 已移除（B-D1）：删除分区确认：连同动作删除（M06） | `activeSessionDeleteSectionDeleteExercises` | —（已移除） | 系统拥有的 `.confirmationDialog` 选项面板；`ios/FineCoachApp/Features/ActiveSession/ActiveSessionView.swift:184` |
 | ActiveSession | 临时课扣课确认（M07） | `activeSessionCreditDebitConfirm` | 是 | `FCConfirmationDialog`（宽度上限 300，受屏幕容器约束）；`ios/FineCoachApp/Features/ActiveSession/ActiveSessionView.swift:306` |
 | TemplateList | 创建模板最终提交（M08） | `templateListCreate` | 是 | `FCButton` 在创建 sheet 的 `VStack` 中；按钮填满可用宽度；`ios/FineCoachApp/Features/Templates/TemplateListView.swift:136` |
 | TemplateEditor | 训练重点 chip（M09） | `templateEditorTrainingFocus(part)` | 是（绑定选择并自动写入） | `FCFlowLayout` 排列按内容定宽的 `FCBodyPartChip`；`ios/FineCoachApp/Features/Templates/TemplateEditorView.swift:185`，identifier 生成于 `ios/FineCoachApp/App/FCAccessibilityID.swift` |
@@ -42,7 +42,7 @@
 | TemplateEditor | 从模板移除动作（M13） | `templateEditorRemoveExercise(exercise.id)` | 是 | 动作行 `HStack`；按钮自身受该行 `Spacer` 与父内容列约束；`ios/FineCoachApp/Features/Templates/TemplateEditorView.swift:296` |
 | TemplateEditor | 删除分区入口（M14） | `templateEditorDeleteSection(section.id)` | 是（打开确认/分支流程） | 分区标题 `HStack` / 页面内容列；按钮自身没有填满宽度的约束；`ios/FineCoachApp/Features/Templates/TemplateEditorView.swift:316` |
 | TemplateEditor | 删除分区确认：将成员移出（M15） | `templateEditorDeleteSectionMoveOut` | 是 | 系统拥有的 `.confirmationDialog` 选项面板；`ios/FineCoachApp/Features/Templates/TemplateEditorView.swift:265` |
-| TemplateEditor | 删除分区确认：连同动作删除（M16） | `templateEditorDeleteSectionDeleteExercises` | 是 | 系统拥有的 `.confirmationDialog` 选项面板；`ios/FineCoachApp/Features/Templates/TemplateEditorView.swift:269` |
+| TemplateEditor | 已移除（B-D1）：删除分区确认：连同动作删除（M16） | `templateEditorDeleteSectionDeleteExercises` | —（已移除） | 系统拥有的 `.confirmationDialog` 选项面板；`ios/FineCoachApp/Features/Templates/TemplateEditorView.swift:269` |
 | StudentList | 恢复已归档学员（M17） | `studentListRestore(student.id)` | 是 | 归档行的 trailing `FCLinkButton`；父 `HStack` 安排宽度，按钮本身未指定填满宽度；`ios/FineCoachApp/Features/Students/StudentList/StudentListView.swift:451` |
 | CourseActionSheet | 开始训练（M18） | `todayStartTraining` | 是 | `FCButton` 在 action sheet 内容 `VStack` 中；按钮填满可用宽度；`ios/FineCoachApp/Features/Appointments/CourseActionSheet.swift:173` |
 | CourseActionSheet | 取消课程确认（M19） | `todayCancelConfirm` | 是 | `FCConfirmationDialog`（宽度上限 300，受屏幕容器约束）；`ios/FineCoachApp/Features/Appointments/CourseActionSheet.swift:94` |
@@ -445,4 +445,4 @@ xcrun swift-format lint --configuration .swift-format --recursive --parallel --s
 - Penpot「M1-B G5 Design」两页（Foundations、M2 G7 Design）的 16 条旧文案已全部改成新文案，共 17 个文字层，分布在 10 张画板：16 学员列表空态、D13b 人工调整课时、D14 / D14b 备份与恢复、M2-03、M2-04、M2-05、M2-07、M2-10、W-02。回读确认旧文案剩余 0 处。新文案都比原文短，没有改动画板布局。
 - 快照：`before-B3-copy-backfill 2026-10-18`、`B3 copy backfilled 2026-10-18: 16 strings per B-D7`。
 - ~~待办~~：2026-10-19 负责人 2x 导出，已导入 10 张画板的 PNG。
-- **顺带发现，不属于 B3**：Foundations 页的通知预览写着「15:00 · 你的训练时间到了」，但代码里约课提醒的正文是「HH:mm 有一节训练安排。」（`AppointmentNotificationContentBuilder`）。这是画稿和代码之间的旧偏差，记下备查，本轮不改。
+- **顺带发现，不属于 B3**：Foundations 页的通知预览写着「15:00 · 你的训练时间到了」，但代码里约课提醒的正文是「HH:mm 有一节训练安排。」（`AppointmentNotificationContentBuilder`）。已裁定（负责人 2026-11-03）：以代码为准，预约通知正文为「HH:mm 有一节训练安排。」（`ios/FineCoachApp/Core/Application/NotificationScheduler.swift:16`）。Foundations 页通知预览已改为「15:00 有一节训练安排。」，Penpot 已回填（快照 `before hero subtitle callout + notification copy 2026-11-03` → `hero subtitle callout 15/500 on 01 + W08-a; notification preview copy = code 2026-11-03`）。

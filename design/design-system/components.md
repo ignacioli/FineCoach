@@ -133,11 +133,11 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 | `DS-LABEL-VALUE-ROW` | `FCLabelValueRow`、`FCLabelValueText` | §8.1 标签-值两栏行；23/26/27/36/37 | 6 个文件 | 见 CG-5 |
 | `DS-PAGE-HEADER` | `FCPageHeader` | §4.7；§4.6 `DS-PAGE-SECONDARY` 的页头部分；26 | StudentDetail（M2 新页面全部使用） | 已实现（M2 T001），人工项待首次走查 |
 | `DS-HUB-ROW` | `FCHubRow` | §4.7；19/42/43 | ResourceHub、Settings（M2 新页面使用） | 已实现（M2 T002），人工项待首次走查 |
-| `DS-INLINE-RESULT` | `FCInlineResult` | §4.7；38/39 | BackupRestoreFlow | 已实现（M2 T003），信息变体待 M2 页面首次使用 |
+| `DS-INLINE-RESULT` | `FCInlineResult` | §4.7；38/39 | BackupRestoreFlow | 已实现（M2 T003）；信息变体已用于 M2 交付取消（`Features/ArchiveExport/ArchiveDeliveryView.swift:55–59`） |
 | `DS-ACTION-ROW` | `FCActionRow` | §8.1 操作行；18/24；destructive 图标（§4.7） | 10 个文件 | 稳定；destructive 图标已实现（M2 T005） |
 | `DS-UNDO-ROW` | `FCUndoRow` | §8.1 删除后撤销行；B-b（2026-10-16 已批准）；E-d（2026-10-27 扩到暂不提醒） | ActiveSession（删组）、BodyMeasurementEntry（删单条测量）、Insights（暂不提醒，README §10 C27） | 稳定 |
 | `DS-SET-ROW` | `FCSetRow`、`FCSetStateCircle`、`FCNewRecordBadge` | §6 组圆圈；11/30 | ActiveSession；圆圈另用于 ShareReport、History | 见 CG-4 |
-| `DS-HERO-CARD` | `FCHeroCard` | §8 深色 hero 卡；01/18；多行变体 Penpot `W08-a`（2026-10-22） | Today（单行 / 多行）、StudentDetail（单行） | 多行变体 2026-10-22 批准，代码待 W-08 |
+| `DS-HERO-CARD` | `FCHeroCard` | §8 深色 hero 卡；01/18；多行变体 Penpot `W08-a`（2026-10-22） | Today（单行 / 多行）、StudentDetail（单行） | 多行变体已实现（W-08，`03800bb`；`FCHeroCard.swift` 的 `rows` initializer / `multiRowCard`，`ComponentCatalogTests` 多行合同） |
 | `DS-HINT-BAR` | `FCHintBar`、`FCActiveSessionBar` | §8 提示条；§8.1 训练中提示条；21 | StudentDetail、StudentList | 稳定 |
 | `DS-BOTTOM-SHEET` | `FCBottomSheet`、`View.fcBottomSheet` | §8.1 底部面板；18/31/33/34 | 8 个文件 | 稳定 |
 | `DS-CONFIRM-DIALOG` | `FCConfirmationDialog`、`View.fcConfirmationDialog` | §8 确认弹窗；14 | CoursePackageList、CourseActionSheet、TemplateEditor | 内容变长规则已实现（M2 T006）；CG-6 |
@@ -148,6 +148,14 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 | `DS-SYMBOL` | `FCSymbol` | §7.2 系统图标 | 11 个文件 | 稳定 |
 | `DS-EQUIPMENT-ICON` | `FCEquipmentIcon`、`FCEquipmentIconView` | §7.1；17 | 5 个文件 | L0 全自动 |
 | `DS-BODY-DIAGRAM` | `FCBodyDiagram` | §9.1；29 | ShareReportCard | 稳定 |
+
+**Penpot ID 兼容登记（不新增索引行，不改 plugin data）**：
+
+- `DS-REST-TIMER`：feature 专有，定义在 `design/experience-p0/implementation-map.md`「`DS-REST-TIMER` 组间休息条」；对应 `ios/FineCoachApp/Features/ActiveSession/ActiveSessionView.swift` 内的 `RestTimerBar`，计时状态见同目录 `RestTimerState.swift`（包含 `RestTimerStore`）。
+- `DS-LAST-REF`：feature 专有，定义在同一实施映射「`DS-LAST-REF` 上次参考」；不是独立组件，对应 `ActiveSessionView.swift` 的动作行参考文字，数据由 `ActiveSessionViewModel` / `LastExercisePerformance` 提供。
+- `DS-STEPPER-FIELD`：README §1.5 记录的 Penpot 图层 ID，实际规格是本文 §4.1 `DS-STEPPER` 的 `FCStepperField` 可输入变体及 README §8.1「数字步进器」；代码在 `ios/FineCoachApp/DesignSystem/Components/FCStepperField.swift`，公开类型已登记在上表 `DS-STEPPER` 代码列。
+
+这些 ID 已用于 Penpot shared plugin data（README §1.5）；此处只解释实际定义与代码位置，不做重命名。
 
 页面组合模式（没有共享代码，由 feature 拼装）：`DS-PAGE-PRIMARY`、`DS-PAGE-SECONDARY`（页头部分已有共享组件 `DS-PAGE-HEADER`）、`DS-EMPTY-STATE`、`DS-LAUNCH`（App 级，只有一处使用），见 §4.6。`DS-HUB-ROW`、`DS-INLINE-RESULT` 已提升为共享组件。
 
@@ -180,7 +188,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 - **部件**：横向排列的选项，间距 `space.2`。选中项：50×32 胶囊、`action.primary` 底、`headline` 白字；未选中项：纯文字 `body` `text.secondary`，无底色。
 - **状态**：选中项带 `.isSelected` 无障碍属性。
 - **不变量**：点击区 ≥ 44（自动）；同时只有一个选中项（类型保证：`selection` 是单个 ID）。
-- **用途**：一级页顶部「今日 / 学员」；页内 2–3 个互斥短选项（37「扣减 / 返还」、趋势指标、身体数据录入单位），通常放在 `DS-LABEL-VALUE-ROW` 的值 slot（README §10 C11）。
+- **用途**：一级页顶部「今日 / 学员」；页内 2–4 段（C26）的互斥短选项（37「扣减 / 返还」、趋势指标、身体数据录入单位），通常放在 `DS-LABEL-VALUE-ROW` 的值 slot（README §10 C11）。
 - **复用边界**：选项超过 3 个或文字较长时改用 `DS-CHIP`；不使用系统分段 `Picker`。
 
 #### `DS-CHIP` 胶囊
@@ -254,7 +262,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 #### `DS-SET-ROW` 训练组行
 
 - **阶段 D 新纪录状态**：已批准的 D-a anatomy、标记外观、阅读顺序、换行与触感规则见 `design/progress-milestones/implementation-map.md` §2 D-a。`FCNewRecordBadge` 是本组件的胶囊部件（文字本地化，自身无障碍隐藏，由组行朗读），仅 completed 且持有纪录时显示；ShareReport 卡片复用该标记。2026-10-23 起（README §10 C16）每个动作最多一组持有标记，总结与分享卡片的胶囊放在「上次 → 本次」动作行的动作名后。确认触感不再挂在组行上：主确认路径插入的是已完成的新行，行状态没有变化，组行触感永远不响（真机走查 D1/D2）；现由 `ActiveSessionView` 上唯一的 `.sensoryFeedback(trigger: confirmationFeedback)` 发出，组行只负责徽标。
-- **新纪录数值浮起（2026-10-23，README §10 C17、§14.4；Penpot D-a3，B 类）**：确认事件的 `isRecordImprovement` 为真时，组行数值上方叠一个装饰副本（同字体、同颜色），上浮 `space.3`、透明度 1 → 0，`motion.duration.emphasis` + `motion.curve.standard`，只播一次；原数值、胶囊、行高不变，副本不改变布局、不被列表裁掉。不变量：只由确认事件触发，编辑、删除、撤销、恢复和重新载入不播（可自动）；「减弱动态效果」时不浮起（可自动）；副本对无障碍隐藏，行仍读作「…，新纪录，…」（可自动）；所有确认一组用同一个 `haptic.confirm`（可自动）；浮起幅度和快慢是否克制、够区分（人工，真机动效试验页 A/B/C 选定）。
+- **新纪录数值浮起（2026-10-23，README §10 C17、§14.4；Penpot D-a3，B 类）**：确认事件的 `isRecordImprovement` 为真时，组行数值上方叠一个装饰副本（同字体、同颜色），上浮 `space.6`、透明度 1 → 0，`motion.duration.emphasis` + `motion.curve.standard`，只播一次；原数值、胶囊、行高不变，副本不改变布局、不被列表裁掉。不变量：只由确认事件触发，编辑、删除、撤销、恢复和重新载入不播（可自动）；「减弱动态效果」时不浮起（可自动）；副本对无障碍隐藏，行仍读作「…，新纪录，…」（可自动）；所有确认一组用同一个 `haptic.confirm`（可自动）；浮起幅度和快慢是否克制、够区分（人工，真机动效试验页 A/B/C 选定）。
 
 - **部件**：组状态圆圈（22×22，点击区 44）→ 一行内：标题「第 N 组」（`body`；已完成为 `text.primary`，其余为 `text.secondary`）→ 弹性空白 → 数值（`body` `text.primary`，单行，最小缩放 0.8）→ 状态文字（`callout` 400 `text.secondary`），刚确认的一组在 4 秒内换成「撤销」（`FCLinkButton`，P0-D11）→ 可选编辑按钮（铅笔，44）。2026-10-15 起由上下两行改为一行，与已批准的 D8 / P0-a2 稿一致（implementation-map Δ5）。
 - **`FCSetStateCircle` 状态**：待完成：1.5pt `border.control` 描边；草稿：1pt `text.secondary` 虚线（3/2）；已完成：`action.primary` 实心 + 白色 ✓。
@@ -339,7 +347,9 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 | `DS-HUB-ROW` 入口行 | 24pt 图标（`action.primary`）→ 标题（`headline`）/ 副标题（`caption` `text.secondary`）→ `›`；最小高 64，间距 `space.4` | 19/42/43 | 已提升为共享组件 `FCHubRow`（M2 T002/T010，2026-10-10）；ResourceHub、Settings 已迁移，规格见 §4.7 |
 | `DS-INLINE-RESULT` 就地结果 | 22×22 `FCStatusBadge` → 标题（`callout` 600；失败为 `status.destructive`，成功为 `text.primary`）→ 说明（`caption` `text.secondary`）→ 失败时显示居中「重试」`FCLinkButton` | 38/39 | 已提升为共享组件 `FCInlineResult`（M2 T003/T011，2026-10-10）；BackupRestoreFlow 已迁移，规格见 §4.7 |
 | `DS-EMPTY-STATE` 空态 | 吉祥物 220×220 居中 → 标题（`headline` `action.primary`）→ 说明（`caption` `text.secondary`）→ 底部主按钮。**动画变体**（2026-10-30 决定并定稿，README §10 C30）：插画换成「咖啡兔」分层素材（README §9）加环境动效（README §14.1 第 6 条、§14.2 `motion.ambient.*`），第一轮只用在今日、课程日历没课时；文案见 C30 | 16 | StudentList |
-| `DS-LAUNCH` 开屏页（2026-10-29，过渡版） | 整屏 `surface.page` 底 → 正中 180×180 圆角吉祥物图标（`launch-icon`）；无文字、无可交互控件。两处呈现同一画面：① `LaunchScreen.storyboard`（系统静态开屏）；② App 根视图最上层的一次性叠层，约 0.3 s 后 `motion.duration.fast` 淡出。不变式：① ② 资源、尺寸与底色一致，「减弱动态效果」时不创建 ②，叠层不响应点击、不读写数据（`auto`：`LaunchScreenConfigurationTests`）；画面观感（`manual`：负责人真机看过，2026-10-29） | G-b | 已实现；2026-10-30 定稿为只用白屏、不放图标、不加叠层（README §10 C31），实现待做 |
+| `DS-LAUNCH` 开屏页（C31 定稿） | 整屏 `surface.page` 白底，直接进入首页；无图标、无文字、无过场叠层、无开屏动画、无可交互控件。由 `LaunchScreen.storyboard` 系统静态开屏呈现，不读写数据；`LaunchScreenConfigurationTests` 检查白底、无图无字、叠层与资源移除 | G-b 说明已由 C31 取代；README §1.14 | 已实现（`654e1b8`）；`LaunchScreen.storyboard` 无 imageView，`AppRoot` 无叠层；走查证据见 `design/stage-c-empty-state/implementation-map.md` §4 |
+
+**DS-LAUNCH 过渡版历史记录（2026-10-29，已由 C31 取代，不作为当前规格）**：整屏 `surface.page` 底 → 正中 180×180 圆角吉祥物图标（`launch-icon`）；无文字、无可交互控件。两处呈现同一画面：① `LaunchScreen.storyboard`（系统静态开屏）；② App 根视图最上层的一次性叠层，约 0.3 s 后 `motion.duration.fast` 淡出。不变式：① ② 资源、尺寸与底色一致，「减弱动态效果」时不创建 ②，叠层不响应点击、不读写数据（`auto`：`LaunchScreenConfigurationTests`）；画面观感（`manual`：负责人真机看过，2026-10-29）
 
 ### 4.7 已定稿规格（M2 Phase 0，T001–T012 已实现）
 
@@ -467,7 +477,7 @@ C 类，只补规则，默认字号下外观不变：
 | CG-4 | `FCSetRow` 的状态文字写死在 `rawValue` 中 | `FCSetRow.swift` | 本地化问题，与视觉无关；下次修改该组件时处理 |
 | CG-5 | CoursePackageEditor、ManualCreditAdjustment 各有私有 `editorRow`，与 `FCLabelValueRow` 职责重叠 | 两个文件中的 `editorRow` | 只在这两个页面被修改时迁移；M2 不涉及课包，不安排 |
 | CG-6 | `FCHeroCard` 徽标固定 56 宽、`FCConfirmationDialog` 固定 300 宽，字号放大时的规则没写 | 两个组件源码 | 下次涉及时先补「内容变长」规则（C 类）；M2 若使用确认弹窗（删除档案、替换档案），在 Phase 0 补规则。确认弹窗规则已起草（§4.7，2026-10-08）。**徽标已解决（2026-10-22，W-08）**：最小宽 56、随文字增长（`DS-HERO-CARD` 部件） |
-| CG-7 | `FCSegmentedSwitch` 在页内使用超出 README 原定义 | 37 画稿 | **已解决（2026-10-05）**：裁决为已批准的复用，限 2–3 个互斥短选项（README §10 C11） |
+| CG-7 | `FCSegmentedSwitch` 在页内使用超出 README 原定义 | 37 画稿 | **已解决（2026-10-05）**：裁决为已批准的复用，限 2–4 段（C26）的互斥短选项（README §10 C11） |
 | CG-8 | 二级页头 `DS-PAGE-SECONDARY` 约 20 处手工拼装；入口行 `DS-HUB-ROW` 有两份（ResourceHub、Settings） | 约 20 个 feature 文件直接写 `.fcFont(.titleLarge)` 页头；`hubRow` 与 Settings `row` | **M2 Phase 0**：抽取共享 `FCPageHeader`（及入口行，如 M2 设置页用到），补组件测试；只迁移 M2 改动的页面。`DS-PAGE-HEADER`、`DS-HUB-ROW` 规格已起草（§4.7，2026-10-08，随 G7 review 审定） |
 | CG-9 | 组件文件中没有任何 `#Preview` | `ios/FineCoachApp` 中搜索不到 `#Preview` | 规则而非一次性任务：新增或扩展组件时，在组件文件里加覆盖代表状态的 `#Preview`（只在 DEBUG 下编译，不新增 target），供 L3 查看组件时使用 |
 | CG-10 | C′ 2b 的完整动作行和两处最近练过需要同一 anatomy | ExerciseLibrary、QuickCreateExerciseFlow | 本轮收敛为 `DS-LIST-ROW` 既有动作行变体 `FCExerciseLibraryRowLabel`，迁移仅这两处，保留既有样式；普通行和模板编辑器不变 |
