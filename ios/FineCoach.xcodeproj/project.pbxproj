@@ -135,6 +135,7 @@
 		B95A /* EmptyStateFirstLoadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95A /* EmptyStateFirstLoadTests.swift */; };
 		B95B /* RootNavigationReturnTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95B /* RootNavigationReturnTests.swift */; };
 		B95C /* AboutVersionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95C /* AboutVersionTests.swift */; };
+		85772F8E8C2CA5DB46C4EAD4 /* ReviewDemoArchiveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED51A7A9E1624CB51A83EE9E /* ReviewDemoArchiveTests.swift */; };
 		473E77213481EBD8A2BDE73A /* CoachAboutAttributionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77844030A22B1E5E7CB6B1DD /* CoachAboutAttributionTests.swift */; };
 		B917 /* FCToggleStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A917 /* FCToggleStyle.swift */; };
 		B962 /* FCStepper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A962 /* FCStepper.swift */; };
@@ -574,6 +575,7 @@
 		A95A /* EmptyStateFirstLoadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateFirstLoadTests.swift; sourceTree = "<group>"; };
 		A95B /* RootNavigationReturnTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootNavigationReturnTests.swift; sourceTree = "<group>"; };
 		A95C /* AboutVersionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutVersionTests.swift; sourceTree = "<group>"; };
+		ED51A7A9E1624CB51A83EE9E /* ReviewDemoArchiveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../Archive/ReviewDemoArchiveTests.swift; sourceTree = "<group>"; };
 		77844030A22B1E5E7CB6B1DD /* CoachAboutAttributionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachAboutAttributionTests.swift; sourceTree = "<group>"; };
 		A917 /* FCToggleStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCToggleStyle.swift; sourceTree = "<group>"; };
 		A962 /* FCStepper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCStepper.swift; sourceTree = "<group>"; };
@@ -1860,6 +1862,7 @@
 				A95A /* EmptyStateFirstLoadTests.swift */,
 				A95B /* RootNavigationReturnTests.swift */,
 				A95C /* AboutVersionTests.swift */,
+				ED51A7A9E1624CB51A83EE9E /* ReviewDemoArchiveTests.swift */,
 				77844030A22B1E5E7CB6B1DD /* CoachAboutAttributionTests.swift */,
 				A182 /* RestNotificationRoutingTests.swift */,
 			);
@@ -2572,6 +2575,7 @@
 				B95A /* EmptyStateFirstLoadTests.swift in Sources */,
 				B95B /* RootNavigationReturnTests.swift in Sources */,
 				B95C /* AboutVersionTests.swift in Sources */,
+				85772F8E8C2CA5DB46C4EAD4 /* ReviewDemoArchiveTests.swift in Sources */,
 				473E77213481EBD8A2BDE73A /* CoachAboutAttributionTests.swift in Sources */,
 				B182 /* RestNotificationRoutingTests.swift in Sources */,
 				B500 /* VisionHarnessTests.swift in Sources */,
