@@ -10,11 +10,28 @@ this file wins for how a Claude Code session should behave mechanically.
 
 ## Stack (current, approved)
 
-Native Swift/SwiftUI, iOS 18.0+, Apple frameworks only, Core Data +
+Shipped iOS: native Swift/SwiftUI, iOS 18.0+, Apple frameworks only, Core Data +
 SQLite local persistence, no cloud, backend, or telemetry. Do not
-introduce a second stack, a new platform, or a network-dependent core
+introduce another stack, platform, or a network-dependent core
 behavior unless the product owner decides and that decision is recorded
 in this repository. See `AGENTS.md` §Change Workflow.
+
+Android is approved by the product owner on 2026-11-02 (ADR-001 D1,
+Q1–Q3, Q7, `specs/007-android-port/adr-001-android-and-macos-port.md`):
+Kotlin + Jetpack Compose, `minSdk 31`, SQLite + Room, in `android/`;
+shared test vectors and contract samples in `shared/`, using fictional
+data only. Do not create the project before the S0 spec is approved.
+Do not change iOS product code; interoperability and shared-vector tests
+may be added. `targetSdk` and the token intermediate format are undecided
+until S0; the Live Activity counterpart is undecided until S5 (Q5).
+Gradle build and test commands will be added to `AGENTS.md` when S0-02
+creates the project.
+
+FCBK and FCPA are frozen, bidirectional iOS–Android formats (D2): the
+existing iOS formats are the contract. Change the contract and raise its
+version before changing both platforms. macOS is only TestFlight
+validation of the iPhone app on Apple Silicon Macs (D3): no code changes
+or Mac target; Mac Catalyst requires a later decision.
 
 ## Protected primary branch
 
@@ -36,7 +53,7 @@ ignored toolchain directories; the script chooses the subtrees.
 
 ## Verification gates — what "done" actually means here
 
-- The only automated acceptance gates in this repo are: `xcodebuild
+- The iOS automated acceptance gates remain: `xcodebuild
   build`, the `FineCoachTests` unit target, and the
   `FineCoachIntegrationTests` restart/persistence target. There is a
   narrow **Deterministic Vision Validation Harness**
@@ -55,6 +72,12 @@ ignored toolchain directories; the script chooses the subtrees.
   owner explicitly asks for more.
 - No ViewInspector-level structural assertions on Feature screens unless
   explicitly requested.
+- Android adds the product-owner-approved gates in ADR-001 Q11/Q12:
+  JVM screenshot regression tests against human-approved baselines, and
+  Compose UI tests (Robolectric) for entry and layout assertions. These
+  Android entry and layout tests are the explicitly requested exception
+  to the Feature-screen structural-assertion restriction. iOS is unchanged.
+  Android build and test commands will be recorded in `AGENTS.md` at S0-02.
 - Store distribution and a manual VoiceOver script are not acceptance
   gates unless the product owner adds them. Do not set
   `ITSAppUsesNonExemptEncryption` to `NO` or claim an encryption
@@ -64,9 +87,10 @@ ignored toolchain directories; the script chooses the subtrees.
 
 A checkpoint is not "done" when tests are green. It requires both:
 
-1. `xcodebuild build` + `FineCoachTests` + `FineCoachIntegrationTests`
+1. For iOS, `xcodebuild build` + `FineCoachTests` + `FineCoachIntegrationTests`
    green (the automated gate — proves domain logic and persistence are
-   correct).
+   correct). For Android, the slice's automated gates under ADR-001 and
+   `specs/007-android-port/roadmap.md` §3 must pass.
 2. An **entry and layout map** in the execution record
    (`design/design-system/components.md` §1.4): one line per new
    user-facing interaction — screen → visible control → accessibility
@@ -76,7 +100,14 @@ A checkpoint is not "done" when tests are green. It requires both:
    width that no component or container fills is a defect to fix, not
    something to leave for a human to find.
 
-Unit and integration tests in this repo do not render SwiftUI views and
+For Android, the entry and layout map is enforced by Compose UI tests
+(Robolectric, ADR-001 Q12): data-changing controls must be visible,
+clickable, and reachable without relying only on long-press; controls
+required to fill the width must equal their parent container's width.
+The map itself remains in the execution record. This is the explicitly
+approved Android exception; the iOS map and gates are unchanged.
+
+iOS unit and integration tests do not render SwiftUI views and
 cannot detect a missing `.frame(maxWidth: .infinity)`, a control hidden
 behind an undiscoverable gesture, or logic that is fully tested but has
 no UI entry point. These are real defect classes — three shipped in an
@@ -127,6 +158,15 @@ mechanism for UX/UI work, at any time, unless the project owner
 explicitly asks for it in that instance.** This applies to the iOS
 Simulator control tool and any other screenshot-capable tool.
 
+Android's approved regression gate (ADR-001 Q11) uses a human-approved
+baseline plus deterministic automated pixel comparison. Only the product
+owner may approve and update baselines; agents must not modify them.
+Agents read test text results only (failed cases and difference ratios),
+never screenshot or difference images. This is not a screenshot → judge
+→ fix loop: no model judges the images. Baselines follow the owner's
+first walkthrough of core screens against the approved iOS designs;
+JVM regression results do not replace physical-device walkthroughs.
+
 - A small number of manual screenshots taken *while debugging* a
   specific, already-identified visual issue is fine.
 - Building an automated cycle that takes a screenshot, judges it,
@@ -172,6 +212,17 @@ let code, doc, and Penpot drift apart.
 - No telemetry, remote logging, cloud services, or auth without a
   product-owner decision and a threat assessment recorded in this
   repository.
+- Android follows the same privacy and offline rules as iOS (ADR-001
+  Q8–Q10): no network calls, `INTERNET` permission, or network APIs;
+  networking requires a product-owner decision and threat assessment.
+  Disable Auto Backup and device migration with `allowBackup=false` and
+  all-domain exclusions for cloud backup, device transfer, and iOS
+  cross-platform transfer in `dataExtractionRules` (`AGENTS.md` §Privacy
+  and safety; ADR-001 §6.1, cross-platform syntax to be validated in S0).
+  Device replacement uses an explicitly exported FCBK encrypted backup.
+  Cover recent-task thumbnails (API 33+ `setRecentsScreenshotEnabled(false)`,
+  API 31/32 cover on `onPause`, validated in S0); do not use `FLAG_SECURE`
+  or prohibit screenshots.
 
 ## Git
 
@@ -185,6 +236,11 @@ let code, doc, and Penpot drift apart.
 
 ## Subagent dispatch discipline
 
+- For Android slices (ADR-001 Q13), the product owner approves one run
+  list at the start of each slice: task, agent, model, worktree, branch.
+  Runs on that list do not need repeated approval; runs outside it still
+  require approval first. Commit, merge, and push each still require
+  product-owner approval every time.
 - Never call the Agent tool a second time for a task whose subagent has
   not yet finished or been properly resumed. To correct or continue a
   running or completed background agent, use `SendMessage` to its agent

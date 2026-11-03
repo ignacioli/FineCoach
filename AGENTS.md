@@ -4,13 +4,15 @@
 
 FineCoach (精练教练) is a local-first iPhone app for recording gym classes. One coach keeps student records on the device. The app can also open a read-only personal training archive.
 
-Do not infer accounts, a backend, cloud sync, telemetry, Android, or a separate student client. Do not add product behavior, fields, permissions, or lifecycle states that this repository does not already implement. Ask the product owner first, and record the decision in this repository before designing or building it.
+Do not infer accounts, a backend, cloud sync, telemetry, or a separate student client. Do not add product behavior, fields, permissions, or lifecycle states that this repository does not already implement. Ask the product owner first, and record the decision in this repository before designing or building it.
 
 ## What this repository contains
 
 M1-A (core class recording) was accepted on 2026-08-30. M1-B (coach operations) was accepted on 2026-10-03; the product owner did not run a separate physical-device acceptance for that slice. M2 (personal training archive) was accepted on 2026-10-11, including a simulator walkthrough and physical-device acceptance on the product owner's iPhone XS Max. `ios/VALIDATION.md` records the evidence and the known gaps.
 
-The shipped stack is native Swift/SwiftUI on iOS 18.0+, using Apple frameworks only and local Core Data persistence. Android is not in this repository.
+The shipped stack is native Swift/SwiftUI on iOS 18.0+, using Apple frameworks only and local Core Data persistence. The product owner approved a native Android port on 2026-11-02 in ADR-001 (`specs/007-android-port/adr-001-android-and-macos-port.md`, D1, Q1–Q3, Q7): Kotlin + Jetpack Compose, `minSdk 31` (Android 12), SQLite + Room. The approved locations are `android/` beside `ios/`, and `shared/` for shared test vectors and contract samples; all samples use fictional data. Do not create the `android/` project before the S0 spec is approved. The port does not change iOS product code; iOS interoperability and shared-vector tests may be added. `targetSdk` and the design-token intermediate format remain undecided until S0; the Android Live Activity counterpart remains undecided until S5 (Q5).
+
+macOS scope is only the existing iPhone app running on Apple Silicon Macs through TestFlight (ADR-001 D3). Do not change code or create a Mac target for this validation; Mac Catalyst requires a later decision.
 
 In-repository authority:
 
@@ -35,6 +37,7 @@ Ask the product owner one targeted question only for a real authority conflict, 
 
 - Core workflows stay usable offline. Accounts, servers, cloud sync, telemetry, remote logging, and network-dependent core behavior need a product-owner decision and a threat assessment recorded in this repository.
 - A confirmed change must be durably recoverable. Do not report success, completion, delivery, import, restore, or deletion until that result is durable and verified. Restore and other destructive operations keep the last valid state until the candidate has passed integrity checks.
+- FCBK backups and FCPA archives are frozen, bidirectional iOS–Android interoperability formats (ADR-001 D2). The existing iOS formats are the contract. Before changing either format, update the contract and raise its version, then update both platforms.
 - User-visible state, error, selection, and danger must not rely only on color. Touch targets are at least 44 by 44 points. Text scales with Dynamic Type.
 - Store distribution and a manual VoiceOver script are not acceptance gates unless the product owner adds them. Do not add VoiceOver-only features. Personal Team local signing is an accepted install path; that does not authorize setting `ITSAppUsesNonExemptEncryption` to `NO` or claiming an encryption exemption.
 - Simulator or configuration evidence is not physical-device, runtime, or acceptance evidence. Name the environment and its limits.
@@ -54,6 +57,7 @@ Ask the product owner one targeted question only for a real authority conflict, 
 - Share, export, notification, and other handoffs use an explicit allowlist and the smallest disclosure that the app already implements. Do not claim delivery, deletion, or revocation that the app cannot verify.
 - Body data never appears in a share report, and there is no UI path that unlocks it.
 - Exercise content and media need reviewable provenance and license evidence before distribution. A repository license is not that evidence.
+- Android follows the same privacy and offline rules as iOS (ADR-001 Q8–Q10): no network calls, `INTERNET` permission, or network APIs. Networking requires a product-owner decision and threat assessment. Disable Auto Backup and device migration with `android:allowBackup="false"` plus `android:dataExtractionRules` excluding all domains in `cloud-backup`, `device-transfer`, and `cross-platform-transfer platform="ios"`; validate the cross-platform rule syntax in S0 as recorded in ADR-001 §6.1. Device replacement uses an explicitly exported FCBK encrypted backup. Cover recent-task thumbnails only: API 33+ uses `Activity.setRecentsScreenshotEnabled(false)`, API 31/32 uses a cover on `onPause` (validate in S0). Do not use `FLAG_SECURE` or prohibit screenshots.
 
 ## Change workflow
 
@@ -66,6 +70,8 @@ Ask the product owner one targeted question only for a real authority conflict, 
 
 When code is introduced, document the canonical setup, build, test, lint, and formatting commands here. Do not invent commands before the toolchain exists.
 
+Android Gradle build and test commands will be added to this file when S0-02 creates the project.
+
 ## Operational constraints
 
 These apply to every coding tool and are not stated in the sections above.
@@ -75,6 +81,7 @@ These apply to every coding tool and are not stated in the sections above.
 - Green unit and integration tests are not checkpoint completion without the entry and layout map in `design/design-system/components.md` §1.4. `VisionHarnessTests` asserts design-token hex values and WCAG contrast ratios only. Do not describe Feature UI as visually verified unless a human looked; say so when that has not happened.
 - Do not add a forced red/green test-order gate, a full UI automation matrix, a fault-injection matrix, a 20-restart matrix, or a new performance-stress matrix unless the product owner asks. Do not add ViewInspector structural assertions on Feature screens unless explicitly requested.
 - Do not accept UX or UI work with a screenshot-compare-fix loop unless the product owner asks for that instance.
+- Android has the explicitly approved exceptions in ADR-001 Q11/Q12, detailed in `CLAUDE.md`: product-owner-approved screenshot baselines with automated pixel comparison, and Compose UI tests (Robolectric) for the entry and layout map. Only the product owner approves and updates baselines; agents must not modify them and read text results only, not images. Deterministic pixel comparison is not the prohibited screenshot-judge-fix loop. The Feature-screen structural-assertion restriction does not apply to these Android entry and layout tests; the map remains in the execution record. iOS rules are unchanged.
 - A data-changing action must be reachable from a visible control (a button, a swipe action, or a visible menu). A long-press `.contextMenu` alone is not a UI path.
 - When a required behavior is ambiguous between an automatic side effect and an explicit coach confirmation, and the effect is hard to reverse (ending a course package's credits, deleting something, or changing billing-adjacent state), ask the product owner. Creating a new course package must not silently end the current package.
 - A design-system change goes into `design/` and is backfilled into the Penpot file「M1-B G5 Design」in the same round.
@@ -86,11 +93,11 @@ These apply to every coding tool and are not stated in the sections above.
 
 - Use `mobile-ux-designer` during discovery and approved feature design for iOS-first journeys, interaction states, accessibility, prototypes, and usability validation.
 - Use `mobile-solution-architect` when the product owner has asked for a technical approach, to record that approach and any focused architecture decisions.
-- Use `ios-swiftui-dev` for implementation in this repository. The shipped stack is native Swift and SwiftUI. The agent's existence does not authorize a second stack.
+- Use `ios-swiftui-dev` for iOS implementation in this repository. The shipped iOS stack is native Swift and SwiftUI. Android uses the separately approved stack in ADR-001 D1.
 - Use `mobile-code-reviewer` only when the user explicitly asks for a mobile code review. Do not launch it after ordinary implementation. When that explicit review is requested, use it instead of `code-reviewer` or `fs-reviewer` for mobile UI, lifecycle, persistence, or platform-API changes.
 - Use `mobile-reliability-tester` after an executable mobile slice exists for lifecycle, migration, offline, permission, accessibility, and device/simulator evidence.
 - Use `mobile-privacy-security-reviewer` as an independent read-only gate for architecture and implementation milestones involving sensitive data or platform privacy controls.
-- Do not create or route work to an Android implementation agent until an Android phase starts and its stack and compatibility contract are approved.
+- Android implementation follows the approved ADR-001 D1/D2 stack and interoperability contract, with an approved spec → plan → tasks for each slice. Do not create the `android/` project before the S0 spec is approved. Agent runs follow the slice run-list approval in `CLAUDE.md` (ADR-001 Q13); commit, merge, and push still require approval each time.
 
 ## Git
 
