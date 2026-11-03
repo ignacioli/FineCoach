@@ -4,6 +4,7 @@ enum RootDestination: Hashable {
     case archivedList
     case resourceHub
     case settings
+    case about
     case studentDetail(UUID)
     case editor(StudentEditorMode)
     case activeSession(UUID)
@@ -234,6 +235,8 @@ struct RootNavigation: View {
                                 )
                             case .settings:
                                 SettingsView(path: $path)
+                            case .about:
+                                CoachAboutView()
                             case .backupRestore:
                                 BackupExportFlowView(
                                     coordinator: environment.requireBackupCoordinator(),

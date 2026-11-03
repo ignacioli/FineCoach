@@ -70,7 +70,7 @@ enum ArchiveViewerPresentation {
     /// names kept in one piece: the version is joined by a no-break space and the hyphens are
     /// non-breaking, so a line break can only fall at the ` / ` between two licences (M2-17).
     static func licenseDisplayName(_ raw: String) -> String {
-        raw.components(separatedBy: " / ").map { name in
+        ExerciseLicensePresentation.uniqueNames(raw.components(separatedBy: " / ")).map { name in
             var shown = ""
             let characters = Array(name)
             for (index, character) in characters.enumerated() {

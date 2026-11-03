@@ -32,8 +32,8 @@ struct SettingsView: View {
                     FCHubRow(
                         icon: .symbol("info.circle"),
                         title: String(localized: "settings.about"),
-                        subtitle: .text(versionText),
-                        mode: .informational
+                        subtitle: .text(Self.versionText),
+                        mode: .action { path.append(.about) }
                     )
                     .accessibilityIdentifier(FCAccessibilityID.settingsAbout)
                     FCListRowDivider()
@@ -78,7 +78,7 @@ struct SettingsView: View {
         }
     }
 
-    private var versionText: String {
+    static var versionText: String {
         let info = Bundle.main.infoDictionary
         let version = info?["CFBundleShortVersionString"] as? String ?? "—"
         let build = info?["CFBundleVersion"] as? String ?? "—"
