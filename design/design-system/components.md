@@ -489,6 +489,40 @@ C 类，只补规则，默认字号下外观不变：
 
 两条路都会落在 CG-1 / CG-8 的手工拼装代码上；第二条路的跑偏风险最高，因为它会产生「看起来一样、实际各写一份」的第三、第四份行结构。所以在 Phase 0 先把行和页头收进共享组件，M2 页面只做拼装。M2 不涉及的 M1 页面（课包、日历、模板、备份等）不在本轮迁移，以免改动已验收界面却没有收益。
 
+### Android 设计差异登记（AD-01～AD-06，roadmap §4）
+
+编号 AD-01–AD-06 来自 specs 仓 `007-android-port/roadmap.md` §4「Android 设计差异」，登记的是 iOS 画稿表达不了的 Android 平台差异。它与上表 CG 编号、路线图评审门 G1–G7、Android 验收门禁 G0–G8 都不是一回事。功能页面不重画：iOS 已批准画稿直接作为 Android 目标，按 D 类执行（ADR-001 §7.4）。本节是 roadmap 任务 AD-00 的登记，只写设计 delta 和受影响组件，不含设计结论。编号跳过 AD-07：roadmap §6 里 AD-07 已是「同步与导出」任务，所以 App Intents 快捷指令这条新差异（2026-11-03 负责人确认补充）从 AD-08 开始，roadmap §4 的表里没有它。
+
+通用约定：
+
+- 类别按 roadmap §4 抄录，未按 §1.2 重判。AD-01、AD-03 保持 B 类：字形来源和操作面板样式都要负责人在画板上定（负责人 2026-11-03 确认）。
+- 画板都画在 Penpot「M1-B G5 Design」的「Android 差异」页，一个 AD 一块；负责人审过后，结论同一轮同步到 README、本文和 Penpot（§1.4、ADR-001 §7.4）。
+- 「新增」只是候选。待画板审过后，在 §4 新增条目；在此之前不分配 `DS-*` ID，也不写代码。
+- 行号为 2026-11-03 核对的 `ios/FineCoachApp` 与 `ios/FineCoachWidgets`，代码移动后以 grep 为准。
+
+| ID | 差异（iOS 现状 → Android 目标） | 设计 delta 类别 | 受影响组件（复用 / 扩展 / 新增） | iOS 证据 | 受影响页面 | 需要的 Penpot 画板 | 状态 |
+|---|---|---|---|---|---|---|---|
+| AD-01 | 图标映射：SF Symbol → Material Symbols。负责人 2026-11-03 定：各平台用自己的系统图标，能找到对应的就用，风格有少量差异可以接受；`‹ › ✓` 仍是随包 Noto Sans SC 字形，两端一致，不在映射内 | B | `DS-SYMBOL`：扩展（`− + ▾` 当前是 SF Symbol，需补 Android 字形来源）；`DS-TITLE-ACTION`、`DS-HUB-ROW`、`DS-STATUS`、`DS-SAVE-STATUS`、`DS-LIST-ROW`、`DS-SET-ROW`、`DS-BOTTOM-SHEET`、`DS-ACTION-ROW`（destructive 图标）：复用，只换字形来源 | `DesignSystem/Components/FCSymbol.swift:40–47, 94`；`FCButton.swift:171, 199`；`FCHubRow.swift:123`；`FCStatusLabel.swift:117`；`FCSaveStatusView.swift:30`；`FCListRow.swift:294`（`star.fill`）；`FCSetRow.swift:255`（`pencil`）；`FCBottomSheet.swift:200`（`trash`）；`Features/ShareReport/ShareReportFlowView.swift:409`、`Features/ArchiveExport/ArchiveExclusionNote.swift:13`（`lock.fill`）；`Features/Insights/InsightRowView.swift:71, 135`（`bell.slash`）；`Features/ActiveSession/ActiveSessionView.swift:92, 506, 520, 527, 596`；`FineCoachWidgets/SessionLiveActivity.swift:28, 32`（`timer`）；`App/SystemEntryIntents.swift:46, 49, 52`（快捷指令图标 `calendar`、`figure.strengthtraining.traditional`、`play.circle`，由 AD-08 处理，不在 AD-01 对照板内）。实际清单比 roadmap 长，范围以 grep 为准，由画板阶段定稿 | 使用上述组件的全部页面（待核实：未逐页列出） | 是，一块图标对照板（SF Symbol 名 → Material Symbol 名，含尺寸；找不到对应的单独列出） | 待画板（S1 前） |
+| AD-02 | 日期和时间选择：iOS `DatePicker`（图形式日历、时分滚轮）→ Material 3 选择器，用设计系统 token 着色 | B | 无现有组件：选择器本身是系统控件，`DS-*` 索引里没有对应项；展开行复用 `DS-LABEL-VALUE-ROW`（见 CG-5 的 `editorRow`），颜色用 `DS-BASE` token。选择器若需要共享规格：新增（待画板审过后在 §4 新增条目） | `Features/CoursePackages/CoursePackageEditorView.swift:161, 183`（`displayedComponents: .date`，图形式）；`Features/Appointments/AppointmentEditorView.swift:472, 485, 681`（日期、时间、重复截止日） | `SCR-PACKAGE-EDIT`、`SCR-APPOINTMENT-NEW`（`SCR-APPOINTMENT-EDIT-SCOPE` 同一视图文件，待核实是否含选择器） | 是 | 待画板（S1 前） |
+| AD-03 | 操作面板：iOS `.confirmationDialog`（动作移入分区选择）→ 现有 `DS-BOTTOM-SHEET` | B | `DS-BOTTOM-SHEET`：复用（或扩展，取决于选项列表样式，待画板）；`DS-ACTION-ROW`：复用；`DS-CONFIRM-DIALOG` 不受影响（已是自绘组件，不用系统 `.confirmationDialog`） | `Features/ActiveSession/ActiveSessionView.swift:249`；`Features/Templates/TemplateEditorView.swift:272`（两处都是「移入分区」选择） | `SCR-SESSION-SECTION`、`SCR-TEMPLATE-SECTION`（均为「iOS 现有实现 + 组件规格」，无画稿） | 是 | 待画板（S1 前） |
+| AD-04 | 应用图标：iOS 单张 1024 方图（light / dark / tinted）→ Android 自适应图标的前景、背景、单色层 | B | 无现有组件：应用图标是资产（README §9.2），不是 `DS-*` 组件；前景、背景、单色层的拆法属于新增资产规格，待画板审过后写入 README §9.2 | `design/design-system/assets/app-icon-{light,dark,tinted}.png`；`ios/FineCoachApp/Resources/Assets.xcassets/AppIcon.appiconset/Contents.json` | 无 `screens.md` 行（图标不属于页面）；README §9.2 | 是 | 待画板（S1 前；R-03 侧载前必须有） |
+| AD-05 | 小组件：Android 小组件尺寸与 iOS 不同，F-a 画稿按 Android 尺寸重排；隐私规则不变（README §10 C28） | B | 无现有组件：小组件是 feature 专有 `SE-*`（anatomy 见 `design/system-entry/implementation-map.md` §2，README §1.13），不在 §3 索引。是否提升为共享组件：不在此判断 | `FineCoachWidgets/TodayWidget.swift`；`FineCoachWidgets/FineCoachWidgetsBundle.swift` | `SCR-WIDGET-LOCK-RECT`、`SCR-WIDGET-LOCK-INLINE`、`SCR-WIDGET-STANDBY`、`SCR-WIDGET-HOME-SMALL`、`SCR-WIDGET-HOME-MEDIUM`、`SCR-WIDGET-STATE-EMPTY`、`SCR-WIDGET-STATE-FINISHED`、`SCR-WIDGET-STATE-PLACEHOLDER`（iOS 形态；Android 形态待画板确认哪些适用） | 是 | 待画板（S5 前） |
+| AD-06 | Live Activity 对应物：Android 持续通知或 Android 16 Live Updates（ADR-001 Q5，S5 再定） | A | 无现有组件：Live Activity 是 feature 专有 `SE-ACTIVITY`（`design/system-entry/implementation-map.md` §2），不在 §3 索引。Android 形态未决，不替负责人选 | `FineCoachWidgets/SessionLiveActivity.swift`（含 `timer` 图标 :28, :32） | `SCR-LIVE-ACTIVITY-LOCK`、`SCR-LIVE-ACTIVITY-ISLAND-MINIMAL`、`SCR-LIVE-ACTIVITY-ISLAND-EXPANDED`、`SCR-LIVE-ACTIVITY-ISLAND-COMPACT`、`SCR-LIVE-ACTIVITY-STATE-UNCONFIRMED`、`SCR-LIVE-ACTIVITY-STATE-TRAINING`、`SCR-LIVE-ACTIVITY-STATE-REST`、`SCR-LIVE-ACTIVITY-STATE-OVERDUE`（iOS 形态，Android 不一定一一对应） | 是 | 待画板（S5 前） |
+| AD-08 | App Intents 快捷指令：iOS App Shortcuts（Siri 与快捷指令 App 里的「今日」「开始训练」「继续训练」三项）→ Android 启动器 App Shortcuts（长按应用图标出现的静态或动态快捷方式）。Google Assistant App Actions 依赖 Assistant 和网络，不在范围内 | B | 无现有组件：快捷方式图标和文案是系统入口资产，不在 §3 索引，`design/system-entry/implementation-map.md` §2 也没有对应 `SE-*`。图标与 AD-01（图标映射）有关联：三个图标在 AD-01 里不含，由本条画板单独定；与 AD-04（自适应图标）有关联：快捷方式图标与应用图标同在启动器出现，两者关系待画板确认。是否登记新的 `SE-*`：待画板审过后决定 | `ios/FineCoachApp/App/SystemEntryIntents.swift:4–55`（`TodayIntent`、`StartTrainingIntent`、`ContinueTrainingIntent`，均 `openAppWhenRun`、`requiresAuthentication`）；`:46, 49, 52`（`AppShortcutsProvider` 中三项及图标）；文案资源 `ios/FineCoachApp/Resources/AppShortcuts.xcstrings` | `SCR-SHORTCUT-TODAY`、`SCR-SHORTCUT-START`、`SCR-SHORTCUT-CONTINUE`（`screens.md` 记为系统界面，未记录独立画板，需求待确认） | 是，一块：长按菜单的三项、图标和文案 | 待画板（S5 前；属于系统入口 S5） |
+
+分类备注：
+
+- AD-04：不是 `DS-*` 组件，§1.3 的复用 / 扩展 / 新增不适用；产物是 README §9.2 的 Android 资产规格。
+
+roadmap §4 里不需要画板的差异（不在上表，不要为它们新开画板）：
+
+- 系统栏、全面屏、手势返回（C 类，S0）：页面仍用 `DS-PAGE-HEADER` 的 `‹`，系统返回与它行为一致；S0 时在 `DS-PAGE-HEADER` 条目补一句，现在不改。
+- 字体（C 类，S1 核心页走查）：正文与 `‹ › ✓` 都用随包 Noto Sans SC（ADR-001 §7.2，负责人 2026-11-03 确认），token 数值不变，只是渲染引擎不同；由 L3 走查看一次，不画板。
+- 趋势图（D 类，S3）：Swift Charts → Compose Canvas，目标是现有画稿；iOS 位置 `Features/Trends/TrendLineChart.swift`、`Features/Trends/TrendsView.swift`。
+- 左滑操作（D 类，S1）：Compose 没有现成控件，按本文 §4.8 自绘；iOS 位置见 §4.8，不重新设计。
+
+文件选择、分享面板、通知外观是系统界面，不设计，通知文案与 iOS 一致（roadmap §4 末行）。
+
 ## 6. Feature 实施映射（每个里程碑一份）
 
 从 M2 开始，每个里程碑在它的高保真目录中维护一份 `implementation-map.md`（例如 `design/m2-hifi/implementation-map.md`），只写该 feature 自己的内容：
