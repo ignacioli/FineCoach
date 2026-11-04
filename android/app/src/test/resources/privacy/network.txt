@@ -1,0 +1,8 @@
+import java.net.URL
+import javax.net.SocketFactory
+import java.net.Socket as FictionalSocket
+HttpURLConnection
+android.webkit.WebView
+okhttp3.OkHttpClient
+retrofit2.Retrofit
+io.ktor.client.HttpClient

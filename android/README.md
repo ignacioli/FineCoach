@@ -32,7 +32,7 @@
 
 `<cross-platform-transfer>` 的系统支持从 Android16 QPR2/API36.1 起；按官方 API/toolchain 支持表，所需最低编译平台取 **36.1**、最低 **AGP8.13.0**；若使用本建议的 compileSdk37.0，最低 **AGP9.1.1**。选定 AGP9.3.1 支持最高 API37。`compileSdk37.0` 不能替代 QPR2 runtime：API36.1 platform 本机缺失但本方案不必另装，**QPR2 镜像仍缺失**。XML 是否接受无 params 的全排除段、三段九域系统正向解析，仍由 T006 验证；本轮没有编译或系统解析证据。[Auto Backup](https://developer.android.com/identity/data/autobackup#configure-cross-platform-transfers)、[API/AGP 最低版本表](https://developer.android.com/build/releases/about-agp#api-level-support)、[minor API 配置](https://developer.android.com/build#android-sdk-settings)
 
-**当前批准状态：已批准（负责人 2026-11-03）。** 以下版本表及其“待批准”描述保留为 T001 申请时的历史记录；负责人现已批准表内版本，并接受 AGP 传递依赖 UTP `1.0.0-beta10` 的 beta 例外。JDK 固定 Temurin `21.0.13+9`（arm64）；未修改表内版本值。
+**当前批准状态：已批准（负责人 2026-11-03）。** 以下版本表及其“待批准”描述保留为 T001 申请时的历史记录；负责人现已批准表内版本，并接受 AGP 传递依赖 `1.0.0-beta10` 的 beta 例外（实为 `jetifier-core` 与 `jetifier-processor`，旧称「UTP」有误，2026-11-04 改正）。JDK 固定 Temurin `21.0.13+9`（arm64）；未修改表内版本值。
 
 ## 版本批准表（待负责人批准）
 
@@ -102,7 +102,7 @@ Wrapper SHA-256（仅拉取官方checksum文本，未下载ZIP）：`84fbba45c7f
 
 1. 负责人逐行批准D01/D04及D03最小spike精确集合；未取得前T001保持待批准，T002不启动。D12/D13已有决定，不重开产品选择。
 2. KSP2.3.13 + Kotlin2.4.21 + Room2.8.5 + AGP9.3.1没有找到覆盖全组合的官方兼容矩阵；记录为待核实。Roborazzi1.77.0上游固定AGP8.13.2、Robolectric4.14.1、Compose1.8.3，且有Compose compiler classloader回归注释；不能据其release存在推定本组合兼容。批准后通过T003定向spike收证据，同问题两次失败即停止上报。
-3. 完整build/runtime/test传递图、每个artifact的license/minCompileSdk/Kotlin metadata约束、依赖checksum和allowlist未生成。已读AGP9.3.1 POM中存在UTP `1.0.0-beta10` 内部依赖标记；本表仅选择stable直接版本，不把内部预发布依赖自动视为已批准。如“仅稳定版”要求覆盖全部传递项，此处须先裁决或另找组合，不擅自强制替换AGP内部依赖。Roborazzi也传递引入`com.dropbox.differ:differ`等第三方，须逐项批准，不能用group通配放行。
+3. 完整build/runtime/test传递图、每个artifact的license/minCompileSdk/Kotlin metadata约束、依赖checksum和allowlist未生成。已读AGP9.3.1 POM中存在 `1.0.0-beta10` 内部依赖标记（实为 jetifier，旧称 UTP 有误）；本表仅选择stable直接版本，不把内部预发布依赖自动视为已批准。如“仅稳定版”要求覆盖全部传递项，此处须先裁决或另找组合，不擅自强制替换AGP内部依赖。Roborazzi也传递引入`com.dropbox.differ:differ`等第三方，须逐项批准，不能用group通配放行。
 4. Compose BOM最新性存在官方来源差异：检索出现2026.10.01，但Google Maven metadata release为2026.09.00、2026.10.01 POM返回404；停止追查该版本，候选采用已返回200且映射已核实的2026.09.00，不声称它是所有来源中的最新。未下载artifact。
 5. 本机缺拟议Temurin、Gradle9.7.0、sdkmanager、QPR2/API31/API32镜像；无本轮Gradle、Robolectric、Compose、截图、KDF、Android系统解析或模拟器可运行证据。宿主/沙箱结果必须分开；metadata联网可用不能记作依赖下载或离线构建PASS。
 6. SDK工具、镜像、JDK archives与wrapper JAR的精确hash/随包license、QPR2 build、必要时D10公开params均待后续核实。本轮不提供未跑过的build/test命令，不修改AGENTS命令段落或tasks复选框。
@@ -225,3 +225,73 @@ xcodebuild -project ios/FineCoach.xcodeproj -scheme FineCoachTests -destination 
 - `s0EnvironmentSmoke -Proborazzi.test.record=true`：配置阶段拒绝，退出 1，不写基线。
 - G0 `assembleDebug lint`：退出 0。
 - 未验证：基线像素被改动时 verify 能否失败（受控失败样例属于后续 G5 任务）；本 smoke 不是 DS 组件或 G5 验收。
+
+## S0-03 T004 targeted 实施记录（2026-11-04，待宿主验证）
+
+基点 `93c3fe1`，branch `feat/android-s0-infrastructure`；初始 tracked/staged 为空，仅用户已有 untracked `.vscode/`，保留。只读 specs canonical 路径为 `/Users/liyongqiang/gitrepo/ignacioli/.worktree/specs-android-s0/FineCoach/007-android-port/s0-infrastructure/`。本轮禁止 Gradle/模拟器/xcodebuild，不 commit、不改任务勾选；无新 UI 或 entry/layout map 条目。
+
+差异：Manifest 原来只有 allowBackup=false → 绑定现代三段规则；新增 cloud-backup、device-transfer、cross-platform-transfer(platform=ios) 的全部九域 path="." exclude，无 include/params。FR-030/ADR §6.1 原为 minSdk31 不要求 fullBackupContent → 按编排方要求（非负责人决定）新增旧版 full-backup-content 九域排除，作为冗余防护；spec 正文尚未更新；minSdk31 保持。未移除原配置；QPR2 系统接受性由 T006 验证。
+
+`BackupRulesTests` 共 5 tests：debug/release 合并规则正例，受控 fixture 缺段/缺域/include 三负例，无效资源引用拒绝。fixture 位于 test/resources，不打包进 main。Manifest 由 `SingleArtifact.MERGED_MANIFEST` provider 接入；规则 XML 由 AGP9.3.1 `MergeResources.mergedNotCompiledResourcesOutputDirectory` 输出接入，Test inputs/dependsOn 保证合并后读取，按 manifest @xml 引用唯一解析，不回退源文件。该 MergeResources 接口通过本地 9.3.1 JAR 的 javap 核对；属 AGP 实现类型，宿主仍须验证 Kotlin DSL 接线与 XML 输出形状。静态 xmllint/diff 检查不等于测试 PASS。
+
+## S0-03 T005 targeted 实施记录（2026-11-04，待宿主验证）
+
+T004 文件实现及 XML 静态检查完成后开始 T005，共享文件串行修改。未运行 Gradle、模拟器或 xcodebuild；不宣称 T004/T005 验收通过，不运行 T006，不修改完整 `s0G8` 的「未实现即失败」逻辑。执行者 Codex；宿主复跑/系统验证交编排方；cursor-agent 独立复核尚未取得。
+
+（历史记录，现行入口集合见下文修复轮 1 一节）权限集合只允许 AndroidX Core 的 `com.ignacioli.finecoach.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`，声明必须为 signature，无其他 uses-permission。debug/release 两套 merged manifest 都检查。原 debug 合并产物有测试宿主 `androidx.activity.ComponentActivity` 与 `androidx.profileinstaller.ProfileInstallReceiver` exported=true → main manifest 用 mergeOnlyAttributes/replace 将二者降为 false；保留库组件供内部使用，唯一 exported 入口为 MainActivity 的 MAIN/LAUNCHER。没有给库入口静默加例外。该合并行为及 Compose smoke 回归仍需宿主验证。
+
+`PrivacySourceScanTests` 扫描非空 main Kotlin/Java 原文（包括 import alias/注释，不能用 suppression 绕过）：java.net/javax.net/android.net、URLConnection/HttpURLConnection、Socket/WebView、OkHttp/Retrofit/Ktor/Apache HTTP/Cronet/Volley、Firebase/Crashlytics/Sentry/Amplitude/Mixpanel、SQLCipher、FLAG_SECURE、android.util.Log/Log 调用、print/println/printf、System.out/err、printStackTrace、java.util.logging/Timber。test/resources 有网络、窗口、日志、遥测受控负例，逐行验证拒绝；权限/入口/signature、未知依赖/版本另有负例。扫描是保守静态守卫，不证明动态代码或第三方 SDK 无网络行为；依赖与 manifest 为另两道边界。
+
+依赖白名单 `dependency-allowlist/resolved.txt` 来自本轮指定宿主机八份文本，保留每个 scope 的最终 selected 坐标、BOM/传递项，忽略图中的本地 project :app 引用；**702 行 scoped 坐标，306 个唯一 group:artifact:version**。scope 行数：debugCompile=85、debugRuntime=100、releaseCompile=84、releaseRuntime=99、debugUnitTestRuntime=164、debugAndroidTestRuntime=34、root build classpath=136、app build classpath=0。`writePrivacyDependencyGraph` 使用 Gradle ResolutionResult 重新解析相同八个 scope，任何 unresolved 失败；测试要求全 scope 出现、坐标/版本/范围集合精确相等，未知或缺失均失败，禁止遥测与 SQLCipher。此白名单是宿主图的库存基线，不代表待确认项获批。
+
+特殊项单独注释「AGP 内部预发布，负责人已接受（2026-11-04）」：jetifier-core/jetifier-processor 1.0.0-beta10 确实 selected；aapt2-proto 7.3.0-alpha07-8248216 仅 requested，selected 是 9.3.1-15703166，未把 alpha 加入 selected 白名单。负责人确认仍 PENDING，库存一致测试不能代替依赖批准。
+
+**日志范围缺口**：FR-034 没有给固定事件词表、输出目的地或 debug logger 行为；当前壳没有日志需求/实现。本轮不发明事件或新增无调用方的 logger，静态守卫禁止所有直接日志；Release APK 通过 artifact provider 构建后读取 DEX，确认不存在约定的 app DebugEventLogger descriptor 与虚构敏感 sentinel，并检查 debug/release 源集没有日志。此检查仅证明当前无 debug logging implementation 的状态；**固定事件封装实现尚未提供，FR-034 的完整实现保持 PENDING**。未来若需要日志，应先定义固定事件契约，再替换本轮“无日志”检查为该契约与实际 logger 隔离检查；不能把目前的占位名称扫描当任意 logger 的完整字节码证明。没有改 main Java/Kotlin 产品代码或源集，无敏感数据。
+
+新增 Test 输入只接 AGP 的 testDebugUnitTest/testReleaseUnitTest，不接独立 s0EnvironmentSmoke；Release APK 通过 SingleArtifact.APK provider 输入依赖构建。源码/白名单/合并产物均登记 inputs；debug/release 可选源集以 fileTree 追踪未来新增 Kotlin/Java 文件，当前不存在这些产品源集。
+
+**宿主复跑**（cwd=`android/`，沿用已批准 JDK21/SDK/cache；本轮未执行）：
+
+```sh
+./gradlew assembleDebug assembleRelease lint
+./gradlew :app:testDebugUnitTest --tests '*BackupRulesTests' --tests '*CapabilityManifestTests' --rerun-tasks
+./gradlew :app:testDebugUnitTest --tests '*CapabilityManifestTests' --tests '*PrivacySourceScanTests' --rerun-tasks
+./gradlew :app:s0EnvironmentSmoke
+```
+
+第一条 G0/build；第二条 targeted 预期 9 tests（Backup 5 + Capability 4）；第三条 targeted 预期 13 tests（Capability 4 + Privacy 9）；最后一条既有环境回归 7 tests。每条测试要求非空、0 failures/errors/skips；两次 targeted 共用 `app/build/test-results/testDebugUnitTest/TEST-*.xml` 与 `app/build/reports/tests/testDebugUnitTest/`，编排方必须每次立即另存报告并标记命令/HEAD/退出码/实际数量，不能用第二次覆盖后的目录证明第一次。依赖报告 `app/build/reports/s0/privacy/resolved.txt`，合并 XML `app/build/privacyMergedResources/{debug,release}/`，manifest 路径由 artifact provider 提供。库存依赖测试即使通过，待确认预发布项/日志契约/独立复核/QPR2 仍未完成；不报告完整 G8 或 CP1 PASS。
+
+本轮静态验证：XML 经 `xmllint --noout`，`git diff --check` 通过。新建四个 Kotlin 测试/辅助文件用本地 Kotlin 2.4.21 compiler + JUnit4.13.2 + 已发现的 SDK `platforms/android-37.0/android.jar`（`-no-jdk`）独立编译，exit 0；不运行测试、不验证 Gradle DSL。首次独立编译误用不存在的 android-37 路径而失败，改为实存 android-37.0 后成功；不涉及产品代码修复。编译提示的 parentFile nullable 访问已改为 safe call。Gradle DSL 的任务接线、完整合并与 APK 构建仍需宿主验证。
+
+## S0-03 修复轮 1（2026-11-04）
+
+本节覆盖上轮 T005 关于入口集合、白名单数量与预期测试数的记录；上文保留为历史。编排方宿主反馈：原 T004 targeted 9/9、s0EnvironmentSmoke 7/7 通过；G0 lint 报 ProfileInstallReceiver MissingClass，PrivacySourceScanTests 报库存白名单多出误解析的 `{strictly` 坐标。此次未运行 Gradle、lint、模拟器或 xcodebuild，不 commit；现有修改及用户 `.vscode/` 均保留。
+
+逐项修订：
+
+- `src/main/AndroidManifest.xml`：删除 ProfileInstallReceiver exported=false 覆盖；按本轮编排方裁决保留库默认 exported=true/DUMP 保护，以恢复 baseline profile 安装入口。未新增 receiver 源声明。
+- `src/main/AndroidManifest.xml` → `src/debug/AndroidManifest.xml`：将 ComponentActivity exported=false 覆盖移至 debug；release 不再因 main 覆盖凭空声明测试 Activity。其余备份规则保持。
+- `CapabilityManifestTests`：原来只允许 MainActivity exported → debug/release 都允许 MainActivity 与库 ProfileInstallReceiver，后者必须 exported=true 且 permission 精确等于 android.permission.DUMP；缺失/错误权限均由负例拒绝。全部组件集合分别锁定 debug 四项（MainActivity、ComponentActivity、InitializationProvider、ProfileInstallReceiver）与 release 三项（不含 ComponentActivity）；两个非 exported 组件必须显式 false。新增 release 混入 debug Activity 的拒绝负例。权限申请白名单未变。
+- `dependency-allowlist/`：新增可复跑生成器 `generate-resolved.mjs`，先分离最终 ` -> selected` 再解析 requested 坐标；处理 `{strictly x}`、无 requested version、`(c)`、`(*)`、重复树节点及本地 project :app，拒绝未解析/动态版本/FAILED。八份宿主报告完整重生成，未手工删条目。
+- `PrivacySourceScanTests`：白名单行格式从任意无空白版本收紧为精确版本语法，新增拒绝残留 `{strictly` 的负例，防止再次将报告语法写成允许坐标。
+
+新库存：**686 条 scope 记录，292 个唯一坐标**，较上轮 702/306 分别减少16/14；其中 debugAndroidTestRuntimeClasspath 34→21、root build classpath 136→133，其余 scope 不变。减少的是 rich constraint 被错误截成 `{strictly` 的伪条目，解析回 selected 后与既有坐标去重。两个 Jetifier beta10 的“AGP 内部预发布，负责人已接受（2026-11-04）”及 aapt2-proto requested/selected 区分注释保持不变。
+
+生成器从产品根运行（只读指定宿主报告，输出写当前脚本同目录 resolved.txt）：
+
+```sh
+node android/dependency-allowlist/generate-resolved.mjs "$HOME/.cache/finecoach-android/deps-2026-11-04"
+```
+
+本轮实际结果：生成器8个正向/本地 project 样例、4个拒绝样例全部通过；与宿主已经留存的 `app/build/reports/s0/privacy/resolved.txt` 集合比对，双方均686条，unknown=[]、missing=[]（旧报告静态比对，不等于本轮 Gradle 测试通过）。XML syntax 与 git diff --check 通过；四个 Kotlin 测试/辅助文件以本地 Kotlin2.4.21/JUnit4.13.2/android-37.0 android.jar（-no-jdk）独立编译 exit0、无诊断，未执行 JUnit。真实 merge/lint/Gradle targeted 仍待编排方宿主复跑。
+
+更新后的宿主命令（cwd=`android/`）：
+
+```sh
+./gradlew assembleDebug assembleRelease lint
+./gradlew :app:testDebugUnitTest --tests '*BackupRulesTests' --tests '*CapabilityManifestTests' --rerun-tasks
+./gradlew :app:testDebugUnitTest --tests '*CapabilityManifestTests' --tests '*PrivacySourceScanTests' --rerun-tasks
+./gradlew :app:s0EnvironmentSmoke
+```
+
+新预期：Backup5 + Capability7 = **12 tests**；Capability7 + Privacy10 = **17 tests**；s0EnvironmentSmoke 仍 **7 tests**。两次 targeted 仍须分别保存 XML/HTML、实际计数、退出码，全部要求非空且0 failures/errors/skips。固定事件日志契约、预发布依赖确认与T006系统验证的原有 PENDING 边界保持；本轮不声称完整 G8 PASS。

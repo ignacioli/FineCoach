@@ -1,0 +1,5 @@
+import android.util.Log as FictionalLogger
+Log.d("fictional", "FICTIONAL_SENSITIVE_LOG_SENTINEL")
+println("fictional")
+System.out.println("fictional")
+throwable.printStackTrace()

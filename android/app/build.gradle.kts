@@ -1,3 +1,6 @@
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.artifacts.result.UnresolvedDependencyResult
+import com.android.build.gradle.tasks.MergeResources
 import com.android.build.api.artifact.SingleArtifact
 import javax.xml.XMLConstants
 import javax.xml.parsers.DocumentBuilderFactory
@@ -193,6 +196,78 @@ androidComponents {
             systemProperty("finecoach.compileSdk", android.compileSdk.toString())
         }
     }
+}
+
+// T004: retain provider dependencies for both manifests and merged XML outputs.
+androidComponents {
+    onVariants { variant ->
+        val name = variant.name
+        if (name == "debug" || name == "release") {
+            val manifest = variant.artifacts.get(SingleArtifact.MERGED_MANIFEST)
+            val mergeTaskName = "merge" + name.replaceFirstChar { it.uppercaseChar() } + "Resources"
+            val resources = layout.buildDirectory.dir("privacyMergedResources/" + name)
+            tasks.withType<MergeResources>().configureEach {
+                if (this.name == mergeTaskName) mergedNotCompiledResourcesOutputDirectory.set(resources)
+            }
+            tasks.withType<Test>().matching { it.name == "testDebugUnitTest" || it.name == "testReleaseUnitTest" }.configureEach {
+                inputs.file(manifest)
+                inputs.dir(resources)
+                dependsOn(mergeTaskName)
+                systemProperty("finecoach.manifest." + name, manifest.get().asFile.absolutePath)
+                systemProperty("finecoach.resources." + name, resources.get().asFile.absolutePath)
+            }
+        }
+    }
+}
+
+// T005: resolve the same complete configurations as the host inventory.
+val privacyDependencyReport = layout.buildDirectory.file("reports/s0/privacy/resolved.txt")
+val privacyDependencyGraph = tasks.register("writePrivacyDependencyGraph") {
+    val allowlist = rootProject.layout.projectDirectory.file("dependency-allowlist/resolved.txt")
+    inputs.file(allowlist)
+    outputs.file(privacyDependencyReport)
+    outputs.upToDateWhen { false }
+    doLast {
+        val graphs = listOf(
+            "app:debugCompileClasspath" to configurations.getByName("debugCompileClasspath"),
+            "app:debugRuntimeClasspath" to configurations.getByName("debugRuntimeClasspath"),
+            "app:releaseCompileClasspath" to configurations.getByName("releaseCompileClasspath"),
+            "app:releaseRuntimeClasspath" to configurations.getByName("releaseRuntimeClasspath"),
+            "app:debugUnitTestRuntimeClasspath" to configurations.getByName("debugUnitTestRuntimeClasspath"),
+            "app:debugAndroidTestRuntimeClasspath" to configurations.getByName("debugAndroidTestRuntimeClasspath"),
+            "app:classpath" to buildscript.configurations.getByName("classpath"),
+            "root:classpath" to rootProject.buildscript.configurations.getByName("classpath"),
+        )
+        val rows = mutableListOf<String>()
+        graphs.forEach { (scope, configuration) ->
+            val result = configuration.incoming.resolutionResult
+            check(result.allDependencies.none { it is UnresolvedDependencyResult }) { "Unresolved dependencies: " + scope }
+            rows += "# scope " + scope
+            result.allComponents.mapNotNull { it.id as? ModuleComponentIdentifier }
+                .map { it.group + ":" + it.module + ":" + it.version + " " + scope }
+                .distinct().sorted().forEach { rows += it }
+        }
+        privacyDependencyReport.get().asFile.apply { parentFile.mkdirs(); writeText(rows.joinToString("\n") + "\n") }
+    }
+}
+androidComponents {
+    onVariants(selector().withBuildType("release")) { variant ->
+        val apk = variant.artifacts.get(SingleArtifact.APK)
+        tasks.withType<Test>().matching { it.name == "testDebugUnitTest" || it.name == "testReleaseUnitTest" }.configureEach {
+            inputs.dir(apk)
+            systemProperty("finecoach.releaseApk", apk.get().asFile.absolutePath)
+        }
+    }
+}
+tasks.withType<Test>().matching { it.name == "testDebugUnitTest" || it.name == "testReleaseUnitTest" }.configureEach {
+    dependsOn(privacyDependencyGraph)
+    inputs.file(privacyDependencyReport)
+    inputs.file(rootProject.layout.projectDirectory.file("dependency-allowlist/resolved.txt"))
+    inputs.dir(layout.projectDirectory.dir("src/main"))
+    inputs.files(fileTree("src") { include("debug/**/*.kt", "debug/**/*.java", "release/**/*.kt", "release/**/*.java") })
+    systemProperty("finecoach.sourceRoot", layout.projectDirectory.dir("src").asFile.absolutePath)
+    systemProperty("finecoach.dependencies", privacyDependencyReport.get().asFile.absolutePath)
+    systemProperty("finecoach.dependencyAllowlist", rootProject.layout.projectDirectory.file("dependency-allowlist/resolved.txt").asFile.absolutePath)
 }
 
 // Reserve the approved interfaces. Each is replaced by its owning task only
