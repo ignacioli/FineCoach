@@ -1,0 +1,4 @@
+<resources>
+    <!-- Infrastructure-only system theme; DS-LAUNCH and AD-04 remain deferred. -->
+    <style name="Theme.FineCoach" parent="android:style/Theme.Material.Light.NoActionBar" />
+</resources>
