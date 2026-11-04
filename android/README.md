@@ -124,6 +124,7 @@ printf 'sdk.dir=%s/Library/Android/sdk\n' "$HOME" > local.properties
 perl -e 'alarm shift; exec @ARGV' 1800 ./gradlew --version
 perl -e 'alarm shift; exec @ARGV' 720 ./gradlew assembleDebug lint
 perl -e 'alarm shift; exec @ARGV' 720 ./gradlew :app:testDebugUnitTest --tests '*InfrastructureConfigurationTests'
+perl -e 'alarm shift; exec @ARGV' 300 ./gradlew :app:s0EnvironmentSmoke
 ```
 
 `local.properties`、`.gradle/`、`.kotlin/`、所有 module `build/` 和备用 `.gradle-home/` 均被忽略。若指定的用户缓存不可写，可将 `GRADLE_USER_HOME` 改为当前目录的 `.gradle-home/`。不要写全局 `~/.gradle/gradle.properties`。首次依赖准备上限 30 分钟，之后每次调用上限 12 分钟；macOS 没有 GNU `timeout`，上面用 `perl -e 'alarm N; exec @ARGV'` 限时：超时进程收到 SIGALRM 退出，退出码非零。
@@ -134,11 +135,11 @@ Gradle 和 Robolectric 测试在宿主机运行，不在 agent 沙箱内运行�
 
 `InfrastructureConfigurationTests` 用 AGP `SingleArtifact.MERGED_MANIFEST` 产物检查 SDK 下限/目标、无 `INTERNET`、`allowBackup=false` 和唯一 launcher Activity；compileSdk 从实际 Gradle DSL 传入测试，独立断言批准值。Robolectric 固定 API36，在 JVM 启动 `MainActivity`；这不是设备启动或系统隐私行为证据。JUnit XML 位于 `app/build/test-results/testDebugUnitTest/`，必须实际执行数 >0、0 failures、0 errors、0 skipped。
 
-预置标准 main/debug/release/test/androidTest source sets；JVM test resources 指向同一产品根的 `shared/test-vectors/`，synthetic schema assets 预留 `app/src/test/assets/`。未创建或复制共享向量、Room schema、字体或基线。JUnit、Robolectric、Compose UI test 与 Android instrumentation runner/core/ext.junit 已配置；Room/KSP/Roborazzi 仅 pin 到 catalog，待对应任务应用和接入，不代表兼容性 smoke 已通过。
+预置标准 main/debug/release/test/androidTest source sets；JVM test resources 指向同一产品根的 `shared/test-vectors/`，synthetic schema assets 预留 `app/src/test/assets/`。JUnit、Robolectric、Compose UI test 与 Android instrumentation runner/core/ext.junit 已配置；Room/KSP 仍仅 pin 到 catalog。T003 在 app 应用 Roborazzi 1.77.0 插件与已有 catalog 的 core 测试依赖，不加其他直接坐标；不代表兼容性 smoke 已通过。
 
-预留 `s0G1`、`s0G2`、`s0G3`、`s0G4`、`s0G5`、`s0G6`、`s0G8`、`s0Room`、`s0SeedIsolation`、`s0InstallSeededDebug`、`s0EnvironmentSmoke`、`generateDesignTokens`、`checkDesignTokens`，目前每个执行时均抛出「未实现」错误，不能 PASS。后续按 plan §4 接入独立 Test task、专属 filter/结果目录及非空报告验证；G5 只接 verify。不注册 G7。
+预留 `s0G1`、`s0G2`、`s0G3`、`s0G4`、`s0G5`、`s0G6`、`s0G8`、`s0Room`、`s0SeedIsolation`、`s0InstallSeededDebug`、`generateDesignTokens`、`checkDesignTokens`，每个执行时仍抛出「未实现」错误，不能 PASS。后续按 plan §4 接入独立 Test task、专属 filter/结果目录及非空报告验证；G5 只接 verify。不注册 G7。`s0EnvironmentSmoke` 在 T003 实现，见下文。
 
-T002 Manifest 仅落地无 `INTERNET` 和 `allowBackup=false`。三段九域 dataExtractionRules、debug/release 完整隐私检查及 QPR2 系统解析留 T004～T006；API31/32 onPause 遮盖、API33+ 最近任务截图策略及系统验证留 T009～T010；不使用 `FLAG_SECURE`。KDF 双端证明、环境截图 spike 及完整 resolved allowlist 分别留 T032、T003、T005。按本轮白名单不改 `AGENTS.md`，实际命令登记由 T003 完成。
+T002 Manifest 仅落地无 `INTERNET` 和 `allowBackup=false`。三段九域 dataExtractionRules、debug/release 完整隐私检查及 QPR2 系统解析留 T004～T006；API31/32 onPause 遮盖、API33+ 最近任务截图策略及系统验证留 T009～T010；不使用 `FLAG_SECURE`。KDF 双端证明、环境截图 spike 及完整 resolved allowlist 分别由 T032、T003、T005 承担。
 
 **T002 验证结果（2026-11-03，宿主机，Temurin 21.0.13+9 arm64）**
 
@@ -149,6 +150,36 @@ T002 Manifest 仅落地无 `INTERNET` 和 `allowBackup=false`。三段九域 dat
 - 沙箱内首轮（Codex）因依赖下载 TLS 握手失败未能完成，以上为宿主复跑结果。
 - debug merged manifest 中 AndroidX Core 传递引入 `com.ignacioli.finecoach.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`（signature）。未新增源码权限声明，未静默移除库声明；该项纳入 T005 权限/传递依赖白名单审查，当前不宣称空权限集合或完整 G8 PASS。
 - 已知 warning：source set 旧式 `srcDir` API deprecation、native library 无法 strip；不影响本轮结果。
+
+## T003 Environment smoke 与最小截图 spike
+
+本轮只实现 T003，不运行 Gradle、模拟器或 xcodebuild，不生成 PNG，不 commit。开工 tracked/staged 为空，untracked 仅用户已有 `.vscode/`，保留不动。规格从指定 canonical specs worktree 只读读取；产品 `ig-worktree-gate` PASS（`feat/android-s0-infrastructure`，missing links 为空）。本节是当前 Environment 状态，上文 T001/T002 的结果保留为历史证据。
+
+`EnvironmentSmokeTests` 在 Robolectric API36 / NATIVE 下检查 JDK21、zh-CN locale、UTF-8 与数值格式，并实际组合/测量 96×64 dp Compose 节点。`EnvironmentScreenshotSpikeTests` 捕获固定几何色块/边框，无文字或图标；字面颜色非 DS token，仅环境 smoke。固定 `@Config(sdk = [36], qualifiers = "zh-rCN-w320dp-h480dp-notnight-mdpi")`，mdpi、fontScale=1、无动画，测试时钟手动推进一帧。此 fixture 无产品交互，entry/layout map 无新增条目，不是正式 DS 或 G5 验收。
+
+`s0EnvironmentSmoke` 是独立 `Test` task，复用 AGP Debug 的 classpath、测试 classes 和 JVM 配置，不依赖 `testDebugUnitTest` 执行，也不复制其 Roborazzi 缓存恢复 actions。专属 filter 仅含 `EnvironmentSmokeTests`（2）、`PlatformCryptoAvailabilityTests`（1）、`PlatformCryptoParityTests`（3）、`EnvironmentScreenshotSpikeTests`（1），当前共预期 **7 tests**。每次调用强制实际执行、不接受 up-to-date/build-cache；不靠修改测试源码重跑。record=true 在配置/执行前拒绝，verify 固定开启；缺 `screenshot-baselines/environment/fixed-geometry.png` 直接失败。finalizer 拒绝 NO-SOURCE/skip/执行失败，再读取专属 JUnit XML：四个 suite 均须出现且各自非零，统计 testcase 实际数并交叉核对 `tests`，任何 failure/error/skipped 均失败。其他预留 gate 仍「未实现即失败」。
+
+专属 XML：`app/build/test-results/s0EnvironmentSmoke/TEST-*.xml`；HTML：`app/build/reports/tests/s0EnvironmentSmoke/`；Roborazzi 文字 JSON：`app/build/reports/s0/environment/results/`；差异图：`app/build/reports/s0/environment/images/`。agent 只读文字，不查看 PNG。baseline 是显式文件路径，插件缓存/恢复目录只在 `app/build/outputs/roborazzi/environment/`，不能补回缺失 baseline。
+
+**编排方宿主机命令**（cwd=`android/`，沿用上文已批准环境；本轮未执行）：
+
+```sh
+perl -e 'alarm shift; exec @ARGV' 720 ./gradlew assembleDebug lint
+perl -e 'alarm shift; exec @ARGV' 300 ./gradlew :app:testDebugUnitTest --tests '*EnvironmentSmokeTests' --tests '*PlatformCryptoAvailabilityTests' --tests '*PlatformCryptoParityTests'
+perl -e 'alarm shift; exec @ARGV' 300 ./gradlew :app:s0EnvironmentSmoke
+```
+
+前两条预期成功（定向 JVM 6 tests）；第三条首次缺基线应非零失败，状态 BLOCKED，不能自动录制。负责人录制/批准后第三条预期 7 tests、0 failures/errors/skips。编排方分别记录首次依赖解析与冷/暖执行耗时、退出码、测试数、报告路径、resolved graph/缓存来源及 baseline diff；warm 重跑用同一命令，task 自身禁用缓存复用。额外负例 `./gradlew :app:s0EnvironmentSmoke -Proborazzi.test.record=true` 必须失败且不写基线。设备沿用下一节 `am instrument` 流程，不使用 UTP。
+
+**负责人专用 record（只能由负责人运行，agent 禁止）**：本轮任务明确要求在此交付命令，仅限 environment fixture。先查看 fixture/配置，亲自执行以下一条，再登记批准文件与 SHA-256；不作为普通 gate 或 agent 运行清单：
+
+```sh
+./gradlew :app:testDebugUnitTest --tests 'com.ignacioli.finecoach.EnvironmentScreenshotSpikeTests' -Proborazzi.test.record=true -Proborazzi.test.verify=false --rerun-tasks
+```
+
+命令只选择 environment screenshot suite，写 `android/screenshot-baselines/environment/fixed-geometry.png`。没有 task 默认 record。基线目录本轮仅有 README；禁止 agent 录制或更新文件。
+
+接口核对依据：[Roborazzi 1.77.0 README](https://github.com/takahirom/roborazzi/blob/1.77.0/README.md) 的插件/core 依赖与 record/verify 属性；[core 捕获源码](https://github.com/takahirom/roborazzi/blob/1.77.0/roborazzi/src/main/java/com/github/takahirom/roborazzi/Roborazzi.kt) 提供 `SemanticsNodeInteraction.captureRoboImage(file: File)`，无需 `roborazzi-compose` 或 rule 的额外直接坐标；[plugin 源码](https://github.com/takahirom/roborazzi/blob/1.77.0/include-build/roborazzi-gradle-plugin/src/main/java/io/github/takahirom/roborazzi/RoborazziPlugin.kt) 核对 `roborazzi.compare.output.dir` / `roborazzi.result.dir` / `roborazzi.project.path`。catalog 无改动。AGP9.3.1 本地 JAR 的 classpath 构造包含 UNIT_TEST_CONFIG_DIRECTORY；复制保留其 FileCollection build dependencies。尚未编译或执行，精确 Gradle9.7.0/AGP9.3.1/Roborazzi1.77.0 组合、NATIVE 渲染与完整传递坐标仍需宿主核实，不能报告 PASS；若出现 catalog 外新增直接坐标需求，停止并上报。
 
 ## KDF 一致性证明
 
@@ -168,9 +199,9 @@ perl -e 'alarm shift; exec @ARGV' 300 adb shell am instrument -w -r -e class "$S
 xcodebuild -project ios/FineCoach.xcodeproj -scheme FineCoachTests -destination "id=${S0_IOS_DESTINATION_ID:?required}" -derivedDataPath "${S0_IOS_DERIVED_DATA:?required}" -only-testing:FineCoachTests/PlatformCryptoParityTests test
 ```
 
-`S0_KDF_TEST_CLASS` 的实际全名为 `com.ignacioli.finecoach.PlatformCryptoParityInstrumentedTests`。JVM 预期 4 tests（`PlatformCryptoAvailabilityTests` 1 + `PlatformCryptoParityTests` 3，含参数拒绝），设备与 iOS 各 2 tests；要求非空、0 failures/errors/skips。测试输出平台/provider、输入名称、digest/key hex；设备 serial 由编排方另外记录。JVM 结果仅算 host smoke，Android instrumentation 与 iOS 均通过且对照一致后才满足 T032 完成线。`s0EnvironmentSmoke` 仍由后续任务接入，本轮不将其改为通过。
+`S0_KDF_TEST_CLASS` 的实际全名为 `com.ignacioli.finecoach.PlatformCryptoParityInstrumentedTests`。JVM 预期 4 tests（`PlatformCryptoAvailabilityTests` 1 + `PlatformCryptoParityTests` 3，含参数拒绝），设备与 iOS 各 2 tests；要求非空、0 failures/errors/skips。测试输出平台/provider、输入名称、digest/key hex；设备 serial 由编排方另外记录。JVM 结果仅算 host smoke，Android instrumentation 与 iOS 均通过且对照一致后才满足 T032 完成线。T003 将这两个 JVM suite 接入 `s0EnvironmentSmoke`。
 
-设备端暂不用 `connectedDebugAndroidTest`：它经 AGP 的 UTP 解析 `com.google.testing.platform:android-device-provider-local:0.0.9-alpha04` 等额外依赖，这个 alpha 版本不在已批准的 beta 例外内，且本机 Gradle 下载 dl.google.com 时 TLS 握手被对端终止。改用 `adb shell am instrument` 直接运行同一测试 APK，结果判据（`OK (N tests)`、logcat 中的 provider/key）不变。是否接受 UTP alpha 传递依赖待负责人裁决。
+设备测试一律用 `adb shell am instrument`，不用 `connectedDebugAndroidTest`（负责人 2026-11-04 裁决）。后者经 AGP 的 UTP 解析 `com.google.testing.platform:android-device-provider-local:0.0.9-alpha04` 等额外依赖，不在已批准的 beta 例外内。直接运行同一测试 APK，检查 `OK (N tests)`、0 failures/errors/skips 和 provider/key 文字，不能只看 adb 退出码。
 
 **T032 验证结果（2026-11-04，宿主机）**
 
@@ -183,3 +214,14 @@ xcodebuild -project ios/FineCoach.xcodeproj -scheme FineCoachTests -destination 
 
 三端 NFC UTF-8 SHA-256 均为 `54a7a451447f7eb29db39828e92309c98034dd167261c476c396634f50473b95`。`PBEKeySpec` 在 Android BC 与 JVM SunJCE 下对非 ASCII 口令都按 UTF-8 编码，未启用 `Mac` 自实现备选。
 
+
+**T003 验证结果（2026-11-04，宿主机，Temurin 21.0.13+9 arm64）**
+
+- 依赖解析 `:app:dependencies --configuration debugUnitTestRuntimeClasspath`：退出 0，无 alpha/beta/rc/snapshot 坐标。
+- 定向 `EnvironmentSmokeTests` + `PlatformCryptoAvailabilityTests` + `PlatformCryptoParityTests`：6 tests，0 failures/errors/skipped；环境 API36、JDK21、zh-CN、160 dpi、fontScale 1。
+- 负责人 2026-11-04 亲自运行 record 命令并批准基线 `screenshot-baselines/environment/fixed-geometry.png`（PNG 96×64 RGBA，SHA-256 `255e06205d4180ab6037b8944ce4a029b2256b7f6e6d465b5312ada316e4ba7a`）。
+- 录制前 `s0EnvironmentSmoke`：按预期失败（缺负责人基线，不自动录制）。
+- 录制后 `s0EnvironmentSmoke`：冷启动（`--stop` 后）12 秒、热启动 5 秒，均为 7 tests、0 failures/errors/skips；verify 前后基线 SHA-256 不变，无差异图。
+- `s0EnvironmentSmoke -Proborazzi.test.record=true`：配置阶段拒绝，退出 1，不写基线。
+- G0 `assembleDebug lint`：退出 0。
+- 未验证：基线像素被改动时 verify 能否失败（受控失败样例属于后续 G5 任务）；本 smoke 不是 DS 组件或 G5 验收。
