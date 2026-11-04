@@ -149,3 +149,37 @@ T002 Manifest 仅落地无 `INTERNET` 和 `allowBackup=false`。三段九域 dat
 - 沙箱内首轮（Codex）因依赖下载 TLS 握手失败未能完成，以上为宿主复跑结果。
 - debug merged manifest 中 AndroidX Core 传递引入 `com.ignacioli.finecoach.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`（signature）。未新增源码权限声明，未静默移除库声明；该项纳入 T005 权限/传递依赖白名单审查，当前不宣称空权限集合或完整 G8 PASS。
 - 已知 warning：source set 旧式 `srcDir` API deprecation、native library 无法 strip；不影响本轮结果。
+
+## KDF 一致性证明
+
+T032 / D13 仅证明 NFC → UTF-8 → PBKDF2-HMAC-SHA256 的密钥字节，不实现容器或 AES-GCM。唯一虚构 fixture 为 `shared/test-vectors/s0/crypto/m1a-fr-044__kdf-nfc-equivalence.json`（相对产品根）；NFC/NFD 两种输入共用固定 32 字节 salt、600000 次、32 字节期望 key 及 NFC UTF-8 SHA-256。`when.op = backup-kdf.derive-equivalent` 在本定向测试中映射到 Android `BackupKDF.deriveKey` 和 iOS `BackupPassword(importing:)` + `BackupKDF.deriveKey`；不接入后续 Domain runner。JVM 使用受限的 fixture 字段读取器（ASCII JSON，仅支持 Unicode 字符串转义，重复/缺失字段报错），无新依赖；设备使用 `JSONObject`，iOS 使用 `JSONDecoder`。JVM resources 与 androidTest assets 指向同一共享目录，不复制数据。
+
+沿用上文 JDK/缓存环境。前两条 cwd=`android/`，第三条 cwd=产品根；编排方须设置有效的 iOS destination 和独立 derived-data 路径，Android 仅连接一个指定设备。
+
+```sh
+perl -e 'alarm shift; exec @ARGV' 720 ./gradlew --offline :app:testDebugUnitTest --tests '*PlatformCryptoAvailabilityTests' --tests '*PlatformCryptoParityTests'
+
+export S0_KDF_TEST_CLASS=com.ignacioli.finecoach.PlatformCryptoParityInstrumentedTests
+perl -e 'alarm shift; exec @ARGV' 600 ./gradlew assembleDebug assembleDebugAndroidTest
+adb install -r -t app/build/outputs/apk/debug/app-debug.apk
+adb install -r -t app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+perl -e 'alarm shift; exec @ARGV' 300 adb shell am instrument -w -r -e class "$S0_KDF_TEST_CLASS" com.ignacioli.finecoach.test/androidx.test.runner.AndroidJUnitRunner
+
+xcodebuild -project ios/FineCoach.xcodeproj -scheme FineCoachTests -destination "id=${S0_IOS_DESTINATION_ID:?required}" -derivedDataPath "${S0_IOS_DERIVED_DATA:?required}" -only-testing:FineCoachTests/PlatformCryptoParityTests test
+```
+
+`S0_KDF_TEST_CLASS` 的实际全名为 `com.ignacioli.finecoach.PlatformCryptoParityInstrumentedTests`。JVM 预期 4 tests（`PlatformCryptoAvailabilityTests` 1 + `PlatformCryptoParityTests` 3，含参数拒绝），设备与 iOS 各 2 tests；要求非空、0 failures/errors/skips。测试输出平台/provider、输入名称、digest/key hex；设备 serial 由编排方另外记录。JVM 结果仅算 host smoke，Android instrumentation 与 iOS 均通过且对照一致后才满足 T032 完成线。`s0EnvironmentSmoke` 仍由后续任务接入，本轮不将其改为通过。
+
+设备端暂不用 `connectedDebugAndroidTest`：它经 AGP 的 UTP 解析 `com.google.testing.platform:android-device-provider-local:0.0.9-alpha04` 等额外依赖，这个 alpha 版本不在已批准的 beta 例外内，且本机 Gradle 下载 dl.google.com 时 TLS 握手被对端终止。改用 `adb shell am instrument` 直接运行同一测试 APK，结果判据（`OK (N tests)`、logcat 中的 provider/key）不变。是否接受 UTP alpha 传递依赖待负责人裁决。
+
+**T032 验证结果（2026-11-04，宿主机）**
+
+| 平台 | 结果 | provider | NFC/NFD key |
+|---|---|---|---|
+| JVM，Temurin 21.0.13 | 4 tests，0 failures/errors/skipped | PBKDF2 SunJCE；AES-GCM Conscrypt | `02171f9cb0decb1812ab132a927109f42dfff580ff96bacb0acc3b25adab2fdb` |
+| Android 模拟器 `emulator-5554`，API 36，`google/sdk_gphone64_arm64/emu64a:16/BE2A.250530.026.D1/13818094` | `OK (2 tests)` | BC | 同上 |
+| iOS 模拟器 iPhone 17，iOS 26.5（23F77） | `Executed 2 tests, with 0 failures`，`TEST SUCCEEDED` | CommonCrypto | 同上 |
+| 独立计算：Python `hashlib.pbkdf2_hmac` | NFC、NFD 均一致 | — | 同上 |
+
+三端 NFC UTF-8 SHA-256 均为 `54a7a451447f7eb29db39828e92309c98034dd167261c476c396634f50473b95`。`PBEKeySpec` 在 Android BC 与 JVM SunJCE 下对非 ASCII 口令都按 UTF-8 编码，未启用 `Mac` 自实现备选。
+

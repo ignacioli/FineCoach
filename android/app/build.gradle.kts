@@ -23,6 +23,9 @@ android {
     buildFeatures { compose = true }
     testOptions { unitTests.isIncludeAndroidResources = true }
     sourceSets {
+        getByName("androidTest") {
+            assets.srcDir("../../shared/test-vectors")
+        }
         getByName("test") {
             resources.srcDir("../../shared/test-vectors")
             assets.srcDir("src/test/assets")
