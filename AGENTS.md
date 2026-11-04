@@ -70,7 +70,27 @@ Ask the product owner one targeted question only for a real authority conflict, 
 
 When code is introduced, document the canonical setup, build, test, lint, and formatting commands here. Do not invent commands before the toolchain exists.
 
-Android Gradle build and test commands will be added to this file when S0-02 creates the project.
+Android 命令从 `android/` 运行；先按 `android/README.md` 配置批准的 JDK21、SDK 与缓存，在宿主机运行：
+
+```sh
+./gradlew assembleDebug lint
+./gradlew :app:testDebugUnitTest --tests '*InfrastructureConfigurationTests'
+./gradlew :app:testDebugUnitTest --tests '*EnvironmentSmokeTests' --tests '*PlatformCryptoAvailabilityTests' --tests '*PlatformCryptoParityTests'
+./gradlew :app:s0EnvironmentSmoke
+```
+
+`s0EnvironmentSmoke` 仅 verify；缺负责人 environment 基线、record=true、0 tests 或 skip 均失败。报告在 `app/build/test-results/s0EnvironmentSmoke/`。负责人专用 record 命令见 `android/README.md`，agent 禁止运行。
+
+设备测试一律用 `am instrument`，不用 `connectedDebugAndroidTest`（负责人 2026-11-04 裁决，避免 UTP 未批准 alpha 依赖）。仅连接一个指定设备，记录 serial/API/build、APK digest 与 provider；当前 KDF 流程：
+
+```sh
+./gradlew assembleDebug assembleDebugAndroidTest
+adb install -r -t app/build/outputs/apk/debug/app-debug.apk
+adb install -r -t app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+adb shell am instrument -w -r -e class com.ignacioli.finecoach.PlatformCryptoParityInstrumentedTests com.ignacioli.finecoach.test/androidx.test.runner.AndroidJUnitRunner
+```
+
+检查 instrumentation 文字结果非空、0 failures/errors/skips（当前预期 `OK (2 tests)`），不能只看 adb 退出码。JVM host smoke 不替代设备/provider 证明。
 
 ## Operational constraints
 

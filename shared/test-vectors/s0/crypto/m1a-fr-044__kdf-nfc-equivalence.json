@@ -1,0 +1,34 @@
+{
+  "id": "kdf-nfc-equivalence",
+  "rule": "M1A-FR-044",
+  "meta": {
+    "description": "S0-FR-023: \u865a\u6784 NFC/NFD \u53e3\u4ee4\u7684\u8de8\u5e73\u53f0\u6062\u590d\u5bc6\u94a5\u4e00\u81f4\u6027\u8bc1\u660e (T032 / D13)\u3002",
+    "tags": [
+      "s0",
+      "crypto",
+      "S0-FR-023",
+      "fictional-data"
+    ]
+  },
+  "given": {
+    "clock": {
+      "now": "2031-04-05T18:30:00Z"
+    },
+    "state": {
+      "passwordNFC": "\u865a\u6784\u53e3\u4ee4\u7532\u4e59\u4e19\u4e01Caf\u00e9",
+      "passwordNFD": "\u865a\u6784\u53e3\u4ee4\u7532\u4e59\u4e19\u4e01Cafe\u0301",
+      "saltHex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "iterations": 600000
+    }
+  },
+  "when": {
+    "op": "backup-kdf.derive-equivalent",
+    "args": {}
+  },
+  "then": {
+    "state": {
+      "keyHex": "02171f9cb0decb1812ab132a927109f42dfff580ff96bacb0acc3b25adab2fdb",
+      "passwordNFCUTF8SHA256": "54a7a451447f7eb29db39828e92309c98034dd167261c476c396634f50473b95"
+    }
+  }
+}

@@ -1,0 +1,4 @@
+# Fictional cross-platform KDF test vector (S0-02 T032): derived key and digest
+# of a made-up password, not credentials. Exact fingerprints only.
+shared/test-vectors/s0/crypto/m1a-fr-044__kdf-nfc-equivalence.json:generic-api-key:30
+shared/test-vectors/s0/crypto/m1a-fr-044__kdf-nfc-equivalence.json:generic-api-key:31
