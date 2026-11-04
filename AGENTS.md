@@ -101,11 +101,13 @@ These apply to every coding tool and are not stated in the sections above.
 
 ## Git
 
-- Do not commit unless explicitly requested.
+- Do not commit unless explicitly requested, except under the checkpoint pre-authorization below.
 - Keep commits and pull requests scoped to one concern and reference the relevant decision recorded in this repository.
 - Preserve unrelated and untracked work.
 
 **Protected primary branch.** Do not modify tracked files, stage, or commit on `main` or `master`. The remote `origin` is the public GitHub repository. Do not push, merge into `main`, delete specs files, or rewrite history without product-owner approval. Use the local `main` tip, then create a topic branch (prefer a dedicated git worktree) before changing tracked files. Direct commits to the primary branch are forbidden. Gitignored local state on the primary checkout is allowed.
+
+**Checkpoint pre-authorization (product owner, 2026-11-04).** After a checkpoint's gates are green and an independent review has passed, an agent may commit to its topic branch and merge that branch into the local `main` without asking again. Merging must use `git merge` (no rebase or history rewrite), and the primary checkout must be clean first. Push, pull requests, and merges into the remote stay subject to product-owner approval, batched per milestone. Design decisions, screenshot baselines, dependency or version exceptions, privacy boundaries, and ambiguous consequential behavior still need the product owner.
 
 **Local toolchain bootstrap.** After `git worktree add`, and before using project skills, `.handoff`, or subagents in that worktree, run `scripts/bootstrap-local-worktree.sh` with the worktree as `cwd`. The script links ignored runtime subtrees from the primary checkout and skips missing sources. Do not symlink entire ignored toolchain directories; the script chooses the subtrees. Agents: run `ig-worktree-gate` before tracked-file edits.
 

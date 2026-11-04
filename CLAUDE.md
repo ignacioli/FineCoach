@@ -36,8 +36,9 @@ or Mac target; Mac Catalyst requires a later decision.
 ## Protected primary branch
 
 Do not modify tracked files, stage, or commit on `main` or `master` in
-this repository. The remote `origin` is the public GitHub repository;
-do not push without product-owner approval. Before any
+this repository, except for the local merges allowed by the checkpoint
+pre-authorization in the Git section. The remote `origin` is the public
+GitHub repository; do not push without product-owner approval. Before any
 tracked-file edit, create or switch into a topic branch — prefer a
 dedicated `git worktree` — and run the `ig-worktree-gate` skill before
 editing. Gitignored or untracked local state on the primary checkout is
@@ -226,7 +227,17 @@ let code, doc, and Penpot drift apart.
 
 ## Git
 
-- Do not commit unless explicitly requested.
+- Do not commit unless explicitly requested, except under the
+  checkpoint pre-authorization below.
+- Checkpoint pre-authorization (product owner, 2026-11-04): after a
+  checkpoint's gates are green and an independent review has passed,
+  commit to the topic branch and `git merge` it into the local `main`
+  without asking again. The primary checkout must be clean first; no
+  rebase or history rewrite. Push, pull requests, and remote merges
+  still need product-owner approval, batched per milestone. Design
+  decisions, screenshot baselines, dependency or version exceptions,
+  privacy boundaries, and ambiguous consequential behavior still go to
+  the product owner. After a merge, remove the merged, clean worktree.
 - Keep commits and pull requests scoped to one concern; reference the
   decision in this repository that drives the change.
 - No `Co-Authored-By` or other AI-attribution trailers in any commit
@@ -239,8 +250,9 @@ let code, doc, and Penpot drift apart.
 - For Android slices (ADR-001 Q13), the product owner approves one run
   list at the start of each slice: task, agent, model, worktree, branch.
   Runs on that list do not need repeated approval; runs outside it still
-  require approval first. Commit, merge, and push each still require
-  product-owner approval every time.
+  require approval first. Commits and local merges follow the
+  checkpoint pre-authorization in the Git section; push and remote
+  merges still require product-owner approval.
 - Never call the Agent tool a second time for a task whose subagent has
   not yet finished or been properly resumed. To correct or continue a
   running or completed background agent, use `SendMessage` to its agent
