@@ -6,7 +6,9 @@ import { fileURLToPath } from 'node:url';
 const reports = [
   ['app-buildEnvironment.txt', 'app:classpath'],
   ...['debugAndroidTestRuntimeClasspath', 'debugCompileClasspath', 'debugRuntimeClasspath',
-    'debugUnitTestRuntimeClasspath', 'releaseCompileClasspath', 'releaseRuntimeClasspath']
+    'debugUnitTestRuntimeClasspath', 'releaseCompileClasspath', 'releaseRuntimeClasspath',
+    'kspDebugKotlinProcessorClasspath', 'kspReleaseKotlinProcessorClasspath',
+    'kspDebugUnitTestKotlinProcessorClasspath']
     .map(scope => [`app-${scope}.txt`, `app:${scope}`]),
   ['root-buildEnvironment.txt', 'root:classpath'],
 ];
@@ -54,17 +56,48 @@ function selfTest() {
 
 selfTest();
 if (process.argv[2] !== '--self-test') {
-  assert.equal(process.argv.length, 3, 'Usage: node generate-resolved.mjs <host-report-directory> | --self-test');
+  assert.ok(process.argv.length === 3 || (process.argv.length === 5 && process.argv[3] === '--resolved-report'),
+    'Usage: node generate-resolved.mjs <host-report-directory> [--resolved-report <resolved.txt>] | --self-test');
   const rows = [];
   const counts = {};
+  // A ResolutionResult inventory can supply the existing scopes alongside new
+  // dependency-tree reports. Preserve every row; never reconstruct old graphs.
+  const inventory = new Map();
+  if (process.argv[3] === '--resolved-report') {
+    let scope;
+    for (const line of readFileSync(process.argv[4], 'utf8').split(/\r?\n/).filter(Boolean)) {
+      if (line.startsWith('# scope ')) {
+        scope = line.slice('# scope '.length);
+        assert.ok(reports.some(([, expected]) => expected === scope) && !inventory.has(scope), `Unexpected/duplicate scope: ${scope}`);
+        inventory.set(scope, new Set());
+      } else {
+        const parts = line.split(' ');
+        assert.ok(scope && parts.length === 2 && parts[1] === scope, `Malformed inventory row: ${line}`);
+        assert.equal(selectedCoordinate(`+--- ${parts[0]}`), parts[0]);
+        assert.ok(!inventory.get(scope).has(parts[0]), `Duplicate inventory row: ${line}`);
+        inventory.get(scope).add(parts[0]);
+      }
+    }
+  }
   for (const [filename, scope] of reports) {
-    const text = readFileSync(join(process.argv[2], filename), 'utf8');
-    assert.ok(!/\bFAILED\b|\(n\)/.test(text), `Unresolved report: ${filename}`);
-    const coordinates = new Set(text.split(/\r?\n/).map(selectedCoordinate).filter(Boolean));
-    assert.ok(coordinates.size > 0 || scope === 'app:classpath', `Empty graph: ${scope}`);
+    let coordinates = inventory.get(scope);
+    if (!coordinates) {
+      const text = readFileSync(join(process.argv[2], filename), 'utf8');
+      assert.ok(!/\bFAILED\b|\(n\)/.test(text), `Unresolved report: ${filename}`);
+      coordinates = new Set(text.split(/\r?\n/).map(selectedCoordinate).filter(Boolean));
+      assert.ok(coordinates.size > 0 || /^No dependencies\s*$/m.test(text), `Missing dependency graph: ${filename}`);
+    }
+    assert.ok(coordinates.size > 0 || ['app:classpath', 'app:kspDebugUnitTestKotlinProcessorClasspath'].includes(scope), `Empty graph: ${scope}`);
     counts[scope] = coordinates.size;
     [...coordinates].sort().forEach(coordinate => rows.push(`${coordinate} ${scope}`));
   }
+  const acceptedPrereleases = new Set([
+    'com.android.tools.build.jetifier:jetifier-core:1.0.0-beta10',
+    'com.android.tools.build.jetifier:jetifier-processor:1.0.0-beta10',
+  ]);
+  const unapproved = rows.map(row => row.split(' ')[0]).filter(coordinate =>
+    /alpha|beta|rc|SNAPSHOT/i.test(coordinate.split(':')[2]) && !acceptedPrereleases.has(coordinate));
+  assert.deepEqual([...new Set(unapproved)].sort(), [], 'Unapproved prerelease coordinates; allowlist was not written');
   const output = fileURLToPath(new URL('./resolved.txt', import.meta.url));
   const header = readFileSync(output, 'utf8').split('\n').filter(line => line.startsWith('#')).join('\n');
   writeFileSync(output, `${header}\n${rows.join('\n')}\n`);

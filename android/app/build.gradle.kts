@@ -5,9 +5,11 @@ import com.android.build.api.artifact.SingleArtifact
 import javax.xml.XMLConstants
 import javax.xml.parsers.DocumentBuilderFactory
 import org.w3c.dom.Element
+import org.gradle.process.CommandLineArgumentProvider
 
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.roborazzi)
 }
@@ -42,7 +44,32 @@ android {
 
 kotlin { jvmToolchain(21) }
 
+// The schema is both compiler input (history) and generated output. Keep the
+// directory present on a fresh checkout; JSON contents come only from Room.
+class RoomSchemaArgProvider(
+    @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    val schemaDir: File,
+) : CommandLineArgumentProvider {
+    override fun asArguments(): Iterable<String> = listOf("room.schemaLocation=${schemaDir.path}")
+}
+
+ksp {
+    arg(RoomSchemaArgProvider(layout.projectDirectory.dir("schemas").asFile))
+    arg("room.incremental", "true")
+    arg("room.generateKotlin", "true")
+}
+
+tasks.withType<Test>().configureEach {
+    inputs.dir(layout.projectDirectory.dir("schemas"))
+    systemProperty("finecoach.roomSchemaDirectory", layout.projectDirectory.dir("schemas").asFile.absolutePath)
+    systemProperty("finecoach.storageProjectDirectory", layout.projectDirectory.asFile.absolutePath)
+}
+
 dependencies {
+    implementation(libs.room.runtime)
+    ksp(libs.room.compiler)
+    testImplementation(libs.room.testing)
     implementation(libs.kotlin.stdlib)
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.runtime)
@@ -235,6 +262,9 @@ val privacyDependencyGraph = tasks.register("writePrivacyDependencyGraph") {
             "app:releaseRuntimeClasspath" to configurations.getByName("releaseRuntimeClasspath"),
             "app:debugUnitTestRuntimeClasspath" to configurations.getByName("debugUnitTestRuntimeClasspath"),
             "app:debugAndroidTestRuntimeClasspath" to configurations.getByName("debugAndroidTestRuntimeClasspath"),
+            "app:kspDebugKotlinProcessorClasspath" to configurations.getByName("kspDebugKotlinProcessorClasspath"),
+            "app:kspReleaseKotlinProcessorClasspath" to configurations.getByName("kspReleaseKotlinProcessorClasspath"),
+            "app:kspDebugUnitTestKotlinProcessorClasspath" to configurations.getByName("kspDebugUnitTestKotlinProcessorClasspath"),
             "app:classpath" to buildscript.configurations.getByName("classpath"),
             "root:classpath" to rootProject.buildscript.configurations.getByName("classpath"),
         )
