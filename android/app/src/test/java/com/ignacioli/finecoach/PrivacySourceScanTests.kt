@@ -24,7 +24,7 @@ internal object PrivacySourcePolicy {
 internal object DependencyPolicy {
     val scopes = setOf("app:debugCompileClasspath", "app:debugRuntimeClasspath", "app:releaseCompileClasspath", "app:releaseRuntimeClasspath",
         "app:debugUnitTestRuntimeClasspath", "app:debugAndroidTestRuntimeClasspath", "app:classpath", "root:classpath",
-        "app:kspDebugKotlinProcessorClasspath", "app:kspReleaseKotlinProcessorClasspath", "app:kspDebugUnitTestKotlinProcessorClasspath")
+        "app:kspDebugKotlinProcessorClasspath", "app:kspReleaseKotlinProcessorClasspath", "app:kspDebugUnitTestKotlinProcessorClasspath", "app:kspDebugAndroidTestKotlinProcessorClasspath")
     fun rows(text: String): Set<String> {
         val lines = text.lineSequence().map { it.trim() }.filter { it.isNotEmpty() && !it.startsWith("#") }.toList()
         require(lines.size == lines.toSet().size) { "Duplicate dependency row" }

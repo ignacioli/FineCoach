@@ -47,6 +47,7 @@
 | `com.android.application` → `com.android.tools.build:gradle` | 9.3.1 | Android 构建/lint | plugin | Apache-2.0 | [AGP9.3](https://developer.android.com/build/releases/agp-9-3-0-release-notes) | [官方表](https://developer.android.com/build/releases/agp-9-3-0-release-notes)：API≤37、Build Tools36.0.0、JDK≥17；在KGP完全支持上限内 | 否，Google |
 | `org.jetbrains.kotlin:kotlin-gradle-plugin`（AGP内建 Kotlin 升级；不应用 `org.jetbrains.kotlin.android`） | 2.4.21 | Kotlin 编译 | plugin | Apache-2.0 | [release](https://kotlinlang.org/docs/releases.html)、[内建升级](https://developer.android.com/build/releases/agp-9-0-0-release-notes#upgrade-to-a-higher-kgp-version) | [KGP表](https://kotlinlang.org/docs/gradle-configure-project.html)：Gradle7.6.3～9.7.0，AGP8.5.2～9.3.1 | 是，JetBrains |
 | `org.jetbrains.kotlin:kotlin-stdlib` | 2.4.21 | Kotlin runtime | implementation | Apache-2.0 | [Kotlin 依赖对齐](https://kotlinlang.org/docs/gradle-configure-project.html#dependency-on-the-standard-library) | 与KGP同版；完整resolved graph待核实 | 是，JetBrains |
+| `org.jetbrains.kotlinx:kotlinx-serialization-bom` | 1.8.1 | 对齐 Room 2.8.5 测试依赖与 navigation/lifecycle 的传递版本 | implementation platform | Apache-2.0 | 负责人 2026-11-05 裁决（见 T008 修复轮 2） | **负责人已批准（2026-11-05）**；core/core-jvm/json 对齐，宿主 resolved graph 与设备复跑待核实 | 是，JetBrains |
 | `org.jetbrains.kotlin.plugin.compose` → `org.jetbrains.kotlin:compose-compiler-gradle-plugin` | 2.4.21 | Compose compiler | plugin | Apache-2.0 | [compiler setup](https://developer.android.com/develop/ui/compose/setup-compose-dependencies-and-compiler) | 官方要求与Kotlin同版本；不由Compose BOM管理 | 是，JetBrains |
 | `androidx.compose:compose-bom` | 2026.09.00 | Compose版本约束 | implementation/test platform | Apache-2.0 | [官方POM](https://dl.google.com/dl/android/maven2/androidx/compose/compose-bom/2026.09.00/compose-bom-2026.09.00.pom) | 本轮POM核实下列版本；[BOM说明](https://developer.android.com/develop/ui/compose/bom) | 否，AndroidX |
 | `androidx.compose.runtime:runtime` | 1.12.1 | 状态 runtime | implementation | Apache-2.0 | [release](https://developer.android.com/jetpack/androidx/releases/compose-runtime) | 由上述[BOM POM](https://dl.google.com/dl/android/maven2/androidx/compose/compose-bom/2026.09.00/compose-bom-2026.09.00.pom)约束 | 否，AndroidX |
@@ -57,7 +58,7 @@
 | `com.google.devtools.ksp` → `com.google.devtools.ksp:symbol-processing-gradle-plugin` | 2.3.13 | Room代码生成 | plugin，KSP2 | Apache-2.0 | [release](https://github.com/google/ksp/releases/tag/2.3.13)、[KSP2](https://github.com/google/ksp/blob/2.3.13/docs/ksp2.md) | KSP2不沿用KSP1版本前缀配对；与Kotlin2.4.21/AGP9.3.1/Room2.8.5的精确组合官方矩阵待核实 | 外部工具，Google维护 |
 | `androidx.room:room-runtime` | 2.8.5 | 私有SQLite ORM | implementation，T007 | Apache-2.0 | [release](https://developer.android.com/jetpack/androidx/releases/room) | 官方要求Kotlin≥2.0、建议KSP2，minSdk23≤31；精确KSP组合待核实 | 否，AndroidX |
 | `androidx.room:room-compiler` | 2.8.5 | DAO/schema生成 | ksp，T007 | Apache-2.0 | [release](https://developer.android.com/jetpack/androidx/releases/room) | 与runtime同版，KSP2；生成实跑待后续 | 否，AndroidX |
-| `androidx.room:room-testing` | 2.8.5 | synthetic migration helper | test，T008 | Apache-2.0 | [release](https://developer.android.com/jetpack/androidx/releases/room) | 与runtime/compiler同版；Robolectric集成待后续 | 否，AndroidX |
+| `androidx.room:room-testing` | 2.8.5 | synthetic migration helper | androidTest，T008 | Apache-2.0 | [release](https://developer.android.com/jetpack/androidx/releases/room) | 与runtime/compiler同版；T008 改为 instrumentation，设备运行待宿主验证 | 否，AndroidX |
 | `androidx.navigation:navigation-compose` | 2.10.2 | 单Activity导航壳 | implementation | Apache-2.0 | [release](https://developer.android.com/jetpack/androidx/releases/navigation) | [官方POM](https://dl.google.com/dl/android/maven2/androidx/navigation/navigation-compose/2.10.2/navigation-compose-2.10.2.pom)；与BOM合并后的精确图/AAR约束待核实 | 否，AndroidX |
 | `androidx.activity:activity-compose` | 1.13.0 | Activity/Compose宿主 | implementation | Apache-2.0 | [release](https://developer.android.com/jetpack/androidx/releases/activity) | [官方POM](https://dl.google.com/dl/android/maven2/androidx/activity/activity-compose/1.13.0/activity-compose-1.13.0.pom)；BOM合并图待核实 | 否，AndroidX |
 | `org.robolectric:robolectric` | 4.17 | JVM Android/Compose测试 | test | MIT | [release](https://github.com/robolectric/robolectric/releases/tag/robolectric-4.17)、[setup](https://robolectric.org/getting-started/) | [SDK/provider源码](https://github.com/robolectric/robolectric/blob/robolectric-4.17/robolectric/src/main/java/org/robolectric/plugins/DefaultSdkProvider.java)：API31～37；API36/37需Java21；不是QPR2系统证明 | 是，Robolectric |
@@ -415,3 +416,90 @@ node android/dependency-allowlist/generate-resolved.mjs "$HOME/.cache/finecoach-
 - 字节码显示该重载按 databaseClass qualified name 设置 assetsFolder；`SQLiteDriverMigrationTestHelper.createDatabase/runMigrationsAndValidate` 仍调用父类 `loadSchema`，后者依次尝试 instrumentation context 与 target context 的 `assets.open("<assetsFolder>/<version>.json")`。此 API 不能解决本轮本地 test assets 缺失。
 
 以上仅为缓存 API/字节码核实，未证明 Robolectric helper 运行兼容性。T008 仍需解决 synthetic schema assets 的有效接入；本轮不实现 T008、不改依赖、不引入替代 harness。完整 `s0Room` 与真实 schema 提交仍待后续。
+
+## S0-04 T008：synthetic migration instrumentation
+
+### 1. Robolectric 探测失败，批准改为 instrumentation（2026-11-05）
+
+宿主机运行原 `RoomTestAssetProbeTests`：**1 test、1 failure**。对 `com.ignacioli.finecoach.SyntheticMigrationDatabase/1.json`，`instrumentation.context` 与 `targetContext` 都抛 `FileNotFoundException`，未取得 Robolectric 下 test assets 可读证据。按 plan §3.2 停止后，负责人于 **2026-11-05 批准**将同一迁移框架的两个用例改在宿主机模拟器上用 instrumentation 运行；使用 `adb shell am instrument`，不用 `connectedDebugAndroidTest`。
+
+删除 JVM probe、`src/test/assets/` 的两份手写 synthetic JSON，将 `RoomMigrationHarnessTests` / `SyntheticMigrationDatabase` 移至 `src/androidTest/java/com/ignacioli/finecoach/`。不改 app 数据库、app schema 或 UI；entry/layout map 无新增行。
+
+### 2. serialization AbstractMethodError，批准统一到 1.8.1（2026-11-05）
+
+首轮宿主 `assembleDebug assembleDebugAndroidTest` 通过并生成 synthetic schema，但 QPR2 `am instrument` 为 **Tests run: 2, Failures: 2**，两例均抛 `AbstractMethodError: kotlinx.serialization.internal.GeneratedSerializer.typeParametersSerializers()`。宿主 `dependencyInsight` 确认：navigation 2.10.2、lifecycle 2.11.0 使应用 runtime 经 BOM 选到 serialization core 1.7.3；Room 2.8.5 的 room-migration 带入 json 1.8.1，androidTest consistent resolution 将 core 限在 1.7.3，导致二进制不兼容。
+
+负责人于 **2026-11-05 批准**应用统一升到 kotlinx-serialization **1.8.1**。catalog 显式声明 1.8.1，app 使用 `implementation(platform(libs.kotlinx.serialization.bom))`；只对齐版本，不新增 core/json 功能依赖，不改测试语义、schema 或 UI。后续宿主确认应用 `debugRuntimeClasspath` 的 serialization core 已选到 1.8.1，QPR2 两例通过。
+
+### 3. lint/merge implicit dependency 与修复轮 4（2026-11-05）
+
+随后 lint model 报读取 synthetic schema 缺少 KSP producer 依赖。修复轮 3 尝试通过 `files(schemaDirectory).builtBy(androidTestKspTasks)` 传递依赖；宿主 clean 构建仍失败：`mergeDebugAndroidTestAssets` 读取被 `kspDebugAndroidTestKotlin` 声明为输出的 `app/schemas-synthetic/`，但 AGP 的 `assets.srcDir` 未保留该 producer 依赖。
+
+修复轮 4 按编排方裁决，将 `schemas-synthetic` 改为普通入库源目录：删除 synthetic KSP task 的 `outputs.dir(schemaDirectory)`、`androidTestKspTasks` 集合和 `builtBy` 接线，在 `androidTest` 源集直接使用 `assets.srcDir("schemas-synthetic")`。KSP 仍通过任务级 `commandLineArgumentProviders` 分别写入 `schemas-synthetic/`（`*AndroidTestKotlin`）和 `schemas/`（其余 task）；不添加 merge/lint 的手写 `dependsOn`，不关闭 Gradle 校验。
+
+`room-testing` 使用 `androidTestImplementation`，`kspAndroidTest` 使用现有批准版本的 `room-compiler`。`writePrivacyDependencyGraph`、`generate-resolved.mjs` 与 `DependencyPolicy.scopes` 已同步增加 `app:kspDebugAndroidTestKotlinProcessorClasspath`（共 **12 scopes**），新 processor scope 不允许空图。白名单已从宿主 ResolutionResult 报告全量生成，覆盖 **860 条 scoped 坐标**（报告另含 12 条 scope header，共 872 行）、327 个唯一坐标；serialization selected 版本同步为 1.8.1。保留原来源注释和 3 条已接受预发布注释，没有手工删坐标或新增预发布例外。
+
+生成命令从产品根执行：
+
+```sh
+node android/dependency-allowlist/generate-resolved.mjs android/app/build/reports/s0/privacy --resolved-report android/app/build/reports/s0/privacy/resolved.txt
+```
+
+### 4. 修复轮 4 宿主机 clean 验证结果（2026-11-05）
+
+以下为编排方提供的宿主机及 QPR2 模拟器结果，本次 README 收尾未复跑：
+
+- clean 后 `assembleDebug`、`assembleRelease`、`assembleDebugAndroidTest`、`lint` 全部通过。
+- 应用 APK 中 synthetic schema **0 条**，测试 APK 中 **2 条**。
+- 卸载重装后，QPR2 `am instrument` 为 **`OK (2 tests)`**。
+- `s0Room` **18/18**；全部单元测试 **52 tests，0 failure/skip**；`s0EnvironmentSmoke` 通过。
+- 依赖白名单覆盖 **12 scopes、860 条 scoped 坐标**，精确集合检查通过。
+
+原始日志位于 `.handoff/logs/2026-11-05-host-s0-04-t008-fix4-*`，仅存本机，不入仓。上述结果证明本轮构建、打包隔离和迁移框架验证通过；设备部分是 CP1 的宿主机系统证据，不代表 app 业务库经历过升级。
+
+### Synthetic schema 来源、隔离与已知限制
+
+synthetic schema 由 **Room 2.8.5 compiler 经 KSP 2.3.13 生成**，不沿用手写 bundle 或人工 identityHash。源码只有虚构 `synthetic_probe`：V1 为 `id`、`label`；V2 增加 `fictional_rank INTEGER NOT NULL DEFAULT 7`，与 app 的 `store_metadata` 无关。已生成并作为入库文件保留：
+
+- `app/schemas-synthetic/com.ignacioli.finecoach.SyntheticMigrationDatabaseV1/1.json`
+- `app/schemas-synthetic/com.ignacioli.finecoach.SyntheticMigrationDatabase/2.json`
+
+V1/V2 是同一测试编译内的两个数据库类，Room 按各自 qualified class name 建目录；`v1Helper` 用 V1 assetsFolder 建旧库，`helper` 用 V2 assetsFolder 迁移并校验目标 schema，操作同一个测试数据库文件。不手工复制、改名或合并 compiler export。synthetic Kotlin 与 schema 仅在 androidTest；应用 schema 仍只有 `app/schemas/com.ignacioli.finecoach.storage.FineCoachDatabase/1.json`。
+
+测试使用 `InstrumentationRegistry.getInstrumentation()` 和 `MigrationTestHelper`；每个用例先显式打开 **instrumentation.context（测试 APK）** 内的两份 schema，要求非空，再由 helper 解析 bundle、建库与校验，避免 target APK fallback 掩盖 assets 错误。
+
+**已知限制：**`schemas-synthetic` 没有声明为 KSP 输出，增量构建可能把过期的 JSON 打进测试 APK。schema 有变化时，先 **clean 构建一次**，再审查并提交 JSON 差异，不能只改数据库定义而保留旧 JSON。JSON 过期时，`MigrationTestHelper` 校验会失败，不会悄悄通过。
+
+### 宿主命令与预期
+
+沿用本文批准的 JDK21、SDK、缓存配置，cwd=`android/`。JVM 部分：
+
+```sh
+./gradlew :app:s0Room
+```
+
+预期 **18 tests**：RoomSkeletonTests **5**、StorageValueTests **10**、StoragePrivacyTests **3**。`s0Room` 仍是独立 `Test` task，复用 AGP debug test 的 classpath、编译产物、JDK/JVM 参数、system properties 与 working directory；固定三类，每次执行且不用结果缓存。finalizer 保留拒绝 skip/失败、空 XML/suite、缺失/重复/意外 suite、failure/error/skip 与不一致 testcase 节点的检查。XML：`app/build/test-results/s0Room/`；HTML：`app/build/reports/tests/s0Room/`。
+
+设备部分不建 Gradle gate task。**仅连接一个指定模拟器**，先记录 serial、API、build 与 SQLite provider 信息；按顺序运行：
+
+```sh
+adb devices -l
+adb shell getprop ro.build.version.sdk
+adb shell getprop ro.build.fingerprint
+./gradlew assembleDebug assembleDebugAndroidTest
+shasum -a 256 app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+unzip -l app/build/outputs/apk/debug/app-debug.apk
+unzip -l app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+adb install -r -t app/build/outputs/apk/debug/app-debug.apk
+adb install -r -t app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+adb shell am instrument -w -r -e class com.ignacioli.finecoach.RoomMigrationHarnessTests com.ignacioli.finecoach.test/androidx.test.runner.AndroidJUnitRunner
+```
+
+预期文字结果 **`OK (2 tests)`**、0 failures/errors/skips，输出必须非空；不能只看 adb 退出码。核对测试 APK 内有上述两份 JSON，应用 APK 内无 synthetic schema。helper 使用 Android framework SQLite（`FrameworkSQLiteOpenHelperFactory`）；执行记录保留 APK digest、serial/API/build、provider 与完整 instrumentation 文字结果。
+
+两个用例语义保持：
+
+- helper 创建 V1 并写虚构行 `(41, fictional-comet)`；提供 `Migration(1,2)` 后 `runMigrationsAndValidate(..., 2, true, migration)`，校验 V2 schema 与无额外表，原行保留且 `fictional_rank=7`。
+- 独立 V1 不提供 migration 打开 V2，必须抛明确缺迁移异常；原文件仍在，只读确认 version 1、原行和原两列保留。不启用 destructive fallback。
+
+Room helper 的 assetsFolder 构造函数（deprecated）、`createDatabase`、`runMigrationsAndValidate` 及其优先读取 instrumentation assets 的实现已由缓存 Room 2.8.5 字节码核实；实际编译、KSP 输出、打包与设备执行结果见上文修复轮 4 宿主记录。

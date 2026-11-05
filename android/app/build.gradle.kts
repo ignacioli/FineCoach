@@ -1,3 +1,4 @@
+import com.google.devtools.ksp.gradle.KspAATask
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.artifacts.result.UnresolvedDependencyResult
 import com.android.build.gradle.tasks.MergeResources
@@ -34,10 +35,10 @@ android {
     sourceSets {
         getByName("androidTest") {
             assets.srcDir("../../shared/test-vectors")
+            assets.srcDir("schemas-synthetic")
         }
         getByName("test") {
             resources.srcDir("../../shared/test-vectors")
-            assets.srcDir("src/test/assets")
         }
     }
 }
@@ -55,9 +56,17 @@ class RoomSchemaArgProvider(
 }
 
 ksp {
-    arg(RoomSchemaArgProvider(layout.projectDirectory.dir("schemas").asFile))
     arg("room.incremental", "true")
     arg("room.generateKotlin", "true")
+}
+
+// KSP 2.3.13 exposes task-local argument providers. Never inherit the app
+// schema location in the instrumentation compilation.
+tasks.withType<KspAATask>().configureEach {
+    val schemaDirectory = layout.projectDirectory.dir(
+        if (name.endsWith("AndroidTestKotlin")) "schemas-synthetic" else "schemas",
+    )
+    commandLineArgumentProviders.add(RoomSchemaArgProvider(schemaDirectory.asFile))
 }
 
 tasks.withType<Test>().configureEach {
@@ -69,8 +78,10 @@ tasks.withType<Test>().configureEach {
 dependencies {
     implementation(libs.room.runtime)
     ksp(libs.room.compiler)
-    testImplementation(libs.room.testing)
+    androidTestImplementation(libs.room.testing)
+    add("kspAndroidTest", libs.room.compiler)
     implementation(libs.kotlin.stdlib)
+    implementation(platform(libs.kotlinx.serialization.bom))
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.runtime)
     implementation(libs.compose.ui)
@@ -212,6 +223,76 @@ val validateEnvironmentSmoke = tasks.register("validateS0EnvironmentSmokeResults
 }
 environmentSmoke.configure { finalizedBy(validateEnvironmentSmoke) }
 
+val roomClasses = listOf(
+    "com.ignacioli.finecoach.RoomSkeletonTests",
+    "com.ignacioli.finecoach.StorageValueTests",
+    "com.ignacioli.finecoach.StoragePrivacyTests",
+)
+val roomGate = tasks.register<Test>("s0Room") {
+    group = "verification"
+    description = "Room skeleton and storage values/privacy (JVM only)"
+    val debugTest = tasks.named<Test>("testDebugUnitTest").get()
+    testClassesDirs = debugTest.testClassesDirs
+    classpath = debugTest.classpath
+    javaLauncher.set(debugTest.javaLauncher)
+    setJvmArgs(debugTest.jvmArgs)
+    jvmArgumentProviders.addAll(debugTest.jvmArgumentProviders)
+    systemProperties(debugTest.systemProperties)
+    workingDir = debugTest.workingDir
+    filter {
+        setIncludePatterns(*roomClasses.toTypedArray())
+        isFailOnNoMatchingTests = true
+    }
+    failOnNoDiscoveredTests.set(true)
+    reports.junitXml.required.set(true)
+    reports.junitXml.outputLocation.set(layout.buildDirectory.dir("test-results/s0Room"))
+    reports.html.outputLocation.set(layout.buildDirectory.dir("reports/tests/s0Room"))
+    binaryResultsDirectory.set(layout.buildDirectory.dir("test-results/s0Room/binary"))
+    outputs.upToDateWhen { false }
+    outputs.doNotCacheIf("Room evidence must execute on this host") { true }
+}
+
+val validateRoomGate = tasks.register("validateS0RoomResults") {
+    doLast {
+        val gate = roomGate.get()
+        check(!gate.state.skipped && gate.state.failure == null) {
+            "s0Room did not successfully execute: ${gate.state.skipMessage ?: gate.state.failure}"
+        }
+        val xmlFiles = gate.reports.junitXml.outputLocation.get().asFile
+            .listFiles { file -> file.name.startsWith("TEST-") && file.extension == "xml" }
+            .orEmpty()
+        check(xmlFiles.isNotEmpty()) { "s0Room has no JUnit XML" }
+        val factory = DocumentBuilderFactory.newInstance().apply {
+            setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
+            setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+            setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "")
+            setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "")
+        }
+        val counts = mutableMapOf<String, Int>()
+        for (xml in xmlFiles) {
+            val suite = factory.newDocumentBuilder().parse(xml).documentElement
+            val name = suite.getAttribute("name")
+            check(name in roomClasses) { "Unexpected Room suite: $name" }
+            val cases = suite.getElementsByTagName("testcase")
+            val count = suite.getAttribute("tests").toInt()
+            check(count > 0 && count == cases.length) { "Empty/inconsistent suite: $name" }
+            for (attribute in listOf("failures", "errors", "skipped")) {
+                check(suite.getAttribute(attribute).toInt() == 0) { "$name has $attribute" }
+            }
+            for (index in 0 until cases.length) {
+                val case = cases.item(index) as Element
+                check(listOf("skipped", "failure", "error").all {
+                    case.getElementsByTagName(it).length == 0
+                }) { "Unsuccessful testcase: $name.${case.getAttribute("name")}" }
+            }
+            check(counts.put(name, count) == null) { "Duplicate suite: $name" }
+        }
+        check(counts.keys == roomClasses.toSet()) { "Missing Room suites: ${roomClasses - counts.keys}" }
+        logger.lifecycle("s0Room: ${counts.values.sum()} tests, 0 failures/errors/skips; $counts")
+    }
+}
+roomGate.configure { finalizedBy(validateRoomGate) }
+
 androidComponents {
     onVariants(selector().withBuildType("debug")) { variant ->
         val mergedManifest = variant.artifacts.get(SingleArtifact.MERGED_MANIFEST)
@@ -265,6 +346,7 @@ val privacyDependencyGraph = tasks.register("writePrivacyDependencyGraph") {
             "app:kspDebugKotlinProcessorClasspath" to configurations.getByName("kspDebugKotlinProcessorClasspath"),
             "app:kspReleaseKotlinProcessorClasspath" to configurations.getByName("kspReleaseKotlinProcessorClasspath"),
             "app:kspDebugUnitTestKotlinProcessorClasspath" to configurations.getByName("kspDebugUnitTestKotlinProcessorClasspath"),
+            "app:kspDebugAndroidTestKotlinProcessorClasspath" to configurations.getByName("kspDebugAndroidTestKotlinProcessorClasspath"),
             "app:classpath" to buildscript.configurations.getByName("classpath"),
             "root:classpath" to rootProject.buildscript.configurations.getByName("classpath"),
         )
@@ -310,7 +392,6 @@ val pendingGates = mapOf(
     "s0G5" to "T019/T020: screenshot verify and owner-approved baselines",
     "s0G6" to "T022-T024: shared vectors",
     "s0G8" to "T004-T010: complete privacy and scope checks",
-    "s0Room" to "T007/T008: Room skeleton and migration harness",
     "s0SeedIsolation" to "T025: release seed isolation",
     "s0InstallSeededDebug" to "T026: explicit device install and seed verification",
     "generateDesignTokens" to "T013: design token generator",
