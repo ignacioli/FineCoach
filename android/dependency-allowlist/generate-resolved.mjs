@@ -8,7 +8,7 @@ const reports = [
   ...['debugAndroidTestRuntimeClasspath', 'debugCompileClasspath', 'debugRuntimeClasspath',
     'debugUnitTestRuntimeClasspath', 'releaseCompileClasspath', 'releaseRuntimeClasspath',
     'kspDebugKotlinProcessorClasspath', 'kspReleaseKotlinProcessorClasspath',
-    'kspDebugUnitTestKotlinProcessorClasspath']
+    'kspDebugUnitTestKotlinProcessorClasspath', 'kspDebugAndroidTestKotlinProcessorClasspath']
     .map(scope => [`app-${scope}.txt`, `app:${scope}`]),
   ['root-buildEnvironment.txt', 'root:classpath'],
 ];
