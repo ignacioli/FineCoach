@@ -363,6 +363,13 @@ val privacyDependencyGraph = tasks.register("writePrivacyDependencyGraph") {
     }
 }
 androidComponents {
+    onVariants(selector().withBuildType("debug")) { variant ->
+        val apk = variant.artifacts.get(SingleArtifact.APK)
+        tasks.withType<Test>().matching { it.name == "testDebugUnitTest" }.configureEach {
+            inputs.dir(apk)
+            systemProperty("finecoach.debugApk", apk.get().asFile.absolutePath)
+        }
+    }
     onVariants(selector().withBuildType("release")) { variant ->
         val apk = variant.artifacts.get(SingleArtifact.APK)
         tasks.withType<Test>().matching { it.name == "testDebugUnitTest" || it.name == "testReleaseUnitTest" }.configureEach {
@@ -376,6 +383,9 @@ tasks.withType<Test>().matching { it.name == "testDebugUnitTest" || it.name == "
     inputs.file(privacyDependencyReport)
     inputs.file(rootProject.layout.projectDirectory.file("dependency-allowlist/resolved.txt"))
     inputs.dir(layout.projectDirectory.dir("src/main"))
+    inputs.dir(rootProject.layout.projectDirectory.dir("../shared"))
+    inputs.dir(layout.projectDirectory.dir("schemas-synthetic"))
+    inputs.files(fileTree("src") { include("**/resources/**", "**/assets/**", "**/seeds/**", "**/fixtures/**") })
     inputs.files(fileTree("src") { include("debug/**/*.kt", "debug/**/*.java", "release/**/*.kt", "release/**/*.java") })
     systemProperty("finecoach.sourceRoot", layout.projectDirectory.dir("src").asFile.absolutePath)
     systemProperty("finecoach.dependencies", privacyDependencyReport.get().asFile.absolutePath)

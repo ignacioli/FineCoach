@@ -503,3 +503,122 @@ adb shell am instrument -w -r -e class com.ignacioli.finecoach.RoomMigrationHarn
 - 独立 V1 不提供 migration 打开 V2，必须抛明确缺迁移异常；原文件仍在，只读确认 version 1、原行和原两列保留。不启用 destructive fallback。
 
 Room helper 的 assetsFolder 构造函数（deprecated）、`createDatabase`、`runMigrationsAndValidate` 及其优先读取 instrumentation assets 的实现已由缓存 Room 2.8.5 字节码核实；实际编译、KSP 输出、打包与设备执行结果见上文修复轮 4 宿主记录。
+
+## S0-07 T009：后台遮挡与范围边界（待宿主验证）
+
+### 实现与边界
+
+基点 `c7ba2a0`，分支 `feat/android-s0-infrastructure`。本轮仅 T009，不执行 T010，不改规格复选框、不 commit。新增 `PrivacyCoverPolicy`，由 `MainActivity` 的 `onCreate/onPause/onResume/onDestroy` 驱动：
+
+- API 33+：`onCreate` 调用 `Activity.setRecentsScreenshotEnabled(false)`。不添加应用内遮罩；该接口只限制最近任务表现，不禁止普通截屏，见 [Activity API](https://developer.android.com/reference/android/app/Activity#setRecentsScreenshotEnabled(boolean))。
+- API 31/32：`onPause` 在每个已登记窗口的 `decorView` 最上层同步添加不透明、可拦截触摸的全窗口 `FrameLayout`；尺寸 `MATCH_PARENT`，当下按 decor 尺寸 measure/layout，随后正常布局继续维护尺寸。背景取现有 `android.R.attr.colorBackground`，无新 token。`onResume` 移除；`onDestroy` 解除登记并清理。重复登记/暂停不叠加，暂停期间新登记的窗口立即遮挡。
+- 弹层是独立窗口，Activity 遮罩不能跨窗口覆盖。debug Compose `Dialog` 从 `LocalView.current.parent as DialogWindowProvider` 获取公开 `window`，在 `DisposableEffect` 登记/解除；窗口本身各有遮罩，Activity 同时遮挡。依据 [DialogWindowProvider](https://developer.android.com/reference/kotlin/androidx/compose/ui/window/package-summary)。**后续任何独立窗口 Dialog/BottomSheet 都必须在显示前接入同一 registerWindow/unregisterWindow 协议**；同窗口 sheet 由 Activity decor 遮罩覆盖。本轮没有 BottomSheet 依赖或实现，不声称已验证未来弹层，也不使用隐藏 WindowManager API 遍历窗口。系统文件选择器不属于本轮壳。
+- 不设置 `FLAG_SECURE`。JVM 检查源码、两种 merged manifest 和实际 Activity flags；它们不证明系统缩略图、普通截屏或 OEM 时序。同步 View 添加是否赶在系统 snapshot 前，必须由 T010 分 API 验证；暴露即 FAIL，不以 JVM green 抵消。
+
+main manifest 未改；debug manifest 仅新增 `.S0DebugApplication`，它实现 main 的 `ShellContentProvider`，通过现有 MainActivity 内容入口显示样例。release 使用默认 Application，保留原空壳，无新 Activity/intent-filter/权限，不改备份规则。release APK DEX 与 manifest 有样例隔离断言。app Gradle 仅新增 debug APK artifact 输入，以及 shared/fixture/schema 扫描输入，不新增依赖、版本、测试 gate 或白名单例外。
+
+### 样例 anatomy、testTag 与 entry/layout map
+
+这是 T009 明确授权的临时基础设施样例，非正式 Feature UI / catalog。沿用已有全屏壳，补登记测试 anatomy（C：批准测试样例的文字化记录）；不改变正式设计系统。结构：壳 Column → 固定虚构 sentinel → 打开弹层 → probe → 计数；独立 Dialog Column → sentinel → probe → 计数 → 关闭。初始弹层关闭、共享内存计数 **0**；probe 每点一次 +1，恢复后第一次为 **1**；不读写数据库、文件、SavedState 或业务数据。返回/关闭弹层不重置计数，重新创建 Activity 归零。普通壳和弹层的 probe 共享同一计数。
+
+| testTag | 元素 / 初始值 |
+|---|---|
+| `s0-privacy-shell` | 全屏壳容器 |
+| `s0-shell-sentinel` | `S0SENTINEL-recents` |
+| `s0-open-dialog` | 可见按钮「打开虚构弹层」；弹层初始关闭 |
+| `s0-probe` | 可见按钮「交互探针 +1」 |
+| `s0-probe-count` | `计数：0` |
+| `s0-privacy-dialog` | 弹层容器；初始不存在 |
+| `s0-dialog-sentinel` | `S0SENTINEL-recents-dialog` |
+| `s0-dialog-probe` | 弹层可见按钮「交互探针 +1」 |
+| `s0-dialog-probe-count` | 打开时 `计数：0`（未点 probe 的情况下） |
+| `s0-close-dialog` | 可见按钮「关闭弹层」 |
+| 各按钮 tag + `-label` | 按钮内文字，非额外交互入口 |
+
+Native 遮罩使用 View tag `s0-privacy-cover`，不是 Compose testTag，不是前台控制。所有样例交互来自 `src/debug/java/com/ignacioli/finecoach/S0DebugApplication.kt` 的 `PrivacySample/SampleButton`。root semantics 开启 `testTagsAsResourceId`，便于宿主在 UI hierarchy 文字中定位；不使用坐标猜测或长按入口。
+
+| 屏幕 → 可见控件 → testTag | 是否改数据 | 宽度由谁撑满 |
+|---|---|---|
+| debug 壳 → 打开虚构弹层 → `s0-open-dialog` | 仅内存弹层状态 | 壳 Column 撑满屏幕安全区；SampleButton `fillMaxWidth` 撑满其 padding 后内容区 |
+| debug 壳 → 交互探针 +1 → `s0-probe` | 仅内存计数；无持久化 | 同上 |
+| debug 弹层 → 交互探针 +1 → `s0-dialog-probe` | 同一内存计数；无持久化 | Dialog 默认平台宽度；Column `fillMaxWidth`，SampleButton 撑满 padding 后内容区 |
+| debug 弹层 → 关闭弹层 → `s0-close-dialog` | 仅内存弹层状态 | 同上 |
+
+样例触控高度至少 48dp，文字采用 Compose BasicText 默认排版和主题文字色，不引入 DS token。各按钮的宽度与同容器 sentinel 内容宽度相等，有 Compose 断言。
+
+五行执行记录：
+
+1. 分类与依据：C，补齐 T009 已批准测试壳的 anatomy 与 map；正式设计不变，来源 tasks T009、plan §5.1；不是 S0-08 组件设计审批。
+2. 范围：PrivacyCoverPolicy（main 私有策略）、debug 专用样例，复用壳与平台背景；没有新增正式 DS 组件或 Feature 页面。
+3. 设计决定：沿用本任务批准的默认背景、固定虚构 sentinel、可见 probe；正式 token/catalog 仍留 S0-05/S0-08，不回写 design/Penpot。
+4. 实现与检查：生命周期/原生层级、真实 API 调用 shadow、弹层恢复与交互/宽度断言、数据/范围负例；map 见上。无截图查看或 baseline 修改。
+5. 结果：2026-11-05 宿主机 `assembleDebug`、`assembleRelease`、`assembleDebugAndroidTest`、`lint` 通过；`:app:testDebugUnitTest --rerun-tasks` 共 **85 例，0 failure/error/skip**，其中 PrivacyCoverTests 11、FictionalDataPolicyTests 10、ScopeBoundaryTests 12；`s0Room` **18/18**；`s0EnvironmentSmoke` 通过，日志 `.handoff/logs/2026-11-05-host-s0-07-t009-unit.log`。Robolectric 4.17 运行时所需 SDK jar（android-all-instrumented `12-robolectric-7732740-i7`、`12.1-robolectric-8229987-i7`、`13-robolectric-9030017-i7`）在宿主机按 Maven Central 的 sha512 与 sha1 核对后放入 `~/.m2`；首次失败是 Maven Central 对宿主 IP 限流（HTTP 429），不是代码问题。此前缓存 Kotlin 2.4.21 + 对应 Compose compiler、JDK21、SDK37 `android.jar` 的定向源码编译退出 0（缓存 classpath，非 Gradle resolved classpath 验证），保留 Compose v1 test rule 与 Drawable opacity 两个 deprecated 警告。T010（API 31/32/33+ 系统缩略图）仍 **PENDING**；JVM 测试不证明系统缩略图；未视觉验证，未完成 CP1。
+
+### 已知残留
+
+- API 31/32 分屏失焦也走 `onPause`，会遮住仍可见的窗口，属于按规格行为。
+- 未调用 `registerWindow` 的独立窗口不会被遮。
+- pause 期间关闭 Dialog 的路径没有专门测试。
+
+### 三个测试类与宿主命令
+
+沿用本文批准 JDK21/SDK/cache，cwd=`android/`，由编排方在宿主机运行：
+
+```sh
+./gradlew assembleDebug assembleRelease lint
+./gradlew :app:testDebugUnitTest --tests '*PrivacyCoverTests' --tests '*FictionalDataPolicyTests' --tests '*ScopeBoundaryTests' --rerun-tasks
+```
+
+预期 **33 tests，0 failures/errors/skips**，JUnit XML 必须非空，核对实际 testcase 数；报告 `app/build/test-results/testDebugUnitTest/`，HTML `app/build/reports/tests/testDebugUnitTest/`。这只是 targeted，不是完整 G8 或 T010 PASS。使用现有 merged-manifest/resource/APK artifact 接线；缺产物/缺目录必须失败，不能 fallback 跳过。单元测试源码按 compileSdk **android.jar** 编译，Robolectric android-all 只用于执行，不作为编译 API 替身。
+
+- `PrivacyCoverTests`：**8 方法 / 11 executions**。33+ 真实 Activity API 被调用一次且参数 false；31/32 均不调用（2）；31/32 pause 壳顶层全尺寸不透明 cover、resume 移除并 probe 0→1（2）；31/32 独立 Dialog 与壳同时覆盖、恢复后弹层 probe 可点且关闭可达（2）；31 暂停后新登记窗口立即覆盖、重复登记不叠加、注销/销毁清理；可见入口和宽度；生产源码与 debug/release merged manifest 无 secure 标志及窗口 flag 检查；release APK/manifest 无 debug 壳与 sentinel。API call 用 `ShadowActivity` 子类观察，未用测试替身替代策略。
+- `FictionalDataPolicyTests`：**10 方法**。当前/未来 fixture 与 inline seed 发现及声明；shared 全部向量与其余 fixture；debug 固定 sentinel；打包 debug DEX sentinel 与 assets/raw 数据；synthetic schema 仅结构；拒绝无声明/变更旧 fixture；拒绝向量缺 tag；拒绝 sentinel/敏感形状文件名与非保留域联系信息；拒绝 sentinel 漂移/声明缺失；临时新增 seed 目录自动纳入。现有 5 个 policy API 片段 fixture 用完整 SHA-256 登记为无人物数据的虚构负例，变更后必须重新声明。新数据文件内含 `fictional-data` 声明，二进制 fixture 用同目录 `fictional-data.txt`；向量要求 `meta.tags` 含 `fictional-data`。扫描是机械声明/命名/固定内容检查，不能证明现实来源，负责人仍须声明来源，独立复核仍待执行。
+- `ScopeBoundaryTests`：**12 方法**。生产 source set 与 merged resources；两种 merged manifest；拒绝静态 shortcut XML；拒绝空 shortcuts.xml；拒绝动态（含 Compat/alias）注册；拒绝 pinned 注册；拒绝 shortcut metadata；拒绝专属 intent-filter；拒绝 Assistant/App Actions source/metadata；拒绝 S1～S5 literal/间接/typed 路由；拒绝通知/小组件/容器 codec/分享/业务入口；允许通用 DS 演示文字。产品 route 当前只允许 `placeholder`；未来获批 S0 catalog 路由须在对应任务明确登记，不凭名称推断业务获批。系统 filter 仅 launcher 与已存在 ProfileInstaller 操作；component/权限仍复用 CapabilityPolicy 精确集合。所有禁止项均有受控负例。
+
+源码策略覆盖当前 Kotlin/Java/XML 注册方式，不能推断任意混淆、反射或语义等价实现；后续新增实现必须扩展相应受控负例，不能把扫描当作完整安全证明。当前未实现 seed 数据清单；未来 assets/resources/fixture/seed 目录会自动发现，inline seed 代码必须带虚构声明，不代表批准新增 S1 业务种子。
+
+### T010：宿主 API 31 / 32 / 33+ 操作与文字证据（本轮不执行）
+
+每个 API 单独执行，普通壳/弹层都做。宿主先核实唯一指定设备及准确输入，未填即 BLOCKED；以下变量由宿主设置，不是已有环境事实：`S0_ANDROID_SERIAL`、`S0_ANDROID_APK`、`S0_ANDROID_PACKAGE`（核实为 `com.ignacioli.finecoach`）、`S0_ANDROID_COMPONENT`（核实为 `com.ignacioli.finecoach/.MainActivity`）、`S0_HOST_EVIDENCE`（独立且已存在的本机证据目录）。只对虚构 debug 包操作。
+
+```sh
+adb version
+adb devices -l
+adb -s "$S0_ANDROID_SERIAL" shell getprop ro.build.version.sdk
+adb -s "$S0_ANDROID_SERIAL" shell getprop ro.build.fingerprint
+shasum -a 256 "$S0_ANDROID_APK"
+adb -s "$S0_ANDROID_SERIAL" install -r "$S0_ANDROID_APK"
+adb -s "$S0_ANDROID_SERIAL" shell am start -W -n "$S0_ANDROID_COMPONENT"
+```
+
+记录 HEAD 与本轮 diff（未 commit，HEAD 本身不足以标识 APK）、APK 路径/SHA-256、serial/API/build、applicationId、component、工具版本、证据目录、完整命令、每条退出码和操作顺序。安装须 `Success`、启动须 `Status: ok`。图像仅负责人查看，agent 只读取文字判定。
+
+1. **普通壳**：新 Activity 会话确认 `s0-probe-count=计数：0`、普通 sentinel 可见。执行下面 HOME→最近任务序列，由负责人查看实际卡片；不能只凭截图文件存在判断遮挡。
+2. **恢复**：负责人点击该最近任务卡片。确认遮罩移除，点击 `s0-probe` 一次，文字结果 0→1；记录 `coverRemoved=true`、`probeBefore=0/probeAfter=1`。再做一次 HOME→最近任务→卡片恢复，确认仍无 sentinel 暴露。
+3. **弹层**：先结束并重新启动这个仅虚构样例的 Activity 会话（不 clear 数据），确认计数 0；点击可见 `s0-open-dialog`，确认弹层 sentinel 可见。执行同一 HOME→最近任务→卡片恢复；确认两层均无 sentinel 暴露、恢复后弹层仍在，点击 `s0-dialog-probe` 一次见 0→1，再点 `s0-close-dialog` 关闭并确认壳显示 1。重复一次最近任务序列。需要独立新会话时用下面 force-stop，仅限本轮 debug 样例，记录实际执行。
+
+```sh
+adb -s "$S0_ANDROID_SERIAL" shell input keyevent KEYCODE_HOME
+adb -s "$S0_ANDROID_SERIAL" shell input keyevent KEYCODE_APP_SWITCH
+# Owner opens the actual card to resume; no guessed tap coordinates.
+# Optional isolated sample restart before the dialog sequence:
+adb -s "$S0_ANDROID_SERIAL" shell am force-stop "$S0_ANDROID_PACKAGE"
+adb -s "$S0_ANDROID_SERIAL" shell am start -W -n "$S0_ANDROID_COMPONENT"
+```
+
+可用以下命令留可交互文字证据（每步保留各自输出，probe 前后不能只记最终值）：
+
+```sh
+adb -s "$S0_ANDROID_SERIAL" shell uiautomator dump /data/local/tmp/s0-privacy-window.xml
+adb -s "$S0_ANDROID_SERIAL" shell cat /data/local/tmp/s0-privacy-window.xml
+```
+
+4. **前台截屏**：每个 API 在前台普通壳和弹层状态分别保存一张 PNG（下面 `foreground.png` 替换为各状态独立文件名，不以 sentinel/人员名命名）。保留退出码、非空文件、PNG 签名及负责人正常内容判定。可以另存最近任务图片作为负责人证据，但 agent 不打开图片。
+
+```sh
+adb -s "$S0_ANDROID_SERIAL" exec-out screencap -p > "$S0_HOST_EVIDENCE/foreground.png"
+test -s "$S0_HOST_EVIDENCE/foreground.png"
+od -An -tx1 -N8 "$S0_HOST_EVIDENCE/foreground.png"
+```
+
+预期签名 `89 50 4e 47 0d 0a 1a 0a`。每个 API/状态记录：FR-070（33+）或 FR-071（31/32）的 `sentinelVisible=false`、恢复的 `coverRemoved=true`/probe 前后值，FR-072 的 `foregroundCaptureNormal=true`，证据文件名、负责人/时间。sentinel 暴露、遮罩残留/点击无效或前台截屏遮黑/失败记 FAIL；设备/卡片/有效图片/负责人文字判定缺失记 BLOCKED。JVM 测试不替代这些结果；同一问题两次失败停止并保留失败证据。本轮 T010 全部仍 PENDING。
