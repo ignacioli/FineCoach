@@ -20,6 +20,8 @@ internal object CapabilityPolicy {
             "activity" to "com.ignacioli.finecoach.MainActivity",
             "receiver" to "androidx.profileinstaller.ProfileInstallReceiver",
             "provider" to "androidx.startup.InitializationProvider",
+            // Library entry contributed by room-runtime 2.8.5 in both variants.
+            "service" to "androidx.room.MultiInstanceInvalidationService",
         ) + if (variant == "debug") setOf("activity" to "androidx.activity.ComponentActivity") else emptySet()
         require(components.size == expectedComponents.size &&
             components.map { it.tagName to it.attr("name") }.toSet() == expectedComponents)
@@ -37,6 +39,9 @@ internal object CapabilityPolicy {
         require(MergedPrivacyInputs.children(filters.single()).map { it.tagName to it.attr("name") }.toSet() == setOf(
             "action" to "android.intent.action.MAIN", "category" to "android.intent.category.LAUNCHER"))
         require(components.filter { it !== launcher && it !== receiver }.all { it.attr("exported") == "false" })
+        val roomService = components.single { it.tagName == "service" && it.attr("name") == "androidx.room.MultiInstanceInvalidationService" }
+        require(roomService.attr("exported") == "false") { "Room invalidation service must not be exported" }
+        require(MergedPrivacyInputs.children(roomService).none { it.tagName == "intent-filter" }) { "Room invalidation service must not have intent filters" }
     }
 }
 
@@ -71,6 +76,15 @@ class CapabilityManifestTests {
         (manifest.getElementsByTagName("permission").item(0) as Element)
             .setAttributeNS(MergedPrivacyInputs.ANDROID, "android:protectionLevel", "normal")
         assertThrows(IllegalArgumentException::class.java) { CapabilityPolicy.validate(manifest, "debug") }
+    }
+    @Test fun rejectsExportedRoomInvalidationServiceFixture() {
+        for (variant in MergedPrivacyInputs.variants) {
+            val manifest = MergedPrivacyInputs.manifest(variant)
+            val service = MergedPrivacyInputs.children(manifest.getElementsByTagName("application").item(0) as Element)
+                .single { it.tagName == "service" && it.getAttributeNS(MergedPrivacyInputs.ANDROID, "name") == "androidx.room.MultiInstanceInvalidationService" }
+            service.setAttributeNS(MergedPrivacyInputs.ANDROID, "android:exported", "true")
+            assertThrows(IllegalArgumentException::class.java) { CapabilityPolicy.validate(manifest, variant) }
+        }
     }
     @Test fun rejectsProfileReceiverWithoutDumpPermissionFixture() {
         for (value in listOf("", "android.permission.INTERNET")) {

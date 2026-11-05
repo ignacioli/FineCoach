@@ -344,3 +344,74 @@ node android/dependency-allowlist/generate-resolved.mjs "$HOME/.cache/finecoach-
 - **cross-platform-transfer(platform=ios) 无 params 分支：FAIL**。系统解析了该段，但因缺少 params 计为 0 个已配置平台，规则未被实际接受；结果上没有传输任何数据。
 - **第二分支：BLOCKED（等待 D10）**。需要负责人提供并批准 bundleId、teamId、contentVersion。
 - **资源处理**：按 §5.1，不删段，也不放宽备份；产品资源本轮不改。
+
+## S0-04 T007：Room 私有库骨架（待宿主验证）
+
+修复轮 2（编排方 2026-11-04 裁决）：`room-runtime 2.8.5` 库 manifest 为 debug/release 合并产物加入 `androidx.room.MultiInstanceInvalidationService`；`CapabilityManifestTests` 将其纳入预期组件集合，保留除启动 Activity 与 DUMP receiver 外全部 `exported=false` 的约束，并显式要求该 service `exported="false"` 且无 `intent-filter`，沿用 fixture 机制新增其 `exported=true` 拒绝负例（覆盖两种 variant）。不修改 manifest 或备份规则；预期该测试类 **8 tests**、全部单元测试 **52 tests**（宿主原 51 + 新增 1），本轮未运行 Gradle，待宿主验证。
+
+负责人 2026-11-04 批准唯一真实实体 `store_metadata`：`key TEXT PRIMARY KEY NOT NULL`、`value TEXT NOT NULL`，无业务列。`FineCoachDatabase` 从 **version 1** 开始，`exportSchema=true`。Room schema version 与 Core Data V1～V6、FCBK/FCPA container/payload version **独立**，互相不映射。依据：ADR-001 §3、§5；S0 spec FR-040～042、FR-121。
+
+`FineCoachDatabaseFactory.create(context)` 通过 application context 的 `getDatabasePath("finecoach.db")` 建 CE 私有磁盘库，拒绝 device-protected context。首次实际打开时，Room `onCreate` 在建库事务中插入 `created_at`，值为 `Instant.now().toString()` canonical UTC 字符串；关闭重开不重写。工厂不自动接入 app shell；调用者负责 off-main 执行同步 DAO 与关闭库。DAO 只有按 key 查询和冲突 ABORT 的插入，不用 replace 覆盖。version 1 尚无升级路径，保留 Room 默认缺迁移拒绝；不注册破坏性回退、预装库、自定义 open helper 或主线程查询豁免。
+
+### 字段策略与延期边界
+
+下列章节均指 [`contracts/payload-schema.md`](../../specs/007-android-port/contracts/payload-schema.md)。`StorageValueConverters` 仅独立测试，**不**注册在数据库或实体上；真实实体两列均为 String。私有表示不是 wire codec，后续实体和 codec 按所属切片实施。
+
+| 类型 / 关系 | 本轮私有值策略 | 契约依据与后续边界 |
+|---|---|---|
+| 稳定 UUID / 关系 | `UUID` 输出小写 canonical；读取只接受完整分组形式，接受大小写。关系按稳定 ID 显式表达，不依赖行号；本轮没有关系表 | §1、§4 Scalar wrappers、§5 JSON 通用差异、§6 引用完整性、§7；FCBK/FCPA wire 大小写分别对齐 golden，不把私有小写写法当 wire 决定 |
+| Decimal | `BigDecimal` + plain canonical 字符串；无 Double/Float。去前导/尾随零，负零为 `0`，按数值比较无精度损失，scale 不保留；拒绝指数、加号、逗号、NaN、内部空白，canonical 上限 64 KiB | §5 DecimalValue。接受首尾空白、`.5`、`1.`、前导零；Android 私有 BigDecimal 不冒充 Foundation Decimal 的完整数值范围兼容证明 |
+| UTC instant | `Instant.toString()` / canonical `Z` 字符串，私有往返保留全部纳秒，包含毫秒和 epoch 前值；非 canonical 输入拒绝 | §5～§7：FCBK writer 无小数秒；FCPA golden 是毫秒样本，更广精度/截断规则未确认。因此本轮不实现 wire 截断或 decoder 接受范围，不能以私有纳秒往返声称互通通过 |
+| LocalDate / LocalTime | 与 Instant 独立；私有日期为有效 Gregorian `yyyy-MM-dd`（year 1～9999）；时间为 `HH:mm`，拒绝非零秒/纳秒，避免静默截断，不作时区换算 | §3 LocalDate / LocalTime、§5～§7；FCBK wire 是整数字段对象，FCPA local date 是 canonical 字符串；更宽日历范围与 wire 验证留后续 codec |
+| null / 缺失 | 当前两列 NOT NULL；转换器非 nullable。未来实体按字段 Optional 映射，不把缺失、null、默认值统一改写 | §1、§5 JSON 通用差异、§7；nil 写出省略，manifest 部分 count 历史缺省与版本拒绝分别处理 |
+| enum / Set | 暂无实体列或集合转换器；后续按明确 raw value/associated-value 表达 enum，Set 按集合相等比较，不依赖枚举序号或遍历次序 | §4、§5、§7；未知值和引用校验按各 wire/Domain 的实际规则，不额外猜测接受或拒绝 |
+
+后续实体延期清单（按 §1 section roster；此表不预建表或列）：
+
+| 切片 | 延期记录 / 关系 |
+|---|---|
+| S1 起 | Student、ExerciseCatalogItem、ExercisePreference、ExerciseNameClaim、Session（BackupSessionRecord）、SessionExercise、TrainingSet、SessionSection、CoursePackage、CreditAdjustment；按 §3 精确字段/稳定 ID/关联约束落表 |
+| S2 | Appointment、RecurrenceSeries；日历值独立于 UTC instant |
+| S3 | BodyMetricDefinition、BodyMeasurement 及趋势所需派生行为；不预留统计列 |
+| 所属业务切片（S1 起） | TrainingTemplate（BackupTemplateRecord）、TemplateExercise、TemplatePlannedSet、BackupSettingRecord；具体归属待对应 spec，不在 S0 扩展 |
+| S4 | ShareReport（BackupShareReportRecord）、ShareReportModuleSelection；BackupManifest 与全部 FCPA Archive DTO/内嵌记录按 §1～§3 实现 codec/映射，不假定每个 DTO 都需独立 Room 表 |
+
+FR-121 种子仅可使用上述批准骨架；本轮未做 seed、组件展示或业务流程，未新增用户交互，entry/layout map 无新增行。没有新增或移除既有 UI/备份规则。新增存储骨架、值边界与测试，原有 `s0Room` 未实现状态保留：plan §4 的 Room 成功条件含 FR-041，tasks T007 明确完整 gate 在 T008 就绪后执行；MigrationTestHelper、synthetic V1/V2 schema 与缺迁移证明留 T008。
+
+### Gradle / schema 与宿主机验证
+
+使用已批准 catalog 的 KSP **2.3.13**、Room runtime/compiler/testing **2.8.5**；只在 app 应用 `com.google.devtools.ksp`，compiler 走 `ksp`，testing 走 `testImplementation`。未应用 `androidx.room` plugin，未增加其他直接依赖。按 [Room 2.8.5 官方 compiler options](https://developer.android.com/jetpack/androidx/releases/room#compiler-options) 使用 `room.schemaLocation`、`room.incremental=true`、`room.generateKotlin=true`；schema 路径经 `CommandLineArgumentProvider` 声明相对路径输入。
+
+schema export 目录为 `android/app/schemas/`，宿主已生成真实产物 `com.ignacioli.finecoach.storage.FineCoachDatabase/1.json`（version 1、唯一实体 `store_metadata`），**没有手写 JSON/identityHash**；保留待审查提交。AGP 9.3.1 不将 `test` 源集 assets 合并给本地单元测试，宿主确认没有 `mergeDebugUnitTestAssets` task。本轮移除 `test.assets.srcDir("schemas")` 与不存在的 merge task 依赖；测试仅通过 `finecoach.roomSchemaDirectory` 读取磁盘 export，缺失即失败，仍检查 version、非空 identityHash、唯一实体、字段类型/非空约束/主键，以及空 views/foreignKeys/indices。没有放宽 schema 内容断言；只移除无效的 assets 传递机制与副本相等断言。
+
+沿用本文获批 JDK21/SDK/缓存设置，cwd=`android/`：
+
+```sh
+./gradlew assembleDebug lint
+./gradlew :app:testDebugUnitTest --tests '*RoomSkeletonTests' --tests '*StorageValueTests' --tests '*StoragePrivacyTests' --rerun-tasks
+./gradlew :app:writePrivacyDependencyGraph
+```
+
+定向预期 **18 tests**：RoomSkeletonTests **5**（磁盘写入/重开/创建时间稳定、事务失败回滚并重开、重复 key 拒绝、实际表列约束、磁盘 export 内容）；StorageValueTests **10**（UUID 正/负例、Decimal 精度/规范化/边界/非法输入、Instant 纳秒往返/非法输入、日历值往返/非法日期/非法时间）；StoragePrivacyTests **3**（生产源码及构建配置无存储放宽/二进制浮点、CE 私有 databases 文件且排除 cache/external/DE、拒绝 DE context）。要求 JUnit XML 非空且实际 **18**、0 failures/errors/skips；结果在 `app/build/test-results/testDebugUnitTest/`、HTML 在 `app/build/reports/tests/testDebugUnitTest/`。修复前编排方宿主反馈 `assembleDebug lint` 通过（3m20s），定向 17/18 通过，唯一失败是 schema assets 缺失。本修复轮按要求未运行 Gradle、模拟器或 xcodebuild，修复后测试待宿主验证，不记录 PASS，不勾选 T007。
+
+### 修复轮 1：完整依赖图与 T008 API 预核实
+
+磁盘产物另显示 Room 省略空 `views`、`foreignKeys`、`indices`；缓存 `room-migration-jvm-2.8.5.jar` 的 `DatabaseBundle` / `EntityBundle` 默认构造函数字节码确认这些字段默认 `emptyList()`。断言按该格式接受字段省略或显式空数组，仍拒绝非空数组、null 和非数组值；version、identityHash、实体、字段与主键断言不变。这修复了原 assets 异常遮住的 JSON 字段读取问题。
+
+`writePrivacyDependencyGraph`、生成器与 `DependencyPolicy.scopes` 从 8 扩为 11 个 scope，新增 `kspDebugKotlinProcessorClasspath`、`kspReleaseKotlinProcessorClasspath`、`kspDebugUnitTestKotlinProcessorClasspath`，将构建时执行的 Room processor 与传递项纳入精确集合相等检查。生成器支持 `--resolved-report` 读取宿主现有 ResolutionResult 库存（8 scopes，744 行含 8 条 scope header），另外解析本轮 3 份 KSP 树报告；树坐标解析规则不变。unit-test KSP 报告明确 `No dependencies`，允许此 scope 为 0，但仍要求 Gradle 报告出现该 scope；没有手工删条目。
+
+复跑生成（不运行 Gradle），从产品根执行：
+
+```sh
+node android/dependency-allowlist/generate-resolved.mjs "$HOME/.cache/finecoach-android/deps-2026-11-04-t007" --resolved-report android/app/build/reports/s0/privacy/resolved.txt
+```
+
+生成器在写入前拒绝新的 alpha/beta/rc/SNAPSHOT selected 坐标，只有负责人此前接受的两个 jetifier beta 坐标可通过。原 3 条负责人接受注释完整保留（第三条说明 aapt2-proto alpha 仅 requested、selected 为稳定版本）。本轮没有新增未批准预发布 selected 坐标。相对当前 HEAD，白名单 **686 → 806 条 scoped 坐标（+120）、292 → 330 个唯一坐标（+38）**；各 scope：app classpath 6、debugAndroidTestRuntime 21、debugCompile 93、debugRuntime 108、debugUnitTestRuntime 176、releaseCompile 92、releaseRuntime 107、kspDebug 35、kspRelease 35、kspDebugUnitTest 0、root classpath 133。新增 Room/SQLite/KSP/serialization/annotation-experimental 稳定版本由编排方宿主核实；本轮不改版本。PrivacySourceScanTests 仍 **10 tests**，上述 Room/storage 定向仍 **18 tests**，合跑两组预期 **28 tests**。
+
+在宿主缓存 `gradle-home/caches/modules-2/files-2.1/androidx.room/room-testing-android/2.8.5/` 仅发现 POM/module/AAR，无 sources JAR。通过 JDK21 `javap -p -c` 核实对应 Gradle transform 的 `b467ce895d42c5756fe14ff54cc740bb/transformed/room-testing/jars/classes.jar`（位于同一缓存 `caches/9.7.0/transforms/`）：
+
+- Android `MigrationTestHelper` **没有直接读 schema 文件目录、绕开 assets 的构造函数**。现有重载使用 `Instrumentation + assetsFolder: String (+ SupportSQLiteOpenHelper.Factory)`，或 `Instrumentation + databaseClass: Class<out RoomDatabase> (+ specs: List<AutoMigrationSpec> + openFactory)`。
+- 带 `File` 的重载参数为 `Instrumentation, file: File, driver: SQLiteDriver, databaseClass: KClass<out RoomDatabase>, databaseFactory: () -> RoomDatabase, autoMigrationSpecs: List<AutoMigrationSpec>`。前四项必需；后两项的 Kotlin 默认值分别为生成的 DB implementation factory 和空列表。这里 `file` 是**数据库文件**，不是 schema 目录。
+- 字节码显示该重载按 databaseClass qualified name 设置 assetsFolder；`SQLiteDriverMigrationTestHelper.createDatabase/runMigrationsAndValidate` 仍调用父类 `loadSchema`，后者依次尝试 instrumentation context 与 target context 的 `assets.open("<assetsFolder>/<version>.json")`。此 API 不能解决本轮本地 test assets 缺失。
+
+以上仅为缓存 API/字节码核实，未证明 Robolectric helper 运行兼容性。T008 仍需解决 synthetic schema assets 的有效接入；本轮不实现 T008、不改依赖、不引入替代 harness。完整 `s0Room` 与真实 schema 提交仍待后续。
