@@ -295,3 +295,52 @@ node android/dependency-allowlist/generate-resolved.mjs "$HOME/.cache/finecoach-
 ```
 
 新预期：Backup5 + Capability7 = **12 tests**；Capability7 + Privacy10 = **17 tests**；s0EnvironmentSmoke 仍 **7 tests**。两次 targeted 仍须分别保存 XML/HTML、实际计数、退出码，全部要求非空且0 failures/errors/skips。固定事件日志契约、预发布依赖确认与T006系统验证的原有 PENDING 边界保持；本轮不声称完整 G8 PASS。
+
+## S0-03 T006 QPR2 系统验证记录（2026-11-04，Claude 宿主机）
+
+证据文件（gitignored，只在本机）：`.handoff/logs/2026-11-04-host-s0-03-t006-r3-{env,e2,e1,product}.txt`，由一个脚本生成，每条命令都记下原文输出和 `exit=`。早先的 r1/r2 日志没有保存 sentinel 查询输出，**不作为判定依据**。
+
+环境（`r3-env.txt`）：serial `emulator-5554`；`ro.build.fingerprint`=`google/sdk_gphone64_arm64/emu64a:16/BE4B.251210.005/14574095:userdebug/dev-keys`；`ro.build.version.sdk`=36，`sdk_full`=36.1；transport `* com.android.localtransport/.LocalTransport`；adb 1.0.41（37.0.1）。APK SHA-256：产品 `b92af793…6039`、E1 `9f82deb2…2c9a`、E2 `5e8d9920…780d`；资源 digest 和 E1/E2 相对产品的 manifest/规则 diff 也记在这个文件里。
+
+对照 APK 只在 scratch 副本中修改，产品 worktree 未改：
+- 产品：`allowBackup=false` + 三段九域 exclude。
+- E1：只把 `allowBackup` 改成 `true`，三段九域 exclude 不变。
+- E2：`allowBackup=true`，三段规则清空，作为正向对照。
+
+方法：每个 APK 安装后，用 `run-as` 写入 9 个虚构 sentinel，并 grep 确认 9 个都存在。CE 域写 `S0SENTINEL-{root,file,db,pref}`，DE 域写 `{droot,dfile,ddb,dpref}`，external 写 `ext`。之后每种模式依次执行：
+1. `am start` 后按 HOME。
+2. `settings put secure backup_local_transport_parameters`：cloud 为空，D2D 为 `is_device_transfer=true`，cross-platform 为 `is_cross_platform_transfer_ios=true`。
+3. `bmgr backupnow --monitor-verbose --non-incremental`。
+4. 对 `/data/data/com.android.localtransport/files/*/_full/<pkg>` 执行 `ls` 和 sentinel grep。
+
+| 模式 | 产品 | E1（exclude） | E2（正向对照） |
+|---|---|---|---|
+| cloud | `Backup is not allowed`；传输库无该包文件 | `Transport rejected`（`ERROR_PREFLIGHT`）；传输库无该包文件 | `Success`；grep 出 8 个 sentinel（root、file、db、pref、droot、dfile、ddb、dpref） |
+| device-transfer | `Transport rejected`（`ERROR_PREFLIGHT`）；传输库无该包文件 | 同产品 | `Success`；同样 8 个 |
+| cross-platform(ios，无 params) | `Backup is not allowed`，无解析日志 | `Backup is not allowed`；logcat `Loaded cross-platform configuration … found 0 configured platforms.` | 同 E1 |
+
+逐域对照（r4，`.handoff/logs/2026-11-04-host-s0-03-t006-r4-x-<domain>.txt`，用 bash 脚本生成，所有命令 `exit=0`）：给 8 个域各建一个对照 APK，`allowBackup=true`。各证据文件中 `aapt2 dump xmltree` 回读到的规则正文显示：cloud-backup 与 device-transfer 段各只有一个 `exclude domain="<domain>" path="."`，cross-platform-transfer 段为空；这一行的写法与产品资源中的对应行相同。8 个 APK 的 SHA-256 各不相同。每个 APK 都先补种 sentinel 并 grep 确认 8 个都在，然后按 cloud（`settings get` 回读为空）和 D2D（回读为 `is_device_transfer=true`）各跑一次：
+
+| 排除的域 | cloud 结果 | D2D 结果 | 传输库中缺少的 sentinel |
+|---|---|---|---|
+| root | Success | Success | 只缺 `root` |
+| file | Success | Success | 只缺 `file` |
+| database | Success | Success | 只缺 `db` |
+| sharedpref | Success | Success | 只缺 `pref` |
+| device_root | Success | Success | 只缺 `droot` |
+| device_file | Success | Success | 只缺 `dfile` |
+| device_database | Success | Success | 只缺 `ddb` |
+| device_sharedpref | Success | Success | 只缺 `dpref` |
+
+每次都只少了被排除的那个域，其余 7 个仍在。
+
+判定（plan §5.1）：
+- **cloud-backup 与 device-transfer 段的 8 个可观察域：PASS（规则级，证据来自对照 APK）**。
+  - r4 逐域对照：在两种模式下，系统都按单行 `exclude` 去掉了对应的那个域。
+  - r3 E2：不带规则时，这 8 个域都会被带出。
+  - 判断“确实按 device-transfer 执行”的依据：传输参数的回读值（r3、r4）；以及产品 APK（`allowBackup=false`）在 cloud 模式下被 `Backup is not allowed` 拒绝，同一 APK 在 D2D 模式下却会进入预检。这和 Android 12+ 的行为一致：`allowBackup=false` 只拦 cloud，不拦 D2D。logcat 里没有直接打印 destination 的值。
+- **产品 APK 本身：只观察到“整包无数据”**。cloud 被 `allowBackup=false` 拒绝；D2D 为 `ERROR_PREFLIGHT`，传输库中没有该包的文件。产品 APK 上没有逐域观察；它与对照 APK 的差别只在于各行合在同一个文件里，以及 `allowBackup` 的取值。
+- **external 域：不可观察（BLOCKED）**。sentinel 已写入并 grep 确认，但 E2 不带任何规则时，系统同样没有带出它，所以本路径上无法证明 exclude 生效。目前只有 `BackupRulesTests` 的结构断言覆盖。
+- **cross-platform-transfer(platform=ios) 无 params 分支：FAIL**。系统解析了该段，但因缺少 params 计为 0 个已配置平台，规则未被实际接受；结果上没有传输任何数据。
+- **第二分支：BLOCKED（等待 D10）**。需要负责人提供并批准 bundleId、teamId、contentVersion。
+- **资源处理**：按 §5.1，不删段，也不放宽备份；产品资源本轮不改。
