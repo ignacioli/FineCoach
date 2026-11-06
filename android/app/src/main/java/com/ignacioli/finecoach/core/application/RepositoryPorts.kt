@@ -122,6 +122,7 @@ data class TemplateRecord(
     val templateID: TemplateID,
     val name: String,
     val trainingFocus: Set<BodyPart>,
+    val revision: Revision,
     val createdAtUTC: Instant,
     val updatedAtUTC: Instant,
 )
