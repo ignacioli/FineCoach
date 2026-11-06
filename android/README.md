@@ -54,7 +54,7 @@
 | `androidx.compose.ui:ui` | 1.12.1 | Compose UI | implementation | Apache-2.0 | [release](https://developer.android.com/jetpack/androidx/releases/compose-ui) | 同BOM；与选定compiler端到端运行待T003 | 否，AndroidX |
 | `androidx.compose.ui:ui-text` | 1.12.1 | 随包字体/排版 | implementation | Apache-2.0 | [release](https://developer.android.com/jetpack/androidx/releases/compose-ui) | 同BOM | 否，AndroidX |
 | `androidx.compose.foundation:foundation` | 1.12.1 | 几何/布局fixture与基础交互 | implementation | Apache-2.0 | [release](https://developer.android.com/jetpack/androidx/releases/compose-foundation) | 同BOM | 否，AndroidX |
-| `androidx.compose.material3:material3` | 1.4.0 | 后续已批准Material平台组件 | implementation，后续组件阶段 | Apache-2.0 | [release](https://developer.android.com/jetpack/androidx/releases/compose-material3) | 同BOM；不为T002最小壳预先添加 | 否，AndroidX |
+| `androidx.compose.material3:material3` | 1.4.0 | 后续已批准Material平台组件 | implementation，后续组件阶段 | Apache-2.0 | [release](https://developer.android.com/jetpack/androidx/releases/compose-material3) | T013 接入（2026-11-05）；由 Compose BOM 管理版本 | 否，AndroidX |
 | `com.google.devtools.ksp` → `com.google.devtools.ksp:symbol-processing-gradle-plugin` | 2.3.13 | Room代码生成 | plugin，KSP2 | Apache-2.0 | [release](https://github.com/google/ksp/releases/tag/2.3.13)、[KSP2](https://github.com/google/ksp/blob/2.3.13/docs/ksp2.md) | KSP2不沿用KSP1版本前缀配对；与Kotlin2.4.21/AGP9.3.1/Room2.8.5的精确组合官方矩阵待核实 | 外部工具，Google维护 |
 | `androidx.room:room-runtime` | 2.8.5 | 私有SQLite ORM | implementation，T007 | Apache-2.0 | [release](https://developer.android.com/jetpack/androidx/releases/room) | 官方要求Kotlin≥2.0、建议KSP2，minSdk23≤31；精确KSP组合待核实 | 否，AndroidX |
 | `androidx.room:room-compiler` | 2.8.5 | DAO/schema生成 | ksp，T007 | Apache-2.0 | [release](https://developer.android.com/jetpack/androidx/releases/room) | 与runtime同版，KSP2；生成实跑待后续 | 否，AndroidX |
@@ -577,7 +577,7 @@ Native 遮罩使用 View tag `s0-privacy-cover`，不是 Compose testTag，不�
 
 源码策略覆盖当前 Kotlin/Java/XML 注册方式，不能推断任意混淆、反射或语义等价实现；后续新增实现必须扩展相应受控负例，不能把扫描当作完整安全证明。当前未实现 seed 数据清单；未来 assets/resources/fixture/seed 目录会自动发现，inline seed 代码必须带虚构声明，不代表批准新增 S1 业务种子。
 
-### T010：宿主 API 31 / 32 / 33+ 操作与文字证据（本轮不执行）
+### T010：宿主 API 31 / 32 / 33+ 操作与文字证据（已自动执行）
 
 每个 API 单独执行，普通壳/弹层都做。宿主先核实唯一指定设备及准确输入，未填即 BLOCKED；以下变量由宿主设置，不是已有环境事实：`S0_ANDROID_SERIAL`、`S0_ANDROID_APK`、`S0_ANDROID_PACKAGE`（核实为 `com.ignacioli.finecoach`）、`S0_ANDROID_COMPONENT`（核实为 `com.ignacioli.finecoach/.MainActivity`）、`S0_HOST_EVIDENCE`（独立且已存在的本机证据目录）。只对虚构 debug 包操作。
 
@@ -621,4 +621,127 @@ test -s "$S0_HOST_EVIDENCE/foreground.png"
 od -An -tx1 -N8 "$S0_HOST_EVIDENCE/foreground.png"
 ```
 
-预期签名 `89 50 4e 47 0d 0a 1a 0a`。每个 API/状态记录：FR-070（33+）或 FR-071（31/32）的 `sentinelVisible=false`、恢复的 `coverRemoved=true`/probe 前后值，FR-072 的 `foregroundCaptureNormal=true`，证据文件名、负责人/时间。sentinel 暴露、遮罩残留/点击无效或前台截屏遮黑/失败记 FAIL；设备/卡片/有效图片/负责人文字判定缺失记 BLOCKED。JVM 测试不替代这些结果；同一问题两次失败停止并保留失败证据。本轮 T010 全部仍 PENDING。
+预期签名 `89 50 4e 47 0d 0a 1a 0a`。每个 API/状态记录：FR-070（33+）或 FR-071（31/32）的 `sentinelVisible=false`、恢复的 `coverRemoved=true`/probe 前后值，FR-072 的 `foregroundCaptureNormal=true`，证据文件名、负责人/时间。sentinel 暴露、遮罩残留/点击无效或前台截屏遮黑/失败记 FAIL；设备/卡片/有效图片缺失记 BLOCKED。以上为原人工操作流程；负责人 2026-11-05 批准的自动化方法及实际结果见下文，以自动恢复和像素统计取代人工点卡片及逐图判定。JVM 测试不替代系统快照验证；同一问题两次失败停止并保留失败证据。
+
+#### T010 宿主自动验证结果（2026-11-05）
+
+负责人 2026-11-05 决定：不涉及真实功能/视觉的验证全部自动化。本记录由编排方提供宿主结果，当前 T013 agent 未重跑设备验证、未读取图片，不将这些结果外推为真实功能、视觉验收或 T013 修改后 APK 的运行证明。
+
+- 方法：root 模拟器读取系统任务快照 `/data/system_ce/0/snapshots/**/<taskId>.jpg`，确定性统计每行相邻像素 `|ΔRGB|>40` 的变化次数，次数 ≥6 记为文字行。对照组为同界面前台截图缩放至快照尺寸，必须检出文字行。恢复使用 `am start` 切回已有任务，替代点击最近任务卡片。
+- 结果：API 36.1（QPR2）、31、32 的普通壳与弹层快照文字行均为 **0**；31/32 弹层快照每行最多 **2** 次变化，对应被遮挡后的纯色弹层框。对照组检出 **23～279** 文字行。
+- 恢复：普通壳与弹层 probe 均 **0→1**，关闭弹层后壳显示 **1**。FR-072 前台截屏 PNG 签名正确且有内容。QPR2 普通壳另有负责人文字判定「QPR2 最近任务卡片看不到 sentinel」。
+- 初版检测以「偏离众数色的行」判断，曾将纯色弹层框误判为 **FAIL**；已改为上述变化次数法，并用阳性对照核实，原始记录保留。
+- 证据与脚本：`.handoff/evidence/2026-11-05-t010/`（本地，不入库）。本段更新此前 T009 执行记录中 T010 的 PENDING 状态，保留此前记录作为历史，不改只读规格复选框。
+
+## S0-05 T012：Android 映射文档
+
+2026-11-05，执行 Codex；branch=`feat/android-s0-infrastructure`，基点 HEAD=`c381853`。只读规格来自 canonical root `~/gitrepo/ignacioli/.worktree/specs-android-s0/FineCoach/007-android-port/` 的 `s0-infrastructure/{tasks,spec,plan}.md` 与 ADR-001 §7.2，不经产品 `specs` symlink 选择来源。开工状态：tracked modification 0、staged 0、untracked 仅 `.vscode/`（用户既存，保留）；`git diff --stat` 为空。白名单只新增 DS README Android 映射节和本节，不 stage/commit、不切分支、不 stash、不改任务复选框。
+
+规则位于 [DS README §15「Android 映射规则」](../design/design-system/README.md#15-android-映射规则)：字号 pt→sp；几何/描边 pt→dp；fontScale；行高倍率与 iOS 实际 lineSpacing；零字距；单文件 variable font 四档轴值；capsule shape；来源与待核实边界。D02/D05/D14 按负责人 2026-11-03 批准执行：直接 README→Kotlin、不出 `tokens.json`，复用现有随包 Noto Sans SC 与 OFL，正文及 `‹ › ✓` 不采用系统字体。
+
+### T013 生成器输入约定
+
+数值唯一输入为 `design/design-system/README.md`，按节标题和表头定位，不依赖行号；iOS 源码/测试是独立比对来源，不是生成输入。本约定沿用 plan §3.3、S0-FR-050～052 和 T013，不在本轮创建生成器、字体副本或 Kotlin 产物。
+
+| DS 来源表 / 文字约束 | 读取列与解释 | T013 用途 |
+|---|---|---|
+| §2.1 原子色 | `Token`、`值`；`备注`只作来源说明 | `FcColors.kt` 的原子值；不读取插图色或历史裁决表作为当前色表 |
+| §2.2 语义色 | `语义 Token`、`引用`、`值`；用途列保留来源语境 | 语义别名及解析值；overlay 的 `#… @ …%` 分别解析 RGB 与 alpha，不能丢 alpha；`—` 引用允许直接值，不臆造原子 token |
+| §3.2 阶梯、§3.3 具名例外 | `样式`、`字号 / 字重`、`行高`、`缩放基准`；§3.2 另读 `允许的字重变体（画稿实测）`；§3.3 的 `画稿用途`含 compact 选中/今天 600 的显式约束 | `FcTypography.kt`，保留 14 个样式名；解析字号与字重为两个数、行高为倍率；按 §15 应用 sp、零字距、随包字体及变体，不把用途文本中的其他数字当新 token |
+| §3.1 字体与 §15 映射 | 家族、资产/OFL、字距、缩放约束；§15 的公式与轴值映射 | 排版生成策略；§15 不是第二份字号表，待核实项不得静默变成默认实现 |
+| §4 间距 | `Token`、`值`，另遵循表后零间距例外 | `FcSpacing.kt`，六档 dp；合法 `0` 不新增刻度，也不豁免其他设计值 |
+| §5 圆角 | `Token`、`值`；用途列保留来源语境 | `FcShapes.kt`，五个固定 dp 圆角及 `radius.capsule` 特殊 shape；「高度 / 2」不是数值解析失败后的默认 0 |
+
+§6 尺寸/描边文字、§7.2 字形表、§8 组件表仅供相应组件后续映射，不扩充 T013 四份 token 文件的数值输入表。G1 的独立期望与对比度检查另以 §11 全 17 行的 `前景`、`背景`、`对比度`、`结论`及 iOS harness 为依据；保留两项豁免分类、阈值与误差，不从待测 Kotlin 反推 expected。对应 iOS 来源：`VisionHarnessTests.swift`（色/alpha/六间距/五固定圆角）、`TypographyHarnessTests.swift`（14 样式与四档轴值）、`ContrastHarnessTests.swift`（阈值/误差）；均在 `ios/FineCoachTests/DesignSystem/`。capsule 与实际 fontScale/行盒需 Android 自己证明，不能声称 iOS 已有相应渲染测试。
+
+生成器按 T013/plan §3.3 将四个 Kotlin 文件写到 build/generated；缺表、重复 token/样式、格式异常必须失败，不能漏行、猜值或沿用旧产物；源章节位置和输入 digest 随产物记录。§3.2 显式指向 §3.3 的具名变体引用需解析为同一样式，不能误判为第二份定义或额外样式。G1 的实现和运行属于 T013，本轮不运行 Gradle。
+
+### 待核实与执行记录
+
+待核实的权威清单在 [DS README §15.5](../design/design-system/README.md#155-待核实)：精确行盒及 Alignment/Trim/includeFontPadding 组合、iOS 注册失败 fallback 差异、组件局部缩放适配、来源历史措辞和 cursor-agent 独立复核。字体方案与 README 直接生成路线已经批准，不列为待选方案。
+
+1. 分类与依据：C，补齐 S0-FR-052/T012 已批准映射的文字；新增 §15 和本节，既有 token/色值/样式/anatomy 保留；无删除项，不触发新的设计审批。
+2. 影响范围：仅两份 README；复用 DS-BASE 排版约束及 DS-SYMBOL 的随包字形来源，不扩展/新增组件，不改 iOS、components、Penpot 或截图基线。
+3. 设计决定：沿用 2026-11-03 的 D02/D05/D14；规则内逐项列 iOS 路径/行号和规格来源。尚无证据的行盒策略不自行定案。
+4. 实施与验证：文档 readback、来源/表头核对与 diff 范围检查；无新交互，entry/layout map 无新增行；不运行 Gradle、模拟器或 xcodebuild，不查看截图，不声称视觉验证；无新 A/B 设计或页面实现，未触发 L3。
+5. 结果：完成两份文档回填与静态检查；待 cursor-agent 独立复核及 §15.5 后续核实。未执行 T013、G1/G5 或 CP2 验收，未改 tasks 状态。
+
+## S0-05 T013：token 生成器与 G1（2026-11-05）
+
+本轮在 T012 未提交文档上继续实现，保留既存 `design/design-system/README.md`、本 README 和 `.vscode/`；不 stage/commit、切分支或 stash，不改只读规格、iOS、shared、截图基线。本节是 T013 实现记录，前节「本轮不创建生成器」属于 T012 的历史范围。
+
+### 输入、输出与失败行为
+
+`scripts/android/generate-tokens.mjs` 使用 Node 标准库，直接读取 DS README §2.1、§2.2、§3.2、§3.3、§4、§5 六表及 §3.1/§15 的字体、字距和映射约束。按章节和完整表头定位，缺章节/表、重复定义、未知/缺失/重排列、坏色值/数值/行结构、引用不一致、具名变体不一致和 capsule 异常均退出非 0；先完整解析再写文件，不拿旧输出冒充成功。
+
+输出仅在 `android/app/build/generated/designtokens/com/ignacioli/finecoach/designsystem/`：`FcColors.kt`、`FcTypography.kt`、`FcSpacing.kt`、`FcShapes.kt`。每份带 README SHA-256 和源表章节/行范围，生成物被现有 build ignore 排除，不入库。颜色含 15 原子色、19 语义色及 40% overlay；`light`/`dark` 均沿用唯一批准色表，没有新增暗色调色盘。排版 14 样式，字号 sp、名义行高为字号×倍率 sp、零字距、禁止合成字重；`title`/`caption` 的箭头引用解析为已有具名样式。间距六档 dp、固定圆角五档 dp、capsule 为按实际短边 50% 的 shape。
+
+从产品根可执行（不需要 Gradle）：
+
+```sh
+node scripts/android/generate-tokens.mjs
+node scripts/android/generate-tokens.mjs --check
+node --test scripts/android/generate-tokens.test.mjs
+```
+
+支持 `--input <README> --output <directory>`，供临时 fixture 使用；`--check` 在系统临时目录重新生成，严格比较文件清单和字节，缺文件、多文件、手改均失败，不修复被检查的文件。Node 自检实测 **16/16 PASS、0 failures/skips**：1 个合法确定性生成/check；12 个输入负例（缺章节、缺表、重复 token、重复样式、未知列、坏数值、坏色值、列数异常、缺 pipe、alias 冲突、具名变体冲突、capsule 固定值）；3 个输出负例（手改、缺文件、多文件）。
+
+Gradle `generateDesignTokens` 声明 README/脚本输入及输出目录，通过 AGP 9 Variant API `variant.sources.kotlin.addGeneratedSourceDirectory(generateDesignTokens, GenerateDesignTokensTask::outputDir)` 注册类型化生成目录，由该 API 传递生成与编译依赖，不再使用 `preBuild.dependsOn`。`checkDesignTokens` 只在整个输出目录尚不存在时 bootstrap；已有目录必须先通过临时重生比对。`s0G1` 同图运行时，generate 排在 check 后，避免自动重生掩盖手改。README 合法修改后先明确运行 generate，再 check；已有过期产物不会在 check 中静默更新。
+
+### G1 测试与宿主命令
+
+| suite | 预期 tests | 独立来源与覆盖 |
+|---|---:|---|
+| `TokenParityTests` | 6 | 从 iOS `Tokens.swift` / `VisionHarnessTests` 逐值写 expected：15 原子色、19 语义色含 overlay、六间距、五固定圆角；另证明 capsule 随短边变化及 dp 不随 fontScale 变化 |
+| `TypographyTests` | 7 | 从 iOS `Typography.swift` / `TypographyHarnessTests` 逐值写 14 样式 size/weight/名义 lineHeight；允许变体及非法请求、字体引用；Android resource 四轴与 `‹ › ✓`/中文字形；Compose fontScale 1/1.5/2 与单/多行 metrics |
+| `ContrastTests` | 17 | §11 全 17 行，用生成颜色自行算 WCAG luminance/ratio；同 iOS 0.005 误差，12 文本行阈值 4.5、3 控件边界行阈值 3.0；装饰分割线/禁用态只锁记录比值，不设阈值、不 skip |
+| `TokenGeneratorTests` | 9 | 真 Node CLI + 临时 README：合法 generate/check、缺表、重复 token/style、坏值、坏行、未知列、alias 冲突、手改生成物；expected 不读取生成物推导 |
+| 合计 | **39** | 全部必须实际执行，0 failures/errors/skips |
+
+宿主从 `android/` 执行（2026-11-06 已通过；allowlist 已按下一节重生成）：
+
+```sh
+./gradlew :app:generateDesignTokens
+./gradlew :app:checkDesignTokens
+./gradlew :app:s0G1
+./gradlew assembleDebug assembleRelease assembleDebugAndroidTest lint
+```
+
+`s0G1` 是独立 resource-aware JVM/Robolectric Test task，精确选择上述四个 suite，拒绝空发现、NO-SOURCE/skip、缺 suite、测试数变化和 JUnit failure/error/skip；每次执行、不复用旧测试结果。JUnit XML 在 `app/build/test-results/s0G1/`，HTML 在 `app/build/reports/tests/s0G1/`。单/多行 metrics 为文字输出；不读取截图、不 record baseline。**2026-11-06 宿主 `generateDesignTokens`、`checkDesignTokens` 通过，`s0G1` 实际执行 39 tests、0 failure。**
+
+### 字体与主题
+
+D05 原资产 `ios/FineCoachApp/Resources/Fonts/NotoSansSC-VF.otf` → `android/app/src/main/res/font/noto_sans_sc_variable.otf`；原 `OFL.txt` → `android/app/src/main/assets/fonts/OFL.txt`。两份复制品均已逐字节比对相同。字体 **15,054,748 bytes**；编排方于 2026-11-06 在宿主重算确认，iOS 原件与 Android 副本的 SHA-256 均为 `d13ed01ec8aa45d6178999b648e96fb92150683e9f8e2a581f2acf208dcbe44b`，两份哈希相同；OpenType CFF2，单 `wght` 轴范围 100～900、默认 100。没有转换、下载或裁剪。
+
+`FcFont.kt` 用同一 `R.font.noto_sans_sc_variable` 建四个 blocking Font 实例，显式 `FontVariation.Settings(FontVariation.weight(400/500/600/700))`，匹配相同 FontWeight；生成 TextStyle 使用该 FontFamily 与 `FontSynthesis.None`。资源方式及 variation API 见 [Android 官方字体文档](https://developer.android.com/develop/ui/compose/text/fonts)。2026-11-06 宿主 G1 已通过其中的 native resource/轴值/glyph 测试；该证据限于所测 Robolectric 环境，不等于独立检查了 Compose resolver 的实际轴值或真机字体表现。
+
+`FineCoachTheme` 用生成颜色和排版包装 MaterialTheme，壳与 debug 样例共用。Material typography 15 个常规槽位均显式映射到既有 DS 样式；`bodyLarge=body`，`bodyMedium=callout(400)`，其余映射见 `FineCoachTheme.kt`，不继承 Material 非零字距。未实现的产品组件仍应显式选择其批准的 DS 样式，不以此包装代替 T015 roster。debug 样例间距改用 space4/space2，保留原 48dp 探针点击高度、所有 testTag、计数/弹层控制和隐私生命周期路径。
+
+### Material3 与 resolved allowlist
+
+负责人 2026-11-05 明确批准 T013 接入已列于 T001 表的 `androidx.compose.material3:material3`（表中 1.4.0）；catalog 新增 `compose-material3`，不写单独 version，由既有 Compose BOM `2026.09.00` 管理，app `implementation(libs.compose.material3)`。仅新增这一条直接依赖坐标，没有声明 `material-icons-*` 或其它新依赖。2026-11-06 宿主 resolved graph 与重生成的 `resolved.txt` 已记录新增坐标：`androidx.compose.material3:material3:1.4.0`、`androidx.compose.material3:material3-android:1.4.0`、`androidx.compose.material:material-ripple:1.12.1`、`androidx.compose.material:material-ripple-android:1.12.1`、`androidx.lifecycle:lifecycle-common-java8:2.11.0`。
+
+现有 `writePrivacyDependencyGraph` 与 `android/dependency-allowlist/generate-resolved.mjs` 已覆盖全部 12 scopes（含 implementation 的 compile/runtime）；不需为 Material3 增补 scope 或修改生成器。现有生成器自检 **8 正/项目例 + 4 拒绝例通过**。2026-11-06 宿主已通过 `writePrivacyDependencyGraph` 并按既有流程重生成 `resolved.txt`；本次文档更新不再修改 allowlist。
+
+以下为宿主已执行的解析与生成命令，保留供后续依赖变更复用：
+
+```sh
+# android/
+./gradlew :app:writePrivacyDependencyGraph
+# product root
+node android/dependency-allowlist/generate-resolved.mjs android/app/build/reports/s0/privacy --resolved-report android/app/build/reports/s0/privacy/resolved.txt
+```
+
+新增坐标见上文，scopes 以宿主重生成的 `resolved.txt` 为准；后续依赖变更仍须按现有流程审核，不放行未批准依赖或 `material-icons-*`。
+
+### 待核实与执行记录
+
+2026-11-06 宿主实际结果（编排方提供）：`writePrivacyDependencyGraph` 与 allowlist 重生成、`generateDesignTokens`/`checkDesignTokens`、`s0G1` **39 tests、0 failure**、`assembleDebug`/`assembleRelease`/`assembleDebugAndroidTest` 与 `lint` 全部通过；`testDebugUnitTest` **127 tests、0 failure/skip**（含 `FictionalDataPolicyTests` **13**）；`s0Room` **18/18**；`s0EnvironmentSmoke` 通过。日志：`.handoff/logs/2026-11-06-host-s0-05-t013*.log`。cursor-agent 对 T012/T013/T010 的复核于 **2026-11-06 通过**；本次仅回填文档，不重跑 Gradle。
+
+仍开放 DS §15.5 的精确自然行高下限、首尾留白与 Alignment/Trim/includeFontPadding parity、字体失败路径差异、局部缩放适配及来源旧措辞；Compose resolver 实际轴值仍待独立核实。fontScale runtime 测试只证明所测环境响应，不代表 Android 14+ 非线性缩放与 UIKit 逐档等价。独立复核项已通过，不再列为待执行。未进行人工视觉验证，不将 G1 通过等同于 CP2 验收，不改 tasks 状态。
+
+1. 分类与依据：D，DS-BASE 既有值的 Android 实现对齐；目标值/anatomy 不变，来源 DS README §2～§5/§15 与批准 D02/D05；T010 为负责人提供的宿主结果回填。
+2. 范围：复用 DS-BASE token/字体；消费者仅空壳和既有虚构 debug 样例；无新增组件、业务入口或持久化，design 与 Penpot 无设计变更可同步。
+3. 设计决定：复用已批准映射、随包字体与本轮 Material3 授权；精确行盒 parity 保持待核实，不以默认值宣称完成。
+4. 实现与检查：Node 16/16、自检字体/OFL 同字节、allowlist parser 自检通过；宿主 G1 39 例及 build/lint 已于 2026-11-06 通过，完整 JVM 127 例、Room 18/18、smoke 通过，证据见上述日志。entry/layout map 无新增行；原 `s0-open-dialog`/`s0-probe`/`s0-dialog-probe`/`s0-close-dialog` 可见按钮仍分别修改弹层状态/内存计数，原 Column.fillMaxWidth 撑满宽度，testTag 未变。未触发新设计 L3；现有 T010 运行结果不代替本轮 APK 验证。
+5. 结果：Node 检查、宿主 G1/build/lint/JVM/Room/smoke、allowlist 重生成及 cursor-agent 复核均 PASS；字体哈希一致。§15.5 上述 parity 等待核实项继续开放；不宣称 CP2 完成，不做截图基线、G3/G4、gate.sh。
