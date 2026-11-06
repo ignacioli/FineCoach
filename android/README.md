@@ -1192,3 +1192,92 @@ S1 所需 Student、Package、Appointment、Session、Set、ledger、template/�
 新增入口为 adb instrumentation，不新增用户交互，entry/layout map 沿用本 README 的 S0-08 map；
 验证仅静态源码/API 签名、XML 和 diff 检查；Gradle 编译/测试、Release APK 检查、API31～33
 设备触发/拒绝、安装重跑和负责人走查均未执行，T026 留给 Claude 宿主。未改只读 specs checkbox，未 commit。
+
+## S1 T001：S0 绑定与接口冻结（2026-11-06）
+
+工作目录与分支（writer）：
+
+- worktree: `/Users/liyongqiang/gitrepo/ignacioli/FineCoach/.claude/worktrees/android-s1`
+- branch: `feat/android-s1-coach-core`
+
+### 本轮冻结摘要
+
+- 新增 `core/domain/common` 共享值类型层：
+  - `CommonTypes.kt`：稳定 ID、枚举、`Revision`、`SourceEventKey`、`CreditLedgerSourceEventKeyFactory`
+- 新增 `core/application` 接口层：
+  - `ApplicationContracts.kt`：Clock、ID generator、error/result 合同（不再承载 domain 值类型）
+  - `RepositoryPorts.kt`：Student/Package/Exercise/Session/Template/History repository ports 与命令/记录命名；新增 coach-only `SessionSettlementNotePort`（`noActivePackage`，不得进入分享/导出）
+- 新增 `navigation/S1Routes.kt`：
+  - 只冻结 route pattern 与稳定 ID 参数（`studentID`、`coursePackageID`、`sessionID`、`templateID`）
+- `ScopeBoundaryTests` 从 S0「无业务页/路由」更新为 S1 允许范围，保留隐私与能力边界断言（shortcut/assistant/notifications/widget/share/延期业务入口）；通知能力放开交接给 T013c（S1-D08）。
+  - 路由守卫：`composable`/`navigation`/`NavHost` 仅允许 `S1Routes` 常量，`navigate` 仅允许 `S1Routes` 常量或 builder，禁止 `composable<T>`、`navDeepLink`、`deepLinks=...`；并对 `S1Routes` object 顶层声明（`val`/`var`/`fun`/`object`/`class`/`typealias`，含注解与修饰符）做白名单冻结。
+
+### S0 接口与 gate 现状登记
+
+- 已实现：`s0G1`、`s0G2`、`s0G6`、`s0Room`、`s0SeedIsolation`、`s0InstallSeededDebug`
+- 占位（执行即失败）：`s0G3`、`s0G4`、`s0G5`、`s0G8`
+- 向量 runner 与余额运算：
+  - `app/src/test/java/com/ignacioli/finecoach/SharedVectorRunner.kt`
+  - `app/src/main/java/com/ignacioli/finecoach/domain/CreditLedger.kt`
+- seed 扩展点：
+  - `app/src/debug/java/com/ignacioli/finecoach/seed/DebugSeed.kt` 的 `SeedContributor`
+  - `app/src/debug/java/com/ignacioli/finecoach/seed/DebugSeedInstrumentation.kt`
+
+### 依赖核对（无新增坐标）
+
+- `androidx.compose.material3:material3`（BOM 解析为 1.4.0）
+- `androidx.navigation:navigation-compose:2.10.2`
+- `androidx.activity:activity-compose:1.13.0`
+- `androidx.room:room-runtime:2.8.5`
+- `androidx.lifecycle:lifecycle-viewmodel-compose:2.11.0`（transitive）
+
+以上均可在 `android/dependency-allowlist/resolved.txt` 定位到；本轮未改 `libs.versions.toml` 和依赖坐标。
+
+### 宿主复核命令（T001 约束内）
+
+```sh
+# G0
+./gradlew assembleDebug assembleRelease assembleDebugAndroidTest lint
+
+# 四个既有 suite（T001 完成线）
+./gradlew :app:testDebugUnitTest \
+  --tests 'com.ignacioli.finecoach.InfrastructureConfigurationTests' \
+  --tests 'com.ignacioli.finecoach.CapabilityManifestTests' \
+  --tests 'com.ignacioli.finecoach.PrivacySourceScanTests' \
+  --tests 'com.ignacioli.finecoach.StorageValueTests'
+
+# s0G2 背后四个组件 suite（按 FQCN 逐一可追溯）
+./gradlew :app:testDebugUnitTest \
+  --tests 'com.ignacioli.finecoach.ComponentCatalogTests' \
+  --tests 'com.ignacioli.finecoach.ComponentCatalogStateTests' \
+  --tests 'com.ignacioli.finecoach.ComponentContractTests' \
+  --tests 'com.ignacioli.finecoach.PlatformShellTests'
+
+# s0G8 实际替代套件（不调用占位 task）
+./gradlew :app:testDebugUnitTest \
+  --tests 'com.ignacioli.finecoach.CapabilityManifestTests' \
+  --tests 'com.ignacioli.finecoach.PrivacySourceScanTests' \
+  --tests 'com.ignacioli.finecoach.BackupRulesTests' \
+  --tests 'com.ignacioli.finecoach.StoragePrivacyTests'
+```
+
+预期测试数（按源码静态计数）：
+
+- `InfrastructureConfigurationTests`: 4
+- `CapabilityManifestTests`: 9
+- `PrivacySourceScanTests`: 10
+- `StorageValueTests`: 10
+
+### 宿主实测（r8）
+
+证据来源：`.handoff/logs/2026-11-06-host-s1-t001-r8.log`
+
+- `./gradlew assembleDebug assembleRelease assembleDebugAndroidTest lint`：`exit 0`
+- `:app:testDebugUnitTest --rerun-tasks` + `s0G1` / `s0G2` / `s0G6` / `s0Room` / `s0SeedIsolation`：均 `exit 0`
+- unit：`321 tests`，`0 failures` / `0 errors` / `0 skipped`
+- `ScopeBoundaryTests`：`19`
+- 报告目录：
+  - `android/app/build/test-results/testDebugUnitTest/`
+  - `android/app/build/reports/lint-results-debug.*`
+
+编排方已修正 `ScopeBoundaryTests.kt:442-444` 的 `const val` 正则，本轮在该修正基础上继续收敛。
