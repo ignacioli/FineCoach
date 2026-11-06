@@ -7,6 +7,8 @@ import javax.xml.XMLConstants
 import javax.xml.parsers.DocumentBuilderFactory
 import org.w3c.dom.Element
 import org.gradle.process.CommandLineArgumentProvider
+import org.gradle.process.ExecOperations
+import javax.inject.Inject
 
 plugins {
     alias(libs.plugins.android.application)
@@ -87,6 +89,7 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.text)
     implementation(libs.compose.foundation)
+    implementation(libs.compose.material3)
     implementation(libs.activity.compose)
     implementation(libs.navigation.compose)
 
@@ -395,7 +398,6 @@ tasks.withType<Test>().matching { it.name == "testDebugUnitTest" || it.name == "
 // Reserve the approved interfaces. Each is replaced by its owning task only
 // when the full, non-empty test/report contract is implemented (plan section 4).
 val pendingGates = mapOf(
-    "s0G1" to "T013: token generation and validation",
     "s0G2" to "T016: approved component contracts",
     "s0G3" to "T018: design value scan",
     "s0G4" to "T017: entry and layout harness",
@@ -404,8 +406,6 @@ val pendingGates = mapOf(
     "s0G8" to "T004-T010: complete privacy and scope checks",
     "s0SeedIsolation" to "T025: release seed isolation",
     "s0InstallSeededDebug" to "T026: explicit device install and seed verification",
-    "generateDesignTokens" to "T013: design token generator",
-    "checkDesignTokens" to "T013: independent design token comparison",
 )
 pendingGates.forEach { (gate, owner) ->
     tasks.register(gate) {
@@ -414,3 +414,149 @@ pendingGates.forEach { (gate, owner) ->
         doLast { throw GradleException("$gate 未实现：$owner；不能报告 PASS。") }
     }
 }
+
+// T013: README is the only generation input; build outputs are never committed.
+abstract class GenerateDesignTokensTask : DefaultTask() {
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val generatorScript: RegularFileProperty
+
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val sourceReadme: RegularFileProperty
+
+    @get:OutputDirectory
+    abstract val outputDir: DirectoryProperty
+
+    @get:Inject
+    abstract val execOperations: ExecOperations
+
+    @TaskAction
+    fun generate() {
+        execOperations.exec {
+            commandLine("node", generatorScript.get().asFile.absolutePath,
+                "--input", sourceReadme.get().asFile.absolutePath,
+                "--output", outputDir.get().asFile.absolutePath)
+        }.assertNormalExitValue()
+    }
+}
+
+val designTokenScript = rootProject.layout.projectDirectory.file("../scripts/android/generate-tokens.mjs")
+val designTokenReadme = rootProject.layout.projectDirectory.file("../design/design-system/README.md")
+val designTokenOutput = layout.buildDirectory.dir("generated/designtokens")
+val generateDesignTokens = tasks.register<GenerateDesignTokensTask>("generateDesignTokens") {
+    group = "build"
+    description = "Generate the four approved design token Kotlin files"
+    generatorScript.set(designTokenScript)
+    sourceReadme.set(designTokenReadme)
+    outputDir.set(designTokenOutput)
+}
+val checkDesignTokens = tasks.register<Exec>("checkDesignTokens") {
+    group = "verification"
+    description = "Regenerate in a temporary directory and reject missing/extra/edited output"
+    inputs.file(designTokenScript)
+    inputs.file(designTokenReadme)
+    // Inspect the existing output at execution time, without a producer input
+    // dependency that could regenerate (and hide) an edit before verification.
+    // This Exec has no outputs/cache entry and therefore always executes.
+    // Bootstrap only an absent output directory. Existing output must be checked
+    // before compile's generator can replace it, including on an incremental build.
+    doFirst {
+        if (!designTokenOutput.get().asFile.exists()) {
+            providers.exec {
+                commandLine("node", designTokenScript.asFile.absolutePath,
+                    "--input", designTokenReadme.asFile.absolutePath,
+                    "--output", designTokenOutput.get().asFile.absolutePath)
+            }.result.get().assertNormalExitValue()
+        }
+    }
+    commandLine("node", designTokenScript.asFile.absolutePath,
+        "--input", designTokenReadme.asFile.absolutePath,
+        "--output", designTokenOutput.get().asFile.absolutePath, "--check")
+}
+generateDesignTokens.configure { mustRunAfter(checkDesignTokens) }
+androidComponents {
+    onVariants { variant ->
+        requireNotNull(variant.sources.kotlin) { "Missing Kotlin sources for ${variant.name}" }
+            .addGeneratedSourceDirectory(generateDesignTokens, GenerateDesignTokensTask::outputDir)
+    }
+}
+
+val designTokenClasses = listOf(
+    "com.ignacioli.finecoach.TokenParityTests",
+    "com.ignacioli.finecoach.TypographyTests",
+    "com.ignacioli.finecoach.ContrastTests",
+    "com.ignacioli.finecoach.TokenGeneratorTests",
+)
+val designTokenGate = tasks.register<Test>("s0G1") {
+    group = "verification"
+    description = "Token generation/parity, typography, contrast and generator negative tests"
+    dependsOn(checkDesignTokens)
+    val debugTest = tasks.named<Test>("testDebugUnitTest").get()
+    testClassesDirs = debugTest.testClassesDirs
+    classpath = debugTest.classpath
+    javaLauncher.set(debugTest.javaLauncher)
+    setJvmArgs(debugTest.jvmArgs)
+    jvmArgumentProviders.addAll(debugTest.jvmArgumentProviders)
+    systemProperties(debugTest.systemProperties)
+    workingDir = debugTest.workingDir
+    filter {
+        setIncludePatterns(*designTokenClasses.toTypedArray())
+        isFailOnNoMatchingTests = true
+    }
+    failOnNoDiscoveredTests.set(true)
+    reports.junitXml.required.set(true)
+    reports.junitXml.outputLocation.set(layout.buildDirectory.dir("test-results/s0G1"))
+    reports.html.outputLocation.set(layout.buildDirectory.dir("reports/tests/s0G1"))
+    binaryResultsDirectory.set(layout.buildDirectory.dir("test-results/s0G1/binary"))
+    inputs.file(designTokenScript)
+    inputs.file(designTokenReadme)
+    outputs.upToDateWhen { false }
+    outputs.doNotCacheIf("G1 evidence must execute on this host") { true }
+}
+val validateDesignTokenGate = tasks.register("validateS0G1Results") {
+    doLast {
+        val gate = designTokenGate.get()
+        check(!gate.state.skipped && gate.state.failure == null) {
+            "s0G1 did not successfully execute: ${gate.state.skipMessage ?: gate.state.failure}"
+        }
+        val xmlFiles = gate.reports.junitXml.outputLocation.get().asFile
+            .listFiles { file -> file.name.startsWith("TEST-") && file.extension == "xml" }.orEmpty()
+        check(xmlFiles.isNotEmpty()) { "s0G1 has no JUnit XML" }
+        val factory = DocumentBuilderFactory.newInstance().apply {
+            setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
+            setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+            setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "")
+            setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "")
+        }
+        val counts = mutableMapOf<String, Int>()
+        for (xml in xmlFiles) {
+            val suite = factory.newDocumentBuilder().parse(xml).documentElement
+            val name = suite.getAttribute("name")
+            check(name in designTokenClasses) { "Unexpected G1 suite: $name" }
+            val cases = suite.getElementsByTagName("testcase")
+            val count = suite.getAttribute("tests").toInt()
+            check(count > 0 && count == cases.length) { "Empty/inconsistent G1 suite: $name" }
+            for (attribute in listOf("failures", "errors", "skipped")) {
+                check(suite.getAttribute(attribute).toInt() == 0) { "$name has $attribute" }
+            }
+            for (index in 0 until cases.length) {
+                val case = cases.item(index) as Element
+                check(listOf("skipped", "failure", "error").all {
+                    case.getElementsByTagName(it).length == 0
+                }) { "Unsuccessful G1 testcase: $name.${case.getAttribute("name")}" }
+            }
+            check(counts.put(name, count) == null) { "Duplicate G1 suite: $name" }
+        }
+        check(counts.keys == designTokenClasses.toSet()) { "Missing G1 suites: ${designTokenClasses - counts.keys}" }
+        val expectedCounts = mapOf(
+            "com.ignacioli.finecoach.TokenParityTests" to 6,
+            "com.ignacioli.finecoach.TypographyTests" to 7,
+            "com.ignacioli.finecoach.ContrastTests" to 17,
+            "com.ignacioli.finecoach.TokenGeneratorTests" to 9,
+        )
+        check(counts == expectedCounts) { "Unexpected G1 testcase counts: $counts; expected $expectedCounts" }
+        logger.lifecycle("s0G1: ${counts.values.sum()} tests, 0 failures/errors/skips; $counts")
+    }
+}
+designTokenGate.configure { finalizedBy(validateDesignTokenGate) }

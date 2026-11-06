@@ -647,3 +647,54 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 | 启动进入首页（§9.3 ② 历史记录；C31 已由 `654e1b8` 删除，不再生效） | 开屏叠层保持约 0.3 s 后淡出，`fast` + `standard`；只在冷启动播一次 | 不叠这一层，直接显示首页 |
 
 迁移范围：本轮只有训练页（ActiveSession 与 `FCSetRow`、`FCSetStateCircle`）改用 `FCMotion`；其他页面的现有数值与 token 相同，改到哪页再迁哪页（`components.md` §1.3）。
+
+## 15. Android 映射规则
+
+T012 文档回填（2026-11-05）。本节解释既有 token 的跨端单位与字体映射，不修改 §2～§14 的值、色值、样式名或组件 anatomy。来源规格为 `007-android-port/s0-infrastructure/spec.md`（下称 S0 spec）、`plan.md` §3.3、`tasks.md` T012/T013 及上级 ADR-001 §7.2；本轮读取的是独立 `specs-android-s0` worktree，路径见 [Android 执行记录](../../android/README.md#s0-05-t012android-映射文档)。负责人 2026-11-03 批准 S0 spec/plan/tasks 及 D02/D05/D14；下文明确标为待核实的实现细节不因此视为已批准。
+
+### 15.1 单位与 fontScale
+
+| 规则 | 映射与边界 | 来源（iOS 路径均相对产品根；行号以 `c381853` 为基点） |
+|---|---|---|
+| 字号 pt → sp | §3.2/§3.3 的字号数值 `s` 生成 `s.sp`，基准 `fontScale=1` 时数值 1pt→1sp；不承诺跨端 px、字形墨迹或物理尺寸相等。 | `ios/FineCoachApp/DesignSystem/Typography.swift:116–160`；S0-FR-052；负责人 2026-11-03 批准 S0 规则基准。 |
+| 几何 pt → dp | §4 间距、§5 固定圆角及已批准组件尺寸/描边数值 `g` 对应 `g.dp`（1pt→1dp），保留小数，不乘 fontScale。§6 的 1pt 分割线、1.5pt 描边同理，不改成按设备像素的 hairline。dp 会随 density 换算成 px，但不随字体设置缩放。 | `ios/FineCoachApp/DesignSystem/Tokens.swift:68–90`；本 README §6；S0-FR-052；负责人 2026-11-03。尺寸/描边没有统一 iOS token 常量，不虚构常量来源。 |
+| 正文与字形缩放 | 14 个文本样式及随包 `‹ › ✓` 都使用 sp，交由平台/Compose 响应系统字体设置，不另乘 `fontScale` 或硬编码 sp→px 公式。iOS 使用各样式的 `UIFontMetrics` 基准，字形用 body 基准；Android 不把这些 UIKit 基准名当作另一组字号或相同缩放曲线。 | 本 README §3.1/§7.2；`ios/FineCoachApp/DesignSystem/Typography.swift:178–226`、`ios/FineCoachApp/DesignSystem/Components/FCSymbol.swift:102–108`；S0-FR-051/052、D05/D14；负责人 2026-11-03（随包字形原决定 2026-10-10）。 |
+| 缩放限制 | token 层不锁 `fontScale=1`，不设置全局上限、不把文字改为 dp；S0-FR-052 没有批准任何样式级 fontScale clamp。G5 固定 fontScale 是测试环境约束，不是产品限制。组件既有换行、最小触控尺寸或局部文字适配约束仍按 components 执行，不推广为全局缩放限制；新增例外见 §15.5。 | `ios/FineCoachApp/DesignSystem/Typography.swift:209–226`（无上限）；components §2 `DS-BASE` 及 §4 的 `DS-PAGE-HEADER`、§3 的 `DS-SET-ROW`；S0-FR-052/090；负责人 2026-11-03。 |
+
+Android 14+ 字体缩放可以是非线性的，不能把 px 定义成 `sp × density × fontScale`。这里的 1:1 是未缩放设计数值的映射，沿用平台 sp 转换；见 [Android 字体缩放说明](https://developer.android.com/about/versions/14/features#non-linear-font-scaling)（2026-11-05 核对）。
+
+### 15.2 lineHeight 与 letterSpacing
+
+- **输入语义**：§3 两张表的「行高」是无量纲倍率 `m`，不是 pt/sp。Android 的名义目标为 `lineHeight=(s × m).sp`，保留乘积精度，不四舍五入到整数，不把 `m` 直接当 sp。字号与行高均使用 sp，由平台分别换算；不承诺所有系统字体设置下换算后的 px 比率恒定。来源：`ios/FineCoachApp/DesignSystem/Typography.swift:108–160`、`:218–226`；S0-FR-051/052；负责人 2026-11-03。
+- **iOS 实际实现**：`View.fcFont` 先通过 `UIFontMetrics` 得到 `scaledFont`，令 `desiredLineHeight=scaledFont.pointSize × m`，再应用 `.lineSpacing(max(0, desiredLineHeight-scaledFont.lineHeight))`。自然行高超过目标时不压缩，且 lineSpacing 不等于强设首尾行盒高度。`Text.fcFont` 只缩放字体，不加行间距，也不响应局部 Dynamic Type override。来源：`ios/FineCoachApp/DesignSystem/Typography.swift:211–226`、`:244–257`；S0-FR-051/052；负责人 2026-11-03 要求对齐既有实现，精确行盒差异见 §15.5。
+- **Compose 处理边界**：`TextStyle.lineHeight` 表达总行高；`PlatformTextStyle(includeFontPadding=false)` 可去除平台额外字体 padding，`LineHeightStyle.Alignment` 控制剩余空间分配，`LineHeightStyle.Trim` 控制首尾额外空间，Trim 需配合 `includeFontPadding=false`。这些 API 已由 [官方段落排版文档](https://developer.android.com/develop/ui/compose/text/style-paragraph)核对（2026-11-05）；不能仅套 `(s × m).sp` 就宣称重现 iOS 的自然行高下限和首尾行盒。本轮未指定 Alignment/Trim 组合，亦未将 includeFontPadding 策略标为已完成 parity；见 §15.5。对齐依据同上 iOS `:218–226`、`:244–257`，S0-FR-051/052、负责人 2026-11-03；API 机制不是额外的负责人设计决定。
+- **letterSpacing**：全部文本样式显式对应 `letterSpacing=0.sp`，不继承 Material typography 的非零默认字距，不把倍率或字重当字距。iOS 没有额外 tracking/kerning，使用默认 0。来源：本 README §3.1；`ios/FineCoachApp/DesignSystem/Typography.swift:230–234`；S0-FR-051/052；负责人 2026-11-03 沿用既有排版。
+
+### 15.3 随包字体与 weight
+
+复用 [NotoSansSC-VF.otf](../../ios/FineCoachApp/Resources/Fonts/NotoSansSC-VF.otf) 和 [OFL.txt](../../ios/FineCoachApp/Resources/Fonts/OFL.txt)，完整字表、不裁剪、不下载字体。所有字重都来自同一个 variable font 文件，不存在四份静态字重文件；字体与许可的 Android 落地由 T013 核实，不在 T012 复制资产。来源：本 README §3.1/§7.2；`ios/FineCoachApp/DesignSystem/Typography.swift:8–25`、`:35–54`；ADR-001 §7.2、S0-FR-052、D05/D14（负责人 2026-11-03；原完整可变字体决定 2026-09-22）。
+
+| 表中 weight | 字体文件与轴值 | Compose 匹配含义 |
+|---|---|---|
+| 400 Regular | `NotoSansSC-VF.otf`，`wght=400` | `FontWeight.Normal`；字体实例显式配置相同轴值 |
+| 500 Medium | 同文件，`wght=500` | `FontWeight.Medium`；同上 |
+| 600 SemiBold | 同文件，`wght=600` | `FontWeight.SemiBold`；600 没有 named instance，仍使用 variable axis 插值 |
+| 700 Bold | 同文件，`wght=700` | `FontWeight.Bold`；字体实例显式配置相同轴值 |
+
+上表逐行来源：`ios/FineCoachApp/DesignSystem/Typography.swift:8–17`、`:35–54`、`:116–151`；`ios/FineCoachTests/DesignSystem/TypographyHarnessTests.swift:29–50` 明确检查四档轴值；S0-FR-051/052、D05/D14，负责人 2026-11-03。Compose 可用 `FontVariation.Settings(FontVariation.weight(w))` 配置同一资源的各个 weight 实例，见 [官方字体文档](https://developer.android.com/develop/ui/compose/text/fonts)（2026-11-05 核对）；不能只声明 `fontWeight` 后假定已命中轴值。
+
+缺少静态 600 不是缺失字重，不能以 500/700 或合成粗体替代；缺资产、加载失败、缺字或不能得到要求轴值时，记录验证失败/待核实，不改用系统字体、不偷偷取最近字重。iOS 的注册失败 fallback 与本规则有差异，见 §15.5。默认字重和允许变体仅取 §3 表：`callout` 400/600、`compact` 选中/今天 600；`title` 的 700 和 `caption` 的 600 分别复用已具名 `titleEmphasis`、`sectionLabel`，不另增样式。来源：`Typography.swift:67–81`、`:164–174`、`TypographyHarnessTests.swift:67–99`（完整路径同上）；S0-FR-051、D05/D14，负责人 2026-11-03。正文与 `‹ › ✓` 都遵循此随包规则；本节不决定其他符号的 Android 资产。
+
+### 15.4 capsule
+
+`radius.capsule` 是随实际尺寸计算的 shape，不生成固定 dp 常量或巨大半径。Android 可用 `RoundedCornerShape(percent=50)`：半径取较短边的 50%，水平胶囊宽≥高时即高度/2；随内容增高后重新按实际尺寸计算。其余 §5 数值圆角照 §15.1 生成 dp。来源：`ios/FineCoachApp/DesignSystem/Tokens.swift:79–90`（iOS 使用 `Capsule()`）；本 README §5；S0-FR-051/052；负责人 2026-11-03；[Compose shape API](https://developer.android.com/reference/kotlin/androidx/compose/foundation/shape/package-summary)（2026-11-05 核对）。不以 `VisionHarnessTests.testRadiusTokenValues` 当作 capsule 运行验证，该方法只断言五个固定半径（`ios/FineCoachTests/DesignSystem/VisionHarnessTests.swift:111–119`）。
+
+### 15.5 待核实
+
+| 项目 | 已知证据与边界 | 后续处理 |
+|---|---|---|
+| 精确行盒、自然行高下限与首尾留白 | iOS `View.fcFont` 用非负 lineSpacing，`Text.fcFont` 不加行间距；S0-FR-051 要求行高 parity，但 `TypographyHarnessTests.swift:93–99` 只验证倍率等元数据，没有渲染行盒证据。当前没有获批的 Compose Alignment/Trim/includeFontPadding 组合；名义 sp 乘积不证明同样结果。 | T013 对所用字体/Compose 版本核实单行、多行及 fontScale 下的自然 metrics 和首尾行为；记录 G1 的可证明范围。需要偏离 iOS/批准设计的策略由负责人裁决，不改 iOS 或降低断言。未核实前不宣称精确行高 parity。 |
+| 字体失败路径不一致 | iOS `Typography.swift:40–43` 在注册失败时使用系统字体，但 iOS harness `:20–50` 将注册/轴值失败判失败；D05/D14 已定 Android 随包字体，系统字体不是候选。 | 不照搬 fallback、不修改 iOS；T013 验证实际资源加载、四档轴值和 `‹ › ✓` 覆盖，失败明确报告；若要改变故障行为，交负责人单独裁决。 |
+| 局部缩放适配边界 | S0 没有统一 clamp 清单；components 的 `DS-SET-ROW` 单行数值最小缩放 0.8 等是组件规则，不等于全局 fontScale 上限。UIKit scalingBase 与 Android 非线性 sp 不存在已批准逐档等价表。 | 按后续获批组件逐项映射；不为 T013 发明上限或重建 UIKit 曲线。 |
+| 来源文件旧措辞 | ADR-001 §7.2 仍写中间格式待定，plan §3.3 仍保留「若 D02 选 JSON」分支；S0 spec D02/D05/D14 已于 2026-11-03 定案。 | 本轮遵循直接 README→Kotlin 与随包字体；来源 owner 跟踪历史文字同步，不重开决定，不修改只读规格。 |
+| 独立复核 | T012 要求 cursor-agent 对照 iOS token 测试复核；本轮仅 Codex 文档与静态来源核对。 | 待 cursor-agent 独立复核，不把本轮 readback 当作该复核或 G1/G5 通过。 |

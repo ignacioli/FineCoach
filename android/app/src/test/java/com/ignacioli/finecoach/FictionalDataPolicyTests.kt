@@ -34,6 +34,17 @@ internal object FictionalDataPolicy {
     fun validateFixture(path: String, bytes: ByteArray, declaration: String? = null) {
         validateName(path)
         val hash = MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
+        // A third-party license is not fictional data. Exempt only the exact
+        // source/APK paths, and require byte provenance from the iOS original.
+        if (path in setOf("main/assets/fonts/OFL.txt", "assets/fonts/OFL.txt")) {
+            val app = File(requireNotNull(System.getProperty("finecoach.storageProjectDirectory")))
+            val original = File(app, "../../ios/FineCoachApp/Resources/Fonts/OFL.txt").canonicalFile
+            require(original.isFile) { "Missing original font license: $original" }
+            val originalHash = MessageDigest.getInstance("SHA-256").digest(original.readBytes())
+                .joinToString("") { "%02x".format(it) }
+            require(hash == originalHash) { "Font license differs from iOS original: $path" }
+            return
+        }
         if (policyFixtures[path] == hash) return
         val text = bytes.toString(Charsets.UTF_8)
         require(text.contains(DECLARATION) || declaration?.contains(DECLARATION) == true) { "Fixture lacks fictional declaration: $path" }
@@ -139,6 +150,32 @@ class FictionalDataPolicyTests {
     @Test fun rejectsUndeclaredFixtureAndChangedLegacyFixture() {
         listOf("fictional.json", "privacy/network.txt").forEach {
             assertThrows(IllegalArgumentException::class.java) { FictionalDataPolicy.validateFixture(it, "{}".toByteArray()) }
+        }
+    }
+    @Test fun exactFontLicensePathsMatchIosOriginalWithoutFictionalDeclaration() {
+        val license = File(app, "src/main/assets/fonts/OFL.txt").readBytes()
+        listOf("main/assets/fonts/OFL.txt", "assets/fonts/OFL.txt").forEach {
+            FictionalDataPolicy.validateFixture(it, license)
+        }
+    }
+    @Test fun rejectsUndeclaredNeighborOfFontLicense() {
+        listOf("main/assets/fonts/OTHER.txt", "assets/fonts/OTHER.txt", "fonts/OTHER.txt").forEach {
+            assertThrows(IllegalArgumentException::class.java) {
+                FictionalDataPolicy.validateFixture(it, "Undeclared neighboring fixture".toByteArray())
+            }
+        }
+        val license = File(app, "src/main/assets/fonts/OFL.txt").readBytes()
+        listOf("fonts/OFL.txt", "main/assets/other/OFL.txt", "assets/other/OFL.txt").forEach {
+            assertThrows(IllegalArgumentException::class.java) { FictionalDataPolicy.validateFixture(it, license) }
+        }
+    }
+    @Test fun rejectsChangedFontLicenseEvenWithFictionalDeclaration() {
+        val changed = File(app, "src/main/assets/fonts/OFL.txt").readBytes() +
+            "\nfictional-data deliberately modified license fixture\n".toByteArray()
+        listOf("main/assets/fonts/OFL.txt", "assets/fonts/OFL.txt").forEach {
+            assertThrows(IllegalArgumentException::class.java) {
+                FictionalDataPolicy.validateFixture(it, changed, FictionalDataPolicy.DECLARATION)
+            }
         }
     }
     @Test fun rejectsVectorWithoutFictionalTag() {

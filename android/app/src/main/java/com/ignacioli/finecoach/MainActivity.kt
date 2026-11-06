@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.ignacioli.finecoach.designsystem.FineCoachTheme
 
 class MainActivity : ComponentActivity() {
     internal lateinit var privacyCover: PrivacyCoverPolicy
@@ -22,16 +23,18 @@ class MainActivity : ComponentActivity() {
         privacyCover.onCreate()
         enableEdgeToEdge()
         setContent {
-            val provider = application as? ShellContentProvider
-            if (provider != null) {
-                provider.Content(privacyCover)
-            } else {
-                NavHost(
-                    navController = rememberNavController(),
-                    startDestination = "placeholder",
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    composable("placeholder") { Box(Modifier.fillMaxSize()) }
+            FineCoachTheme {
+                val provider = application as? ShellContentProvider
+                if (provider != null) {
+                    provider.Content(privacyCover)
+                } else {
+                    NavHost(
+                        navController = rememberNavController(),
+                        startDestination = "placeholder",
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        composable("placeholder") { Box(Modifier.fillMaxSize()) }
+                    }
                 }
             }
         }

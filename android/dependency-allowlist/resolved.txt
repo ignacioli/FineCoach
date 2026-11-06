@@ -70,6 +70,10 @@ androidx.compose.foundation:foundation-android:1.12.1 app:debugCompileClasspath
 androidx.compose.foundation:foundation-layout-android:1.12.1 app:debugCompileClasspath
 androidx.compose.foundation:foundation-layout:1.12.1 app:debugCompileClasspath
 androidx.compose.foundation:foundation:1.12.1 app:debugCompileClasspath
+androidx.compose.material3:material3-android:1.4.0 app:debugCompileClasspath
+androidx.compose.material3:material3:1.4.0 app:debugCompileClasspath
+androidx.compose.material:material-ripple-android:1.12.1 app:debugCompileClasspath
+androidx.compose.material:material-ripple:1.12.1 app:debugCompileClasspath
 androidx.compose.runtime:runtime-android:1.12.1 app:debugCompileClasspath
 androidx.compose.runtime:runtime-annotation-android:1.12.1 app:debugCompileClasspath
 androidx.compose.runtime:runtime-annotation:1.12.1 app:debugCompileClasspath
@@ -166,6 +170,10 @@ androidx.compose.foundation:foundation-android:1.12.1 app:debugRuntimeClasspath
 androidx.compose.foundation:foundation-layout-android:1.12.1 app:debugRuntimeClasspath
 androidx.compose.foundation:foundation-layout:1.12.1 app:debugRuntimeClasspath
 androidx.compose.foundation:foundation:1.12.1 app:debugRuntimeClasspath
+androidx.compose.material3:material3-android:1.4.0 app:debugRuntimeClasspath
+androidx.compose.material3:material3:1.4.0 app:debugRuntimeClasspath
+androidx.compose.material:material-ripple-android:1.12.1 app:debugRuntimeClasspath
+androidx.compose.material:material-ripple:1.12.1 app:debugRuntimeClasspath
 androidx.compose.runtime:runtime-android:1.12.1 app:debugRuntimeClasspath
 androidx.compose.runtime:runtime-annotation-android:1.12.1 app:debugRuntimeClasspath
 androidx.compose.runtime:runtime-annotation:1.12.1 app:debugRuntimeClasspath
@@ -196,6 +204,7 @@ androidx.customview:customview-poolingcontainer:1.0.0 app:debugRuntimeClasspath
 androidx.emoji2:emoji2:1.4.0 app:debugRuntimeClasspath
 androidx.graphics:graphics-path:1.0.1 app:debugRuntimeClasspath
 androidx.interpolator:interpolator:1.0.0 app:debugRuntimeClasspath
+androidx.lifecycle:lifecycle-common-java8:2.11.0 app:debugRuntimeClasspath
 androidx.lifecycle:lifecycle-common-jvm:2.11.0 app:debugRuntimeClasspath
 androidx.lifecycle:lifecycle-common:2.11.0 app:debugRuntimeClasspath
 androidx.lifecycle:lifecycle-livedata-core:2.11.0 app:debugRuntimeClasspath
@@ -274,6 +283,10 @@ androidx.compose.foundation:foundation-android:1.12.1 app:debugUnitTestRuntimeCl
 androidx.compose.foundation:foundation-layout-android:1.12.1 app:debugUnitTestRuntimeClasspath
 androidx.compose.foundation:foundation-layout:1.12.1 app:debugUnitTestRuntimeClasspath
 androidx.compose.foundation:foundation:1.12.1 app:debugUnitTestRuntimeClasspath
+androidx.compose.material3:material3-android:1.4.0 app:debugUnitTestRuntimeClasspath
+androidx.compose.material3:material3:1.4.0 app:debugUnitTestRuntimeClasspath
+androidx.compose.material:material-ripple-android:1.12.1 app:debugUnitTestRuntimeClasspath
+androidx.compose.material:material-ripple:1.12.1 app:debugUnitTestRuntimeClasspath
 androidx.compose.runtime:runtime-android:1.12.1 app:debugUnitTestRuntimeClasspath
 androidx.compose.runtime:runtime-annotation-android:1.12.1 app:debugUnitTestRuntimeClasspath
 androidx.compose.runtime:runtime-annotation:1.12.1 app:debugUnitTestRuntimeClasspath
@@ -309,6 +322,7 @@ androidx.customview:customview-poolingcontainer:1.0.0 app:debugUnitTestRuntimeCl
 androidx.emoji2:emoji2:1.4.0 app:debugUnitTestRuntimeClasspath
 androidx.graphics:graphics-path:1.0.1 app:debugUnitTestRuntimeClasspath
 androidx.interpolator:interpolator:1.0.0 app:debugUnitTestRuntimeClasspath
+androidx.lifecycle:lifecycle-common-java8:2.11.0 app:debugUnitTestRuntimeClasspath
 androidx.lifecycle:lifecycle-common-jvm:2.11.0 app:debugUnitTestRuntimeClasspath
 androidx.lifecycle:lifecycle-common:2.11.0 app:debugUnitTestRuntimeClasspath
 androidx.lifecycle:lifecycle-livedata-core:2.11.0 app:debugUnitTestRuntimeClasspath
@@ -443,6 +457,10 @@ androidx.compose.foundation:foundation-android:1.12.1 app:releaseCompileClasspat
 androidx.compose.foundation:foundation-layout-android:1.12.1 app:releaseCompileClasspath
 androidx.compose.foundation:foundation-layout:1.12.1 app:releaseCompileClasspath
 androidx.compose.foundation:foundation:1.12.1 app:releaseCompileClasspath
+androidx.compose.material3:material3-android:1.4.0 app:releaseCompileClasspath
+androidx.compose.material3:material3:1.4.0 app:releaseCompileClasspath
+androidx.compose.material:material-ripple-android:1.12.1 app:releaseCompileClasspath
+androidx.compose.material:material-ripple:1.12.1 app:releaseCompileClasspath
 androidx.compose.runtime:runtime-android:1.12.1 app:releaseCompileClasspath
 androidx.compose.runtime:runtime-annotation-android:1.12.1 app:releaseCompileClasspath
 androidx.compose.runtime:runtime-annotation:1.12.1 app:releaseCompileClasspath
@@ -538,6 +556,10 @@ androidx.compose.foundation:foundation-android:1.12.1 app:releaseRuntimeClasspat
 androidx.compose.foundation:foundation-layout-android:1.12.1 app:releaseRuntimeClasspath
 androidx.compose.foundation:foundation-layout:1.12.1 app:releaseRuntimeClasspath
 androidx.compose.foundation:foundation:1.12.1 app:releaseRuntimeClasspath
+androidx.compose.material3:material3-android:1.4.0 app:releaseRuntimeClasspath
+androidx.compose.material3:material3:1.4.0 app:releaseRuntimeClasspath
+androidx.compose.material:material-ripple-android:1.12.1 app:releaseRuntimeClasspath
+androidx.compose.material:material-ripple:1.12.1 app:releaseRuntimeClasspath
 androidx.compose.runtime:runtime-android:1.12.1 app:releaseRuntimeClasspath
 androidx.compose.runtime:runtime-annotation-android:1.12.1 app:releaseRuntimeClasspath
 androidx.compose.runtime:runtime-annotation:1.12.1 app:releaseRuntimeClasspath
@@ -567,6 +589,7 @@ androidx.customview:customview-poolingcontainer:1.0.0 app:releaseRuntimeClasspat
 androidx.emoji2:emoji2:1.4.0 app:releaseRuntimeClasspath
 androidx.graphics:graphics-path:1.0.1 app:releaseRuntimeClasspath
 androidx.interpolator:interpolator:1.0.0 app:releaseRuntimeClasspath
+androidx.lifecycle:lifecycle-common-java8:2.11.0 app:releaseRuntimeClasspath
 androidx.lifecycle:lifecycle-common-jvm:2.11.0 app:releaseRuntimeClasspath
 androidx.lifecycle:lifecycle-common:2.11.0 app:releaseRuntimeClasspath
 androidx.lifecycle:lifecycle-livedata-core:2.11.0 app:releaseRuntimeClasspath
