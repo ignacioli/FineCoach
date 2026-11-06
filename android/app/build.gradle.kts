@@ -9,6 +9,9 @@ import org.w3c.dom.Element
 import org.gradle.process.CommandLineArgumentProvider
 import org.gradle.process.ExecOperations
 import javax.inject.Inject
+import java.security.MessageDigest
+import java.util.concurrent.TimeUnit
+import java.util.zip.ZipFile
 
 plugins {
     alias(libs.plugins.android.application)
@@ -402,14 +405,158 @@ val pendingGates = mapOf(
     "s0G4" to "T017: entry and layout harness",
     "s0G5" to "T019/T020: screenshot verify and owner-approved baselines",
     "s0G8" to "T004-T010: complete privacy and scope checks",
-    "s0SeedIsolation" to "T025: release seed isolation",
-    "s0InstallSeededDebug" to "T026: explicit device install and seed verification",
 )
 pendingGates.forEach { (gate, owner) ->
     tasks.register(gate) {
         group = "verification"
         description = "未实现 — $owner"
         doLast { throw GradleException("$gate 未实现：$owner；不能报告 PASS。") }
+    }
+}
+
+// S0-12: inspect the actual APK entries, including binary XML/string pools.
+val seedIsolation = tasks.register("s0SeedIsolation") {
+    group = "verification"
+    description = "Reject debug seed/catalog code, resources and entries in the assembled Release APK"
+    dependsOn("assembleRelease")
+}
+androidComponents.onVariants(androidComponents.selector().withBuildType("release")) { variant ->
+    val apkDirectory = variant.artifacts.get(SingleArtifact.APK)
+    seedIsolation.configure {
+        inputs.dir(apkDirectory)
+        doLast {
+            val apks = apkDirectory.get().asFile.walkTopDown().filter { it.isFile && it.extension == "apk" }.toList()
+            check(apks.size == 1) { "s0SeedIsolation: expected exactly one Release APK" }
+            val forbidden = listOf(
+                "com/ignacioli/finecoach/seed/", "com.ignacioli.finecoach.seed.",
+                "DebugSeed", "SeedContributor", "SeedResult", "MetadataSeedContributor",
+                "S0ComponentCatalog", "S0Catalog", "S0DebugApplication", "FineCoachSeed", "finecoach-debug-seed.db",
+                "debug_seed.", "debug_seed_", "s0_catalog", "s0_seed", "SEED version=",
+            )
+            val encoded = forbidden.flatMap { name ->
+                listOf(Charsets.UTF_8, Charsets.UTF_16LE, Charsets.UTF_16BE).map {
+                    String(name.toByteArray(it), Charsets.ISO_8859_1)
+                }
+            }
+            var dexCount = 0
+            var resourceCount = 0
+            var manifestCount = 0
+            ZipFile(apks.single()).use { zip ->
+                for (entry in zip.entries().asSequence().filter { !it.isDirectory }) {
+                    check(forbidden.none { entry.name.contains(it, ignoreCase = true) } &&
+                        !Regex("(?i)(^|[/_.-])(seed|catalog)([/_.-]|$)").containsMatchIn(entry.name)) {
+                        "s0SeedIsolation: debug APK entry ${entry.name}"
+                    }
+                    if (Regex("classes[0-9]*\\.dex").matches(entry.name)) dexCount++
+                    if (entry.name == "AndroidManifest.xml") manifestCount++
+                    if (entry.name == "resources.arsc") resourceCount++
+                    val content = zip.getInputStream(entry).use { String(it.readBytes(), Charsets.ISO_8859_1) }
+                    check(encoded.none { content.contains(it) }) { "s0SeedIsolation: debug content in ${entry.name}" }
+                }
+            }
+            check(dexCount > 0 && manifestCount == 1 && resourceCount == 1) {
+                "s0SeedIsolation: missing dex, manifest or resource table"
+            }
+            val digest = MessageDigest.getInstance("SHA-256").digest(apks.single().readBytes())
+                .joinToString("") { "%02x".format(it) }
+            logger.lifecycle("s0SeedIsolation: status=ok apk=${apks.single().name} sha256=$digest dex=$dexCount manifest=1 resources=1")
+        }
+    }
+}
+
+// No shell command strings: serial and arguments remain distinct process arguments.
+abstract class SeedDeviceTask : DefaultTask() {
+    @get:InputFile abstract val adbFile: RegularFileProperty
+    @get:Input abstract val deviceSerial: Property<String>
+    @get:Input abstract val environmentSerial: Property<String>
+
+    fun adb(vararg arguments: String): String {
+        val output = temporaryDir.resolve("adb-output.txt")
+        val process = ProcessBuilder(listOf(adbFile.get().asFile.absolutePath) + arguments)
+            .redirectErrorStream(true).redirectOutput(output).start()
+        try {
+            check(process.waitFor(60, TimeUnit.SECONDS)) { "S0 seed adb command timed out" }
+            check(process.exitValue() == 0) { "S0 seed adb command failed (exit=${process.exitValue()})" }
+            return output.readText()
+        } finally {
+            if (process.isAlive) process.destroyForcibly()
+            output.delete()
+        }
+    }
+
+    fun requireSingleDevice(): String {
+        val serial = deviceSerial.get()
+        check(Regex("[A-Za-z0-9][A-Za-z0-9._:-]*").matches(serial)) {
+            "Specify -Pandroid.device=<serial> or ANDROID_SERIAL; no automatic selection"
+        }
+        check(environmentSerial.get().isBlank() || environmentSerial.get() == serial) { "Conflicting ANDROID_SERIAL and android.device" }
+        val inventory = adb("devices", "-l")
+        check(inventory.contains("List of devices attached")) { "Missing adb inventory" }
+        val devices = inventory.substringAfter("List of devices attached").lineSequence()
+            .filter { it.isNotBlank() }.map { it.trim().split(Regex("\\s+")) }.toList()
+        check(devices.size == 1 && devices.single().take(2) == listOf(serial, "device")) {
+            "Exactly one connected, authorized device matching the explicit serial is required"
+        }
+        return serial
+    }
+}
+
+val seedDeviceSerial = providers.gradleProperty("android.device").orElse(providers.environmentVariable("ANDROID_SERIAL")).orElse("")
+val validateSeedDevice = tasks.register<SeedDeviceTask>("validateS0SeedDevice") {
+    group = "verification"
+    adbFile.set(androidComponents.sdkComponents.adb)
+    deviceSerial.set(seedDeviceSerial)
+    environmentSerial.set(providers.environmentVariable("ANDROID_SERIAL").orElse(""))
+    doLast { requireSingleDevice() }
+}
+// Ordering is added without changing the behavior of a direct installDebug invocation.
+tasks.matching { it.name == "installDebug" }.configureEach { mustRunAfter(validateSeedDevice) }
+val installSeededDebug = tasks.register<SeedDeviceTask>("s0InstallSeededDebug") {
+    group = "verification"
+    description = "Validate one explicit device, installDebug, seed via instrumentation, verify fresh logcat, launch shell"
+    dependsOn(validateSeedDevice, "installDebug")
+    adbFile.set(androidComponents.sdkComponents.adb)
+    deviceSerial.set(seedDeviceSerial)
+    environmentSerial.set(providers.environmentVariable("ANDROID_SERIAL").orElse(""))
+}
+androidComponents.onVariants(androidComponents.selector().withBuildType("debug")) { variant ->
+    val apkDirectory = variant.artifacts.get(SingleArtifact.APK)
+    installSeededDebug.configure {
+        inputs.dir(apkDirectory)
+        doLast {
+            val install = tasks.named("installDebug").get()
+            check(!install.state.skipped && install.state.failure == null && install.state.didWork) { "installDebug did not execute successfully" }
+            val serial = requireSingleDevice()
+            val api = adb("-s", serial, "shell", "getprop", "ro.build.version.sdk").trim().toInt()
+            check(api >= 31) { "S0 requires API 31+" }
+            val build = adb("-s", serial, "shell", "getprop", "ro.build.id").trim()
+            val result = adb("-s", serial, "shell", "am", "instrument", "-w", "-r",
+                "com.ignacioli.finecoach/.seed.DebugSeedInstrumentation")
+            val lines = result.lineSequence().map { it.trim() }.toList()
+            check(lines.count { it == "INSTRUMENTATION_CODE: -1" } == 1 &&
+                lines.none { it.startsWith("INSTRUMENTATION_FAILED") || it.startsWith("INSTRUMENTATION_ABORTED") }) {
+                "Seed instrumentation did not finish successfully"
+            }
+            fun resultValue(key: String): String = lines.single { it.startsWith("INSTRUMENTATION_RESULT: $key=") }.substringAfter('=')
+            val expected = resultValue("seed")
+            check(Regex("SEED version=[1-9][0-9]* rows=[1-9][0-9]* status=ok").matches(expected)) { "Missing successful seed result" }
+            val pid = resultValue("seed_pid").toInt().also { check(it > 0) }
+            val loggedAt = resultValue("seed_log_time").toLong().also { check(it > 0) }
+            val logs = adb("-s", serial, "logcat", "-d", "-v", "epoch", "--pid=$pid", "-s", "FineCoachSeed:I", "*:S")
+            val logPattern = Regex("^\\s*([0-9]+\\.[0-9]+)\\s+[0-9]+\\s+[0-9]+\\s+I\\s+FineCoachSeed\\s*:\\s*(SEED .*)$")
+            val fresh = logs.lineSequence().mapNotNull { logPattern.matchEntire(it) }.filter {
+                it.groupValues[1].toBigDecimal().multiply(1000.toBigDecimal()).toLong() >= loggedAt
+            }.map { it.groupValues[2] }.toList()
+            check(fresh == listOf(expected)) { "Missing, duplicate or stale SEED logcat event" }
+            val launch = adb("-s", serial, "shell", "am", "start", "-W", "-n", "com.ignacioli.finecoach/.MainActivity")
+            check(launch.lineSequence().any { it.trim() == "Status: ok" } && !launch.contains("Error:")) { "Debug shell launch failed" }
+            val apks = apkDirectory.get().asFile.walkTopDown().filter { it.isFile && it.extension == "apk" }.toList()
+            check(apks.size == 1) { "Expected exactly one Debug APK" }
+            val digest = MessageDigest.getInstance("SHA-256").digest(apks.single().readBytes())
+                .joinToString("") { "%02x".format(it) }
+            logger.lifecycle(expected)
+            logger.lifecycle("s0InstallSeededDebug: status=ok serial=$serial api=$api build=$build apkSha256=$digest")
+        }
     }
 }
 

@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <!-- fictional-data: shell-only seed harness; no exported application component. -->
+    <instrumentation
+        android:name="com.ignacioli.finecoach.seed.DebugSeedInstrumentation"
+        android:targetPackage="com.ignacioli.finecoach"
+        android:functionalTest="true" />
     <application android:name=".S0DebugApplication">
         <!-- Keep the Compose test host internal to the debug variant. -->
         <activity
