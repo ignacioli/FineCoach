@@ -5,11 +5,54 @@ import java.util.Locale
 import java.util.UUID
 
 private const val MAX_UTF8_BYTES = 64 * 1024
+private val CANONICAL_UUID_REGEX = Regex("^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$")
 
-private fun canonicalUUID(raw: String): String = UUID.fromString(raw).toString()
+private fun canonicalUUID(raw: String): String {
+    require(CANONICAL_UUID_REGEX.matches(raw)) { "UUID must be canonical 8-4-4-4-12 format" }
+    return UUID.fromString(raw).toString()
+}
+
+private fun isUnicodeWhitespace(codePoint: Int): Boolean = when (codePoint) {
+    0x0009, // TAB
+    0x000A, // LF
+    0x000B, // VT
+    0x000C, // FF
+    0x000D, // CR
+    0x0020, // SPACE
+    0x0085, // NEL
+    0x00A0, // NBSP
+    0x1680, // OGHAM SPACE MARK
+    0x2028, // LINE SEPARATOR
+    0x2029, // PARAGRAPH SEPARATOR
+    0x202F, // NARROW NBSP
+    0x205F, // MEDIUM MATHEMATICAL SPACE
+    0x3000, // IDEOGRAPHIC SPACE
+    -> true
+    in 0x2000..0x200A -> true // EN QUAD .. HAIR SPACE
+    else -> false
+}
+
+private fun trimUnicodeWhitespace(raw: String): String {
+    var start = 0
+    var end = raw.length
+
+    while (start < end) {
+        val codePoint = raw.codePointAt(start)
+        if (!isUnicodeWhitespace(codePoint)) break
+        start += Character.charCount(codePoint)
+    }
+    while (start < end) {
+        val codePoint = raw.codePointBefore(end)
+        if (!isUnicodeWhitespace(codePoint)) break
+        end -= Character.charCount(codePoint)
+    }
+    return raw.substring(start, end)
+}
+
+private fun utf8ByteCount(value: String): Int = value.toByteArray(Charsets.UTF_8).size
 
 private fun canonicalText(raw: String): String {
-    return Normalizer.normalize(raw.trim(), Normalizer.Form.NFC)
+    return Normalizer.normalize(trimUnicodeWhitespace(raw), Normalizer.Form.NFC)
 }
 
 @JvmInline
@@ -41,6 +84,14 @@ value class SessionID private constructor(val value: String) {
     companion object {
         fun parse(raw: String): SessionID = SessionID(canonicalUUID(raw))
         fun fromUUID(value: UUID): SessionID = SessionID(value.toString())
+    }
+}
+
+@JvmInline
+value class AppointmentID private constructor(val value: String) {
+    companion object {
+        fun parse(raw: String): AppointmentID = AppointmentID(canonicalUUID(raw))
+        fun fromUUID(value: UUID): AppointmentID = AppointmentID(value.toString())
     }
 }
 
@@ -90,11 +141,49 @@ value class StableExerciseID private constructor(val value: String) {
         fun parse(raw: String): StableExerciseID {
             val canonical = canonicalText(raw)
             require(canonical.isNotBlank()) { "StableExerciseID must be non-blank" }
-            require(canonical.toByteArray(Charsets.UTF_8).size <= MAX_UTF8_BYTES) {
+            require(utf8ByteCount(canonical) <= MAX_UTF8_BYTES) {
                 "StableExerciseID exceeds max UTF-8 length"
             }
             return StableExerciseID(canonical)
         }
+    }
+}
+
+@JvmInline
+value class ValidatedText private constructor(val value: String) {
+    companion object {
+        const val maximumUTF8Bytes: Int = MAX_UTF8_BYTES
+
+        fun parse(raw: String, allowEmpty: Boolean = false): ValidatedText {
+            val canonical = canonicalText(raw)
+            require(allowEmpty || canonical.isNotEmpty()) { "ValidatedText must not be empty" }
+            require(utf8ByteCount(canonical) <= maximumUTF8Bytes) {
+                "ValidatedText exceeds max UTF-8 length"
+            }
+            return ValidatedText(canonical)
+        }
+
+        fun required(raw: String): ValidatedText = parse(raw = raw, allowEmpty = false)
+
+        fun optional(raw: String?): ValidatedText? {
+            if (raw == null) return null
+            val canonical = canonicalText(raw)
+            if (canonical.isEmpty()) return null
+            require(utf8ByteCount(canonical) <= maximumUTF8Bytes) {
+                "ValidatedText exceeds max UTF-8 length"
+            }
+            return ValidatedText(canonical)
+        }
+    }
+
+    val isEmpty: Boolean get() = value.isEmpty()
+}
+
+@JvmInline
+value class NormalizedName private constructor(val value: String) {
+    companion object {
+        fun parse(raw: String): NormalizedName = NormalizedName(ValidatedText.required(raw).value)
+        fun optional(raw: String?): NormalizedName? = ValidatedText.optional(raw)?.let { NormalizedName(it.value) }
     }
 }
 
@@ -307,6 +396,9 @@ object CreditLedgerSourceEventKeyFactory {
 
     fun sessionReopen(sessionID: SessionID): SourceEventKey =
         SourceEventKey.parse("session-reopen:${keyUUID(sessionID.value)}")
+
+    fun appointmentAbsent(appointmentID: AppointmentID): SourceEventKey =
+        SourceEventKey.parse("appointment-absent:${keyUUID(appointmentID.value)}")
 
     fun appointmentAbsent(appointmentID: String): SourceEventKey =
         SourceEventKey.parse("appointment-absent:${keyUUID(canonicalUUID(appointmentID))}")
