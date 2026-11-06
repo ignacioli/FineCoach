@@ -1,8 +1,10 @@
 package com.ignacioli.finecoach.core.domain.student
 
+import com.ignacioli.finecoach.core.domain.common.NormalizedName
 import com.ignacioli.finecoach.core.domain.common.StudentID
 import com.ignacioli.finecoach.core.domain.common.StudentLifecycle
 import com.ignacioli.finecoach.core.domain.common.StudentSex
+import com.ignacioli.finecoach.core.domain.common.ValidatedText
 import java.time.Instant
 
 data class StudentDraft(
@@ -89,7 +91,7 @@ data class Student(
                 ?: throw StudentDomainException(StudentDomainError.invalidState, "Student sex is required")
             return Student(
                 studentID = studentID,
-                displayName = NormalizedName.parse(draft.displayName),
+                displayName = parseDisplayName(draft.displayName),
                 sex = sexValue,
                 trainingGoal = optionalText(draft.trainingGoal),
                 injuryNotes = optionalText(draft.injuryNotes),
@@ -103,12 +105,29 @@ data class Student(
         }
 
         fun optionalText(rawValue: String): ValidatedText? {
-            val canonical = ValidatedText.parse(rawValue, allowEmpty = true).value
-            return if (canonical.isEmpty()) {
-                null
-            } else {
-                ValidatedText.parse(canonical)
+            return try {
+                ValidatedText.optional(rawValue)
+            } catch (error: IllegalArgumentException) {
+                throw StudentDomainException(
+                    StudentDomainError.textTooLong,
+                    error.message ?: "Text exceeds max UTF-8 length",
+                )
             }
+        }
+
+        private fun parseDisplayName(raw: String): NormalizedName {
+            val canonical = try {
+                ValidatedText.parse(raw, allowEmpty = true)
+            } catch (error: IllegalArgumentException) {
+                throw StudentDomainException(
+                    StudentDomainError.textTooLong,
+                    error.message ?: "Text exceeds max UTF-8 length",
+                )
+            }
+            if (canonical.isEmpty) {
+                throw StudentDomainException(StudentDomainError.emptyText, "Text must not be empty")
+            }
+            return NormalizedName.parse(canonical.value)
         }
     }
 }
@@ -123,7 +142,7 @@ object StudentDeletionPolicy {
     fun confirmDisplayName(expected: NormalizedName, typed: String) {
         val confirmed = try {
             NormalizedName.parse(typed)
-        } catch (_: StudentDomainException) {
+        } catch (_: IllegalArgumentException) {
             throw StudentDomainException(StudentDomainError.invalidState, "Display name confirmation is invalid")
         }
         if (confirmed != expected) {

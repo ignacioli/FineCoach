@@ -3,11 +3,12 @@ package com.ignacioli.finecoach
 import com.ignacioli.finecoach.core.domain.common.StudentID
 import com.ignacioli.finecoach.core.domain.common.StudentLifecycle
 import com.ignacioli.finecoach.core.domain.common.StudentSex
+import com.ignacioli.finecoach.core.domain.common.ValidatedText
+import com.ignacioli.finecoach.core.domain.student.Student
 import com.ignacioli.finecoach.core.domain.student.StudentDeletionPolicy
 import com.ignacioli.finecoach.core.domain.student.StudentDomainError
 import com.ignacioli.finecoach.core.domain.student.StudentDomainException
 import com.ignacioli.finecoach.core.domain.student.StudentDraft
-import com.ignacioli.finecoach.core.domain.student.ValidatedText
 import java.time.Instant
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -96,6 +97,50 @@ class StudentDomainTests {
     }
 
     @Test
+    fun studentTextFieldsAccept65536Utf8BytesAndReject65537IncludingMultibyte() {
+        val exact = "你".repeat(21_845) + "a"
+        val oneByteOver = exact + "a"
+        assertEquals(65_536, exact.toByteArray(Charsets.UTF_8).size)
+        assertEquals(65_537, oneByteOver.toByteArray(Charsets.UTF_8).size)
+
+        textFields.forEach { field ->
+            val accepted = draft(field, exact).makeStudent(firstID, now)
+            assertEquals(exact, textValue(accepted, field))
+            assertEquals(65_536, textValue(accepted, field).toByteArray(Charsets.UTF_8).size)
+
+            assertDomainError(StudentDomainError.textTooLong) {
+                draft(field, oneByteOver).makeStudent(firstID, now)
+            }
+        }
+
+        val underByOneByte = "你".repeat(21_845)
+        val crossesWithOneHan = "你".repeat(21_846)
+        assertEquals(65_535, underByOneByte.toByteArray(Charsets.UTF_8).size)
+        assertEquals(65_538, crossesWithOneHan.toByteArray(Charsets.UTF_8).size)
+        assertEquals(underByOneByte, draft("displayName", underByOneByte).makeStudent(firstID, now).displayName.value)
+        assertDomainError(StudentDomainError.textTooLong) {
+            draft("displayName", crossesWithOneHan).makeStudent(firstID, now)
+        }
+    }
+
+    @Test
+    fun nbspWrappedDisplayNameTrimsLikeIos() {
+        val wrapped = "\u00A0Coach Student\u00A0"
+        val student = StudentDraft(
+            displayName = wrapped,
+            sex = StudentSex.female,
+            trainingGoal = "\u00A0",
+        ).makeStudent(firstID, now)
+
+        assertEquals("Coach Student", student.displayName.value)
+        assertNull(student.trainingGoal)
+        StudentDeletionPolicy.confirmDisplayName(expected = student.displayName, typed = wrapped)
+        assertDomainError(StudentDomainError.emptyText) {
+            StudentDraft(displayName = "\u00A0\u00A0", sex = StudentSex.female).makeStudent(firstID, now)
+        }
+    }
+
+    @Test
     fun allSexCasesAreAccepted() {
         StudentSex.entries.forEach { sex ->
             val student = StudentDraft(displayName = "Any Student", sex = sex).makeStudent(firstID, now)
@@ -159,6 +204,39 @@ class StudentDomainTests {
         assertEquals(composed.studentID, decomposed.studentID)
         assertEquals(composed.displayName, decomposed.displayName)
         assertEquals("Cafe\u00E9", decomposed.displayName.value)
+    }
+
+    private val textFields = listOf(
+        "displayName",
+        "trainingGoal",
+        "injuryNotes",
+        "privateCoachNote",
+        "phone",
+        "wechatID",
+    )
+
+    private fun draft(field: String, value: String): StudentDraft {
+        return StudentDraft(
+            displayName = if (field == "displayName") value else "Coach Student",
+            sex = StudentSex.male,
+            trainingGoal = if (field == "trainingGoal") value else "",
+            injuryNotes = if (field == "injuryNotes") value else "",
+            privateCoachNote = if (field == "privateCoachNote") value else "",
+            phone = if (field == "phone") value else "",
+            wechatID = if (field == "wechatID") value else "",
+        )
+    }
+
+    private fun textValue(student: Student, field: String): String {
+        return when (field) {
+            "displayName" -> student.displayName.value
+            "trainingGoal" -> student.trainingGoal?.value
+            "injuryNotes" -> student.injuryNotes?.value
+            "privateCoachNote" -> student.privateCoachNote?.value
+            "phone" -> student.phone?.value
+            "wechatID" -> student.wechatID?.value
+            else -> error("Unknown student text field: $field")
+        } ?: error("Expected $field to persist")
     }
 
     private fun assertDomainError(expected: StudentDomainError, block: () -> Unit) {
