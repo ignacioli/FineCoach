@@ -84,16 +84,21 @@ class RoomSkeletonTests {
         assertEquals("original", dao.find("fictional_key")?.value)
     }
 
-    @Test fun runtimeSchemaContainsOnlyMetadataAndFrameworkTables() = offMain {
+    @Test fun runtimeV2SchemaRetainsMetadataShapeAlongsideS1Tables() = offMain {
         val sqlite = open().openHelper.writableDatabase
-        assertEquals(1, sqlite.version)
+        assertEquals(2, sqlite.version)
         val tables = mutableSetOf<String>()
         sqlite.query("SELECT name FROM sqlite_master WHERE type = 'table'").use { cursor ->
             while (cursor.moveToNext()) tables += cursor.getString(0)
         }
         assertTrue(tables.contains("store_metadata"))
         assertTrue(tables.contains("room_master_table"))
-        assertTrue(tables.all { it in setOf("store_metadata", "room_master_table", "android_metadata", "sqlite_sequence") })
+        val expected = setOf("store_metadata", "students", "course_packages", "active_package_claims",
+            "credit_adjustments", "sessions", "active_session_pointers", "session_training_focus",
+            "session_exercises", "training_sets", "training_templates", "template_training_focus",
+            "template_exercises", "template_planned_sets", "session_sections", "exercise_catalog",
+            "exercise_preferences", "exercise_name_claims")
+        assertEquals(expected, tables - setOf("room_master_table", "android_metadata", "sqlite_sequence"))
         val columns = mutableListOf<List<String>>()
         sqlite.query("PRAGMA table_info(`store_metadata`)").use { cursor ->
             while (cursor.moveToNext()) columns += listOf(

@@ -59,10 +59,10 @@ class DebugSeedTests {
         assertNotEquals(FineCoachDatabaseFactory.DATABASE_NAME, DebugSeed.DATABASE_NAME)
     }
 
-    @Test fun loadsOnlyFiveMetadataRowsInSchemaOne() = offMain {
+    @Test fun loadsOnlyFiveMetadataRowsInSchemaTwo() = offMain {
         val database = open()
         assertEquals(SeedResult(1, 5), DebugSeedLoader().load(database))
-        assertEquals(1, database.openHelper.readableDatabase.version)
+        assertEquals(2, database.openHelper.readableDatabase.version)
         assertEquals(5, snapshot(database).size)
         assertEquals("1", database.storeMetadataDao().find(DebugSeed.VERSION_KEY)?.value)
         assertEquals("5", database.storeMetadataDao().find(DebugSeed.ROWS_KEY)?.value)

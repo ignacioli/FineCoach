@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.ignacioli.finecoach.storage.FineCoachDatabase
 import com.ignacioli.finecoach.storage.StoreMetadata
+import com.ignacioli.finecoach.storage.migration.MIGRATION_1_2
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
@@ -26,7 +27,9 @@ internal object DebugSeed {
     fun open(context: Context): FineCoachDatabase {
         val application = context.applicationContext
         require(!context.isDeviceProtectedStorage && !application.isDeviceProtectedStorage)
-        return Room.databaseBuilder(application, FineCoachDatabase::class.java, DATABASE_NAME).build()
+        return Room.databaseBuilder(application, FineCoachDatabase::class.java, DATABASE_NAME)
+            .addMigrations(MIGRATION_1_2)
+            .build()
     }
 
     fun insertMetadata(database: FineCoachDatabase, key: String, value: String) {
