@@ -1,0 +1,53 @@
+{
+  "id": "s1-package-ledger-balance",
+  "rule": "M1B-FR-015",
+  "meta": {
+    "tags": [
+      "fictional-data"
+    ]
+  },
+  "given": {
+    "clock": {
+      "now": "2031-04-05T18:30:00Z"
+    },
+    "state": {
+      "totalCredits": 10,
+      "creditAdjustments": [
+        {
+          "id": "10000000-0000-4000-8000-000000000001",
+          "packageID": "10000000-0000-4000-8000-000000000099",
+          "direction": "debit",
+          "amount": 3,
+          "reasonKind": "sessionComplete",
+          "sourceEventKey": "fictional-event-1",
+          "createdAtUTC": "2031-04-05T18:30:00Z"
+        },
+        {
+          "id": "10000000-0000-4000-8000-000000000002",
+          "packageID": "10000000-0000-4000-8000-000000000099",
+          "direction": "credit",
+          "amount": 1,
+          "reasonKind": "sessionReopen",
+          "sourceEventKey": "fictional-event-2",
+          "createdAtUTC": "2031-04-05T18:30:00Z"
+        }
+      ]
+    }
+  },
+  "when": {
+    "op": "credit-ledger.balance",
+    "args": {
+      "totalCredits": {
+        "$ref": "/given/state/totalCredits"
+      },
+      "adjustments": {
+        "$ref": "/given/state/creditAdjustments"
+      }
+    }
+  },
+  "then": {
+    "state": {
+      "balance": 8
+    }
+  }
+}

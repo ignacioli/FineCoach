@@ -1,0 +1,39 @@
+{
+  "id": "local-time-mismatch",
+  "rule": "M1B-FR-015",
+  "meta": {
+    "tags": [
+      "fictional-data"
+    ],
+    "conformance": {
+      "outcome": "compare",
+      "path": "/then/state/localTime/minute"
+    }
+  },
+  "given": {
+    "clock": {
+      "now": "2031-04-05T18:30:00Z"
+    },
+    "state": {},
+    "timeZone": "America/Los_Angeles"
+  },
+  "when": {
+    "op": "fixture.calendar",
+    "args": {
+      "value": {
+        "localTime": {
+          "hour": 11,
+          "minute": 30
+        }
+      }
+    }
+  },
+  "then": {
+    "state": {
+      "localTime": {
+        "hour": 11,
+        "minute": 31
+      }
+    }
+  }
+}

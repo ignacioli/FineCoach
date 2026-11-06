@@ -1,0 +1,37 @@
+{
+  "id": "object-order-and-unknown-meta",
+  "rule": "M1B-FR-015",
+  "meta": {
+    "tags": [
+      "fictional-data"
+    ],
+    "ignored": {
+      "arbitrary": true
+    },
+    "conformance": {
+      "outcome": "pass",
+      "path": "/"
+    }
+  },
+  "given": {
+    "clock": {
+      "now": "2031-04-05T18:30:00Z"
+    },
+    "state": {}
+  },
+  "when": {
+    "op": "fixture.value",
+    "args": {
+      "value": {
+        "b": 2,
+        "a": 1
+      }
+    }
+  },
+  "then": {
+    "state": {
+      "a": 1,
+      "b": 2
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "decimal-string-not-number",
+  "rule": "M1B-FR-015",
+  "meta": {
+    "tags": [
+      "fictional-data"
+    ],
+    "conformance": {
+      "outcome": "compare",
+      "path": "/then/state/amountDecimal"
+    }
+  },
+  "given": {
+    "clock": {
+      "now": "2031-04-05T18:30:00Z"
+    },
+    "state": {}
+  },
+  "when": {
+    "op": "fixture.value",
+    "args": {
+      "value": {
+        "amountDecimal": 1
+      }
+    }
+  },
+  "then": {
+    "state": {
+      "amountDecimal": "1"
+    }
+  }
+}

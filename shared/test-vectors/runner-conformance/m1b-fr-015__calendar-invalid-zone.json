@@ -1,0 +1,31 @@
+{
+  "id": "calendar-invalid-zone",
+  "rule": "M1B-FR-015",
+  "meta": {
+    "tags": [
+      "fictional-data"
+    ],
+    "conformance": {
+      "outcome": "format",
+      "path": "/given/timeZone"
+    }
+  },
+  "given": {
+    "clock": {
+      "now": "2031-04-05T18:30:00Z"
+    },
+    "state": {},
+    "timeZone": "Fictional/Nowhere"
+  },
+  "when": {
+    "op": "fixture.calendar",
+    "args": {
+      "value": {}
+    }
+  },
+  "then": {
+    "state": {
+      "balance": 8
+    }
+  }
+}

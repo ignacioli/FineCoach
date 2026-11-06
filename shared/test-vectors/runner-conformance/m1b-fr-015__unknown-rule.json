@@ -1,0 +1,32 @@
+{
+  "id": "unknown-rule",
+  "rule": "M1B-FR-999",
+  "meta": {
+    "tags": [
+      "fictional-data"
+    ],
+    "conformance": {
+      "outcome": "format",
+      "path": "/rule"
+    }
+  },
+  "given": {
+    "clock": {
+      "now": "2031-04-05T18:30:00Z"
+    },
+    "state": {}
+  },
+  "when": {
+    "op": "fixture.value",
+    "args": {
+      "value": {
+        "balance": 8
+      }
+    }
+  },
+  "then": {
+    "state": {
+      "balance": 8
+    }
+  }
+}

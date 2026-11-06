@@ -1,0 +1,32 @@
+{
+  "id": "enum-is-exact",
+  "rule": "M1B-FR-015",
+  "meta": {
+    "tags": [
+      "fictional-data"
+    ],
+    "conformance": {
+      "outcome": "compare",
+      "path": "/then/state/mode"
+    }
+  },
+  "given": {
+    "clock": {
+      "now": "2031-04-05T18:30:00Z"
+    },
+    "state": {}
+  },
+  "when": {
+    "op": "fixture.value",
+    "args": {
+      "value": {
+        "mode": "credit"
+      }
+    }
+  },
+  "then": {
+    "state": {
+      "mode": "debit"
+    }
+  }
+}

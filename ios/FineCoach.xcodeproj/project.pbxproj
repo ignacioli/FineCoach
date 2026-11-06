@@ -430,6 +430,9 @@
 		F71000000000000000000012 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F71000000000000000000002 /* LaunchScreen.storyboard */; };
 		F71000000000000000000013 /* LaunchScreenConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71000000000000000000003 /* LaunchScreenConfigurationTests.swift */; };
 		FC3000000000000000000004 /* FCAmbientEmptySceneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC3000000000000000000003 /* FCAmbientEmptySceneTests.swift */; };
+		FC0060000000000000000002 /* SharedVectorRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0060000000000000000001 /* SharedVectorRunner.swift */; };
+		FC0060000000000000000004 /* VectorFormatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0060000000000000000003 /* VectorFormatTests.swift */; };
+		FC0060000000000000000006 /* SharedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0060000000000000000005 /* SharedVectorTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -887,6 +890,9 @@
 		F71000000000000000000002 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F71000000000000000000003 /* LaunchScreenConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreenConfigurationTests.swift; sourceTree = "<group>"; };
 		FC3000000000000000000003 /* FCAmbientEmptySceneTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCAmbientEmptySceneTests.swift; sourceTree = "<group>"; };
+		FC0060000000000000000001 /* SharedVectorRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../SharedVectors/SharedVectorRunner.swift; sourceTree = "<group>"; };
+		FC0060000000000000000003 /* VectorFormatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../SharedVectors/VectorFormatTests.swift; sourceTree = "<group>"; };
+		FC0060000000000000000005 /* SharedVectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../SharedVectors/SharedVectorTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1814,6 +1820,9 @@
 			children = (
 				A250 /* BackupGoldenVectorTests.swift */,
 				A251 /* BackupHostileInputTests.swift */,
+				FC0060000000000000000001 /* SharedVectorRunner.swift */,
+				FC0060000000000000000003 /* VectorFormatTests.swift */,
+				FC0060000000000000000005 /* SharedVectorTests.swift */,
 				FC0320000000000000000001 /* PlatformCryptoParityTests.swift */,
 			);
 			path = Backup;
@@ -2600,6 +2609,9 @@
 				B933 /* ContrastHarnessTests.swift in Sources */,
 				B250 /* BackupGoldenVectorTests.swift in Sources */,
 				B251 /* BackupHostileInputTests.swift in Sources */,
+				FC0060000000000000000002 /* SharedVectorRunner.swift in Sources */,
+				FC0060000000000000000004 /* VectorFormatTests.swift in Sources */,
+				FC0060000000000000000006 /* SharedVectorTests.swift in Sources */,
 				FC0320000000000000000002 /* PlatformCryptoParityTests.swift in Sources */,
 				B252 /* ScenePrivacyCoordinatorTests.swift in Sources */,
 				B201 /* FictitiousFixtures.swift in Sources */,

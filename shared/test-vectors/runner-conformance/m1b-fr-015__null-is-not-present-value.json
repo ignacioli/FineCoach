@@ -1,0 +1,32 @@
+{
+  "id": "null-is-not-present-value",
+  "rule": "M1B-FR-015",
+  "meta": {
+    "tags": [
+      "fictional-data"
+    ],
+    "conformance": {
+      "outcome": "compare",
+      "path": "/then/state/balance"
+    }
+  },
+  "given": {
+    "clock": {
+      "now": "2031-04-05T18:30:00Z"
+    },
+    "state": {}
+  },
+  "when": {
+    "op": "fixture.value",
+    "args": {
+      "value": {
+        "balance": null
+      }
+    }
+  },
+  "then": {
+    "state": {
+      "balance": 8
+    }
+  }
+}

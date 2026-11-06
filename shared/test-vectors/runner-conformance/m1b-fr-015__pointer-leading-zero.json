@@ -1,0 +1,34 @@
+{
+  "id": "pointer-leading-zero",
+  "rule": "M1B-FR-015",
+  "meta": {
+    "tags": [
+      "fictional-data"
+    ],
+    "conformance": {
+      "outcome": "format",
+      "path": "/when/0/args/value"
+    }
+  },
+  "given": {
+    "clock": {
+      "now": "2031-04-05T18:30:00Z"
+    },
+    "state": [
+      1
+    ]
+  },
+  "when": {
+    "op": "fixture.value",
+    "args": {
+      "value": {
+        "$ref": "/given/state/00"
+      }
+    }
+  },
+  "then": {
+    "state": {
+      "balance": 8
+    }
+  }
+}
