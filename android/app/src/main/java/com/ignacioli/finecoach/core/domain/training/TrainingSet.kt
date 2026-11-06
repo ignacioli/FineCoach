@@ -45,36 +45,56 @@ data class TrainingSet(
     val contributesToStatistics: Boolean
         get() = state == SetRecordingState.completed
 
-    val displaySummary: String
-        get() = when (recordMode) {
-            RecordMode.weightReps -> {
-                val reps = repetitionCount?.canonicalString ?: "-"
-                val unitText = when (unit) {
-                    MeasurementUnit.kilograms -> "kg"
-                    MeasurementUnit.pounds -> "lb"
-                    else -> ""
+    /**
+     * iOS `TrainingSetDisplayFormatting.summary` (`TrainingSetDisplayFormatting.swift:37-82`).
+     * The stored [unit] is not the printed weight label; callers pass `kg` or `lb`.
+     */
+    fun displaySummary(weightUnit: String = "kg"): String = when (recordMode) {
+        RecordMode.weightReps -> {
+            val repsText = repetitionCount?.canonicalString ?: "-"
+            when (side) {
+                SetSide.none -> "${weightValue?.canonicalString ?: "-"} $weightUnit × $repsText"
+                SetSide.left -> {
+                    val load = (leftValue ?: weightValue)?.canonicalString ?: "-"
+                    "左 $load $weightUnit × $repsText"
                 }
-                val load = when (side) {
-                    SetSide.none -> weightValue?.canonicalString
-                    SetSide.left -> leftValue?.canonicalString ?: weightValue?.canonicalString
-                    SetSide.right -> rightValue?.canonicalString ?: weightValue?.canonicalString
-                    SetSide.bilateral -> if (leftValue != null && rightValue != null) {
-                        "${leftValue.canonicalString}/${rightValue.canonicalString}"
+                SetSide.right -> {
+                    val load = (rightValue ?: weightValue)?.canonicalString ?: "-"
+                    "右 $load $weightUnit × $repsText"
+                }
+                SetSide.bilateral -> {
+                    val left = leftValue
+                    val right = rightValue
+                    if (left != null && right != null && left.canonicalString == right.canonicalString) {
+                        "每侧 ${left.canonicalString} $weightUnit × $repsText"
+                    } else if (left != null && right != null) {
+                        "左 ${left.canonicalString} $weightUnit / 右 ${right.canonicalString} $weightUnit × $repsText"
                     } else {
-                        weightValue?.canonicalString
+                        "${weightValue?.canonicalString ?: "-"} $weightUnit（双侧） × $repsText"
                     }
-                } ?: "-"
-                "$load $unitText × $reps"
-            }
-
-            RecordMode.reps -> "${repetitionCount?.canonicalString ?: "-"} 次"
-            RecordMode.duration -> "${durationSeconds?.canonicalString ?: "-"} 秒"
-            RecordMode.cardio -> {
-                val duration = durationSeconds?.canonicalString ?: "-"
-                val distance = distanceValue?.canonicalString ?: "-"
-                "$duration 秒 / $distance"
+                }
             }
         }
+
+        RecordMode.reps -> "${repetitionCount?.canonicalString ?: "-"} 次"
+        RecordMode.duration -> durationSeconds?.let {
+            DurationTextParser.formatForEditing(it.canonicalString)
+        } ?: "-"
+        RecordMode.cardio -> {
+            val parts = ArrayList<String>(4)
+            parts += durationSeconds?.let { DurationTextParser.formatForEditing(it.canonicalString) } ?: "-"
+            parts += "${distanceValue?.canonicalString ?: "-"} km"
+            val speed = speedValue
+            if (speed != null) {
+                parts += "速度 ${speed.canonicalString}"
+            }
+            val resistance = resistanceValue
+            if (resistance != null) {
+                parts += "阻力 ${resistance.canonicalString}"
+            }
+            parts.joinToString(separator = " · ")
+        }
+    }
 
     fun ordinaryVolumeContribution(): DecimalValue? {
         if (state != SetRecordingState.completed || recordMode != RecordMode.weightReps || repetitionCount == null) {
@@ -339,8 +359,10 @@ private data class ParsedFields(
         }
 
         private fun parseDecimal(raw: String?): DecimalValue? {
-            val canonical = optionalText(raw) ?: return null
-            return DecimalValue.parse(canonical)
+            if (raw == null || raw.trim().isEmpty()) {
+                return null
+            }
+            return DecimalValue.parse(raw)
         }
 
         private fun requirePositiveInteger(value: DecimalValue?, field: String) {

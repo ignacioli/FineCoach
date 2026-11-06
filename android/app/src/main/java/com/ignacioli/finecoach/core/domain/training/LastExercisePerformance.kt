@@ -20,8 +20,12 @@ data class LastExercisePerformance(
     val firstSet: TrainingSet
         get() = sets.first()
 
+    /**
+     * iOS `session.lastReferenceFormat` = "上次 %@ · %d 组"
+     * (`LastExercisePerformance.swift:18-24`, `Localizable.xcstrings` key `session.lastReferenceFormat`).
+     */
     val referenceText: String
-        get() = "${firstSet.displaySummary} · ${sets.size} 组"
+        get() = "上次 ${firstSet.displaySummary()} · ${sets.size} 组"
 }
 
 class LastExercisePerformanceLookup(
@@ -79,7 +83,7 @@ class LastExercisePerformanceLookup(
             }
             return LookupKey(
                 sourceID = null,
-                name = exercise.displayNameSnapshot,
+                name = exercise.displayNameSnapshot.value,
                 recordMode = exercise.recordModeSnapshot,
             )
         }

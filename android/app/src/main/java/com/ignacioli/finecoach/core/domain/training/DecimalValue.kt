@@ -1,5 +1,6 @@
 package com.ignacioli.finecoach.core.domain.training
 
+import com.ignacioli.finecoach.core.domain.common.ValidatedText
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -41,6 +42,9 @@ value class DecimalValue private constructor(val canonicalString: String) : Comp
         }
 
         fun seconds(intervalSeconds: Double): DecimalValue {
+            if (!intervalSeconds.isFinite()) {
+                fail(DomainError.invalidDecimal)
+            }
             val clamped = if (intervalSeconds < 0.0) {
                 0.0
             } else {
@@ -55,7 +59,7 @@ value class DecimalValue private constructor(val canonicalString: String) : Comp
             if (canonical == "-0") {
                 canonical = "0"
             }
-            if (canonical.toByteArray(Charsets.UTF_8).size > MAX_UTF8_BYTES) {
+            if (canonical.toByteArray(Charsets.UTF_8).size > ValidatedText.maximumUTF8Bytes) {
                 fail(DomainError.textTooLong)
             }
             return DecimalValue(canonical)

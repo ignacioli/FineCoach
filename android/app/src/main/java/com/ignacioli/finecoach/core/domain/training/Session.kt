@@ -1,8 +1,10 @@
 package com.ignacioli.finecoach.core.domain.training
 
 import com.ignacioli.finecoach.core.domain.common.BodyPart
+import com.ignacioli.finecoach.core.domain.common.ExerciseKind
 import com.ignacioli.finecoach.core.domain.common.ExerciseLifecycle
 import com.ignacioli.finecoach.core.domain.common.ExerciseSourceKind
+import com.ignacioli.finecoach.core.domain.common.NormalizedName
 import com.ignacioli.finecoach.core.domain.common.RecordMode
 import com.ignacioli.finecoach.core.domain.common.Revision
 import com.ignacioli.finecoach.core.domain.common.SectionID
@@ -11,6 +13,7 @@ import com.ignacioli.finecoach.core.domain.common.SessionState
 import com.ignacioli.finecoach.core.domain.common.SetRecordingState
 import com.ignacioli.finecoach.core.domain.common.StudentID
 import com.ignacioli.finecoach.core.domain.common.TrainingSetID
+import com.ignacioli.finecoach.core.domain.common.ValidatedText
 import com.ignacioli.finecoach.core.domain.exercise.ExerciseCatalogItem
 import java.time.Instant
 import java.util.Locale
@@ -38,8 +41,8 @@ data class Session(
     val durationNeedsReview: Boolean,
     val coachAdjustedDurationSeconds: DecimalValue?,
     val trainingFocus: Set<BodyPart>,
-    val studentFacingSummary: String?,
-    val privateCoachNote: String?,
+    val studentFacingSummary: ValidatedText?,
+    val privateCoachNote: ValidatedText?,
     val revision: Revision,
     val createdAtUTC: Instant,
     val updatedAtUTC: Instant,
@@ -69,9 +72,8 @@ data class Session(
         get() {
             val actionPrivateNotes = buildMap {
                 for (exercise in exercises) {
-                    if (exercise.actionPrivateNote != null) {
-                        put(exercise.sessionExerciseID, exercise.actionPrivateNote)
-                    }
+                    val note = exercise.actionPrivateNote ?: continue
+                    put(exercise.sessionExerciseID, note)
                 }
             }
             return SessionNotes(
@@ -115,7 +117,7 @@ data class Session(
             orderIndex = exercises.size.toUInt(),
             sourceKind = ExerciseSourceKind.sessionOnly,
             sourceID = null,
-            displayNameSnapshot = requiredText(displayName, "displayNameSnapshot"),
+            displayNameSnapshot = parseDisplayName(displayName),
             recordModeSnapshot = recordMode,
             actionPrivateNote = null,
             sets = emptyList(),
@@ -136,7 +138,7 @@ data class Session(
         if (item.lifecycle != ExerciseLifecycle.active) {
             fail(DomainError.invalidState)
         }
-        val sourceKind = if (item.kind == com.ignacioli.finecoach.core.domain.common.ExerciseKind.builtIn) {
+        val sourceKind = if (item.kind == ExerciseKind.builtIn) {
             ExerciseSourceKind.builtIn
         } else {
             ExerciseSourceKind.custom
@@ -368,19 +370,19 @@ data class Session(
         return next(revision = revision.next(), updatedAtUTC = nowUTC, trainingFocus = value)
     }
 
-    fun updatingStudentFacingSummary(value: String?, nowUTC: Instant): Session {
+    fun updatingStudentFacingSummary(value: ValidatedText?, nowUTC: Instant): Session {
         ensureCompleted()
-        return next(revision = revision.next(), updatedAtUTC = nowUTC, studentFacingSummary = optionalText(value))
+        return next(revision = revision.next(), updatedAtUTC = nowUTC, studentFacingSummary = value)
     }
 
-    fun updatingPrivateCoachNote(value: String?, nowUTC: Instant): Session {
+    fun updatingPrivateCoachNote(value: ValidatedText?, nowUTC: Instant): Session {
         ensureCompleted()
-        return next(revision = revision.next(), updatedAtUTC = nowUTC, privateCoachNote = optionalText(value))
+        return next(revision = revision.next(), updatedAtUTC = nowUTC, privateCoachNote = value)
     }
 
     fun updatingActionPrivateNote(
         exerciseID: com.ignacioli.finecoach.core.domain.common.SessionExerciseID,
-        note: String?,
+        note: ValidatedText?,
         nowUTC: Instant,
     ): Session {
         ensureCompleted()
@@ -390,8 +392,8 @@ data class Session(
 
     fun updatingCompletedSummary(
         trainingFocus: Set<BodyPart>,
-        privateCoachNote: String?,
-        studentFacingSummary: String?,
+        privateCoachNote: ValidatedText?,
+        studentFacingSummary: ValidatedText?,
         nowUTC: Instant,
     ): Session {
         ensureCompleted()
@@ -399,8 +401,8 @@ data class Session(
             revision = revision.next(),
             updatedAtUTC = nowUTC,
             trainingFocus = trainingFocus,
-            privateCoachNote = optionalText(privateCoachNote),
-            studentFacingSummary = optionalText(studentFacingSummary),
+            privateCoachNote = privateCoachNote,
+            studentFacingSummary = studentFacingSummary,
         )
     }
 
@@ -468,13 +470,13 @@ data class Session(
         state: SessionState = this.state,
         exercises: List<SessionExercise> = this.exercises,
         elapsedSeconds: DecimalValue = this.elapsedSeconds,
-        lastCheckpointUTC: Instant = this.lastCheckpointUTC,
+        lastCheckpointUTC: Instant = updatedAtUTC,
         interruptionStartedAtUTC: Instant? = this.interruptionStartedAtUTC,
         durationNeedsReview: Boolean = this.durationNeedsReview,
         coachAdjustedDurationSeconds: DecimalValue? = this.coachAdjustedDurationSeconds,
         trainingFocus: Set<BodyPart> = this.trainingFocus,
-        studentFacingSummary: String? = this.studentFacingSummary,
-        privateCoachNote: String? = this.privateCoachNote,
+        studentFacingSummary: ValidatedText? = this.studentFacingSummary,
+        privateCoachNote: ValidatedText? = this.privateCoachNote,
         completedAtUTC: Instant? = this.completedAtUTC,
     ): Session {
         return copy(
@@ -495,6 +497,8 @@ data class Session(
     }
 
     companion object {
+        private fun parseDisplayName(raw: String): NormalizedName = parseDomainName(raw, "displayName")
+
         fun start(
             id: SessionID,
             studentID: StudentID,

@@ -1,20 +1,18 @@
 package com.ignacioli.finecoach.core.domain.training
 
 import com.ignacioli.finecoach.core.domain.common.BodyPart
-import com.ignacioli.finecoach.core.domain.common.ExerciseLifecycle
-import com.ignacioli.finecoach.core.domain.common.ExerciseSourceKind
+import com.ignacioli.finecoach.core.domain.common.NormalizedName
 import com.ignacioli.finecoach.core.domain.common.SessionExerciseID
 import com.ignacioli.finecoach.core.domain.common.SessionID
 import com.ignacioli.finecoach.core.domain.common.SessionState
-import com.ignacioli.finecoach.core.domain.common.StableExerciseID
 import com.ignacioli.finecoach.core.domain.common.StudentID
-import com.ignacioli.finecoach.core.domain.exercise.ExerciseLibraryEntry
+import com.ignacioli.finecoach.core.domain.common.ValidatedText
 import java.time.Instant
 
 data class SessionNotes(
-    val privateCoachNote: String?,
-    val studentFacingSummary: String?,
-    val actionPrivateNotes: Map<SessionExerciseID, String>,
+    val privateCoachNote: ValidatedText?,
+    val studentFacingSummary: ValidatedText?,
+    val actionPrivateNotes: Map<SessionExerciseID, ValidatedText>,
 )
 
 data class SessionStatistics(
@@ -45,7 +43,7 @@ data class SessionStatistics(
 data class CompletedSession(
     val sessionID: SessionID,
     val studentID: StudentID,
-    val studentDisplayName: String,
+    val studentDisplayName: NormalizedName,
     val startedAtUTC: Instant,
     val completedAtUTC: Instant,
     val trainingFocus: Set<BodyPart>,
@@ -55,14 +53,14 @@ data class CompletedSession(
     val revision: ULong,
 ) {
     companion object {
-        fun make(from: Session, studentDisplayName: String): CompletedSession {
+        fun make(from: Session, studentDisplayName: NormalizedName): CompletedSession {
             if (from.state != SessionState.completed || from.completedAtUTC == null) {
                 fail(DomainError.invalidState)
             }
             return CompletedSession(
                 sessionID = from.sessionID,
                 studentID = from.studentID,
-                studentDisplayName = requiredText(studentDisplayName, "studentDisplayName"),
+                studentDisplayName = studentDisplayName,
                 startedAtUTC = from.startedAtUTC,
                 completedAtUTC = from.completedAtUTC,
                 trainingFocus = from.trainingFocus,
@@ -75,56 +73,5 @@ data class CompletedSession(
 
         fun mostRecent(sessions: List<CompletedSession>): CompletedSession? =
             sessions.maxByOrNull { it.completedAtUTC }
-    }
-}
-
-object RecentExerciseSelection {
-    fun entries(
-        sessions: List<CompletedSession>,
-        studentID: StudentID? = null,
-        availableEntries: List<ExerciseLibraryEntry>,
-        limit: Int = 5,
-    ): List<ExerciseLibraryEntry> {
-        if (limit <= 0) {
-            return emptyList()
-        }
-
-        val availableByID = availableEntries
-            .filter { entry ->
-                entry.item.lifecycle == ExerciseLifecycle.active &&
-                    !entry.item.isRetired &&
-                    entry.preference?.isHidden != true
-            }
-            .associateBy { it.exerciseID }
-
-        if (availableByID.isEmpty()) {
-            return emptyList()
-        }
-
-        val scoped = sessions
-            .asSequence()
-            .filter { studentID == null || it.studentID == studentID }
-            .sortedByDescending { it.completedAtUTC }
-            .toList()
-
-        val seen = mutableSetOf<StableExerciseID>()
-        val result = ArrayList<ExerciseLibraryEntry>(minOf(limit, availableByID.size))
-        for (session in scoped) {
-            for (exercise in session.exercises) {
-                if (exercise.sourceKind == ExerciseSourceKind.sessionOnly) {
-                    continue
-                }
-                val sourceID = exercise.sourceID ?: continue
-                if (!seen.add(sourceID)) {
-                    continue
-                }
-                val entry = availableByID[sourceID] ?: continue
-                result += entry
-                if (result.size == limit) {
-                    return result
-                }
-            }
-        }
-        return result
     }
 }

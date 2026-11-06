@@ -1,11 +1,13 @@
 package com.ignacioli.finecoach.core.domain.training
 
 import com.ignacioli.finecoach.core.domain.common.ExerciseSourceKind
+import com.ignacioli.finecoach.core.domain.common.NormalizedName
 import com.ignacioli.finecoach.core.domain.common.RecordMode
 import com.ignacioli.finecoach.core.domain.common.SectionID
 import com.ignacioli.finecoach.core.domain.common.SessionExerciseID
 import com.ignacioli.finecoach.core.domain.common.SessionID
 import com.ignacioli.finecoach.core.domain.common.StableExerciseID
+import com.ignacioli.finecoach.core.domain.common.ValidatedText
 
 data class SessionExercise(
     val sessionExerciseID: SessionExerciseID,
@@ -13,15 +15,12 @@ data class SessionExercise(
     val orderIndex: UInt,
     val sourceKind: ExerciseSourceKind,
     val sourceID: StableExerciseID?,
-    val displayNameSnapshot: String,
+    val displayNameSnapshot: NormalizedName,
     val recordModeSnapshot: RecordMode,
-    val actionPrivateNote: String?,
+    val actionPrivateNote: ValidatedText?,
     val sectionID: SectionID? = null,
     val sets: List<TrainingSet>,
 ) {
-    init {
-        requiredText(displayNameSnapshot, "displayNameSnapshot")
-    }
 
     val hasCompletedSet: Boolean
         get() = sets.any { it.contributesToStatistics }
@@ -45,7 +44,7 @@ data class SessionExercise(
         )
     }
 
-    fun replacingActionPrivateNote(note: String?): SessionExercise = copy(actionPrivateNote = optionalText(note))
+    fun replacingActionPrivateNote(note: ValidatedText?): SessionExercise = copy(actionPrivateNote = note)
 
     fun replacingSets(sets: List<TrainingSet>): SessionExercise {
         return copy(
