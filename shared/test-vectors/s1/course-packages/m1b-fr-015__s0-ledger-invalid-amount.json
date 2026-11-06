@@ -1,0 +1,42 @@
+{
+  "id": "s0-ledger-invalid-amount",
+  "rule": "M1B-FR-015",
+  "meta": {
+    "tags": [
+      "fictional-data"
+    ]
+  },
+  "given": {
+    "clock": {
+      "now": "2031-04-05T18:30:00Z"
+    },
+    "state": {
+      "totalCredits": 1,
+      "creditAdjustments": [
+        {
+          "id": "10000000-0000-4000-8000-000000000001",
+          "packageID": "10000000-0000-4000-8000-000000000099",
+          "direction": "debit",
+          "amount": 0,
+          "reasonKind": "sessionComplete",
+          "sourceEventKey": "fictional-event-1",
+          "createdAtUTC": "2031-04-05T18:30:00Z"
+        }
+      ]
+    }
+  },
+  "when": {
+    "op": "credit-ledger.balance",
+    "args": {
+      "totalCredits": {
+        "$ref": "/given/state/totalCredits"
+      },
+      "adjustments": {
+        "$ref": "/given/state/creditAdjustments"
+      }
+    }
+  },
+  "then": {
+    "error": "invalidNumber"
+  }
+}

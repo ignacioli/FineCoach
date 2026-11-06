@@ -401,7 +401,6 @@ val pendingGates = mapOf(
     "s0G3" to "T018: design value scan",
     "s0G4" to "T017: entry and layout harness",
     "s0G5" to "T019/T020: screenshot verify and owner-approved baselines",
-    "s0G6" to "T022-T024: shared vectors",
     "s0G8" to "T004-T010: complete privacy and scope checks",
     "s0SeedIsolation" to "T025: release seed isolation",
     "s0InstallSeededDebug" to "T026: explicit device install and seed verification",
@@ -641,3 +640,82 @@ val validateComponentGate = tasks.register("validateS0G2Results") {
     }
 }
 componentGate.configure { finalizedBy(validateComponentGate) }
+
+// S0-06: read source fixtures directly; never copy them into an app bundle.
+val sharedVectorRoot = rootProject.layout.projectDirectory.dir("../shared/test-vectors")
+// Standard testDebugUnitTest must also be able to discover these source files.
+tasks.withType<Test>().configureEach {
+    inputs.dir(sharedVectorRoot)
+    systemProperty("finecoach.sharedVectorRoot", sharedVectorRoot.asFile.absolutePath)
+}
+val sharedVectorClasses = listOf(
+    "com.ignacioli.finecoach.VectorFormatTests",
+    "com.ignacioli.finecoach.SharedVectorTests",
+)
+val sharedVectorGate = tasks.register<Test>("s0G6") {
+    group = "verification"
+    description = "Shared vector conformance and real Domain samples; separate locked counts"
+    val debugTest = tasks.named<Test>("testDebugUnitTest").get()
+    testClassesDirs = debugTest.testClassesDirs
+    classpath = debugTest.classpath
+    javaLauncher.set(debugTest.javaLauncher)
+    setJvmArgs(debugTest.jvmArgs)
+    jvmArgumentProviders.addAll(debugTest.jvmArgumentProviders)
+    systemProperties(debugTest.systemProperties)
+    workingDir = debugTest.workingDir
+    filter {
+        setIncludePatterns(*sharedVectorClasses.toTypedArray())
+        isFailOnNoMatchingTests = true
+    }
+    failOnNoDiscoveredTests.set(true)
+    reports.junitXml.required.set(true)
+    reports.junitXml.outputLocation.set(layout.buildDirectory.dir("test-results/s0G6"))
+    reports.html.outputLocation.set(layout.buildDirectory.dir("reports/tests/s0G6"))
+    binaryResultsDirectory.set(layout.buildDirectory.dir("test-results/s0G6/binary"))
+    outputs.upToDateWhen { false }
+    outputs.doNotCacheIf("G6 evidence must execute on this host") { true }
+}
+val validateSharedVectorGate = tasks.register("validateS0G6Results") {
+    doLast {
+        val gate = sharedVectorGate.get()
+        check(!gate.state.skipped && gate.state.failure == null) {
+            "s0G6 did not successfully execute: ${gate.state.skipMessage ?: gate.state.failure}"
+        }
+        val xmlFiles = gate.reports.junitXml.outputLocation.get().asFile
+            .listFiles { file -> file.name.startsWith("TEST-") && file.extension == "xml" }.orEmpty()
+        check(xmlFiles.isNotEmpty()) { "s0G6 has no JUnit XML" }
+        val factory = DocumentBuilderFactory.newInstance().apply {
+            setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
+            setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+            setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "")
+            setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "")
+        }
+        val counts = mutableMapOf<String, Int>()
+        for (xml in xmlFiles) {
+            val suite = factory.newDocumentBuilder().parse(xml).documentElement
+            val name = suite.getAttribute("name")
+            check(name in sharedVectorClasses) { "Unexpected G6 suite: $name" }
+            val cases = suite.getElementsByTagName("testcase")
+            val count = suite.getAttribute("tests").toInt()
+            check(count > 0 && count == cases.length) { "Empty/inconsistent G6 suite: $name" }
+            for (attribute in listOf("failures", "errors", "skipped")) {
+                check(suite.getAttribute(attribute).toInt() == 0) { "$name has $attribute" }
+            }
+            for (index in 0 until cases.length) {
+                val case = cases.item(index) as Element
+                check(listOf("skipped", "failure", "error").all {
+                    case.getElementsByTagName(it).length == 0
+                }) { "Unsuccessful G6 testcase: $name.${case.getAttribute("name")}" }
+            }
+            check(counts.put(name, count) == null) { "Duplicate G6 suite: $name" }
+        }
+        check(counts.keys == sharedVectorClasses.toSet()) { "Missing G6 suites: ${sharedVectorClasses - counts.keys}" }
+        val expectedCounts = mapOf(
+            "com.ignacioli.finecoach.VectorFormatTests" to 72,
+            "com.ignacioli.finecoach.SharedVectorTests" to 5,
+        )
+        check(counts == expectedCounts) { "Unexpected G6 testcase counts: $counts; expected $expectedCounts" }
+        logger.lifecycle("s0G6: ${counts.values.sum()} tests, 0 failures/errors/skips; $counts")
+    }
+}
+sharedVectorGate.configure { finalizedBy(validateSharedVectorGate) }

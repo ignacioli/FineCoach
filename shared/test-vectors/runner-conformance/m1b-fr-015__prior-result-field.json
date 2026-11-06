@@ -1,0 +1,44 @@
+{
+  "id": "prior-result-field",
+  "rule": "M1B-FR-015",
+  "meta": {
+    "tags": [
+      "fictional-data"
+    ],
+    "conformance": {
+      "outcome": "pass",
+      "path": "/"
+    }
+  },
+  "given": {
+    "clock": {
+      "now": "2031-04-05T18:30:00Z"
+    },
+    "state": {}
+  },
+  "when": [
+    {
+      "op": "fixture.value",
+      "args": {
+        "value": {
+          "balance": 8
+        }
+      }
+    },
+    {
+      "op": "fixture.value",
+      "args": {
+        "value": {
+          "balance": {
+            "$ref": "/results/0/balance"
+          }
+        }
+      }
+    }
+  ],
+  "then": {
+    "state": {
+      "balance": 8
+    }
+  }
+}

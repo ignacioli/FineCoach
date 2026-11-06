@@ -1,0 +1,35 @@
+{
+  "id": "root-pointer",
+  "rule": "M1B-FR-015",
+  "meta": {
+    "tags": [
+      "fictional-data"
+    ],
+    "input": {
+      "balance": 8
+    },
+    "conformance": {
+      "outcome": "pass",
+      "path": "/"
+    }
+  },
+  "given": {
+    "clock": {
+      "now": "2031-04-05T18:30:00Z"
+    },
+    "state": {}
+  },
+  "when": {
+    "op": "fixture.value",
+    "args": {
+      "value": {
+        "$ref": "/meta/input"
+      }
+    }
+  },
+  "then": {
+    "state": {
+      "balance": 8
+    }
+  }
+}

@@ -925,3 +925,148 @@ Material Symbols by Google，Apache License 2.0；完整 LICENSE、NOTICE 和原
 G1 预期 39；G2 仍 96（6+63+22+5），联合 135。图标来源/转换/许可/assertions 扩充在既有 ComponentCatalogTests 用例内，未改代表状态数或减弱断言。隐私定向用例数见下方静态统计记录，真正执行与 APK 打包证据仍由宿主提供。
 
 静态方法统计：FictionalDataPolicyTests 16、PrivacySourceScanTests 10，定向命令预期 26 tests；新增 3 个精确许可路径/篡改/邻居拒绝用例。此数量仍不是运行结果。
+
+## S0-06 T022～T024：双端共享向量 runner（2026-11-05，待宿主验证）
+
+D06/D11 已由负责人于 2026-11-03 批准：S0 正常样例只做最小纯 Kotlin
+`credit-ledger.balance`，完整业务留 S1；只有日历规则必填 IANA `timeZone`。
+格式权威仍是 `specs/007-android-port/contracts/test-vector-format.md` §1～§2；
+本轮不修改契约、iOS 产品代码、scheme 或 `s0/crypto`。
+
+### 清单与证明边界
+
+- `shared/test-vectors/runner-conformance/`：72 个单向量 JSON，15 正例、57 负例
+  （44 格式拒绝、13 比较失败）。`meta.tags` 均含 `fictional-data`。
+- `shared/test-vectors/s1/course-packages/`：5 个正常行为样例。
+  `s1-package-ledger-balance` 对齐 S1 plan §5.1 的稳定 ID；其余 `s0-ledger-*`
+  是 S0 算术/构造边界，不能算作 S1 13 个用例已完成。
+- Conformance 仅证明基础设施；test-only `fixture.*` 不进入正常样例 registry，
+  不读取 `then` 生成结果。负例通过 `meta.conformance.outcome/path` 声明预期拒绝。
+  `filename`、`duplicate`、`mutation` 是外层测试驱动选项：分别替换传入文件名、
+  对同一 runner 重复装载、注入坏 JSON/坏 UTF-8/非 object meta。
+  原始 fixture 保持合法 JSON 和既有虚构标记，FictionalDataPolicy 不放宽。
+- 每端按相对路径排序，逐文件输出 `VECTOR id=… path=… sha256=…`，另输出
+  `VECTOR-SUMMARY conformance=72 positive=15 negative=57` 与 `normal=5`。
+  SHA-256 针对仓库原始 UTF-8 字节，mutations 不改变源文件或清单摘要。
+  Android Parameterized 的数量是 discovery inventory；执行是否通过以 JUnit XML 为准。
+
+### 双端 op 映射
+
+| 向量 op | iOS 测试 adapter / 产品入口 | Android Kotlin 运算 | 投影与默认值 |
+|---|---|---|---|
+| `credit-ledger.balance` | `ios/FineCoachTests/SharedVectors/SharedVectorRunner.swift` 的 `balance` → `CreditAdjustment.init`（`ios/FineCoachApp/Core/Domain/CreditLedger.swift:49`）→ `CreditLedger.balance(totalCredits:adjustments:)`（同文件 `:95`）；已有测试 `ios/FineCoachTests/CoursePackages/CreditLedgerIdempotencyTests.swift:10`、`:35` | `SharedVectorRunner.balance` 验证并投影 adjustment → `android/app/src/main/java/com/ignacioli/finecoach/domain/CreditLedger.kt` 的 `CreditLedger.balance` | `args.totalCredits`、`args.adjustments` 全部显式给出；结果 `{balance: Int64}`。不 clamp、不去重、不筛选 package，不声称完成/重开业务或持久化幂等 |
+| `fixture.value` | test-only runner 从解析后的 `args.value` 产生结果 | 同名 test-only 分支 | 无默认值；返回输入数据，不读取 then；供投影/引用/比较验证 |
+| `fixture.fail` | test-only `FixtureDomainFailure`（非产品错误） | test-only `DomainFailure` | `args.error` 必填，必须为契约稳定 token；首错停止，保留前一步 state |
+| `fixture.calendar` | test-only value 分支 + IANA zone 验证 | 同名分支 + `ZoneId` 验证 | `given.timeZone` 必填；LocalDate/LocalTime 原始 wire 投影比较；不冒充日历业务实现 |
+
+余额 adapter 的每笔 adjustment 必填字段为 `id`、`packageID`、`direction`、
+`amount`、`reasonKind`、`sourceEventKey`、`createdAtUTC`。UUID 与时间全部来自向量，
+`amount` 是有符号 64 位整数且构造时须为正，`direction` 只接受 `debit/credit`。
+S0 受控子集的 `reasonKind` 只接受 `sessionComplete/sessionReopen/appointmentAbsent/adhocSession`；
+不接入需要额外 reasonText 的 `manualCorrection`。Swift 使用 initializer 明示的
+`reasonText=nil`、`linkedSessionID=nil`、`linkedAppointmentID=nil` 默认（产品 `CreditLedger.swift:55-57`），
+Kotlin 算术投影不包含这三个字段。其余字段没有默认值，不补当前时间、不生成 UUID。
+样例 adjustment 的 packageID 显式一致；余额函数本身不校验关联，也不按 event key 去重。
+无 adjustment 时仍须显式提供空数组。`given.clock.now` 必填，算术不消费时钟；
+`createdAtUTC` 独立显式提供，不能由本机时间补齐。
+
+Android 运算逐行对应 Swift `CreditLedger.swift:96-105`：初始 totalCredits →
+按数组顺序 debit 减 amount / credit 加 amount → 返回余额。Swift Int 在支持设备上是
+64 位，Kotlin 使用 Long；溢出不转换为成功值或 DomainError（Kotlin exact arithmetic
+会失败，Swift 产品算术会 trap），本批没有溢出样例。非法 amount 样例先由 Swift
+真实 `CreditAdjustment` 构造器抛 `invalidNumber`（`:61-62`）；Kotlin adapter 用相同
+前置约束映射 token，不声称 Kotlin 已实现完整 CreditAdjustment Domain。
+
+### 格式、引用与比较
+
+Android 的 test-only `VectorJSON` 严格解析 JSON，拒绝尾随内容、无效 escape 与
+重复 object key；UTF-8 decoder 使用 REPORT。iOS 用 Foundation JSONSerialization，
+先检查 UTF-8；两端都把解析失败报告为 `vector=<id或文件名回退> path=/ kind=format`。
+映射不覆盖通用 JSON 的所有 parser 扩展差异；新增输入边界须先补共同 conformance。
+
+必需五键、可选 object meta、ID/文件名、真实 rule registry、then 至少 state/error、
+已登记 op/args 都验证。rule registry 对照当前 M1A spec 的 FR-001～045 与 M1B 的
+FR-001～034，静态自检已核对连续编号确实存在；未知编号不会仅因匹配正则而接受。
+未知 meta 成员忽略。只有 `args` 内的精确单键 `$ref` object 会被解释；
+JSON Pointer 解 `~1/~0`，从文件根或运行时 `/results/N` 查找，缺目标/前向引用/
+非法数组索引均为格式错误，不能计入 DomainError。
+
+有序调度先验证 action registry，再依索引执行，结果按原索引暂存；首 DomainError
+停止。error 比较稳定 token；同时给 state/error 时比较失败前最后成功结果。
+object 是 subset projection、键序无关；数组顺序和长度精确，只有明确的
+`trainingFocus` 使用 Set<String> 语义（自然去重）。Decimal 保持 schema canonical
+string 精确比较，不转浮点；`*AtUTC` 按 instant；LocalDate/LocalTime 投影精确比较。
+整数、布尔、enum、字符串、null 和缺失分别比较。错误带 vector id 和字段路径。
+正常样例与 conformance 独立发现，缺目录/空集失败，不 XCTSkip/ignore。
+
+### FR-018 / FR-012 登记
+
+- FR-018：**已有断言于 `ios/FineCoachTests/ActiveSession/SessionActivityHookTests.swift:18`，
+  非纯 Domain 单测**。测试 `testStartReopenAndTwoFictitiousStudentsKeepOneActivityPerSession`
+  在 `:15-17` 通过 fixture 的真实 `sessions.startOrOpen(studentID:)` 两次打开同学员，
+  `:18` 比较稳定 Session ID。未来共享 adapter 入口为
+  `ActiveSessionUseCases.startOrOpen(studentID:trainingFocus:)`
+  （`ios/FineCoachApp/Core/Application/ActiveSessionUseCases.swift:94`），
+  需要测试 persistence/activities fixture，不能映射到余额 runner。
+  本次未注册该 op，未实现 S1 开课业务。
+- FR-012：规则在契约 §4 已写明，**确认门槛的共享测试/adapter 映射仍未确认**。
+  已定位 `CoursePackageEditorView.swift:63-76` 的 `save()`：未过期且余额非零时等待确认，
+  `:81-83` 的 `confirmEndActiveAndSave()` 才调用保存。它是 editor 行为，不能以
+  `CoursePackage.ending(now:)`（产品 `Core/Domain/CoursePackage.swift:77`）替代。
+  已有 `CreditLedgerIdempotencyTests.swift:138` 只证明 ending 转换和重复结束拒绝。
+  UI/用例层门槛的等价双端向量入口及自动化断言仍待 S1 核实；不改产品来消除此缺口。
+
+### 宿主机运行与预期（本轮未运行）
+
+从 `android/` 运行：
+
+```sh
+./gradlew :app:s0G6
+```
+
+预期 `VectorFormatTests` 72 tests、`SharedVectorTests` 5 tests，合计 77，
+0 failures/errors/skips。G6 复用现有 AGP test runtime，锁定两类精确数量；
+finalizer 同时检查 task 实际执行、非空 XML、suite 集、testcase 节点与失败/skip 节点，
+拒绝 NO-SOURCE、被跳过或旧 cache 结果。报告在 `app/build/test-results/s0G6/`，
+清单 stdout 同时进入 XML。不修改其他 gate。
+
+从产品根由 Claude 宿主设置并记录可用 destination 和独立 DerivedData，再运行：
+
+```sh
+xcodebuild -project ios/FineCoach.xcodeproj -scheme FineCoachTests \
+  -destination "id=$S0_IOS_DESTINATION_ID" -derivedDataPath "$S0_IOS_DERIVED_DATA" \
+  -only-testing:FineCoachTests/VectorFormatTests \
+  -only-testing:FineCoachTests/SharedVectorTests test
+```
+
+这两个变量是 plan §5 的宿主输入，本轮未设置或核实；未设置即 BLOCKED。
+XCTest 预期 2 个测试方法，内部逐文件执行 72 conformance + 5 正常向量，
+0 failures/errors/skips；数量与 Android Parameterized 的 testcase 数不能混为一谈。
+双端同一清单的 id/path/SHA-256/count 全部一致才满足 G6，Android 独绿不代表双端通过。
+既有 iOS build/unit/integration 门禁仍交宿主执行，定向 runner 不替代这些门禁。
+
+定位方式：XCTest 从 `SharedVectors/SharedVectorRunner.swift` 的 `#filePath` 向上四层
+到产品根；Gradle 为 G6 设置 `finecoach.sharedVectorRoot` 指向同一产品根下目录，
+将整个共享目录声明为 task input。文件不复制进 iOS bundle，既有 crypto 向量不改。
+新增三份 Swift 文件仅加入 FineCoachTests 的 PBXFileReference/PBXBuildFile/Sources；
+挂在已有 Backup group，用 `../SharedVectors/…` 指向测试目录，无产品 target membership。
+
+本轮状态：实现已写入；只做静态 JSON、清单/SHA-256、rule registry、membership 与 diff
+自检。未运行 Gradle、xcodebuild、模拟器或设备，编译/运行通过、双端实际执行清单一致性、
+cursor-agent 独立复核及 T023/T024 完成门禁均 **未确认**。不修改只读 tasks 的 checkbox，
+不 commit。本轮没有新增用户交互，entry/layout map 不适用，未宣称视觉验证。
+
+静态源清单摘要（按相对路径排序，每行 `path<TAB>sha256<LF>`，不是运行证明）：
+`f8c47f29eb9b3d6a81e3668ebf0926b4ec7e7bd1b0c566aa14bc493054c0c639`。
+正常样例文件均在 `shared/test-vectors/s1/course-packages/`，前缀为 `m1b-fr-015__`：
+
+| vector ID（文件名末尾加 `.json`） | SHA-256 |
+|---|---|
+| `s1-package-ledger-balance` | `d0c2dce3738f5889fe3d9d72a3c80ab0042985b022bf1775baa601920ad61bb6` |
+| `s0-ledger-empty` | `65a23d94c02ffb84a587665ee07249f43a032bceada89d64390b523d92fab74f` |
+| `s0-ledger-zero` | `f401d8d49d7ebafe7df160bbb3b9c05d8b77ab3118bb614c50c242a866010abf` |
+| `s0-ledger-negative` | `807c8f2aaf91ab274490fa325350f8ce0e28c0627272a011275ad3907a11dd89` |
+| `s0-ledger-invalid-amount` | `70c8cdeeace790bce6a5fa3bc5cd904e0b0e7af93dc1559ed4f5531bcb9e103d` |
+
+`finecoach.sharedVectorRoot` 同时配置到标准 Test tasks，避免新增测试只能被 G6 单独运行、
+而使全量 `testDebugUnitTest` 因缺路径失败；标准任务和 G6 均声明同一共享目录 input。

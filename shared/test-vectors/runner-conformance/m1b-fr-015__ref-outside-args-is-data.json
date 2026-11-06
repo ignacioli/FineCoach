@@ -1,0 +1,38 @@
+{
+  "id": "ref-outside-args-is-data",
+  "rule": "M1B-FR-015",
+  "meta": {
+    "tags": [
+      "fictional-data"
+    ],
+    "conformance": {
+      "outcome": "pass",
+      "path": "/"
+    }
+  },
+  "given": {
+    "clock": {
+      "now": "2031-04-05T18:30:00Z"
+    },
+    "state": {
+      "value": {
+        "$ref": "/missing"
+      }
+    }
+  },
+  "when": {
+    "op": "fixture.value",
+    "args": {
+      "value": {
+        "$ref": "/given/state"
+      }
+    }
+  },
+  "then": {
+    "state": {
+      "value": {
+        "$ref": "/missing"
+      }
+    }
+  }
+}
