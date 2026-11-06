@@ -1,0 +1,16 @@
+# Integrated: 13 checked SVGs converted; provenance in material-symbols-provenance.json.
+# symbol | style/weight | iOS SF Symbol | components | status
+add | outlined/600 | plus | DS-TITLE-ACTION,DS-STEPPER,DS-SYMBOL | integrated
+remove | outlined/600 | minus | DS-STEPPER,DS-SYMBOL,DS-LIST-ROW | integrated
+expand_more | outlined/600 | chevron.down | DS-SYMBOL,DS-LIST-ROW | integrated
+calendar_month | outlined/300 | calendar | DS-TITLE-ACTION | integrated
+settings | outlined/300 | gearshape | DS-TITLE-ACTION,DS-HUB-ROW | integrated
+grid_view | outlined/300 | square.grid.2x2 | DS-TITLE-ACTION,DS-HUB-ROW | integrated
+filter_list | outlined/300 | line.3.horizontal.decrease | DS-TITLE-ACTION | integrated
+delete | outlined/400 | trash | DS-ACTION-ROW | integrated
+sync | outlined/400 | arrow.triangle.2.circlepath | DS-SAVE-STATUS | integrated
+check_circle | outlined/400 | checkmark.circle | DS-SAVE-STATUS | integrated
+warning | outlined/400 | exclamationmark.triangle | DS-SAVE-STATUS | integrated
+priority_high | outlined/600 | exclamationmark | DS-STATUS,DS-INLINE-RESULT | integrated
+info | outlined/600 | info | DS-STATUS,DS-INLINE-RESULT | integrated
+# ‹ › ✓ are bundled Noto Sans SC glyphs, excluded from asset requests.

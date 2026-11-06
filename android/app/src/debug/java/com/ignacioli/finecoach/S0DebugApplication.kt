@@ -24,18 +24,25 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogWindowProvider
-import com.ignacioli.finecoach.designsystem.FcSpacing
+import com.ignacioli.finecoach.designsystem.*
+import androidx.compose.runtime.CompositionLocalProvider
 
 // fictional-data: infrastructure sample only; no student/coach data or persistence.
 internal class S0DebugApplication : Application(), ShellContentProvider {
-    @Composable override fun Content(privacyCover: PrivacyCoverPolicy) = PrivacySample(privacyCover)
+    @Composable override fun Content(privacyCover: PrivacyCoverPolicy) {
+        var catalog by remember { mutableStateOf(false) }
+        val registry = remember(privacyCover) { FcWindowRegistry(privacyCover::registerWindow, privacyCover::unregisterWindow) }
+        CompositionLocalProvider(LocalFcWindowRegistry provides registry) {
+            if (catalog) S0ComponentCatalog { catalog = false }
+            else PrivacySample(privacyCover) { catalog = true }
+        }
+    }
 }
 
 @Composable
-private fun PrivacySample(privacyCover: PrivacyCoverPolicy) {
+private fun PrivacySample(privacyCover: PrivacyCoverPolicy, onCatalog: () -> Unit) {
     var dialogOpen by remember { mutableStateOf(false) }
     var count by remember { mutableIntStateOf(0) }
     val background = MaterialTheme.colorScheme.background
@@ -45,6 +52,7 @@ private fun PrivacySample(privacyCover: PrivacyCoverPolicy) {
         SampleButton("打开虚构弹层", "s0-open-dialog") { dialogOpen = true }
         SampleButton("交互探针 +1", "s0-probe") { count++ }
         SampleText("计数：$count", "s0-probe-count")
+        SampleButton("基础组件样例", "s0-open-catalog", onCatalog)
     }
     if (dialogOpen) {
         Dialog(onDismissRequest = { dialogOpen = false }) {
@@ -72,7 +80,7 @@ private fun SampleText(text: String, tag: String) {
 
 @Composable
 private fun SampleButton(text: String, tag: String, onClick: () -> Unit) {
-    Column(Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag(tag)
+    Column(Modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.field).testTag(tag)
         .clickable(role = Role.Button, onClick = onClick).padding(FcSpacing.space2)) {
         SampleText(text, "$tag-label")
     }

@@ -398,7 +398,6 @@ tasks.withType<Test>().matching { it.name == "testDebugUnitTest" || it.name == "
 // Reserve the approved interfaces. Each is replaced by its owning task only
 // when the full, non-empty test/report contract is implemented (plan section 4).
 val pendingGates = mapOf(
-    "s0G2" to "T016: approved component contracts",
     "s0G3" to "T018: design value scan",
     "s0G4" to "T017: entry and layout harness",
     "s0G5" to "T019/T020: screenshot verify and owner-approved baselines",
@@ -560,3 +559,85 @@ val validateDesignTokenGate = tasks.register("validateS0G1Results") {
     }
 }
 designTokenGate.configure { finalizedBy(validateDesignTokenGate) }
+
+
+// T016: non-empty, verify-only G2; no screenshot recording or G3/G4 prerequisites.
+val componentClasses = listOf(
+    "com.ignacioli.finecoach.ComponentCatalogTests",
+    "com.ignacioli.finecoach.ComponentCatalogStateTests",
+    "com.ignacioli.finecoach.ComponentContractTests",
+    "com.ignacioli.finecoach.PlatformShellTests",
+)
+val componentGate = tasks.register<Test>("s0G2") {
+    group = "verification"
+    description = "Approved component roster, representative states, contracts and platform shell"
+    dependsOn(checkDesignTokens)
+    val debugTest = tasks.named<Test>("testDebugUnitTest").get()
+    testClassesDirs = debugTest.testClassesDirs
+    classpath = debugTest.classpath
+    javaLauncher.set(debugTest.javaLauncher)
+    setJvmArgs(debugTest.jvmArgs)
+    jvmArgumentProviders.addAll(debugTest.jvmArgumentProviders)
+    systemProperties(debugTest.systemProperties)
+    workingDir = debugTest.workingDir
+    filter {
+        setIncludePatterns(*componentClasses.toTypedArray())
+        isFailOnNoMatchingTests = true
+    }
+    failOnNoDiscoveredTests.set(true)
+    reports.junitXml.required.set(true)
+    reports.junitXml.outputLocation.set(layout.buildDirectory.dir("test-results/s0G2"))
+    reports.html.outputLocation.set(layout.buildDirectory.dir("reports/tests/s0G2"))
+    binaryResultsDirectory.set(layout.buildDirectory.dir("test-results/s0G2/binary"))
+    inputs.file(rootProject.layout.projectDirectory.file("../design/design-system/components.md"))
+    inputs.dir(layout.projectDirectory.dir("src/main/java/com/ignacioli/finecoach/designsystem"))
+    inputs.dir(layout.projectDirectory.dir("src/debug"))
+    outputs.upToDateWhen { false }
+    outputs.doNotCacheIf("G2 evidence must execute on this host") { true }
+}
+val validateComponentGate = tasks.register("validateS0G2Results") {
+    doLast {
+        val gate = componentGate.get()
+        check(!gate.state.skipped && gate.state.failure == null) {
+            "s0G2 did not successfully execute: ${gate.state.skipMessage ?: gate.state.failure}"
+        }
+        val xmlFiles = gate.reports.junitXml.outputLocation.get().asFile
+            .listFiles { file -> file.name.startsWith("TEST-") && file.extension == "xml" }.orEmpty()
+        check(xmlFiles.isNotEmpty()) { "s0G2 has no JUnit XML" }
+        val factory = DocumentBuilderFactory.newInstance().apply {
+            setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
+            setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+            setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "")
+            setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "")
+        }
+        val counts = mutableMapOf<String, Int>()
+        for (xml in xmlFiles) {
+            val suite = factory.newDocumentBuilder().parse(xml).documentElement
+            val name = suite.getAttribute("name")
+            check(name in componentClasses) { "Unexpected G2 suite: $name" }
+            val cases = suite.getElementsByTagName("testcase")
+            val count = suite.getAttribute("tests").toInt()
+            check(count > 0 && count == cases.length) { "Empty/inconsistent G2 suite: $name" }
+            for (attribute in listOf("failures", "errors", "skipped")) {
+                check(suite.getAttribute(attribute).toInt() == 0) { "$name has $attribute" }
+            }
+            for (index in 0 until cases.length) {
+                val case = cases.item(index) as Element
+                check(listOf("skipped", "failure", "error").all {
+                    case.getElementsByTagName(it).length == 0
+                }) { "Unsuccessful G2 testcase: $name.${case.getAttribute("name")}" }
+            }
+            check(counts.put(name, count) == null) { "Duplicate G2 suite: $name" }
+        }
+        check(counts.keys == componentClasses.toSet()) { "Missing G2 suites: ${componentClasses - counts.keys}" }
+        val expectedCounts = mapOf(
+            "com.ignacioli.finecoach.ComponentCatalogTests" to 6,
+            "com.ignacioli.finecoach.ComponentCatalogStateTests" to 63,
+            "com.ignacioli.finecoach.ComponentContractTests" to 22,
+            "com.ignacioli.finecoach.PlatformShellTests" to 5,
+        )
+        check(counts == expectedCounts) { "Unexpected G2 testcase counts: $counts; expected $expectedCounts" }
+        logger.lifecycle("s0G2: ${counts.values.sum()} tests, 0 failures/errors/skips; $counts")
+    }
+}
+componentGate.configure { finalizedBy(validateComponentGate) }

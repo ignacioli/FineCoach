@@ -745,3 +745,183 @@ node android/dependency-allowlist/generate-resolved.mjs android/app/build/report
 3. 设计决定：复用已批准映射、随包字体与本轮 Material3 授权；精确行盒 parity 保持待核实，不以默认值宣称完成。
 4. 实现与检查：Node 16/16、自检字体/OFL 同字节、allowlist parser 自检通过；宿主 G1 39 例及 build/lint 已于 2026-11-06 通过，完整 JVM 127 例、Room 18/18、smoke 通过，证据见上述日志。entry/layout map 无新增行；原 `s0-open-dialog`/`s0-probe`/`s0-dialog-probe`/`s0-close-dialog` 可见按钮仍分别修改弹层状态/内存计数，原 Column.fillMaxWidth 撑满宽度，testTag 未变。未触发新设计 L3；现有 T010 运行结果不代替本轮 APK 验证。
 5. 结果：Node 检查、宿主 G1/build/lint/JVM/Room/smoke、allowlist 重生成及 cursor-agent 复核均 PASS；字体哈希一致。§15.5 上述 parity 等待核实项继续开放；不宣称 CP2 完成，不做截图基线、G3/G4、gate.sh。
+
+## S0-08 T015/T016：Android 基础组件与 G2
+
+2026-11-05 本轮依据负责人「全速推进到 S1」决定实施，不等 Penpot AD-01～03，不执行 T014/T031、截图基线、G3/G4。规格目录 `/Users/liyongqiang/gitrepo/ignacioli/.worktree/specs-android-s0/FineCoach/007-android-port/` 只读，未改 tasks 状态。设计权威和完整 roster 见 [components.md §8](../design/design-system/components.md#8-android-s0-rostert015t0162026-11-05)。一般组件沿用 iOS anatomy；AD-01/02/03 保留 B 类，系统栏/全面屏/返回按 ADR A/B，未宣称负责人已审设计或已验收。
+
+开工审计：`git status --short` 仅 `?? .vscode/`，tracked modifications/staged 均 0，`git diff --stat` 空；`.vscode/` 属既有用户文件，原样保留。计划仅写本轮白名单，未 commit、stash、切分支；GATE PASS，分支 `feat/android-s0-infrastructure`。独立 agent 未启动：CLAUDE 的批准 run-list 仅列 Codex，且禁止两个并发 agent 写同一 worktree。本轮由 primary 完成，cursor-agent 独立复核待编排。
+
+### roster 摘要
+
+D07 的 22 个 ID 全部登记 Kotlin 入口、iOS 来源、代表状态、G2 method 与 L3 项；debug catalog 共 63 个代表状态。`FcControls.kt` 负责按钮、标题操作、segmented、chips、toggle、Stepper/FIELD、输入和符号；`FcRows.kt` 负责列表、区段、两栏、页头、入口、操作、撤销；`FcFeedback.kt` 负责状态、头像、结果、sheet、确认和日期选择。`FineCoachTheme.kt` 继续作为 DS-BASE，不修改生成器或 token 权威。
+
+- Material 对应物：DS-BOTTOM-SHEET → M3 ModalBottomSheet；日期选择 → M3 DatePickerDialog/DatePicker（LABEL-VALUE-ROW 示例）；toggle 使用 Compose toggleable 的 Role.Switch，保留已有轨道外观。其余按 iOS anatomy 自绘，消费生成 token，不引图标依赖。
+- 组件既有几何在 `FcComponentMetrics` 用生成 spacing 组合表达，出处是 components §4/README §6/§8；没有新增 token 值。`‹ › ✓` 仍用随包 Noto Sans SC，不使用系统图标或临时字体替代。
+- 延期 11 ID：AMBIENT-SCENE、SET-ROW、HERO-CARD、HINT-BAR（S1，洞察扩展 S3）、EQUIPMENT-ICON、PAGE-PRIMARY、PAGE-SECONDARY、EMPTY-STATE、LAUNCH（S1）；CALENDAR-DAY（S2）；BODY-DIAGRAM（S4）。完整逐 ID 表含 D07 批准来源，见 components §8.2。
+- 行和按钮传入 callback，不在 DS 层持久化、删除对象或决定课包生命周期；Undo 的业务窗口、原位置恢复留给调用方，S0 无业务实体不伪造这类证明。
+
+### 宿主命令与预期数量
+
+按本 README 前文配置已批准 JDK21、SDK 与缓存，从 `android/` 执行：
+
+```sh
+./gradlew assembleDebug lint
+./gradlew :app:s0G1 :app:s0G2
+```
+
+本轮按指令没有运行以上命令、Gradle、模拟器或 xcodebuild。下表是代码声明的预期值，**不是运行结果**。
+
+| gate / suite | 预期 tests | 证明范围 |
+|---|---:|---|
+| s0G1 | 39 | 现有 token/字体/contrast/generator 合同，未改 |
+| ComponentCatalogTests | 6 | 22 项精确 roster、类型/真实文件/iOS 来源、状态与测试方法、11 项延期和 authority 并集、debug/privacy 入口保留、图标需求/无依赖 |
+| ComponentCatalogStateTests | 63 | 参数化逐个状态真正 compose 并检查组件 testTag，不以文字清单代替渲染 |
+| ComponentContractTests | 22 | roster 每 ID 一个合同方法；touch/满宽、disabled callback、单选/三态、Stepper/FIELD、输入/secure、heading/semantics、确认/重试/撤销、token source 检查等 |
+| PlatformShellTests | 5 | header 与系统 back dispatcher 同 callback、Insets 只消费一次、内容宽度、catalog 可见入口/返回、独立 overlay window 隐私注册/释放 |
+| s0G2 合计 | 96 | 上述四个 suite 全部非空，0 failures/errors/skips；与 G1 联跑总计 135 |
+
+`s0G2` 替换原占位任务，report：`app/build/test-results/s0G2/TEST-*.xml`，HTML：`app/build/reports/tests/s0G2/`。禁用 up-to-date/cache；finalizer 拒绝失败、skip、NO-SOURCE、缺 suite、重复 suite、0 tests、非预期数量，以及 XML 中任一 failure/error/skipped。不创建或更新 screenshot baseline，不依赖 G3/G4/G5。ParameterizedRobolectricTestRunner 使用其自己的 `Parameters` 注解（已对照本机 4.17 JAR）；最终 Gradle XML 归组/计数仍待宿主执行确认，失败不能改数量或删断言求通过。
+
+### entry / layout map
+
+所有操作仅修改 debug 内存或样例导航，不改业务数据。下列 `tag` 都是实际代码的 `testTag`，`{id}/{state}` 是下面明确列举的 catalog 元数据展开，不是任意产品路由。文件缩写：
+
+- Shell = `app/src/debug/java/com/ignacioli/finecoach/S0DebugApplication.kt` 的 `Content` / `PrivacySample`。
+- Catalog = `app/src/debug/java/com/ignacioli/finecoach/S0ComponentCatalog.kt` 的 `S0ComponentCatalog` / `S0ComponentState`。
+- Controls / Rows / Feedback = `app/src/main/java/com/ignacioli/finecoach/designsystem/FcControls.kt` / `FcRows.kt` / `FcFeedback.kt`。
+
+格式为 §1.4 要求的「screen → visible control → identifier → mutates data? → width owner」，末列指向真实实现。满宽指父内容列，图标/链接/segmented/chip/开关/步进符号只要求 44 点击区，明确不要求满宽。
+
+| screen | visible control | identifier | mutates data? | width owner / code |
+|---|---|---|---|---|
+| debug shell | 打开虚构弹层 | s0-open-dialog | 否，开弹层 | Shell SampleButton fillMaxWidth |
+| debug shell | 交互探针 +1 | s0-probe | 仅内存计数 | Shell SampleButton fillMaxWidth |
+| debug privacy dialog | 交互探针 +1 | s0-dialog-probe | 仅内存计数 | Shell SampleButton fillMaxWidth |
+| debug privacy dialog | 关闭弹层 | s0-close-dialog | 否，关弹层 | Shell SampleButton fillMaxWidth |
+| debug shell | 基础组件样例 | s0-open-catalog | 否，样例导航 | Shell SampleButton fillMaxWidth |
+| catalog 任一级 | 返回 ‹ | catalog-back | 否，样例导航；同系统 back callback | Rows FcPageHeader；44 点击区，布局占 space.4 |
+| catalog 索引 | DS-BASE 分组入口 | catalog-DS-BASE | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-BUTTON 分组入口 | catalog-DS-BUTTON | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-TITLE-ACTION 分组入口 | catalog-DS-TITLE-ACTION | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-SEGMENTED 分组入口 | catalog-DS-SEGMENTED | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-CHIP 分组入口 | catalog-DS-CHIP | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-TOGGLE 分组入口 | catalog-DS-TOGGLE | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-STEPPER 分组入口 | catalog-DS-STEPPER | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-TEXT-FIELD 分组入口 | catalog-DS-TEXT-FIELD | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-LIST-ROW 分组入口 | catalog-DS-LIST-ROW | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-SECTION 分组入口 | catalog-DS-SECTION | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-LABEL-VALUE-ROW 分组入口 | catalog-DS-LABEL-VALUE-ROW | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-PAGE-HEADER 分组入口 | catalog-DS-PAGE-HEADER | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-HUB-ROW 分组入口 | catalog-DS-HUB-ROW | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-INLINE-RESULT 分组入口 | catalog-DS-INLINE-RESULT | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-ACTION-ROW 分组入口 | catalog-DS-ACTION-ROW | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-UNDO-ROW 分组入口 | catalog-DS-UNDO-ROW | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-BOTTOM-SHEET 分组入口 | catalog-DS-BOTTOM-SHEET | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-CONFIRM-DIALOG 分组入口 | catalog-DS-CONFIRM-DIALOG | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-STATUS 分组入口 | catalog-DS-STATUS | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-SAVE-STATUS 分组入口 | catalog-DS-SAVE-STATUS | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-AVATAR 分组入口 | catalog-DS-AVATAR | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-SYMBOL 分组入口 | catalog-DS-SYMBOL | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| DS-BUTTON/default | 主按钮样例 / 次按钮样例 / 链接样例 | DS-BUTTON-default | 仅内存计数 | Catalog → Controls；primary/secondary 满宽，link ≥44 |
+| DS-BUTTON/secondary | 主按钮样例 / 次按钮样例 / 链接样例 | DS-BUTTON-secondary | 仅内存计数 | Catalog → Controls；primary/secondary 满宽，link ≥44 |
+| DS-BUTTON/link | 主按钮样例 / 次按钮样例 / 链接样例 | DS-BUTTON-link | 仅内存计数 | Catalog → Controls；primary/secondary 满宽，link ≥44 |
+| DS-TITLE-ACTION/icon | Material 图标按钮 | DS-TITLE-ACTION-icon | 仅内存计数 | Catalog → Controls title button ≥44 |
+| DS-TITLE-ACTION/add | Material 图标按钮 | DS-TITLE-ACTION-add | 仅内存计数 | Catalog → Controls title button ≥44 |
+| DS-SEGMENTED/first | 选项甲 | DS-SEGMENTED-first-0 | 仅内存选择 | Catalog → Controls selectable ≥44 |
+| DS-SEGMENTED/first | 选项乙 | DS-SEGMENTED-first-1 | 仅内存选择 | Catalog → Controls selectable ≥44 |
+| DS-SEGMENTED/last | 选项甲 | DS-SEGMENTED-last-0 | 仅内存选择 | Catalog → Controls selectable ≥44 |
+| DS-SEGMENTED/last | 选项乙 | DS-SEGMENTED-last-1 | 仅内存选择 | Catalog → Controls selectable ≥44 |
+| DS-CHIP/off | 虚构筛选 | DS-CHIP-off | 仅内存选择 | Catalog → Controls chip ≥44 |
+| DS-CHIP/on | 虚构筛选 | DS-CHIP-on | 仅内存选择 | Catalog → Controls chip ≥44 |
+| DS-CHIP/body | 胸 | DS-CHIP-body-0 | 仅内存选择 | Catalog → Controls BodyPartPicker FlowRow / chip ≥44 |
+| DS-CHIP/body | 肩 | DS-CHIP-body-1 | 仅内存选择 | Catalog → Controls BodyPartPicker FlowRow / chip ≥44 |
+| DS-CHIP/body | 背 | DS-CHIP-body-2 | 仅内存选择 | Catalog → Controls BodyPartPicker FlowRow / chip ≥44 |
+| DS-CHIP/body | 大腿 | DS-CHIP-body-3 | 仅内存选择 | Catalog → Controls BodyPartPicker FlowRow / chip ≥44 |
+| DS-CHIP/body | 小腿 | DS-CHIP-body-4 | 仅内存选择 | Catalog → Controls BodyPartPicker FlowRow / chip ≥44 |
+| DS-CHIP/body | 臂 | DS-CHIP-body-5 | 仅内存选择 | Catalog → Controls BodyPartPicker FlowRow / chip ≥44 |
+| DS-CHIP/body | 臀 | DS-CHIP-body-6 | 仅内存选择 | Catalog → Controls BodyPartPicker FlowRow / chip ≥44 |
+| DS-CHIP/body | 核心 | DS-CHIP-body-7 | 仅内存选择 | Catalog → Controls BodyPartPicker FlowRow / chip ≥44 |
+| DS-TOGGLE/off | 样例开关 | DS-TOGGLE-off | 仅内存开关 | Catalog → Controls toggle ≥44 |
+| DS-TOGGLE/on | 样例开关 | DS-TOGGLE-on | 仅内存开关 | Catalog → Controls toggle ≥44 |
+| DS-STEPPER/lower | 左侧减少 / 右侧增加 | DS-STEPPER-lower-minus | 仅内存数值，边界禁用 | Catalog → Controls StepButton ≥44 |
+| DS-STEPPER/lower | 左侧减少 / 右侧增加 | DS-STEPPER-lower-plus | 仅内存数值，边界禁用 | Catalog → Controls StepButton ≥44 |
+| DS-STEPPER/upper | 左侧减少 / 右侧增加 | DS-STEPPER-upper-minus | 仅内存数值，边界禁用 | Catalog → Controls StepButton ≥44 |
+| DS-STEPPER/upper | 左侧减少 / 右侧增加 | DS-STEPPER-upper-plus | 仅内存数值，边界禁用 | Catalog → Controls StepButton ≥44 |
+| DS-STEPPER/field | 左侧减少 / 右侧增加 | DS-STEPPER-field-minus | 仅内存数值，边界禁用 | Catalog → Controls StepButton ≥44 |
+| DS-STEPPER/field | 左侧减少 / 右侧增加 | DS-STEPPER-field-plus | 仅内存数值，边界禁用 | Catalog → Controls StepButton ≥44 |
+| DS-STEPPER/field | 样例数值输入 | DS-STEPPER-field-input | 仅内存文本 | Catalog → Controls FIELD weight(1f)，整胶囊满宽 |
+| DS-TEXT-FIELD/empty | 虚构输入 | DS-TEXT-FIELD-empty | 仅内存文本 | Catalog → Controls TextField fillMaxWidth |
+| DS-TEXT-FIELD/secure | 虚构输入 | DS-TEXT-FIELD-secure | 仅内存文本 | Catalog → Controls TextField fillMaxWidth |
+| DS-TEXT-FIELD/search | 搜索虚构内容 | DS-TEXT-FIELD-search | 仅内存文本 | Catalog → Controls TextField fillMaxWidth |
+| DS-LIST-ROW/action | 虚构项目 | DS-LIST-ROW-action | 仅内存计数或选择 | Catalog → Rows ListRow fillMaxWidth |
+| DS-LIST-ROW/selected | 虚构项目 | DS-LIST-ROW-selected | 仅内存计数或选择 | Catalog → Rows ListRow fillMaxWidth |
+| DS-LIST-ROW/group | 虚构分组展开 / 选择 | DS-LIST-ROW-group-expand | 仅内存展开或选择 | Catalog → Rows GroupRow 满宽；expand weight(1f)，toggle ≥44 |
+| DS-LIST-ROW/group | 虚构分组展开 / 选择 | DS-LIST-ROW-group-toggle | 仅内存展开或选择 | Catalog → Rows GroupRow 满宽；expand weight(1f)，toggle ≥44 |
+| DS-SECTION/entry | 虚构分组 | DS-SECTION-entry | 仅内存计数 | Catalog → Rows GroupEntryRow fillMaxWidth |
+| DS-LABEL-VALUE-ROW/slot | 值开关 | DS-LABEL-VALUE-ROW-slot-toggle | 仅内存开关 | Catalog → Rows 值 slot → Controls toggle ≥44 |
+| DS-LABEL-VALUE-ROW/action | 选择日期 | DS-LABEL-VALUE-ROW-action | 仅内存开弹层 | Catalog → Rows LabelValueRow fillMaxWidth |
+| DS-PAGE-HEADER/back | 返回 ‹（样例探针） | DS-PAGE-HEADER-back-back | 仅内存计数 | Catalog → Rows PageHeader ≥44 |
+| DS-PAGE-HEADER/trailing | 返回 ‹（样例探针） | DS-PAGE-HEADER-trailing-back | 仅内存计数 | Catalog → Rows PageHeader ≥44 |
+| DS-PAGE-HEADER/trailing | 编辑样例 | DS-PAGE-HEADER-trailing-trailing | 仅内存计数 | Catalog → Rows PageHeader → Controls LinkButton ≥44 |
+| DS-HUB-ROW/action | 虚构入口 | DS-HUB-ROW-action | 仅内存计数 | Catalog → Rows HubRow fillMaxWidth |
+| DS-INLINE-RESULT/failure | 重试 | DS-INLINE-RESULT-failure-retry | 仅内存计数 | Catalog → Feedback InlineResult → Controls LinkButton ≥44 |
+| DS-INLINE-RESULT/success | 重试 | DS-INLINE-RESULT-success-retry | 仅内存计数 | Catalog → Feedback InlineResult → Controls LinkButton ≥44 |
+| DS-INLINE-RESULT/info | 重试 | DS-INLINE-RESULT-info-retry | 仅内存计数 | Catalog → Feedback InlineResult → Controls LinkButton ≥44 |
+| DS-ACTION-ROW/normal | 普通操作样例 | DS-ACTION-ROW-normal | 仅内存计数 | Catalog → Rows ActionRow fillMaxWidth |
+| DS-ACTION-ROW/destructive | 删除虚构样例 | DS-ACTION-ROW-destructive | 否，先打开确认 | Catalog → Rows ActionRow fillMaxWidth |
+| DS-ACTION-ROW/destructive | 删除样例 / 取消 | DS-ACTION-ROW-destructive-accept | 确认仅增内存计数；取消只关闭 | Catalog → Feedback ConfirmationDialog 按钮行 weight(1f)；大字纵排满宽 |
+| DS-ACTION-ROW/destructive | 删除样例 / 取消 | DS-ACTION-ROW-destructive-cancel | 确认仅增内存计数；取消只关闭 | Catalog → Feedback ConfirmationDialog 按钮行 weight(1f)；大字纵排满宽 |
+| DS-UNDO-ROW/visible | 撤销 | DS-UNDO-ROW-visible-action | 仅内存计数 | Catalog → Rows UndoRow 满宽；LinkButton ≥44 |
+| DS-BOTTOM-SHEET/open | 打开样例面板 | DS-BOTTOM-SHEET-open | 否，开弹层 | Catalog → Controls Button fillMaxWidth |
+| DS-BOTTOM-SHEET/open | 关闭样例面板 | DS-BOTTOM-SHEET-open-close | 否，关弹层 | Catalog → Feedback Sheet → Rows ActionRow fillMaxWidth |
+| DS-CONFIRM-DIALOG/open | 打开样例确认 | DS-CONFIRM-DIALOG-open | 否，开弹层 | Catalog → Controls Button fillMaxWidth |
+| DS-CONFIRM-DIALOG/open | 确认样例 / 取消 | DS-CONFIRM-DIALOG-open-accept | 确认仅增内存计数；取消只关闭 | Catalog → Feedback ConfirmationDialog 按钮行 weight(1f)；大字纵排满宽 |
+| DS-CONFIRM-DIALOG/open | 确认样例 / 取消 | DS-CONFIRM-DIALOG-open-cancel | 确认仅增内存计数；取消只关闭 | Catalog → Feedback ConfirmationDialog 按钮行 weight(1f)；大字纵排满宽 |
+| DS-CONFIRM-DIALOG/long | 打开样例确认 | DS-CONFIRM-DIALOG-long | 否，开弹层 | Catalog → Controls Button fillMaxWidth |
+| DS-CONFIRM-DIALOG/long | 确认样例 / 取消 | DS-CONFIRM-DIALOG-long-accept | 确认仅增内存计数；取消只关闭 | Catalog → Feedback ConfirmationDialog 按钮行 weight(1f)；大字纵排满宽 |
+| DS-CONFIRM-DIALOG/long | 确认样例 / 取消 | DS-CONFIRM-DIALOG-long-cancel | 确认仅增内存计数；取消只关闭 | Catalog → Feedback ConfirmationDialog 按钮行 weight(1f)；大字纵排满宽 |
+| 日期样例 | Material 日期选择器 | date-picker | 仅 picker 暂存选择 | Feedback M3 DatePicker；内部日期格由 Material semantics 定位 |
+| 日期样例 | 确定 | date-accept | 仅内存选择日期并关闭 | Feedback Controls LinkButton ≥44 |
+| 日期样例 | 取消 | date-cancel | 否，关闭 | Feedback Controls LinkButton ≥44 |
+
+只读、disabled、装饰性样例没有数据操作：BUTTON/disabled、TOGGLE/disabled、ACTION-ROW/disabled 不触发 callback；LIST-ROW/plain/unavailable、HUB-ROW/info/unavailable 不提供 click action。DatePicker 的应用入口、整体、确定/取消由应用赋 tag；Material 内部日期格/年导航和 sheet 内部手势使用平台 semantics，库没有逐格 tag 注入 API，本轮不侵入库或虚构 API。宿主应核实其可访问性和触控行为；这不是 app 自绘控件漏入口的豁免。
+
+### L3 与图标接入
+
+统一负责人模拟器走查仍待执行：header 内联返回与大字标题/尾部操作不重叠、中文字体行盒、chip 换行与间隔、Stepper 数值和键盘、确认框大字纵排/长说明滚动、危险操作语义、sheet 拖拽/遮罩/返回、DatePicker 本地化与颜色、系统栏明暗/全面屏/系统返回动画。JVM back dispatcher/Insets 测试不能替代真实系统手势或 OEM runtime 证据。API31/32 新独立窗口的后台遮罩与 API33+ recents 行为仍需宿主设备证据，不把 G2 注册测试称为系统缩略图证明。
+
+13 个 Material Symbols 已接入，见 [manifest](design-assets/material-symbols-manifest.txt) 和 [逐项 provenance](design-assets/material-symbols-provenance.json)：add、remove、expand_more、calendar_month、settings、grid_view、filter_list、delete、sync、check_circle、warning、priority_high、info。SVG/权重按宿主清单，上游 commit 为 10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7；已比对原 SHA256SUMS，保留 pathData，viewport 960×960 和 translateY=960。catalog 使用 painterResource 注入，已去掉空 Painter 与占位文字；没有新增依赖。
+
+Material Symbols by Google，Apache License 2.0；完整 LICENSE、NOTICE 和原始 SVG 归档在 design-assets，许可也随 APK assets/licenses 打包。现无应用内许可页面约定，本轮不新增产品页面。FictionalDataPolicy 按精确路径与固定 SHA-256 接受这两份文件，新增篡改/邻居/错误路径拒绝测试；无宽泛目录豁免。
+
+### 本轮验证记录与剩余项
+
+静态 readback：22 roster 项/11 延期项与 §3/§4.6 authority 并集一致，Kotlin 类型文件/iOS 来源/22 合同方法引用存在；63 状态元数据；raw Color/非零 dp/sp 扫描通过；`git diff --check` 通过。Material3 1.4.0、Compose Test 1.12.1、Robolectric 4.17 的关键 API/注解已对照本机批准缓存 JAR，未联网。
+
+未验证：Kotlin/Compose 编译、Gradle DSL 执行、96 tests 的真实执行与 XML 归组、lint、G1 回归、Material 日期内部控件、真实返回手势/Insets/弹层隐私、L3、cursor-agent 独立复核。图标 XML 与许可已静态核验，实际资源加载仍待宿主验证。T015/T016 当前是可审查实现，不能据此报告 gate PASS、checkpoint 完成或负责人验收；未修改只读规格复选框。
+
+
+### 宿主编译失败修复与 D12 资源接入（2026-11-06）
+
+宿主日志 .handoff/logs/2026-11-06-host-s0-08.log 的 compileDebugKotlin 因 toggleable 第四位置参数类型不符失败；其他门禁没有形成本轮 PASS。现改为 value/enabled/role/onValueChange 全具名参数；clickable/selectable 的布尔位置参数、DatePicker state 也改为具名。已对照本机 foundation 1.12.1、M3 1.4.0 AAR 中的签名/参数名核对，ModalBottomSheet/DatePickerDialog 仍使用正确的默认参数与具名参数，未新增依赖。未运行 Gradle，不据静态检查宣布编译已通过。
+
+新增 entry/layout map（原 tags 保留）：
+
+| screen | visible control | identifier | mutates data? | width owner / code |
+|---|---|---|---|---|
+| DS-TITLE-ACTION/icon | 日历图标 | DS-TITLE-ACTION-icon-calendar | 仅内存计数 | S0ComponentCatalog.kt → FcTitleIconButton，≥44 |
+| DS-TITLE-ACTION/icon | 资料库图标 | DS-TITLE-ACTION-icon-library | 仅内存计数 | S0ComponentCatalog.kt → FcTitleIconButton，≥44 |
+| DS-TITLE-ACTION/icon | 筛选图标 | DS-TITLE-ACTION-icon-filter | 仅内存计数 | S0ComponentCatalog.kt → FcTitleIconButton，≥44 |
+
+宿主需从 android/ 执行（本轮未执行）：
+
+```sh
+./gradlew assembleDebug lint
+./gradlew :app:s0G1 :app:s0G2
+./gradlew :app:testDebugUnitTest --tests '*FictionalDataPolicyTests' --tests '*PrivacySourceScanTests'
+```
+
+G1 预期 39；G2 仍 96（6+63+22+5），联合 135。图标来源/转换/许可/assertions 扩充在既有 ComponentCatalogTests 用例内，未改代表状态数或减弱断言。隐私定向用例数见下方静态统计记录，真正执行与 APK 打包证据仍由宿主提供。
+
+静态方法统计：FictionalDataPolicyTests 16、PrivacySourceScanTests 10，定向命令预期 26 tests；新增 3 个精确许可路径/篡改/邻居拒绝用例。此数量仍不是运行结果。

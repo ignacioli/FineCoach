@@ -1,0 +1,212 @@
+{
+  "upstreamRepository": "https://github.com/google/material-design-icons",
+  "upstreamCommit": "10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7",
+  "license": "Apache-2.0",
+  "licenseSha256": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd",
+  "icons": [
+    {
+      "symbol": "add",
+      "style": "outlined",
+      "weight": 600,
+      "iosSymbol": "plus",
+      "components": [
+        "DS-TITLE-ACTION",
+        "DS-STEPPER",
+        "DS-SYMBOL"
+      ],
+      "sourceSvg": "material-symbols-svg/add.svg",
+      "sourceSha256": "458d5a13b482a7b9afcbf7a78fb6e28ef272b880de9532a3eb7782ecf2a35fd1",
+      "upstreamCommit": "10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7",
+      "upstreamPath": "symbols/web/add/materialsymbolsoutlined/add_wght600_24px.svg",
+      "drawable": "app/src/main/res/drawable/ic_ms_add.xml",
+      "drawableSha256": "68d4f3b7ab71d39b4ef66e170d378eb3ebe7dee13872892ad45ca0117e858ae6"
+    },
+    {
+      "symbol": "remove",
+      "style": "outlined",
+      "weight": 600,
+      "iosSymbol": "minus",
+      "components": [
+        "DS-STEPPER",
+        "DS-SYMBOL",
+        "DS-LIST-ROW"
+      ],
+      "sourceSvg": "material-symbols-svg/remove.svg",
+      "sourceSha256": "725d36cac35cf7fa2f56bc412b471dc9844f36950e772e64b762860738cc64bf",
+      "upstreamCommit": "10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7",
+      "upstreamPath": "symbols/web/remove/materialsymbolsoutlined/remove_wght600_24px.svg",
+      "drawable": "app/src/main/res/drawable/ic_ms_remove.xml",
+      "drawableSha256": "a683514a4a71bfc167523f02d9cd422a7b8f38864fa9713a7b4abb63cddd0b0c"
+    },
+    {
+      "symbol": "expand_more",
+      "style": "outlined",
+      "weight": 600,
+      "iosSymbol": "chevron.down",
+      "components": [
+        "DS-SYMBOL",
+        "DS-LIST-ROW"
+      ],
+      "sourceSvg": "material-symbols-svg/expand_more.svg",
+      "sourceSha256": "302cfd5053115593d64444aaecaf087e451d6db4fecec9b51d595add7ad21b94",
+      "upstreamCommit": "10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7",
+      "upstreamPath": "symbols/web/expand_more/materialsymbolsoutlined/expand_more_wght600_24px.svg",
+      "drawable": "app/src/main/res/drawable/ic_ms_expand_more.xml",
+      "drawableSha256": "a557e29b10d24eb70cb0049b9699069ad72e4b797dc6a160637f83e567105381"
+    },
+    {
+      "symbol": "calendar_month",
+      "style": "outlined",
+      "weight": 300,
+      "iosSymbol": "calendar",
+      "components": [
+        "DS-TITLE-ACTION"
+      ],
+      "sourceSvg": "material-symbols-svg/calendar_month.svg",
+      "sourceSha256": "28f6218e13f75f4b8c012fa1a02e802ad66bb330c3020a6d7425a16542422a5d",
+      "upstreamCommit": "10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7",
+      "upstreamPath": "symbols/web/calendar_month/materialsymbolsoutlined/calendar_month_wght300_24px.svg",
+      "drawable": "app/src/main/res/drawable/ic_ms_calendar_month.xml",
+      "drawableSha256": "b3654001e9ed053f873252ed0f2c700aa3cd1834a80817f167243c9164166b97"
+    },
+    {
+      "symbol": "settings",
+      "style": "outlined",
+      "weight": 300,
+      "iosSymbol": "gearshape",
+      "components": [
+        "DS-TITLE-ACTION",
+        "DS-HUB-ROW"
+      ],
+      "sourceSvg": "material-symbols-svg/settings.svg",
+      "sourceSha256": "dd020ca4b460b6e64bdb6f2703ed56848f142241f31ef4e034935bd97f3c641a",
+      "upstreamCommit": "10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7",
+      "upstreamPath": "symbols/web/settings/materialsymbolsoutlined/settings_wght300_24px.svg",
+      "drawable": "app/src/main/res/drawable/ic_ms_settings.xml",
+      "drawableSha256": "2232cdc0c3b7fc9f7414b61d3a3ded428e32566adbfce7ae020a90a5babe1aea"
+    },
+    {
+      "symbol": "grid_view",
+      "style": "outlined",
+      "weight": 300,
+      "iosSymbol": "square.grid.2x2",
+      "components": [
+        "DS-TITLE-ACTION",
+        "DS-HUB-ROW"
+      ],
+      "sourceSvg": "material-symbols-svg/grid_view.svg",
+      "sourceSha256": "bb0d3d4726db31ccfef15bde15bd9a97145630380c9af8119245608a5f0d964f",
+      "upstreamCommit": "10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7",
+      "upstreamPath": "symbols/web/grid_view/materialsymbolsoutlined/grid_view_wght300_24px.svg",
+      "drawable": "app/src/main/res/drawable/ic_ms_grid_view.xml",
+      "drawableSha256": "a4fa3a0c59f9057018eff1fdbda7e5fe8af7db49c4ce600077ac66b8774fff55"
+    },
+    {
+      "symbol": "filter_list",
+      "style": "outlined",
+      "weight": 300,
+      "iosSymbol": "line.3.horizontal.decrease",
+      "components": [
+        "DS-TITLE-ACTION"
+      ],
+      "sourceSvg": "material-symbols-svg/filter_list.svg",
+      "sourceSha256": "487474370c3c7a77776ee981c463a712f6eaa97d7863ccd224f1555f33aae235",
+      "upstreamCommit": "10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7",
+      "upstreamPath": "symbols/web/filter_list/materialsymbolsoutlined/filter_list_wght300_24px.svg",
+      "drawable": "app/src/main/res/drawable/ic_ms_filter_list.xml",
+      "drawableSha256": "6619bf54db2c83f6fb2e49f887e17c7ef4ce6f957d7384ef373fd6b9131c29f6"
+    },
+    {
+      "symbol": "delete",
+      "style": "outlined",
+      "weight": 400,
+      "iosSymbol": "trash",
+      "components": [
+        "DS-ACTION-ROW"
+      ],
+      "sourceSvg": "material-symbols-svg/delete.svg",
+      "sourceSha256": "ec75e756af4e37a926a2f64ef8f59eac85276a658fc8a7aef0cc12c5e871e971",
+      "upstreamCommit": "10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7",
+      "upstreamPath": "symbols/web/delete/materialsymbolsoutlined/delete_24px.svg",
+      "drawable": "app/src/main/res/drawable/ic_ms_delete.xml",
+      "drawableSha256": "60377abceda5f3ba4f0e7c6c70693e29775fa932aad6408dbc9f5fe4e38c07c1"
+    },
+    {
+      "symbol": "sync",
+      "style": "outlined",
+      "weight": 400,
+      "iosSymbol": "arrow.triangle.2.circlepath",
+      "components": [
+        "DS-SAVE-STATUS"
+      ],
+      "sourceSvg": "material-symbols-svg/sync.svg",
+      "sourceSha256": "1b47b89b3d9dde46cf7d2329286f95ddcfa7f060dabc740f22169c53c72f624c",
+      "upstreamCommit": "10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7",
+      "upstreamPath": "symbols/web/sync/materialsymbolsoutlined/sync_24px.svg",
+      "drawable": "app/src/main/res/drawable/ic_ms_sync.xml",
+      "drawableSha256": "421e052b48fa396b246645791583be1c15241b7af32d37bc778a6d880bb0d5b3"
+    },
+    {
+      "symbol": "check_circle",
+      "style": "outlined",
+      "weight": 400,
+      "iosSymbol": "checkmark.circle",
+      "components": [
+        "DS-SAVE-STATUS"
+      ],
+      "sourceSvg": "material-symbols-svg/check_circle.svg",
+      "sourceSha256": "42bf0950bc12ecf7952a8c3be86e0131f225095a7dc6c824a659a13df442e373",
+      "upstreamCommit": "10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7",
+      "upstreamPath": "symbols/web/check_circle/materialsymbolsoutlined/check_circle_24px.svg",
+      "drawable": "app/src/main/res/drawable/ic_ms_check_circle.xml",
+      "drawableSha256": "7bb1a3802573f6c5f34e21f4c960766535b37b12872fef95603bce735ede47bf"
+    },
+    {
+      "symbol": "warning",
+      "style": "outlined",
+      "weight": 400,
+      "iosSymbol": "exclamationmark.triangle",
+      "components": [
+        "DS-SAVE-STATUS"
+      ],
+      "sourceSvg": "material-symbols-svg/warning.svg",
+      "sourceSha256": "0212c59cfa1e2da887b0b36c7d89886de94b019feaaba5c063ec8dc7d32be436",
+      "upstreamCommit": "10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7",
+      "upstreamPath": "symbols/web/warning/materialsymbolsoutlined/warning_24px.svg",
+      "drawable": "app/src/main/res/drawable/ic_ms_warning.xml",
+      "drawableSha256": "f458714c0b7eeffcfa1cd8b4fc2c979e01eae24c6949380a4a36f33c1a5e21ef"
+    },
+    {
+      "symbol": "priority_high",
+      "style": "outlined",
+      "weight": 600,
+      "iosSymbol": "exclamationmark",
+      "components": [
+        "DS-STATUS",
+        "DS-INLINE-RESULT"
+      ],
+      "sourceSvg": "material-symbols-svg/priority_high.svg",
+      "sourceSha256": "ade199ca94e11c852b6c4622bd6a4097b965691b9f79db144a041d6c319b4663",
+      "upstreamCommit": "10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7",
+      "upstreamPath": "symbols/web/priority_high/materialsymbolsoutlined/priority_high_wght600_24px.svg",
+      "drawable": "app/src/main/res/drawable/ic_ms_priority_high.xml",
+      "drawableSha256": "fe8b57d5ea35dda22a995fcdd7ffb254093bef6b6356ee138be55060ff0084cd"
+    },
+    {
+      "symbol": "info",
+      "style": "outlined",
+      "weight": 600,
+      "iosSymbol": "info",
+      "components": [
+        "DS-STATUS",
+        "DS-INLINE-RESULT"
+      ],
+      "sourceSvg": "material-symbols-svg/info.svg",
+      "sourceSha256": "f8523aab5abe97de038a0abbbf81e2bdd43fc09696ef9c354e341abf5612ddba",
+      "upstreamCommit": "10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7",
+      "upstreamPath": "symbols/web/info/materialsymbolsoutlined/info_wght600_24px.svg",
+      "drawable": "app/src/main/res/drawable/ic_ms_info.xml",
+      "drawableSha256": "82221780c26009b9aadcaf1363cce9e5cebbd89cf574f5200ebe389107e0fd9a"
+    }
+  ]
+}

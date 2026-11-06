@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Material Symbols by Google; Apache-2.0. Source and conversion: android/design-assets/. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="960" android:viewportHeight="960">
+    <group android:translateY="960">
+        <path android:fillColor="@android:color/white" android:pathData="M480-327.48 221.91-585.57 296-659.65l184 184 184-184 74.09 74.08L480-327.48Z" />
+    </group>
+</vector>
