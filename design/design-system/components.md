@@ -552,3 +552,92 @@ roadmap §4 里不需要画板的差异（不在上表，不要为它们新开�
 关于 → CC BY-SA 4.0 → about.ccBySA4 → 否 → FCHubRow（Features/Settings/CoachAboutView.swift）
 关于 → CC BY-SA 3.0 → about.ccBySA3 → 否 → FCHubRow（Features/Settings/CoachAboutView.swift）
 ```
+
+## 8. Android S0 roster（T015/T016，2026-11-05）
+
+本节只增加 Android 映射，不改 §1～§7/iOS anatomy。依据 S0 spec D07（负责人 2026-11-03 按建议批准）、D09、D12，以及 roadmap §8 2026-11-05「全速推进到 S1」决定：本轮不等 AD-01～03、不执行 T014/T031，不做截图基线/G3/G4；统一模拟器走查仍未完成。以下是实现合同，不是视觉验收记录。
+
+### 8.1 范围、来源与变化
+
+| 位置 | 当前 | 目标 | 理由 | 处理 |
+|---|---|---|---|---|
+| §3 共享组件 | iOS anatomy 与源码 | D07 22 个 ID 的 Compose 映射 | 复用既有设计 | 保留 iOS，新增 Android 实现；一般组件 C 类移植/复用，差异如下 |
+| DS-SYMBOL / AD-01 | SF Symbols 与随包字形 | 按需 Material Symbols SVG→vector drawable；Painter 注入 | D12 | B 类平台映射，资产已接入并登记 provenance；不新增图标库 |
+| DS-BOTTOM-SHEET / AD-03 | 自绘 iOS 面板 | Material3 ModalBottomSheet | 本轮授权的平台对应物 | B 类；保留 token 遮罩、标题/内容层级，拖拽/关闭采用平台实现 |
+| 日期选择 / AD-02 | 系统 DatePicker | Material3 DatePicker | 本轮明确要求 | B 类；作为 LABEL-VALUE-ROW 的值入口，不新增 DS ID |
+| 系统栏、edge-to-edge、返回 | ADR §7.2 A/B；roadmap 旧 C 分类冲突 | 安全 Insets 与统一 back callback | D09 | A/B，未登记为已批准 C 类；延后负责人走查 |
+| T014/T031、截图/G3/G4 | 原依赖 | 本轮不执行 | roadmap §8 最新决定 | 移出本轮；不修改其状态、不提前宣称通过 |
+
+代码列均相对 `android/app/src/main/java/com/ignacioli/finecoach/designsystem/`；iOS 列均相对 `ios/FineCoachApp/DesignSystem/`。状态 key 同时用于 debug catalog 和 G2；G2 ID 对应 `ComponentContractTests` 同名 test method（BASE 由 catalog source/token 检查补充）。L3 为尚待负责人统一走查的项目。
+
+<!-- android-roster-start -->
+| ID | Kotlin 类型 | 文件 | 代表状态 key | iOS 源码 | G2 不变量 ID | L3 / Material 差异 |
+|---|---|---|---|---|---|---|
+| DS-BASE | FineCoachTheme | FineCoachTheme.kt | tokens | Tokens.swift;Typography.swift | tokenUsage | 字体行盒/缩放，沿用 G1 限制 |
+| DS-BUTTON | FcButton;FcSecondaryButton;FcLinkButton | FcControls.kt | default;disabled;secondary;link | Components/FCButton.swift | buttons | 按下 token、长文/大字；无 opacity 压暗 |
+| DS-TITLE-ACTION | FcTitleIconButton;FcTitleAddButton | FcControls.kt | icon;add | Components/FCButton.swift | titleActions | Painter 注入，图标已接入，待负责人走查 |
+| DS-SEGMENTED | FcSegmentedSwitch | FcControls.kt | first;last | Components/FCSegmentedSwitch.swift | segmented | 单选布局/大字 |
+| DS-CHIP | FcFilterChip;FcBodyPartChip;FcBodyPartPicker | FcControls.kt | off;on;body | Components/FCChip.swift;Components/FCBodyPartChip.swift | chips | FlowRow 换行与视觉行距 |
+| DS-TOGGLE | FcToggle | FcControls.kt | off;on;disabled | Components/FCToggleStyle.swift | toggle | Compose toggleable Switch 语义；保留 iOS 轨道尺寸 |
+| DS-STEPPER | FcStepper;FcStepperField | FcControls.kt | lower;upper;field | Components/FCStepper.swift | steppers | 字号放大/键盘；图标 Painter 注入 |
+| DS-TEXT-FIELD | FcTextField;FcSearchField | FcControls.kt | empty;secure;search | Components/FCTextField.swift | fields | 焦点/软键盘/长文 |
+| DS-LIST-ROW | FcListRow;FcListGroupRow;FcListRowDivider | FcRows.kt | plain;action;selected;unavailable;group | Components/FCListRow.swift | listRows | 子行缩进/大字；组状态由子项推导 |
+| DS-SECTION | FcSectionLabel;FcGroupEntryRow | FcRows.kt | label;entry | Components/FCListRow.swift | sections | 区块阅读层级 |
+| DS-LABEL-VALUE-ROW | FcLabelValueRow;FcLabelValueText | FcRows.kt | text;slot;action | Components/FCListRow.swift | labelValue | 标签列/大字；DatePicker 为 M3 平台对应物 |
+| DS-PAGE-HEADER | FcPageHeader | FcRows.kt | back;trailing | Components/FCPageHeader.swift | pageHeader | 基线/标题折行；返回 A/B 见 §8.4 |
+| DS-HUB-ROW | FcHubRow | FcRows.kt | action;info;unavailable | Components/FCHubRow.swift | hubRows | Painter 注入；标题与原因合并读取 |
+| DS-INLINE-RESULT | FcInlineResult | FcFeedback.kt | failure;success;info | Components/FCInlineResult.swift | inlineResult | 重试独立可访问/大字 |
+| DS-ACTION-ROW | FcActionRow | FcRows.kt | normal;destructive;disabled | Components/FCListRow.swift | actionRows | 危险文案+可选 Painter，不靠颜色；确认由调用方发起 |
+| DS-UNDO-ROW | FcUndoRow | FcRows.kt | visible | Components/FCUndoRow.swift | undoRow | 原位置恢复/窗口由未来业务 owner 实现，不在 DS 创建计时器 |
+| DS-BOTTOM-SHEET | FcBottomSheet | FcFeedback.kt | open | Components/FCBottomSheet.swift | bottomSheet | M3 ModalBottomSheet；拖拽/返回关闭/隐私遮罩待设备走查 |
+| DS-CONFIRM-DIALOG | FcConfirmationDialog | FcFeedback.kt | open;long | Components/FCConfirmationDialog.swift | confirmation | 自绘 Dialog；大字堆叠、滚动、取消/确认位置 |
+| DS-STATUS | FcStatus;FcStatusLabel;FcStatusBadge | FcFeedback.kt | overdue;conflict;coursePackageInvalid;notComparable;permissionDenied | Components/FCStatusLabel.swift | status | 五态文字+徽标，装饰字形隐藏 |
+| DS-SAVE-STATUS | FcSaveState;FcSaveStatusView | FcFeedback.kt | saving;saved;failed | Components/FCSaveStatusView.swift | saveStatus | Painter 注入；真实 Painter 注入，待负责人走查 |
+| DS-AVATAR | FcAvatar | FcFeedback.kt | initial | Components/FCAvatar.swift | avatar | 首字与圆形裁切，装饰性 |
+| DS-SYMBOL | FcSymbol;FcGlyph;FcAssetSymbol | FcControls.kt | pageBack;back;forward;check;checkOnFill;minus;plus;collapse | Components/FCSymbol.swift | symbols | 字形仅 ‹ › ✓；其余 Painter，13 个 Material Symbols drawable 已接入（§8.3），待 L3 走查 |
+<!-- android-roster-end -->
+
+### 8.2 D07 延期表
+
+D07 按建议批准含以下逐项候选；不实施、不计 S0 G2 组件完成。未知新增 ID 必须失败并交负责人补定。延期不等于这些组件已实现。
+
+<!-- android-deferred-start -->
+| ID | 目标切片 | 批准来源 / 原因 |
+|---|---|---|
+| DS-AMBIENT-SCENE | S1 | D07 2026-11-03；今日/日历空态 |
+| DS-SET-ROW | S1 | D07 2026-11-03；训练业务状态 |
+| DS-HERO-CARD | S1 | D07 2026-11-03；今日/学员详情 |
+| DS-HINT-BAR | S1（S3 扩展） | D07 2026-11-03；训练提示/洞察 |
+| DS-CALENDAR-DAY | S2 | D07 2026-11-03；预约日历 |
+| DS-EQUIPMENT-ICON | S1 | D07 2026-11-03；动作资产 |
+| DS-BODY-DIAGRAM | S4 | D07 2026-11-03；分享报告 |
+| DS-PAGE-PRIMARY | S1 | D07 2026-11-03；功能页组合 |
+| DS-PAGE-SECONDARY | S1 | D07 2026-11-03；S0 仅 header/平台壳 |
+| DS-EMPTY-STATE | S1 | D07 2026-11-03；功能页空态 |
+| DS-LAUNCH | S1 | D07 2026-11-03；不包含 S0 必要系统启动配置 |
+<!-- android-deferred-end -->
+
+### 8.3 Android anatomy 与 G2 边界
+
+沿用 §4 部件顺序、颜色、字号、disabled/selection/accessibility 合同。`FcComponentMetrics` 仅将 §4 与 README §6/§8 已有几何表示为生成 spacing token 的算式（44=32+12、52=32+16+4、48=32+16、1.5=12/8 等）；不是新设计值或新的 token 源。禁止裸 Color/sp/dp（零 dp 除外）；G2 扫描 main designsystem 与 debug catalog，实际 pressed 配色由交互测试核验。
+
+- touch：所有交互目标至少 44×44；视觉 chip 28/30、toggle 44×26、搜索视觉 40 保留，外层点击区补足。满宽按钮、输入框、rows 与父内容容器等宽。
+- state：disabled 不触发 callback；segmented 单选；组选择状态只能由 children 推导；Stepper 整数 ±1 并 clamp，FIELD 将步长/解析交回调用方；自定义 accessibility action 提供调节。撤销不自带业务计时、持久化或假造完成状态。
+- semantics：heading、selected、Switch、密码遮蔽、强制非空 icon label；无交互行合并读取；徽标/头像/图标默认装饰性；重试单独可访问。每个新入口有 testTag 和可见控件，见 android/README 的 entry/layout map。
+- overlays：Dialog 采用既有 300 宽/80% 可滚动说明、大字纵排，token scrim；ModalBottomSheet 接管平台 drag/back/dismiss，token scrim/圆角/内容 padding；独立窗口注册 T009 privacyCover，不以壳窗口覆盖等同已保护弹层。
+- DatePicker：M3 DatePickerDialog/DatePicker，用 Theme 与显式 token colors；选择只改变虚构 catalog 内存状态，不创建 Appointment、不承诺保存。
+- icon：`android/design-assets/material-symbols-manifest.txt` 的 13 项已接入（源码/输出 digest、权重、commit 见 provenance JSON）；完整 Apache-2.0 LICENSE/NOTICE 已归档并随 APK 打包。catalog 通过 painterResource 注入真实 vector，不含占位 Painter。无图标库依赖；视觉验收仍待负责人走查。
+
+### 8.4 平台壳（D09：A/B，待负责人走查）
+
+`FcPlatformShell` 在 Activity 已启用 edge-to-edge 的前提下，以 surface.page 绘制全屏背景，仅内容消费 safeDrawing Insets；不写死状态栏/导航栏高度，不吞系统手势。`BackHandler` 与 DS-PAGE-HEADER 的 `‹` 调用同一 onBack；catalog 只维护样例导航，不新增产品路由。系统栏图标明暗沿用 Activity `enableEdgeToEdge` 默认平台策略，尚待负责人核实。PlatformShellTests 注入确定 Insets，验证内容边界与返回 dispatcher/header 一致；JVM 不能证明真实系统手势动画、OEM 系统栏或缩略图。
+
+### 8.5 本轮五行执行记录
+
+分类与依据：一般组件 C 类映射/复用 §4 iOS anatomy；AD-01/02/03 B 类平台差异、系统壳 ADR A/B；2026-11-05 授权先实现并统一走查。
+范围：D07 22 个 ID + debug catalog；11 个 ID 延期；不改 iOS，不建功能页，不回写 Penpot。
+设计决定：复用生成 token 与随包字体；Material Sheet/DatePicker 按本轮指令；Material Symbols 资产已接入，视觉验收仍未取证。
+实现与检查：G2 对应本节 roster 与测试方法，entry/layout map 在 android/README；按指令不运行 Gradle/模拟器/xcodebuild；不做 G3/G4/截图。
+结果：实现待宿主编译/G1/G2 验证与 cursor-agent 复核；L3 统一走查未取证；不得据此勾选只读 tasks 或宣布 T016 验收通过。
+
+2026-11-06 接入差异：移除 catalog 空 Painter/「图标待接入」占位与边框，目标为 D12 的 13 个宿主提供 SVG→vector；保留所有原 testTag，追加三个标题图标样例入口（android/README map）。LICENSE/NOTICE 精确路径+digest 纳入隐私策略；未新增产品许可页面、依赖或设计值。未运行 Gradle；宿主 toggleable 编译失败仍保留为历史 FAIL，修复后运行证据待取。

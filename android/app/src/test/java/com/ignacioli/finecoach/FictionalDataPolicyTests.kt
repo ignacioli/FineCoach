@@ -22,6 +22,13 @@ internal object FictionalDataPolicy {
         "privacy/telemetry.txt" to "b43241d8739de122821e45caff9cf77e344c31a0e8baad933a3d39e42b2cb96e",
         "privacy/valid-extraction.xml" to "f418293f594ab02038d77a2999b87eccdc9625e9dc4c7026dd4ff1535490810a",
     )
+    // Exact source/APK paths only; changed license/notice bytes fail even with a declaration.
+    private val materialNotices = mapOf(
+        "main/assets/licenses/material-symbols-LICENSE.txt" to "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd",
+        "assets/licenses/material-symbols-LICENSE.txt" to "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd",
+        "main/assets/licenses/material-symbols-NOTICE.txt" to "4b4bcdf3546bb501568e2dc9e1f4951678c0946caaf110c1d4ef7c70a73542d6",
+        "assets/licenses/material-symbols-NOTICE.txt" to "4b4bcdf3546bb501568e2dc9e1f4951678c0946caaf110c1d4ef7c70a73542d6",
+    )
     private val email = Regex("[A-Za-z0-9._%+-]+@([A-Za-z0-9.-]+\\.[A-Za-z]{2,})")
     fun validateName(path: String) {
         require(!Regex("(?i)(S0SENTINEL|FICTIONAL_SENSITIVE|@|(?:^|[/_-])(?:student|coach|patient)[_-]?[0-9]{6,}|1[3-9][0-9]{9})")
@@ -34,6 +41,10 @@ internal object FictionalDataPolicy {
     fun validateFixture(path: String, bytes: ByteArray, declaration: String? = null) {
         validateName(path)
         val hash = MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
+        materialNotices[path]?.let { expected ->
+            require(hash == expected) { "Material Symbols notice provenance mismatch: $path" }
+            return
+        }
         // A third-party license is not fictional data. Exempt only the exact
         // source/APK paths, and require byte provenance from the iOS original.
         if (path in setOf("main/assets/fonts/OFL.txt", "assets/fonts/OFL.txt")) {
@@ -176,6 +187,35 @@ class FictionalDataPolicyTests {
             assertThrows(IllegalArgumentException::class.java) {
                 FictionalDataPolicy.validateFixture(it, changed, FictionalDataPolicy.DECLARATION)
             }
+        }
+    }
+
+    @Test fun exactMaterialNoticePathsMatchPinnedBytesAndDistributionCopies() {
+        listOf("LICENSE", "NOTICE").forEach { kind ->
+            val name = "material-symbols-$kind.txt"
+            val bytes = File(app, "src/main/assets/licenses/$name").readBytes()
+            assertArrayEquals(File(app, "../design-assets/$name").readBytes(), bytes)
+            listOf("main/assets/licenses/$name", "assets/licenses/$name").forEach {
+                FictionalDataPolicy.validateFixture(it, bytes)
+            }
+        }
+    }
+    @Test fun rejectsChangedMaterialNoticesEvenWithDeclaration() {
+        listOf("LICENSE", "NOTICE").forEach { kind ->
+            val name = "material-symbols-$kind.txt"
+            val bytes = File(app, "src/main/assets/licenses/$name").readBytes() + "\nfictional-data changed notice\n".toByteArray()
+            listOf("main/assets/licenses/$name", "assets/licenses/$name").forEach {
+                assertThrows(IllegalArgumentException::class.java) {
+                    FictionalDataPolicy.validateFixture(it, bytes, FictionalDataPolicy.DECLARATION)
+                }
+            }
+        }
+    }
+    @Test fun rejectsUndeclaredMaterialNoticeNeighborsAndAlternatePaths() {
+        val bytes = File(app, "src/main/assets/licenses/material-symbols-LICENSE.txt").readBytes()
+        listOf("main/assets/licenses/OTHER.txt", "assets/licenses/OTHER.txt", "licenses/material-symbols-LICENSE.txt",
+            "main/assets/other/material-symbols-LICENSE.txt", "assets/other/material-symbols-LICENSE.txt").forEach {
+            assertThrows(IllegalArgumentException::class.java) { FictionalDataPolicy.validateFixture(it, bytes) }
         }
     }
     @Test fun rejectsVectorWithoutFictionalTag() {
