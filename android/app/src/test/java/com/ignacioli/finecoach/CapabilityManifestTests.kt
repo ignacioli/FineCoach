@@ -14,6 +14,13 @@ internal object CapabilityPolicy {
         require(!requested.single().hasAttributeNS(MergedPrivacyInputs.ANDROID, "maxSdkVersion"))
         val declared = MergedPrivacyInputs.children(manifest).filter { it.tagName == "permission" }
         require(declared.size == 1 && declared.single().attr("name") == permission && declared.single().attr("protectionLevel") == "signature")
+        val instrumentation = MergedPrivacyInputs.children(manifest).filter { it.tagName == "instrumentation" }
+        if (variant == "debug") {
+            require(instrumentation.size == 1)
+            require(instrumentation.single().attr("name") == "com.ignacioli.finecoach.seed.DebugSeedInstrumentation")
+            require(instrumentation.single().attr("targetPackage") == "com.ignacioli.finecoach")
+            require(instrumentation.single().attr("functionalTest") == "true")
+        } else require(instrumentation.isEmpty()) { "Release must not expose instrumentation" }
         val app = manifest.getElementsByTagName("application").item(0) as Element
         val components = MergedPrivacyInputs.children(app).filter { it.tagName in setOf("activity", "activity-alias", "service", "receiver", "provider") }
         val expectedComponents = setOf(
@@ -48,6 +55,16 @@ internal object CapabilityPolicy {
 class CapabilityManifestTests {
     @Test fun debugMergedManifestHasOnlyApprovedCapabilities() = validateVariant("debug")
     @Test fun releaseMergedManifestHasOnlyApprovedCapabilities() = validateVariant("release")
+    @Test fun rejectsUnexpectedInstrumentation() {
+        for (variant in MergedPrivacyInputs.variants) {
+            val manifest = MergedPrivacyInputs.manifest(variant)
+            val entry = manifest.ownerDocument.createElement("instrumentation")
+            entry.setAttributeNS(MergedPrivacyInputs.ANDROID, "android:name", "fictional.UnapprovedInstrumentation")
+            entry.setAttributeNS(MergedPrivacyInputs.ANDROID, "android:targetPackage", "com.ignacioli.finecoach")
+            manifest.appendChild(entry)
+            assertThrows(IllegalArgumentException::class.java) { CapabilityPolicy.validate(manifest, variant) }
+        }
+    }
     private fun validateVariant(variant: String) {
         val manifest = MergedPrivacyInputs.manifest(variant)
         CapabilityPolicy.validate(manifest, variant)

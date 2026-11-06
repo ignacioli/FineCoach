@@ -82,12 +82,17 @@ class PrivacySourceScanTests {
         }
     }
     @Test fun releaseContainsNoAppDebugLoggingImplementation() {
-        // No debug logger exists in this slice. Fail if one is introduced without
-        // replacing this absence contract with an approved fixed-event contract.
+        // S0-12 permits exactly one debug-only, fixed-event seed log call.
         val sourceRoot = File(MergedPrivacyInputs.property("sourceRoot"))
         for (variant in listOf("debug", "release")) {
             File(sourceRoot, variant).walkTopDown().filter { it.isFile && it.extension in setOf("kt", "java") }.forEach {
-                PrivacySourcePolicy.validate(it.readText())
+                val source = it.readText()
+                val seedEntry = "debug/java/com/ignacioli/finecoach/seed/DebugSeedInstrumentation.kt"
+                val call = "android.util.Log.i(\"FineCoachSeed\", result.logLine)"
+                if (it.relativeTo(sourceRoot).invariantSeparatorsPath == seedEntry) {
+                    require(source.windowed(call.length).count { fragment -> fragment == call } == 1)
+                    PrivacySourcePolicy.validate(source.replace(call, ""))
+                } else PrivacySourcePolicy.validate(source)
             }
         }
         val apks = File(MergedPrivacyInputs.property("releaseApk")).walkTopDown().filter { it.isFile && it.extension == "apk" }.toList()
@@ -100,6 +105,8 @@ class PrivacySourceScanTests {
                 val strings = String(bytes, Charsets.ISO_8859_1)
                 require(!strings.contains("Lcom/ignacioli/finecoach/DebugEventLogger;"))
                 require(!strings.contains("FICTIONAL_SENSITIVE_LOG_SENTINEL"))
+                require(!strings.contains("Lcom/ignacioli/finecoach/seed/"))
+                require(!strings.contains("FineCoachSeed"))
             }
         }
     }

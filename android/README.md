@@ -1070,3 +1070,125 @@ cursor-agent 独立复核及 T023/T024 完成门禁均 **未确认**。不修改
 
 `finecoach.sharedVectorRoot` 同时配置到标准 Test tasks，避免新增测试只能被 G6 单独运行、
 而使全量 `testDebugUnitTest` 因缺路径失败；标准任务和 G6 均声明同一共享目录 input。
+
+## S0-12 T025：debug 种子、Release 隔离与安装（待宿主验证）
+
+依据 S0-FR-120/121、S0-NFR-001 和 S0 plan §4。原先两个失败占位任务已替换为真实
+实现；没有新增业务表、功能页面、main 源集接口、权限或依赖。所有 seed 文件位于
+`app/src/debug/java/com/ignacioli/finecoach/seed/`，声明 `fictional-data`。
+本节是可审查实现记录，不代表 T025/T026、checkpoint 或负责人验收已通过。
+
+### 显式触发与权限边界
+
+选择 debug APK 自带的 framework `DebugSeedInstrumentation`，targetPackage 为本应用；
+不依赖 androidTest APK、JUnit runner 或 UTP。宿主通过 `adb shell am instrument -w -r`
+启动，在 instrumentation worker thread 上阻塞执行 Room，结束时返回结果。
+`Instrumentation.start/onStart/finish` 均为早期公开 API，适用于 API31～33；
+[官方 Instrumentation 文档](https://developer.android.com/reference/android/app/Instrumentation)
+说明其独立线程与 finish 生命周期。当前 API31/32/33 的实际运行仍待宿主确认。
+
+它是 debug manifest 的顶层 instrumentation 声明，不是 exported Activity/receiver；
+普通第三方无法经 Activity/广播调用种子。入口在写库前还要求连接 shell 提供的
+`UiAutomation`（使用 `FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES`，不执行 UI 操作、
+不读取屏幕、不采用 shell 权限）。普通应用直接调用 startInstrumentation 时没有该连接，
+入口失败且不写库；系统/获授权 adb 的 automation 属于可信调试边界。
+[framework 源码](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/android12-release/core/java/android/app/Instrumentation.java)
+的 getUiAutomation 无连接时返回 null。此设计不新增 exported 应用组件或权限，也不需要 root；
+Release APK 不携带 instrumentation。宿主需验证普通应用触发被拒及三个 API 的 shell session
+可用性，不能把静态源码依据视作设备安全验证。只对专用虚构模拟器运行安装任务。
+
+独立触发（仅在已安装对应 debug APK 时；`$S0_DEVICE_SERIAL` 为宿主明确设置的目标 serial）：
+
+```sh
+adb -s "$S0_DEVICE_SERIAL" shell am instrument -w -r \
+  com.ignacioli.finecoach/.seed.DebugSeedInstrumentation
+```
+
+成功预期为 `INSTRUMENTATION_RESULT: seed=SEED version=1 rows=5 status=ok`、
+`seed_pid`、`seed_log_time` 和 `INSTRUMENTATION_CODE: -1`；失败返回 `seed=status=failed`、
+code 0，且不输出 exception 或数据库字段。不能仅凭 adb 的退出码判断成功。
+app 唯一日志为 tag `FineCoachSeed` 的 `SEED version=1 rows=5 status=ok`，只含数字和固定状态。
+PID/时间用于宿主结果和本次 logcat 事件关联，不含业务内容。
+
+### 种子记录表与持久性
+
+`DebugSeed.open(context)` 用当前真实 `FineCoachDatabase` schema 1，在
+credential-protected 内部目录单独打开 `finecoach-debug-seed.db`，不访问
+`FineCoachDatabaseFactory` 的 `finecoach.db`。没有复制或删除现有用户数据，也没有 reset 入口。
+S0 壳和组件目录仍不读业务库；此独立文件不是可向产品库导入的数据包。
+
+| schema / table | key / 内容 | seed 行数 | 可见样例入口 |
+|---|---|---:|---|
+| Room 1 / `store_metadata(key TEXT PRIMARY KEY, value TEXT NOT NULL)` | `debug_seed.declaration = fictional-data` | 1 | 无 metadata 编辑页面；debug 壳 →「基础组件样例」（`s0-open-catalog`）→ 既有 catalog |
+| 同上 | `debug_seed.dataset_id = 00000000-0000-4000-8000-000000000025` | 1 | 同上，组件展示不依赖 metadata |
+| 同上 | `debug_seed.clock = 2026-01-01T00:00:00Z`，固定 UTC Clock | 1 | 同上 |
+| 同上 | `debug_seed.version = 1` | 1 | 仅种子结果，不提供功能页面 |
+| 同上 | `debug_seed.rows = 5` | 1 | 仅种子结果；计数包含版本/条数两行，排除 Room/framework 内部行 |
+
+五行均为本轮手工编造的基础设施值，不对应真实 Coach/Student。FictionalDataPolicy
+继续扫描 seed 文件名/内容/声明；不新增宽泛豁免。独立库不用生产 factory 的当前时间 callback。
+
+loader 在一个 Room transaction 内运行 contributor、验证所拥有行并写版本/条数；同版本
+只验证、不重新 install，重复安装/显式触发或重开不新增行。升级只向前、保留旧数据，
+contributor 失败整笔 rollback；降级、固定值冲突、同版本缺行/计数不一致拒绝，不自动修复。
+入口 commit 后 close/reopen，再装载验证同一结果，之后才记录 ok。普通应用启动不自动 seed。
+
+### 宿主命令与预期
+
+先按本文批准的 JDK21/SDK/cache 配置，从 `android/` 运行：
+
+```sh
+./gradlew :app:testDebugUnitTest --tests '*DebugSeedTests'
+./gradlew :app:s0SeedIsolation
+./gradlew :app:s0InstallSeededDebug -Pandroid.device="$S0_DEVICE_SERIAL"
+./gradlew :app:s0InstallSeededDebug -Pandroid.device="$S0_DEVICE_SERIAL"
+```
+
+也可明确设置 `ANDROID_SERIAL` 后运行 `./gradlew :app:s0InstallSeededDebug`；两个输入同时存在
+时必须完全一致，不默认挑设备。运行期间仅连接该一台设备，不热插拔。未指定、serial 非法、
+多设备（含 offline/unauthorized）、目标不匹配、输入冲突均在 installDebug 之前失败。
+
+- `DebugSeedTests`：10 tests，预期 0 failures/errors/skips。覆盖固定 UUID/UTC clock、
+  schema1 五行、重复装载及磁盘重开、版本升级/保留无关 metadata、失败回滚、降级拒绝、
+  计数损坏拒绝、固定值冲突、虚构标记与日志格式。标准报告 `app/build/test-results/testDebugUnitTest/`。
+- `s0SeedIsolation`：依赖 assembleRelease，用 AGP `SingleArtifact.APK` 定位实际输出；
+  缺 APK/多 APK、缺 dex/manifest/resources table 或发现禁止内容均失败。逐 ZIP entry
+  解压检查路径，以及 UTF-8/UTF-16LE/UTF-16BE 字节中的 seed 包、类名、固定标记与
+  catalog/debug Application/入口名；包含二进制 manifest、资源表和所有 dex，不能只扫文件名。
+  预期 `s0SeedIsolation: status=ok apk=… sha256=… dex=… manifest=1 resources=1`。
+  当前不启用 shrinking/obfuscation；以后开启时必须重新评估名字扫描的证明边界。
+- `s0InstallSeededDebug`：单设备预检 → 实际 AGP installDebug → 再核实单设备/API31+ →
+  am instrument → 核对 instrumentation code/result + 本次 PID/时间之后唯一匹配的 logcat 行 →
+  `am start -W` 打开既有 MainActivity。命令失败、缺结果、失败状态、缺/旧/重复日志、
+  安装未执行或启动非 `Status: ok` 均非零。预期输出 `SEED version=1 rows=5 status=ok`，
+  然后 `s0InstallSeededDebug: status=ok serial=… api=… build=… apkSha256=…`；第二次仍为 version1/rows5。
+  不清空 logcat，不输出原始 instrumentation/系统日志内容。
+
+隐私合同跟随本轮批准的固定 seed event 更新，只有指定 debug 入口中的一条精确 call 可用，
+其他 source 日志仍拒绝；Release dex 额外拒绝 seed 包/tag。宿主还需回归：
+
+```sh
+./gradlew assembleDebug lint
+./gradlew :app:testDebugUnitTest --tests '*FictionalDataPolicyTests' \
+  --tests '*PrivacySourceScanTests' --tests '*CapabilityManifestTests'
+```
+
+### S1 扩展与延期
+
+S1 T019 在 debug 目录实现 `SeedContributor.install(database)` 和
+`verifiedRows(database)`，加入 `DebugSeed.contributors`，提升 `DebugSeed.VERSION` 并更新
+`ROWS`、测试/记录表。install 必须幂等、只操作自身稳定 ID 的虚构行；verifiedRows 验证实际
+数据并返回拥有行数，不能拿预期常数冒充验证。保留原 contributor/固定 Clock 与 UUID，
+使用同一 transaction，不在 contributor 内开新 transaction 或自行 close。
+S1 必须在其已批准业务 schema 上实现，并将 debug 业务读取绑定到独立虚构库；当前没有替换
+main factory，也没有声称 S1 直接调用 loader 就能展示业务。ROWS 是 S0 inventory，不是 loader 的计数来源。
+
+同一版本只验证，新增 contributor 必须升级版本；升级不得清用户数据或重写既有练课记录。
+需要重置时另经负责人确认，仅作用于专用虚构模拟器数据集，本轮不提供该功能。
+S1 所需 Student、Package、Appointment、Session、Set、ledger、template/分区等业务列和
+空列表/同名学员/各类课包/进行中训练场景全部延期至 S1，不能以本轮五行 metadata 宣称已交付。
+
+本轮 execution record：变更为非 UI debug 基础设施；复用既有 catalog，无视觉设计 delta；
+新增入口为 adb instrumentation，不新增用户交互，entry/layout map 沿用本 README 的 S0-08 map；
+验证仅静态源码/API 签名、XML 和 diff 检查；Gradle 编译/测试、Release APK 检查、API31～33
+设备触发/拒绝、安装重跑和负责人走查均未执行，T026 留给 Claude 宿主。未改只读 specs checkbox，未 commit。
