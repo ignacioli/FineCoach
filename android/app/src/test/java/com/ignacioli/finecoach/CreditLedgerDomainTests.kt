@@ -1,5 +1,6 @@
 package com.ignacioli.finecoach
 
+import com.ignacioli.finecoach.core.domain.common.AppointmentID
 import com.ignacioli.finecoach.core.domain.common.CoursePackageID
 import com.ignacioli.finecoach.core.domain.common.CoursePackageStatus
 import com.ignacioli.finecoach.core.domain.common.CreditAdjustmentID
@@ -9,6 +10,7 @@ import com.ignacioli.finecoach.core.domain.common.CreditReasonKind
 import com.ignacioli.finecoach.core.domain.common.SessionID
 import com.ignacioli.finecoach.core.domain.common.SourceEventKey
 import com.ignacioli.finecoach.core.domain.common.StudentID
+import com.ignacioli.finecoach.core.domain.common.ValidatedText
 import com.ignacioli.finecoach.core.domain.credit.CoursePackage
 import com.ignacioli.finecoach.core.domain.credit.CreditAdjustment
 import com.ignacioli.finecoach.core.domain.credit.CreditLedger
@@ -36,7 +38,7 @@ class CreditLedgerDomainTests {
     private val sessionID = SessionID.parse("aaaaaaaa-1111-4111-8111-111111111111")
     private val adjustmentID = "cccccccc-3333-4333-8333-333333333333"
     private val otherAdjustmentID = "dddddddd-4444-4444-8444-444444444444"
-    private val appointmentID = "bbbbbbbb-2222-4222-8222-222222222222"
+    private val appointmentID = AppointmentID.parse("bbbbbbbb-2222-4222-8222-222222222222")
     private val now = Instant.parse("2026-11-06T08:00:00Z")
     private val later = Instant.parse("2026-11-06T08:01:00Z")
 
@@ -73,7 +75,7 @@ class CreditLedgerDomainTests {
             direction = CreditDirection.credit,
             amount = 1,
             reasonKind = CreditReasonKind.manualCorrection,
-            reasonText = "fictional correction",
+            reasonText = ValidatedText.required("fictional correction"),
             sourceEventKey = "manual-correction:OVERFLOW",
         )
         val debit = adjustment(
@@ -138,7 +140,7 @@ class CreditLedgerDomainTests {
     @Test
     fun endingActivePackageKeepsHistoryAndRejectsDoubleEnd() {
         val packageValue = coursePackage(
-            name = "Fictional 10-pack",
+            name = ValidatedText.required("Fictional 10-pack"),
             totalCredits = 10,
             remainingCreditsCache = 4,
             startDate = LocalDate.of(2026, 1, 1),
@@ -194,14 +196,45 @@ class CreditLedgerDomainTests {
     }
 
     @Test
+    fun blankCoursePackageNameBecomesNullAndFallsBackToStartDate() {
+        val blankName = ValidatedText.optional(" \t\u00A0\u3000\n")
+
+        assertNull(blankName)
+        val packageValue = coursePackage(name = blankName, startDate = LocalDate.of(2026, 1, 5))
+        assertNull(packageValue.name)
+        assertEquals("课包 · 2026-01-05", packageValue.displayName)
+
+        // The shared ValidatedText also trims and NFC-normalizes a real name.
+        val named = coursePackage(name = ValidatedText.optional("  Cafe\u0301 plan  "))
+        assertEquals("Caf\u00E9 plan", named.displayName)
+    }
+
+    @Test
+    fun overlongCoursePackageNameIsRejected() {
+        // 21_846 * 3 UTF-8 bytes = 65_538 > 64 KiB.
+        val overlong = "课".repeat(21_846)
+
+        assertThrows(IllegalArgumentException::class.java) { ValidatedText.optional(overlong) }
+        assertThrows(IllegalArgumentException::class.java) {
+            coursePackage(name = ValidatedText.optional(overlong))
+        }
+    }
+
+    @Test
     fun displayNameFallsBackToStartDateThenGenericLabel() {
         assertEquals(
             "Fictional plan",
-            coursePackage(name = "Fictional plan", startDate = LocalDate.of(2026, 1, 5)).displayName,
+            coursePackage(
+                name = ValidatedText.required("Fictional plan"),
+                startDate = LocalDate.of(2026, 1, 5),
+            ).displayName,
         )
         assertEquals(
             "课包 · 2026-01-05",
-            coursePackage(name = "", startDate = LocalDate.of(2026, 1, 5)).displayName,
+            coursePackage(
+                name = ValidatedText.parse("", allowEmpty = true),
+                startDate = LocalDate.of(2026, 1, 5),
+            ).displayName,
         )
         assertEquals("课包 · 2026-01-05", coursePackage(startDate = LocalDate.of(2026, 1, 5)).displayName)
         assertEquals("课包", coursePackage().displayName)
@@ -231,7 +264,12 @@ class CreditLedgerDomainTests {
 
     @Test
     fun manualCorrectionRequiresANonBlankReason() {
-        listOf(null, "", "   ").forEach { reason ->
+        listOf<ValidatedText?>(
+            null,
+            ValidatedText.optional(""),
+            ValidatedText.optional("   "),
+        ).forEach { reason ->
+            assertNull(reason)
             assertThrows(IllegalArgumentException::class.java) {
                 adjustment(
                     direction = CreditDirection.debit,
@@ -240,6 +278,48 @@ class CreditLedgerDomainTests {
                     reasonText = reason,
                 )
             }
+        }
+    }
+
+    @Test
+    fun blankReasonTextBecomesNullForAutomaticReasons() {
+        val blankReason = ValidatedText.optional(" \t\u00A0\u3000\n")
+
+        assertNull(blankReason)
+        val value = adjustment(
+            direction = CreditDirection.debit,
+            amount = 1,
+            reasonKind = CreditReasonKind.appointmentAbsent,
+            reasonText = blankReason,
+        )
+
+        assertNull(value.reasonText)
+    }
+
+    @Test
+    fun overlongReasonTextIsRejected() {
+        val overlong = "a".repeat(ValidatedText.maximumUTF8Bytes + 1)
+
+        assertThrows(IllegalArgumentException::class.java) { ValidatedText.optional(overlong) }
+        assertThrows(IllegalArgumentException::class.java) {
+            adjustment(
+                direction = CreditDirection.debit,
+                amount = 1,
+                reasonKind = CreditReasonKind.manualCorrection,
+                reasonText = ValidatedText.optional(overlong),
+            )
+        }
+    }
+
+    @Test
+    fun invalidAppointmentIdIsRejected() {
+        listOf(
+            "not-a-uuid",
+            "bbbbbbbb-2222-4222-8222-22222222222",
+            "bbbbbbbb-2222-4222-8222-22222222222z",
+            "bbbbbbbb222242228222222222222222",
+        ).forEach { raw ->
+            assertThrows(IllegalArgumentException::class.java) { AppointmentID.parse(raw) }
         }
     }
 
@@ -269,7 +349,7 @@ class CreditLedgerDomainTests {
             direction = CreditDirection.credit,
             amount = 2,
             reasonKind = CreditReasonKind.manualCorrection,
-            reasonText = "fictional correction",
+            reasonText = ValidatedText.required("fictional correction"),
             linkedSessionID = sessionID,
             linkedAppointmentID = appointmentID,
             sourceEventKey = "manual-correction:TRACE",
@@ -280,7 +360,7 @@ class CreditLedgerDomainTests {
         assertEquals(CreditDirection.credit, value.direction)
         assertEquals(2L, value.amount)
         assertEquals(CreditReasonKind.manualCorrection, value.reasonKind)
-        assertEquals("fictional correction", value.reasonText)
+        assertEquals(ValidatedText.required("fictional correction"), value.reasonText)
         assertEquals(sessionID, value.linkedSessionID)
         assertEquals(appointmentID, value.linkedAppointmentID)
         assertEquals("manual-correction:TRACE", value.sourceEventKey.value)
@@ -391,7 +471,7 @@ class CreditLedgerDomainTests {
     }
 
     private fun coursePackage(
-        name: String? = null,
+        name: ValidatedText? = null,
         totalCredits: Long = 10,
         remainingCreditsCache: Long = totalCredits,
         startDate: LocalDate? = null,
@@ -414,9 +494,9 @@ class CreditLedgerDomainTests {
         direction: CreditDirection,
         amount: Long,
         reasonKind: CreditReasonKind,
-        reasonText: String? = null,
+        reasonText: ValidatedText? = null,
         linkedSessionID: SessionID? = null,
-        linkedAppointmentID: String? = null,
+        linkedAppointmentID: AppointmentID? = null,
         sourceEventKey: String = "manual-correction:TEST",
     ): CreditAdjustment = CreditAdjustment(
         creditAdjustmentID = CreditAdjustmentID.parse(adjustmentID),

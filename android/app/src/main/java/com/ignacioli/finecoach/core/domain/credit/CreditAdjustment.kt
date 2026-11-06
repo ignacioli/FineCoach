@@ -1,11 +1,13 @@
 package com.ignacioli.finecoach.core.domain.credit
 
+import com.ignacioli.finecoach.core.domain.common.AppointmentID
 import com.ignacioli.finecoach.core.domain.common.CoursePackageID
 import com.ignacioli.finecoach.core.domain.common.CreditAdjustmentID
 import com.ignacioli.finecoach.core.domain.common.CreditDirection
 import com.ignacioli.finecoach.core.domain.common.CreditReasonKind
 import com.ignacioli.finecoach.core.domain.common.SessionID
 import com.ignacioli.finecoach.core.domain.common.SourceEventKey
+import com.ignacioli.finecoach.core.domain.common.ValidatedText
 import java.time.Instant
 
 /**
@@ -17,8 +19,9 @@ import java.time.Instant
  * `CreditLedgerSourceEventKeyFactory`; persistence owns the actual
  * dedup-by-key transaction.
  *
- * `linkedAppointmentID` stays a raw UUID string because Appointment IDs are not
- * part of the S1 frozen identifier set.
+ * `linkedAppointmentID` uses the frozen common [AppointmentID]; `reasonText`
+ * uses the frozen common [ValidatedText] and is `null` when the caller passed
+ * blank text (S1-D10).
  */
 data class CreditAdjustment(
     val creditAdjustmentID: CreditAdjustmentID,
@@ -26,16 +29,16 @@ data class CreditAdjustment(
     val direction: CreditDirection,
     val amount: Long,
     val reasonKind: CreditReasonKind,
-    val reasonText: String? = null,
+    val reasonText: ValidatedText? = null,
     val linkedSessionID: SessionID? = null,
-    val linkedAppointmentID: String? = null,
+    val linkedAppointmentID: AppointmentID? = null,
     val sourceEventKey: SourceEventKey,
     val createdAtUTC: Instant,
 ) {
     init {
         require(amount > 0) { "amount must be positive" }
-        require(reasonKind != CreditReasonKind.manualCorrection || !reasonText.isNullOrBlank()) {
-            "manualCorrection requires a non-blank reasonText"
+        require(reasonKind != CreditReasonKind.manualCorrection || reasonText?.isEmpty == false) {
+            "manualCorrection requires a non-empty reasonText"
         }
     }
 }

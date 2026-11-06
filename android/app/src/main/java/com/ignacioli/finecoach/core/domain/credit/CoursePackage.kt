@@ -3,6 +3,7 @@ package com.ignacioli.finecoach.core.domain.credit
 import com.ignacioli.finecoach.core.domain.common.CoursePackageID
 import com.ignacioli.finecoach.core.domain.common.CoursePackageStatus
 import com.ignacioli.finecoach.core.domain.common.StudentID
+import com.ignacioli.finecoach.core.domain.common.ValidatedText
 import java.time.Instant
 import java.time.LocalDate
 
@@ -20,7 +21,7 @@ import java.time.LocalDate
 data class CoursePackage(
     val coursePackageID: CoursePackageID,
     val studentID: StudentID,
-    val name: String? = null,
+    val name: ValidatedText? = null,
     val totalCredits: Long,
     val remainingCreditsCache: Long = totalCredits,
     val startDate: LocalDate? = null,
@@ -38,7 +39,7 @@ data class CoursePackage(
      * (`CoursePackage.swift:62-72`).
      */
     val displayName: String
-        get() = name?.takeIf { it.isNotEmpty() }
+        get() = name?.takeIf { !it.isEmpty }?.value
             ?: startDate?.let { "课包 · $it" }
             ?: "课包"
 
