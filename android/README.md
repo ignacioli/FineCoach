@@ -777,7 +777,7 @@ node android/dependency-allowlist/generate-resolved.mjs android/app/build/report
 | s0G1 | 39 | 现有 token/字体/contrast/generator 合同，未改 |
 | ComponentCatalogTests | 6 | 24 项精确 roster、类型/真实文件/iOS 来源、状态与测试方法、9 项延期和 authority 并集、debug/privacy 入口保留、图标需求/无依赖 |
 | ComponentCatalogStateTests | 66 | 参数化逐个状态真正 compose 并检查组件 testTag，不以文字清单代替渲染 |
-| ComponentContractTests | 25 | roster 每 ID 一个合同方法（含 S1-D13 BottomSheet 完全展开）；touch/满宽、disabled callback、单选/三态、Stepper/FIELD、输入/secure、heading/semantics、确认/重试/撤销、提示条/单行 hero、token source 检查等 |
+| ComponentContractTests | 26 | roster 每 ID 一个合同方法（含 S1-D13 BottomSheet 完全展开）；touch/满宽、disabled callback、单选/三态、Stepper/FIELD、输入/secure、heading/semantics、确认/重试/撤销、提示条/单行 hero、训练组行、token source 检查等 |
 | PlatformShellTests | 5 | header 与系统 back dispatcher 同 callback、Insets 只消费一次、内容宽度、catalog 可见入口/返回、独立 overlay window 隐私注册/释放 |
 | s0G2 合计 | 101 | 上述四个 suite 全部非空，0 failures/errors/skips；与 G1 联跑总计 140 |
 
