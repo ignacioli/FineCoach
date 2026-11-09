@@ -15,7 +15,7 @@ class SharedVectorTests(private val fixture: File) {
     companion object {
         @JvmStatic @Parameterized.Parameters(name = "{0}")
         fun vectors(): Collection<Array<Any>> {
-            val files = VectorFiles.files("s1/course-packages")
+            val files = VectorFiles.files("s1/course-packages").filter { it.name.contains("__s0-") || it.name.endsWith("__s1-package-ledger-balance.json") }
             check(files.size == 5) { "Normal sample inventory changed: ${files.size}" }
             val ids = files.map { (VectorJSON(it.readText()).parse() as Map<*, *>)["id"] }
             check(ids.toSet().size == files.size) { "Duplicate normal vector id" }

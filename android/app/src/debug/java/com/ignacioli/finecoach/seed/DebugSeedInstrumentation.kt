@@ -8,8 +8,10 @@ import android.os.Process
 
 // fictional-data: explicit shell instrumentation; never an application startup side effect.
 class DebugSeedInstrumentation : Instrumentation() {
+    private var scenario = "multi"
     override fun onCreate(arguments: Bundle?) {
         super.onCreate(arguments)
+        scenario = arguments?.getString("scenario") ?: "multi"
         start()
     }
 
@@ -34,8 +36,6 @@ class DebugSeedInstrumentation : Instrumentation() {
     }
 
     private fun loadAndClose(): SeedResult {
-        val database = DebugSeed.open(targetContext)
-        try { return DebugSeedLoader().load(database) }
-        finally { database.close() }
+        return kotlinx.coroutines.runBlocking { S1DebugSeed.load(targetContext, scenario) }
     }
 }

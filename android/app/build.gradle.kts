@@ -422,11 +422,55 @@ pendingGates.forEach { (gate, owner) ->
     }
 }
 
+// T019: the exact S1 suites run independently of the broad JVM gate.
+val s1SeedChecks = tasks.register<Test>("s1SeedChecks") {
+    group = "verification"
+    val debugTest = tasks.named<Test>("testDebugUnitTest").get()
+    testClassesDirs = debugTest.testClassesDirs
+    classpath = debugTest.classpath
+    javaLauncher.set(debugTest.javaLauncher)
+    setJvmArgs(debugTest.jvmArgs)
+    jvmArgumentProviders.addAll(debugTest.jvmArgumentProviders)
+    systemProperties(debugTest.systemProperties)
+    workingDir = debugTest.workingDir
+    filter {
+        setIncludePatterns("com.ignacioli.finecoach.S1DebugSeedTests", "com.ignacioli.finecoach.S1SeedIsolationTests")
+        isFailOnNoMatchingTests = true
+    }
+    failOnNoDiscoveredTests.set(true)
+    reports.junitXml.required.set(true)
+    reports.junitXml.outputLocation.set(layout.buildDirectory.dir("test-results/s1SeedChecks"))
+    reports.html.outputLocation.set(layout.buildDirectory.dir("reports/tests/s1SeedChecks"))
+    binaryResultsDirectory.set(layout.buildDirectory.dir("test-results/s1SeedChecks/binary"))
+    outputs.upToDateWhen { false }
+    outputs.doNotCacheIf("Seed checks must execute") { true }
+    doLast {
+        val expected = mapOf("com.ignacioli.finecoach.S1DebugSeedTests" to 9, "com.ignacioli.finecoach.S1SeedIsolationTests" to 4)
+        val files = reports.junitXml.outputLocation.get().asFile.listFiles { file -> file.name.startsWith("TEST-") && file.extension == "xml" }.orEmpty()
+        check(files.size == expected.size) { "S1 seed checks must run nonzero tests without failures or skips" }
+        val factory = DocumentBuilderFactory.newInstance().apply {
+            setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
+            setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+            setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "")
+            setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "")
+        }
+        val actual = files.associate { file ->
+            val suite = factory.newDocumentBuilder().parse(file).documentElement
+            check(suite.getAttribute("failures") == "0" && suite.getAttribute("errors") == "0" && suite.getAttribute("skipped") == "0") {
+                "S1 seed checks must run nonzero tests without failures or skips"
+            }
+            suite.getAttribute("name") to suite.getAttribute("tests").toInt()
+        }
+        check(actual == expected) { "S1 seed checks must run nonzero tests without failures or skips" }
+        actual.forEach { (suite, count) -> logger.lifecycle("S1-SEED-CHECK suite=$suite tests=$count failures=0 errors=0 skips=0") }
+    }
+}
+
 // S0-12: inspect the actual APK entries, including binary XML/string pools.
 val seedIsolation = tasks.register("s0SeedIsolation") {
     group = "verification"
     description = "Reject debug seed/catalog code, resources and entries in the assembled Release APK"
-    dependsOn("assembleRelease")
+    dependsOn("assembleRelease", s1SeedChecks)
 }
 androidComponents.onVariants(androidComponents.selector().withBuildType("release")) { variant ->
     val apkDirectory = variant.artifacts.get(SingleArtifact.APK)
@@ -437,6 +481,7 @@ androidComponents.onVariants(androidComponents.selector().withBuildType("release
             check(apks.size == 1) { "s0SeedIsolation: expected exactly one Release APK" }
             val forbidden = listOf(
                 "com/ignacioli/finecoach/seed/", "com.ignacioli.finecoach.seed.",
+                "S1DebugSeed", "S1SeedIDs", "s1_debug_seed.", "s1-debug-seed.lock", "fictional-s1-coach-core-v1",
                 "DebugSeed", "SeedContributor", "SeedResult", "MetadataSeedContributor",
                 "S0ComponentCatalog", "S0Catalog", "S0DebugApplication", "FineCoachSeed", "finecoach-debug-seed.db",
                 "debug_seed.", "debug_seed_", "s0_catalog", "s0_seed", "SEED version=",
@@ -519,10 +564,12 @@ val validateSeedDevice = tasks.register<SeedDeviceTask>("validateS0SeedDevice") 
 }
 // Ordering is added without changing the behavior of a direct installDebug invocation.
 tasks.matching { it.name == "installDebug" }.configureEach { mustRunAfter(validateSeedDevice) }
+val requestedSeedScenario = providers.gradleProperty("s1.seedScenario").orElse("multi")
 val installSeededDebug = tasks.register<SeedDeviceTask>("s0InstallSeededDebug") {
     group = "verification"
-    description = "Validate one explicit device, installDebug, seed via instrumentation, verify fresh logcat, launch shell"
-    dependsOn(validateSeedDevice, "installDebug")
+    description = "Build/install S1DebugSeed on one explicit device, verify durable seed, launch default S1"
+    dependsOn(validateSeedDevice, "assembleDebug")
+    inputs.property("seedScenario", requestedSeedScenario)
     adbFile.set(androidComponents.sdkComponents.adb)
     deviceSerial.set(seedDeviceSerial)
     environmentSerial.set(providers.environmentVariable("ANDROID_SERIAL").orElse(""))
@@ -532,14 +579,19 @@ androidComponents.onVariants(androidComponents.selector().withBuildType("debug")
     installSeededDebug.configure {
         inputs.dir(apkDirectory)
         doLast {
-            val install = tasks.named("installDebug").get()
-            check(!install.state.skipped && install.state.failure == null && install.state.didWork) { "installDebug did not execute successfully" }
             val serial = requireSingleDevice()
+            val scenario = requestedSeedScenario.get()
+            check(scenario in setOf("empty", "single", "multi")) { "Unknown S1 seed scenario" }
+            val apks = apkDirectory.get().asFile.walkTopDown().filter { it.isFile && it.extension == "apk" }.toList()
+            check(apks.size == 1) { "Expected exactly one Debug APK" }
+            val installed = adb("-s", serial, "install", "-r", "-t", apks.single().absolutePath)
+            check(installed.lineSequence().any { it.trim() == "Success" }) { "Debug APK installation failed" }
+            adb("-s", serial, "shell", "am", "force-stop", "com.ignacioli.finecoach")
             val api = adb("-s", serial, "shell", "getprop", "ro.build.version.sdk").trim().toInt()
             check(api >= 31) { "S0 requires API 31+" }
             val build = adb("-s", serial, "shell", "getprop", "ro.build.id").trim()
             val result = adb("-s", serial, "shell", "am", "instrument", "-w", "-r",
-                "com.ignacioli.finecoach/.seed.DebugSeedInstrumentation")
+                "-e", "scenario", scenario, "com.ignacioli.finecoach/.seed.DebugSeedInstrumentation")
             val lines = result.lineSequence().map { it.trim() }.toList()
             check(lines.count { it == "INSTRUMENTATION_CODE: -1" } == 1 &&
                 lines.none { it.startsWith("INSTRUMENTATION_FAILED") || it.startsWith("INSTRUMENTATION_ABORTED") }) {
@@ -547,7 +599,8 @@ androidComponents.onVariants(androidComponents.selector().withBuildType("debug")
             }
             fun resultValue(key: String): String = lines.single { it.startsWith("INSTRUMENTATION_RESULT: $key=") }.substringAfter('=')
             val expected = resultValue("seed")
-            check(Regex("SEED version=[1-9][0-9]* rows=[1-9][0-9]* status=ok").matches(expected)) { "Missing successful seed result" }
+            val expectedRows = mapOf("empty" to 5, "single" to 55, "multi" to 66).getValue(scenario)
+            check(expected == "SEED version=1 rows=$expectedRows status=ok") { "Missing successful S1 seed result" }
             val pid = resultValue("seed_pid").toInt().also { check(it > 0) }
             val loggedAt = resultValue("seed_log_time").toLong().also { check(it > 0) }
             val logs = adb("-s", serial, "logcat", "-d", "-v", "epoch", "--pid=$pid", "-s", "FineCoachSeed:I", "*:S")
@@ -558,8 +611,6 @@ androidComponents.onVariants(androidComponents.selector().withBuildType("debug")
             check(fresh == listOf(expected)) { "Missing, duplicate or stale SEED logcat event" }
             val launch = adb("-s", serial, "shell", "am", "start", "-W", "-n", "com.ignacioli.finecoach/.MainActivity")
             check(launch.lineSequence().any { it.trim() == "Status: ok" } && !launch.contains("Error:")) { "Debug shell launch failed" }
-            val apks = apkDirectory.get().asFile.walkTopDown().filter { it.isFile && it.extension == "apk" }.toList()
-            check(apks.size == 1) { "Expected exactly one Debug APK" }
             val digest = MessageDigest.getInstance("SHA-256").digest(apks.single().readBytes())
                 .joinToString("") { "%02x".format(it) }
             logger.lifecycle(expected)

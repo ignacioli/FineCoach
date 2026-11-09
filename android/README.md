@@ -1101,18 +1101,7 @@ cursor-agent 独立复核及 T023/T024 完成门禁均 **未确认**。不修改
 Release APK 不携带 instrumentation。宿主需验证普通应用触发被拒及三个 API 的 shell session
 可用性，不能把静态源码依据视作设备安全验证。只对专用虚构模拟器运行安装任务。
 
-独立触发（仅在已安装对应 debug APK 时；`$S0_DEVICE_SERIAL` 为宿主明确设置的目标 serial）：
-
-```sh
-adb -s "$S0_DEVICE_SERIAL" shell am instrument -w -r \
-  com.ignacioli.finecoach/.seed.DebugSeedInstrumentation
-```
-
-成功预期为 `INSTRUMENTATION_RESULT: seed=SEED version=1 rows=5 status=ok`、
-`seed_pid`、`seed_log_time` 和 `INSTRUMENTATION_CODE: -1`；失败返回 `seed=status=failed`、
-code 0，且不输出 exception 或数据库字段。不能仅凭 adb 的退出码判断成功。
-app 唯一日志为 tag `FineCoachSeed` 的 `SEED version=1 rows=5 status=ok`，只含数字和固定状态。
-PID/时间用于宿主结果和本次 logcat 事件关联，不含业务内容。
+**已停用的 S0 独立触发与输出合同（历史记录）**：S0 曾通过独立 instrumentation 验证 metadata 样例及固定数值日志。当前入口已由 T019 接管，不再使用本段旧触发/输出约定；实际命令、失败非零规则和唯一预期输出见本文「S1 T019：真实 seed 与一键安装」（rows 66/55/5）。seed 日志仍只含版本/计数/固定状态，PID/时间仅用于关联本次事件，不含业务内容。
 
 ### 种子记录表与持久性
 
@@ -1150,7 +1139,7 @@ contributor 失败整笔 rollback；降级、固定值冲突、同版本缺行/�
 
 也可明确设置 `ANDROID_SERIAL` 后运行 `./gradlew :app:s0InstallSeededDebug`；两个输入同时存在
 时必须完全一致，不默认挑设备。运行期间仅连接该一台设备，不热插拔。未指定、serial 非法、
-多设备（含 offline/unauthorized）、目标不匹配、输入冲突均在 installDebug 之前失败。
+多设备（含 offline/unauthorized）、目标不匹配、输入冲突均在安装之前失败。上面的 `s0InstallSeededDebug` 不是当前验收命令；旧 installDebug / `SEED version=1 rows=5` 合同已停用，预期输出只见文末 T019。
 
 - `DebugSeedTests`：10 tests，预期 0 failures/errors/skips。覆盖固定 UUID/UTC clock、
   schema1 五行、重复装载及磁盘重开、版本升级/保留无关 metadata、失败回滚、降级拒绝、
@@ -1161,12 +1150,7 @@ contributor 失败整笔 rollback；降级、固定值冲突、同版本缺行/�
   catalog/debug Application/入口名；包含二进制 manifest、资源表和所有 dex，不能只扫文件名。
   预期 `s0SeedIsolation: status=ok apk=… sha256=… dex=… manifest=1 resources=1`。
   当前不启用 shrinking/obfuscation；以后开启时必须重新评估名字扫描的证明边界。
-- `s0InstallSeededDebug`：单设备预检 → 实际 AGP installDebug → 再核实单设备/API31+ →
-  am instrument → 核对 instrumentation code/result + 本次 PID/时间之后唯一匹配的 logcat 行 →
-  `am start -W` 打开既有 MainActivity。命令失败、缺结果、失败状态、缺/旧/重复日志、
-  安装未执行或启动非 `Status: ok` 均非零。预期输出 `SEED version=1 rows=5 status=ok`，
-  然后 `s0InstallSeededDebug: status=ok serial=… api=… build=… apkSha256=…`；第二次仍为 version1/rows5。
-  不清空 logcat，不输出原始 instrumentation/系统日志内容。
+- **已停用的 S0 安装合同（仅历史记录）**：原 `s0InstallSeededDebug` 曾通过 AGP `installDebug` 安装 S0 metadata 样例。该流程及其旧输出约定已由 T019 替代，不再用作当前安装/验收命令。当前实际流程、serial 参数及唯一预期输出见本文「S1 T019：真实 seed 与一键安装」（multi/single/empty 的 rows 分别为66/55/5）。
 
 隐私合同跟随本轮批准的固定 seed event 更新，只有指定 debug 入口中的一条精确 call 可用，
 其他 source 日志仍拒绝；Release dex 额外拒绝 seed 包/tag。宿主还需回归：
@@ -1177,20 +1161,13 @@ contributor 失败整笔 rollback；降级、固定值冲突、同版本缺行/�
   --tests '*PrivacySourceScanTests' --tests '*CapabilityManifestTests'
 ```
 
-### S1 扩展与延期
+### S1 扩展（T019，2026-11-09）
 
-S1 T019 在 debug 目录实现 `SeedContributor.install(database)` 和
-`verifiedRows(database)`，加入 `DebugSeed.contributors`，提升 `DebugSeed.VERSION` 并更新
-`ROWS`、测试/记录表。install 必须幂等、只操作自身稳定 ID 的虚构行；verifiedRows 验证实际
-数据并返回拥有行数，不能拿预期常数冒充验证。保留原 contributor/固定 Clock 与 UUID，
-使用同一 transaction，不在 contributor 内开新 transaction 或自行 close。
-S1 必须在其已批准业务 schema 上实现，并将 debug 业务读取绑定到独立虚构库；当前没有替换
-main factory，也没有声称 S1 直接调用 loader 就能展示业务。ROWS 是 S0 inventory，不是 loader 的计数来源。
+上面的 S0 五行 metadata、独立 `finecoach-debug-seed.db` 和10例 `DebugSeedTests` 是历史基础设施证据，保持不变。当前 `s0InstallSeededDebug` 已切到 S1 installer，实际命令/结果以本文末尾「S1 T019」为准，不再把 S0 五行 metadata 安装当 S1 交付。
 
-同一版本只验证，新增 contributor 必须升级版本；升级不得清用户数据或重写既有练课记录。
-需要重置时另经负责人确认，仅作用于专用虚构模拟器数据集，本轮不提供该功能。
-S1 所需 Student、Package、Appointment、Session、Set、ledger、template/分区等业务列和
-空列表/同名学员/各类课包/进行中训练场景全部延期至 S1，不能以本轮五行 metadata 宣称已交付。
+S1 数据由独立的 debug-only `S1DebugSeed` 经真实 Repository 写入一份全新、显式标记所有权的 `finecoach.db`，这正是冻结 S1Runtime 默认读取的库；不替换产品 factory，不通过 S0 contributor 的同步事务调用会切 dispatcher 的 Repository。S0 contributor 接口仍为 S0 测试保留，未改其版本/UUID/clock/inventory。这个接线取代原先“给 S0 contributor 加业务行、把业务页面改读另一个库”的预案：后者需修改已冻结的 graph/factory 且会让默认 S1 读不到 seed。
+
+只接受全新 app 数据目录，或完全匹配 dataset/version/scenario/complete 的既有 S1 seed。任何已有非 seed 数据库（包括空库）拒绝；重复执行只验证持久标记，不修改体验中编辑、删除、完成过的数据。初始化中断保留 installing 并非零，不自动 reset/repair。需要清理/更换场景由负责人另行决定，本工具不提供清库命令。Appointment 仍属于 S2，不造假数据。
 
 本轮 execution record：变更为非 UI debug 基础设施；复用既有 catalog，无视觉设计 delta；
 新增入口为 adb instrumentation，不新增用户交互，entry/layout map 沿用本 README 的 S0-08 map；
@@ -1307,3 +1284,27 @@ adb shell am start -n com.ignacioli.finecoach/.MainActivity --ez finecoachS0Shel
 ```
 
 `PrivacyCoverTests` 仅启动 intent 带此 extra，既有断言不变。通知点击使用原有稳定 Session ID，始终进入 S1。release 没有 S0 provider，即使传入该 extra 也不会进入测试壳。
+
+## S1 T019：真实 seed 与一键安装
+
+先按本文 setup 配置 JDK21/SDK/cache。以下命令从 `android/` 运行；`S1_DEVICE_SERIAL` 必须是宿主明确指定的专用虚构模拟器 serial，且只连接这一个设备（S1-D21 默认 API31/API36 分别执行）。
+
+```sh
+./gradlew --offline :app:s0InstallSeededDebug -Pandroid.device="${S1_DEVICE_SERIAL:?required}" -Ps1.seedScenario=multi
+```
+
+这一条命令 build Debug APK → `adb -s SERIAL install -r -t` → 停止目标进程以串行初始化 → shell-only `am instrument` → 关闭重开数据库验证 complete/version/rows → 校验 instrumentation code/result 和本次 PID/时间的唯一数值日志 → `am start -W` 启动默认 S1。S1-D20 已在基线实现，不需要启动开关。每条 adb 命令都携带 serial；缺设备、冲突 serial、授权失败、安装/seed/日志/启动失败均非零。没有 `pm clear`、uninstall、reset 或自动库切换。相同命令可再执行一次，仍返回初始 inventory，保留教练体验更改。
+
+场景参数：`multi`（默认，两位学员各一进行中，初始 `SEED version=1 rows=66 status=ok`）、`single`（一进行中，rows=55）、`empty`（无学员/训练，rows=5）。场景只在首次空数据目录安装时选择；已有 seed 切换参数会拒绝，不能靠参数重建。dataset=`fictional-s1-coach-core-v1`，版本1，clock=`2026-11-09T00:00:00Z`，UUID 以 `72000000-0000-4000-8000-` 为前缀，学员尾号1～7；其余生成ID使用固定顺序1000起，显式分段/计划组使用800～933。只含虚构内容。
+
+`rows` 是首次成功初始化时实际查询到的业务行数加 S1 自有 metadata 行数（含 rows 本身，不计框架、generation、created_at）；不是后续体验中的当前行数。重跑不要求已经删除/编辑的 seed 内容恢复到初始值。首次 marker 之前经 Repository 读取核验初始状态；重开持久性由 JVM 文件库测试与 instrumentation 二次 open 证明。写入失败会保留 installing 并失败，人工决定如何处置。
+
+隔离检查：
+
+```sh
+./gradlew --offline :app:s0SeedIsolation
+```
+
+实际执行 `S1DebugSeedTests` 9例与 `S1SeedIsolationTests` 4例（报告 `app/build/test-results/s1SeedChecks/`），精确非零、0 failures/errors/skips；随后检查实际 Release APK 的全部条目和 UTF-8/UTF-16 dex/manifest/resources 字节，拒绝 S0/S1 seed、fixture入口及标记。预期包含两条 `S1-SEED-CHECK suite=… tests=9/4 failures=0 errors=0 skips=0`，以及 `s0SeedIsolation: status=ok apk=… sha256=… dex=… manifest=1 resources=1`。不连接设备。
+
+完整改动清单、实测日志、初始场景与未验证项见 [T019](docs/s1/T019.md)；共享13向量与宿主 iOS 命令见 [T017](docs/s1/T017.md)；入口总表及未确认断言见 [implementation map](docs/s1/implementation-map.md)。安装/界面 runtime、负责人走查、独立复核与 T020 仍由宿主执行，不能用 JVM/Release 扫描代替。
