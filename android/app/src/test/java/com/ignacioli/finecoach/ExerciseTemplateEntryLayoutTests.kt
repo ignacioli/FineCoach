@@ -50,7 +50,7 @@ class ExerciseTemplateEntryLayoutTests {
             throw AssertionError("Entry geometry: control=" + control.getUnclippedBoundsInRoot() +
                 "; root=" + compose.onAllNodes(isRoot(), useUnmergedTree = true).fetchSemanticsNodes().map { it.boundsInRoot }, failure)
         }
-        control.assertHasClickAction().performClick()
+        control.assertIsEnabled().assertHasClickAction().performClick()
         compose.waitForIdle()
     }
     private fun text(tag: String, value: String) { node(tag).performScrollTo().assertIsDisplayed().performTextReplacement(value) }
@@ -419,4 +419,97 @@ class ExerciseTemplateEntryLayoutTests {
         click("exercise-save"); compose.waitUntil(15_000) { back == 1 }
         f.test { assertEquals(1, ok(exerciseUseCases.search("虚构键盘动作")).size) }
     }
+    @Test fun exerciseOptionsCancelDiscardsAliasWithoutWritingPreferenceOrCatalog() {
+        val original = custom(); library()
+        await("exercise-options-${original.exerciseID.value}")
+        click("exercise-options-${original.exerciseID.value}"); text("exercise-alias", "虚构取消显示名")
+        click("exercise-options-cancel"); gone("exercise-alias")
+        f.test {
+            assertEquals(original, ok(f.exercises.listCatalog()).single())
+            assertNull(ok(f.exercises.preference(original.exerciseID)))
+        }
+        quiesceThenReopen()
+        f.test {
+            assertEquals(original, ok(f.exercises.listCatalog()).single())
+            assertNull(ok(f.exercises.preference(original.exerciseID)))
+        }
+    }
+
+    @Test fun templateMetadataAndOperationMenuCancelEntriesWriteNothing() {
+        val original = template(); editor(original)
+        f.test { f.blockAllWrites(listOf("training_templates", "template_training_focus", "template_exercises", "template_planned_sets", "session_sections")) }
+        click("template-editor-trailing"); text("template-name", "虚构取消名称"); click("template-focus-0")
+        click("template-metadata-cancel"); gone("template-name")
+        assertEquals(original, read(original.template.templateID))
+        click("template-section-${original.sections.first().sectionID.value}")
+        click("template-section-options-cancel"); gone("template-section-options-cancel")
+        assertEquals(original, read(original.template.templateID))
+        click("template-exercise-${original.exercises.first().templateExerciseID.value}")
+        click("template-exercise-options-cancel"); gone("template-exercise-options-cancel")
+        assertEquals(original, read(original.template.templateID))
+        assertNull(templateState.error)
+        quiesceThenReopen()
+        f.test { assertEquals(original, ok(f.templateUseCases.load(original.template.templateID))) }
+    }
+
+    @Test fun plannedSideAndUnitInputsPersistExactValuesAfterQuiesceThenReopen() {
+        val original = template(); editor(original)
+        val row = original.exercises.first()
+        click("template-exercise-${row.templateExerciseID.value}"); click("template-planned-sets")
+        SetSide.entries.forEachIndexed { index, side ->
+            text("planned-weight", "20"); text("planned-reps", "6")
+            val unit = if (index % 2 == 0) MeasurementUnit.kilograms else MeasurementUnit.pounds
+            click("planned-unit-${unit.name}"); click("planned-side-${side.name}")
+            if (side != SetSide.none) {
+                full("planned-left", "planned-content"); full("planned-right", "planned-content")
+                text("planned-left", if (side == SetSide.left || side == SetSide.bilateral) "8.25" else "")
+                text("planned-right", if (side == SetSide.right || side == SetSide.bilateral) "9.5" else "")
+            }
+            click("planned-stage")
+            assertEquals(original, read(original.template.templateID))
+        }
+        click("planned-save"); gone("planned-content")
+        val saved = read(original.template.templateID)
+        val added = saved.exercises.first().plannedSets.drop(row.plannedSets.size)
+        assertEquals(4, added.size)
+        SetSide.entries.forEachIndexed { index, side ->
+            val set = added[index]
+            assertEquals(side, set.side)
+            assertEquals(if (index % 2 == 0) MeasurementUnit.kilograms else MeasurementUnit.pounds, set.unit)
+            assertEquals(java.math.BigDecimal("20"), set.weightValue)
+            assertEquals(java.math.BigDecimal("6"), set.repetitionCount)
+            assertEquals(if (side == SetSide.left || side == SetSide.bilateral) java.math.BigDecimal("8.25") else null, set.leftValue)
+            assertEquals(if (side == SetSide.right || side == SetSide.bilateral) java.math.BigDecimal("9.5") else null, set.rightValue)
+        }
+        quiesceThenReopen()
+        f.test { assertEquals(saved, ok(f.templateUseCases.load(original.template.templateID))) }
+    }
+
+    @Test fun plannedCardioInputsPersistExactValuesAfterQuiesceThenReopen() {
+        lateinit var original: TemplateContentRecord
+        f.test {
+            val created = ok(f.templateUseCases.save(SaveTemplateCommand(null, "虚构有氧模板", emptySet(), null)))
+            val row = TemplateExerciseRecord(f.ids.newTemplateExerciseID(), created.templateID, null, 0u,
+                ExerciseSourceKind.sessionOnly, null, "虚构有氧动作", RecordMode.cardio, emptyList())
+            original = ok(f.templates.saveContent(SaveTemplateContentCommand(created.templateID, created.revision, emptyList(), listOf(row))))
+        }
+        editor(original)
+        click("template-exercise-${original.exercises.single().templateExerciseID.value}"); click("template-planned-sets")
+        listOf("planned-duration" to "360", "planned-distance" to "1.25", "planned-speed" to "12.5", "planned-resistance" to "4").forEach { (tag, value) ->
+            text(tag, value); full(tag, "planned-content")
+        }
+        click("planned-stage"); assertEquals(original, read(original.template.templateID))
+        click("planned-save"); gone("planned-content")
+        val saved = read(original.template.templateID)
+        val set = saved.exercises.single().plannedSets.single()
+        assertEquals(RecordMode.cardio, set.recordMode); assertEquals(MeasurementUnit.seconds, set.unit)
+        assertEquals(java.math.BigDecimal("360"), set.durationSeconds)
+        assertEquals(java.math.BigDecimal("1.25"), set.distanceValue)
+        assertEquals(java.math.BigDecimal("12.5"), set.speedValue)
+        assertEquals(java.math.BigDecimal("4"), set.resistanceValue)
+        assertNull(set.weightValue); assertNull(set.repetitionCount)
+        quiesceThenReopen()
+        f.test { assertEquals(saved, ok(f.templateUseCases.load(original.template.templateID))) }
+    }
+
 }

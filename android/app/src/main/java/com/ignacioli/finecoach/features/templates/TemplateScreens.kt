@@ -53,18 +53,24 @@ fun TemplateListScreen(state: TemplateUiState, onNavigate: (String) -> Unit, onB
 @Composable
 fun ApplyTemplateSheet(state: TemplateUiState, target: SessionRecord, onApplied: (SessionContentRecord) -> Unit, onDismiss: () -> Unit) {
     val scope = rememberCoroutineScope()
+    var applying by remember(target.sessionID) { mutableStateOf(false) }
     LaunchedEffect(state, target.sessionID) { state.list() }
-    FcBottomSheet("应用模板", { if (!state.busy) onDismiss() }) {
+    FcBottomSheet("应用模板", { if (!applying) onDismiss() }) {
         Column(Modifier.fillMaxWidth().heightIn(max = FcComponentMetrics.row * 7).verticalScroll(rememberScrollState())
             .testTag("template-apply-content")) {
             state.templates.forEach { template ->
                 FcActionRow("应用 ${template.name}", Modifier.testTag("template-apply-${template.templateID.value}"), enabled = !state.busy) {
-                    scope.launch { state.perform({ state.useCases.apply(ApplyTemplateSnapshotCommand(template.templateID,
-                        target.sessionID, template.revision, target.revision, state.clock.now())) }) { onApplied(it); onDismiss() } }
+                    applying = true
+                    scope.launch {
+                        try {
+                            state.perform({ state.useCases.apply(ApplyTemplateSnapshotCommand(template.templateID,
+                                target.sessionID, template.revision, target.revision, state.clock.now())) }) { onApplied(it); onDismiss() }
+                        } finally { applying = false }
+                    }
                 }
             }
             state.error?.let { FcListRow(exerciseErrorTitle(it), Modifier.testTag("template-apply-error")) }
-            FcSecondaryButton("取消", Modifier.testTag("template-apply-cancel"), !state.busy, onDismiss)
+            FcSecondaryButton("取消", Modifier.testTag("template-apply-cancel"), !applying, onDismiss)
         }
     }
 }
@@ -167,7 +173,7 @@ fun TemplateEditorScreen(state: TemplateUiState, id: TemplateID, exercises: Exer
         }
     }
     exerciseOptions?.let { row ->
-        FcBottomSheet("动作操作", { exerciseOptions = null }) {
+        FcBottomSheet("动作操作", { exerciseOptions = null }, skipPartiallyExpanded = true) {
             FcActionRow("计划组", Modifier.testTag("template-planned-sets"), enabled = !state.busy) { planned = row; exerciseOptions = null }
             FcActionRow("移入分段", Modifier.testTag("template-exercise-move"), enabled = !state.busy) { moving = row.templateExerciseID; exerciseOptions = null }
             FcActionRow("上移", Modifier.testTag("template-exercise-up"), enabled = !state.busy) {

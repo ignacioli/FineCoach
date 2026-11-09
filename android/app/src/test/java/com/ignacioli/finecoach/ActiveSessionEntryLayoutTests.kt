@@ -43,7 +43,7 @@ class ActiveSessionEntryLayoutTests {
     private fun click(tag: String) {
         val n = node(tag)
         if (n.onAncestors().filter(hasScrollAction()).fetchSemanticsNodes().isNotEmpty()) n.performScrollTo()
-        n.assertIsDisplayed().assertHasClickAction().performClick(); compose.waitForIdle()
+        n.assertIsDisplayed().assertIsEnabled().assertHasClickAction().performClick(); compose.waitForIdle()
     }
     private fun text(tag: String, value: String) { node(tag).performScrollTo().assertIsDisplayed().performTextReplacement(value) }
     private fun full(tag: String, parent: String) = assertEquals(node(parent).getUnclippedBoundsInRoot().width, node(tag).getUnclippedBoundsInRoot().width)
@@ -255,6 +255,59 @@ class ActiveSessionEntryLayoutTests {
         click("session-exercise-options-${row.sessionExerciseID.value}"); click("session-exercise-delete"); gone("session-exercise-delete")
         node("session-delete-exercise-confirm").assertDoesNotExist()
         assertEquals(original.exercises, read(original.session.sessionID).exercises)
+    }
+
+    @Test fun applyTemplateEntryOpensRealSheetAndCancelDoesNotWrite() {
+        val original = content()
+        val requested = kotlinx.coroutines.CompletableDeferred<Unit>()
+        val release = kotlinx.coroutines.CompletableDeferred<Unit>()
+        val completed = kotlinx.coroutines.CompletableDeferred<Unit>()
+        lateinit var delegate: TemplateRepositoryPort
+        f.test { delegate = f.templates }
+        val pendingList = object : TemplateRepositoryPort by delegate {
+            override suspend fun list(): ApplicationResult<List<TemplateRecord>> {
+                requested.complete(Unit)
+                try {
+                    release.await()
+                    return delegate.list()
+                } finally { completed.complete(Unit) }
+            }
+        }
+        templates = TemplateUiState(TemplateUseCases(pendingList, f.clock), f.clock, f.ids)
+        show(original)
+        click("session-apply-template"); await("template-apply-content")
+        node("template-apply-content").assertIsDisplayed()
+        try {
+            compose.waitUntil(15_000) { requested.isCompleted && templates.busy }
+            compose.waitForIdle()
+            assertFalse(release.isCompleted)
+            assertFalse(completed.isCompleted)
+            assertTrue(templates.busy)
+            // Assert before releasing the read; waiting for enabled would also pass the old implementation.
+            node("template-apply-cancel").assertIsDisplayed().assertIsEnabled().assertHasClickAction()
+        } finally { release.complete(Unit) }
+        compose.waitUntil(15_000) { completed.isCompleted && !templates.busy }
+        click("template-apply-cancel"); gone("template-apply-content")
+        assertEquals(original, read(original.session.sessionID))
+    }
+
+    @Test fun operationMenusAndSetEditCancelHaveVisibleZeroWriteEntries() {
+        val original = content(true); show(original)
+        val row = original.exercises.first(); val set = row.sets.first()
+        f.test { f.blockAllWrites(listOf("sessions", "session_exercises", "training_sets", "session_sections")) }
+        click("session-section-${original.sections.first().sectionID.value}")
+        click("session-section-options-cancel"); gone("session-section-options-cancel")
+        assertEquals(original, read(original.session.sessionID))
+        click("session-exercise-options-${row.sessionExerciseID.value}")
+        click("session-exercise-options-cancel"); gone("session-exercise-options-cancel")
+        assertEquals(original, read(original.session.sessionID))
+        options(set); click("session-set-options-cancel"); gone("session-set-options-cancel")
+        assertEquals(original, read(original.session.sessionID))
+        options(set); click("session-set-edit"); await("set-editor-content")
+        node("set-editor-content").assertIsDisplayed()
+        assertEquals(original, read(original.session.sessionID))
+        text("set-weight-input", "88"); click("set-cancel"); gone("set-editor-content")
+        assertEquals(original, read(original.session.sessionID))
     }
 
 }

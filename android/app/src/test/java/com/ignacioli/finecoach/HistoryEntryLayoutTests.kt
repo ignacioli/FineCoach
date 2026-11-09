@@ -144,4 +144,23 @@ class HistoryEntryLayoutTests {
         f.test { assertEquals(1L, f.count("training_templates")); assertEquals(1L, f.count("template_exercises")) }
     }
 
+    @Test fun historyRetryReadsCompletedHistoryAgainAfterGenerationFailure() {
+        val original = completed()
+        var generation = ""
+        f.test {
+            generation = f.db.storeMetadataDao().find("store_generation")!!.value
+            f.db.openHelper.writableDatabase.execSQL("UPDATE store_metadata SET value=? WHERE `key`=?",
+                arrayOf("abcdef09-0000-4000-8000-000000000099", "store_generation"))
+        }
+        compose.setContent { FineCoachTheme { HistoryListScreen(state, f.zone, {}, {}) } }
+        await("history-retry")
+        node("history-retry").assertIsDisplayed().assertIsEnabled().assertHasClickAction()
+        assertNotNull(state.error); assertTrue(state.records.isEmpty())
+        f.test { f.db.openHelper.writableDatabase.execSQL("UPDATE store_metadata SET value=? WHERE `key`=?",
+            arrayOf(generation, "store_generation")) }
+        click("history-retry"); await("history-open-${original.session.sessionID.value}")
+        assertNull(state.error); assertEquals(original.session.sessionID, state.records.single().sessionID)
+        assertEquals(SessionState.completed, read(original.session.sessionID).session.state)
+    }
+
 }
