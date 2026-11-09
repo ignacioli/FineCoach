@@ -29,6 +29,14 @@ internal object FictionalDataPolicy {
         "main/assets/licenses/material-symbols-NOTICE.txt" to "4b4bcdf3546bb501568e2dc9e1f4951678c0946caaf110c1d4ef7c70a73542d6",
         "assets/licenses/material-symbols-NOTICE.txt" to "4b4bcdf3546bb501568e2dc9e1f4951678c0946caaf110c1d4ef7c70a73542d6",
     )
+    // Catalog attribution is real source metadata, not fictional person data.
+    // Exact paths and bytes only; never exempt the whole exercises directory.
+    private val exerciseAssets = mapOf(
+        "provenance.json" to ("ios/FineCoachApp/Resources/ExerciseCatalog/provenance.json" to
+            "ce7a408d0fd1e7b0a65a97df003e830022fca41350a21a4d91c7116a59a98920"),
+        "licenses/SOURCES.md" to ("design/catalog-expansion/source/2026-10-17/out/SOURCES.md" to
+            "aebb9761c68e81bad01907e99cec15688fa6fe1118d05cfc5af8ab2f96973eb9"),
+    )
     private val email = Regex("[A-Za-z0-9._%+-]+@([A-Za-z0-9.-]+\\.[A-Za-z]{2,})")
     fun validateName(path: String) {
         require(!Regex("(?i)(S0SENTINEL|FICTIONAL_SENSITIVE|@|(?:^|[/_-])(?:student|coach|patient)[_-]?[0-9]{6,}|1[3-9][0-9]{9})")
@@ -41,6 +49,14 @@ internal object FictionalDataPolicy {
     fun validateFixture(path: String, bytes: ByteArray, declaration: String? = null) {
         validateName(path)
         val hash = MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
+        val exercisePath = listOf("main/assets/exercises/", "assets/exercises/")
+            .firstOrNull { path.startsWith(it) }?.let { path.removePrefix(it) }
+        exerciseAssets[exercisePath]?.let { (source, expected) ->
+            val app = File(requireNotNull(System.getProperty("finecoach.storageProjectDirectory")))
+            val original = File(app, "../../$source")
+            require(hash == expected && original.readBytes().contentEquals(bytes)) { "Exercise asset provenance mismatch: $path" }
+            return
+        }
         materialNotices[path]?.let { expected ->
             require(hash == expected) { "Material Symbols notice provenance mismatch: $path" }
             return

@@ -1,14 +1,14 @@
 package com.ignacioli.finecoach.storage.value
 
 import androidx.room.TypeConverter
+import com.ignacioli.finecoach.core.domain.common.*
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.UUID
 
-// Private storage representations, not FCBK/FCPA encoders. No converter is
-// registered on the database: the sole entity has two non-null String columns.
+// Private storage representations, not FCBK/FCPA encoders.
 class StorageValueConverters {
     @TypeConverter
     fun uuidToString(value: UUID): String = value.toString()
@@ -76,6 +76,111 @@ class StorageValueConverters {
         val parsed = LocalTime.parse(value)
         require(value == localTimeToString(parsed)) { "Non-canonical calendar time" }
         return parsed
+    }
+
+    @TypeConverter
+    fun studentSexToString(value: StudentSex): String = value.wireValue
+
+    @TypeConverter
+    fun stringToStudentSex(value: String): StudentSex = StudentSex.parse(value)
+
+    @TypeConverter
+    fun studentLifecycleToString(value: StudentLifecycle): String = value.wireValue
+
+    @TypeConverter
+    fun stringToStudentLifecycle(value: String): StudentLifecycle = StudentLifecycle.parse(value)
+
+    @TypeConverter
+    fun coursePackageStatusToString(value: CoursePackageStatus): String = value.wireValue
+
+    @TypeConverter
+    fun stringToCoursePackageStatus(value: String): CoursePackageStatus = CoursePackageStatus.parse(value)
+
+    @TypeConverter
+    fun creditDirectionToString(value: CreditDirection): String = value.wireValue
+
+    @TypeConverter
+    fun stringToCreditDirection(value: String): CreditDirection = CreditDirection.parse(value)
+
+    @TypeConverter
+    fun creditReasonKindToString(value: CreditReasonKind): String = value.wireValue
+
+    @TypeConverter
+    fun stringToCreditReasonKind(value: String): CreditReasonKind = CreditReasonKind.parse(value)
+
+    @TypeConverter
+    fun sessionStateToString(value: SessionState): String = value.wireValue
+
+    @TypeConverter
+    fun stringToSessionState(value: String): SessionState = SessionState.parse(value)
+
+    @TypeConverter
+    fun exerciseKindToString(value: ExerciseKind): String = value.wireValue
+
+    @TypeConverter
+    fun stringToExerciseKind(value: String): ExerciseKind = ExerciseKind.parse(value)
+
+    @TypeConverter
+    fun exerciseLifecycleToString(value: ExerciseLifecycle): String = value.wireValue
+
+    @TypeConverter
+    fun stringToExerciseLifecycle(value: String): ExerciseLifecycle = ExerciseLifecycle.parse(value)
+
+    @TypeConverter
+    fun exerciseSourceKindToString(value: ExerciseSourceKind): String = value.wireValue
+
+    @TypeConverter
+    fun stringToExerciseSourceKind(value: String): ExerciseSourceKind = ExerciseSourceKind.parse(value)
+
+    @TypeConverter
+    fun exerciseClaimScopeToString(value: ExerciseClaimScope): String = value.wireValue
+
+    @TypeConverter
+    fun stringToExerciseClaimScope(value: String): ExerciseClaimScope = ExerciseClaimScope.parse(value)
+
+    @TypeConverter
+    fun recordModeToString(value: RecordMode): String = value.wireValue
+
+    @TypeConverter
+    fun stringToRecordMode(value: String): RecordMode = RecordMode.parse(value)
+
+    @TypeConverter
+    fun measurementUnitToString(value: MeasurementUnit): String = value.wireValue
+
+    @TypeConverter
+    fun stringToMeasurementUnit(value: String): MeasurementUnit = MeasurementUnit.parse(value)
+
+    @TypeConverter
+    fun setSideToString(value: SetSide): String = value.wireValue
+
+    @TypeConverter
+    fun stringToSetSide(value: String): SetSide = SetSide.parse(value)
+
+    @TypeConverter
+    fun setRecordingStateToString(value: SetRecordingState): String = value.wireValue
+
+    @TypeConverter
+    fun stringToSetRecordingState(value: String): SetRecordingState = SetRecordingState.parse(value)
+
+    @TypeConverter
+    fun sessionSectionOwnerKindToString(value: SessionSectionOwnerKind): String = value.wireValue
+
+    @TypeConverter
+    fun stringToSessionSectionOwnerKind(value: String): SessionSectionOwnerKind = SessionSectionOwnerKind.parse(value)
+
+    @TypeConverter
+    fun bodyPartToString(value: BodyPart): String = value.wireValue
+
+    @TypeConverter
+    fun stringToBodyPart(value: String): BodyPart = BodyPart.parse(value)
+
+    @TypeConverter
+    fun booleanToInt(value: Boolean): Int = if (value) 1 else 0
+
+    @TypeConverter
+    fun intToBoolean(value: Int): Boolean {
+        require(value == 0 || value == 1) { "Invalid stored Boolean" }
+        return value == 1
     }
 
     private companion object {

@@ -1,0 +1,1289 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "858c7bada9eb75198bf45934bf2d72d0",
+    "entities": [
+      {
+        "tableName": "store_metadata",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`key` TEXT NOT NULL, `value` TEXT NOT NULL, PRIMARY KEY(`key`))",
+        "fields": [
+          {
+            "fieldPath": "key",
+            "columnName": "key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "key"
+          ]
+        }
+      },
+      {
+        "tableName": "students",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `displayName` TEXT NOT NULL, `sex` TEXT NOT NULL, `trainingGoal` TEXT, `injuryNotes` TEXT, `privateCoachNote` TEXT, `phone` TEXT, `wechatID` TEXT, `lifecycle` TEXT NOT NULL, `createdAtUTC` TEXT NOT NULL, `updatedAtUTC` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayName",
+            "columnName": "displayName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sex",
+            "columnName": "sex",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "trainingGoal",
+            "columnName": "trainingGoal",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "injuryNotes",
+            "columnName": "injuryNotes",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "privateCoachNote",
+            "columnName": "privateCoachNote",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "phone",
+            "columnName": "phone",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "wechatID",
+            "columnName": "wechatID",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "lifecycle",
+            "columnName": "lifecycle",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAtUTC",
+            "columnName": "createdAtUTC",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAtUTC",
+            "columnName": "updatedAtUTC",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_students_lifecycle",
+            "unique": false,
+            "columnNames": [
+              "lifecycle"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_students_lifecycle` ON `${TABLE_NAME}` (`lifecycle`)"
+          }
+        ]
+      },
+      {
+        "tableName": "course_packages",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `studentID` TEXT NOT NULL, `name` TEXT, `totalCredits` INTEGER NOT NULL, `remainingCreditsCache` INTEGER NOT NULL, `startDate` TEXT, `endDate` TEXT, `status` TEXT NOT NULL, `createdAtUTC` TEXT NOT NULL, `updatedAtUTC` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "studentID",
+            "columnName": "studentID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "totalCredits",
+            "columnName": "totalCredits",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "remainingCreditsCache",
+            "columnName": "remainingCreditsCache",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startDate",
+            "columnName": "startDate",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "endDate",
+            "columnName": "endDate",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAtUTC",
+            "columnName": "createdAtUTC",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAtUTC",
+            "columnName": "updatedAtUTC",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_course_packages_studentID",
+            "unique": false,
+            "columnNames": [
+              "studentID"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_course_packages_studentID` ON `${TABLE_NAME}` (`studentID`)"
+          }
+        ]
+      },
+      {
+        "tableName": "active_package_claims",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`studentID` TEXT NOT NULL, `packageID` TEXT NOT NULL, PRIMARY KEY(`studentID`))",
+        "fields": [
+          {
+            "fieldPath": "studentID",
+            "columnName": "studentID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "packageID",
+            "columnName": "packageID",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "studentID"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_active_package_claims_packageID",
+            "unique": false,
+            "columnNames": [
+              "packageID"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_active_package_claims_packageID` ON `${TABLE_NAME}` (`packageID`)"
+          }
+        ]
+      },
+      {
+        "tableName": "credit_adjustments",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `packageID` TEXT NOT NULL, `direction` TEXT NOT NULL, `amount` INTEGER NOT NULL, `reasonKind` TEXT NOT NULL, `reasonText` TEXT, `linkedSessionID` TEXT, `linkedAppointmentID` TEXT, `sourceEventKey` TEXT NOT NULL, `createdAtUTC` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`packageID`) REFERENCES `course_packages`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "packageID",
+            "columnName": "packageID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "direction",
+            "columnName": "direction",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "amount",
+            "columnName": "amount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reasonKind",
+            "columnName": "reasonKind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reasonText",
+            "columnName": "reasonText",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "linkedSessionID",
+            "columnName": "linkedSessionID",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "linkedAppointmentID",
+            "columnName": "linkedAppointmentID",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sourceEventKey",
+            "columnName": "sourceEventKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAtUTC",
+            "columnName": "createdAtUTC",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_credit_adjustments_packageID",
+            "unique": false,
+            "columnNames": [
+              "packageID"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_credit_adjustments_packageID` ON `${TABLE_NAME}` (`packageID`)"
+          },
+          {
+            "name": "index_credit_adjustments_sourceEventKey",
+            "unique": true,
+            "columnNames": [
+              "sourceEventKey"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_credit_adjustments_sourceEventKey` ON `${TABLE_NAME}` (`sourceEventKey`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "course_packages",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "packageID"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "sessions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `studentID` TEXT NOT NULL, `state` TEXT NOT NULL, `startedAtUTC` TEXT NOT NULL, `lastCheckpointUTC` TEXT NOT NULL, `elapsedSeconds` TEXT NOT NULL, `interruptionStartedAtUTC` TEXT, `durationNeedsReview` INTEGER NOT NULL, `coachAdjustedDurationSeconds` TEXT, `studentFacingSummary` TEXT, `privateCoachNote` TEXT, `revision` TEXT NOT NULL, `createdAtUTC` TEXT NOT NULL, `updatedAtUTC` TEXT NOT NULL, `completedAtUTC` TEXT, `appointmentID` TEXT, `creditSettlementNote` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`studentID`) REFERENCES `students`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "studentID",
+            "columnName": "studentID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "state",
+            "columnName": "state",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startedAtUTC",
+            "columnName": "startedAtUTC",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastCheckpointUTC",
+            "columnName": "lastCheckpointUTC",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "elapsedSeconds",
+            "columnName": "elapsedSeconds",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "interruptionStartedAtUTC",
+            "columnName": "interruptionStartedAtUTC",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "durationNeedsReview",
+            "columnName": "durationNeedsReview",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "coachAdjustedDurationSeconds",
+            "columnName": "coachAdjustedDurationSeconds",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "studentFacingSummary",
+            "columnName": "studentFacingSummary",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "privateCoachNote",
+            "columnName": "privateCoachNote",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "revision",
+            "columnName": "revision",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAtUTC",
+            "columnName": "createdAtUTC",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAtUTC",
+            "columnName": "updatedAtUTC",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "completedAtUTC",
+            "columnName": "completedAtUTC",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "appointmentID",
+            "columnName": "appointmentID",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "creditSettlementNote",
+            "columnName": "creditSettlementNote",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_sessions_studentID",
+            "unique": false,
+            "columnNames": [
+              "studentID"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_sessions_studentID` ON `${TABLE_NAME}` (`studentID`)"
+          },
+          {
+            "name": "index_sessions_state",
+            "unique": false,
+            "columnNames": [
+              "state"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_sessions_state` ON `${TABLE_NAME}` (`state`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "students",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "studentID"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "active_session_pointers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`key` TEXT NOT NULL, `sessionID` TEXT NOT NULL, PRIMARY KEY(`key`))",
+        "fields": [
+          {
+            "fieldPath": "key",
+            "columnName": "key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sessionID",
+            "columnName": "sessionID",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "key"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_active_session_pointers_sessionID",
+            "unique": true,
+            "columnNames": [
+              "sessionID"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_active_session_pointers_sessionID` ON `${TABLE_NAME}` (`sessionID`)"
+          }
+        ]
+      },
+      {
+        "tableName": "session_training_focus",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`sessionID` TEXT NOT NULL, `bodyPart` TEXT NOT NULL, PRIMARY KEY(`sessionID`, `bodyPart`), FOREIGN KEY(`sessionID`) REFERENCES `sessions`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "sessionID",
+            "columnName": "sessionID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bodyPart",
+            "columnName": "bodyPart",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "sessionID",
+            "bodyPart"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "sessions",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "sessionID"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "session_exercises",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `sessionID` TEXT NOT NULL, `orderIndex` INTEGER NOT NULL, `sourceKind` TEXT NOT NULL, `sourceID` TEXT, `displayNameSnapshot` TEXT NOT NULL, `recordModeSnapshot` TEXT NOT NULL, `actionPrivateNote` TEXT, `sectionID` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`sessionID`) REFERENCES `sessions`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sessionID",
+            "columnName": "sessionID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "orderIndex",
+            "columnName": "orderIndex",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceKind",
+            "columnName": "sourceKind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceID",
+            "columnName": "sourceID",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "displayNameSnapshot",
+            "columnName": "displayNameSnapshot",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recordModeSnapshot",
+            "columnName": "recordModeSnapshot",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actionPrivateNote",
+            "columnName": "actionPrivateNote",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sectionID",
+            "columnName": "sectionID",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_session_exercises_sessionID_orderIndex",
+            "unique": true,
+            "columnNames": [
+              "sessionID",
+              "orderIndex"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_session_exercises_sessionID_orderIndex` ON `${TABLE_NAME}` (`sessionID`, `orderIndex`)"
+          },
+          {
+            "name": "index_session_exercises_sectionID",
+            "unique": false,
+            "columnNames": [
+              "sectionID"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_session_exercises_sectionID` ON `${TABLE_NAME}` (`sectionID`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "sessions",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "sessionID"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "training_sets",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `sessionExerciseID` TEXT NOT NULL, `orderIndex` INTEGER NOT NULL, `state` TEXT NOT NULL, `recordMode` TEXT NOT NULL, `weightValue` TEXT, `repetitionCount` TEXT, `durationSeconds` TEXT, `leftValue` TEXT, `rightValue` TEXT, `distanceValue` TEXT, `speedValue` TEXT, `resistanceValue` TEXT, `unit` TEXT NOT NULL, `side` TEXT NOT NULL, `createdAtUTC` TEXT NOT NULL, `updatedAtUTC` TEXT NOT NULL, `completedAtUTC` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`sessionExerciseID`) REFERENCES `session_exercises`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sessionExerciseID",
+            "columnName": "sessionExerciseID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "orderIndex",
+            "columnName": "orderIndex",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "state",
+            "columnName": "state",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recordMode",
+            "columnName": "recordMode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "weightValue",
+            "columnName": "weightValue",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "repetitionCount",
+            "columnName": "repetitionCount",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "durationSeconds",
+            "columnName": "durationSeconds",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "leftValue",
+            "columnName": "leftValue",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "rightValue",
+            "columnName": "rightValue",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "distanceValue",
+            "columnName": "distanceValue",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "speedValue",
+            "columnName": "speedValue",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "resistanceValue",
+            "columnName": "resistanceValue",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "side",
+            "columnName": "side",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAtUTC",
+            "columnName": "createdAtUTC",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAtUTC",
+            "columnName": "updatedAtUTC",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "completedAtUTC",
+            "columnName": "completedAtUTC",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_training_sets_sessionExerciseID_orderIndex",
+            "unique": true,
+            "columnNames": [
+              "sessionExerciseID",
+              "orderIndex"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_training_sets_sessionExerciseID_orderIndex` ON `${TABLE_NAME}` (`sessionExerciseID`, `orderIndex`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "session_exercises",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "sessionExerciseID"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "training_templates",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `revision` TEXT NOT NULL, `createdAtUTC` TEXT NOT NULL, `updatedAtUTC` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "revision",
+            "columnName": "revision",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAtUTC",
+            "columnName": "createdAtUTC",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAtUTC",
+            "columnName": "updatedAtUTC",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "template_training_focus",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`templateID` TEXT NOT NULL, `bodyPart` TEXT NOT NULL, PRIMARY KEY(`templateID`, `bodyPart`), FOREIGN KEY(`templateID`) REFERENCES `training_templates`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "templateID",
+            "columnName": "templateID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bodyPart",
+            "columnName": "bodyPart",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "templateID",
+            "bodyPart"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "training_templates",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "templateID"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "template_exercises",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `templateID` TEXT NOT NULL, `sectionID` TEXT, `orderIndex` INTEGER NOT NULL, `sourceKind` TEXT NOT NULL, `sourceID` TEXT, `displayNameSnapshot` TEXT NOT NULL, `recordModeSnapshot` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`templateID`) REFERENCES `training_templates`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "templateID",
+            "columnName": "templateID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sectionID",
+            "columnName": "sectionID",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "orderIndex",
+            "columnName": "orderIndex",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceKind",
+            "columnName": "sourceKind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceID",
+            "columnName": "sourceID",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "displayNameSnapshot",
+            "columnName": "displayNameSnapshot",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recordModeSnapshot",
+            "columnName": "recordModeSnapshot",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_template_exercises_templateID_orderIndex",
+            "unique": true,
+            "columnNames": [
+              "templateID",
+              "orderIndex"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_template_exercises_templateID_orderIndex` ON `${TABLE_NAME}` (`templateID`, `orderIndex`)"
+          },
+          {
+            "name": "index_template_exercises_sectionID",
+            "unique": false,
+            "columnNames": [
+              "sectionID"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_template_exercises_sectionID` ON `${TABLE_NAME}` (`sectionID`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "training_templates",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "templateID"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "template_planned_sets",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`templateExerciseID` TEXT NOT NULL, `position` INTEGER NOT NULL, `recordMode` TEXT NOT NULL, `unit` TEXT NOT NULL, `side` TEXT NOT NULL, `weightValue` TEXT, `repetitionCount` TEXT, `durationSeconds` TEXT, `leftValue` TEXT, `rightValue` TEXT, `distanceValue` TEXT, `speedValue` TEXT, `resistanceValue` TEXT, PRIMARY KEY(`templateExerciseID`, `position`), FOREIGN KEY(`templateExerciseID`) REFERENCES `template_exercises`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "templateExerciseID",
+            "columnName": "templateExerciseID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recordMode",
+            "columnName": "recordMode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "side",
+            "columnName": "side",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "weightValue",
+            "columnName": "weightValue",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "repetitionCount",
+            "columnName": "repetitionCount",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "durationSeconds",
+            "columnName": "durationSeconds",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "leftValue",
+            "columnName": "leftValue",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "rightValue",
+            "columnName": "rightValue",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "distanceValue",
+            "columnName": "distanceValue",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "speedValue",
+            "columnName": "speedValue",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "resistanceValue",
+            "columnName": "resistanceValue",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "templateExerciseID",
+            "position"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "template_exercises",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "templateExerciseID"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "session_sections",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `ownerKind` TEXT NOT NULL, `ownerID` TEXT NOT NULL, `name` TEXT NOT NULL, `orderIndex` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ownerKind",
+            "columnName": "ownerKind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ownerID",
+            "columnName": "ownerID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "orderIndex",
+            "columnName": "orderIndex",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_session_sections_ownerKind_ownerID_orderIndex",
+            "unique": true,
+            "columnNames": [
+              "ownerKind",
+              "ownerID",
+              "orderIndex"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_session_sections_ownerKind_ownerID_orderIndex` ON `${TABLE_NAME}` (`ownerKind`, `ownerID`, `orderIndex`)"
+          }
+        ]
+      },
+      {
+        "tableName": "exercise_catalog",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `kind` TEXT NOT NULL, `canonicalName` TEXT NOT NULL, `normalizedName` TEXT NOT NULL, `recordMode` TEXT NOT NULL, `metadataVersion` TEXT NOT NULL, `lifecycle` TEXT NOT NULL, `isRetired` INTEGER NOT NULL, `provenanceRef` TEXT, `createdAtUTC` TEXT NOT NULL, `updatedAtUTC` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kind",
+            "columnName": "kind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "canonicalName",
+            "columnName": "canonicalName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "normalizedName",
+            "columnName": "normalizedName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recordMode",
+            "columnName": "recordMode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "metadataVersion",
+            "columnName": "metadataVersion",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lifecycle",
+            "columnName": "lifecycle",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isRetired",
+            "columnName": "isRetired",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "provenanceRef",
+            "columnName": "provenanceRef",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdAtUTC",
+            "columnName": "createdAtUTC",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAtUTC",
+            "columnName": "updatedAtUTC",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_exercise_catalog_normalizedName",
+            "unique": false,
+            "columnNames": [
+              "normalizedName"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_exercise_catalog_normalizedName` ON `${TABLE_NAME}` (`normalizedName`)"
+          }
+        ]
+      },
+      {
+        "tableName": "exercise_preferences",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`exerciseID` TEXT NOT NULL, `alias` TEXT, `isFavorite` INTEGER NOT NULL, `isHidden` INTEGER NOT NULL, `isAssisted` INTEGER NOT NULL, `isUnilateral` INTEGER, PRIMARY KEY(`exerciseID`))",
+        "fields": [
+          {
+            "fieldPath": "exerciseID",
+            "columnName": "exerciseID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "alias",
+            "columnName": "alias",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isFavorite",
+            "columnName": "isFavorite",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isHidden",
+            "columnName": "isHidden",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isAssisted",
+            "columnName": "isAssisted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isUnilateral",
+            "columnName": "isUnilateral",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "exerciseID"
+          ]
+        }
+      },
+      {
+        "tableName": "exercise_name_claims",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`normalizedName` TEXT NOT NULL, `ownerKind` TEXT NOT NULL, `ownerID` TEXT NOT NULL, `scope` TEXT NOT NULL, PRIMARY KEY(`normalizedName`))",
+        "fields": [
+          {
+            "fieldPath": "normalizedName",
+            "columnName": "normalizedName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ownerKind",
+            "columnName": "ownerKind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ownerID",
+            "columnName": "ownerID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "scope",
+            "columnName": "scope",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "normalizedName"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_exercise_name_claims_ownerKind_ownerID",
+            "unique": false,
+            "columnNames": [
+              "ownerKind",
+              "ownerID"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_exercise_name_claims_ownerKind_ownerID` ON `${TABLE_NAME}` (`ownerKind`, `ownerID`)"
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '858c7bada9eb75198bf45934bf2d72d0')"
+    ]
+  }
+}

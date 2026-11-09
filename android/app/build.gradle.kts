@@ -41,6 +41,7 @@ android {
         getByName("androidTest") {
             assets.srcDir("../../shared/test-vectors")
             assets.srcDir("schemas-synthetic")
+            assets.srcDir("schemas")
         }
         getByName("test") {
             resources.srcDir("../../shared/test-vectors")
@@ -72,6 +73,13 @@ tasks.withType<KspAATask>().configureEach {
         if (name.endsWith("AndroidTestKotlin")) "schemas-synthetic" else "schemas",
     )
     commandLineArgumentProviders.add(RoomSchemaArgProvider(schemaDirectory.asFile))
+}
+
+// AGP assets.srcDir does not retain builtBy dependencies (S0-04 T008).
+// Order every debug androidTest consumer, including asset merge and lint model
+// tasks, after the main KSP export; keep task lookup lazy and configuration-only.
+tasks.matching { it.name.contains("DebugAndroidTest") }.configureEach {
+    dependsOn(tasks.named<KspAATask>("kspDebugKotlin"))
 }
 
 tasks.withType<Test>().configureEach {
