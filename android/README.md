@@ -777,7 +777,7 @@ node android/dependency-allowlist/generate-resolved.mjs android/app/build/report
 | s0G1 | 39 | 现有 token/字体/contrast/generator 合同，未改 |
 | ComponentCatalogTests | 6 | 24 项精确 roster、类型/真实文件/iOS 来源、状态与测试方法、9 项延期和 authority 并集、debug/privacy 入口保留、图标需求/无依赖 |
 | ComponentCatalogStateTests | 66 | 参数化逐个状态真正 compose 并检查组件 testTag，不以文字清单代替渲染 |
-| ComponentContractTests | 25 | roster 每 ID 一个合同方法（含 S1-D13 BottomSheet 完全展开）；touch/满宽、disabled callback、单选/三态、Stepper/FIELD、输入/secure、heading/semantics、确认/重试/撤销、提示条/单行 hero、token source 检查等 |
+| ComponentContractTests | 27 | roster 每 ID 一个合同方法（含 S1-D13 BottomSheet 完全展开）；touch/满宽、disabled callback、单选/三态、Stepper/FIELD、输入/secure、heading/semantics、确认/重试/撤销、提示条/单行 hero、训练组行、多行 hero、token source 检查等 |
 | PlatformShellTests | 5 | header 与系统 back dispatcher 同 callback、Insets 只消费一次、内容宽度、catalog 可见入口/返回、独立 overlay window 隐私注册/释放 |
 | s0G2 合计 | 101 | 上述四个 suite 全部非空，0 failures/errors/skips；与 G1 联跑总计 140 |
 
@@ -1285,3 +1285,25 @@ S1 所需 Student、Package、Appointment、Session、Set、ledger、template/�
   - `android/app/build/reports/lint-results-debug.*`
 
 编排方已修正 `ScopeBoundaryTests.kt:442-444` 的 `const val` 正则，本轮在该修正基础上继续收敛。
+
+### S1 T013c 休息通知能力
+
+批准能力新增且仅新增 `android.permission.POST_NOTIFICATIONS`（API33+ runtime）。API31/32 不申请该 runtime 权限。无 INTERNET、精确闹钟权限或网络 API。内部非 exported receiver 仅用于当前 Session 休息提醒。
+通知标题「休息结束」、正文「可以继续训练了」，不含任何身份、训练值、课包或备注。每 Session 一个 inexact alarm，±15秒替换；跳过/关闭/结束/放弃取消。使用 `setAndAllowWhileIdle`，系统可延迟投递；不承诺精准120秒系统通知。权限拒绝或系统关闭不阻断前台记录/休息计时。进程退出后由已调度 alarm 处理；设备重启不承诺保留。
+DEVICE `RestNotificationPermissionTests` 由宿主在专用虚构 API31/32、API33+ 环境通过 `am instrument` 执行；agent 的编译与 JVM 结果不等于设备授权、展示或系统送达证明。
+
+### S1 启动与 S0 隐私测试壳（S1-D20）
+
+安装后正常启动 debug 或 release 都默认进入 S1，无需启动开关：
+
+```sh
+adb shell am start -n com.ignacioli.finecoach/.MainActivity
+```
+
+仅需要 S0 隐私壳的 debug 测试使用显式 extra；该壳不作为日常启动入口：
+
+```sh
+adb shell am start -n com.ignacioli.finecoach/.MainActivity --ez finecoachS0Shell true
+```
+
+`PrivacyCoverTests` 仅启动 intent 带此 extra，既有断言不变。通知点击使用原有稳定 Session ID，始终进入 S1。release 没有 S0 provider，即使传入该 extra 也不会进入测试壳。

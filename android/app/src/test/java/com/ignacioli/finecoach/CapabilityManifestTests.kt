@@ -10,8 +10,9 @@ internal object CapabilityPolicy {
         require(variant in MergedPrivacyInputs.variants)
         fun Element.attr(name: String) = getAttributeNS(MergedPrivacyInputs.ANDROID, name)
         val requested = MergedPrivacyInputs.children(manifest).filter { it.tagName.startsWith("uses-permission") }
-        require(requested.size == 1 && requested.single().tagName == "uses-permission" && requested.single().attr("name") == permission)
-        require(!requested.single().hasAttributeNS(MergedPrivacyInputs.ANDROID, "maxSdkVersion"))
+        require(requested.size == 2 && requested.all { it.tagName == "uses-permission" } &&
+            requested.map { it.attr("name") }.toSet() == setOf(permission, "android.permission.POST_NOTIFICATIONS"))
+        require(requested.none { it.hasAttributeNS(MergedPrivacyInputs.ANDROID, "maxSdkVersion") })
         val declared = MergedPrivacyInputs.children(manifest).filter { it.tagName == "permission" }
         require(declared.size == 1 && declared.single().attr("name") == permission && declared.single().attr("protectionLevel") == "signature")
         val instrumentation = MergedPrivacyInputs.children(manifest).filter { it.tagName == "instrumentation" }
@@ -26,6 +27,7 @@ internal object CapabilityPolicy {
         val expectedComponents = setOf(
             "activity" to "com.ignacioli.finecoach.MainActivity",
             "receiver" to "androidx.profileinstaller.ProfileInstallReceiver",
+            "receiver" to "com.ignacioli.finecoach.notifications.RestNotificationReceiver",
             "provider" to "androidx.startup.InitializationProvider",
             // Library entry contributed by room-runtime 2.8.5 in both variants.
             "service" to "androidx.room.MultiInstanceInvalidationService",

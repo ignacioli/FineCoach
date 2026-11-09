@@ -7,7 +7,10 @@ import android.view.ViewGroup
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.AndroidComposeTestRule
+import androidx.test.ext.junit.rules.ActivityScenarioRule
+import androidx.test.core.app.ApplicationProvider
+import android.content.Intent
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.Lifecycle
@@ -39,7 +42,14 @@ class RecentsActivityShadow : ShadowActivity() {
     qualifiers = "zh-rCN-w320dp-h640dp-notnight-mdpi")
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class PrivacyCoverTests {
-    @get:Rule val compose = createAndroidComposeRule<MainActivity>()
+    @get:Rule val compose = AndroidComposeTestRule(
+        ActivityScenarioRule<MainActivity>(Intent(ApplicationProvider.getApplicationContext(), MainActivity::class.java)
+            .putExtra(MainActivity.EXTRA_S0_SHELL, true)),
+    ) { rule ->
+        var activity: MainActivity? = null
+        rule.scenario.onActivity { activity = it }
+        requireNotNull(activity)
+    }
 
     @Test fun api33DisablesRecentsSnapshotsWithoutAnAppCover() {
         assertEquals(listOf(false), Shadow.extract<RecentsActivityShadow>(compose.activity).recentsCalls)

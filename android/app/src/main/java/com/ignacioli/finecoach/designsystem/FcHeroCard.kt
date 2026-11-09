@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.semantics.Role
@@ -97,6 +98,32 @@ fun FcHeroCard(
                     style = FcTypography.style("callout", 600),
                     color = FcColors.actionOn,
                 )
+            }
+        }
+    }
+}
+
+data class FcHeroEntry(val id: String, val title: String, val subtitle: String)
+
+@Composable
+fun FcMultiHeroCard(entries: List<FcHeroEntry>, onOpen: (String) -> Unit, modifier: Modifier = Modifier) {
+    require(entries.isNotEmpty() && entries.map { it.id }.distinct().size == entries.size)
+    Column(modifier.fillMaxWidth().clip(RoundedCornerShape(FcShapes.lg)).background(FcColors.actionPrimary)
+        .padding(FcSpacing.space4), verticalArrangement = Arrangement.spacedBy(FcSpacing.space3)) {
+        Box(Modifier.widthIn(min = FcComponentMetrics.touch + FcSpacing.space3).height(FcComponentMetrics.icon)
+            .clip(FcShapes.capsule).background(FcColors.surfaceCanvas).padding(horizontal = FcSpacing.space2), contentAlignment = Alignment.Center) {
+            Text("进行中 · ${entries.size}", style = FcTypography.sectionLabel, color = FcColors.actionPrimary)
+        }
+        entries.forEachIndexed { index, entry ->
+            if (index > 0) Box(Modifier.fillMaxWidth().height(FcComponentMetrics.hairline).background(FcColors.surfaceDividerOnAction))
+            Row(Modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.touch).then(Modifier.clickable(role = Role.Button) { onOpen(entry.id) })
+                .then(Modifier.semantics { }).testTag("hero-${entry.id}"), verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+                Column(Modifier.weight(1f)) {
+                    Text(entry.title, style = FcTypography.headline, color = FcColors.actionOn)
+                    Text(entry.subtitle, style = FcTypography.callout, color = FcColors.textOnActionSecondary)
+                }
+                Text("继续 ›", style = FcTypography.style("callout", 600), color = FcColors.actionOn)
             }
         }
     }

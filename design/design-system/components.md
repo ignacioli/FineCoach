@@ -596,7 +596,7 @@ roadmap §4 里不需要画板的差异（不在上表，不要为它们新开�
 | DS-AVATAR | FcAvatar | FcFeedback.kt | initial | Components/FCAvatar.swift | avatar | 首字与圆形裁切，装饰性 |
 | DS-SYMBOL | FcSymbol;FcGlyph;FcAssetSymbol | FcControls.kt | pageBack;back;forward;check;checkOnFill;minus;plus;collapse | Components/FCSymbol.swift | symbols | 字形仅 ‹ › ✓；其余 Painter，13 个 Material Symbols drawable 已接入（§8.3），待 L3 走查 |
 | DS-HINT-BAR | FcHintBar | FcHintBar.kt | info;continue | Components/FCHintBar.swift | hintBar | 提示与训练中条同一组件；整条可点。单行，不改其他 DS |
-| DS-HERO-CARD | FcHeroCard | FcHeroCard.kt | single | Components/FCHeroCard.swift | heroCard | 仅单行变体；有动作时整卡可点。多行今日卡不实现 |
+| DS-HERO-CARD | FcHeroCard | FcHeroCard.kt | single | Components/FCHeroCard.swift | heroCard | 单行默认不变；多行 `FcMultiHeroCard` 是已实现的变体，见 651-655 |
 <!-- android-roster-end -->
 
 ### 8.2 D07 延期表
@@ -607,7 +607,7 @@ D07 按建议批准含以下逐项候选；不实施、不计 S0 G2 组件完成
 | ID | 目标切片 | 批准来源 / 原因 |
 |---|---|---|
 | DS-AMBIENT-SCENE | S1 | D07 2026-11-03；今日/日历空态 |
-| DS-SET-ROW | S1 | D07 2026-11-03；训练业务状态 |
+| DS-SET-ROW | S1 | D07 2026-11-03；训练业务状态；T013a 已补实现与合同，见本文件 S1 对照表，仍不计 S0 截图目录 |
 | DS-CALENDAR-DAY | S2 | D07 2026-11-03；预约日历 |
 | DS-EQUIPMENT-ICON | S1 | D07 2026-11-03；动作资产 |
 | DS-BODY-DIAGRAM | S4 | D07 2026-11-03；分享报告 |
@@ -641,3 +641,15 @@ D07 按建议批准含以下逐项候选；不实施、不计 S0 G2 组件完成
 结果：实现待宿主编译/G1/G2 验证与 cursor-agent 复核；L3 统一走查未取证；不得据此勾选只读 tasks 或宣布 T016 验收通过。
 
 2026-11-06 接入差异：移除 catalog 空 Painter/「图标待接入」占位与边框，目标为 D12 的 13 个宿主提供 SVG→vector；保留所有原 testTag，追加三个标题图标样例入口（android/README map）。LICENSE/NOTICE 精确路径+digest 纳入隐私策略；未新增产品许可页面、依赖或设计值。未运行 Gradle；宿主 toggleable 编译失败仍保留为历史 FAIL，修复后运行证据待取。
+
+### S1 T013a Android DS-SET-ROW 对照（C 类，iOS anatomy 不变）
+
+| ID | Compose | 部件与状态 | 合同 |
+|---|---|---|---|
+| DS-SET-ROW | FcSetRow / FcSetRow.kt | 44 触控区的状态入口 → 第 N 组 → 数值 → 状态 → 编辑；draft/pending/completed；操作菜单承载复制/删除 | 满宽、确认/编辑可见可点、禁用时不写入；ComponentContractTests.setRow |
+
+### S1 T016 Android 多人 hero 对照（C 类，复用 W08-a anatomy）
+
+| ID | Compose | 部件与状态 | 合同 |
+|---|---|---|---|
+| DS-HERO-CARD | FcMultiHeroCard / FcHeroCard.kt | 一个进行中 N 徽标，每名学员一行44触控区，姓名/重点→时长→继续，行间divider；0条不展示 | 满宽、每行独立点击且稳定ID、开始时间排序由Today提供；ComponentContractTests.multiHeroCard。原 FcHeroCard 默认不变；S0截图目录不变 |
