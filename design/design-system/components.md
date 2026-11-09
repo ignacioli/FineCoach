@@ -589,7 +589,7 @@ roadmap §4 里不需要画板的差异（不在上表，不要为它们新开�
 | DS-INLINE-RESULT | FcInlineResult | FcFeedback.kt | failure;success;info | Components/FCInlineResult.swift | inlineResult | 重试独立可访问/大字 |
 | DS-ACTION-ROW | FcActionRow | FcRows.kt | normal;destructive;disabled | Components/FCListRow.swift | actionRows | 危险文案+可选 Painter，不靠颜色；确认由调用方发起 |
 | DS-UNDO-ROW | FcUndoRow | FcRows.kt | visible | Components/FCUndoRow.swift | undoRow | 原位置恢复/窗口由未来业务 owner 实现，不在 DS 创建计时器 |
-| DS-BOTTOM-SHEET | FcBottomSheet | FcFeedback.kt | open | Components/FCBottomSheet.swift | bottomSheet | M3 ModalBottomSheet；拖拽/返回关闭/隐私遮罩待设备走查 |
+| DS-BOTTOM-SHEET | FcBottomSheet | FcFeedback.kt | open | Components/FCBottomSheet.swift | bottomSheet | M3 ModalBottomSheet；拖拽/返回关闭/隐私遮罩待设备走查；Android 可选 skipPartiallyExpanded，长内容面板使用；iOS 面板本来无半展开态 |
 | DS-CONFIRM-DIALOG | FcConfirmationDialog | FcFeedback.kt | open;long | Components/FCConfirmationDialog.swift | confirmation | 自绘 Dialog；大字堆叠、滚动、取消/确认位置 |
 | DS-STATUS | FcStatus;FcStatusLabel;FcStatusBadge | FcFeedback.kt | overdue;conflict;coursePackageInvalid;notComparable;permissionDenied | Components/FCStatusLabel.swift | status | 五态文字+徽标，装饰字形隐藏 |
 | DS-SAVE-STATUS | FcSaveState;FcSaveStatusView | FcFeedback.kt | saving;saved;failed | Components/FCSaveStatusView.swift | saveStatus | Painter 注入；真实 Painter 注入，待负责人走查 |

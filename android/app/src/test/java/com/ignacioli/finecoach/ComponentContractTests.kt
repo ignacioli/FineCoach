@@ -1,3 +1,4 @@
+// fictional-data: Component labels are fictional and contain no personal data.
 package com.ignacioli.finecoach
 
 import androidx.compose.foundation.layout.*
@@ -250,6 +251,17 @@ class ComponentContractTests {
         show { if (open) FcBottomSheet("虚构面板", { open = false }) { FcActionRow("关闭", Modifier.testTag("close")) { open = false } } }
         node("sheet-content").assertIsDisplayed(); touch("close"); full("close", "sheet-content")
         node("close").performClick(); node("sheet-content").assertDoesNotExist()
+    }
+
+    @Test fun bottomSheetFullyExpandedShowsLastControl() {
+        show {
+            FcBottomSheet("虚构长面板", {}, skipPartiallyExpanded = true) {
+                repeat(8) { index ->
+                    FcActionRow("虚构操作 ${index + 1}", Modifier.testTag("long-sheet-$index")) { }
+                }
+            }
+        }
+        node("long-sheet-7").assertIsDisplayed().assertHasClickAction()
     }
 
     @Test fun confirmation() {
