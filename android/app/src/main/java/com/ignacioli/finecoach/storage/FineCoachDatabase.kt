@@ -39,4 +39,5 @@ abstract class FineCoachDatabase : RoomDatabase() {
     abstract fun t006bExerciseDao(): com.ignacioli.finecoach.storage.dao.T006bExerciseDao
     abstract fun t007PackageDao(): com.ignacioli.finecoach.storage.dao.T007PackageDao
     abstract fun t008SessionDao(): com.ignacioli.finecoach.storage.dao.T008SessionDao
+    abstract fun t009HistoryDao(): com.ignacioli.finecoach.storage.dao.T009HistoryDao
 }
