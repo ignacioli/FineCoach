@@ -35,4 +35,5 @@ import com.ignacioli.finecoach.storage.value.StorageValueConverters
 abstract class FineCoachDatabase : RoomDatabase() {
     abstract fun storeMetadataDao(): StoreMetadataDao
     abstract fun s1Dao(): S1Dao
+    abstract fun t006bExerciseDao(): com.ignacioli.finecoach.storage.dao.T006bExerciseDao
 }
