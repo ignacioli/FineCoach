@@ -55,7 +55,7 @@ final class SharedVectorRunner {
         return formatter.date(from: text) ?? ISO8601DateFormatter().date(from: text)
     }
 
-    func run(_ data: Data, filename: String) throws {
+    func run(_ data: Data, filename: String, extraOps: Set<String> = [], dispatch: ((String, [String: Any]) throws -> Any)? = nil) throws {
         id = filename.components(separatedBy: "__").last?.replacingOccurrences(of: ".json", with: "") ?? filename
         guard String(data: data, encoding: .utf8) != nil else { throw fail("/") }
         let decoded: Any
@@ -91,7 +91,7 @@ final class SharedVectorRunner {
             let action = try object(raw, path)
             try keys(action, ["op", "args"], [], path)
             let op = try string(action["op"], "\(path)/op")
-            guard op == "credit-ledger.balance" || (conformance && ["fixture.value", "fixture.fail", "fixture.calendar"].contains(op)) else { throw fail("\(path)/op") }
+            guard extraOps.contains(op) || op == "credit-ledger.balance" || (conformance && ["fixture.value", "fixture.fail", "fixture.calendar"].contains(op)) else { throw fail("\(path)/op") }
             _ = try object(action["args"], "\(path)/args")
             if op == "fixture.calendar" {
                 let zone = try string(given["timeZone"], "/given/timeZone")
@@ -115,8 +115,11 @@ final class SharedVectorRunner {
                     let token = try string(args["error"], "\(path)/error")
                     guard Self.errors.contains(token) else { throw fail("\(path)/error") }
                     throw FixtureDomainFailure(token: token)
-                default:
+                case "credit-ledger.balance":
                     state = try balance(args, path)
+                default:
+                    guard let dispatch else { throw fail("\(path)/op") }
+                    state = try dispatch(action["op"] as! String, args)
                 }
                 results.append(state)
             } catch let failure as FixtureDomainFailure { error = failure.token; break }

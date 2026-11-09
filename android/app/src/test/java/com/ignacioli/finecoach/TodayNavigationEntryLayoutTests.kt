@@ -43,10 +43,16 @@ class TodayNavigationEntryLayoutTests {
     } }
     private fun text(tag: String, value: String) { node(tag).performScrollTo().assertIsDisplayed().performTextReplacement(value) }
     @Before fun prepare() {
+        S1Runtime.resetForTest()
         f = T008Fixture()
         f.test { graph = S1AppGraph(f.db, f.clock, f.ids, f.generation, ApplicationProvider.getApplicationContext<Context>(), java.time.ZoneOffset.UTC) }
     }
-    @After fun close() { compose.runOnUiThread { compose.activity.setContent { } }; compose.waitForIdle(); f.test { f.db.runInTransaction { } }; f.close() }
+    @After fun close() {
+        try {
+            compose.runOnUiThread { compose.activity.setContent { } }; compose.waitForIdle()
+            f.test { f.db.runInTransaction { } }; f.close()
+        } finally { S1Runtime.resetForTest() }
+    }
     private fun show() { compose.setContent { FineCoachTheme { S1App(graph, notification, { notification = null }) } } }
     @Test fun emptyTodaySwitchesToStudentCreateAndReturnsToSameDurableStudent() {
         show(); await("today-empty"); click("root-1"); await(StudentTestTags.STUDENT_LIST_EMPTY_ADD)
@@ -120,6 +126,82 @@ class TodayNavigationEntryLayoutTests {
             assertEquals(SessionState.completed, saved.session.state); assertEquals(SetRecordingState.completed, saved.exercises.single().sets.single().state)
             assertEquals(1L, f.count("credit_adjustments")); assertEquals(1, f.ok(graph.history.list(HistoryQuery())).records.size)
         }
+    }
+
+    @Test fun startupLoadRetryReopensDatabaseAfterInvalidGenerationIsRepaired() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val expected = graph.generation
+        f.test { f.db.openHelper.writableDatabase.execSQL("UPDATE store_metadata SET value=? WHERE `key`=?",
+            arrayOf("fictional-invalid-generation", "store_generation")) }
+        // Only the notification bridge is needed; S1Root uses the real host's LocalContext to open Room.
+        val bridge = org.robolectric.Robolectric.buildActivity(MainActivity::class.java).get()
+        compose.setContent { FineCoachTheme { S1Root(bridge) } }
+        await("s1-load-retry")
+        node("s1-load-retry").assertIsDisplayed().assertIsEnabled().assertHasClickAction()
+        node("s1-navigation").assertDoesNotExist()
+        f.test { f.db.openHelper.writableDatabase.execSQL("UPDATE store_metadata SET value=? WHERE `key`=?",
+            arrayOf(expected.toString(), "store_generation")) }
+        click("s1-load-retry"); await("today-empty")
+        f.test {
+            val reopened = f.ok(S1Runtime.open(context))
+            assertNotSame(f.db, reopened.database)
+            assertTrue(reopened.database.isOpen)
+            assertEquals(expected, reopened.generation)
+        }
+        compose.runOnUiThread { compose.activity.setContent { } }; compose.waitForIdle()
+        f.test { f.db.runInTransaction { }; f.ok(S1Runtime.open(context)).database.close() }
+    }
+
+    @Test fun startupRecoveryRetryRepeatsCheckpointAndLoadsTheSameSession() {
+        lateinit var original: SessionRecord
+        f.test { f.student(1); original = f.start(); f.failWrites("sessions", "UPDATE") }
+        show(); await("s1-recovery-retry")
+        node("s1-recovery-retry").assertIsDisplayed().assertIsEnabled().assertHasClickAction()
+        f.test {
+            assertEquals(original, f.ok(graph.sessions.find(original.sessionID)))
+            f.clearFailure(); f.time = f.now.plusSeconds(60)
+        }
+        click("s1-recovery-retry"); await("hero-${original.sessionID.value}")
+        f.test {
+            val saved = f.ok(graph.sessions.find(original.sessionID))!!
+            assertTrue(saved.revision.value > original.revision.value)
+            assertEquals(f.time, saved.lastCheckpointUTC)
+            assertEquals(1L, f.count("sessions")); assertEquals(1L, f.count("active_session_pointers"))
+        }
+    }
+
+    @Test fun todayRetryReadsRealRepositoryAgainAfterGenerationFailure() {
+        lateinit var session: SessionRecord
+        f.test {
+            f.student(1); session = f.start()
+            f.db.openHelper.writableDatabase.execSQL("UPDATE store_metadata SET value=? WHERE `key`=?",
+                arrayOf("abcdef00-0000-4000-8000-000000000099", "store_generation"))
+        }
+        val today = com.ignacioli.finecoach.features.today.TodayUiState(graph.sessions, graph.students, graph.clock)
+        compose.setContent { FineCoachTheme { com.ignacioli.finecoach.features.today.TodayScreen(today, {}) } }
+        await("today-retry")
+        node("today-retry").assertIsDisplayed().assertIsEnabled().assertHasClickAction()
+        assertNotNull(today.error); assertTrue(today.items.isEmpty())
+        f.test { f.db.openHelper.writableDatabase.execSQL("UPDATE store_metadata SET value=? WHERE `key`=?",
+            arrayOf(graph.generation.toString(), "store_generation")) }
+        click("today-retry"); await("hero-${session.sessionID.value}")
+        assertNull(today.error); assertEquals(session.sessionID.value, today.items.single().id)
+        f.test { assertEquals(session, f.ok(graph.sessions.find(session.sessionID))) }
+    }
+
+    @Test fun templateRowOpensItsOwnEditorWithoutWritingOrOpeningAnotherTemplate() {
+        lateinit var first: TemplateRecord; lateinit var second: TemplateRecord
+        f.test {
+            first = f.ok(graph.templates.save(SaveTemplateCommand(null, "虚构模板甲", emptySet(), null)))
+            second = f.ok(graph.templates.save(SaveTemplateCommand(null, "虚构模板乙", emptySet(), null)))
+        }
+        show(); await("today-empty"); click("today-templates"); await("template-open-${first.templateID.value}")
+        click("template-open-${first.templateID.value}"); await("template-add-exercise")
+        compose.onNodeWithText(first.name, useUnmergedTree = true).assertIsDisplayed()
+        click("template-editor-back"); await("template-open-${second.templateID.value}")
+        click("template-open-${second.templateID.value}"); await("template-add-exercise")
+        compose.onNodeWithText(second.name, useUnmergedTree = true).assertIsDisplayed()
+        f.test { assertEquals(setOf(first, second), f.ok(graph.templates.list()).toSet()) }
     }
 
 }

@@ -169,12 +169,21 @@ class PackageEntryLayoutTests {
     }
 
     @Test(timeout = 30_000)
+    fun noActivePackageCopyIsVisibleWithoutAnyMutation() {
+        showHost(); awaitTag("package-list-none")
+        node("package-list-none").performScrollTo().assertIsDisplayed()
+        assertTrue(packages().isEmpty())
+    }
+
+    @Test(timeout = 30_000)
     fun cancelReplacementLeavesTheActivePackage() {
         val original = createPackage("虚构旧课包", 8, LocalDate.of(2026, 10, 1), LocalDate.of(2026, 12, 31))
         showHost()
         awaitTag("package-list-add")
         node("package-list-add").assertIsDisplayed().assertHasClickAction().performClick()
         awaitTag("package-editor-save")
+        awaitTag("package-editor-warning")
+        node("package-editor-warning").performScrollTo().assertIsDisplayed()
         node("package-editor-name").performTextInput("虚构未确认课包")
         node("package-editor-save").performScrollTo().assertIsEnabled().performClick()
         awaitTag("package-replace-cancel")

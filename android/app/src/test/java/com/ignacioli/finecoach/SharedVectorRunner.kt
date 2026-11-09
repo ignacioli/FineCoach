@@ -55,7 +55,8 @@ internal class VectorJSON(private val text: String) {
     }
 }
 
-internal class SharedVectorRunner(private val conformance: Boolean) {
+internal class SharedVectorRunner(private val conformance: Boolean, private val extraOps: Set<String> = emptySet(),
+    private val dispatch: ((String, Map<String, Any?>) -> Any?)? = null) {
     private var id = "<unread>"
     private val seen = mutableSetOf<String>()
     private fun fail(path: String, kind: String = "format"): Nothing = throw VectorFailure(kind, path, id)
@@ -96,7 +97,7 @@ internal class SharedVectorRunner(private val conformance: Boolean) {
             val path = "/when/$index"; val action = obj(raw, path)
             keys(action, setOf("op", "args"), emptySet(), path)
             val op = str(action["op"], "$path/op")
-            if (op != "credit-ledger.balance" && !(conformance && op in setOf("fixture.value", "fixture.fail", "fixture.calendar"))) fail("$path/op")
+            if (op !in extraOps && op != "credit-ledger.balance" && !(conformance && op in setOf("fixture.value", "fixture.fail", "fixture.calendar"))) fail("$path/op")
             obj(action["args"], "$path/args")
             if (op == "fixture.calendar") {
                 val zone = str(given["timeZone"], "/given/timeZone")
@@ -111,7 +112,8 @@ internal class SharedVectorRunner(private val conformance: Boolean) {
                 state = when (action["op"]) {
                     "fixture.value", "fixture.calendar" -> { keys(args, setOf("value"), emptySet(), "/when/$index/args"); args["value"] }
                     "fixture.fail" -> { keys(args, setOf("error"), emptySet(), "/when/$index/args"); val token = str(args["error"], "/when/$index/args/error"); if (token !in errors) fail("/when/$index/args/error"); throw DomainFailure(token) }
-                    else -> balance(args, "/when/$index/args")
+                    "credit-ledger.balance" -> balance(args, "/when/$index/args")
+                    else -> requireNotNull(dispatch).invoke(action["op"] as String, args)
                 }
                 results.add(state)
             } catch (e: DomainFailure) { error = e.token; break }

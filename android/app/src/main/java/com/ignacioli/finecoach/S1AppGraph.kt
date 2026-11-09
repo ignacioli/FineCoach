@@ -37,6 +37,7 @@ class S1AppGraph(val database: FineCoachDatabase, val clock: AppClock, val ids: 
 internal object S1Runtime {
     private val gate = Mutex()
     private var graph: S1AppGraph? = null
+    internal fun resetForTest() { graph = null }
     suspend fun open(context: Context): ApplicationResult<S1AppGraph> = gate.withLock {
         graph?.let { return@withLock ApplicationResult.Success(it) }
         withContext(Dispatchers.IO) {
