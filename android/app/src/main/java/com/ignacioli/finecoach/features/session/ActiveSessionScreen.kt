@@ -13,12 +13,16 @@ import com.ignacioli.finecoach.designsystem.*
 import com.ignacioli.finecoach.features.exercises.*
 import com.ignacioli.finecoach.features.templates.*
 import kotlinx.coroutines.launch
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 
 @Composable
 fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: ExerciseUiState, templates: TemplateUiState,
     onBack: () -> Unit, onFinish: () -> Unit, recoverySlot: @Composable () -> Unit = {}, restSlot: @Composable () -> Unit = {}) {
     val scope = rememberCoroutineScope()
     var picker by remember { mutableStateOf(false) }
+    var review by remember { mutableStateOf(false) }
     var apply by remember { mutableStateOf(false) }
     var sectionForm by remember { mutableStateOf(false) }
     var section by remember { mutableStateOf<SectionRecord?>(null) }
@@ -33,17 +37,27 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
     val content = state.content?.takeIf { it.session.sessionID == id }
     val back = { if (!state.busy) onBack() }
     LaunchedEffect(id) { state.load(id); exercises.search("") }
+    val lifecycle = LocalLifecycleOwner.current
+    DisposableEffect(lifecycle, id) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_STOP) scope.launch { state.checkpoint(interruption = true) }
+        }
+        lifecycle.lifecycle.addObserver(observer)
+        onDispose { lifecycle.lifecycle.removeObserver(observer) }
+    }
     fun change(action: (SectionedSession) -> SectionedSession, done: () -> Unit = {}) {
         scope.launch { if (state.mutate(action) is ApplicationResult.Success) done() }
     }
     fun openEditor(row: SessionExerciseRecord, set: TrainingSetRecord? = null) { editing = set; editor = row }
     FcPlatformShell(back) {
         FcPageHeader("训练记录", onBack = back, tag = "active-session")
+        SaveStatusView(state)
         recoverySlot()
         Column(Modifier.fillMaxWidth().weight(1f).imePadding().verticalScroll(rememberScrollState()).testTag("active-session-content"),
             verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
             state.error?.let { FcListRow(exerciseErrorTitle(it), Modifier.testTag("active-session-error")) }
             if (content != null) {
+                if (content.session.durationNeedsReview) FcButton("确认训练时长", Modifier.testTag("session-review-duration"), !state.busy) { review = true }
                 val axis = (content.sections.map { it.orderIndex to it } + content.exercises.filter { it.sectionID == null }.map { it.orderIndex to it }).sortedBy { it.first }
                 @Composable fun exercise(row: SessionExerciseRecord) {
                     FcListRow(row.displayNameSnapshot, Modifier.testTag("session-exercise-${row.sessionExerciseID.value}"),
@@ -76,7 +90,10 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
             }
         }
         restSlot()
-        FcButton("结束训练", Modifier.testTag("session-finish"), content != null && !state.busy, onFinish)
+        RestTimerView(state.rests, id)
+        FcButton("结束训练", Modifier.testTag("session-finish"), content != null && !state.busy && state.saveState != FcSaveState.Failed) {
+            if (content?.session?.durationNeedsReview == true) review = true else onFinish()
+        }
     }
     if (picker) ExercisePicker(exercises, state::addExercise) { picker = false }
     if (apply && content != null) ApplyTemplateSheet(templates, content.session, state::accept) { apply = false }
@@ -165,6 +182,7 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
     editor?.let { row -> SetEditor(state, row, editing,
         row.sourceID?.let { exercises.preference(it).isUnilateral } == true,
         row.sourceID?.let { exercises.preference(it).isAssisted } == true) { editor = null } }
+    if (review) SessionRecoveryReview(state, { review = false }, { review = false })
 }
 
 /** Sections move as blocks; members move only inside their section. */

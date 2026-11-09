@@ -596,7 +596,7 @@ roadmap §4 里不需要画板的差异（不在上表，不要为它们新开�
 | DS-AVATAR | FcAvatar | FcFeedback.kt | initial | Components/FCAvatar.swift | avatar | 首字与圆形裁切，装饰性 |
 | DS-SYMBOL | FcSymbol;FcGlyph;FcAssetSymbol | FcControls.kt | pageBack;back;forward;check;checkOnFill;minus;plus;collapse | Components/FCSymbol.swift | symbols | 字形仅 ‹ › ✓；其余 Painter，13 个 Material Symbols drawable 已接入（§8.3），待 L3 走查 |
 | DS-HINT-BAR | FcHintBar | FcHintBar.kt | info;continue | Components/FCHintBar.swift | hintBar | 提示与训练中条同一组件；整条可点。单行，不改其他 DS |
-| DS-HERO-CARD | FcHeroCard | FcHeroCard.kt | single | Components/FCHeroCard.swift | heroCard | 仅单行变体；有动作时整卡可点。多行今日卡不实现 |
+| DS-HERO-CARD | FcHeroCard | FcHeroCard.kt | single | Components/FCHeroCard.swift | heroCard | 单行默认不变；多行 `FcMultiHeroCard` 是已实现的变体，见 651-655 |
 <!-- android-roster-end -->
 
 ### 8.2 D07 延期表
@@ -647,3 +647,9 @@ D07 按建议批准含以下逐项候选；不实施、不计 S0 G2 组件完成
 | ID | Compose | 部件与状态 | 合同 |
 |---|---|---|---|
 | DS-SET-ROW | FcSetRow / FcSetRow.kt | 44 触控区的状态入口 → 第 N 组 → 数值 → 状态 → 编辑；draft/pending/completed；操作菜单承载复制/删除 | 满宽、确认/编辑可见可点、禁用时不写入；ComponentContractTests.setRow |
+
+### S1 T016 Android 多人 hero 对照（C 类，复用 W08-a anatomy）
+
+| ID | Compose | 部件与状态 | 合同 |
+|---|---|---|---|
+| DS-HERO-CARD | FcMultiHeroCard / FcHeroCard.kt | 一个进行中 N 徽标，每名学员一行44触控区，姓名/重点→时长→继续，行间divider；0条不展示 | 满宽、每行独立点击且稳定ID、开始时间排序由Today提供；ComponentContractTests.multiHeroCard。原 FcHeroCard 默认不变；S0截图目录不变 |

@@ -787,7 +787,7 @@ val validateComponentGate = tasks.register("validateS0G2Results") {
         val expectedCounts = mapOf(
             "com.ignacioli.finecoach.ComponentCatalogTests" to 6,
             "com.ignacioli.finecoach.ComponentCatalogStateTests" to 66,
-            "com.ignacioli.finecoach.ComponentContractTests" to 26,
+            "com.ignacioli.finecoach.ComponentContractTests" to 27,
             "com.ignacioli.finecoach.PlatformShellTests" to 5,
         )
         check(counts == expectedCounts) { "Unexpected G2 testcase counts: $counts; expected $expectedCounts" }

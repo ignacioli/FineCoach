@@ -13,7 +13,8 @@ internal object ScopeBoundaryPolicy {
         "dynamic-shortcut" to Regex("\\b(?:ShortcutManager(?:Compat)?|ShortcutInfo(?:Compat)?|setDynamicShortcuts|addDynamicShortcuts|pushDynamicShortcut)\\b"),
         "pinned-shortcut" to Regex("\\b(?:requestPinShortcut|createShortcutResultIntent|ACTION_CREATE_SHORTCUT|INSTALL_SHORTCUT)\\b"),
         "assistant" to Regex("actions\\.intent\\.|com\\.google\\.android\\.actions|<\\s*(?:capability|capability-binding|app-actions)\\b|VoiceInteraction(?:Service|Session)|AppActions", RegexOption.IGNORE_CASE),
-        // S1-D08: notification capability relaxation is owned by T013c, not T001.
+        "exact-alarms" to Regex("\\b(?:SCHEDULE_EXACT_ALARM|USE_EXACT_ALARM|setExact(?:AndAllowWhileIdle)?|setAlarmClock)\\b"),
+        // S1-D08 / T013c: only the notification adapter, Activity bridge and manifest are approved.
         "notifications" to Regex("\\b(?:NotificationManager(?:Compat)?|NotificationChannel|NotificationCompat|AlarmManager|POST_NOTIFICATIONS|SCHEDULE_EXACT_ALARM|USE_EXACT_ALARM)\\b"),
         "widgets" to Regex("\\b(?:AppWidgetProvider|AppWidgetManager|GlanceAppWidget|RemoteViews|LiveActivity)\\b|android\\.appwidget"),
         "containers-and-sharing" to Regex("\\b(?:FcbkCodec|FcpaCodec|BackupFileCodec|ArchiveFileCodec|ShareReport|FileProvider|ACTION_SEND|ACTION_SEND_MULTIPLE|ACTION_OPEN_DOCUMENT|ACTION_CREATE_DOCUMENT)\\b", RegexOption.IGNORE_CASE),
@@ -302,7 +303,12 @@ internal object ScopeBoundaryPolicy {
     fun validateSource(path: String, source: String) {
         val sourceWithoutComments = stripCommentsPreservingStrings(source)
         require(!path.substringAfterLast('/').equals("shortcuts.xml", ignoreCase = true)) { "Static shortcuts resource: $path" }
-        forbidden.forEach { (kind, pattern) -> require(!pattern.containsMatchIn(sourceWithoutComments)) { "$kind: $path" } }
+        val notificationOwner = path.contains("/notifications/") || path.endsWith("MainActivity.kt") || path.endsWith("AndroidManifest.xml")
+        forbidden.forEach { (kind, pattern) ->
+            val inspected = if (kind == "notifications" && notificationOwner)
+                sourceWithoutComments.replace(Regex("\\b(?:NotificationManager|NotificationChannel|AlarmManager|POST_NOTIFICATIONS)\\b"), "") else sourceWithoutComments
+            require(!pattern.containsMatchIn(inspected)) { "$kind: $path" }
+        }
         ensureComposableRoutesUseS1Contracts(path, sourceWithoutComments)
         ensureNavigationRoutesUseS1Contracts(path, sourceWithoutComments)
         // Extension members on S1Routes (in any file) would add route names outside the frozen object.

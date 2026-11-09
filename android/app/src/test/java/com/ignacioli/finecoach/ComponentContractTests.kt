@@ -342,4 +342,11 @@ class ComponentContractTests {
         node("set-confirm").assertIsDisplayed().performClick(); node("set-edit").assertIsDisplayed().performClick()
         compose.runOnIdle { assertEquals(1, confirms); assertEquals(1, edits) }
     }
+    @Test fun multiHeroCard() {
+        var opened = ""
+        show { FcMultiHeroCard(listOf(FcHeroEntry("a", "虚构甲", "训练中"), FcHeroEntry("b", "虚构乙", "训练中")), { opened = it }, Modifier.testTag("multi")) }
+        full("multi"); touch("hero-a"); touch("hero-b")
+        node("hero-a").assertIsDisplayed().performClick(); assertEquals("a", opened)
+        node("hero-b").assertIsDisplayed().performClick(); assertEquals("b", opened)
+    }
 }

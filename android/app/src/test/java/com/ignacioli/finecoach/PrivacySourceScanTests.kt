@@ -43,6 +43,14 @@ internal object DependencyPolicy {
 }
 
 class PrivacySourceScanTests {
+    @Test fun restNotificationCopyIsGenericAndHasNoBusinessFields() {
+        val source = File(MergedPrivacyInputs.property("sourceRoot"), "main/java/com/ignacioli/finecoach/notifications/RestNotifications.kt").readText()
+        require(source.contains("const val TITLE = \"休息结束\""))
+        require(source.contains("const val BODY = \"可以继续训练了\""))
+        require(source.contains(".setContentTitle(TITLE).setContentText(BODY)"))
+        require(!Regex("(?i)student|weight|repetition|balance|privateCoachNote|actionPrivateNote").containsMatchIn(source))
+        PrivacySourcePolicy.validate(source)
+    }
     @Test fun productionSourcesHaveNoForbiddenCapabilitiesOrLogs() {
         val root = File(MergedPrivacyInputs.property("sourceRoot"), "main")
         require(root.isDirectory)
