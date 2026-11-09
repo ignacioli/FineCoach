@@ -291,4 +291,36 @@ class ComponentContractTests {
                 .assertWidthIsEqualTo(if (it == FcAssetSymbol.Collapse) 15.dp else 20.dp)
         }
     }
+
+    @Test fun hintBar() {
+        var calls = 0
+        show {
+            FcHintBar("虚构提示", Modifier.testTag("hint"))
+            FcHintBar("虚构训练中", Modifier.testTag("active"), actionTitle = "继续", onClick = { calls++ })
+        }
+        full("hint")
+        node("hint").assertHeightIsAtLeast(44.dp).assertContentDescriptionEquals("虚构提示")
+        full("active")
+        touch("active")
+        node("active").performClick()
+        compose.runOnIdle { assertEquals(1, calls) }
+    }
+
+    @Test fun heroCard() {
+        var calls = 0
+        show {
+            FcHeroCard(
+                badgeText = "进行中",
+                title = "虚构标题",
+                subtitle = "虚构副标题",
+                modifier = Modifier.testTag("hero"),
+                actionTitle = "继续样例",
+                onClick = { calls++ },
+            )
+        }
+        full("hero")
+        node("hero").assertHeightIsAtLeast(100.dp).assertHasClickAction().performClick()
+        compose.onNodeWithText("虚构标题").assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading))
+        compose.runOnIdle { assertEquals(1, calls) }
+    }
 }

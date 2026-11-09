@@ -12,8 +12,8 @@ class ComponentCatalogTests {
     private val test = File(app, "src/test/java/com/ignacioli/finecoach/ComponentContractTests.kt").readText()
     private val approved = setOf("BASE", "BUTTON", "TITLE-ACTION", "SEGMENTED", "CHIP", "TOGGLE", "STEPPER", "TEXT-FIELD",
         "LIST-ROW", "SECTION", "LABEL-VALUE-ROW", "PAGE-HEADER", "HUB-ROW", "INLINE-RESULT", "ACTION-ROW", "UNDO-ROW",
-        "BOTTOM-SHEET", "CONFIRM-DIALOG", "STATUS", "SAVE-STATUS", "AVATAR", "SYMBOL").map { "DS-$it" }.toSet()
-    private val deferred = setOf("AMBIENT-SCENE", "SET-ROW", "HERO-CARD", "HINT-BAR", "CALENDAR-DAY", "EQUIPMENT-ICON",
+        "BOTTOM-SHEET", "CONFIRM-DIALOG", "STATUS", "SAVE-STATUS", "AVATAR", "SYMBOL", "HINT-BAR", "HERO-CARD").map { "DS-$it" }.toSet()
+    private val deferred = setOf("AMBIENT-SCENE", "SET-ROW", "CALENDAR-DAY", "EQUIPMENT-ICON",
         "BODY-DIAGRAM", "PAGE-PRIMARY", "PAGE-SECONDARY", "EMPTY-STATE", "LAUNCH").map { "DS-$it" }.toSet()
 
     private fun rows(start: String, end: String): List<List<String>> = doc.substringAfter("<!-- $start -->", "")
@@ -22,10 +22,10 @@ class ComponentCatalogTests {
 
     @Test fun approvedRosterIsExactAndUnique() {
         val rows = rows("android-roster-start", "android-roster-end")
-        assertEquals(22, rows.size)
+        assertEquals(24, rows.size)
         assertEquals(approved, rows.map { it[0] }.toSet())
         assertEquals(approved, S0CatalogEntries.map { it.id }.toSet())
-        assertEquals(22, S0CatalogEntries.size)
+        assertEquals(24, S0CatalogEntries.size)
     }
 
     @Test fun everyTypeFileAndIosSourceExists() {
@@ -49,7 +49,7 @@ class ComponentCatalogTests {
 
     @Test fun deferredTableIsExactAndUnionCoversAuthorityIndexWithoutUnknownIds() {
         val rows = rows("android-deferred-start", "android-deferred-end")
-        assertEquals(11, rows.size)
+        assertEquals(9, rows.size)
         assertEquals(deferred, rows.map { it[0] }.toSet())
         rows.forEach { assertTrue(it[1].startsWith("S")); assertTrue(it[2].contains("D07 2026-11-03")) }
         assertTrue(approved.intersect(deferred).isEmpty())

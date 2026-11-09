@@ -38,6 +38,8 @@ val S0CatalogEntries = listOf(
     S0CatalogEntry("DS-SAVE-STATUS", listOf("saving", "saved", "failed")),
     S0CatalogEntry("DS-AVATAR", listOf("initial")),
     S0CatalogEntry("DS-SYMBOL", listOf("pageBack", "back", "forward", "check", "checkOnFill", "minus", "plus", "collapse")),
+    S0CatalogEntry("DS-HINT-BAR", listOf("info", "continue")),
+    S0CatalogEntry("DS-HERO-CARD", listOf("single")),
 )
 
 @Composable
@@ -155,6 +157,12 @@ internal fun S0ComponentState(id: String, state: String) {
             "DS-SAVE-STATUS" -> FcSaveStatusView(FcSaveState.entries.single { it.name.lowercase() == state },
                 painterResource(when (state) { "saving" -> R.drawable.ic_ms_sync; "saved" -> R.drawable.ic_ms_check_circle; else -> R.drawable.ic_ms_warning }), modifier)
             "DS-AVATAR" -> FcAvatar("虚构", modifier)
+            "DS-HINT-BAR" -> if (state == "continue") {
+                FcHintBar("虚构训练中", modifier, actionTitle = "继续", onClick = tap)
+            } else {
+                FcHintBar("虚构提示", modifier)
+            }
+            "DS-HERO-CARD" -> FcHeroCard("进行中", "虚构标题", "虚构副标题", modifier, actionTitle = "继续样例", onClick = tap)
             "DS-SYMBOL" -> if (state in listOf("minus", "plus", "collapse")) {
                 FcSymbol(FcAssetSymbol.entries.single { it.name.lowercase() == state },
                     painterResource(when (state) { "minus" -> R.drawable.ic_ms_remove; "plus" -> R.drawable.ic_ms_add; else -> R.drawable.ic_ms_expand_more }), modifier)
