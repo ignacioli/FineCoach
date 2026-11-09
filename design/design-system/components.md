@@ -595,6 +595,8 @@ roadmap §4 里不需要画板的差异（不在上表，不要为它们新开�
 | DS-SAVE-STATUS | FcSaveState;FcSaveStatusView | FcFeedback.kt | saving;saved;failed | Components/FCSaveStatusView.swift | saveStatus | Painter 注入；真实 Painter 注入，待负责人走查 |
 | DS-AVATAR | FcAvatar | FcFeedback.kt | initial | Components/FCAvatar.swift | avatar | 首字与圆形裁切，装饰性 |
 | DS-SYMBOL | FcSymbol;FcGlyph;FcAssetSymbol | FcControls.kt | pageBack;back;forward;check;checkOnFill;minus;plus;collapse | Components/FCSymbol.swift | symbols | 字形仅 ‹ › ✓；其余 Painter，13 个 Material Symbols drawable 已接入（§8.3），待 L3 走查 |
+| DS-HINT-BAR | FcHintBar | FcHintBar.kt | info;continue | Components/FCHintBar.swift | hintBar | 提示与训练中条同一组件；整条可点。单行，不改其他 DS |
+| DS-HERO-CARD | FcHeroCard | FcHeroCard.kt | single | Components/FCHeroCard.swift | heroCard | 仅单行变体；有动作时整卡可点。多行今日卡不实现 |
 <!-- android-roster-end -->
 
 ### 8.2 D07 延期表
@@ -606,8 +608,6 @@ D07 按建议批准含以下逐项候选；不实施、不计 S0 G2 组件完成
 |---|---|---|
 | DS-AMBIENT-SCENE | S1 | D07 2026-11-03；今日/日历空态 |
 | DS-SET-ROW | S1 | D07 2026-11-03；训练业务状态 |
-| DS-HERO-CARD | S1 | D07 2026-11-03；今日/学员详情 |
-| DS-HINT-BAR | S1（S3 扩展） | D07 2026-11-03；训练提示/洞察 |
 | DS-CALENDAR-DAY | S2 | D07 2026-11-03；预约日历 |
 | DS-EQUIPMENT-ICON | S1 | D07 2026-11-03；动作资产 |
 | DS-BODY-DIAGRAM | S4 | D07 2026-11-03；分享报告 |

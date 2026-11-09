@@ -754,11 +754,11 @@ node android/dependency-allowlist/generate-resolved.mjs android/app/build/report
 
 ### roster 摘要
 
-D07 的 22 个 ID 全部登记 Kotlin 入口、iOS 来源、代表状态、G2 method 与 L3 项；debug catalog 共 63 个代表状态。`FcControls.kt` 负责按钮、标题操作、segmented、chips、toggle、Stepper/FIELD、输入和符号；`FcRows.kt` 负责列表、区段、两栏、页头、入口、操作、撤销；`FcFeedback.kt` 负责状态、头像、结果、sheet、确认和日期选择。`FineCoachTheme.kt` 继续作为 DS-BASE，不修改生成器或 token 权威。
+当前 roster 24 个 ID 全部登记 Kotlin 入口、iOS 来源、代表状态、G2 method 与 L3 项；debug catalog 共 66 个代表状态。S0 登记 22 个，S1 T010 按 S1-D15 补上 `DS-HINT-BAR`（`FcHintBar.kt`）和单行 `DS-HERO-CARD`（`FcHeroCard.kt`）。`FcControls.kt` 负责按钮、标题操作、segmented、chips、toggle、Stepper/FIELD、输入和符号；`FcRows.kt` 负责列表、区段、两栏、页头、入口、操作、撤销；`FcFeedback.kt` 负责状态、头像、结果、sheet、确认和日期选择。`FineCoachTheme.kt` 继续作为 DS-BASE，不修改生成器或 token 权威。
 
 - Material 对应物：DS-BOTTOM-SHEET → M3 ModalBottomSheet；日期选择 → M3 DatePickerDialog/DatePicker（LABEL-VALUE-ROW 示例）；toggle 使用 Compose toggleable 的 Role.Switch，保留已有轨道外观。其余按 iOS anatomy 自绘，消费生成 token，不引图标依赖。
 - 组件既有几何在 `FcComponentMetrics` 用生成 spacing 组合表达，出处是 components §4/README §6/§8；没有新增 token 值。`‹ › ✓` 仍用随包 Noto Sans SC，不使用系统图标或临时字体替代。
-- 延期 11 ID：AMBIENT-SCENE、SET-ROW、HERO-CARD、HINT-BAR（S1，洞察扩展 S3）、EQUIPMENT-ICON、PAGE-PRIMARY、PAGE-SECONDARY、EMPTY-STATE、LAUNCH（S1）；CALENDAR-DAY（S2）；BODY-DIAGRAM（S4）。完整逐 ID 表含 D07 批准来源，见 components §8.2。
+- 延期 9 ID：AMBIENT-SCENE、SET-ROW、EQUIPMENT-ICON、PAGE-PRIMARY、PAGE-SECONDARY、EMPTY-STATE、LAUNCH（S1）；CALENDAR-DAY（S2）；BODY-DIAGRAM（S4）。`DS-HINT-BAR` 与 `DS-HERO-CARD` 已进入 roster。完整逐 ID 表含 D07 批准来源，见 components §8.2。
 - 行和按钮传入 callback，不在 DS 层持久化、删除对象或决定课包生命周期；Undo 的业务窗口、原位置恢复留给调用方，S0 无业务实体不伪造这类证明。
 
 ### 宿主命令与预期数量
@@ -775,11 +775,11 @@ D07 的 22 个 ID 全部登记 Kotlin 入口、iOS 来源、代表状态、G2 me
 | gate / suite | 预期 tests | 证明范围 |
 |---|---:|---|
 | s0G1 | 39 | 现有 token/字体/contrast/generator 合同，未改 |
-| ComponentCatalogTests | 6 | 22 项精确 roster、类型/真实文件/iOS 来源、状态与测试方法、11 项延期和 authority 并集、debug/privacy 入口保留、图标需求/无依赖 |
-| ComponentCatalogStateTests | 63 | 参数化逐个状态真正 compose 并检查组件 testTag，不以文字清单代替渲染 |
-| ComponentContractTests | 23 | roster 每 ID 一个合同方法（含 S1-D13 BottomSheet 完全展开）；touch/满宽、disabled callback、单选/三态、Stepper/FIELD、输入/secure、heading/semantics、确认/重试/撤销、token source 检查等 |
+| ComponentCatalogTests | 6 | 24 项精确 roster、类型/真实文件/iOS 来源、状态与测试方法、9 项延期和 authority 并集、debug/privacy 入口保留、图标需求/无依赖 |
+| ComponentCatalogStateTests | 66 | 参数化逐个状态真正 compose 并检查组件 testTag，不以文字清单代替渲染 |
+| ComponentContractTests | 25 | roster 每 ID 一个合同方法（含 S1-D13 BottomSheet 完全展开）；touch/满宽、disabled callback、单选/三态、Stepper/FIELD、输入/secure、heading/semantics、确认/重试/撤销、提示条/单行 hero、token source 检查等 |
 | PlatformShellTests | 5 | header 与系统 back dispatcher 同 callback、Insets 只消费一次、内容宽度、catalog 可见入口/返回、独立 overlay window 隐私注册/释放 |
-| s0G2 合计 | 96 | 上述四个 suite 全部非空，0 failures/errors/skips；与 G1 联跑总计 135 |
+| s0G2 合计 | 101 | 上述四个 suite 全部非空，0 failures/errors/skips；与 G1 联跑总计 140 |
 
 `s0G2` 替换原占位任务，report：`app/build/test-results/s0G2/TEST-*.xml`，HTML：`app/build/reports/tests/s0G2/`。禁用 up-to-date/cache；finalizer 拒绝失败、skip、NO-SOURCE、缺 suite、重复 suite、0 tests、非预期数量，以及 XML 中任一 failure/error/skipped。不创建或更新 screenshot baseline，不依赖 G3/G4/G5。ParameterizedRobolectricTestRunner 使用其自己的 `Parameters` 注解（已对照本机 4.17 JAR）；最终 Gradle XML 归组/计数仍待宿主执行确认，失败不能改数量或删断言求通过。
 
@@ -823,6 +823,8 @@ D07 的 22 个 ID 全部登记 Kotlin 入口、iOS 来源、代表状态、G2 me
 | catalog 索引 | DS-SAVE-STATUS 分组入口 | catalog-DS-SAVE-STATUS | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
 | catalog 索引 | DS-AVATAR 分组入口 | catalog-DS-AVATAR | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
 | catalog 索引 | DS-SYMBOL 分组入口 | catalog-DS-SYMBOL | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-HINT-BAR 分组入口 | catalog-DS-HINT-BAR | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-HERO-CARD 分组入口 | catalog-DS-HERO-CARD | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
 | DS-BUTTON/default | 主按钮样例 / 次按钮样例 / 链接样例 | DS-BUTTON-default | 仅内存计数 | Catalog → Controls；primary/secondary 满宽，link ≥44 |
 | DS-BUTTON/secondary | 主按钮样例 / 次按钮样例 / 链接样例 | DS-BUTTON-secondary | 仅内存计数 | Catalog → Controls；primary/secondary 满宽，link ≥44 |
 | DS-BUTTON/link | 主按钮样例 / 次按钮样例 / 链接样例 | DS-BUTTON-link | 仅内存计数 | Catalog → Controls；primary/secondary 满宽，link ≥44 |
@@ -881,11 +883,13 @@ D07 的 22 个 ID 全部登记 Kotlin 入口、iOS 来源、代表状态、G2 me
 | DS-CONFIRM-DIALOG/long | 打开样例确认 | DS-CONFIRM-DIALOG-long | 否，开弹层 | Catalog → Controls Button fillMaxWidth |
 | DS-CONFIRM-DIALOG/long | 确认样例 / 取消 | DS-CONFIRM-DIALOG-long-accept | 确认仅增内存计数；取消只关闭 | Catalog → Feedback ConfirmationDialog 按钮行 weight(1f)；大字纵排满宽 |
 | DS-CONFIRM-DIALOG/long | 确认样例 / 取消 | DS-CONFIRM-DIALOG-long-cancel | 确认仅增内存计数；取消只关闭 | Catalog → Feedback ConfirmationDialog 按钮行 weight(1f)；大字纵排满宽 |
+| DS-HINT-BAR/continue | 继续 | DS-HINT-BAR-continue | 仅内存计数 | Catalog → FcHintBar 满宽，最小触控高 |
+| DS-HERO-CARD/single | 继续样例 | DS-HERO-CARD-single | 仅内存计数 | Catalog → FcHeroCard 满宽，最小高 100；标题 heading |
 | 日期样例 | Material 日期选择器 | date-picker | 仅 picker 暂存选择 | Feedback M3 DatePicker；内部日期格由 Material semantics 定位 |
 | 日期样例 | 确定 | date-accept | 仅内存选择日期并关闭 | Feedback Controls LinkButton ≥44 |
 | 日期样例 | 取消 | date-cancel | 否，关闭 | Feedback Controls LinkButton ≥44 |
 
-只读、disabled、装饰性样例没有数据操作：BUTTON/disabled、TOGGLE/disabled、ACTION-ROW/disabled 不触发 callback；LIST-ROW/plain/unavailable、HUB-ROW/info/unavailable 不提供 click action。DatePicker 的应用入口、整体、确定/取消由应用赋 tag；Material 内部日期格/年导航和 sheet 内部手势使用平台 semantics，库没有逐格 tag 注入 API，本轮不侵入库或虚构 API。宿主应核实其可访问性和触控行为；这不是 app 自绘控件漏入口的豁免。
+只读、disabled、装饰性样例没有数据操作：BUTTON/disabled、TOGGLE/disabled、ACTION-ROW/disabled 不触发 callback；LIST-ROW/plain/unavailable、HUB-ROW/info/unavailable、HINT-BAR/info 不提供 click action。DatePicker 的应用入口、整体、确定/取消由应用赋 tag；Material 内部日期格/年导航和 sheet 内部手势使用平台 semantics，库没有逐格 tag 注入 API，本轮不侵入库或虚构 API。宿主应核实其可访问性和触控行为；这不是 app 自绘控件漏入口的豁免。
 
 ### L3 与图标接入
 
