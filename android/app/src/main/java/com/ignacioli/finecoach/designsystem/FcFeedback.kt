@@ -113,8 +113,11 @@ fun FcAvatar(name: String, modifier: Modifier = Modifier) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FcBottomSheet(title: String, onDismiss: () -> Unit, modifier: Modifier = Modifier, subtitle: String? = null,
+    skipPartiallyExpanded: Boolean = false,
     content: @Composable ColumnScope.() -> Unit) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
     ModalBottomSheet(onDismissRequest = onDismiss, modifier = modifier, containerColor = FcColors.surfacePage,
+        sheetState = sheetState,
         tonalElevation = 0.dp, contentColor = FcColors.textPrimary, scrimColor = FcColors.overlayScrim,
         shape = RoundedCornerShape(topStart = FcShapes.lg, topEnd = FcShapes.lg),
         dragHandle = {
