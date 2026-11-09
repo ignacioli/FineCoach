@@ -1308,3 +1308,13 @@ adb shell am start -n com.ignacioli.finecoach/.MainActivity --ez finecoachS0Shel
 实际执行 `S1DebugSeedTests` 9例与 `S1SeedIsolationTests` 4例（报告 `app/build/test-results/s1SeedChecks/`），精确非零、0 failures/errors/skips；随后检查实际 Release APK 的全部条目和 UTF-8/UTF-16 dex/manifest/resources 字节，拒绝 S0/S1 seed、fixture入口及标记。预期包含两条 `S1-SEED-CHECK suite=… tests=9/4 failures=0 errors=0 skips=0`，以及 `s0SeedIsolation: status=ok apk=… sha256=… dex=… manifest=1 resources=1`。不连接设备。
 
 完整改动清单、实测日志、初始场景与未验证项见 [T019](docs/s1/T019.md)；共享13向量与宿主 iOS 命令见 [T017](docs/s1/T017.md)；入口总表及未确认断言见 [implementation map](docs/s1/implementation-map.md)。安装/界面 runtime、负责人走查、独立复核与 T020 仍由宿主执行，不能用 JVM/Release 扫描代替。
+
+## S1 T020：负责人走查入口
+
+**已准备，待负责人走查。** 最终安装命令（从 `android/` 运行，将 `<SERIAL>` 替换为明确指定的目标设备）：
+
+```sh
+./gradlew --offline :app:s0InstallSeededDebug -Pandroid.device="<SERIAL>" -Ps1.seedScenario=multi
+```
+
+[负责人走查：安装条件、核心页与交互清单](docs/s1/walkthrough.md) · [entry/layout总表](docs/s1/implementation-map.md) · [T020宿主证据与PENDING](docs/s1/T020.md)
