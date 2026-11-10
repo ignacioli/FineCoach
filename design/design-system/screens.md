@@ -215,3 +215,13 @@
 - **C24 / C25 历史规则冲突**：README §10 C24 保留「看着结束则 3 秒后收起」，C25 取消「休息结束 3 秒后自动收起」。本轮仅在 C24 标注取代关系；历史原文如何统一待负责人，不改规则或数值。
 - **学员详情底稿编号冲突**：已更正（2026-11-03）：insights 分类表 E-b 底稿改为学员详情（26-student-detail；M2-01 导出入口），依据 README §1.2、SCR-STUDENT-DETAIL；M2-03 是导出预览。
 - **删除分区确认来源分歧**：已更正（2026-11-03）：experience-t2 入口表 M06、M16「连同动作删除」标为已移除（B-D1），M05、M15 保留；`FCAccessibilityID.swift` 已无 `DeleteSectionDeleteExercises`。
+
+## Android 已批准差异画板的导出登记（AD-07）
+
+批准来源见 `components.md` §5；负责人已在 Penpot「M1-B G5 Design」→「Android 差异」页导出三块 2 倍 PNG，宿主已放入以下路径（2026-11-10）。已核验 SHA-256；不取代既有 iOS 页面目标。
+
+| 画板名 | 入库路径 | 状态 | SHA-256 |
+|---|---|---|---|
+| AD-01 图标映射 | `design/android-differences/screens/AD-01-icon-mapping.png` | 已入库（2026-11-10，负责人导出） | `769ad7d20c3de8bee10f0f0b48c4ed9203b8c0e55d2cf8900e619a9847177f71` |
+| AD-02 日期和时间选择 | `design/android-differences/screens/AD-02-date-time-picker.png` | 已入库（2026-11-10，负责人导出） | `4eb76ec7f3bcf1f49a92b671ef66ac1c6356e41e444bf2bf759bea96ecccfb2f` |
+| AD-03 操作面板 | `design/android-differences/screens/AD-03-action-sheet.png` | 已入库（2026-11-10，负责人导出） | `a05bd35362ce27c6e9a2f8e04f04e0f1a61b366eebfcea7b328c8b30ef946d35` |
