@@ -41,9 +41,12 @@ fun S1Root(activity: MainActivity) {
     }
     graph?.let { value ->
         S1App(value, activity.restNotificationSessionID, activity::consumeRestNotificationRoute, activity.notificationPermissionRevision)
-    } ?: FcPlatformShell({}) {
-        FcListRow(if (failed) "本地数据加载失败" else "正在加载", Modifier.testTag("s1-loading"))
-        if (failed) FcButton("重试", Modifier.testTag("s1-load-retry")) { failed = false; attempt++ }
+    } ?: FcPlatformShell({}, Modifier.testTag("s1-loading")) {
+        if (failed) {
+            androidx.compose.material3.Text("没有完成，再试一次。", Modifier.testTag("s1-load-error"),
+                style = FcTypography.caption, color = FcColors.statusDestructive)
+            FcButton("重试", Modifier.testTag("s1-load-retry")) { failed = false; attempt++ }
+        }
     }
 }
 
@@ -107,9 +110,12 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
         }
     }
     if (!recovered) {
-        FcPlatformShell({}) {
-            FcListRow(if (recoveryError) "恢复失败，请重试" else "正在恢复训练", Modifier.testTag("s1-recovery-state"))
-            if (recoveryError) FcButton("重试", Modifier.testTag("s1-recovery-retry")) { recoveryAttempt++ }
+        FcPlatformShell({}, Modifier.testTag("s1-recovery-state")) {
+            if (recoveryError) {
+                androidx.compose.material3.Text("恢复失败", Modifier.testTag("s1-recovery-error"),
+                    style = FcTypography.caption, color = FcColors.statusDestructive)
+                FcButton("重试", Modifier.testTag("s1-recovery-retry")) { recoveryError = false; recoveryAttempt++ }
+            }
         }; return
     }
     val back = { navigator.back() }

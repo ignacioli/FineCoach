@@ -15,6 +15,8 @@ import com.ignacioli.finecoach.core.application.*
 import com.ignacioli.finecoach.core.domain.common.*
 import com.ignacioli.finecoach.designsystem.*
 import com.ignacioli.finecoach.features.students.StudentTestTags
+import com.ignacioli.finecoach.features.today.ambientFrame
+import com.ignacioli.finecoach.features.today.ambientSteamPath
 import org.junit.*
 import org.junit.Assert.*
 import org.junit.runner.RunWith
@@ -56,13 +58,74 @@ class TodayNavigationEntryLayoutTests {
     }
     private fun show() { compose.setContent { FineCoachTheme { S1App(graph, notification, { notification = null }) } } }
     @Test fun emptyTodaySwitchesToStudentCreateAndReturnsToSameDurableStudent() {
-        show(); await("today-empty"); click("root-1"); await(StudentTestTags.STUDENT_LIST_EMPTY_ADD)
+        // Fixed Sunday: an expected literal catches Android CLDR differences from the approved iOS label.
+        val sunday = java.time.LocalDate.of(2026, 11, 8)
+        f.test { f.time = sunday.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant() }
+        show(); await("today-empty")
+        node("today-date").assertIsDisplayed().assertTextEquals("11月8日 · 周日")
+        node("today-empty-scene").assertIsDisplayed()
+        compose.onNodeWithText("今天没课，休息一下吧～").assertIsDisplayed()
+        compose.onNodeWithText("有新课程时会显示在这里").assertIsDisplayed()
+        node("today-loading").assertDoesNotExist()
+        click("root-1"); await(StudentTestTags.STUDENT_LIST_EMPTY_ADD)
         click(StudentTestTags.STUDENT_LIST_EMPTY_ADD); text(StudentTestTags.EDITOR_NAME, "虚构导航学员"); click(StudentTestTags.EDITOR_SEX_UNDISCLOSED); click(StudentTestTags.EDITOR_SAVE)
         await(StudentTestTags.DETAIL_START_TRAINING)
         f.test { assertEquals(1L, f.count("students")); assertEquals(0L, f.count("sessions")) }
         click(StudentTestTags.DETAIL_HEADER_BACK); await(StudentTestTags.STUDENT_LIST_ROOT)
         click("${StudentTestTags.STUDENT_LIST_SEGMENT}-0"); await("today-empty")
     }
+    @Test fun firstTodayLoadKeepsContentBlankUntilRepositoryCompletes() {
+        val pending = kotlinx.coroutines.CompletableDeferred<Unit>()
+        val repository = object : SessionRepositoryPort by graph.sessions {
+            override suspend fun listActiveSessions(): ApplicationResult<List<ActiveSessionSnapshot>> {
+                pending.await()
+                return graph.sessions.listActiveSessions()
+            }
+        }
+        val today = com.ignacioli.finecoach.features.today.TodayUiState(repository, graph.students, graph.clock)
+        compose.setContent { FineCoachTheme { com.ignacioli.finecoach.features.today.TodayScreen(today, {}) } }
+        await("today-loading")
+        node("today-empty").assertDoesNotExist()
+        node("today-empty-scene").assertDoesNotExist()
+        compose.onNodeWithText("正在加载").assertDoesNotExist()
+        assertFalse(today.hasCompletedInitialLoad)
+        compose.runOnIdle { pending.complete(Unit) }
+        await("today-empty-scene")
+        assertTrue(today.hasCompletedInitialLoad)
+        node("today-loading").assertDoesNotExist()
+        // The same approved ambient scene pauses offscreen, in battery saver and reduced motion.
+        assertTrue(com.ignacioli.finecoach.features.today.ambientMotionRunning(true, false, false))
+        assertFalse(com.ignacioli.finecoach.features.today.ambientMotionRunning(false, false, false))
+        assertFalse(com.ignacioli.finecoach.features.today.ambientMotionRunning(true, true, false))
+        assertFalse(com.ignacioli.finecoach.features.today.ambientMotionRunning(true, false, true))
+        // Approved C30 keyframes, rather than only checking whether a clock can run.
+        assertEquals(3, ambientFrame(0.0, emptyList()).steam.size)
+        assertTrue(ambientFrame(0.0, emptyList()).steam.all { it.opacity == 0f })
+        assertEquals(0.6f, ambientFrame(0.9, emptyList()).steam[0].opacity, 0.0001f)
+        assertEquals(0.35f, ambientFrame(2.52, emptyList()).steam[0].opacity, 0.0001f)
+        assertEquals(0f, ambientFrame(3.6, emptyList()).steam[0].opacity, 0.0001f)
+        assertEquals(0.6f, ambientFrame(2.1, emptyList()).steam[1].opacity, 0.0001f)
+        assertEquals(0.6f, ambientFrame(3.3, emptyList()).steam[2].opacity, 0.0001f)
+        assertEquals(0.75f, ambientFrame(1.8, emptyList()).steam[0].x, 0.0001f)
+        assertEquals(-10f, ambientFrame(1.8, emptyList()).steam[0].y, 0.0001f)
+        assertEquals(1.008f, ambientFrame(2.1, emptyList()).breathScale, 0.0001f)
+        assertEquals(1.004f, ambientFrame(1.05, emptyList()).breathScale, 0.0001f)
+        val still = ambientFrame(5.05, listOf(5.0), reducedMotion = true)
+        assertEquals(2, still.steam.size)
+        assertTrue(still.steam.all { it.opacity == 0.45f && it.x == 0f && it.y == 0f })
+        assertEquals(1f, still.breathScale, 0f); assertFalse(still.closedEyes)
+        assertTrue(ambientFrame(5.05, listOf(5.0)).closedEyes)
+        assertFalse(ambientFrame(5.05, listOf(5.0), paused = true).closedEyes)
+        assertFalse(ambientFrame(5.15, listOf(5.0)).closedEyes)
+        listOf(Triple(125f, 77f, 104f), Triple(131f, 75f, 103f), Triple(137f, 77f, 104f)).forEachIndexed { index, (x, top, bottom) ->
+            val path = ambientSteamPath(index)
+            assertFalse(path.isEmpty)
+            assertEquals(x, path.getBounds().center.x, 0.001f)
+            assertEquals(top, path.getBounds().top, 0.001f)
+            assertEquals(bottom, path.getBounds().bottom, 0.001f)
+        }
+    }
+
     @Test fun singleAndMultipleHeroesOpenExactExistingSessionAndBackNeverStartsAnother() {
         lateinit var first: SessionContentRecord; lateinit var second: SessionRecord
         f.test { f.student(1); first = f.sessionContent(); f.student(2); f.time = f.now.plusSeconds(60); second = f.start(2) }
@@ -97,6 +160,17 @@ class TodayNavigationEntryLayoutTests {
         await("resource-hub-exercises")
         compose.waitUntil(15_000) { compose.onAllNodesWithText("内置 541 个 · 自定义 0 个", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithText("0 个模板", useUnmergedTree = true).assertIsDisplayed()
+        val app = java.io.File(requireNotNull(System.getProperty("finecoach.storageProjectDirectory")))
+        val appSources = java.io.File(app, "src/main/java/com/ignacioli/finecoach")
+        val hubSource = java.io.File(appSources, "features/resources/ResourceHubScreen.kt").readText()
+        assertTrue(hubSource.contains("FcHubRow(\"动作库\", painterResource(R.drawable.ic_ms_grid_view)"))
+        assertTrue(Regex("FcHubRow\\s*\\(\\s*\"训练模板\"\\s*,\\s*null\\b").containsMatchIn(hubSource))
+        for ((source, drawable) in listOf("mascot-empty-state.jpeg" to "mascot_empty_state.jpeg",
+            "mascot-cafe-rabbit.png" to "mascot_cafe_rabbit.png", "mascot-cafe-blink.png" to "mascot_cafe_blink.png",
+            "mascot-cafe-table.png" to "mascot_cafe_table.png")) {
+            assertArrayEquals(java.io.File(app.parentFile.parentFile, "design/design-system/assets/$source").readBytes(),
+                java.io.File(app, "src/main/res/drawable-nodpi/$drawable").readBytes())
+        }
         for (tag in listOf("resource-hub-exercises", "resource-hub-templates")) {
             node(tag).assertIsDisplayed().assertHasClickAction()
             assertEquals(node("resource-hub-content").getUnclippedBoundsInRoot().width, node(tag).getUnclippedBoundsInRoot().width)
@@ -184,6 +258,8 @@ class TodayNavigationEntryLayoutTests {
         compose.setContent { FineCoachTheme { S1Root(bridge) } }
         await("s1-load-retry")
         node("s1-load-retry").assertIsDisplayed().assertIsEnabled().assertHasClickAction()
+        node("s1-load-error").assertTextEquals("没有完成，再试一次。")
+        assertEquals(node("platform-content").getUnclippedBoundsInRoot().width, node("s1-load-retry").getUnclippedBoundsInRoot().width)
         node("s1-navigation").assertDoesNotExist()
         f.test { f.db.openHelper.writableDatabase.execSQL("UPDATE store_metadata SET value=? WHERE `key`=?",
             arrayOf(expected.toString(), "store_generation")) }
@@ -203,6 +279,8 @@ class TodayNavigationEntryLayoutTests {
         f.test { f.student(1); original = f.start(); f.failWrites("sessions", "UPDATE") }
         show(); await("s1-recovery-retry")
         node("s1-recovery-retry").assertIsDisplayed().assertIsEnabled().assertHasClickAction()
+        node("s1-recovery-error").assertTextEquals("恢复失败")
+        assertEquals(node("platform-content").getUnclippedBoundsInRoot().width, node("s1-recovery-retry").getUnclippedBoundsInRoot().width)
         f.test {
             assertEquals(original, f.ok(graph.sessions.find(original.sessionID)))
             f.clearFailure(); f.time = f.now.plusSeconds(60)
@@ -227,6 +305,9 @@ class TodayNavigationEntryLayoutTests {
         compose.setContent { FineCoachTheme { com.ignacioli.finecoach.features.today.TodayScreen(today, {}) } }
         await("today-retry")
         node("today-retry").assertIsDisplayed().assertIsEnabled().assertHasClickAction()
+        node("today-error").assertTextEquals("加载今日安排失败，再试一次。")
+        node("today-empty").assertDoesNotExist()
+        assertEquals(node("today-content").getUnclippedBoundsInRoot().width, node("today-retry").getUnclippedBoundsInRoot().width)
         assertNotNull(today.error); assertTrue(today.items.isEmpty())
         f.test { f.db.openHelper.writableDatabase.execSQL("UPDATE store_metadata SET value=? WHERE `key`=?",
             arrayOf(graph.generation.toString(), "store_generation")) }

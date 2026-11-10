@@ -1,5 +1,8 @@
 package com.ignacioli.finecoach.features.students
 
+import androidx.compose.foundation.Image
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -393,15 +396,16 @@ fun StudentListScreen(
                     }
 
                     state.errorMessage?.let { message ->
-                        FcInlineResult(
-                            variant = FcResultVariant.Failure,
-                            title = message,
-                            description = "请重试。",
-                            icon = painterResource(R.drawable.ic_ms_priority_high),
+                        Text(
+                            text = message,
+                            style = FcTypography.caption,
+                            color = FcColors.statusDestructive,
                             modifier = Modifier.testTag(StudentTestTags.STUDENT_LIST_ERROR),
-                            onRetry = { scope.launch { viewModel.reload() } },
-                            tag = StudentTestTags.STUDENT_LIST_ERROR,
                         )
+                        // Unlike iOS query/path reloads, this remains the explicit recovery path.
+                        FcButton("重试", Modifier.testTag("${StudentTestTags.STUDENT_LIST_ERROR}-retry")) {
+                            scope.launch { viewModel.reload() }
+                        }
                     }
 
                     if (state.showsStudentEmptyState) {
@@ -503,15 +507,15 @@ fun ArchivedStudentListScreen(
             )
 
             state.errorMessage?.let { message ->
-                FcInlineResult(
-                    variant = FcResultVariant.Failure,
-                    title = message,
-                    description = "请重试。",
-                    icon = painterResource(R.drawable.ic_ms_priority_high),
+                Text(
+                    text = message,
+                    style = FcTypography.caption,
+                    color = FcColors.statusDestructive,
                     modifier = Modifier.testTag(StudentTestTags.ARCHIVED_ERROR),
-                    onRetry = { scope.launch { viewModel.reload() } },
-                    tag = StudentTestTags.ARCHIVED_ERROR,
                 )
+                FcButton("重试", Modifier.testTag("${StudentTestTags.ARCHIVED_ERROR}-retry")) {
+                    scope.launch { viewModel.reload() }
+                }
             }
 
             if (state.showsStudentEmptyState) {
@@ -605,6 +609,10 @@ private fun NoStudentsEmptyState(
         verticalArrangement = Arrangement.spacedBy(FcSpacing.space3),
     ) {
         Spacer(modifier = Modifier.height(FcSpacing.space6))
+        Image(
+            painter = painterResource(R.drawable.mascot_empty_state), contentDescription = null,
+            modifier = Modifier.size(220.dp).testTag("student-list-empty-mascot"),
+        )
         Text(
             text = "还没有学员",
             modifier = Modifier.padding(top = FcSpacing.space6),

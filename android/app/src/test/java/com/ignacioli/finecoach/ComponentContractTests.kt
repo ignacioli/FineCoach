@@ -49,6 +49,13 @@ class ComponentContractTests {
         assertEquals(44.dp, FcComponentMetrics.touch); assertEquals(52.dp, FcComponentMetrics.row)
         assertEquals(48.dp, FcComponentMetrics.field); assertEquals(96.dp, FcComponentMetrics.label)
         assertEquals(1.5.dp, FcComponentMetrics.stroke); assertEquals(300.dp, FcComponentMetrics.dialogWidth)
+        // DS-LAUNCH uses this empty shell; real startup failures/retries are covered by navigation tests.
+        assertEquals(androidx.compose.ui.graphics.Color.White, FcColors.surfacePage)
+        compose.setContent { FineCoachTheme { FcPlatformShell({}) {} } }
+        node("platform-shell").assertIsDisplayed().assertHasNoClickAction()
+        assertEquals(compose.onRoot().getUnclippedBoundsInRoot(), node("platform-shell").getUnclippedBoundsInRoot())
+        compose.onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsProperties.Text), useUnmergedTree = true).assertCountEquals(0)
+        compose.onAllNodes(hasClickAction(), useUnmergedTree = true).assertCountEquals(0)
     }
 
     @Test fun buttons() {
