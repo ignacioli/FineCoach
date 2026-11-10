@@ -76,7 +76,7 @@ private fun ExerciseSearchRow(query: String, onQuery: (String) -> Unit, active: 
     searchTag: String, prefix: String, showFilters: Boolean = true, onFilters: () -> Unit) {
     Row(Modifier.fillMaxWidth().testTag("$prefix-search-row"), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
         FcSearchField("搜索动作", query, onQuery, Modifier.weight(1f).testTag(searchTag))
-        if (showFilters) FcTitleIconButton("筛选", painterResource(R.drawable.ic_ms_filter_list),
+        if (showFilters) FcTitleIconButton("筛选", painterResource(if (active) R.drawable.ic_ms_filter_alt_filled else R.drawable.ic_ms_filter_alt),
             Modifier.testTag("$prefix-filter").semantics { stateDescription = if (active) "已筛选" else "" }, onFilters)
     }
 }
@@ -125,6 +125,9 @@ private fun ExerciseBrowseRows(state: ExerciseUiState, query: String, muscle: St
     val recent = state.recentEntries
     @Composable fun row(item: ExerciseRecord, tag: String) {
         FcListRow(state.selection(item).name, Modifier.testTag(tag), subtitle = state.subtitle(item),
+            leading = state.metadata[item.exerciseID].takeIf { item.kind == ExerciseKind.builtIn }?.let { facet ->
+                FcEquipmentIcon.icon(facet.equipmentClass, facet.primaryMuscleGroup)?.let { painterResource(it.drawable) }
+            }, reservesLeading = true, favorite = state.preference(item.exerciseID).isFavorite,
             mode = if (enabled) FcRowMode.Action { onClick(item) } else FcRowMode.Unavailable("保存中"))
         FcListRowDivider()
     }

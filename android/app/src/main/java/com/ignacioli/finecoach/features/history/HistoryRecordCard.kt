@@ -76,8 +76,11 @@ internal fun HistoryRecordCard(detail: HistoryDetail, zone: ZoneId, studentName:
         if (exercises.isNotEmpty()) HistoryRecordSection("动作", "history-record-exercises") {
             exercises.forEach { exercise ->
                 Column(Modifier.fillMaxWidth().padding(bottom = FcSpacing.space4), verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+                    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(FcSpacing.space3)) {
+                    FcEquipmentIconForExercise(exercise.sourceID.takeUnless { exercise.sourceKind == ExerciseSourceKind.sessionOnly })
                     Text(exercise.displayNameSnapshot, Modifier.testTag("history-snapshot-${exercise.sessionExerciseID.value}"),
                         style = FcTypography.headline, color = FcColors.textPrimary)
+                    }
                     exercise.sets.filter { it.state == SetRecordingState.completed }.sortedBy { it.orderIndex }.chunked(3).forEachIndexed { rowIndex, row ->
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
                             row.forEachIndexed { index, set ->

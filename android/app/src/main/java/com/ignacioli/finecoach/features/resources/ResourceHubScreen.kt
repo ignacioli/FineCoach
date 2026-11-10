@@ -35,8 +35,7 @@ fun ResourceHubScreen(exercises: ExerciseRepository, templates: TemplateUseCases
             is ApplicationResult.Success -> "${result.value.size} 个模板"
         }
     }
-    FcPlatformShell(onBack) {
-        FcPageHeader("资料库", onBack = onBack, tag = "resource-hub")
+    FcPageSecondary("资料库", onBack, tag = "resource-hub") {
         Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).testTag("resource-hub-content"),
             verticalArrangement = Arrangement.spacedBy(FcSpacing.space4)) {
             Column(Modifier.fillMaxWidth()) {
@@ -44,7 +43,7 @@ fun ResourceHubScreen(exercises: ExerciseRepository, templates: TemplateUseCases
                 FcHubRow("动作库", painterResource(R.drawable.ic_ms_grid_view), Modifier.testTag("resource-hub-exercises"), subtitle = exerciseSummary,
                     mode = FcRowMode.Action { onNavigate(S1Routes.EXERCISES) })
                 FcListRowDivider()
-                FcHubRow("训练模板", null, Modifier.testTag("resource-hub-templates"), subtitle = templateSummary,
+                FcHubRow("训练模板", painterResource(R.drawable.ic_ms_list_alt), Modifier.testTag("resource-hub-templates"), subtitle = templateSummary,
                     mode = FcRowMode.Action { onNavigate(S1Routes.TEMPLATES) })
                 FcListRowDivider()
             }

@@ -502,7 +502,7 @@ C 类，只补规则，默认字号下外观不变：
 
 | ID | 差异（iOS 现状 → Android 目标） | 设计 delta 类别 | 受影响组件（复用 / 扩展 / 新增） | iOS 证据 | 受影响页面 | 需要的 Penpot 画板 | 状态 |
 |---|---|---|---|---|---|---|---|
-| AD-01 | 图标映射：SF Symbol → Material Symbols。负责人 2026-11-03 定：各平台用自己的系统图标，能找到对应的就用，风格有少量差异可以接受；`‹ › ✓` 仍是随包 Noto Sans SC 字形，两端一致，不在映射内 | B | `DS-SYMBOL`：扩展（`− + ▾` 当前是 SF Symbol，需补 Android 字形来源）；`DS-TITLE-ACTION`、`DS-HUB-ROW`、`DS-STATUS`、`DS-SAVE-STATUS`、`DS-LIST-ROW`、`DS-SET-ROW`、`DS-BOTTOM-SHEET`、`DS-ACTION-ROW`（destructive 图标）：复用，只换字形来源 | `DesignSystem/Components/FCSymbol.swift:40–47, 94`；`FCButton.swift:171, 199`；`FCHubRow.swift:123`；`FCStatusLabel.swift:117`；`FCSaveStatusView.swift:30`；`FCListRow.swift:294`（`star.fill`）；`FCSetRow.swift:255`（`pencil`）；`FCBottomSheet.swift:200`（`trash`）；`Features/ShareReport/ShareReportFlowView.swift:409`、`Features/ArchiveExport/ArchiveExclusionNote.swift:13`（`lock.fill`）；`Features/Insights/InsightRowView.swift:71, 135`（`bell.slash`）；`Features/ActiveSession/ActiveSessionView.swift:92, 506, 520, 527, 596`；`FineCoachWidgets/SessionLiveActivity.swift:28, 32`（`timer`）；`App/SystemEntryIntents.swift:46, 49, 52`（快捷指令图标 `calendar`、`figure.strengthtraining.traditional`、`play.circle`，由 AD-08 处理，不在 AD-01 对照板内）。实际清单比 roadmap 长，范围以 grep 为准，由画板阶段定稿 | 使用上述组件的全部页面（待核实：未逐页列出） | 是，一块图标对照板（SF Symbol 名 → Material Symbol 名，含尺寸；找不到对应的单独列出） | 待画板（S1 前） |
+| AD-01 | 图标映射：SF Symbol → Material Symbols。负责人 2026-11-03 定：各平台用自己的系统图标，能找到对应的就用，风格有少量差异可以接受；`‹ › ✓` 仍是随包 Noto Sans SC 字形，两端一致，不在映射内 | B | `DS-SYMBOL`：扩展（`− + ▾` 当前是 SF Symbol，需补 Android 字形来源）；`DS-TITLE-ACTION`、`DS-HUB-ROW`、`DS-STATUS`、`DS-SAVE-STATUS`、`DS-LIST-ROW`、`DS-SET-ROW`、`DS-BOTTOM-SHEET`、`DS-ACTION-ROW`（destructive 图标）：复用，只换字形来源 | `DesignSystem/Components/FCSymbol.swift:40–47, 94`；`FCButton.swift:171, 199`；`FCHubRow.swift:123`；`FCStatusLabel.swift:117`；`FCSaveStatusView.swift:30`；`FCListRow.swift:294`（`star.fill`）；`FCSetRow.swift:255`（`pencil`）；`FCBottomSheet.swift:200`（`trash`）；`Features/ShareReport/ShareReportFlowView.swift:409`、`Features/ArchiveExport/ArchiveExclusionNote.swift:13`（`lock.fill`）；`Features/Insights/InsightRowView.swift:71, 135`（`bell.slash`）；`Features/ActiveSession/ActiveSessionView.swift:92, 506, 520, 527, 596`；`FineCoachWidgets/SessionLiveActivity.swift:28, 32`（`timer`）；`App/SystemEntryIntents.swift:46, 49, 52`（快捷指令图标 `calendar`、`figure.strengthtraining.traditional`、`play.circle`，由 AD-08 处理，不在 AD-01 对照板内）。实际清单比 roadmap 长，范围以 grep 为准，由画板阶段定稿 | 使用上述组件的全部页面（待核实：未逐页列出） | 是，一块图标对照板（SF Symbol 名 → Material Symbol 名，含尺寸；找不到对应的单独列出） | 已批准（S1-D28，2026-11-10）；AD-01 图标映射：filter_alt（outlined/300，筛选后 FILL=1）、info_i（600）、list_alt（300）、edit/folder/check_circle FILL=1/star FILL=1（400）；± ▾ 600。实现回写见 android/docs/s1/S0-step3-components.md |
 | AD-02 | 日期和时间选择：iOS `DatePicker`（图形式日历、时分滚轮）→ Material 3 选择器，用设计系统 token 着色 | B | 无现有组件：选择器本身是系统控件，`DS-*` 索引里没有对应项；展开行复用 `DS-LABEL-VALUE-ROW`（见 CG-5 的 `editorRow`），颜色用 `DS-BASE` token。选择器若需要共享规格：新增（待画板审过后在 §4 新增条目） | `Features/CoursePackages/CoursePackageEditorView.swift:161, 183`（`displayedComponents: .date`，图形式）；`Features/Appointments/AppointmentEditorView.swift:472, 485, 681`（日期、时间、重复截止日） | `SCR-PACKAGE-EDIT`、`SCR-APPOINTMENT-NEW`（`SCR-APPOINTMENT-EDIT-SCOPE` 同一视图文件，待核实是否含选择器） | 是 | 待画板（S1 前） |
 | AD-03 | 操作面板：iOS `.confirmationDialog`（动作移入分区选择）→ 现有 `DS-BOTTOM-SHEET` | B | `DS-BOTTOM-SHEET`：复用（或扩展，取决于选项列表样式，待画板）；`DS-ACTION-ROW`：复用；`DS-CONFIRM-DIALOG` 不受影响（已是自绘组件，不用系统 `.confirmationDialog`） | `Features/ActiveSession/ActiveSessionView.swift:249`；`Features/Templates/TemplateEditorView.swift:272`（两处都是「移入分区」选择） | `SCR-SESSION-SECTION`、`SCR-TEMPLATE-SECTION`（均为「iOS 现有实现 + 组件规格」，无画稿） | 是 | 待画板（S1 前） |
 | AD-04 | 应用图标：iOS 单张 1024 方图（light / dark / tinted）→ Android 自适应图标的前景、背景、单色层 | B | 无现有组件：应用图标是资产（README §9.2），不是 `DS-*` 组件；前景、背景、单色层的拆法属于新增资产规格，待画板审过后写入 README §9.2 | `design/design-system/assets/app-icon-{light,dark,tinted}.png`；`ios/FineCoachApp/Resources/Assets.xcassets/AppIcon.appiconset/Contents.json` | 无 `screens.md` 行（图标不属于页面）；README §9.2 | 是 | 待画板（S1 前；R-03 侧载前必须有） |
@@ -568,7 +568,7 @@ roadmap §4 里不需要画板的差异（不在上表，不要为它们新开�
 | 系统栏、edge-to-edge、返回 | ADR §7.2 A/B；roadmap 旧 C 分类冲突 | 安全 Insets 与统一 back callback | D09 | A/B，未登记为已批准 C 类；延后负责人走查 |
 | T014/T031、截图/G3/G4 | 原依赖 | 本轮不执行 | roadmap §8 最新决定 | 移出本轮；不修改其状态、不提前宣称通过 |
 
-代码列均相对 `android/app/src/main/java/com/ignacioli/finecoach/designsystem/`；iOS 列均相对 `ios/FineCoachApp/DesignSystem/`。状态 key 同时用于 debug catalog 和 G2；G2 ID 对应 `ComponentContractTests` 同名 test method（BASE 由 catalog source/token 检查补充）。L3 为尚待负责人统一走查的项目。
+代码列均相对 `android/app/src/main/java/com/ignacioli/finecoach/designsystem/`；iOS 列均相对 `ios/FineCoachApp/DesignSystem/`。原 S0 状态 key 用于 G2（66 例保持）；新增 S1 key 用于独立 `S1CatalogEntries`。不变量 ID 对应 `ComponentContractTests` 或 `S1ComponentTests` 同名 test method（BASE 由 catalog source/token 检查补充）。L3 为尚待负责人统一走查的项目。
 
 <!-- android-roster-start -->
 | ID | Kotlin 类型 | 文件 | 代表状态 key | iOS 源码 | G2 不变量 ID | L3 / Material 差异 |
@@ -594,27 +594,27 @@ roadmap §4 里不需要画板的差异（不在上表，不要为它们新开�
 | DS-STATUS | FcStatus;FcStatusLabel;FcStatusBadge | FcFeedback.kt | overdue;conflict;coursePackageInvalid;notComparable;permissionDenied | Components/FCStatusLabel.swift | status | 五态文字+徽标，装饰字形隐藏 |
 | DS-SAVE-STATUS | FcSaveState;FcSaveStatusView | FcFeedback.kt | saving;saved;failed | Components/FCSaveStatusView.swift | saveStatus | Painter 注入；真实 Painter 注入，待负责人走查 |
 | DS-AVATAR | FcAvatar | FcFeedback.kt | initial | Components/FCAvatar.swift | avatar | 首字与圆形裁切，装饰性 |
-| DS-SYMBOL | FcSymbol;FcGlyph;FcAssetSymbol | FcControls.kt | pageBack;back;forward;check;checkOnFill;minus;plus;collapse | Components/FCSymbol.swift | symbols | 字形仅 ‹ › ✓；其余 Painter，13 个 Material Symbols drawable 已接入（§8.3），待 L3 走查 |
+| DS-SYMBOL | FcSymbol;FcGlyph;FcAssetSymbol | FcControls.kt | pageBack;back;forward;check;checkOnFill;minus;plus;collapse | Components/FCSymbol.swift | symbols | 字形仅 ‹ › ✓；其余 Painter，19 个 Material Symbols drawable 已接入（§8.3），待 L3 走查 |
 | DS-HINT-BAR | FcHintBar | FcHintBar.kt | info;continue | Components/FCHintBar.swift | hintBar | 提示与训练中条同一组件；整条可点。单行，不改其他 DS |
 | DS-HERO-CARD | FcHeroCard | FcHeroCard.kt | single | Components/FCHeroCard.swift | heroCard | 单行默认不变；多行 `FcMultiHeroCard` 是已实现的变体，见 651-655 |
+| DS-AMBIENT-SCENE | FcAmbientScene | FcAmbientScene.kt | today;calendar | Components/FCAmbientEmptyScene.swift | ambientScene | C 类迁移；四层与暂停逻辑复用，未做人工视觉验收 |
+| DS-SET-ROW | FcSetRow | FcSetRow.kt | draft;pending;completed;disabled;undo | Components/FCSetRow.swift | setRow | C 类正式登记；G2 计数保持，新增检查在 S1ComponentTests |
+| DS-EQUIPMENT-ICON | FcEquipmentIcon;FcEquipmentIconView;FcEquipmentIconForExercise | FcEquipmentIcon.kt | barbell;bike;bodyweight;cable_crossover;cable_machine;dumbbell;hack_squat;hip_adduction;jump_rope;kettlebell;leg_extension;pec_deck;plate_loaded;pull_up_bar;resistance_band;rowing_machine;shoulder_press;smith_machine;suspension_trainer;tbar_row;treadmill | Components/FCEquipmentIcon.swift | equipmentIcons | C 类产品自有 21 SVG，路径/圆头描边保留；未人工视觉验收 |
+| DS-PAGE-PRIMARY | FcPagePrimary | FcPages.kt | coach;viewer | Components/FCPageHeader.swift | primaryPage | C 类组合；分段→display 标题，调用方提供入口 |
+| DS-PAGE-SECONDARY | FcPageSecondary | FcPages.kt | back;bottom | Components/FCPageHeader.swift | secondaryPage | C 类组合；FcPlatformShell 唯一 Insets 与返回 owner |
+| DS-EMPTY-STATE | FcEmptyState | FcPages.kt | static;ambient | Components/FCAmbientEmptyScene.swift | emptyState | C 类组合；静态与 C30 动画空态，底部主按钮 |
+| DS-LAUNCH | FcLaunch | FcPages.kt | white | ../Resources/LaunchScreen.storyboard | launch | D 类 C31：纯白系统启动与 Compose 加载面，无图无字无过场；iOS 实际依据 LaunchScreen.storyboard |
 <!-- android-roster-end -->
 
 ### 8.2 D07 延期表
 
-D07 按建议批准含以下逐项候选；不实施、不计 S0 G2 组件完成。未知新增 ID 必须失败并交负责人补定。延期不等于这些组件已实现。
+S0 恢复第 3 步已将 S1 目标移至 §8.1；HERO/HINT 已有映射，本轮补正式合同。以下仅保留实际存在的 S2+ 两项，不补造第三项；均不实施、不计 S0 G2 完成。
 
 <!-- android-deferred-start -->
 | ID | 目标切片 | 批准来源 / 原因 |
 |---|---|---|
-| DS-AMBIENT-SCENE | S1 | D07 2026-11-03；今日/日历空态 |
-| DS-SET-ROW | S1 | D07 2026-11-03；训练业务状态；T013a 已补实现与合同，见本文件 S1 对照表，仍不计 S0 截图目录 |
 | DS-CALENDAR-DAY | S2 | D07 2026-11-03；预约日历 |
-| DS-EQUIPMENT-ICON | S1 | D07 2026-11-03；动作资产 |
 | DS-BODY-DIAGRAM | S4 | D07 2026-11-03；分享报告 |
-| DS-PAGE-PRIMARY | S1 | D07 2026-11-03；功能页组合 |
-| DS-PAGE-SECONDARY | S1 | D07 2026-11-03；S0 仅 header/平台壳 |
-| DS-EMPTY-STATE | S1 | D07 2026-11-03；功能页空态 |
-| DS-LAUNCH | S1 | D07 2026-11-03；不包含 S0 必要系统启动配置 |
 <!-- android-deferred-end -->
 
 ### 8.3 Android anatomy 与 G2 边界
@@ -626,7 +626,7 @@ D07 按建议批准含以下逐项候选；不实施、不计 S0 G2 组件完成
 - semantics：heading、selected、Switch、密码遮蔽、强制非空 icon label；无交互行合并读取；徽标/头像/图标默认装饰性；重试单独可访问。每个新入口有 testTag 和可见控件，见 android/README 的 entry/layout map。
 - overlays：Dialog 采用既有 300 宽/80% 可滚动说明、大字纵排，token scrim；ModalBottomSheet 接管平台 drag/back/dismiss，token scrim/圆角/内容 padding；独立窗口注册 T009 privacyCover，不以壳窗口覆盖等同已保护弹层。
 - DatePicker：M3 DatePickerDialog/DatePicker，用 Theme 与显式 token colors；选择只改变虚构 catalog 内存状态，不创建 Appointment、不承诺保存。
-- icon：`android/design-assets/material-symbols-manifest.txt` 的 13 项已接入（源码/输出 digest、权重、commit 见 provenance JSON）；完整 Apache-2.0 LICENSE/NOTICE 已归档并随 APK 打包。catalog 通过 painterResource 注入真实 vector，不含占位 Painter。无图标库依赖；视觉验收仍待负责人走查。
+- icon：`android/design-assets/material-symbols-manifest.txt` 的 19 项已接入（源码/输出 digest、权重、commit 见 provenance JSON）；完整 Apache-2.0 LICENSE/NOTICE 已归档并随 APK 打包。catalog 通过 painterResource 注入真实 vector，不含占位 Painter。无图标库依赖；视觉验收仍待负责人走查。
 
 ### 8.4 平台壳（D09：A/B，待负责人走查）
 
@@ -653,3 +653,7 @@ D07 按建议批准含以下逐项候选；不实施、不计 S0 G2 组件完成
 | ID | Compose | 部件与状态 | 合同 |
 |---|---|---|---|
 | DS-HERO-CARD | FcMultiHeroCard / FcHeroCard.kt | 一个进行中 N 徽标，每名学员一行44触控区，姓名/重点→时长→继续，行间divider；0条不展示 | 满宽、每行独立点击且稳定ID、开始时间排序由Today提供；ComponentContractTests.multiHeroCard。原 FcHeroCard 默认不变；S0截图目录不变 |
+
+### S0 恢复第 3 步（2026-11-10）
+
+S1 的九项按 §4 anatomy 正式落地：HERO/HINT 既有实现保留，SET 正式登记，AMBIENT 迁移，其余见 §8.1。G2 固定计数 27/66/6/5 不变，新不变量在 `S1ComponentTests`、`S1ComponentAssetTests`、`S1CatalogStateTests`。差异与五行执行记录见 `android/docs/s1/S0-step3-components.md`。
