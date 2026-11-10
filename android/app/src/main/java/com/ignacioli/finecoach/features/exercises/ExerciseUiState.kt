@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import com.ignacioli.finecoach.core.application.*
 import com.ignacioli.finecoach.core.domain.common.*
 import com.ignacioli.finecoach.storage.repository.ExerciseRepository
+import com.ignacioli.finecoach.storage.repository.HistoryRepository
 
 /** A draft selection; the consuming feature owns its session/template transaction and claim. */
 data class ExerciseSelection(
@@ -13,8 +14,66 @@ data class ExerciseSelection(
     val sourceID: StableExerciseID?,
 )
 
-class ExerciseUiState(val useCases: ExerciseUseCases, private val repository: ExerciseRepository) {
-    val catalogUnavailable get() = repository.catalogUnavailable
+class ExerciseUiState(val useCases: ExerciseUseCases, private val repository: ExerciseRepository,
+    private val history: HistoryRepository? = null, private val sessions: SessionRepositoryPort? = null) {
+    var metadataUnavailable by mutableStateOf(false)
+        private set
+    var metadata by mutableStateOf<Map<StableExerciseID, ExerciseCatalogMetadata>>(emptyMap())
+        private set
+    var recentEntries by mutableStateOf<List<ExerciseRecord>>(emptyList())
+        private set
+    var historyError by mutableStateOf<ApplicationError?>(null)
+        private set
+    private var historyGeneration = 0
+    private var reloadGeneration = 0
+
+    suspend fun reload(query: String, includeHidden: Boolean = false, studentID: StudentID? = null,
+        recentEnabled: Boolean = true) {
+        val generation = ++reloadGeneration
+        ++historyGeneration
+        recentEntries = emptyList()
+        historyError = null
+        search(query, includeHidden)
+        if (generation == reloadGeneration && error == null && recentEnabled && query.isBlank()) loadRecent(studentID)
+    }
+
+    private suspend fun loadRecent(studentID: StudentID?) {
+        val generation = ++historyGeneration
+        val source = history ?: return
+        val contentSource = sessions ?: return
+        val available = ExerciseBrowse.availableRecent(entries, preferences)
+        if (available.isEmpty()) return
+        val result = mutableListOf<ExerciseRecord>()
+        val seen = mutableSetOf<StableExerciseID>()
+        when (val candidates = source.recentSessionIDs(studentID)) {
+            is ApplicationResult.Failure -> { if (generation == historyGeneration) historyError = candidates.error; return }
+            is ApplicationResult.Success -> for (id in candidates.value) {
+                if (generation != historyGeneration) return
+                when (val content = contentSource.loadContent(id)) {
+                    is ApplicationResult.Failure -> { if (generation == historyGeneration) historyError = content.error; return }
+                    is ApplicationResult.Success -> content.value?.let {
+                        ExerciseBrowse.collectRecent(it, available, seen, result, studentID)
+                    }
+                }
+                if (result.size == 5) break
+            }
+        }
+        if (generation == historyGeneration) recentEntries = result.toList()
+    }
+
+    fun sections(muscle: String?, equipment: String?): List<ExerciseBrowse.Section> {
+        // With no successful facets, show the unavailable message instead of a fabricated uncategorized catalog.
+        val source = if (metadataUnavailable && metadata.isEmpty()) entries.filter { it.kind == ExerciseKind.custom } else entries
+        return ExerciseBrowse.sections(source, metadata, muscle, equipment)
+    }
+    fun subtitle(item: ExerciseRecord): String = buildList {
+        val facet = metadata[item.exerciseID].takeIf { item.kind == ExerciseKind.builtIn }
+        add(if (item.kind == ExerciseKind.custom) "自定义" else facet?.equipmentClass ?: "内置")
+        if (!facet?.secondaryMuscleGroups.isNullOrEmpty()) add("次要：${facet!!.secondaryMuscleGroups.joinToString("、")}")
+        if (preference(item.exerciseID).isHidden || item.lifecycle == ExerciseLifecycle.archived) add("已隐藏")
+    }.joinToString(" · ")
+
+    val catalogUnavailable get() = repository.catalogUnavailable || metadataUnavailable
     var entries by mutableStateOf<List<ExerciseRecord>>(emptyList())
         private set
     var preferences by mutableStateOf<Map<StableExerciseID, ExercisePreferenceRecord>>(emptyMap())
@@ -27,7 +86,8 @@ class ExerciseUiState(val useCases: ExerciseUseCases, private val repository: Ex
 
     suspend fun search(query: String, includeHidden: Boolean = false) {
         val generation = ++searchGeneration
-        val result = if (includeHidden) repository.listCatalog() else useCases.search(query)
+        val result = repository.search(query, includeHidden)
+        if (generation == searchGeneration) metadataUnavailable = repository.browseMetadataUnavailable
         if (generation != searchGeneration) return
         when (result) {
             is ApplicationResult.Failure -> { error = result.error; entries = emptyList() }
@@ -41,9 +101,8 @@ class ExerciseUiState(val useCases: ExerciseUseCases, private val repository: Ex
                 }
                 if (generation != searchGeneration) return
                 preferences = prefs
-                entries = result.value.filter { !includeHidden || query.isBlank() ||
-                    it.canonicalName.contains(query.trim(), ignoreCase = true) ||
-                    prefs[it.exerciseID]?.alias?.contains(query.trim(), ignoreCase = true) == true }
+                metadata = repository.browseMetadata
+                entries = result.value
                 error = null
             }
         }

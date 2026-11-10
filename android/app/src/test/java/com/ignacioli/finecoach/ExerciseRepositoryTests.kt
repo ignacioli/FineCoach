@@ -1,6 +1,7 @@
 package com.ignacioli.finecoach
 
 import android.content.Context
+import com.ignacioli.finecoach.features.exercises.*
 import androidx.test.core.app.ApplicationProvider
 import com.ignacioli.finecoach.core.application.*
 import com.ignacioli.finecoach.core.domain.common.*
@@ -63,6 +64,109 @@ class ExerciseRepositoryTests {
         withContext(Dispatchers.IO) { database.close() }
         context.deleteDatabase(FineCoachDatabaseFactory.DATABASE_NAME)
         Unit
+    }
+
+    @Test fun metadataReadFailureKeepsLastSuccessfulFacetsAndReportsUnavailableUntilRecovery() = runBlocking {
+        var failRead = false
+        repository = ExerciseRepository(database, loader, clock) {
+            if (failRead) throw java.io.IOException("fictional catalog read failure")
+            loader.load(now)
+        }
+        ok(repository.synchronizeCatalog())
+        val initial = ok(repository.search("胸"))
+        val metadata = repository.browseMetadata
+        assertTrue(metadata.isNotEmpty()); assertFalse(repository.browseMetadataUnavailable)
+        failRead = true
+        assertEquals(initial, ok(repository.search("胸")))
+        assertEquals(metadata, repository.browseMetadata)
+        assertTrue(repository.browseMetadataUnavailable)
+        failRead = false
+        assertEquals(initial, ok(repository.search("胸")))
+        assertFalse(repository.browseMetadataUnavailable)
+    }
+
+    @Test fun browseCombinesSearchMuscleEquipmentAndPreservesCanonicalOrderingAndCounts() = runBlocking {
+        ok(repository.synchronizeCatalog())
+        val all = ok(repository.search(""))
+        val metadata = repository.browseMetadata
+        val custom = ok(repository.saveCustom(custom()))
+        val entries = ok(repository.search(""))
+        val sections = ExerciseBrowse.sections(entries, metadata, null, null)
+        assertEquals("custom", sections.first().id)
+        assertEquals(listOf(custom), sections.first().entries)
+        assertEquals(ExerciseBrowse.muscles, sections.drop(1).map { it.id })
+        assertEquals(all.size + 1, sections.sumOf { it.entries.size })
+        for (muscle in ExerciseBrowse.muscles) {
+            val expected = all.filter { metadata[it.exerciseID]?.primaryMuscleGroup == muscle }
+            assertEquals(listOf(ExerciseBrowse.Section(muscle, expected)), ExerciseBrowse.sections(entries, metadata, muscle, null))
+        }
+        for (equipment in ExerciseBrowse.equipment) {
+            val filtered = ExerciseBrowse.sections(entries, metadata, null, equipment).flatMap { it.entries }
+            assertEquals(all.filter { metadata[it.exerciseID]?.equipmentClass == equipment }.map { it.exerciseID }.toSet(), filtered.map { it.exerciseID }.toSet())
+        }
+        val searched = ok(repository.search("wo tui"))
+        val combined = ExerciseBrowse.sections(searched, metadata, "胸", "杠铃").single().entries
+        val expected = all.filter { it.canonicalName.contains("卧推") && metadata[it.exerciseID]?.primaryMuscleGroup == "胸" && metadata[it.exerciseID]?.equipmentClass == "杠铃" }
+        assertTrue(expected.isNotEmpty()); assertEquals(expected, combined)
+        assertEquals(listOf(ExerciseBrowse.Section("uncategorized", listOf(all.first()))), ExerciseBrowse.sections(listOf(all.first()), emptyMap(), null, null))
+    }
+
+    @Test fun includeHiddenKeepsPinyinAliasEquipmentAndRetirementSearchRules() = runBlocking {
+        ok(repository.synchronizeCatalog())
+        val item = ok(repository.search("杠铃平板卧推")).single()
+        ok(repository.updatePreference(preference(item, alias = "虚构卧推别名", hidden = true)))
+        assertTrue(ok(repository.search("杠铃平板卧推")).isEmpty())
+        for (query in listOf("gang ling ping ban wo tui", "虚构卧推别名", "杠铃", "胸", "  杠铃平板卧推  ")) {
+            assertTrue("Hidden result must match $query", item in ok(repository.search(query, true)))
+        }
+        assertFalse(ok(repository.search("不存在的虚构词", true)).contains(item))
+        assertTrue(ok(repository.search("", true)).none { it.isRetired || it.lifecycle != ExerciseLifecycle.active })
+        val archived = ok(repository.saveCustom(custom("fictional-archived", "虚构深蹲")))
+        ok(repository.saveCustom(archived.copy(lifecycle = ExerciseLifecycle.archived)))
+        assertTrue(ok(repository.search("xu gou shen dun")).isEmpty())
+        assertEquals(archived.exerciseID, ok(repository.search("xu gou shen dun", true)).single().exerciseID)
+        ok(repository.saveCustom(archived))
+        // A displayed alias does not reorder canonical catalog rows.
+
+        assertEquals(ok(repository.search("", true)).map { it.exerciseID }, ok(repository.listCatalog()).filter { !it.isRetired }.map { it.exerciseID })
+    }
+
+    @Test fun recentSelectionOrdersCompletedSessionsDeduplicatesScopesAndExcludesUnavailableSources() {
+        val items = (1..9).map { custom("fictional-$it", "虚构动作$it") }
+        fun content(n: Int, student: Int, ids: List<Int>, completed: Boolean = true): SessionContentRecord {
+            val time = now.plusSeconds(n.toLong())
+            val sessionID = SessionID.fromUUID(uuid(n))
+            val record = SessionRecord(sessionID, StudentID.fromUUID(uuid(student)), if (completed) SessionState.completed else SessionState.inProgress,
+                now, time, BigDecimal.TEN, null, false, null, emptySet(), null, null, Revision(1u), now, time, if (completed) time else null)
+            return SessionContentRecord(record, emptyList(), ids.mapIndexed { index, id ->
+                SessionExerciseRecord(SessionExerciseID.fromUUID(uuid(n * 100 + index)), sessionID, index.toUInt(),
+                    if (id == 9) ExerciseSourceKind.sessionOnly else ExerciseSourceKind.custom, items[id - 1].exerciseID,
+                    "虚构历史显示名", RecordMode.weightReps, null, null, emptyList())
+            })
+        }
+        val available = items.mapIndexed { index, item -> when (index) {
+            5 -> item.copy(lifecycle = ExerciseLifecycle.archived)
+            6 -> item.copy(isRetired = true)
+            else -> item
+        } }
+        val prefs = mapOf(items[7].exerciseID to ExercisePreferenceRecord(items[7].exerciseID, null, false, true, false, null))
+        val history = listOf(content(1, 20, listOf(1, 2, 3, 4, 5)), content(2, 21, listOf(6, 7, 8, 9, 2, 1)), content(3, 20, listOf(4), false))
+        assertEquals(listOf(items[1], items[0], items[2], items[3], items[4]), ExerciseBrowse.recent(history, available, prefs))
+        assertEquals(items.take(5), ExerciseBrowse.recent(history, available, prefs, StudentID.fromUUID(uuid(20))))
+        assertEquals(listOf(items[1], items[0]), ExerciseBrowse.recent(history, available, prefs, StudentID.fromUUID(uuid(21))))
+        assertTrue(ExerciseBrowse.recent(history, available, prefs, limit = 0).isEmpty())
+        assertTrue(ExerciseBrowse.recent(history, emptyList(), prefs).isEmpty())
+        val recent = ExerciseBrowse.recent(history, available, prefs)
+        val unreadOlder = content(0, 20, listOf(1)).copy(exercises = object : AbstractList<SessionExerciseRecord>() {
+            override val size: Int get() = throw AssertionError("Older session content must not be expanded after reaching the limit")
+            override fun get(index: Int): SessionExerciseRecord = throw AssertionError("Older session must remain unread")
+        })
+        assertEquals(listOf(items[1]), ExerciseBrowse.recent(history + unreadOlder, available, prefs, limit = 1))
+        assertTrue(ExerciseBrowse.showsRecent(" \n", null, null, recent))
+        assertFalse(ExerciseBrowse.showsRecent("卧推", null, null, recent))
+        assertFalse(ExerciseBrowse.showsRecent("", "胸", null, recent))
+        assertFalse(ExerciseBrowse.showsRecent("", null, "杠铃", recent))
+        assertFalse(ExerciseBrowse.showsRecent("", null, null, emptyList()))
     }
 
     @Test fun customAndAllPreferencesSurviveRealFileDatabaseReopen() = runBlocking {

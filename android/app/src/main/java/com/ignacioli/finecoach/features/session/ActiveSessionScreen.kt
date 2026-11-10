@@ -95,7 +95,7 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
             if (content?.session?.durationNeedsReview == true) review = true else onFinish()
         }
     }
-    if (picker) ExercisePicker(exercises, state::addExercise) { picker = false }
+    if (picker) ExercisePicker(exercises, state::addExercise, studentID = content?.session?.studentID) { picker = false }
     if (apply && content != null) ApplyTemplateSheet(templates, content.session, state::accept) { apply = false }
     if (sectionForm) {
         var name by remember(section) { mutableStateOf(section?.name ?: "") }

@@ -124,7 +124,7 @@ fun TemplateEditorScreen(state: TemplateUiState, id: TemplateID, exercises: Exer
             }
         }
     }
-    if (picker) ExercisePicker(exercises, state::addExercise) { picker = false }
+    if (picker) ExercisePicker(exercises, state::addExercise, studentID = null, isTemplateContext = true) { picker = false }
     if (metadata && content != null) {
         var name by remember { mutableStateOf(content.template.name) }
         var focus by remember { mutableStateOf(content.template.trainingFocus) }

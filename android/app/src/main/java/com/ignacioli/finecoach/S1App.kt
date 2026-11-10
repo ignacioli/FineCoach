@@ -173,7 +173,7 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
             ResourceHubScreen(graph.exerciseRepository, graph.templates, navigator::open, back)
         }
         composable(S1Routes.EXERCISES) {
-            val state = remember { ExerciseUiState(graph.exercises, graph.exerciseRepository) }
+            val state = remember { ExerciseUiState(graph.exercises, graph.exerciseRepository, graph.historyRepository, graph.sessions) }
             ExerciseLibraryScreen(state, back)
         }
         composable(S1Routes.TEMPLATES) {
@@ -183,7 +183,7 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
         composable(S1Routes.TEMPLATE_DETAIL) { entry ->
             val id = TemplateID.parse(requireNotNull(entry.arguments?.getString(S1Routes.ARG_TEMPLATE_ID)))
             val state = remember(id) { TemplateUiState(graph.templates, graph.clock, graph.ids) }
-            val exercises = remember { ExerciseUiState(graph.exercises, graph.exerciseRepository) }
+            val exercises = remember { ExerciseUiState(graph.exercises, graph.exerciseRepository, graph.historyRepository, graph.sessions) }
             TemplateEditorScreen(state, id, exercises, back)
         }
         composable(S1Routes.SESSION_ACTIVE) { entry ->
@@ -197,7 +197,7 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
 @Composable
 private fun S1ActiveDestination(graph: S1AppGraph, id: SessionID, onBack: () -> Unit, onToday: () -> Unit, onAdjust: (CoursePackageID) -> Unit) {
     val active = remember(id) { ActiveSessionUiState(graph.active, graph.clock, graph.ids, graph.sessions, graph.historyRepository, graph.exercises, graph.rests) }
-    val exercises = remember { ExerciseUiState(graph.exercises, graph.exerciseRepository) }
+    val exercises = remember { ExerciseUiState(graph.exercises, graph.exerciseRepository, graph.historyRepository, graph.sessions) }
     val templates = remember { TemplateUiState(graph.templates, graph.clock, graph.ids) }
     val summary = remember(id) { SessionSummaryUiState(graph.history, graph.clock) }
     val summaryTemplates = remember(id) { HistoryTemplateState(graph.templates, graph.clock, graph.ids) }

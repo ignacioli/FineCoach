@@ -729,3 +729,67 @@ D 类 drift repair；复用 DS-ACTION-ROW，不改设计/token/基线。标题�
 | 归档/课包余额/永久删除 → trailing detail | 沿用调用方 tag | 本轮无行为变化 | 标题 weight(1f)，detail 内容宽度且最大 label；FcActionRow 满宽 | [FcRows.kt:175](../../app/src/main/java/com/ignacioli/finecoach/designsystem/FcRows.kt#L175)、[180](../../app/src/main/java/com/ignacioli/finecoach/designsystem/FcRows.kt#L180) | [ComponentContractTests.actionRows](../../app/src/test/java/com/ignacioli/finecoach/ComponentContractTests.kt#L225)；StudentEntryLayoutTests.permanentDeleteKeepsSingleLineTitleAndVisibleNoteAt320dp |
 | 资料库 → 动作数量加载失败 | resource-hub-exercises 的副标题 | 否；只读错误 | FcHubRow / resource-hub-content | [ResourceHubScreen.kt:27](../../app/src/main/java/com/ignacioli/finecoach/features/resources/ResourceHubScreen.kt#L27) | [TodayNavigationEntryLayoutTests.resourceRoutesTemplateAndExerciseEditorCancelReturnConsistently](../../app/src/test/java/com/ignacioli/finecoach/TodayNavigationEntryLayoutTests.kt#L113)，注入及断言见 121～141 |
 | 资料库 → 模板数量加载失败 | resource-hub-templates 的副标题 | 否；只读错误 | FcHubRow / resource-hub-content | [ResourceHubScreen.kt:34](../../app/src/main/java/com/ignacioli/finecoach/features/resources/ResourceHubScreen.kt#L34) | 同上 |
+
+## T020 fix2 anatomy（S1-D23，实施前冻结）
+
+- 分类与依据：D，修复动作库/训练动作选择器对 iOS ExerciseLibraryView、QuickCreateExerciseFlow 及画稿 20/33 的偏差；目标设计不变。
+- 影响范围：复用 DS-TEXT-FIELD、DS-TITLE-ACTION、DS-CHIP、DS-SECTION、DS-LIST-ROW、DS-TOGGLE、DS-LABEL-VALUE-ROW、DS-BOTTOM-SHEET；features/exercises 内共享 feature 组合，不新增 token 或组件语义。搜索行满宽：search weight(1f) + 已接入 filter_list 图标按钮；横向部位 chips 容器满宽，胶囊本身按文字宽；按部位固定顺序的段标题「部位 · 数量」与满宽行；器械/显示隐藏收进可滚动、完全展开的筛选 sheet，完成按钮满宽。
+- 设计决定：沿用 iOS 的搜索后再按 metadata 过滤、保留段内 canonicalName/id 顺序；自定义分段与请求文字冲突已提问，待回答后冻结该项。最近段仅空搜索且无部位/器械筛选并有可选历史时显示，最多 5 条；库范围全教练，训练范围当前学员；hidden 开关不使隐藏动作进入最近段。无合适已接入器械图标，不显示图标且不占位，待负责人确认。
+- 实施与验证：部位 strip、器械 FlowRow、筛选完成/关闭、显示隐藏、最近行与分组行都有稳定 testTag；选择器保留原 select/search/取消及快速新建入口；recent 行独立 tag，避免与常规行重复。数据源为具体 HistoryRepository 的只读候选投影 + SessionRepositoryPort.loadContent；不改变冻结 domain/ports/schema。entry/layout 行及实际测试结果在本节后补齐。
+- 结果：首轮快照（本次 P2 结果见本节末）：定向五类 108 例全部通过，0 failures/errors/skips；日志 agent-test-android-s1-walk2-20261110-095709.log 非空（6145字节），XML 快照 `.handoff/logs/t020-fix2-20261110/final/`。L0 TokenGeneratorTests 9/0、TokenParityTests 6/0 先通过，L1 ComponentContractTests 27/0 后再做 L2。构建/lint 结果见 T020-fix2；人工复验与自定义分组冲突未确认，不声明视觉或 S1 验收通过。
+
+### T020 fix2 entry/layout
+
+本节为本轮受影响入口的当前索引，覆盖上方 T012/fix1 中同名 tag 的旧行号及旧布局描述；未变选项/编辑行为仍参考 T012。`E` 为 `features/exercises/ExerciseScreens.kt`；prefix `exercise-library` / `exercise-picker` 对应动作库/训练选择器两个 surface；模板上下文隐藏最近段及筛选控件（含部位 chips）。chips 按字宽而非逐个拉满；其 strip/FlowRow 负责满宽。近期/普通动作刻意使用不同 tag，完整列表不删除已出现的近期动作。
+
+| 位置 | 当前 → 目标 | 理由 | 处置 |
+|---|---|---|---|
+| 动作库/选择器搜索 | 独占一行 → search weight(1f) + 筛选图标 | iOS searchRow | 改变；原 search tag 保留 |
+| 动作库/选择器列表 | 平铺 → 部位横向 chips + 分组与计数 | S1-D23 / ExerciseCatalogBrowse | 移除平铺结构 |
+| 动作库显示隐藏 | 页内孤立 chip → 器械筛选 sheet 中 FcToggle | iOS filterSheet，复用既有 DS | 移除页内 chip；exercise-show-hidden 保留 |
+| 动作库标题操作 | 新建 → ＋ 自定义 | iOS exercise.library.addCustomShort | 仅文案变化，tag 不变 |
+| 两处动作行 | mode 副标题 → 器械/次要部位/隐藏状态（自定义则标自定义） | iOS FCExerciseLibraryRowLabel.subtitle | 改变；点击用途不变 |
+| 最近段 | 无 → 只读推导的最多 5 行「最近练过」 | iOS RecentExerciseSelection 与本地化值 | 新增；不写数据库 |
+| 选择器展开 | 默认半展开 → 完全展开 | 增加筛选组合后取消按钮不可见，沿用 S1-D13 变体 | 改变；不更改共享组件默认值 |
+| 器械图标 | 无 → 仍无 | 已接入 Material Symbols 无合适对应；用户禁止下载 | 刻意保留，归 S0 组件轮 |
+| 自定义分段 | 平铺 → iOS「自定义」独立段；缺 metadata 的 builtIn 进「未分类」 | 源码与请求括号冲突，已提问 | 当前按 iOS；未确认，不声称产品裁决 |
+| archived 自定义恢复 | includeHidden 时可查找 → 保留且支持拼音/metadata 搜索 | 要求 5：隐藏/恢复行为不变 | 刻意保留 Android 既有恢复入口；与 iOS active-only 不同 |
+
+| screen → visible control/state | testTag | 改数据 | width owner | 当前源码 | 测试 |
+|---|---|---|---|---|---|
+| 动作库/选择器 → 搜索动作 | exercise-library-search / exercise-search | 否，仅查询 | E:77 满宽 Row，search weight(1f)，icon 固定触达区 | [E:75](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L75) | libraryMuscleEquipmentSearchCountsAndFilterEntriesAreClickableAndFullWidth / pickerFiltersGroupedRowsAndStudentRecentUseSameBrowseAndSelectRealSource |
+| 动作库 → 筛选图标 | exercise-library-filter | 否，打开 sheet；stateDescription 已筛选 | FcTitleIconButton | [E:79](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L79) | libraryMuscleEquipmentSearchCountsAndFilterEntriesAreClickableAndFullWidth |
+| 选择器 → 筛选图标 | exercise-picker-filter | 否，保留 picker sheet 与 query/mode/filter 草稿，在其上叠加筛选 sheet | FcTitleIconButton | [E:48](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L48)、E:79 | pickerFiltersGroupedRowsAndStudentRecentUseSameBrowseAndSelectRealSource |
+| 动作库 → 全部/8 部位 chips | exercise-library-muscle-all / exercise-library-muscle-{部位} | 否，单选，清空仅清部位 | 横向 Row fillMaxWidth，chip 随文字 | [E:85](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L85) | libraryMuscleEquipmentSearchCountsAndFilterEntriesAreClickableAndFullWidth（逐 chip 点击） |
+| 选择器 → 全部/8 部位 chips | exercise-picker-muscle-all / exercise-picker-muscle-{部位} | 否，单选 | 同一满宽 Row | E:85 | pickerFiltersGroupedRowsAndStudentRecentUseSameBrowseAndSelectRealSource |
+| 动作库 → 器械全部/13 chips | exercise-library-equipment-all / exercise-library-equipment-{器械} | 否，单选，与 query/部位取交集 | FlowRow fillMaxWidth | [E:103](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L103) | libraryMuscleEquipmentSearchCountsAndFilterEntriesAreClickableAndFullWidth（逐 chip 点击） |
+| 选择器 → 器械全部/13 chips | exercise-picker-equipment-all / exercise-picker-equipment-{器械} | 否 | 同一 FlowRow | E:103 | pickerFiltersGroupedRowsAndStudentRecentUseSameBrowseAndSelectRealSource；组合逻辑由 ExerciseRepositoryTests 覆盖 |
+| 动作库筛选 → 显示已隐藏 | exercise-show-hidden | 否，仅读取，含 archived 自定义恢复入口 | FcLabelValueRow fillMaxWidth；FcToggle 自身触达区 | [E:111](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L111) | libraryHideRestoreAliasAndRecordingPreferencesRetainEachOther / archivedCustomCanBeRestoredFromHiddenLibraryList |
+| 动作库筛选 → 完成/系统返回/遮罩 | exercise-library-filter-done / exercise-library-filter-sheet | 否，保留即时筛选 | FcLinkButton / filter-content 满宽 | [E:98](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L98)、E:116 | libraryMuscleEquipmentSearchCountsAndFilterEntriesAreClickableAndFullWidth（完成）；系统/scrim 沿用 FcBottomSheet 合同，本轮未新增手势证据 |
+| 选择器筛选 → 完成/系统返回/遮罩 | exercise-picker-filter-done / exercise-picker-filter-sheet | 否，返回原选择器草稿 | 同上 | E:98、116 | pickerFiltersGroupedRowsAndStudentRecentUseSameBrowseAndSelectRealSource（完成） |
+| 动作库 → 分组/数量、常规行打开选项 | exercise-library-section-{段} / exercise-options-{id} | 打开无写入；选项确认才写 | FcSectionLabel/FcListRow fillMaxWidth | [E:122](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L122) | libraryMuscleEquipmentSearchCountsAndFilterEntriesAreClickableAndFullWidth |
+| 训练/模板选择器 → 分组/数量、常规行选择 | exercise-picker-section-{段} / exercise-select-{id} | 消费方原 callback 保存 Session/template | 同上 | E:122、50 | pickerFiltersGroupedRowsAndStudentRecentUseSameBrowseAndSelectRealSource；原真实持久性 suite 保留 |
+| 动作库 → 最近练过 / 行打开选项 | exercise-library-recent / exercise-library-recent-{id} | 打开无写入 | 满宽 Column + FcListRow | E:122 | recentLibraryRowsUseDurableHistoryAndDisappearForSearchFiltersAndHiddenItems（Room 重开后加载、满宽、点击） |
+| 选择器 → 当前学员最近练过 / 行选择 | exercise-picker-recent / exercise-picker-recent-{id} | 消费方原 callback | 满宽 Column + FcListRow | E:122；[ActiveSessionScreen.kt:98](../../app/src/main/java/com/ignacioli/finecoach/features/session/ActiveSessionScreen.kt#L98) 传当前学员 | pickerFiltersGroupedRowsAndStudentRecentUseSameBrowseAndSelectRealSource（排除其他学员、满宽、点击） |
+| 两处 → 历史加载失败 | exercise-library-history-error / exercise-picker-history-error | 否，失败不虚构最近数据 | FcListRow fillMaxWidth | E:131；ExerciseUiState.loadRecent | 静态路径证据；本轮未注入历史读取失败 |
+| 两处 → 动作库暂不可用 | exercise-catalog-unavailable | 否 | FcListRow fillMaxWidth | E:55 / E:187 | failedInitialCatalogShowsUnavailableInLibraryAndPicker；原断言保留 |
+
+表中未写 suite 的 case 均属于 `ExerciseTemplateEntryLayoutTests`。旧选项菜单、显示名、收藏、单侧/辅助、快速新建、仅本节使用、编辑与隐藏恢复 tags 未删除；结构/持久性回归见本轮完整 suite 结果。
+
+### dsh P2 修复 anatomy（实施前）
+
+D 类；按本轮负责人明确要求保留 picker 的 DS-BOTTOM-SHEET，在其上叠加器械筛选 sheet；完成入口使用满宽 DS-BUTTON 的 FcLinkButton 变体。模板上下文明确标记，不显示最近段或筛选入口（含部位 chips），不展开本轮为模板完整对齐。最近结果由 reload 生成并保存到 state，普通重组只读取；只读候选查询保留 History 的非零完成组口径，不改 frozen port/schema。metadata 私有线程安全快照在失败时保留上次成功值，并通过既有 unavailable 文案呈现。器械图标与收藏星标归 S0，本轮不修改。
+
+P2 最终五行执行记录：
+
+- 分类与依据：D，dsh 只读 PASS 后按负责人明确修正 P2-1～6，模板上下文按 S1-D25/D1；目标设计不变。
+- 范围：复用 DS-BOTTOM-SHEET、DS-BUTTON（FcLinkButton）、DS-TEXT-FIELD/CHIP/SECTION/LIST-ROW；新增具体 Repository/DAO 的只读候选投影，不新增 port/schema；metadata 私有线程安全快照。
+- 设计决定：picker 保留、筛选叠加；完成满宽 link；模板不显示最近/筛选（含部位）；图标/收藏星标归 S0。零组完成记录不进入 recent 的既有 Android 差异已登记，不改 History.list。
+- 实施与验证：新 metadata 失败/恢复测试、真实7课/6次load得到5个可用结果、筛选重组缓存不变；旧课 sentinel 证明早停；双层sheet并存与模板入口排除；所有 entry/layout tags 保留，当前源码行号已重新定位。
+- 结果：ExerciseTemplateEntryLayoutTests 33、ExerciseRepositoryTests 25、ActiveSessionEntryLayoutTests 14、ComponentContractTests 27，共99例、0 failures/errors/skips；日志 agent-test-android-s1-walk2-20261110-114219.log 非空6145字节，XML `.handoff/logs/t020-fix2-20261110/p2-final-114219/`。git diff --check PASS。修复后独立复核/人工视觉未执行，无 stage/commit。
+
+| screen → control/state | testTag | 改数据 | width owner | 当前源码 | 测试 |
+|---|---|---|---|---|---|
+| 模板编辑 → 添加动作（排除recent/筛选入口） | template-add-exercise；保留exercise-search/select-ID，exercise-picker-filter/muscles/recent 不存在 | 仅选中动作由原 callback 保存 | 原 picker-content 满宽，搜索不预留 filter 按钮 | [TemplateScreens.kt:127](../../app/src/main/java/com/ignacioli/finecoach/features/templates/TemplateScreens.kt#L127)、[ExerciseScreens.kt:27](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L27)、48-51 | ExerciseTemplateEntryLayoutTests.templateAddPickerMoveExerciseToSectionAndUnsectionedAndRemove |
+| 训练选择器 → 筛选面板（叠在picker上） | exercise-picker-filter/filter-sheet/filter-done | 否 | 底层FcBottomSheet保留，上层FcBottomSheet+满宽FcLinkButton | E:44、71、116 | pickerFiltersGroupedRowsAndStudentRecentUseSameBrowseAndSelectRealSource：picker/search存在、完成按钮可见可点满宽 |
+| 动作库/选择器 → metadata不可用 | exercise-catalog-unavailable | 否 | 既有FcListRow满宽；有缓存保持分组，无缓存不虚构未分类 | E:55、187；ExerciseUiState:64、76、87-90 | metadataFailureDisplaysUnavailableWithoutReclassifyingCachedCatalog；ExerciseRepositoryTests.metadataReadFailureKeepsLastSuccessfulFacetsAndReportsUnavailableUntilRecovery |
