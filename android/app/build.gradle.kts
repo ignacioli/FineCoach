@@ -394,6 +394,12 @@ androidComponents {
 }
 tasks.withType<Test>().matching { it.name == "testDebugUnitTest" || it.name == "testReleaseUnitTest" }.configureEach {
     dependsOn(privacyDependencyGraph)
+    // T019/S0-14 visual suites run only in s0G5 / s0Conformance, never in the unit gate.
+    // The owner's explicit record run (README T019) is the only path that keeps ComponentScreenshotTests.
+    filter {
+        if (!recordRequested.get().equals("true", ignoreCase = true)) excludeTestsMatching("com.ignacioli.finecoach.ComponentScreenshotTests")
+        excludeTestsMatching("com.ignacioli.finecoach.TrainingConformanceTests")
+    }
     inputs.file(privacyDependencyReport)
     inputs.file(rootProject.layout.projectDirectory.file("dependency-allowlist/resolved.txt"))
     inputs.dir(layout.projectDirectory.dir("src/main"))
@@ -411,7 +417,6 @@ tasks.withType<Test>().matching { it.name == "testDebugUnitTest" || it.name == "
 val pendingGates = mapOf(
     "s0G3" to "T018: design value scan",
     "s0G4" to "T017: entry and layout harness",
-    "s0G5" to "T019/T020: screenshot verify and owner-approved baselines",
     "s0G8" to "T004-T010: complete privacy and scope checks",
 )
 pendingGates.forEach { (gate, owner) ->
@@ -928,3 +933,73 @@ val validateSharedVectorGate = tasks.register("validateS0G6Results") {
     }
 }
 sharedVectorGate.configure { finalizedBy(validateSharedVectorGate) }
+
+// T019/S0-14: isolated tasks reuse T003's resource-aware JVM without plugin
+// restore/finalizers. No gate ever accepts a record request.
+fun registerVisualGate(taskName: String, suite: String, expectedTests: Int): TaskProvider<Test> {
+    val gate = tasks.register<Test>(taskName) {
+        group = "verification"
+        val debugTest = tasks.named<Test>("testDebugUnitTest").get()
+        testClassesDirs = debugTest.testClassesDirs
+        classpath = debugTest.classpath
+        javaLauncher.set(debugTest.javaLauncher)
+        setJvmArgs(debugTest.jvmArgs)
+        jvmArgumentProviders.addAll(debugTest.jvmArgumentProviders)
+        systemProperties(debugTest.systemProperties)
+        workingDir = debugTest.workingDir
+        filter { setIncludePatterns("com.ignacioli.finecoach.$suite"); isFailOnNoMatchingTests = true }
+        failOnNoDiscoveredTests.set(true)
+        reports.junitXml.outputLocation.set(layout.buildDirectory.dir("test-results/$taskName"))
+        reports.html.outputLocation.set(layout.buildDirectory.dir("reports/tests/$taskName"))
+        binaryResultsDirectory.set(layout.buildDirectory.dir("test-results/$taskName/binary"))
+        outputs.upToDateWhen { false }
+        outputs.doNotCacheIf("Visual gate must execute") { true }
+        inputs.dir(rootProject.layout.projectDirectory.dir("design-assets"))
+        doFirst {
+            check(!recordRequested.get().equals("true", true) && !System.getProperty("roborazzi.test.record", "false").equals("true", true)) {
+                "$taskName forbids roborazzi.test.record=true"
+            }
+            systemProperty("roborazzi.test.record", "false")
+            systemProperty("roborazzi.test.compare", "false")
+            systemProperty("roborazzi.test.verify", "true")
+            systemProperty("roborazzi.compare.output.dir", layout.buildDirectory.dir("reports/s0/components/images").get().asFile.absolutePath)
+            systemProperty("roborazzi.result.dir", layout.buildDirectory.dir("reports/s0/components/results").get().asFile.absolutePath)
+        }
+    }
+    val validation = tasks.register("validate${taskName.replaceFirstChar(Char::uppercase)}Results") {
+        doLast {
+            val test = gate.get()
+            check(!test.state.skipped && test.state.failure == null) { "$taskName failed or skipped: ${test.state.failure ?: test.state.skipMessage}" }
+            val xml = test.reports.junitXml.outputLocation.get().asFile.listFiles { f -> f.name.startsWith("TEST-") && f.extension == "xml" }.orEmpty()
+            check(xml.size == 1) { "$taskName requires exactly one suite" }
+            val factory = DocumentBuilderFactory.newInstance().apply {
+                setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
+                setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+                setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "")
+                setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "")
+            }
+            val suiteXml = factory.newDocumentBuilder().parse(xml.single()).documentElement
+            check(suiteXml.getAttribute("name") == "com.ignacioli.finecoach.$suite")
+            check(suiteXml.getAttribute("tests").toInt() == expectedTests && suiteXml.getElementsByTagName("testcase").length == expectedTests)
+            for (attr in listOf("failures", "errors", "skipped")) check(suiteXml.getAttribute(attr).toInt() == 0)
+            check(listOf("failure", "error", "skipped").all { suiteXml.getElementsByTagName(it).length == 0 })
+            logger.lifecycle("$taskName: $expectedTests tests, 0 failures/errors/skips")
+        }
+    }
+    gate.configure { finalizedBy(validation) }
+    return gate
+}
+val screenshotGate = registerVisualGate("s0G5", "ComponentScreenshotTests", 1)
+val visualBaselineBefore = mutableMapOf<String, String>()
+fun visualBaselineManifest(): Map<String, String> = rootProject.fileTree("screenshot-baselines").files.associate {
+    it.relativeTo(rootProject.projectDir).path to MessageDigest.getInstance("SHA-256").digest(it.readBytes()).joinToString("") { byte -> "%02x".format(byte) }
+}
+val baselineUnchanged = tasks.register("verifyS0G5BaselineUnchanged") {
+    doLast { check(visualBaselineBefore == visualBaselineManifest()) { "BASELINE_CHANGED during s0G5" } }
+}
+screenshotGate.configure {
+    inputs.files(rootProject.fileTree("screenshot-baselines/components"))
+    doFirst { visualBaselineBefore.putAll(visualBaselineManifest()) }
+    finalizedBy(baselineUnchanged)
+}
+registerVisualGate("s0Conformance", "TrainingConformanceTests", 1)
