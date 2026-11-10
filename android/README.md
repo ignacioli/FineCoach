@@ -1322,3 +1322,41 @@ adb shell am start -n com.ignacioli.finecoach/.MainActivity --ez finecoachS0Shel
 T020 fix1：seed v2 使用周十节（同名两人）、李思远、林小禾、王小明、长名字样例与孙已归档等合成数据。session/模板引用内置杠铃平板卧推、俯卧撑、平板支撑；catalog 没有 cardio mode，跑步机使用 sessionOnly。所有场景先走与启动相同的 catalog 同步路径，新增 542 catalog + 541 name claim 行，multi/single/empty 分别为 1149/1138/1088。旧 v1 seed 由宿主决定卸载后重装，agent 不执行清库。详见 [T020-fix1](docs/s1/T020-fix1.md)。
 
 负责人追加的明文数据入口：[seed fixture 字段与重装指南](docs/s1/seed-fixture.md)。内容统一在 `app/src/debug/assets/seed/s1-seed.json`，当前 v3 保持 rows 1149/1138/1088；loader 与 installer 从该文件读取版本、时间、业务内容与预期行数。Release 不包含 fixture，内置引用缺失直接失败。
+
+## S0 恢复第 4 步：T019 / S0-14（2026-11-10）
+
+基线 `c41d1d4`，worktree `android-s1-conf`，branch `feat/android-s1-conformance`。开工 tracked/staged/untracked 全空，worktree gate PASS。本轮单写者；subagent 仅只读核对工具约束。未提交、未推送、未修改任何截图基线或产品 UI。
+
+从 `android/` 执行：
+
+```sh
+./gradlew :app:s0G5
+./gradlew :app:s0Conformance
+```
+
+agent 运行上述任务一律从产品根调用共享宿主锁 wrapper：
+
+```sh
+.handoff/bin/agent-test.sh --task s0G5
+.handoff/bin/agent-test.sh --task s0Conformance
+```
+
+本轮为 wrapper 添加了仅允许这两个 verify task 的 `--task` 模式，原有测试类模式保留；完整日志位于 `.handoff/logs/agent-test-android-s1-conf-*.log`，本轮输出另 tee 到 `s0-step4-*.log`。wrapper 位于共享 ignored `.handoff`，不在产品 Git diff 中。
+
+`s0G5` 只执行 `ComponentScreenshotTests`，使用 T016 debug catalog 的主按钮样例；组件基线独立于 environment，缺 `screenshot-baselines/components/DS-BUTTON-default.png` 时明确失败，不自动创建。结果：1 test / 1 expected failure / 0 skipped，退出 1；G5 保持 BLOCKED owner baseline。`s0G5` 的前后 baseline manifest 相同；独立 baseline guard 的 staged/unstaged/untracked/committed、ignored-untracked、digest 变化与受信批准正例共 7 tests 通过。详见 [T019](docs/s0/T019.md)。
+
+`s0Conformance` 使用真实 `ActiveSessionScreen` + test-only Room fixture；固定 API36 / NATIVE / 390×844dp / density2 / fontScale1 / zh-CN / 随包 Noto Sans SC。图层来源和坐标约定见 [conformance assets](design-assets/conformance/README.md)。产物位于 `app/build/outputs/conformance/P0-a2-training.{android.png,nodes.json,triptych.png,report.json,report.md}`。
+
+**当前状态：VALID_FIXTURE / 设计一致性FAIL（预期非零）**。宿主已修复编辑器预填等待和暂停clock下真实触摸无法完成的问题，本轮保留逐帧等待120、再推进500ms、临时autoAdvance真实点击plus后恢复暂停的流程，122.5断言通过，无SetText/IME注入。双次fresh Room/composition渲染hash一致：`c190e2890406e8b3c89c0f247baba457aaaff4229801cbd83ad414edc9f28a64`。S1-D30规定每层top/bottom/viewport，背景不再套用top offset；capsule由测试侧LayoutInfo共同父Row定位，无产品tag改动。最终51项：通过1、UI_DEVIATION40、missing10、不可见0，故s0Conformance退出1；raw像素差异37.2325%。ComponentContractTests27 + ConformanceVisibilityTests4 + ConformanceComparisonTests10共41/0/0。剩余偏差交step6，不修产品UI、不放宽容差、不改基线；本轮未看图，负责人视觉验收PENDING。详细计数、逐轴容差、top10、观测限制及日志见 [S0-14执行说明](docs/s0/S0-14-conformance.md)。
+
+### 负责人专用：组件基线录制（agent 禁止执行）
+
+负责人先亲自走查并批准样例，再从 `android/` 手动执行下列命令。复用 T003 已核实的 Roborazzi 1.77.0 record/verify 属性与显式 baseline 路径；本轮未执行该命令。
+
+```sh
+./gradlew :app:testDebugUnitTest --tests 'com.ignacioli.finecoach.ComponentScreenshotTests' -Proborazzi.test.record=true -Proborazzi.test.verify=false --rerun-tasks
+```
+
+常规 `testDebugUnitTest` / `testReleaseUnitTest` 排除 `ComponentScreenshotTests` 与 `TrainingConformanceTests`（`app/build.gradle.kts`）；只有显式传入 `-Proborazzi.test.record=true` 时才保留 `ComponentScreenshotTests`，因此上面这条命令仍能选中该类。`TrainingConformanceTests` 只在 `s0Conformance` 中运行。
+
+随后负责人登记文件清单、SHA-256 与批准 commit，再运行 `s0G5`。这不自动完成 T020，agent 不创建/批准/更新基线。宿主 S0-13 需接入 T019 baseline guard 的前后检查；本轮未修改 host gate。
