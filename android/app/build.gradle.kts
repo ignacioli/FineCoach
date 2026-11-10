@@ -394,6 +394,12 @@ androidComponents {
 }
 tasks.withType<Test>().matching { it.name == "testDebugUnitTest" || it.name == "testReleaseUnitTest" }.configureEach {
     dependsOn(privacyDependencyGraph)
+    // T019/S0-14 visual suites run only in s0G5 / s0Conformance, never in the unit gate.
+    // The owner's explicit record run (README T019) is the only path that keeps ComponentScreenshotTests.
+    filter {
+        if (!recordRequested.get().equals("true", ignoreCase = true)) excludeTestsMatching("com.ignacioli.finecoach.ComponentScreenshotTests")
+        excludeTestsMatching("com.ignacioli.finecoach.TrainingConformanceTests")
+    }
     inputs.file(privacyDependencyReport)
     inputs.file(rootProject.layout.projectDirectory.file("dependency-allowlist/resolved.txt"))
     inputs.dir(layout.projectDirectory.dir("src/main"))
@@ -411,7 +417,6 @@ tasks.withType<Test>().matching { it.name == "testDebugUnitTest" || it.name == "
 val pendingGates = mapOf(
     "s0G3" to "T018: design value scan",
     "s0G4" to "T017: entry and layout harness",
-    "s0G5" to "T019/T020: screenshot verify and owner-approved baselines",
     "s0G8" to "T004-T010: complete privacy and scope checks",
 )
 pendingGates.forEach { (gate, owner) ->
@@ -422,11 +427,55 @@ pendingGates.forEach { (gate, owner) ->
     }
 }
 
+// T019: the exact S1 suites run independently of the broad JVM gate.
+val s1SeedChecks = tasks.register<Test>("s1SeedChecks") {
+    group = "verification"
+    val debugTest = tasks.named<Test>("testDebugUnitTest").get()
+    testClassesDirs = debugTest.testClassesDirs
+    classpath = debugTest.classpath
+    javaLauncher.set(debugTest.javaLauncher)
+    setJvmArgs(debugTest.jvmArgs)
+    jvmArgumentProviders.addAll(debugTest.jvmArgumentProviders)
+    systemProperties(debugTest.systemProperties)
+    workingDir = debugTest.workingDir
+    filter {
+        setIncludePatterns("com.ignacioli.finecoach.S1DebugSeedTests", "com.ignacioli.finecoach.S1SeedIsolationTests")
+        isFailOnNoMatchingTests = true
+    }
+    failOnNoDiscoveredTests.set(true)
+    reports.junitXml.required.set(true)
+    reports.junitXml.outputLocation.set(layout.buildDirectory.dir("test-results/s1SeedChecks"))
+    reports.html.outputLocation.set(layout.buildDirectory.dir("reports/tests/s1SeedChecks"))
+    binaryResultsDirectory.set(layout.buildDirectory.dir("test-results/s1SeedChecks/binary"))
+    outputs.upToDateWhen { false }
+    outputs.doNotCacheIf("Seed checks must execute") { true }
+    doLast {
+        val expected = mapOf("com.ignacioli.finecoach.S1DebugSeedTests" to 12, "com.ignacioli.finecoach.S1SeedIsolationTests" to 4)
+        val files = reports.junitXml.outputLocation.get().asFile.listFiles { file -> file.name.startsWith("TEST-") && file.extension == "xml" }.orEmpty()
+        check(files.size == expected.size) { "S1 seed checks must run nonzero tests without failures or skips" }
+        val factory = DocumentBuilderFactory.newInstance().apply {
+            setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
+            setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+            setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "")
+            setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "")
+        }
+        val actual = files.associate { file ->
+            val suite = factory.newDocumentBuilder().parse(file).documentElement
+            check(suite.getAttribute("failures") == "0" && suite.getAttribute("errors") == "0" && suite.getAttribute("skipped") == "0") {
+                "S1 seed checks must run nonzero tests without failures or skips"
+            }
+            suite.getAttribute("name") to suite.getAttribute("tests").toInt()
+        }
+        check(actual == expected) { "S1 seed checks must run nonzero tests without failures or skips" }
+        actual.forEach { (suite, count) -> logger.lifecycle("S1-SEED-CHECK suite=$suite tests=$count failures=0 errors=0 skips=0") }
+    }
+}
+
 // S0-12: inspect the actual APK entries, including binary XML/string pools.
 val seedIsolation = tasks.register("s0SeedIsolation") {
     group = "verification"
     description = "Reject debug seed/catalog code, resources and entries in the assembled Release APK"
-    dependsOn("assembleRelease")
+    dependsOn("assembleRelease", s1SeedChecks)
 }
 androidComponents.onVariants(androidComponents.selector().withBuildType("release")) { variant ->
     val apkDirectory = variant.artifacts.get(SingleArtifact.APK)
@@ -437,6 +486,7 @@ androidComponents.onVariants(androidComponents.selector().withBuildType("release
             check(apks.size == 1) { "s0SeedIsolation: expected exactly one Release APK" }
             val forbidden = listOf(
                 "com/ignacioli/finecoach/seed/", "com.ignacioli.finecoach.seed.",
+                "S1DebugSeed", "S1SeedIDs", "s1_debug_seed.", "s1-debug-seed.lock", "fictional-s1-coach-core-v1", "fictional-s1-coach-core-v2", "fictional-s1-coach-core-v3", "S1SeedFixture", "seed/s1-seed.json",
                 "DebugSeed", "SeedContributor", "SeedResult", "MetadataSeedContributor",
                 "S0ComponentCatalog", "S0Catalog", "S0DebugApplication", "FineCoachSeed", "finecoach-debug-seed.db",
                 "debug_seed.", "debug_seed_", "s0_catalog", "s0_seed", "SEED version=",
@@ -519,10 +569,13 @@ val validateSeedDevice = tasks.register<SeedDeviceTask>("validateS0SeedDevice") 
 }
 // Ordering is added without changing the behavior of a direct installDebug invocation.
 tasks.matching { it.name == "installDebug" }.configureEach { mustRunAfter(validateSeedDevice) }
+val requestedSeedScenario = providers.gradleProperty("s1.seedScenario").orElse("multi")
 val installSeededDebug = tasks.register<SeedDeviceTask>("s0InstallSeededDebug") {
     group = "verification"
-    description = "Validate one explicit device, installDebug, seed via instrumentation, verify fresh logcat, launch shell"
-    dependsOn(validateSeedDevice, "installDebug")
+    description = "Build/install S1DebugSeed on one explicit device, verify durable seed, launch default S1"
+    dependsOn(validateSeedDevice, "assembleDebug")
+    inputs.property("seedScenario", requestedSeedScenario)
+    inputs.file(layout.projectDirectory.file("src/debug/assets/seed/s1-seed.json"))
     adbFile.set(androidComponents.sdkComponents.adb)
     deviceSerial.set(seedDeviceSerial)
     environmentSerial.set(providers.environmentVariable("ANDROID_SERIAL").orElse(""))
@@ -532,14 +585,19 @@ androidComponents.onVariants(androidComponents.selector().withBuildType("debug")
     installSeededDebug.configure {
         inputs.dir(apkDirectory)
         doLast {
-            val install = tasks.named("installDebug").get()
-            check(!install.state.skipped && install.state.failure == null && install.state.didWork) { "installDebug did not execute successfully" }
             val serial = requireSingleDevice()
+            val scenario = requestedSeedScenario.get()
+            check(scenario in setOf("empty", "single", "multi")) { "Unknown S1 seed scenario" }
+            val apks = apkDirectory.get().asFile.walkTopDown().filter { it.isFile && it.extension == "apk" }.toList()
+            check(apks.size == 1) { "Expected exactly one Debug APK" }
+            val installed = adb("-s", serial, "install", "-r", "-t", apks.single().absolutePath)
+            check(installed.lineSequence().any { it.trim() == "Success" }) { "Debug APK installation failed" }
+            adb("-s", serial, "shell", "am", "force-stop", "com.ignacioli.finecoach")
             val api = adb("-s", serial, "shell", "getprop", "ro.build.version.sdk").trim().toInt()
             check(api >= 31) { "S0 requires API 31+" }
             val build = adb("-s", serial, "shell", "getprop", "ro.build.id").trim()
             val result = adb("-s", serial, "shell", "am", "instrument", "-w", "-r",
-                "com.ignacioli.finecoach/.seed.DebugSeedInstrumentation")
+                "-e", "scenario", scenario, "com.ignacioli.finecoach/.seed.DebugSeedInstrumentation")
             val lines = result.lineSequence().map { it.trim() }.toList()
             check(lines.count { it == "INSTRUMENTATION_CODE: -1" } == 1 &&
                 lines.none { it.startsWith("INSTRUMENTATION_FAILED") || it.startsWith("INSTRUMENTATION_ABORTED") }) {
@@ -547,7 +605,10 @@ androidComponents.onVariants(androidComponents.selector().withBuildType("debug")
             }
             fun resultValue(key: String): String = lines.single { it.startsWith("INSTRUMENTATION_RESULT: $key=") }.substringAfter('=')
             val expected = resultValue("seed")
-            check(Regex("SEED version=[1-9][0-9]* rows=[1-9][0-9]* status=ok").matches(expected)) { "Missing successful seed result" }
+            val fixture = groovy.json.JsonSlurper().parse(file("src/debug/assets/seed/s1-seed.json")) as Map<*, *>
+            val expectedRows = requireNotNull((fixture["expectedRows"] as Map<*, *>)[scenario])
+            val expectedVersion = requireNotNull(fixture["seedVersion"])
+            check(expected == "SEED version=$expectedVersion rows=$expectedRows status=ok") { "Missing successful S1 seed result" }
             val pid = resultValue("seed_pid").toInt().also { check(it > 0) }
             val loggedAt = resultValue("seed_log_time").toLong().also { check(it > 0) }
             val logs = adb("-s", serial, "logcat", "-d", "-v", "epoch", "--pid=$pid", "-s", "FineCoachSeed:I", "*:S")
@@ -558,8 +619,6 @@ androidComponents.onVariants(androidComponents.selector().withBuildType("debug")
             check(fresh == listOf(expected)) { "Missing, duplicate or stale SEED logcat event" }
             val launch = adb("-s", serial, "shell", "am", "start", "-W", "-n", "com.ignacioli.finecoach/.MainActivity")
             check(launch.lineSequence().any { it.trim() == "Status: ok" } && !launch.contains("Error:")) { "Debug shell launch failed" }
-            val apks = apkDirectory.get().asFile.walkTopDown().filter { it.isFile && it.extension == "apk" }.toList()
-            check(apks.size == 1) { "Expected exactly one Debug APK" }
             val digest = MessageDigest.getInstance("SHA-256").digest(apks.single().readBytes())
                 .joinToString("") { "%02x".format(it) }
             logger.lifecycle(expected)
@@ -786,8 +845,8 @@ val validateComponentGate = tasks.register("validateS0G2Results") {
         check(counts.keys == componentClasses.toSet()) { "Missing G2 suites: ${componentClasses - counts.keys}" }
         val expectedCounts = mapOf(
             "com.ignacioli.finecoach.ComponentCatalogTests" to 6,
-            "com.ignacioli.finecoach.ComponentCatalogStateTests" to 63,
-            "com.ignacioli.finecoach.ComponentContractTests" to 22,
+            "com.ignacioli.finecoach.ComponentCatalogStateTests" to 66,
+            "com.ignacioli.finecoach.ComponentContractTests" to 27,
             "com.ignacioli.finecoach.PlatformShellTests" to 5,
         )
         check(counts == expectedCounts) { "Unexpected G2 testcase counts: $counts; expected $expectedCounts" }
@@ -874,3 +933,73 @@ val validateSharedVectorGate = tasks.register("validateS0G6Results") {
     }
 }
 sharedVectorGate.configure { finalizedBy(validateSharedVectorGate) }
+
+// T019/S0-14: isolated tasks reuse T003's resource-aware JVM without plugin
+// restore/finalizers. No gate ever accepts a record request.
+fun registerVisualGate(taskName: String, suite: String, expectedTests: Int): TaskProvider<Test> {
+    val gate = tasks.register<Test>(taskName) {
+        group = "verification"
+        val debugTest = tasks.named<Test>("testDebugUnitTest").get()
+        testClassesDirs = debugTest.testClassesDirs
+        classpath = debugTest.classpath
+        javaLauncher.set(debugTest.javaLauncher)
+        setJvmArgs(debugTest.jvmArgs)
+        jvmArgumentProviders.addAll(debugTest.jvmArgumentProviders)
+        systemProperties(debugTest.systemProperties)
+        workingDir = debugTest.workingDir
+        filter { setIncludePatterns("com.ignacioli.finecoach.$suite"); isFailOnNoMatchingTests = true }
+        failOnNoDiscoveredTests.set(true)
+        reports.junitXml.outputLocation.set(layout.buildDirectory.dir("test-results/$taskName"))
+        reports.html.outputLocation.set(layout.buildDirectory.dir("reports/tests/$taskName"))
+        binaryResultsDirectory.set(layout.buildDirectory.dir("test-results/$taskName/binary"))
+        outputs.upToDateWhen { false }
+        outputs.doNotCacheIf("Visual gate must execute") { true }
+        inputs.dir(rootProject.layout.projectDirectory.dir("design-assets"))
+        doFirst {
+            check(!recordRequested.get().equals("true", true) && !System.getProperty("roborazzi.test.record", "false").equals("true", true)) {
+                "$taskName forbids roborazzi.test.record=true"
+            }
+            systemProperty("roborazzi.test.record", "false")
+            systemProperty("roborazzi.test.compare", "false")
+            systemProperty("roborazzi.test.verify", "true")
+            systemProperty("roborazzi.compare.output.dir", layout.buildDirectory.dir("reports/s0/components/images").get().asFile.absolutePath)
+            systemProperty("roborazzi.result.dir", layout.buildDirectory.dir("reports/s0/components/results").get().asFile.absolutePath)
+        }
+    }
+    val validation = tasks.register("validate${taskName.replaceFirstChar(Char::uppercase)}Results") {
+        doLast {
+            val test = gate.get()
+            check(!test.state.skipped && test.state.failure == null) { "$taskName failed or skipped: ${test.state.failure ?: test.state.skipMessage}" }
+            val xml = test.reports.junitXml.outputLocation.get().asFile.listFiles { f -> f.name.startsWith("TEST-") && f.extension == "xml" }.orEmpty()
+            check(xml.size == 1) { "$taskName requires exactly one suite" }
+            val factory = DocumentBuilderFactory.newInstance().apply {
+                setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
+                setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+                setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "")
+                setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "")
+            }
+            val suiteXml = factory.newDocumentBuilder().parse(xml.single()).documentElement
+            check(suiteXml.getAttribute("name") == "com.ignacioli.finecoach.$suite")
+            check(suiteXml.getAttribute("tests").toInt() == expectedTests && suiteXml.getElementsByTagName("testcase").length == expectedTests)
+            for (attr in listOf("failures", "errors", "skipped")) check(suiteXml.getAttribute(attr).toInt() == 0)
+            check(listOf("failure", "error", "skipped").all { suiteXml.getElementsByTagName(it).length == 0 })
+            logger.lifecycle("$taskName: $expectedTests tests, 0 failures/errors/skips")
+        }
+    }
+    gate.configure { finalizedBy(validation) }
+    return gate
+}
+val screenshotGate = registerVisualGate("s0G5", "ComponentScreenshotTests", 1)
+val visualBaselineBefore = mutableMapOf<String, String>()
+fun visualBaselineManifest(): Map<String, String> = rootProject.fileTree("screenshot-baselines").files.associate {
+    it.relativeTo(rootProject.projectDir).path to MessageDigest.getInstance("SHA-256").digest(it.readBytes()).joinToString("") { byte -> "%02x".format(byte) }
+}
+val baselineUnchanged = tasks.register("verifyS0G5BaselineUnchanged") {
+    doLast { check(visualBaselineBefore == visualBaselineManifest()) { "BASELINE_CHANGED during s0G5" } }
+}
+screenshotGate.configure {
+    inputs.files(rootProject.fileTree("screenshot-baselines/components"))
+    doFirst { visualBaselineBefore.putAll(visualBaselineManifest()) }
+    finalizedBy(baselineUnchanged)
+}
+registerVisualGate("s0Conformance", "TrainingConformanceTests", 1)

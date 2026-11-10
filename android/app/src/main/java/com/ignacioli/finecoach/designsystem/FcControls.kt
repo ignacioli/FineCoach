@@ -14,6 +14,7 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -40,6 +41,8 @@ import androidx.compose.ui.unit.dp
 // Geometry in components.md §4 / README §6/§8, expressed using generated tokens.
 // These are aliases for existing component dimensions, not independent token values.
 object FcComponentMetrics {
+    val illustration = FcSpacing.space8 * 6 + FcSpacing.space4 + FcSpacing.space3 // 220, README §9
+    val calendarIllustration = FcSpacing.space8 * 5 // 160, §4.9
     val touch = FcSpacing.space8 + FcSpacing.space3 // 44
     val row = FcSpacing.space8 + FcSpacing.space4 + FcSpacing.space1 // 52
     val field = FcSpacing.space8 + FcSpacing.space4 // 48
@@ -204,9 +207,10 @@ fun FcToggle(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit
 
 @Composable
 fun FcTextField(title: String, value: String, onValueChange: (String) -> Unit, modifier: Modifier = Modifier,
-    secure: Boolean = false, enabled: Boolean = true, search: Boolean = false) {
+    secure: Boolean = false, enabled: Boolean = true, search: Boolean = false,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default, keyboardActions: KeyboardActions = KeyboardActions.Default) {
     BasicTextField(value, onValueChange, modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.touch)
-        .semantics { contentDescription = title }, enabled = enabled, singleLine = true,
+        .semantics { contentDescription = title }, enabled = enabled, singleLine = true, keyboardOptions = keyboardOptions, keyboardActions = keyboardActions,
         textStyle = (if (search) FcTypography.style("callout", 400) else FcTypography.body).copy(color = FcColors.textPrimary),
         visualTransformation = if (secure) PasswordVisualTransformation() else VisualTransformation.None,
         cursorBrush = SolidColor(FcColors.actionPrimary), decorationBox = { field ->
@@ -268,7 +272,7 @@ internal fun FcStepButton(label: String, painter: Painter, enabled: Boolean, mod
 @Composable
 fun FcStepperField(label: String, value: String, onValueChange: (String) -> Unit, canDecrement: Boolean,
     minus: Painter, plus: Painter, onDecrement: () -> Unit, onIncrement: () -> Unit,
-    modifier: Modifier = Modifier, tag: String = "stepper-field", keyboardOptions: KeyboardOptions = KeyboardOptions.Default) {
+    modifier: Modifier = Modifier, tag: String = "stepper-field", keyboardOptions: KeyboardOptions = KeyboardOptions.Default, keyboardActions: KeyboardActions = KeyboardActions.Default) {
     var focused by remember { mutableStateOf(false) }
     Row(modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.field).background(FcColors.surfaceCanvas, FcShapes.capsule)
         .then(if (focused) Modifier.border(FcComponentMetrics.stroke, FcColors.actionPrimary, FcShapes.capsule) else Modifier),
@@ -277,7 +281,7 @@ fun FcStepperField(label: String, value: String, onValueChange: (String) -> Unit
         BasicTextField(value, onValueChange, Modifier.weight(1f).heightIn(min = FcComponentMetrics.touch)
             .testTag("$tag-input").onFocusChanged { focused = it.isFocused }.semantics { contentDescription = label },
             textStyle = FcTypography.numeralLarge.copy(color = FcColors.textPrimary, textAlign = TextAlign.Center),
-            singleLine = true, keyboardOptions = keyboardOptions, cursorBrush = SolidColor(FcColors.actionPrimary))
+            singleLine = true, keyboardOptions = keyboardOptions, keyboardActions = keyboardActions, cursorBrush = SolidColor(FcColors.actionPrimary))
         FcStepButton("增加$label", plus, true, Modifier.testTag("$tag-plus"), onIncrement)
     }
 }

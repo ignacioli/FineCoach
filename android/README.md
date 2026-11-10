@@ -754,11 +754,11 @@ node android/dependency-allowlist/generate-resolved.mjs android/app/build/report
 
 ### roster 摘要
 
-D07 的 22 个 ID 全部登记 Kotlin 入口、iOS 来源、代表状态、G2 method 与 L3 项；debug catalog 共 63 个代表状态。`FcControls.kt` 负责按钮、标题操作、segmented、chips、toggle、Stepper/FIELD、输入和符号；`FcRows.kt` 负责列表、区段、两栏、页头、入口、操作、撤销；`FcFeedback.kt` 负责状态、头像、结果、sheet、确认和日期选择。`FineCoachTheme.kt` 继续作为 DS-BASE，不修改生成器或 token 权威。
+当前 roster 24 个 ID 全部登记 Kotlin 入口、iOS 来源、代表状态、G2 method 与 L3 项；debug catalog 共 66 个代表状态。S0 登记 22 个，S1 T010 按 S1-D15 补上 `DS-HINT-BAR`（`FcHintBar.kt`）和单行 `DS-HERO-CARD`（`FcHeroCard.kt`）。`FcControls.kt` 负责按钮、标题操作、segmented、chips、toggle、Stepper/FIELD、输入和符号；`FcRows.kt` 负责列表、区段、两栏、页头、入口、操作、撤销；`FcFeedback.kt` 负责状态、头像、结果、sheet、确认和日期选择。`FineCoachTheme.kt` 继续作为 DS-BASE，不修改生成器或 token 权威。
 
 - Material 对应物：DS-BOTTOM-SHEET → M3 ModalBottomSheet；日期选择 → M3 DatePickerDialog/DatePicker（LABEL-VALUE-ROW 示例）；toggle 使用 Compose toggleable 的 Role.Switch，保留已有轨道外观。其余按 iOS anatomy 自绘，消费生成 token，不引图标依赖。
 - 组件既有几何在 `FcComponentMetrics` 用生成 spacing 组合表达，出处是 components §4/README §6/§8；没有新增 token 值。`‹ › ✓` 仍用随包 Noto Sans SC，不使用系统图标或临时字体替代。
-- 延期 11 ID：AMBIENT-SCENE、SET-ROW、HERO-CARD、HINT-BAR（S1，洞察扩展 S3）、EQUIPMENT-ICON、PAGE-PRIMARY、PAGE-SECONDARY、EMPTY-STATE、LAUNCH（S1）；CALENDAR-DAY（S2）；BODY-DIAGRAM（S4）。完整逐 ID 表含 D07 批准来源，见 components §8.2。
+- 延期 9 ID：AMBIENT-SCENE、SET-ROW、EQUIPMENT-ICON、PAGE-PRIMARY、PAGE-SECONDARY、EMPTY-STATE、LAUNCH（S1）；CALENDAR-DAY（S2）；BODY-DIAGRAM（S4）。`DS-HINT-BAR` 与 `DS-HERO-CARD` 已进入 roster。完整逐 ID 表含 D07 批准来源，见 components §8.2。
 - 行和按钮传入 callback，不在 DS 层持久化、删除对象或决定课包生命周期；Undo 的业务窗口、原位置恢复留给调用方，S0 无业务实体不伪造这类证明。
 
 ### 宿主命令与预期数量
@@ -775,11 +775,11 @@ D07 的 22 个 ID 全部登记 Kotlin 入口、iOS 来源、代表状态、G2 me
 | gate / suite | 预期 tests | 证明范围 |
 |---|---:|---|
 | s0G1 | 39 | 现有 token/字体/contrast/generator 合同，未改 |
-| ComponentCatalogTests | 6 | 22 项精确 roster、类型/真实文件/iOS 来源、状态与测试方法、11 项延期和 authority 并集、debug/privacy 入口保留、图标需求/无依赖 |
-| ComponentCatalogStateTests | 63 | 参数化逐个状态真正 compose 并检查组件 testTag，不以文字清单代替渲染 |
-| ComponentContractTests | 22 | roster 每 ID 一个合同方法；touch/满宽、disabled callback、单选/三态、Stepper/FIELD、输入/secure、heading/semantics、确认/重试/撤销、token source 检查等 |
+| ComponentCatalogTests | 6 | 24 项精确 roster、类型/真实文件/iOS 来源、状态与测试方法、9 项延期和 authority 并集、debug/privacy 入口保留、图标需求/无依赖 |
+| ComponentCatalogStateTests | 66 | 参数化逐个状态真正 compose 并检查组件 testTag，不以文字清单代替渲染 |
+| ComponentContractTests | 27 | roster 每 ID 一个合同方法（含 S1-D13 BottomSheet 完全展开）；touch/满宽、disabled callback、单选/三态、Stepper/FIELD、输入/secure、heading/semantics、确认/重试/撤销、提示条/单行 hero、训练组行、多行 hero、token source 检查等 |
 | PlatformShellTests | 5 | header 与系统 back dispatcher 同 callback、Insets 只消费一次、内容宽度、catalog 可见入口/返回、独立 overlay window 隐私注册/释放 |
-| s0G2 合计 | 96 | 上述四个 suite 全部非空，0 failures/errors/skips；与 G1 联跑总计 135 |
+| s0G2 合计 | 101 | 上述四个 suite 全部非空，0 failures/errors/skips；与 G1 联跑总计 140 |
 
 `s0G2` 替换原占位任务，report：`app/build/test-results/s0G2/TEST-*.xml`，HTML：`app/build/reports/tests/s0G2/`。禁用 up-to-date/cache；finalizer 拒绝失败、skip、NO-SOURCE、缺 suite、重复 suite、0 tests、非预期数量，以及 XML 中任一 failure/error/skipped。不创建或更新 screenshot baseline，不依赖 G3/G4/G5。ParameterizedRobolectricTestRunner 使用其自己的 `Parameters` 注解（已对照本机 4.17 JAR）；最终 Gradle XML 归组/计数仍待宿主执行确认，失败不能改数量或删断言求通过。
 
@@ -823,6 +823,8 @@ D07 的 22 个 ID 全部登记 Kotlin 入口、iOS 来源、代表状态、G2 me
 | catalog 索引 | DS-SAVE-STATUS 分组入口 | catalog-DS-SAVE-STATUS | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
 | catalog 索引 | DS-AVATAR 分组入口 | catalog-DS-AVATAR | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
 | catalog 索引 | DS-SYMBOL 分组入口 | catalog-DS-SYMBOL | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-HINT-BAR 分组入口 | catalog-DS-HINT-BAR | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
+| catalog 索引 | DS-HERO-CARD 分组入口 | catalog-DS-HERO-CARD | 否，样例导航 | Catalog → Rows FcGroupEntryRow fillMaxWidth |
 | DS-BUTTON/default | 主按钮样例 / 次按钮样例 / 链接样例 | DS-BUTTON-default | 仅内存计数 | Catalog → Controls；primary/secondary 满宽，link ≥44 |
 | DS-BUTTON/secondary | 主按钮样例 / 次按钮样例 / 链接样例 | DS-BUTTON-secondary | 仅内存计数 | Catalog → Controls；primary/secondary 满宽，link ≥44 |
 | DS-BUTTON/link | 主按钮样例 / 次按钮样例 / 链接样例 | DS-BUTTON-link | 仅内存计数 | Catalog → Controls；primary/secondary 满宽，link ≥44 |
@@ -881,11 +883,13 @@ D07 的 22 个 ID 全部登记 Kotlin 入口、iOS 来源、代表状态、G2 me
 | DS-CONFIRM-DIALOG/long | 打开样例确认 | DS-CONFIRM-DIALOG-long | 否，开弹层 | Catalog → Controls Button fillMaxWidth |
 | DS-CONFIRM-DIALOG/long | 确认样例 / 取消 | DS-CONFIRM-DIALOG-long-accept | 确认仅增内存计数；取消只关闭 | Catalog → Feedback ConfirmationDialog 按钮行 weight(1f)；大字纵排满宽 |
 | DS-CONFIRM-DIALOG/long | 确认样例 / 取消 | DS-CONFIRM-DIALOG-long-cancel | 确认仅增内存计数；取消只关闭 | Catalog → Feedback ConfirmationDialog 按钮行 weight(1f)；大字纵排满宽 |
+| DS-HINT-BAR/continue | 继续 | DS-HINT-BAR-continue | 仅内存计数 | Catalog → FcHintBar 满宽，最小触控高 |
+| DS-HERO-CARD/single | 继续样例 | DS-HERO-CARD-single | 仅内存计数 | Catalog → FcHeroCard 满宽，最小高 100；标题 heading |
 | 日期样例 | Material 日期选择器 | date-picker | 仅 picker 暂存选择 | Feedback M3 DatePicker；内部日期格由 Material semantics 定位 |
 | 日期样例 | 确定 | date-accept | 仅内存选择日期并关闭 | Feedback Controls LinkButton ≥44 |
 | 日期样例 | 取消 | date-cancel | 否，关闭 | Feedback Controls LinkButton ≥44 |
 
-只读、disabled、装饰性样例没有数据操作：BUTTON/disabled、TOGGLE/disabled、ACTION-ROW/disabled 不触发 callback；LIST-ROW/plain/unavailable、HUB-ROW/info/unavailable 不提供 click action。DatePicker 的应用入口、整体、确定/取消由应用赋 tag；Material 内部日期格/年导航和 sheet 内部手势使用平台 semantics，库没有逐格 tag 注入 API，本轮不侵入库或虚构 API。宿主应核实其可访问性和触控行为；这不是 app 自绘控件漏入口的豁免。
+只读、disabled、装饰性样例没有数据操作：BUTTON/disabled、TOGGLE/disabled、ACTION-ROW/disabled 不触发 callback；LIST-ROW/plain/unavailable、HUB-ROW/info/unavailable、HINT-BAR/info 不提供 click action。DatePicker 的应用入口、整体、确定/取消由应用赋 tag；Material 内部日期格/年导航和 sheet 内部手势使用平台 semantics，库没有逐格 tag 注入 API，本轮不侵入库或虚构 API。宿主应核实其可访问性和触控行为；这不是 app 自绘控件漏入口的豁免。
 
 ### L3 与图标接入
 
@@ -1097,18 +1101,7 @@ cursor-agent 独立复核及 T023/T024 完成门禁均 **未确认**。不修改
 Release APK 不携带 instrumentation。宿主需验证普通应用触发被拒及三个 API 的 shell session
 可用性，不能把静态源码依据视作设备安全验证。只对专用虚构模拟器运行安装任务。
 
-独立触发（仅在已安装对应 debug APK 时；`$S0_DEVICE_SERIAL` 为宿主明确设置的目标 serial）：
-
-```sh
-adb -s "$S0_DEVICE_SERIAL" shell am instrument -w -r \
-  com.ignacioli.finecoach/.seed.DebugSeedInstrumentation
-```
-
-成功预期为 `INSTRUMENTATION_RESULT: seed=SEED version=1 rows=5 status=ok`、
-`seed_pid`、`seed_log_time` 和 `INSTRUMENTATION_CODE: -1`；失败返回 `seed=status=failed`、
-code 0，且不输出 exception 或数据库字段。不能仅凭 adb 的退出码判断成功。
-app 唯一日志为 tag `FineCoachSeed` 的 `SEED version=1 rows=5 status=ok`，只含数字和固定状态。
-PID/时间用于宿主结果和本次 logcat 事件关联，不含业务内容。
+**已停用的 S0 独立触发与输出合同（历史记录）**：S0 曾通过独立 instrumentation 验证 metadata 样例及固定数值日志。当前入口已由 T019 接管，不再使用本段旧触发/输出约定；实际命令、失败非零规则和唯一预期输出见本文「S1 T019：真实 seed 与一键安装」（rows 1149/1138/1088）。seed 日志仍只含版本/计数/固定状态，PID/时间仅用于关联本次事件，不含业务内容。
 
 ### 种子记录表与持久性
 
@@ -1146,7 +1139,7 @@ contributor 失败整笔 rollback；降级、固定值冲突、同版本缺行/�
 
 也可明确设置 `ANDROID_SERIAL` 后运行 `./gradlew :app:s0InstallSeededDebug`；两个输入同时存在
 时必须完全一致，不默认挑设备。运行期间仅连接该一台设备，不热插拔。未指定、serial 非法、
-多设备（含 offline/unauthorized）、目标不匹配、输入冲突均在 installDebug 之前失败。
+多设备（含 offline/unauthorized）、目标不匹配、输入冲突均在安装之前失败。上面的 `s0InstallSeededDebug` 不是当前验收命令；旧 installDebug / `SEED version=1 rows=5` 合同已停用，预期输出只见文末 T019。
 
 - `DebugSeedTests`：10 tests，预期 0 failures/errors/skips。覆盖固定 UUID/UTC clock、
   schema1 五行、重复装载及磁盘重开、版本升级/保留无关 metadata、失败回滚、降级拒绝、
@@ -1157,12 +1150,7 @@ contributor 失败整笔 rollback；降级、固定值冲突、同版本缺行/�
   catalog/debug Application/入口名；包含二进制 manifest、资源表和所有 dex，不能只扫文件名。
   预期 `s0SeedIsolation: status=ok apk=… sha256=… dex=… manifest=1 resources=1`。
   当前不启用 shrinking/obfuscation；以后开启时必须重新评估名字扫描的证明边界。
-- `s0InstallSeededDebug`：单设备预检 → 实际 AGP installDebug → 再核实单设备/API31+ →
-  am instrument → 核对 instrumentation code/result + 本次 PID/时间之后唯一匹配的 logcat 行 →
-  `am start -W` 打开既有 MainActivity。命令失败、缺结果、失败状态、缺/旧/重复日志、
-  安装未执行或启动非 `Status: ok` 均非零。预期输出 `SEED version=1 rows=5 status=ok`，
-  然后 `s0InstallSeededDebug: status=ok serial=… api=… build=… apkSha256=…`；第二次仍为 version1/rows5。
-  不清空 logcat，不输出原始 instrumentation/系统日志内容。
+- **已停用的 S0 安装合同（仅历史记录）**：原 `s0InstallSeededDebug` 曾通过 AGP `installDebug` 安装 S0 metadata 样例。该流程及其旧输出约定已由 T019 替代，不再用作当前安装/验收命令。当前实际流程、serial 参数及唯一预期输出见本文「S1 T019：真实 seed 与一键安装」（multi/single/empty 的 rows 分别为1149/1138/1088）。
 
 隐私合同跟随本轮批准的固定 seed event 更新，只有指定 debug 入口中的一条精确 call 可用，
 其他 source 日志仍拒绝；Release dex 额外拒绝 seed 包/tag。宿主还需回归：
@@ -1173,20 +1161,13 @@ contributor 失败整笔 rollback；降级、固定值冲突、同版本缺行/�
   --tests '*PrivacySourceScanTests' --tests '*CapabilityManifestTests'
 ```
 
-### S1 扩展与延期
+### S1 扩展（T019，2026-11-09）
 
-S1 T019 在 debug 目录实现 `SeedContributor.install(database)` 和
-`verifiedRows(database)`，加入 `DebugSeed.contributors`，提升 `DebugSeed.VERSION` 并更新
-`ROWS`、测试/记录表。install 必须幂等、只操作自身稳定 ID 的虚构行；verifiedRows 验证实际
-数据并返回拥有行数，不能拿预期常数冒充验证。保留原 contributor/固定 Clock 与 UUID，
-使用同一 transaction，不在 contributor 内开新 transaction 或自行 close。
-S1 必须在其已批准业务 schema 上实现，并将 debug 业务读取绑定到独立虚构库；当前没有替换
-main factory，也没有声称 S1 直接调用 loader 就能展示业务。ROWS 是 S0 inventory，不是 loader 的计数来源。
+上面的 S0 五行 metadata、独立 `finecoach-debug-seed.db` 和10例 `DebugSeedTests` 是历史基础设施证据，保持不变。当前 `s0InstallSeededDebug` 已切到 S1 installer，实际命令/结果以本文末尾「S1 T019」为准，不再把 S0 五行 metadata 安装当 S1 交付。
 
-同一版本只验证，新增 contributor 必须升级版本；升级不得清用户数据或重写既有练课记录。
-需要重置时另经负责人确认，仅作用于专用虚构模拟器数据集，本轮不提供该功能。
-S1 所需 Student、Package、Appointment、Session、Set、ledger、template/分区等业务列和
-空列表/同名学员/各类课包/进行中训练场景全部延期至 S1，不能以本轮五行 metadata 宣称已交付。
+S1 数据由独立的 debug-only `S1DebugSeed` 经真实 Repository 写入一份全新、显式标记所有权的 `finecoach.db`，这正是冻结 S1Runtime 默认读取的库；不替换产品 factory，不通过 S0 contributor 的同步事务调用会切 dispatcher 的 Repository。S0 contributor 接口仍为 S0 测试保留，未改其版本/UUID/clock/inventory。这个接线取代原先“给 S0 contributor 加业务行、把业务页面改读另一个库”的预案：后者需修改已冻结的 graph/factory 且会让默认 S1 读不到 seed。
+
+只接受全新 app 数据目录，或完全匹配 dataset/version/scenario/complete 的既有 S1 seed。任何已有非 seed 数据库（包括空库）拒绝；重复执行只验证持久标记，不修改体验中编辑、删除、完成过的数据。初始化中断保留 installing 并非零，不自动 reset/repair。需要清理/更换场景由负责人另行决定，本工具不提供清库命令。Appointment 仍属于 S2，不造假数据。
 
 本轮 execution record：变更为非 UI debug 基础设施；复用既有 catalog，无视觉设计 delta；
 新增入口为 adb instrumentation，不新增用户交互，entry/layout map 沿用本 README 的 S0-08 map；
@@ -1281,3 +1262,101 @@ S1 所需 Student、Package、Appointment、Session、Set、ledger、template/�
   - `android/app/build/reports/lint-results-debug.*`
 
 编排方已修正 `ScopeBoundaryTests.kt:442-444` 的 `const val` 正则，本轮在该修正基础上继续收敛。
+
+### S1 T013c 休息通知能力
+
+批准能力新增且仅新增 `android.permission.POST_NOTIFICATIONS`（API33+ runtime）。API31/32 不申请该 runtime 权限。无 INTERNET、精确闹钟权限或网络 API。内部非 exported receiver 仅用于当前 Session 休息提醒。
+通知标题「休息结束」、正文「可以继续训练了」，不含任何身份、训练值、课包或备注。每 Session 一个 inexact alarm，±15秒替换；跳过/关闭/结束/放弃取消。使用 `setAndAllowWhileIdle`，系统可延迟投递；不承诺精准120秒系统通知。权限拒绝或系统关闭不阻断前台记录/休息计时。进程退出后由已调度 alarm 处理；设备重启不承诺保留。
+DEVICE `RestNotificationPermissionTests` 由宿主在专用虚构 API31/32、API33+ 环境通过 `am instrument` 执行；agent 的编译与 JVM 结果不等于设备授权、展示或系统送达证明。
+
+### S1 启动与 S0 隐私测试壳（S1-D20）
+
+安装后正常启动 debug 或 release 都默认进入 S1，无需启动开关：
+
+```sh
+adb shell am start -n com.ignacioli.finecoach/.MainActivity
+```
+
+仅需要 S0 隐私壳的 debug 测试使用显式 extra；该壳不作为日常启动入口：
+
+```sh
+adb shell am start -n com.ignacioli.finecoach/.MainActivity --ez finecoachS0Shell true
+```
+
+`PrivacyCoverTests` 仅启动 intent 带此 extra，既有断言不变。通知点击使用原有稳定 Session ID，始终进入 S1。release 没有 S0 provider，即使传入该 extra 也不会进入测试壳。
+
+## S1 T019：真实 seed 与一键安装
+
+先按本文 setup 配置 JDK21/SDK/cache。以下命令从 `android/` 运行；`S1_DEVICE_SERIAL` 必须是宿主明确指定的专用虚构模拟器 serial，且只连接这一个设备（S1-D21 默认 API31/API36 分别执行）。
+
+```sh
+./gradlew --offline :app:s0InstallSeededDebug -Pandroid.device="${S1_DEVICE_SERIAL:?required}" -Ps1.seedScenario=multi
+```
+
+这一条命令 build Debug APK → `adb -s SERIAL install -r -t` → 停止目标进程以串行初始化 → shell-only `am instrument` → 关闭重开数据库验证 complete/version/rows → 校验 instrumentation code/result 和本次 PID/时间的唯一数值日志 → `am start -W` 启动默认 S1。S1-D20 已在基线实现，不需要启动开关。每条 adb 命令都携带 serial；缺设备、冲突 serial、授权失败、安装/seed/日志/启动失败均非零。没有 `pm clear`、uninstall、reset 或自动库切换。相同命令可再执行一次，仍返回初始 inventory，保留教练体验更改。
+
+场景参数：`multi`（默认，两位学员各一进行中，初始 `SEED version=3 rows=1149 status=ok`）、`single`（一进行中，rows=1138）、`empty`（无学员/训练，rows=1088）。场景只在首次空数据目录安装时选择；已有 seed 切换参数会拒绝，不能靠参数重建。dataset=`fictional-s1-coach-core-v3`，版本3，clock=`2026-11-09T00:00:00Z`，UUID 以 `72000000-0000-4000-8000-` 为前缀，学员尾号1～7；其余生成ID使用固定顺序1000起，显式分段使用800～900，动作/组使用10000～13053（以 JSON 为准）。只含虚构内容。
+
+`rows` 是首次成功初始化时实际查询到的业务行数加 S1 自有 metadata 行数（含 rows 本身，不计框架、generation、created_at）；不是后续体验中的当前行数。重跑不要求已经删除/编辑的 seed 内容恢复到初始值。首次 marker 之前经 Repository 读取核验初始状态；重开持久性由 JVM 文件库测试与 instrumentation 二次 open 证明。写入失败会保留 installing 并失败，人工决定如何处置。
+
+隔离检查：
+
+```sh
+./gradlew --offline :app:s0SeedIsolation
+```
+
+实际执行 `S1DebugSeedTests` 12例与 `S1SeedIsolationTests` 4例（报告 `app/build/test-results/s1SeedChecks/`），精确非零、0 failures/errors/skips；随后检查实际 Release APK 的全部条目和 UTF-8/UTF-16 dex/manifest/resources 字节，拒绝 S0/S1 seed、fixture入口及标记。预期包含两条 `S1-SEED-CHECK suite=… tests=12/4 failures=0 errors=0 skips=0`，以及 `s0SeedIsolation: status=ok apk=… sha256=… dex=… manifest=1 resources=1`。不连接设备。
+
+完整改动清单、实测日志、初始场景与未验证项见 [T019](docs/s1/T019.md)；共享13向量与宿主 iOS 命令见 [T017](docs/s1/T017.md)；入口总表及未确认断言见 [implementation map](docs/s1/implementation-map.md)。安装/界面 runtime、负责人走查、独立复核与 T020 仍由宿主执行，不能用 JVM/Release 扫描代替。
+
+## S1 T020：负责人走查入口
+
+**已准备，待负责人走查。** 最终安装命令（从 `android/` 运行，将 `<SERIAL>` 替换为明确指定的目标设备）：
+
+```sh
+./gradlew --offline :app:s0InstallSeededDebug -Pandroid.device="<SERIAL>" -Ps1.seedScenario=multi
+```
+
+[负责人走查：安装条件、核心页与交互清单](docs/s1/walkthrough.md) · [entry/layout总表](docs/s1/implementation-map.md) · [T020宿主证据与PENDING](docs/s1/T020.md)
+
+T020 fix1：seed v2 使用周十节（同名两人）、李思远、林小禾、王小明、长名字样例与孙已归档等合成数据。session/模板引用内置杠铃平板卧推、俯卧撑、平板支撑；catalog 没有 cardio mode，跑步机使用 sessionOnly。所有场景先走与启动相同的 catalog 同步路径，新增 542 catalog + 541 name claim 行，multi/single/empty 分别为 1149/1138/1088。旧 v1 seed 由宿主决定卸载后重装，agent 不执行清库。详见 [T020-fix1](docs/s1/T020-fix1.md)。
+
+负责人追加的明文数据入口：[seed fixture 字段与重装指南](docs/s1/seed-fixture.md)。内容统一在 `app/src/debug/assets/seed/s1-seed.json`，当前 v3 保持 rows 1149/1138/1088；loader 与 installer 从该文件读取版本、时间、业务内容与预期行数。Release 不包含 fixture，内置引用缺失直接失败。
+
+## S0 恢复第 4 步：T019 / S0-14（2026-11-10）
+
+基线 `c41d1d4`，worktree `android-s1-conf`，branch `feat/android-s1-conformance`。开工 tracked/staged/untracked 全空，worktree gate PASS。本轮单写者；subagent 仅只读核对工具约束。未提交、未推送、未修改任何截图基线或产品 UI。
+
+从 `android/` 执行：
+
+```sh
+./gradlew :app:s0G5
+./gradlew :app:s0Conformance
+```
+
+agent 运行上述任务一律从产品根调用共享宿主锁 wrapper：
+
+```sh
+.handoff/bin/agent-test.sh --task s0G5
+.handoff/bin/agent-test.sh --task s0Conformance
+```
+
+本轮为 wrapper 添加了仅允许这两个 verify task 的 `--task` 模式，原有测试类模式保留；完整日志位于 `.handoff/logs/agent-test-android-s1-conf-*.log`，本轮输出另 tee 到 `s0-step4-*.log`。wrapper 位于共享 ignored `.handoff`，不在产品 Git diff 中。
+
+`s0G5` 只执行 `ComponentScreenshotTests`，使用 T016 debug catalog 的主按钮样例；组件基线独立于 environment，缺 `screenshot-baselines/components/DS-BUTTON-default.png` 时明确失败，不自动创建。结果：1 test / 1 expected failure / 0 skipped，退出 1；G5 保持 BLOCKED owner baseline。`s0G5` 的前后 baseline manifest 相同；独立 baseline guard 的 staged/unstaged/untracked/committed、ignored-untracked、digest 变化与受信批准正例共 7 tests 通过。详见 [T019](docs/s0/T019.md)。
+
+`s0Conformance` 使用真实 `ActiveSessionScreen` + test-only Room fixture；固定 API36 / NATIVE / 390×844dp / density2 / fontScale1 / zh-CN / 随包 Noto Sans SC。图层来源和坐标约定见 [conformance assets](design-assets/conformance/README.md)。产物位于 `app/build/outputs/conformance/P0-a2-training.{android.png,nodes.json,triptych.png,report.json,report.md}`。
+
+**当前状态：VALID_FIXTURE / 设计一致性FAIL（预期非零）**。宿主已修复编辑器预填等待和暂停clock下真实触摸无法完成的问题，本轮保留逐帧等待120、再推进500ms、临时autoAdvance真实点击plus后恢复暂停的流程，122.5断言通过，无SetText/IME注入。双次fresh Room/composition渲染hash一致：`c190e2890406e8b3c89c0f247baba457aaaff4229801cbd83ad414edc9f28a64`。S1-D30规定每层top/bottom/viewport，背景不再套用top offset；capsule由测试侧LayoutInfo共同父Row定位，无产品tag改动。最终51项：通过1、UI_DEVIATION40、missing10、不可见0，故s0Conformance退出1；raw像素差异37.2325%。ComponentContractTests27 + ConformanceVisibilityTests4 + ConformanceComparisonTests10共41/0/0。剩余偏差交step6，不修产品UI、不放宽容差、不改基线；本轮未看图，负责人视觉验收PENDING。详细计数、逐轴容差、top10、观测限制及日志见 [S0-14执行说明](docs/s0/S0-14-conformance.md)。
+
+### 负责人专用：组件基线录制（agent 禁止执行）
+
+负责人先亲自走查并批准样例，再从 `android/` 手动执行下列命令。复用 T003 已核实的 Roborazzi 1.77.0 record/verify 属性与显式 baseline 路径；本轮未执行该命令。
+
+```sh
+./gradlew :app:testDebugUnitTest --tests 'com.ignacioli.finecoach.ComponentScreenshotTests' -Proborazzi.test.record=true -Proborazzi.test.verify=false --rerun-tasks
+```
+
+常规 `testDebugUnitTest` / `testReleaseUnitTest` 排除 `ComponentScreenshotTests` 与 `TrainingConformanceTests`（`app/build.gradle.kts`）；只有显式传入 `-Proborazzi.test.record=true` 时才保留 `ComponentScreenshotTests`，因此上面这条命令仍能选中该类。`TrainingConformanceTests` 只在 `s0Conformance` 中运行。
+
+随后负责人登记文件清单、SHA-256 与批准 commit，再运行 `s0G5`。这不自动完成 T020，agent 不创建/批准/更新基线。宿主 S0-13 需接入 T019 baseline guard 的前后检查；本轮未修改 host gate。

@@ -17,10 +17,10 @@ const sums = new Map(fs.readFileSync(path.join(input, 'SHA256SUMS'), 'utf8').tri
   assert(match, `Unexpected checksum row: ${line}`);
   return [match[2], match[1]];
 }));
-assert.equal(sums.size, 14);
+assert.equal(sums.size, 20);
 const rows = fs.readFileSync(path.join(here, 'material-symbols-manifest.txt'), 'utf8').split('\n')
   .filter(line => line && !line.startsWith('#')).map(line => line.split('|').map(s => s.trim()));
-assert.equal(rows.length, 13);
+assert.equal(rows.length, 19);
 const drawableDir = path.resolve(here, '../app/src/main/res/drawable');
 const originals = path.join(here, 'material-symbols-svg');
 fs.mkdirSync(drawableDir, { recursive: true });
@@ -29,6 +29,8 @@ const records = [];
 for (const [name, styleWeight, iosSymbol, components] of rows) {
   assert(/^[a-z_]+$/.test(name));
   const [style, weight] = styleWeight.split('/');
+  const filled = name.endsWith('_filled');
+  const upstreamName = name.replace(/_filled$/, '');
   assert.equal(style, 'outlined');
   assert(['300', '400', '600'].includes(weight));
   const filename = `${name}.svg`;
@@ -44,9 +46,9 @@ for (const [name, styleWeight, iosSymbol, components] of rows) {
   const drawable = `ic_ms_${name}.xml`;
   fs.writeFileSync(path.join(drawableDir, drawable), xml);
   fs.writeFileSync(path.join(originals, filename), bytes);
-  records.push({ symbol: name, style, weight: Number(weight), iosSymbol, components: components.split(','),
+  records.push({ symbol: name, style, weight: Number(weight), fill: filled ? 1 : 0, iosSymbol, components: components.split(','),
     sourceSvg: `material-symbols-svg/${filename}`, sourceSha256: sums.get(filename), upstreamCommit: commit,
-    upstreamPath: `symbols/web/${name}/materialsymbolsoutlined/${name}${weight === '400' ? '' : `_wght${weight}`}_24px.svg`,
+    upstreamPath: `symbols/web/${upstreamName}/materialsymbolsoutlined/${upstreamName}${weight === '400' ? '' : `_wght${weight}`}${filled ? (weight === '400' ? '_fill1' : 'fill1') : ''}_24px.svg`,
     drawable: `app/src/main/res/drawable/${drawable}`, drawableSha256: sha(xml) });
 }
 const license = fs.readFileSync(path.join(input, 'LICENSE'));
@@ -64,5 +66,5 @@ fs.writeFileSync(path.join(packaged, 'material-symbols-LICENSE.txt'), license);
 const notice = `Material Symbols by Google\nSource: https://github.com/google/material-design-icons\nCommit: ${commit}\nLicensed under the Apache License, Version 2.0.\nSee material-symbols-LICENSE.txt for the full license.\nModified for Android: SVG paths retained verbatim; converted to vector drawable,\nY translated by 960; white placeholder fill colored by Compose tint.\n`;
 fs.writeFileSync(path.join(packaged, 'material-symbols-NOTICE.txt'), notice);
 fs.writeFileSync(path.join(here, 'material-symbols-NOTICE.txt'), notice);
-console.log(`Verified ${records.length} SVG SHA-256 values and LICENSE; wrote 13 vectors and provenance.`);
+console.log(`Verified ${records.length} SVG SHA-256 values and LICENSE; wrote ${records.length} vectors and provenance.`);
 console.log(`Packaged license SHA-256: ${sha(license)}; notice SHA-256: ${sha(notice)}`);

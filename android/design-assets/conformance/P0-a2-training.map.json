@@ -1,0 +1,455 @@
+{
+  "version": 2,
+  "toleranceDp": 2,
+  "originOffsetY": -52,
+  "originRule": "仅 anchor=top：expectedAndroidY=designY+originOffsetY+measuredContentTop，originOffsetY=-52 对齐画稿首内容与Android content顶；bottom比较视口底距，不应用此偏移；viewport按390×844视口比较。S1-D30，不吸收页面内部偏差。",
+  "viewport": {
+    "widthDp": 390,
+    "heightDp": 844,
+    "density": 2,
+    "fontScale": 1,
+    "locale": "zh-CN"
+  },
+  "elements": [
+    {
+      "path": "0",
+      "tag": "platform-shell",
+      "expectedToken": "color.surface.page",
+      "colorMethod": "exactPixelMode",
+      "textPolicy": "exact",
+      "anchor": "viewport"
+    },
+    {
+      "path": "1",
+      "text": "训练中",
+      "expectedToken": "color.text.primary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "2",
+      "tag": "session-student",
+      "expectedToken": "color.text.secondary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "3",
+      "tag": "session-clock",
+      "expectedToken": "color.action.primary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "4",
+      "scope": "$squat",
+      "text": "深蹲",
+      "expectedToken": "color.text.primary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "5",
+      "tag": "session-finish",
+      "expectedToken": "color.action.primary",
+      "colorMethod": "exactPixelMode",
+      "textPolicy": "exact",
+      "anchor": "bottom"
+    },
+    {
+      "path": "6",
+      "scope": "session-finish",
+      "text": "结束训练",
+      "expectedToken": "color.surface.page",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "bottom"
+    },
+    {
+      "path": "7",
+      "missingReason": "无独立可定位的 Compose semantics 节点；保留图层并报 missing，不用近似矩形替代 SVG/分割线。",
+      "expectedToken": null,
+      "colorMethod": "exactPixelMode",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "7/1",
+      "missingReason": "无独立可定位的 Compose semantics 节点；保留图层并报 missing，不用近似矩形替代 SVG/分割线。",
+      "expectedToken": "color.action.primary",
+      "colorMethod": "exactPixelMode",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "8",
+      "tag": "session-previous-$squatID",
+      "expectedToken": "color.text.secondary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "9",
+      "tag": "$set1-confirm",
+      "note": "触控容器；圆形本身无独立 semantics bounds，应暴露尺寸差",
+      "expectedToken": "color.action.primary",
+      "colorMethod": "exactPixelMode",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "10",
+      "scope": "$set1-confirm",
+      "text": "✓",
+      "expectedToken": "color.surface.page",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "11",
+      "scope": "$set1",
+      "text": "第 1 组",
+      "expectedToken": "color.text.primary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "12",
+      "tag": "$set1-values",
+      "expectedToken": "color.text.primary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "13",
+      "scope": "$set1",
+      "text": "已完成",
+      "expectedToken": "color.action.primary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "45",
+      "tag": "$set1-edit",
+      "expectedToken": null,
+      "colorMethod": "exactPixelMode",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "45/1",
+      "missingReason": "无独立可定位的 Compose semantics 节点；保留图层并报 missing，不用近似矩形替代 SVG/分割线。",
+      "expectedToken": "color.action.primary",
+      "colorMethod": "exactPixelMode",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "14",
+      "tag": "$set2-confirm",
+      "note": "触控容器；圆形本身无独立 semantics bounds，应暴露尺寸差",
+      "expectedToken": "color.action.primary",
+      "colorMethod": "exactPixelMode",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "15",
+      "scope": "$set2-confirm",
+      "text": "✓",
+      "expectedToken": "color.surface.page",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "16",
+      "scope": "$set2",
+      "text": "第 2 组",
+      "expectedToken": "color.text.primary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "17",
+      "tag": "$set2-values",
+      "expectedToken": "color.text.primary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "18",
+      "scope": "$set2-undo",
+      "text": "撤销",
+      "expectedToken": "color.action.primary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "46",
+      "tag": "$set2-edit",
+      "expectedToken": null,
+      "colorMethod": "exactPixelMode",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "46/1",
+      "missingReason": "无独立可定位的 Compose semantics 节点；保留图层并报 missing，不用近似矩形替代 SVG/分割线。",
+      "expectedToken": "color.action.primary",
+      "colorMethod": "exactPixelMode",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "19",
+      "text": "重量 kg",
+      "expectedToken": "color.text.secondary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "20",
+      "expectedToken": "color.surface.canvas",
+      "colorMethod": "exactPixelMode",
+      "textPolicy": "exact",
+      "anchor": "top",
+      "commonLayoutParentOfTags": [
+        "set-weight-minus",
+        "set-weight-plus"
+      ],
+      "containsTag": "set-weight-input",
+      "note": "测试侧读取minus/plus最近共同LayoutInfo父容器，且input祖先链必须包含它；不使用目标尺寸反选、不构造子节点union。"
+    },
+    {
+      "path": "21",
+      "tag": "set-weight-minus",
+      "expectedToken": "color.text.primary",
+      "colorMethod": "iconInk",
+      "textPolicy": "exact",
+      "note": "Android 为 painter 图标，无文字 semantics；原文精确比对仍失败。颜色取节点截图中排除白底/canvas 后的实际 RGB 众数。",
+      "anchor": "top"
+    },
+    {
+      "path": "22",
+      "tag": "set-weight-input",
+      "expectedToken": "color.text.primary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "23",
+      "tag": "set-weight-plus",
+      "expectedToken": "color.text.primary",
+      "colorMethod": "iconInk",
+      "textPolicy": "exact",
+      "note": "Android 为 painter 图标，无文字 semantics；原文精确比对仍失败。颜色取节点截图中排除白底/canvas 后的实际 RGB 众数。",
+      "anchor": "top"
+    },
+    {
+      "path": "24",
+      "text": "次数",
+      "expectedToken": "color.text.secondary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "25",
+      "expectedToken": "color.surface.canvas",
+      "colorMethod": "exactPixelMode",
+      "textPolicy": "exact",
+      "anchor": "top",
+      "commonLayoutParentOfTags": [
+        "set-reps-minus",
+        "set-reps-plus"
+      ],
+      "containsTag": "set-reps-input",
+      "note": "测试侧读取minus/plus最近共同LayoutInfo父容器，且input祖先链必须包含它；不使用目标尺寸反选、不构造子节点union。"
+    },
+    {
+      "path": "26",
+      "tag": "set-reps-minus",
+      "expectedToken": "color.text.primary",
+      "colorMethod": "iconInk",
+      "textPolicy": "exact",
+      "note": "Android 为 painter 图标，无文字 semantics；原文精确比对仍失败。颜色取节点截图中排除白底/canvas 后的实际 RGB 众数。",
+      "anchor": "top"
+    },
+    {
+      "path": "27",
+      "tag": "set-reps-input",
+      "expectedToken": "color.text.primary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "28",
+      "tag": "set-reps-plus",
+      "expectedToken": "color.text.primary",
+      "colorMethod": "iconInk",
+      "textPolicy": "exact",
+      "note": "Android 为 painter 图标，无文字 semantics；原文精确比对仍失败。颜色取节点截图中排除白底/canvas 后的实际 RGB 众数。",
+      "anchor": "top"
+    },
+    {
+      "path": "29",
+      "tag": "set-weight-hint",
+      "expectedToken": "color.text.secondary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "30",
+      "tag": "set-save",
+      "expectedToken": "color.action.primary",
+      "colorMethod": "exactPixelMode",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "31",
+      "scope": "set-save",
+      "text": "确认",
+      "expectedToken": "color.surface.page",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "32",
+      "missingReason": "无独立可定位的 Compose semantics 节点；保留图层并报 missing，不用近似矩形替代 SVG/分割线。",
+      "expectedToken": "color.surface.divider",
+      "colorMethod": "exactPixelMode",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "33",
+      "missingReason": "无独立可定位的 Compose semantics 节点；保留图层并报 missing，不用近似矩形替代 SVG/分割线。",
+      "expectedToken": null,
+      "colorMethod": "exactPixelMode",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "33/1",
+      "missingReason": "无独立可定位的 Compose semantics 节点；保留图层并报 missing，不用近似矩形替代 SVG/分割线。",
+      "expectedToken": "color.action.primary",
+      "colorMethod": "exactPixelMode",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "34",
+      "scope": "$bench",
+      "text": "卧推",
+      "expectedToken": "color.text.primary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "35",
+      "tag": "session-previous-$benchID",
+      "expectedToken": "color.text.secondary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "36",
+      "missingReason": "无独立可定位的 Compose semantics 节点；保留图层并报 missing，不用近似矩形替代 SVG/分割线。",
+      "expectedToken": "color.surface.divider",
+      "colorMethod": "exactPixelMode",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "37",
+      "scope": "session-add-exercise",
+      "text": "＋ 添加动作",
+      "expectedToken": "color.action.primary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "38",
+      "scope": "session-add-section",
+      "text": "＋ 新建分区",
+      "expectedToken": "color.action.primary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top"
+    },
+    {
+      "path": "39",
+      "tag": "rest-content",
+      "expectedToken": "color.surface.canvas",
+      "colorMethod": "exactPixelMode",
+      "textPolicy": "exact",
+      "anchor": "bottom"
+    },
+    {
+      "path": "40",
+      "scope": "rest-content",
+      "text": "组间休息",
+      "expectedToken": "color.text.secondary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "bottom"
+    },
+    {
+      "path": "41",
+      "tag": "rest-remaining",
+      "expectedToken": "color.text.primary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "bottom"
+    },
+    {
+      "path": "42",
+      "scope": "rest-minus",
+      "text": "−15 秒",
+      "expectedToken": "color.action.primary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "bottom"
+    },
+    {
+      "path": "43",
+      "scope": "rest-plus",
+      "text": "+15 秒",
+      "expectedToken": "color.action.primary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "bottom"
+    },
+    {
+      "path": "44",
+      "scope": "rest-skip",
+      "text": "跳过",
+      "expectedToken": "color.action.primary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "bottom"
+    }
+  ]
+}

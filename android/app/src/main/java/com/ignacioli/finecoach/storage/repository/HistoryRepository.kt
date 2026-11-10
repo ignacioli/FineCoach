@@ -3,6 +3,7 @@ package com.ignacioli.finecoach.storage.repository
 import com.ignacioli.finecoach.core.application.*
 import com.ignacioli.finecoach.core.domain.common.*
 import com.ignacioli.finecoach.storage.FineCoachDatabase
+import com.ignacioli.finecoach.storage.dao.RecentSessionCandidate
 import com.ignacioli.finecoach.storage.entity.SessionEntity
 import java.time.ZoneId
 import java.util.UUID
@@ -14,6 +15,13 @@ class HistoryRepository(
     private val expectedGeneration: UUID,
     private val zoneID: ZoneId,
 ) : HistoryRepositoryPort, SessionSettlementNotePort {
+    /** Read-only browse projection; the frozen history port and list semantics stay unchanged. */
+    suspend fun recentSessionIDs(studentID: StudentID?): ApplicationResult<List<SessionID>> = transaction {
+        database.t009HistoryDao().recentCandidates(studentID?.t008UUID())
+            .sortedWith(compareByDescending<RecentSessionCandidate> { it.completedAtUTC }.thenBy { it.id.toString() })
+            .map { SessionID.fromUUID(it.id) }
+    }
+
     override suspend fun list(query: HistoryQuery): ApplicationResult<List<SessionHistoryRecord>> = transaction {
         val today = clock.today(zoneID)
         val firstDay = query.window?.let { today.minusDays(it.days.toLong() - 1) }

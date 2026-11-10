@@ -1,3 +1,4 @@
+// fictional-data: Component labels are fictional and contain no personal data.
 package com.ignacioli.finecoach
 
 import androidx.compose.foundation.layout.*
@@ -48,6 +49,13 @@ class ComponentContractTests {
         assertEquals(44.dp, FcComponentMetrics.touch); assertEquals(52.dp, FcComponentMetrics.row)
         assertEquals(48.dp, FcComponentMetrics.field); assertEquals(96.dp, FcComponentMetrics.label)
         assertEquals(1.5.dp, FcComponentMetrics.stroke); assertEquals(300.dp, FcComponentMetrics.dialogWidth)
+        // DS-LAUNCH uses this empty shell; real startup failures/retries are covered by navigation tests.
+        assertEquals(androidx.compose.ui.graphics.Color.White, FcColors.surfacePage)
+        compose.setContent { FineCoachTheme { FcPlatformShell({}) {} } }
+        node("platform-shell").assertIsDisplayed().assertHasNoClickAction()
+        assertEquals(compose.onRoot().getUnclippedBoundsInRoot(), node("platform-shell").getUnclippedBoundsInRoot())
+        compose.onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsProperties.Text), useUnmergedTree = true).assertCountEquals(0)
+        compose.onAllNodes(hasClickAction(), useUnmergedTree = true).assertCountEquals(0)
     }
 
     @Test fun buttons() {
@@ -225,12 +233,19 @@ class ComponentContractTests {
         var calls = 0
         var dialog by mutableStateOf(false)
         show {
+            FcActionRow("归档学员", Modifier.testTag("short-detail"), detail = "可恢复") { }
             FcActionRow("普通", Modifier.testTag("normal")) { calls++ }
-            FcActionRow("删除样例", Modifier.testTag("danger"), destructive = true, trash = icon) { dialog = true }
+            FcActionRow("删除样例", Modifier.testTag("danger"), detail = "删除学员和训练记录；课包与课时流水仍保留，需二次确认", destructive = true, trash = icon) { dialog = true }
             FcActionRow("禁用", Modifier.testTag("disabled"), enabled = false) { calls++ }
             if (dialog) FcConfirmationDialog("确认删除？", "虚构数据", "删除", { calls++; dialog = false }, { dialog = false })
         }
-        listOf("normal", "danger", "disabled").forEach { full(it); touch(it) }
+        listOf("normal", "danger", "disabled", "short-detail").forEach { full(it); touch(it) }
+        val shortTitle = compose.onNodeWithText("归档学员", useUnmergedTree = true).fetchSemanticsNode().layoutInfo.parentInfo!!
+        val shortDetail = compose.onNodeWithText("可恢复", useUnmergedTree = true).fetchSemanticsNode().layoutInfo.parentInfo!!
+        assertTrue("Short detail must not reserve half the row", shortTitle.width > shortDetail.width)
+        val title = compose.onNodeWithText("删除样例", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        assertTrue("Long trailing detail must reserve title width", title.width >= 64.dp)
+        compose.onNodeWithText("删除学员和训练记录；课包与课时流水仍保留，需二次确认", useUnmergedTree = true).assertIsDisplayed()
         node("disabled").assertIsNotEnabled().performTouchInput { click() }
         node("danger").performClick(); node("confirm-accept").assertIsDisplayed()
         compose.runOnIdle { assertEquals(0, calls) }
@@ -250,6 +265,17 @@ class ComponentContractTests {
         show { if (open) FcBottomSheet("虚构面板", { open = false }) { FcActionRow("关闭", Modifier.testTag("close")) { open = false } } }
         node("sheet-content").assertIsDisplayed(); touch("close"); full("close", "sheet-content")
         node("close").performClick(); node("sheet-content").assertDoesNotExist()
+    }
+
+    @Test fun bottomSheetFullyExpandedShowsLastControl() {
+        show {
+            FcBottomSheet("虚构长面板", {}, skipPartiallyExpanded = true) {
+                repeat(8) { index ->
+                    FcActionRow("虚构操作 ${index + 1}", Modifier.testTag("long-sheet-$index")) { }
+                }
+            }
+        }
+        node("long-sheet-7").assertIsDisplayed().assertHasClickAction()
     }
 
     @Test fun confirmation() {
@@ -290,5 +316,60 @@ class ComponentContractTests {
             node(it.name).assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.ContentDescription))
                 .assertWidthIsEqualTo(if (it == FcAssetSymbol.Collapse) 15.dp else 20.dp)
         }
+    }
+
+    @Test fun hintBar() {
+        var calls = 0
+        show {
+            FcHintBar("虚构提示", Modifier.testTag("hint"))
+            FcHintBar("虚构训练中", Modifier.testTag("active"), actionTitle = "继续", onClick = { calls++ })
+        }
+        full("hint")
+        node("hint").assertHeightIsAtLeast(44.dp).assertContentDescriptionEquals("虚构提示")
+        full("active")
+        touch("active")
+        node("active").performClick()
+        compose.runOnIdle { assertEquals(1, calls) }
+    }
+
+    @Test fun heroCard() {
+        var calls = 0
+        show {
+            FcHeroCard(
+                badgeText = "进行中",
+                title = "虚构标题",
+                subtitle = "虚构副标题",
+                modifier = Modifier.testTag("hero"),
+                actionTitle = "继续样例",
+                onClick = { calls++ },
+            )
+        }
+        full("hero")
+        node("hero").assertHeightIsAtLeast(100.dp).assertHasClickAction().performClick()
+        compose.onNodeWithText("虚构标题").assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading))
+        compose.runOnIdle { assertEquals(1, calls) }
+    }
+    @Test fun setRow() {
+        var confirms = 0; var edits = 0
+        var completed by mutableStateOf(false)
+        var undos = 0
+        show { FcSetRow(1, "12.5 × 8", completed, !completed, { confirms++ }, { edits++ }, Modifier.testTag("set"), tag = "set",
+            onUndo = if (completed) ({ undos++ }) else null) }
+        full("set"); touch("set-confirm"); touch("set-edit")
+        node("set-edit").assertContentDescriptionEquals("编辑组")
+        node("set-confirm").assertIsDisplayed().performClick(); node("set-edit").assertIsDisplayed().performClick()
+        compose.runOnIdle { assertEquals(1, confirms); assertEquals(1, edits); completed = true }
+        node("set-confirm").assertIsNotEnabled()
+        node("set-undo").assertIsDisplayed().assertHasClickAction().performClick()
+        node("set-edit").assertIsDisplayed().assertHasClickAction()
+        full("set"); touch("set-undo")
+        compose.runOnIdle { assertEquals(1, undos) }
+    }
+    @Test fun multiHeroCard() {
+        var opened = ""
+        show { FcMultiHeroCard(listOf(FcHeroEntry("a", "虚构甲", "训练中"), FcHeroEntry("b", "虚构乙", "训练中")), { opened = it }, Modifier.testTag("multi")) }
+        full("multi"); touch("hero-a"); touch("hero-b")
+        node("hero-a").assertIsDisplayed().performClick(); assertEquals("a", opened)
+        node("hero-b").assertIsDisplayed().performClick(); assertEquals("b", opened)
     }
 }

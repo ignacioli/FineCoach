@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "count": 13,
+  "vectors": [
+    {
+      "id": "s1-student-required-fields",
+      "path": "s1/students/m1a-fr-003__s1-student-required-fields.json",
+      "sha256": "1dcdec6e56e4103084b8140c54a1dc0abfb9a83fa0389b78df71253cd68e79de",
+      "androidAdapter": "student.required",
+      "iosAdapter": "student.required"
+    },
+    {
+      "id": "s1-student-optional-fields-roundtrip",
+      "path": "s1/students/m1a-fr-005__s1-student-optional-fields-roundtrip.json",
+      "sha256": "6fb0022d9e9a18c69f7a369aa9a0ff44b031285b01ad1281ee689659f52270ff",
+      "androidAdapter": "student.optional",
+      "iosAdapter": "student.optional"
+    },
+    {
+      "id": "s1-student-same-name-distinct-ids",
+      "path": "s1/students/m1a-fr-003__s1-student-same-name-distinct-ids.json",
+      "sha256": "c49c15f9c208086dc5113f74a4636cb002139cc8269112bc5162d22b785b1f4c",
+      "androidAdapter": "student.same-name",
+      "iosAdapter": "student.same-name"
+    },
+    {
+      "id": "s1-session-start-reuses-student-active-session",
+      "path": "s1/sessions/m1a-fr-011__s1-session-start-reuses-student-active-session.json",
+      "sha256": "6086c412d05431f5d07a27409280d409e4bb29402979ae5def991d244d21a510",
+      "androidAdapter": "session.start",
+      "iosAdapter": "session.start"
+    },
+    {
+      "id": "s1-set-completion-validity",
+      "path": "s1/sets/m1a-fr-020__s1-set-completion-validity.json",
+      "sha256": "dbc6a5bc99386dcd4888d2c13da5c61cccc6b98788f4de2a52a2eeba83497e64",
+      "androidAdapter": "set.validity",
+      "iosAdapter": "set.validity"
+    },
+    {
+      "id": "s1-set-copy-stays-pending",
+      "path": "s1/sets/m1a-fr-020__s1-set-copy-stays-pending.json",
+      "sha256": "b41209cfe3c0f13aa8690ceca6f0ad18bbc97a01c26839995874533f6cefc5a7",
+      "androidAdapter": "set.copy",
+      "iosAdapter": "set.copy"
+    },
+    {
+      "id": "s1-package-ending-retains-history",
+      "path": "s1/course-packages/m1b-fr-012__s1-package-ending-retains-history.json",
+      "sha256": "7d8a6b9acad095b75e63780f255f33c4b7d0b9886cbc217e6cbc75b4cea1f575",
+      "androidAdapter": "package.end",
+      "iosAdapter": "package.end"
+    },
+    {
+      "id": "s1-package-replacement-confirmation-gate",
+      "path": "s1/course-packages/m1b-fr-012__s1-package-replacement-confirmation-gate.json",
+      "sha256": "e119d1e1775c0f67ba580967aa2a727f87ae5f083bfa534f12d8a364509dd16a",
+      "androidAdapter": "package.replace",
+      "iosAdapter": "package.replace"
+    },
+    {
+      "id": "s1-package-session-debit-idempotent",
+      "path": "s1/course-packages/m1b-fr-015__s1-package-session-debit-idempotent.json",
+      "sha256": "4f7ce8fb3a5a01331b74d8949816ee7850c97ed7c93eb98cb65dd003deec78e5",
+      "androidAdapter": "package.debit",
+      "iosAdapter": "package.debit"
+    },
+    {
+      "id": "s1-package-reopen-refunds-once",
+      "path": "s1/course-packages/m1b-fr-015__s1-package-reopen-refunds-once.json",
+      "sha256": "6728cdad7dbda4ce0131fec194d1808dbc60561cba41ee99602fc2f0ca576c68",
+      "androidAdapter": "package.refund",
+      "iosAdapter": "package.refund"
+    },
+    {
+      "id": "s1-history-most-recent-completed-session",
+      "path": "s1/history/m1a-fr-030__s1-history-most-recent-completed-session.json",
+      "sha256": "a7cf7e03553ec724e522c522528b2e0dd7ab47ed060072e0608aa34123280a45",
+      "androidAdapter": "history.recent",
+      "iosAdapter": "history.recent"
+    },
+    {
+      "id": "s1-statistics-completed-only",
+      "path": "s1/sets/m1a-fr-020__s1-statistics-completed-only.json",
+      "sha256": "79aa5e1c21806fa8be39b7e8cbc4f2234afb3383f7d162210b22032986d5911b",
+      "androidAdapter": "set.statistics",
+      "iosAdapter": "set.statistics"
+    },
+    {
+      "id": "s1-package-ledger-balance",
+      "path": "s1/course-packages/m1b-fr-015__s1-package-ledger-balance.json",
+      "sha256": "d0c2dce3738f5889fe3d9d72a3c80ab0042985b022bf1775baa601920ad61bb6",
+      "androidAdapter": "credit-ledger.balance",
+      "iosAdapter": "credit-ledger.balance"
+    }
+  ],
+  "meta": {
+    "tags": [
+      "fictional-data"
+    ]
+  }
+}

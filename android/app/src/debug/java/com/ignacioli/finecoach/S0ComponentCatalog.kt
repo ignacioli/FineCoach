@@ -38,6 +38,8 @@ val S0CatalogEntries = listOf(
     S0CatalogEntry("DS-SAVE-STATUS", listOf("saving", "saved", "failed")),
     S0CatalogEntry("DS-AVATAR", listOf("initial")),
     S0CatalogEntry("DS-SYMBOL", listOf("pageBack", "back", "forward", "check", "checkOnFill", "minus", "plus", "collapse")),
+    S0CatalogEntry("DS-HINT-BAR", listOf("info", "continue")),
+    S0CatalogEntry("DS-HERO-CARD", listOf("single")),
 )
 
 @Composable
@@ -48,14 +50,14 @@ internal fun S0ComponentCatalog(onBack: () -> Unit) {
         FcPageHeader(selectedId ?: "基础组件样例", onBack = back, tag = "catalog")
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).testTag("catalog-content"),
             verticalArrangement = Arrangement.spacedBy(FcSpacing.space3)) {
-            if (selectedId == null) S0CatalogEntries.forEach { entry ->
+            if (selectedId == null) (S0CatalogEntries + S1CatalogEntries).forEach { entry ->
                 FcGroupEntryRow(entry.id, entry.states.size, Modifier.testTag("catalog-${entry.id}")) { selectedId = entry.id }
             } else {
-                val entry = S0CatalogEntries.single { it.id == selectedId }
+                val entry = (S0CatalogEntries + S1CatalogEntries).single { it.id == selectedId }
                 Text("虚构样例 · 无持久化", style = FcTypography.caption, color = FcColors.textSecondary)
                 entry.states.forEach { state ->
                     FcSectionLabel(state)
-                    S0ComponentState(entry.id, state)
+                    if (entry in S1CatalogEntries) S1ComponentState(entry.id, state) else S0ComponentState(entry.id, state)
                 }
             }
         }
@@ -86,7 +88,7 @@ internal fun S0ComponentState(id: String, state: String) {
                     FcTitleIconButton("设置样例", painterResource(R.drawable.ic_ms_settings), modifier, tap)
                     FcTitleIconButton("日历样例", painterResource(R.drawable.ic_ms_calendar_month), Modifier.testTag("$tag-calendar"), tap)
                     FcTitleIconButton("资料库样例", painterResource(R.drawable.ic_ms_grid_view), Modifier.testTag("$tag-library"), tap)
-                    FcTitleIconButton("筛选样例", painterResource(R.drawable.ic_ms_filter_list), Modifier.testTag("$tag-filter"), tap)
+                    FcTitleIconButton("筛选样例", painterResource(R.drawable.ic_ms_filter_alt), Modifier.testTag("$tag-filter"), tap)
                 }
             "DS-SEGMENTED" -> {
                 var selected by remember { mutableIntStateOf(if (state == "first") 0 else 1) }
@@ -129,7 +131,7 @@ internal fun S0ComponentState(id: String, state: String) {
                 "action" -> FcRowMode.Action(tap); "unavailable" -> FcRowMode.Unavailable("档案未包含"); else -> FcRowMode.Informational
             })
             "DS-INLINE-RESULT" -> FcInlineResult(when (state) { "failure" -> FcResultVariant.Failure; "success" -> FcResultVariant.Success; else -> FcResultVariant.Info },
-                "虚构结果", "仅演示，不代表保存或交付", painterResource(if (state == "failure") R.drawable.ic_ms_priority_high else R.drawable.ic_ms_info), modifier, onRetry = tap, tag = tag)
+                "虚构结果", "仅演示，不代表保存或交付", painterResource(if (state == "failure") R.drawable.ic_ms_priority_high else R.drawable.ic_ms_info_i), modifier, onRetry = tap, tag = tag)
             "DS-ACTION-ROW" -> {
                 FcActionRow(if (state == "destructive") "删除虚构样例" else "普通操作样例", modifier,
                     destructive = state == "destructive", enabled = state != "disabled",
@@ -150,11 +152,17 @@ internal fun S0ComponentState(id: String, state: String) {
             }
             "DS-STATUS" -> {
                 val status = FcStatus.entries.single { it.name.replaceFirstChar(Char::lowercase) == state }
-                FcStatusLabel(status, painterResource(if (status.warning) R.drawable.ic_ms_priority_high else R.drawable.ic_ms_info), modifier)
+                FcStatusLabel(status, painterResource(if (status.warning) R.drawable.ic_ms_priority_high else R.drawable.ic_ms_info_i), modifier)
             }
             "DS-SAVE-STATUS" -> FcSaveStatusView(FcSaveState.entries.single { it.name.lowercase() == state },
                 painterResource(when (state) { "saving" -> R.drawable.ic_ms_sync; "saved" -> R.drawable.ic_ms_check_circle; else -> R.drawable.ic_ms_warning }), modifier)
             "DS-AVATAR" -> FcAvatar("虚构", modifier)
+            "DS-HINT-BAR" -> if (state == "continue") {
+                FcHintBar("虚构训练中", modifier, actionTitle = "继续", onClick = tap)
+            } else {
+                FcHintBar("虚构提示", modifier)
+            }
+            "DS-HERO-CARD" -> FcHeroCard("进行中", "虚构标题", "虚构副标题", modifier, actionTitle = "继续样例", onClick = tap)
             "DS-SYMBOL" -> if (state in listOf("minus", "plus", "collapse")) {
                 FcSymbol(FcAssetSymbol.entries.single { it.name.lowercase() == state },
                     painterResource(when (state) { "minus" -> R.drawable.ic_ms_remove; "plus" -> R.drawable.ic_ms_add; else -> R.drawable.ic_ms_expand_more }), modifier)

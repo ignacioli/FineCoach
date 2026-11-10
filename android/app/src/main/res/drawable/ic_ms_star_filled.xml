@@ -4,6 +4,6 @@
     android:width="24dp" android:height="24dp"
     android:viewportWidth="960" android:viewportHeight="960">
     <group android:translateY="960">
-        <path android:fillColor="@android:color/white" android:pathData="M411.15-260v-60h137.31v60H411.15ZM256.16-450v-60h447.3v60h-447.3ZM140-640v-60h680v60H140Z" />
+        <path android:fillColor="@android:color/white" android:pathData="m233-120 65-281L80-590l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Z" />
     </group>
 </vector>
