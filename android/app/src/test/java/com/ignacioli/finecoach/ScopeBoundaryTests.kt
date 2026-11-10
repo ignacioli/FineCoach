@@ -503,6 +503,8 @@ class ScopeBoundaryTests {
         "STUDENT_HISTORY" to "students/{\$ARG_STUDENT_ID}/history",
         "PACKAGE_DETAIL" to "packages/{\$ARG_PACKAGE_ID}",
         "SESSION_ACTIVE" to "session/{\$ARG_SESSION_ID}",
+        // T020 fix1: owner-approved student title entry for coach resources.
+        "RESOURCE_HUB" to "resources",
         "TEMPLATES" to "templates",
         "TEMPLATE_DETAIL" to "templates/{\$ARG_TEMPLATE_ID}",
         "EXERCISES" to "exercises",

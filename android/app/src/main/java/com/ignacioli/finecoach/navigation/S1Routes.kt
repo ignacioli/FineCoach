@@ -20,6 +20,7 @@ object S1Routes {
     const val STUDENT_HISTORY = "students/{$ARG_STUDENT_ID}/history"
     const val PACKAGE_DETAIL = "packages/{$ARG_PACKAGE_ID}"
     const val SESSION_ACTIVE = "session/{$ARG_SESSION_ID}"
+    const val RESOURCE_HUB = "resources"
     const val TEMPLATES = "templates"
     const val TEMPLATE_DETAIL = "templates/{$ARG_TEMPLATE_ID}"
     const val EXERCISES = "exercises"
@@ -35,6 +36,7 @@ object S1Routes {
         STUDENT_HISTORY,
         PACKAGE_DETAIL,
         SESSION_ACTIVE,
+        RESOURCE_HUB,
         TEMPLATES,
         TEMPLATE_DETAIL,
         EXERCISES,

@@ -13,9 +13,11 @@ class S1SeedIsolationTests {
         main.forEach { file ->
             val source=file.readText()
             assertFalse(source.contains("S1DebugSeed")); assertFalse(source.contains("DebugSeedInstrumentation"))
-            assertFalse(source.contains("s1_debug_seed.")); assertFalse(source.contains("fictional-s1-coach-core-v1"))
+            assertFalse(source.contains("s1_debug_seed.")); assertFalse(source.contains("fictional-s1-coach-core-v1")); assertFalse(source.contains("fictional-s1-coach-core-v2")); assertFalse(source.contains("S1SeedFixture"))
         }
         assertTrue(File(app,"src/debug/java/com/ignacioli/finecoach/seed/S1DebugSeed.kt").isFile)
+        assertTrue(File(app,"src/debug/assets/seed/s1-seed.json").isFile)
+        assertFalse(File(app,"src/main/assets/seed/s1-seed.json").exists())
         assertTrue(File(app,"src/debug/AndroidManifest.xml").readText().contains("seed.DebugSeedInstrumentation"))
         assertFalse(File(app,"src/main/AndroidManifest.xml").readText().contains("<instrumentation"))
     }
@@ -33,7 +35,7 @@ class S1SeedIsolationTests {
         assertTrue(installer.contains("requireSingleDevice()")); assertTrue(installer.contains("\"-s\", serial"))
         assertFalse(installer.contains("\"clear\"")); assertFalse(installer.contains("\"uninstall\""))
         assertTrue(installer.contains("INSTRUMENTATION_CODE: -1"))
-        assertTrue(installer.contains("Status: ok")); assertTrue(installer.contains("S1DebugSeed"))
+        assertTrue(installer.contains("JsonSlurper")); assertTrue(installer.contains("seed/s1-seed.json")); assertTrue(installer.contains("Status: ok")); assertTrue(installer.contains("S1DebugSeed"))
     }
     @Test fun releaseGateScansBinaryEntriesAndRunsTheExactIsolationSuite() {
         val build=File(app,"build.gradle.kts").readText()

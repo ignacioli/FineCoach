@@ -17,6 +17,14 @@ import kotlinx.coroutines.sync.withLock
 /** Process-owned database; tests inject their isolated file database and own its lifetime. */
 class S1AppGraph(val database: FineCoachDatabase, val clock: AppClock, val ids: StableIDGenerator,
     val generation: UUID, val context: Context, val zone: ZoneId = ZoneId.systemDefault()) {
+    private val catalogGate = Mutex()
+    private var catalogPrepared = false
+    suspend fun prepareExerciseCatalog() = catalogGate.withLock {
+        if (!catalogPrepared) {
+            exerciseRepository.prepareCatalog()
+            catalogPrepared = true
+        }
+    }
     val studentRepository = StudentRepository(database, clock)
     val students = StudentUseCases(studentRepository, clock, ids)
     val exerciseRepository = ExerciseRepository(database, ExerciseCatalogLoader(context.assets), clock)

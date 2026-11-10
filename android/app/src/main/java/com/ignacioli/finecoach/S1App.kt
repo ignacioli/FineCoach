@@ -22,6 +22,7 @@ import com.ignacioli.finecoach.features.templates.*
 import com.ignacioli.finecoach.features.session.*
 import com.ignacioli.finecoach.features.history.*
 import com.ignacioli.finecoach.features.today.*
+import com.ignacioli.finecoach.features.resources.*
 import com.ignacioli.finecoach.navigation.*
 import com.ignacioli.finecoach.notifications.*
 import kotlinx.coroutines.launch
@@ -88,6 +89,7 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
     var adjustmentRequested by remember { mutableStateOf<CoursePackageID?>(null) }
     val adapter = remember(graph) { RestNotifications(graph.context) }
     LaunchedEffect(graph, recoveryAttempt) {
+        graph.prepareExerciseCatalog()
         graph.rests.notifications = adapter
         when (graph.recovery.reconcileOnLaunch()) {
             is ApplicationResult.Failure -> recoveryError = true
@@ -166,6 +168,9 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
             val state = remember(id) { HistoryUiState(graph.history, null) }
             val templates = remember(id) { HistoryTemplateState(graph.templates, graph.clock, graph.ids) }
             HistoryDetailScreen(state, id, graph.zone, back, templates)
+        }
+        composable(S1Routes.RESOURCE_HUB) {
+            ResourceHubScreen(graph.exerciseRepository, graph.templates, navigator::open, back)
         }
         composable(S1Routes.EXERCISES) {
             val state = remember { ExerciseUiState(graph.exercises, graph.exerciseRepository) }

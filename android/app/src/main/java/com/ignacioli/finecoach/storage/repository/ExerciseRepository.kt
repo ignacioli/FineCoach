@@ -25,13 +25,29 @@ class ExerciseRepository(
     private val base get() = database.s1Dao()
     private val pinyin = ConcurrentHashMap<String, Pair<String, String>>()
 
+    /** Launch preparation is separate from Room construction and never blocks app availability on failure. */
+    var catalogUnavailable: Boolean = false
+        private set
+
+    suspend fun prepareCatalog() {
+        val result = synchronizeCatalog()
+        catalogUnavailable = result is ApplicationResult.Failure &&
+            (listCatalog() as? ApplicationResult.Success)?.value?.any { it.kind == ExerciseKind.builtIn } != true
+    }
+
     /** Keeps historical rows addressable, including retired/archived/hidden items. */
     override suspend fun listCatalog(): ApplicationResult<List<ExerciseRecord>> = transaction {
         dao.catalog().map { it.record() }
     }
 
     override suspend fun search(query: String): ApplicationResult<List<ExerciseRecord>> = transaction {
-        val metadata = loader.load(clock.now()).metadata
+        val metadata = try { loader.load(clock.now()).metadata }
+        catch (cancelled: CancellationException) { throw cancelled }
+        catch (failure: Exception) {
+            // Existing durable catalog remains searchable when bundled metadata cannot be read.
+            if (dao.catalog().none { it.kind == ExerciseKind.builtIn }) throw failure
+            emptyMap()
+        }
         val preferences = dao.preferences().associateBy { it.exerciseID }
         val occupied = dao.claims().filter { it.ownerKind != ExerciseSourceKind.builtIn }.map { it.normalizedName }.toSet()
         val normalizedQuery = fold(query.trim())

@@ -1,0 +1,702 @@
+{
+  "declaration": "fictional-data: all people, identifiers, notes and values are invented walkthrough fixtures.",
+  "source": "ios/FineCoachApp/Core/Platform/ArchiveExportDebugSeed.swift（仅借鉴虚构姓名与训练文案风格）",
+  "seedVersion": 3,
+  "dataset": "fictional-s1-coach-core-v3",
+  "clockUTC": "2026-11-09T00:00:00Z",
+  "uuidPrefix": "72000000-0000-4000-8000-",
+  "generatedIDStart": 1000,
+  "catalogCount": 542,
+  "expectedRows": {
+    "empty": 1088,
+    "single": 1138,
+    "multi": 1149
+  },
+  "scenarios": [
+    {
+      "key": "empty",
+      "scenario": "T019 空学员/空训练；保留内置动作库"
+    },
+    {
+      "key": "single",
+      "scenario": "T019 一位学员进行中；其余全部课包/历史/模板场景"
+    },
+    {
+      "key": "multi",
+      "scenario": "T019 两位学员各自进行中；其余全部场景"
+    }
+  ],
+  "students": [
+    {
+      "scenario": "T019 同名两人之一；active；无课包；single/multi 进行中",
+      "variants": [
+        "single",
+        "multi"
+      ],
+      "id": 1,
+      "name": "周十节",
+      "sex": "male",
+      "trainingGoal": "建立基础力量",
+      "privateCoachNote": "合成走查样例：注意动作节奏，按当天状态调整训练量。",
+      "phone": "000-0100",
+      "wechatID": "fictional-seed-1",
+      "lifecycle": "active",
+      "offsetSeconds": 0
+    },
+    {
+      "scenario": "T019 同名两人之二；active；可用课包；completed 历史与 ledger；multi 进行中",
+      "variants": [
+        "single",
+        "multi"
+      ],
+      "id": 2,
+      "name": "周十节",
+      "sex": "female",
+      "trainingGoal": "增肌与动作控制",
+      "privateCoachNote": "合成走查样例：注意动作节奏，按当天状态调整训练量。",
+      "phone": "000-0101",
+      "wechatID": "fictional-seed-2",
+      "lifecycle": "active",
+      "offsetSeconds": 0
+    },
+    {
+      "scenario": "T019 active；到期课包",
+      "variants": [
+        "single",
+        "multi"
+      ],
+      "id": 3,
+      "name": "李思远",
+      "sex": "other",
+      "trainingGoal": "减脂塑形",
+      "privateCoachNote": "合成走查样例：注意动作节奏，按当天状态调整训练量。",
+      "phone": "000-0102",
+      "wechatID": "fictional-seed-3",
+      "lifecycle": "active",
+      "offsetSeconds": 0
+    },
+    {
+      "scenario": "T019 active；耗尽课包",
+      "variants": [
+        "single",
+        "multi"
+      ],
+      "id": 4,
+      "name": "林小禾",
+      "sex": "undisclosed",
+      "trainingGoal": "核心稳定",
+      "privateCoachNote": "合成走查样例：注意动作节奏，按当天状态调整训练量。",
+      "phone": "000-0103",
+      "wechatID": "fictional-seed-4",
+      "lifecycle": "active",
+      "offsetSeconds": 0
+    },
+    {
+      "scenario": "T019 active；ended 课包",
+      "variants": [
+        "single",
+        "multi"
+      ],
+      "id": 5,
+      "name": "王小明",
+      "sex": "male",
+      "trainingGoal": "保持运动习惯",
+      "privateCoachNote": "合成走查样例：注意动作节奏，按当天状态调整训练量。",
+      "phone": "000-0104",
+      "wechatID": "fictional-seed-5",
+      "lifecycle": "active",
+      "offsetSeconds": 0
+    },
+    {
+      "scenario": "T019 active；旧包 ended 与新包 active；长名字换行",
+      "variants": [
+        "single",
+        "multi"
+      ],
+      "id": 6,
+      "name": "这是一位用来检查长名字换行的虚构学员张浩然",
+      "sex": "female",
+      "trainingGoal": "改善体能与耐力",
+      "privateCoachNote": "合成走查样例：注意动作节奏，按当天状态调整训练量。",
+      "phone": "000-0105",
+      "wechatID": "fictional-seed-6",
+      "lifecycle": "active",
+      "offsetSeconds": 0
+    },
+    {
+      "scenario": "T019 archived；可恢复",
+      "variants": [
+        "single",
+        "multi"
+      ],
+      "id": 7,
+      "name": "孙已归档",
+      "sex": "other",
+      "trainingGoal": "恢复规律训练",
+      "privateCoachNote": "合成走查样例：注意动作节奏，按当天状态调整训练量。",
+      "phone": "000-0106",
+      "wechatID": "fictional-seed-7",
+      "lifecycle": "archived",
+      "offsetSeconds": 0
+    }
+  ],
+  "packages": [
+    {
+      "key": "available",
+      "scenario": "T019 available 课包",
+      "variants": [
+        "single",
+        "multi"
+      ],
+      "studentID": 2,
+      "name": "私教基础 8 次卡",
+      "totalCredits": 8,
+      "startDate": "2026-11-01",
+      "endDate": "2099-12-31",
+      "state": "active",
+      "confirmedReplacement": false,
+      "offsetSeconds": 0
+    },
+    {
+      "key": "expired",
+      "scenario": "T019 expired 课包",
+      "variants": [
+        "single",
+        "multi"
+      ],
+      "studentID": 3,
+      "name": "减脂训练 8 次卡",
+      "totalCredits": 8,
+      "startDate": "2026-11-01",
+      "endDate": "2026-11-02",
+      "state": "active",
+      "confirmedReplacement": false,
+      "offsetSeconds": 0
+    },
+    {
+      "key": "exhausted",
+      "scenario": "T019 exhausted 课包",
+      "variants": [
+        "single",
+        "multi"
+      ],
+      "studentID": 4,
+      "name": "核心进阶 8 次卡",
+      "totalCredits": 8,
+      "startDate": "2026-11-01",
+      "endDate": "2099-12-31",
+      "state": "active",
+      "confirmedReplacement": false,
+      "offsetSeconds": 0
+    },
+    {
+      "key": "ended",
+      "scenario": "T019 ended 课包",
+      "variants": [
+        "single",
+        "multi"
+      ],
+      "studentID": 5,
+      "name": "体能训练 8 次卡",
+      "totalCredits": 8,
+      "startDate": "2026-11-01",
+      "endDate": "2099-12-31",
+      "state": "ended",
+      "confirmedReplacement": false,
+      "offsetSeconds": 0
+    },
+    {
+      "key": "replacement-old",
+      "scenario": "T019 replacement-old 课包",
+      "variants": [
+        "single",
+        "multi"
+      ],
+      "studentID": 6,
+      "name": "力量基础 8 次卡",
+      "totalCredits": 8,
+      "startDate": "2026-11-01",
+      "endDate": "2099-12-31",
+      "state": "active",
+      "confirmedReplacement": false,
+      "offsetSeconds": 0
+    },
+    {
+      "key": "replacement-new",
+      "scenario": "T019 replacement-new 课包",
+      "variants": [
+        "single",
+        "multi"
+      ],
+      "studentID": 6,
+      "name": "力量进阶 12 次卡",
+      "totalCredits": 12,
+      "startDate": null,
+      "endDate": null,
+      "state": "active",
+      "confirmedReplacement": true,
+      "offsetSeconds": 0
+    }
+  ],
+  "sessions": [
+    {
+      "key": "history",
+      "scenario": "T019 completed 历史；四 mode；公开总结与教练备注",
+      "variants": [
+        "single",
+        "multi"
+      ],
+      "studentID": 2,
+      "state": "completed",
+      "startOffsetSeconds": 0,
+      "finishOffsetSeconds": 0,
+      "trainingFocus": [],
+      "sections": [
+        {
+          "scenario": "T019 历史训练分段",
+          "id": 800,
+          "name": "主训练",
+          "orderIndex": 0
+        }
+      ],
+      "exercises": [
+        {
+          "scenario": "T019 四种 mode：weightReps；completed 训练组",
+          "id": 10000,
+          "sectionID": 800,
+          "orderIndex": 1,
+          "sourceKind": "builtIn",
+          "canonicalName": "杠铃平板卧推",
+          "recordMode": "weightReps",
+          "sets": [
+            {
+              "scenario": "T019 completed；weightReps",
+              "id": 10050,
+              "orderIndex": 0,
+              "state": "completed",
+              "offsetSeconds": 0,
+              "weightValue": "20",
+              "repetitionCount": "8",
+              "unit": "kilograms"
+            }
+          ]
+        },
+        {
+          "scenario": "T019 四种 mode：reps；completed 训练组",
+          "id": 10001,
+          "sectionID": 800,
+          "orderIndex": 2,
+          "sourceKind": "builtIn",
+          "canonicalName": "俯卧撑",
+          "recordMode": "reps",
+          "sets": [
+            {
+              "scenario": "T019 completed；reps",
+              "id": 10051,
+              "orderIndex": 0,
+              "state": "completed",
+              "offsetSeconds": 0,
+              "repetitionCount": "10",
+              "unit": "repetitions"
+            }
+          ]
+        },
+        {
+          "scenario": "T019 四种 mode：duration；completed 训练组",
+          "id": 10002,
+          "sectionID": 800,
+          "orderIndex": 3,
+          "sourceKind": "builtIn",
+          "canonicalName": "平板支撑",
+          "recordMode": "duration",
+          "sets": [
+            {
+              "scenario": "T019 completed；duration",
+              "id": 10052,
+              "orderIndex": 0,
+              "state": "completed",
+              "offsetSeconds": 0,
+              "durationSeconds": "45",
+              "unit": "seconds"
+            }
+          ]
+        },
+        {
+          "scenario": "T019 四种 mode：cardio；completed 训练组",
+          "id": 10003,
+          "sectionID": 800,
+          "orderIndex": 4,
+          "sourceKind": "sessionOnly",
+          "canonicalName": "跑步机",
+          "recordMode": "cardio",
+          "sets": [
+            {
+              "scenario": "T019 completed；cardio",
+              "id": 10053,
+              "orderIndex": 0,
+              "state": "completed",
+              "offsetSeconds": 0,
+              "durationSeconds": "300",
+              "unit": "seconds",
+              "distanceValue": "1.25",
+              "speedValue": "15",
+              "resistanceValue": "2"
+            }
+          ]
+        }
+      ],
+      "summary": {
+        "scenario": "T019 总结与备注；不生成分享内容",
+        "publicSummary": "卧推动作更稳定，俯卧撑保持匀速；下次继续练习核心控制。",
+        "privateCoachNote": "合成走查样例：下一节先复习卧推轨迹，再逐步增加训练量。",
+        "offsetSeconds": 0
+      }
+    },
+    {
+      "key": "active-first",
+      "scenario": "T019 single/multi 进行中；completed/pending/draft；四 mode",
+      "variants": [
+        "single",
+        "multi"
+      ],
+      "studentID": 1,
+      "state": "inProgress",
+      "startOffsetSeconds": 0,
+      "trainingFocus": [],
+      "sections": [
+        {
+          "scenario": "T019 进行中分段",
+          "id": 801,
+          "name": "主训练",
+          "orderIndex": 0
+        }
+      ],
+      "exercises": [
+        {
+          "scenario": "T019 四种 mode：weightReps；completed",
+          "id": 11000,
+          "sectionID": 801,
+          "orderIndex": 1,
+          "sourceKind": "builtIn",
+          "canonicalName": "杠铃平板卧推",
+          "recordMode": "weightReps",
+          "sets": [
+            {
+              "scenario": "T019 completed；weightReps",
+              "id": 11050,
+              "orderIndex": 0,
+              "state": "completed",
+              "offsetSeconds": 0,
+              "weightValue": "20",
+              "repetitionCount": "8",
+              "unit": "kilograms"
+            }
+          ]
+        },
+        {
+          "scenario": "T019 四种 mode：reps；pending",
+          "id": 11001,
+          "sectionID": 801,
+          "orderIndex": 2,
+          "sourceKind": "builtIn",
+          "canonicalName": "俯卧撑",
+          "recordMode": "reps",
+          "sets": [
+            {
+              "scenario": "T019 pending；reps",
+              "id": 11051,
+              "orderIndex": 0,
+              "state": "pending",
+              "offsetSeconds": 0,
+              "repetitionCount": "10",
+              "unit": "repetitions"
+            }
+          ]
+        },
+        {
+          "scenario": "T019 四种 mode：duration；draft",
+          "id": 11002,
+          "sectionID": 801,
+          "orderIndex": 3,
+          "sourceKind": "builtIn",
+          "canonicalName": "平板支撑",
+          "recordMode": "duration",
+          "sets": [
+            {
+              "scenario": "T019 draft；duration",
+              "id": 11052,
+              "orderIndex": 0,
+              "state": "draft",
+              "offsetSeconds": 0,
+              "durationSeconds": "45",
+              "unit": "seconds"
+            }
+          ]
+        },
+        {
+          "scenario": "T019 四种 mode：cardio；draft",
+          "id": 11003,
+          "sectionID": 801,
+          "orderIndex": 4,
+          "sourceKind": "sessionOnly",
+          "canonicalName": "跑步机",
+          "recordMode": "cardio",
+          "sets": [
+            {
+              "scenario": "T019 draft；cardio",
+              "id": 11053,
+              "orderIndex": 0,
+              "state": "draft",
+              "offsetSeconds": 0,
+              "durationSeconds": "300",
+              "unit": "seconds",
+              "distanceValue": "1.25",
+              "speedValue": "15",
+              "resistanceValue": "2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "active-second",
+      "scenario": "T019 multi 两学员各自进行中，互不覆盖",
+      "variants": [
+        "multi"
+      ],
+      "studentID": 2,
+      "state": "inProgress",
+      "startOffsetSeconds": 0,
+      "trainingFocus": [],
+      "sections": [
+        {
+          "scenario": "T019 第二位学员的进行中分段",
+          "id": 802,
+          "name": "主训练",
+          "orderIndex": 0
+        }
+      ],
+      "exercises": [
+        {
+          "scenario": "T019 四种 mode：weightReps；completed",
+          "id": 12000,
+          "sectionID": 802,
+          "orderIndex": 1,
+          "sourceKind": "builtIn",
+          "canonicalName": "杠铃平板卧推",
+          "recordMode": "weightReps",
+          "sets": [
+            {
+              "scenario": "T019 completed；weightReps",
+              "id": 12050,
+              "orderIndex": 0,
+              "state": "completed",
+              "offsetSeconds": 0,
+              "weightValue": "20",
+              "repetitionCount": "8",
+              "unit": "kilograms"
+            }
+          ]
+        },
+        {
+          "scenario": "T019 四种 mode：reps；pending",
+          "id": 12001,
+          "sectionID": 802,
+          "orderIndex": 2,
+          "sourceKind": "builtIn",
+          "canonicalName": "俯卧撑",
+          "recordMode": "reps",
+          "sets": [
+            {
+              "scenario": "T019 pending；reps",
+              "id": 12051,
+              "orderIndex": 0,
+              "state": "pending",
+              "offsetSeconds": 0,
+              "repetitionCount": "10",
+              "unit": "repetitions"
+            }
+          ]
+        },
+        {
+          "scenario": "T019 四种 mode：duration；draft",
+          "id": 12002,
+          "sectionID": 802,
+          "orderIndex": 3,
+          "sourceKind": "builtIn",
+          "canonicalName": "平板支撑",
+          "recordMode": "duration",
+          "sets": [
+            {
+              "scenario": "T019 draft；duration",
+              "id": 12052,
+              "orderIndex": 0,
+              "state": "draft",
+              "offsetSeconds": 0,
+              "durationSeconds": "45",
+              "unit": "seconds"
+            }
+          ]
+        },
+        {
+          "scenario": "T019 四种 mode：cardio；draft",
+          "id": 12003,
+          "sectionID": 802,
+          "orderIndex": 4,
+          "sourceKind": "sessionOnly",
+          "canonicalName": "跑步机",
+          "recordMode": "cardio",
+          "sets": [
+            {
+              "scenario": "T019 draft；cardio",
+              "id": 12053,
+              "orderIndex": 0,
+              "state": "draft",
+              "offsetSeconds": 0,
+              "durationSeconds": "300",
+              "unit": "seconds",
+              "distanceValue": "1.25",
+              "speedValue": "15",
+              "resistanceValue": "2"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "ledger": [
+    {
+      "key": "exhaustion",
+      "scenario": "T019 手工扣减至耗尽；保留原因",
+      "variants": [
+        "single",
+        "multi"
+      ],
+      "kind": "manualCorrection",
+      "packageKey": "exhausted",
+      "direction": "debit",
+      "amount": 8,
+      "note": "合成走查样例：补录此前完成的八节训练",
+      "offsetSeconds": 0
+    },
+    {
+      "key": "history-debit",
+      "scenario": "T019 临时课 completed 后明确扣一课；历史与 ledger 关联",
+      "variants": [
+        "single",
+        "multi"
+      ],
+      "kind": "adhocDebit",
+      "packageKey": "available",
+      "sessionKey": "history",
+      "offsetSeconds": 0
+    }
+  ],
+  "templates": [
+    {
+      "key": "full-body",
+      "scenario": "T019 分段模板；四 mode 各一 pending 计划组",
+      "variants": [
+        "single",
+        "multi"
+      ],
+      "name": "全身基础·力量与体能",
+      "trainingFocus": [],
+      "offsetSeconds": 0,
+      "sections": [
+        {
+          "scenario": "T019 模板分段",
+          "id": 900,
+          "name": "基础力量与核心",
+          "orderIndex": 0
+        }
+      ],
+      "exercises": [
+        {
+          "scenario": "T019 四种 mode：weightReps；模板计划组",
+          "id": 13000,
+          "sectionID": 900,
+          "orderIndex": 1,
+          "sourceKind": "builtIn",
+          "canonicalName": "杠铃平板卧推",
+          "recordMode": "weightReps",
+          "sets": [
+            {
+              "scenario": "T019 pending 计划组；weightReps",
+              "id": 13050,
+              "orderIndex": 0,
+              "state": "pending",
+              "offsetSeconds": 0,
+              "weightValue": "20",
+              "repetitionCount": "8",
+              "unit": "kilograms"
+            }
+          ]
+        },
+        {
+          "scenario": "T019 四种 mode：reps；模板计划组",
+          "id": 13001,
+          "sectionID": 900,
+          "orderIndex": 2,
+          "sourceKind": "builtIn",
+          "canonicalName": "俯卧撑",
+          "recordMode": "reps",
+          "sets": [
+            {
+              "scenario": "T019 pending 计划组；reps",
+              "id": 13051,
+              "orderIndex": 0,
+              "state": "pending",
+              "offsetSeconds": 0,
+              "repetitionCount": "10",
+              "unit": "repetitions"
+            }
+          ]
+        },
+        {
+          "scenario": "T019 四种 mode：duration；模板计划组",
+          "id": 13002,
+          "sectionID": 900,
+          "orderIndex": 3,
+          "sourceKind": "builtIn",
+          "canonicalName": "平板支撑",
+          "recordMode": "duration",
+          "sets": [
+            {
+              "scenario": "T019 pending 计划组；duration",
+              "id": 13052,
+              "orderIndex": 0,
+              "state": "pending",
+              "offsetSeconds": 0,
+              "durationSeconds": "45",
+              "unit": "seconds"
+            }
+          ]
+        },
+        {
+          "scenario": "T019 四种 mode：cardio；模板计划组",
+          "id": 13003,
+          "sectionID": 900,
+          "orderIndex": 4,
+          "sourceKind": "sessionOnly",
+          "canonicalName": "跑步机",
+          "recordMode": "cardio",
+          "sets": [
+            {
+              "scenario": "T019 pending 计划组；cardio",
+              "id": 13053,
+              "orderIndex": 0,
+              "state": "pending",
+              "offsetSeconds": 0,
+              "durationSeconds": "300",
+              "unit": "seconds",
+              "distanceValue": "1.25",
+              "speedValue": "15",
+              "resistanceValue": "2"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

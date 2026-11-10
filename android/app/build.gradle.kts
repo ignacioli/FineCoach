@@ -445,7 +445,7 @@ val s1SeedChecks = tasks.register<Test>("s1SeedChecks") {
     outputs.upToDateWhen { false }
     outputs.doNotCacheIf("Seed checks must execute") { true }
     doLast {
-        val expected = mapOf("com.ignacioli.finecoach.S1DebugSeedTests" to 9, "com.ignacioli.finecoach.S1SeedIsolationTests" to 4)
+        val expected = mapOf("com.ignacioli.finecoach.S1DebugSeedTests" to 12, "com.ignacioli.finecoach.S1SeedIsolationTests" to 4)
         val files = reports.junitXml.outputLocation.get().asFile.listFiles { file -> file.name.startsWith("TEST-") && file.extension == "xml" }.orEmpty()
         check(files.size == expected.size) { "S1 seed checks must run nonzero tests without failures or skips" }
         val factory = DocumentBuilderFactory.newInstance().apply {
@@ -481,7 +481,7 @@ androidComponents.onVariants(androidComponents.selector().withBuildType("release
             check(apks.size == 1) { "s0SeedIsolation: expected exactly one Release APK" }
             val forbidden = listOf(
                 "com/ignacioli/finecoach/seed/", "com.ignacioli.finecoach.seed.",
-                "S1DebugSeed", "S1SeedIDs", "s1_debug_seed.", "s1-debug-seed.lock", "fictional-s1-coach-core-v1",
+                "S1DebugSeed", "S1SeedIDs", "s1_debug_seed.", "s1-debug-seed.lock", "fictional-s1-coach-core-v1", "fictional-s1-coach-core-v2", "fictional-s1-coach-core-v3", "S1SeedFixture", "seed/s1-seed.json",
                 "DebugSeed", "SeedContributor", "SeedResult", "MetadataSeedContributor",
                 "S0ComponentCatalog", "S0Catalog", "S0DebugApplication", "FineCoachSeed", "finecoach-debug-seed.db",
                 "debug_seed.", "debug_seed_", "s0_catalog", "s0_seed", "SEED version=",
@@ -570,6 +570,7 @@ val installSeededDebug = tasks.register<SeedDeviceTask>("s0InstallSeededDebug") 
     description = "Build/install S1DebugSeed on one explicit device, verify durable seed, launch default S1"
     dependsOn(validateSeedDevice, "assembleDebug")
     inputs.property("seedScenario", requestedSeedScenario)
+    inputs.file(layout.projectDirectory.file("src/debug/assets/seed/s1-seed.json"))
     adbFile.set(androidComponents.sdkComponents.adb)
     deviceSerial.set(seedDeviceSerial)
     environmentSerial.set(providers.environmentVariable("ANDROID_SERIAL").orElse(""))
@@ -599,8 +600,10 @@ androidComponents.onVariants(androidComponents.selector().withBuildType("debug")
             }
             fun resultValue(key: String): String = lines.single { it.startsWith("INSTRUMENTATION_RESULT: $key=") }.substringAfter('=')
             val expected = resultValue("seed")
-            val expectedRows = mapOf("empty" to 5, "single" to 55, "multi" to 66).getValue(scenario)
-            check(expected == "SEED version=1 rows=$expectedRows status=ok") { "Missing successful S1 seed result" }
+            val fixture = groovy.json.JsonSlurper().parse(file("src/debug/assets/seed/s1-seed.json")) as Map<*, *>
+            val expectedRows = requireNotNull((fixture["expectedRows"] as Map<*, *>)[scenario])
+            val expectedVersion = requireNotNull(fixture["seedVersion"])
+            check(expected == "SEED version=$expectedVersion rows=$expectedRows status=ok") { "Missing successful S1 seed result" }
             val pid = resultValue("seed_pid").toInt().also { check(it > 0) }
             val loggedAt = resultValue("seed_log_time").toLong().also { check(it > 0) }
             val logs = adb("-s", serial, "logcat", "-d", "-v", "epoch", "--pid=$pid", "-s", "FineCoachSeed:I", "*:S")

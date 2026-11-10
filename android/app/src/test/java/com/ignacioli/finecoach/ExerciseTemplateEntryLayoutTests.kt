@@ -37,6 +37,7 @@ import org.robolectric.annotation.GraphicsMode
 class ExerciseTemplateEntryLayoutTests {
     @get:Rule val compose = createAndroidComposeRule<ComponentActivity>()
     private lateinit var f: T008Fixture
+    private lateinit var exerciseRepository: com.ignacioli.finecoach.storage.repository.ExerciseRepository
     private lateinit var exerciseState: ExerciseUiState
     private lateinit var templateState: TemplateUiState
     private lateinit var exerciseUseCases: ExerciseUseCases
@@ -68,6 +69,7 @@ class ExerciseTemplateEntryLayoutTests {
     @Before fun prepare() {
         f = T008Fixture()
         val repository = f.exercises
+        exerciseRepository = repository
         exerciseUseCases = ExerciseUseCases(repository, f.clock, f.ids)
         exerciseState = ExerciseUiState(exerciseUseCases, repository)
         f.test {
@@ -76,6 +78,37 @@ class ExerciseTemplateEntryLayoutTests {
         }
     }
     @After fun close() { f.close() }
+    @Test fun failedInitialCatalogShowsUnavailableInLibraryAndPicker() {
+        f.test {
+            f.db.openHelper.writableDatabase.execSQL("CREATE TRIGGER fictional_catalog_failure BEFORE INSERT ON exercise_catalog BEGIN SELECT RAISE(ABORT, 'fictional failure'); END")
+            exerciseRepository.prepareCatalog()
+            assertTrue(exerciseRepository.catalogUnavailable)
+        }
+        var picker by mutableStateOf(false)
+        compose.setContent { FineCoachTheme {
+            if (picker) ExercisePicker(exerciseState, { ApplicationResult.Success(Unit) }, {})
+            else ExerciseLibraryScreen(exerciseState) { picker = true }
+        } }
+        await("exercise-catalog-unavailable")
+        node("exercise-catalog-unavailable").assertIsDisplayed(); compose.onNodeWithText("动作库暂不可用", useUnmergedTree = true).assertIsDisplayed()
+        click("exercise-library-back"); await("exercise-picker")
+        node("exercise-catalog-unavailable").performScrollTo().assertIsDisplayed(); compose.onNodeWithText("动作库暂不可用", useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    @Test fun launchCatalogIsSelectableAsBuiltInAndSelectionDoesNotDuplicateCatalog() {
+        f.test { exerciseRepository.prepareCatalog() }
+        var selected: ExerciseSelection? = null
+        compose.setContent { FineCoachTheme { ExercisePicker(exerciseState, { selected = it; ApplicationResult.Success(Unit) }, {}) } }
+        await("exercise-search"); text("exercise-search", "杠铃平板卧推")
+        var selectedID: StableExerciseID? = null
+        f.test { selectedID = f.ok(exerciseRepository.search("杠铃平板卧推")).single().exerciseID }
+        val id = requireNotNull(selectedID)
+        await("exercise-select-${id.value}"); click("exercise-select-${id.value}")
+        assertEquals(ExerciseSourceKind.builtIn, selected?.sourceKind)
+        assertEquals(id, selected?.sourceID)
+        f.test { assertEquals(542, f.ok(f.exercises.listCatalog()).size) }
+    }
+
     private fun library() { compose.setContent { FineCoachTheme { ExerciseLibraryScreen(exerciseState) { back++ } } } }
     private fun editor(content: TemplateContentRecord) {
         compose.setContent { FineCoachTheme { TemplateEditorScreen(templateState, content.template.templateID, exerciseState) { back++ } } }

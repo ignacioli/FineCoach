@@ -14,6 +14,7 @@ data class ExerciseSelection(
 )
 
 class ExerciseUiState(val useCases: ExerciseUseCases, private val repository: ExerciseRepository) {
+    val catalogUnavailable get() = repository.catalogUnavailable
     var entries by mutableStateOf<List<ExerciseRecord>>(emptyList())
         private set
     var preferences by mutableStateOf<Map<StableExerciseID, ExercisePreferenceRecord>>(emptyMap())
