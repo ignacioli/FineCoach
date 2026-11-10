@@ -316,38 +316,16 @@ fun StudentListScreen(
                 .fillMaxSize()
                 .testTag(StudentTestTags.STUDENT_LIST_ROOT),
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = FcSpacing.space4, bottom = FcSpacing.space4),
-                verticalArrangement = Arrangement.spacedBy(FcSpacing.space4),
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = "学员",
-                        modifier = Modifier
-                            .weight(1f)
-                            .semantics { heading() },
-                        style = FcTypography.display,
-                        color = FcColors.actionPrimary,
-                    )
+            com.ignacioli.finecoach.designsystem.FcPagePrimary("学员",
+                Modifier.fillMaxWidth().padding(top = FcSpacing.space4, bottom = FcSpacing.space4),
+                segments = if (showRootSwitch) ({
+                    FcSegmentedSwitch(listOf("今日", "学员"), 1,
+                        { index -> if (index == 0) onRoute(S1Routes.TODAY) }, tag = StudentTestTags.STUDENT_LIST_SEGMENT)
+                }) else null,
+                actions = {
                     FcTitleIconButton("资料库", painterResource(R.drawable.ic_ms_grid_view),
                         Modifier.testTag("student-list-resource-hub")) { onRoute(S1Routes.RESOURCE_HUB) }
-                }
-                if (showRootSwitch) {
-                    FcSegmentedSwitch(
-                        options = listOf("今日", "学员"),
-                        selection = 1,
-                        onSelect = { index ->
-                            if (index == 0) onRoute(S1Routes.TODAY)
-                        },
-                        tag = StudentTestTags.STUDENT_LIST_SEGMENT,
-                    )
-                }
-            }
+                }) { }
 
             if (state.isTrulyEmpty) {
                 NoStudentsEmptyState(
@@ -601,41 +579,10 @@ private fun NoStudentsEmptyState(
     onAddStudent: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .testTag(StudentTestTags.STUDENT_LIST_EMPTY),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(FcSpacing.space3),
-    ) {
-        Spacer(modifier = Modifier.height(FcSpacing.space6))
-        Image(
-            painter = painterResource(R.drawable.mascot_empty_state), contentDescription = null,
-            modifier = Modifier.size(220.dp).testTag("student-list-empty-mascot"),
-        )
-        Text(
-            text = "还没有学员",
-            modifier = Modifier.padding(top = FcSpacing.space6),
-            style = FcTypography.headline,
-            color = FcColors.actionPrimary,
-        )
-        Text(
-            text = "开始记录第一堂课",
-            style = FcTypography.caption,
-            color = FcColors.textSecondary,
-            textAlign = TextAlign.Center,
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = FcSpacing.space4),
-        ) {
-            FcButton(
-                title = "＋ 新建学员",
-                modifier = Modifier.testTag(StudentTestTags.STUDENT_LIST_EMPTY_ADD),
-                onClick = onAddStudent,
-            )
-        }
-    }
+    com.ignacioli.finecoach.designsystem.FcEmptyState(
+        title = "还没有学员", description = "开始记录第一堂课",
+        modifier = modifier.fillMaxSize().padding(top = FcSpacing.space6).testTag(StudentTestTags.STUDENT_LIST_EMPTY),
+        illustrationTag = "student-list-empty-mascot", actionTitle = "＋ 新建学员",
+        actionTag = StudentTestTags.STUDENT_LIST_EMPTY_ADD, onAction = onAddStudent,
+    )
 }

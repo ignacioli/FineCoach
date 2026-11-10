@@ -58,12 +58,9 @@ fun TodayScreen(state: TodayUiState, onNavigate: (String) -> Unit) {
     val scope = rememberCoroutineScope()
     LaunchedEffect(state) { state.load() }
     FcPlatformShell({}) {
-        Column(Modifier.fillMaxWidth().padding(top = FcSpacing.space4), verticalArrangement = Arrangement.spacedBy(FcSpacing.space1)) {
-            Text("今日", Modifier.semantics { heading() }, style = FcTypography.display, color = FcColors.actionPrimary)
-            Text(state.todayDate.format(DateTimeFormatter.ofPattern("M月d日 · EEE", Locale.SIMPLIFIED_CHINESE)),
-                Modifier.testTag("today-date"), style = FcTypography.style("callout", 400), color = FcColors.textSecondary)
-        }
-        FcSegmentedSwitch(listOf("今日", "学员"), 0, { if (it == 1) onNavigate(S1Routes.STUDENTS) }, tag = "root")
+        FcPagePrimary("今日", Modifier.fillMaxSize(),
+            segments = { FcSegmentedSwitch(listOf("今日", "学员"), 0, { if (it == 1) onNavigate(S1Routes.STUDENTS) }, tag = "root") },
+            subtitleModifier = Modifier.testTag("today-date"), subtitle = state.todayDate.format(DateTimeFormatter.ofPattern("M月d日 · EEE", Locale.SIMPLIFIED_CHINESE))) {
         Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).testTag("today-content"), verticalArrangement = Arrangement.spacedBy(FcSpacing.space4)) {
             if (state.error != null) {
                 Text("加载今日安排失败，再试一次。", Modifier.testTag("today-error"), style = FcTypography.caption, color = FcColors.statusDestructive)
@@ -71,18 +68,13 @@ fun TodayScreen(state: TodayUiState, onNavigate: (String) -> Unit) {
             }
             when {
                 !state.hasCompletedInitialLoad -> Spacer(Modifier.fillMaxWidth().testTag("today-loading"))
-                state.items.isEmpty() -> Column(
-                    Modifier.fillMaxWidth().padding(vertical = FcSpacing.space4).testTag("today-empty"),
-                    horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(FcSpacing.space2),
-                ) {
-                    TodayAmbientScene()
-                    Text("今天没课，休息一下吧～", style = FcTypography.headline, color = FcColors.actionPrimary, textAlign = TextAlign.Center)
-                    Text("有新课程时会显示在这里", style = FcTypography.caption, color = FcColors.textSecondary, textAlign = TextAlign.Center)
-                }
+                state.items.isEmpty() -> FcEmptyState("今天没课，休息一下吧～", "有新课程时会显示在这里",
+                    Modifier.fillMaxWidth().padding(vertical = FcSpacing.space4).testTag("today-empty"), ambient = true)
                 state.items.size == 1 -> state.items.single().let { row -> FcHeroCard("进行中", row.title, row.subtitle,
                     Modifier.testTag("hero-${row.id}"), "继续训练", { onNavigate(S1Routes.activeSession(SessionID.parse(row.id))) }) }
                 else -> FcMultiHeroCard(state.items, { onNavigate(S1Routes.activeSession(SessionID.parse(it))) }, Modifier.testTag("today-hero"))
             }
+        }
         }
     }
 }

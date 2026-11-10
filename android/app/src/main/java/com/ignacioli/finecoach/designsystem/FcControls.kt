@@ -41,6 +41,8 @@ import androidx.compose.ui.unit.dp
 // Geometry in components.md §4 / README §6/§8, expressed using generated tokens.
 // These are aliases for existing component dimensions, not independent token values.
 object FcComponentMetrics {
+    val illustration = FcSpacing.space8 * 6 + FcSpacing.space4 + FcSpacing.space3 // 220, README §9
+    val calendarIllustration = FcSpacing.space8 * 5 // 160, §4.9
     val touch = FcSpacing.space8 + FcSpacing.space3 // 44
     val row = FcSpacing.space8 + FcSpacing.space4 + FcSpacing.space1 // 52
     val field = FcSpacing.space8 + FcSpacing.space4 // 48

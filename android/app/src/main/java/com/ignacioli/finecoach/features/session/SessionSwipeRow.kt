@@ -52,6 +52,7 @@ internal fun SessionSwipeRow(tag: String, open: Boolean, enabled: Boolean, revea
                     .padding(horizontal = FcSpacing.space1), horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center) {
                     if (action.destructive) FcSymbol(painterResource(R.drawable.ic_ms_delete), tint = FcColors.actionOn)
+                    if (action.tag == "session-exercise-move") FcSymbol(painterResource(R.drawable.ic_ms_folder), tint = FcColors.actionOn)
                     Text(action.title, style = FcTypography.caption, color = FcColors.actionOn, maxLines = 1)
                 }
             }

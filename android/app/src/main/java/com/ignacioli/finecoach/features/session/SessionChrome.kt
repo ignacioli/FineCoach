@@ -47,7 +47,7 @@ internal fun SessionExerciseHeader(row: SessionExerciseRecord, previous: Trainin
         .testTag("session-exercise-${row.sessionExerciseID.value}").semantics { this.selected = selected }
         .clickable(enabled = enabled, onClick = onSelect), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
-        // 待 DS-EQUIPMENT-ICON：共享组件任务完成后回填。
+        FcEquipmentIconForExercise(row.sourceID.takeUnless { row.sourceKind == ExerciseSourceKind.sessionOnly })
         Text(row.displayNameSnapshot, Modifier.weight(1f), style = FcTypography.exerciseTitle, color = FcColors.textPrimary)
         Text(previous?.let { "上次 ${it.toDomain().displaySummary()} · $previousCount 组" } ?: when (row.recordModeSnapshot) {
             com.ignacioli.finecoach.core.domain.common.RecordMode.weightReps -> "重量与次数"
@@ -57,5 +57,12 @@ internal fun SessionExerciseHeader(row: SessionExerciseRecord, previous: Trainin
         }, Modifier.testTag(if (previous != null) "session-previous-${row.sessionExerciseID.value}" else "session-mode-${row.sessionExerciseID.value}"),
             style = FcTypography.caption, color = FcColors.textSecondary)
         if (selected) FcSymbol(FcGlyph.Check)
+        if (row.sets.isNotEmpty() && row.sets.all { it.state == SetRecordingState.completed }) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(FcSpacing.space1),
+                modifier = Modifier.semantics(mergeDescendants = true) { stateDescription = "动作已完成" }) {
+                FcSymbol(androidx.compose.ui.res.painterResource(com.ignacioli.finecoach.R.drawable.ic_ms_check_circle_filled))
+                Text("已完成", style = FcTypography.caption, color = FcColors.textSecondary)
+            }
+        }
     }
 }

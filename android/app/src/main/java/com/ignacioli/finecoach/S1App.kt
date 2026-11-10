@@ -41,7 +41,7 @@ fun S1Root(activity: MainActivity) {
     }
     graph?.let { value ->
         S1App(value, activity.restNotificationSessionID, activity::consumeRestNotificationRoute, activity.notificationPermissionRevision)
-    } ?: FcPlatformShell({}, Modifier.testTag("s1-loading")) {
+    } ?: if (!failed) FcLaunch(Modifier.testTag("s1-loading")) else FcPlatformShell({}, Modifier.testTag("s1-loading")) {
         if (failed) {
             androidx.compose.material3.Text("没有完成，再试一次。", Modifier.testTag("s1-load-error"),
                 style = FcTypography.caption, color = FcColors.statusDestructive)

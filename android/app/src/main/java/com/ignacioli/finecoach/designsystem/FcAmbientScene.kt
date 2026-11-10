@@ -1,4 +1,4 @@
-package com.ignacioli.finecoach.features.today
+package com.ignacioli.finecoach.designsystem
 
 import android.animation.ValueAnimator
 import android.content.BroadcastReceiver
@@ -24,7 +24,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -78,7 +79,7 @@ internal fun ambientSteamPath(index: Int): Path {
 
 /** Original C30 layers and native steam; metrics mirror FCMotion / README §14.2. */
 @Composable
-internal fun TodayAmbientScene() {
+fun FcAmbientScene(modifier: Modifier = Modifier, size: Dp = FcComponentMetrics.illustration) {
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val power = remember(context) { context.getSystemService(PowerManager::class.java) }
@@ -117,7 +118,7 @@ internal fun TodayAmbientScene() {
         }
     }
     val frame = ambientFrame(elapsedSeconds, blinkSchedule, reducedMotion, paused = !running)
-    Box(Modifier.size(220.dp).testTag("today-empty-scene")) {
+    Box(modifier.size(size).testTag("today-empty-scene").clearAndSetSemantics { }) {
         Box(Modifier.matchParentSize().graphicsLayer {
             scaleX = frame.breathScale; scaleY = frame.breathScale; transformOrigin = TransformOrigin(0.44f, 0.78f)
         }) {
@@ -127,7 +128,7 @@ internal fun TodayAmbientScene() {
         }
         Image(painterResource(R.drawable.mascot_cafe_table), contentDescription = null, modifier = Modifier.matchParentSize())
         Canvas(Modifier.matchParentSize()) {
-            val ratio = size.width / 220f
+            val ratio = this.size.width / 220f
             frame.steam.forEachIndexed { index, steam ->
                 withTransform({
                     scale(ratio, ratio, pivot = Offset.Zero)

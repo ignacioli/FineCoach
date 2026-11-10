@@ -32,19 +32,21 @@ private fun Modifier.rowInteraction(mode: FcRowMode): Modifier = when (mode) {
 @Composable
 fun FcListRow(title: String, modifier: Modifier = Modifier, subtitle: String? = null,
     detail: String? = null, mode: FcRowMode = FcRowMode.Informational, leading: Painter? = null,
-    reservesLeading: Boolean = false, indented: Boolean = false) {
+    reservesLeading: Boolean = false, indented: Boolean = false, favorite: Boolean = false) {
     Row(modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.row).semantics(mergeDescendants = true) { }
         .rowInteraction(mode).padding(start = if (indented) FcSpacing.space4 else 0.dp,
             top = FcSpacing.space2, bottom = FcSpacing.space2),
         horizontalArrangement = Arrangement.spacedBy(FcSpacing.space3), verticalAlignment = Alignment.CenterVertically) {
-        if (leading != null || reservesLeading) Box(Modifier.size(FcComponentMetrics.icon)) { leading?.let { FcSymbol(it) } }
+        if (leading != null || reservesLeading) Box(Modifier.size(FcComponentMetrics.icon)) { leading?.let { FcSymbol(it, tint = FcColors.actionPrimary) } }
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(FcSpacing.space1)) {
             Text(title, style = FcTypography.headline, color = if (mode is FcRowMode.Unavailable) FcColors.textDisabled else FcColors.textPrimary)
             subtitle?.let { Text(it, style = FcTypography.caption, color = FcColors.textSecondary) }
         }
         (if (mode is FcRowMode.Unavailable) mode.reason else detail)?.let { Text(it, style = FcTypography.caption, color = FcColors.textSecondary) }
+        if (favorite) FcSymbol(androidx.compose.ui.res.painterResource(com.ignacioli.finecoach.R.drawable.ic_ms_star_filled),
+            Modifier.testTag("favorite-star"), tint = FcColors.actionPrimary)
         when (mode) {
-            is FcRowMode.Action -> FcSymbol(FcGlyph.Forward)
+            is FcRowMode.Action -> FcSymbol(FcGlyph.Forward, Modifier.testTag("list-row-disclosure"))
             is FcRowMode.Selection -> FcSelectionMark(if (mode.selected) ToggleableState.On else ToggleableState.Off)
             else -> Unit
         }

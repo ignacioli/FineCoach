@@ -1,0 +1,22 @@
+# Product-owned equipment SVG → Android vector; see equipment-provenance.json
+barbell | design/m1-b-hifi/icons/barbell.svg | app/src/main/res/drawable/ic_equipment_barbell.xml
+bike | design/m1-b-hifi/icons/bike.svg | app/src/main/res/drawable/ic_equipment_bike.xml
+bodyweight | design/m1-b-hifi/icons/bodyweight.svg | app/src/main/res/drawable/ic_equipment_bodyweight.xml
+cable-crossover | design/m1-b-hifi/icons/cable-crossover.svg | app/src/main/res/drawable/ic_equipment_cable_crossover.xml
+cable-machine | design/m1-b-hifi/icons/cable-machine.svg | app/src/main/res/drawable/ic_equipment_cable_machine.xml
+dumbbell | design/m1-b-hifi/icons/dumbbell.svg | app/src/main/res/drawable/ic_equipment_dumbbell.xml
+hack-squat | design/m1-b-hifi/icons/hack-squat.svg | app/src/main/res/drawable/ic_equipment_hack_squat.xml
+hip-adduction | design/m1-b-hifi/icons/hip-adduction.svg | app/src/main/res/drawable/ic_equipment_hip_adduction.xml
+jump-rope | design/m1-b-hifi/icons/jump-rope.svg | app/src/main/res/drawable/ic_equipment_jump_rope.xml
+kettlebell | design/m1-b-hifi/icons/kettlebell.svg | app/src/main/res/drawable/ic_equipment_kettlebell.xml
+leg-extension | design/m1-b-hifi/icons/leg-extension.svg | app/src/main/res/drawable/ic_equipment_leg_extension.xml
+pec-deck | design/m1-b-hifi/icons/pec-deck.svg | app/src/main/res/drawable/ic_equipment_pec_deck.xml
+plate-loaded | design/m1-b-hifi/icons/plate-loaded.svg | app/src/main/res/drawable/ic_equipment_plate_loaded.xml
+pull-up-bar | design/m1-b-hifi/icons/pull-up-bar.svg | app/src/main/res/drawable/ic_equipment_pull_up_bar.xml
+resistance-band | design/m1-b-hifi/icons/resistance-band.svg | app/src/main/res/drawable/ic_equipment_resistance_band.xml
+rowing-machine | design/m1-b-hifi/icons/rowing-machine.svg | app/src/main/res/drawable/ic_equipment_rowing_machine.xml
+shoulder-press | design/m1-b-hifi/icons/shoulder-press.svg | app/src/main/res/drawable/ic_equipment_shoulder_press.xml
+smith-machine | design/m1-b-hifi/icons/smith-machine.svg | app/src/main/res/drawable/ic_equipment_smith_machine.xml
+suspension-trainer | design/m1-b-hifi/icons/suspension-trainer.svg | app/src/main/res/drawable/ic_equipment_suspension_trainer.xml
+tbar-row | design/m1-b-hifi/icons/tbar-row.svg | app/src/main/res/drawable/ic_equipment_tbar_row.xml
+treadmill | design/m1-b-hifi/icons/treadmill.svg | app/src/main/res/drawable/ic_equipment_treadmill.xml

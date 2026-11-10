@@ -15,8 +15,8 @@ import com.ignacioli.finecoach.core.application.*
 import com.ignacioli.finecoach.core.domain.common.*
 import com.ignacioli.finecoach.designsystem.*
 import com.ignacioli.finecoach.features.students.StudentTestTags
-import com.ignacioli.finecoach.features.today.ambientFrame
-import com.ignacioli.finecoach.features.today.ambientSteamPath
+import com.ignacioli.finecoach.designsystem.ambientFrame
+import com.ignacioli.finecoach.designsystem.ambientSteamPath
 import org.junit.*
 import org.junit.Assert.*
 import org.junit.runner.RunWith
@@ -94,10 +94,10 @@ class TodayNavigationEntryLayoutTests {
         assertTrue(today.hasCompletedInitialLoad)
         node("today-loading").assertDoesNotExist()
         // The same approved ambient scene pauses offscreen, in battery saver and reduced motion.
-        assertTrue(com.ignacioli.finecoach.features.today.ambientMotionRunning(true, false, false))
-        assertFalse(com.ignacioli.finecoach.features.today.ambientMotionRunning(false, false, false))
-        assertFalse(com.ignacioli.finecoach.features.today.ambientMotionRunning(true, true, false))
-        assertFalse(com.ignacioli.finecoach.features.today.ambientMotionRunning(true, false, true))
+        assertTrue(com.ignacioli.finecoach.designsystem.ambientMotionRunning(true, false, false))
+        assertFalse(com.ignacioli.finecoach.designsystem.ambientMotionRunning(false, false, false))
+        assertFalse(com.ignacioli.finecoach.designsystem.ambientMotionRunning(true, true, false))
+        assertFalse(com.ignacioli.finecoach.designsystem.ambientMotionRunning(true, false, true))
         // Approved C30 keyframes, rather than only checking whether a clock can run.
         assertEquals(3, ambientFrame(0.0, emptyList()).steam.size)
         assertTrue(ambientFrame(0.0, emptyList()).steam.all { it.opacity == 0f })
@@ -164,7 +164,7 @@ class TodayNavigationEntryLayoutTests {
         val appSources = java.io.File(app, "src/main/java/com/ignacioli/finecoach")
         val hubSource = java.io.File(appSources, "features/resources/ResourceHubScreen.kt").readText()
         assertTrue(hubSource.contains("FcHubRow(\"动作库\", painterResource(R.drawable.ic_ms_grid_view)"))
-        assertTrue(Regex("FcHubRow\\s*\\(\\s*\"训练模板\"\\s*,\\s*null\\b").containsMatchIn(hubSource))
+        assertTrue(hubSource.contains("FcHubRow(\"训练模板\", painterResource(R.drawable.ic_ms_list_alt)"))
         for ((source, drawable) in listOf("mascot-empty-state.jpeg" to "mascot_empty_state.jpeg",
             "mascot-cafe-rabbit.png" to "mascot_cafe_rabbit.png", "mascot-cafe-blink.png" to "mascot_cafe_blink.png",
             "mascot-cafe-table.png" to "mascot_cafe_table.png")) {

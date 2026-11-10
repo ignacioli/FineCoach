@@ -1,0 +1,137 @@
+// fictional-data: deterministic component contracts, no product persistence.
+package com.ignacioli.finecoach
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.*
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.width
+import com.ignacioli.finecoach.designsystem.*
+import org.junit.Assert.*
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+import org.robolectric.annotation.GraphicsMode
+
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [36], qualifiers = "zh-rCN-w320dp-h640dp-notnight-mdpi")
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+class S1ComponentTests {
+    @get:Rule val compose = createComposeRule()
+    private fun node(tag: String) = compose.onNodeWithTag(tag, useUnmergedTree = true)
+    private fun show(content: @Composable ColumnScope.() -> Unit) {
+        compose.setContent { FineCoachTheme { Column(Modifier.fillMaxWidth().testTag("parent"), content = content) } }
+    }
+    private fun full(tag: String) = assertEquals(node("parent").getUnclippedBoundsInRoot().width, node(tag).getUnclippedBoundsInRoot().width)
+    private fun touch(tag: String) { node(tag).assertWidthIsAtLeast(44.dp).assertHeightIsAtLeast(44.dp) }
+
+    @Test fun ambientScene() {
+        show { FcAmbientScene(size = FcComponentMetrics.calendarIllustration) }
+        node("today-empty-scene").assertWidthIsEqualTo(160.dp).assertHeightIsEqualTo(160.dp).assertHasNoClickAction()
+        assertFalse(node("today-empty-scene").fetchSemanticsNode().config.contains(SemanticsProperties.ContentDescription))
+        assertFalse(ambientMotionRunning(false, false, false)); assertFalse(ambientMotionRunning(true, true, false))
+        assertFalse(ambientMotionRunning(true, false, true)); assertTrue(ambientMotionRunning(true, false, false))
+        val still = ambientFrame(5.05, listOf(5.0), reducedMotion = true)
+        assertEquals(2, still.steam.size); assertTrue(still.steam.all { it.opacity == 0.45f && it.x == 0f && it.y == 0f })
+        assertEquals(1f, still.breathScale); assertFalse(still.closedEyes)
+        assertFalse(ambientFrame(5.05, listOf(5.0), paused = true).closedEyes)
+    }
+
+    @Test fun setRow() {
+        var confirms = 0; var edits = 0; var undos = 0
+        show {
+            FcSetRow(1, "20 kg × 8", false, true, { confirms++ }, { edits++ }, Modifier.testTag("pending"), tag = "pending")
+            FcSetRow(2, "20 kg × 8", true, false, { confirms++ }, {}, tag = "complete", onUndo = { undos++ })
+            FcSetRow(3, "20 kg × 8", false, false, { confirms++ }, { edits++ }, enabled = false, tag = "disabled")
+        }
+        full("pending"); node("pending").assertHeightIsAtLeast(52.dp)
+        touch("pending-confirm"); touch("pending-edit"); node("pending-confirm").assertContentDescriptionEquals("确认本组").performClick()
+        node("pending-edit").assertContentDescriptionEquals("编辑组").performClick()
+        node("complete-confirm").assertIsNotEnabled(); node("complete-undo").performClick()
+        node("disabled-confirm").assertIsNotEnabled().performClick(); node("disabled-edit").assertIsNotEnabled().performClick()
+        assertEquals(1, confirms); assertEquals(1, edits); assertEquals(1, undos)
+    }
+
+    @Test fun equipmentIcons() {
+        show { FcEquipmentIconView(FcEquipmentIcon.barbell, Modifier.testTag("equipment")) }
+        node("equipment").assertWidthIsEqualTo(24.dp).assertHeightIsEqualTo(24.dp).assertHasNoClickAction()
+        assertFalse(node("equipment").fetchSemanticsNode().config.contains(SemanticsProperties.ContentDescription))
+        assertEquals(21, FcEquipmentIcon.entries.size)
+        val expected = mapOf("杠铃" to FcEquipmentIcon.barbell, "哑铃" to FcEquipmentIcon.dumbbell, "徒手" to FcEquipmentIcon.bodyweight,
+            "绳索" to FcEquipmentIcon.cable_crossover, "史密斯机" to FcEquipmentIcon.smith_machine, "壶铃" to FcEquipmentIcon.kettlebell,
+            "哈克机" to FcEquipmentIcon.hack_squat, "悍马机" to FcEquipmentIcon.plate_loaded, "悬挂带" to FcEquipmentIcon.suspension_trainer,
+            "单杠" to FcEquipmentIcon.pull_up_bar, "弹力带" to FcEquipmentIcon.resistance_band)
+        expected.forEach { (equipment, icon) -> assertEquals(icon, FcEquipmentIcon.icon(equipment, "核心")) }
+        mapOf("胸" to FcEquipmentIcon.pec_deck, "肩" to FcEquipmentIcon.shoulder_press, "大腿" to FcEquipmentIcon.leg_extension,
+            "臀" to FcEquipmentIcon.hip_adduction, "小腿" to FcEquipmentIcon.hack_squat, "背" to FcEquipmentIcon.tbar_row)
+            .forEach { (muscle, icon) -> assertEquals(icon, FcEquipmentIcon.icon("固定器械", muscle)) }
+        listOf("臂", "核心", "未知").forEach { assertNull(FcEquipmentIcon.icon("固定器械", it)) }
+        assertNull(FcEquipmentIcon.icon(null, null)); assertNull(FcEquipmentIcon.icon("其他", "胸"))
+    }
+
+    @Test fun primaryPage() {
+        show { FcPagePrimary("虚构首页", Modifier.testTag("primary"), segments = {
+            FcSegmentedSwitch(listOf("今日", "学员"), 0, {}, Modifier.testTag("segments"))
+        }) { FcListRow("虚构内容", Modifier.testTag("content")) } }
+        full("primary"); full("content")
+        assertTrue(node("segments").getUnclippedBoundsInRoot().bottom <= compose.onNodeWithText("虚构首页").getUnclippedBoundsInRoot().top)
+        compose.onNodeWithText("虚构首页").assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading))
+    }
+
+    @Test fun secondaryPage() {
+        var back = 0; var saves = 0
+        compose.setContent { FineCoachTheme { FcPageSecondary("虚构详情", { back++ }, bottom = {
+            FcButton("保存", Modifier.testTag("save")) { saves++ }
+        }) { FcListRow("虚构内容", Modifier.testTag("content")) } } }
+        compose.onNodeWithContentDescription("返回").performClick(); assertEquals(1, back)
+        node("save").assertIsDisplayed().performClick(); assertEquals(1, saves)
+        assertEquals(node("platform-content").getUnclippedBoundsInRoot().width, node("save").getUnclippedBoundsInRoot().width)
+        node("content").assertExists()
+    }
+
+    @Test fun emptyState() {
+        var calls = 0
+        show { FcEmptyState("还没有学员", "虚构说明", Modifier.fillMaxSize().testTag("empty"), actionTitle = "新建学员", onAction = { calls++ }) }
+        full("empty"); full("empty-action"); touch("empty-action")
+        node("empty-mascot").assertWidthIsEqualTo(220.dp).assertHeightIsEqualTo(220.dp).assertHasNoClickAction()
+        node("empty-action").assertIsDisplayed().performClick(); assertEquals(1, calls)
+        compose.onNodeWithText("还没有学员").assertIsDisplayed(); compose.onNodeWithText("虚构说明").assertIsDisplayed()
+    }
+
+    @Test fun launch() {
+        show { FcLaunch(Modifier.testTag("launch")) }
+        full("launch"); node("launch").assertHasNoClickAction()
+        compose.onAllNodes(hasText("", substring = true)).assertCountEquals(0)
+        assertEquals(androidx.compose.ui.graphics.Color.White, FcColors.surfacePage)
+    }
+
+    @Test fun heroAndHint() {
+        var single = 0; var hint = 0; var opened = ""
+        show {
+            FcHeroCard("进行中", "虚构学员", "已训练 1 分钟", Modifier.testTag("single"), "继续训练", { single++ })
+            FcMultiHeroCard(listOf(FcHeroEntry("a", "虚构甲", "1 分钟"), FcHeroEntry("b", "虚构乙", "2 分钟")), { opened = it }, Modifier.testTag("multi"))
+            FcHintBar("虚构提示", Modifier.testTag("hint"), "继续训练", { hint++ })
+        }
+        full("single"); node("single").assertHeightIsAtLeast(100.dp).performClick(); assertEquals(1, single)
+        full("multi"); node("hero-a").assertHeightIsAtLeast(44.dp).performClick(); assertEquals("a", opened)
+        node("hero-b").performClick(); assertEquals("b", opened)
+        full("hint"); node("hint").assertHeightIsAtLeast(44.dp).performClick(); assertEquals(1, hint)
+    }
+
+    @Test fun favoritePrecedesDisclosureWithoutChangingRowAction() {
+        var opens = 0
+        show { FcListRow("虚构动作", Modifier.testTag("row"), mode = FcRowMode.Action { opens++ }, favorite = true) }
+        full("row"); node("favorite-star").assertWidthIsEqualTo(24.dp).assertHasNoClickAction()
+        assertFalse(node("favorite-star").fetchSemanticsNode().config.contains(SemanticsProperties.ContentDescription))
+        val star = node("favorite-star").getUnclippedBoundsInRoot()
+        val disclosure = node("list-row-disclosure").getUnclippedBoundsInRoot()
+        assertTrue("Favorite must precede disclosure", star.right <= disclosure.left)
+        node("row").performClick(); assertEquals(1, opens)
+    }
+}
