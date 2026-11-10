@@ -225,3 +225,4 @@
 | AD-01 图标映射 | `design/android-differences/screens/AD-01-icon-mapping.png` | 已入库（2026-11-10，负责人导出） | `769ad7d20c3de8bee10f0f0b48c4ed9203b8c0e55d2cf8900e619a9847177f71` |
 | AD-02 日期和时间选择 | `design/android-differences/screens/AD-02-date-time-picker.png` | 已入库（2026-11-10，负责人导出） | `4eb76ec7f3bcf1f49a92b671ef66ac1c6356e41e444bf2bf759bea96ecccfb2f` |
 | AD-03 操作面板 | `design/android-differences/screens/AD-03-action-sheet.png` | 已入库（2026-11-10，负责人导出） | `a05bd35362ce27c6e9a2f8e04f04e0f1a61b366eebfcea7b328c8b30ef946d35` |
+| AD-04 自适应图标 | `design/android-differences/screens/AD-04-adaptive-icon.png` | 已入库（2026-11-10，负责人导出） | `5457264f78d0cc02ecf1a042a3a9774c0ab86ab0f9ef972a4e0b8ed38be698ea` |
