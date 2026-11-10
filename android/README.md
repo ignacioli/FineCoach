@@ -1196,7 +1196,8 @@ S1 数据由独立的 debug-only `S1DebugSeed` 经真实 Repository 写入一份
 ### S0 接口与 gate 现状登记
 
 - 已实现：`s0G1`、`s0G2`、`s0G6`、`s0Room`、`s0SeedIsolation`、`s0InstallSeededDebug`
-- 占位（执行即失败）：`s0G3`、`s0G4`、`s0G5`、`s0G8`
+- 已接入独立非空 Test gate：`s0G3`（DesignValueScanTests）、`s0G4`（EntryLayoutHarnessTests）；用法与独立报告目录见本文末尾 S0 G3/G4。
+- `s0G5` 已接入 verify-only 截图门禁（T019）；`s0G8` 仍是占位（执行即失败）。
 - 向量 runner 与余额运算：
   - `app/src/test/java/com/ignacioli/finecoach/SharedVectorRunner.kt`
   - `app/src/main/java/com/ignacioli/finecoach/domain/CreditLedger.kt`
@@ -1360,3 +1361,15 @@ agent 运行上述任务一律从产品根调用共享宿主锁 wrapper：
 常规 `testDebugUnitTest` / `testReleaseUnitTest` 排除 `ComponentScreenshotTests` 与 `TrainingConformanceTests`（`app/build.gradle.kts`）；只有显式传入 `-Proborazzi.test.record=true` 时才保留 `ComponentScreenshotTests`，因此上面这条命令仍能选中该类。`TrainingConformanceTests` 只在 `s0Conformance` 中运行。
 
 随后负责人登记文件清单、SHA-256 与批准 commit，再运行 `s0G5`。这不自动完成 T020，agent 不创建/批准/更新基线。宿主 S0-13 需接入 T019 baseline guard 的前后检查；本轮未修改 host gate。
+
+### S0 G4：入口与布局工具
+
+从 worktree 根运行 `.handoff/bin/agent-test.sh --task s0G4`，只运行 `EntryLayoutHarnessTests`。
+可复用 `assertEntryClick(tag, callbackCount)` 和 `assertFullContentWidth(tag, parentContentTag)`；tag 指向真实点击节点和父内容区。
+报告：`app/build/test-results/s0G4/`、`app/build/reports/tests/s0G4/`（相对 android/）；空测试、skip、失败均拒绝。样例 map 与结果见 `docs/s0/T017.md`。
+
+### S0 G3：页面组合设计数值扫描
+
+从 worktree 根运行 `.handoff/bin/agent-test.sh --task s0G3`，只运行 `DesignValueScanTests`。
+扫描 main Kotlin（含壳、features、navigation）及 debug Kotlin；main `designsystem/` 定义处排除，测试 fixture 不进入源码扫描目录。仅间距位置允许原始零值。
+通过 `finecoach.sourceRoot` 指定 `app/src`；报告位于 `app/build/test-results/s0G3/`、`app/build/reports/tests/s0G3/`，打印实际文件数、分目录违规数及文件:行。空测试、skip、失败均拒绝。

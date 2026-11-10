@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.text.BasicText
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -45,7 +44,7 @@ internal class S0DebugApplication : Application(), ShellContentProvider {
 private fun PrivacySample(privacyCover: PrivacyCoverPolicy, onCatalog: () -> Unit) {
     var dialogOpen by remember { mutableStateOf(false) }
     var count by remember { mutableIntStateOf(0) }
-    val background = MaterialTheme.colorScheme.background
+    val background = FcColors.surfacePage
     Column(Modifier.fillMaxSize().background(background).safeDrawingPadding().padding(FcSpacing.space4)
         .testTag("s0-privacy-shell").semantics { testTagsAsResourceId = true }) {
         SampleText("S0SENTINEL-recents", "s0-shell-sentinel")
@@ -75,7 +74,7 @@ private fun PrivacySample(privacyCover: PrivacyCoverPolicy, onCatalog: () -> Uni
 @Composable
 private fun SampleText(text: String, tag: String) {
     BasicText(text, Modifier.fillMaxWidth().testTag(tag),
-        style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onBackground))
+        style = FcTypography.body.copy(color = FcColors.textPrimary))
 }
 
 @Composable

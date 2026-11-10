@@ -698,3 +698,17 @@ Android 14+ 字体缩放可以是非线性的，不能把 px 定义成 `sp × de
 | 局部缩放适配边界 | S0 没有统一 clamp 清单；components 的 `DS-SET-ROW` 单行数值最小缩放 0.8 等是组件规则，不等于全局 fontScale 上限。UIKit scalingBase 与 Android 非线性 sp 不存在已批准逐档等价表。 | 按后续获批组件逐项映射；不为 T013 发明上限或重建 UIKit 曲线。 |
 | 来源文件旧措辞 | ADR-001 §7.2 仍写中间格式待定，plan §3.3 仍保留「若 D02 选 JSON」分支；S0 spec D02/D05/D14 已于 2026-11-03 定案。 | 本轮遵循直接 README→Kotlin 与随包字体；来源 owner 跟踪历史文字同步，不重开决定，不修改只读规格。 |
 | 独立复核 | T012 要求 cursor-agent 对照 iOS token 测试复核；本轮仅 Codex 文档与静态来源核对。 | 待 cursor-agent 独立复核，不把本轮 readback 当作该复核或 G1/G5 通过。 |
+
+### 15.6 Android 平台设计结论回写（AD-07，2026-11-10）
+
+本节为 C 类文档回填，目标设计不变、不修改任何 token 数值。AD-01、AD-02、AD-03 的负责人批准记录、画板名称及日期以 `components.md` §5 为唯一记录；本节引用已批准结论，不重复记批准。三块画板的 2 倍 PNG 已入库（2026-11-10，负责人导出），路径/摘要、35 项逐行对照与未接入项见 [T031](../../android/docs/s0/T031.md)。
+
+| 来源 | 当前适用规则 | 替代的旧表述 / 保留边界 |
+|---|---|---|
+| AD-01 / D12 | SF Symbols → 按需 Material Symbols vector drawable，附 Apache 2.0 LICENSE/NOTICE；标题栏 weight 300、状态/保存 400–600、± ▾ 600。实际 drawable 与 provenance、35 项逐行状态见 `components.md` §5 AD-07 引用 | 不再待选图标引入方式；不引图标库。`‹ › ✓` 保留随包 Noto Sans SC，来源不变 |
+| AD-02 | 日期点值行后在行下页内展开、再点收起，不用日期弹窗；时间用 M3 时间弹窗，24h 表盘，左下键盘图标切换直接输入；重复截止日早于开始日期的日子灰显 `text.disabled`；选中 `action.primary` 底白字，今天 1pt 圆环，`radius.lg`，星期从「日」开始 | 替代快进阶段的通用 M3 DatePickerDialog 目标；不以旧 catalog 样例反向定义设计。日期值行复用 DS-LABEL-VALUE-ROW，不新增 DS ID |
+| AD-03 | 复用 DS-BOTTOM-SHEET 和 DS-ACTION-ROW；当前分区行尾 ✓（15/600、action.primary）；选项纯文字、不加 folder 图标；点遮罩或下拉取消 | 不再待定选项样式；folder 仍可用于训练页「移入分区」左滑入口，面板选项内不用 |
+| D07 | 负责人批准基础子集；当前 31 个已实现 ID 的真实类型/状态/不变量及 S2/S4 两项延期以 `components.md` §8.1–8.2 为准 | 初始 22 个基础 ID 与 11 项延期是历史范围；恢复第 3 步已将 S1 项提升，不继续作为当前延期 |
+| D09 | 负责人批准按 ADR A/B 处理、经 Penpot 审；系统壳使用安全 Insets、系统返回与 DS-PAGE-HEADER 的 ‹ 共用 callback，详见 `components.md` §8.4 | 不把 roadmap 旧 C 分类写成已批准；真实系统栏与手势效果仍需核实，不新增自动结束/删除行为 |
+
+三块批准画板导出已按摘要核验入库；文档回写、导出核验与自动测试不等于 Android 运行时视觉验收。
