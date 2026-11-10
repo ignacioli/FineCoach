@@ -71,7 +71,11 @@ class ExerciseTemplateEntryLayoutTests {
         val repository = f.exercises
         exerciseRepository = repository
         exerciseUseCases = ExerciseUseCases(repository, f.clock, f.ids)
-        exerciseState = ExerciseUiState(exerciseUseCases, repository)
+        f.test {
+            val history = com.ignacioli.finecoach.storage.repository.HistoryRepository(f.db, f.clock, f.generation, java.time.ZoneId.of("UTC"))
+            exerciseState = ExerciseUiState(exerciseUseCases, repository, history, f.sessions)
+        }
+
         f.test {
             templateState = TemplateUiState(f.templateUseCases, f.clock, f.ids)
             sessionUseCases = f.useCases
@@ -149,6 +153,197 @@ class ExerciseTemplateEntryLayoutTests {
         click("template-section-delete")
     }
 
+    @Test fun metadataFailureDisplaysUnavailableWithoutReclassifyingCachedCatalog() {
+        var failRead = false
+        var reload by mutableIntStateOf(0)
+        val loader = ExerciseCatalogLoader(ApplicationProvider.getApplicationContext<Context>().assets)
+        val repo = com.ignacioli.finecoach.storage.repository.ExerciseRepository(f.db, loader, f.clock) {
+            if (failRead) throw java.io.IOException("fictional catalog read failure")
+            loader.load(f.time)
+        }
+        exerciseState = ExerciseUiState(ExerciseUseCases(repo, f.clock, f.ids), repo)
+        f.test { repo.prepareCatalog() }
+        compose.setContent { FineCoachTheme { key(reload) { ExerciseLibraryScreen(exerciseState) {} } } }
+        await("exercise-library-section-胸")
+        val count = exerciseState.sections(null, null).sumOf { it.entries.size }
+        compose.runOnIdle { failRead = true; reload++ }
+        await("exercise-catalog-unavailable")
+        node("exercise-catalog-unavailable").assertIsDisplayed()
+        node("exercise-library-section-胸").assertExists()
+        node("exercise-library-section-uncategorized").assertDoesNotExist()
+        assertEquals(count, exerciseState.sections(null, null).sumOf { it.entries.size })
+        compose.runOnIdle { failRead = false; reload++ }
+        gone("exercise-catalog-unavailable")
+    }
+
+    @Test fun recentReloadLoadsOnlyEnoughSessionsAndFilterRecompositionKeepsCachedResult() {
+        val items = (1..7).map { custom("虚构近期动作$it") }
+        items.forEachIndexed { index, item ->
+            f.time = f.now.plusSeconds(index.toLong() + 1)
+            completedCatalogExercise(item, index + 1)
+        }
+        f.test { ok(exerciseUseCases.updatePreference(UpdateExercisePreferenceCommand(items.last().exerciseID, null, false, true, false, null))) }
+        val loads = java.util.Collections.synchronizedList(mutableListOf<SessionID>())
+        lateinit var candidates: List<SessionID>
+        f.test {
+            val history = com.ignacioli.finecoach.storage.repository.HistoryRepository(f.db, f.clock, f.generation, java.time.ZoneId.of("UTC"))
+            candidates = ok(history.recentSessionIDs(null))
+            val actualSessions = f.sessions
+            val sessions = object : SessionRepositoryPort by actualSessions {
+                override suspend fun loadContent(sessionID: SessionID): ApplicationResult<SessionContentRecord?> {
+                    loads.add(sessionID)
+                    return actualSessions.loadContent(sessionID)
+                }
+            }
+            exerciseState = ExerciseUiState(exerciseUseCases, exerciseRepository, history, sessions)
+        }
+        library(); await("exercise-library-recent")
+        assertEquals(items.subList(1, 6).reversed(), exerciseState.recentEntries)
+        assertEquals(candidates.take(6), loads.toList())
+        val cached = exerciseState.recentEntries
+        click("exercise-library-muscle-胸"); click("exercise-library-muscle-all")
+        click("exercise-library-filter"); click("exercise-library-equipment-杠铃"); click("exercise-library-filter-done")
+        assertSame(cached, exerciseState.recentEntries)
+        assertEquals(6, loads.size)
+    }
+
+    @Test fun libraryMuscleEquipmentSearchCountsAndFilterEntriesAreClickableAndFullWidth() {
+        f.test { exerciseRepository.prepareCatalog() }
+        library()
+        await("exercise-library-section-胸")
+        full("exercise-library-muscles", "exercise-library-content")
+        full("exercise-library-search-row", "exercise-library-content")
+        // Every horizontally reachable chip has its own real click action.
+        ExerciseBrowse.muscles.forEach { muscle ->
+            click("exercise-library-muscle-$muscle")
+            node("exercise-library-muscle-$muscle").assertIsSelected()
+            val expected = exerciseState.entries.count { exerciseState.metadata[it.exerciseID]?.primaryMuscleGroup == muscle }
+            node("exercise-library-section-$muscle").assertTextEquals("$muscle · $expected")
+        }
+        click("exercise-library-muscle-胸")
+        click("exercise-library-filter")
+        full("exercise-library-equipment", "exercise-library-filter-content")
+        ExerciseBrowse.equipment.forEach { equipment ->
+            click("exercise-library-equipment-$equipment")
+            node("exercise-library-equipment-$equipment").assertIsSelected()
+        }
+        click("exercise-library-equipment-杠铃")
+        full("exercise-library-filter-done", "exercise-library-filter-content")
+        click("exercise-library-filter-done")
+        node("exercise-library-filter").assert(SemanticsMatcher.expectValue(androidx.compose.ui.semantics.SemanticsProperties.StateDescription, "已筛选"))
+        text("exercise-library-search", "wo tui")
+        lateinit var expectedMatches: List<ExerciseRecord>
+        f.test { expectedMatches = ok(exerciseRepository.search("wo tui")) }
+        compose.waitUntil(15_000) { exerciseState.entries == expectedMatches }
+
+        val rows = exerciseState.sections("胸", "杠铃").single().entries
+        assertTrue(rows.isNotEmpty())
+        node("exercise-library-section-胸").assertTextEquals("胸 · ${rows.size}")
+        val tag = "exercise-options-${rows.first().exerciseID.value}"
+        full(tag, "exercise-library-content"); click(tag); click("exercise-options-cancel")
+        click("exercise-library-filter"); click("exercise-library-equipment-all"); click("exercise-library-filter-done")
+        click("exercise-library-muscle-all")
+        node("exercise-library-muscle-all").assertIsSelected()
+    }
+
+    private fun completedCatalogExercise(item: ExerciseRecord, student: Int) {
+        f.test {
+            f.student(student)
+            val session = f.start(student)
+            val exerciseID = f.ids.newSessionExerciseID()
+            val set = TrainingSet.makeDraft(f.ids.newTrainingSetID(), exerciseID, 0u,
+                TrainingSetInput(item.recordMode, weightValue = if (item.recordMode == RecordMode.weightReps) "10" else null, repetitionCount = "8", unit = if (item.recordMode == RecordMode.reps) MeasurementUnit.repetitions else MeasurementUnit.kilograms), f.time).confirmed(f.time)
+            val exercise = SessionExerciseRecord(exerciseID, session.sessionID, 0u,
+                if (item.kind == ExerciseKind.builtIn) ExerciseSourceKind.builtIn else ExerciseSourceKind.custom,
+                item.exerciseID, item.canonicalName, item.recordMode, null, null, listOf(set.toRecord()))
+            val content = ok(f.sessions.saveContent(SaveSessionContentCommand(session.sessionID, session.revision, emptyList(), listOf(exercise))))
+            ok(f.sessions.complete(CompleteSessionCommand(session.sessionID, content.session.revision, f.time, false)))
+        }
+    }
+
+    @Test fun recentLibraryRowsUseDurableHistoryAndDisappearForSearchFiltersAndHiddenItems() {
+        val item = custom()
+        completedCatalogExercise(item, 1)
+        f.test { f.reopen()
+            val history = com.ignacioli.finecoach.storage.repository.HistoryRepository(f.db, f.clock, f.generation, java.time.ZoneId.of("UTC"))
+            val repo = f.exercises
+            exerciseState = ExerciseUiState(ExerciseUseCases(repo, f.clock, f.ids), repo, history, f.sessions)
+        }
+        library(); await("exercise-library-recent")
+        val recentTag = "exercise-library-recent-${item.exerciseID.value}"
+        full(recentTag, "exercise-library-content"); click(recentTag); click("exercise-options-cancel")
+        // Complete list intentionally retains the same action as a separate row/tag.
+        node("exercise-options-${item.exerciseID.value}").assertExists()
+        text("exercise-library-search", "虚构"); gone("exercise-library-recent")
+        text("exercise-library-search", ""); await("exercise-library-recent")
+        click("exercise-library-muscle-胸"); gone("exercise-library-recent")
+        click("exercise-library-muscle-all"); await("exercise-library-recent")
+        click("exercise-library-filter"); click("exercise-library-equipment-杠铃"); click("exercise-library-filter-done"); gone("exercise-library-recent")
+        click("exercise-library-filter"); click("exercise-library-equipment-all"); click("exercise-show-hidden"); click("exercise-library-filter-done")
+        await("exercise-library-recent")
+        click(recentTag); click("exercise-hide"); gone("exercise-alias"); gone("exercise-library-recent")
+        await("exercise-options-${item.exerciseID.value}")
+        click("exercise-options-${item.exerciseID.value}"); click("exercise-hide"); await("exercise-library-recent")
+    }
+
+    @Test fun pickerFiltersGroupedRowsAndStudentRecentUseSameBrowseAndSelectRealSource() {
+        f.test { exerciseRepository.prepareCatalog() }
+        lateinit var first: ExerciseRecord; lateinit var other: ExerciseRecord
+        f.test {
+            first = ok(exerciseRepository.search("杠铃平板卧推")).single()
+            other = ok(exerciseRepository.search("俯卧撑")).first()
+        }
+        completedCatalogExercise(first, 1); completedCatalogExercise(other, 2)
+        var selected: ExerciseSelection? = null
+        var visible by mutableStateOf(true)
+        compose.setContent { FineCoachTheme { if (visible) ExercisePicker(exerciseState,
+            { selected = it; ApplicationResult.Success(Unit) }, studentID = f.studentID(1)) { visible = false } } }
+        await("exercise-picker-recent-${first.exerciseID.value}")
+        node("exercise-picker-recent-${other.exerciseID.value}").assertDoesNotExist()
+        full("exercise-picker-muscles", "exercise-picker-content")
+        full("exercise-picker-search-row", "exercise-picker-content")
+        click("exercise-picker-muscle-胸"); gone("exercise-picker-recent")
+        click("exercise-picker-filter")
+        node("exercise-picker").assertExists()
+        node("exercise-search").assertExists()
+        full("exercise-picker-filter-done", "exercise-picker-filter-content")
+        click("exercise-picker-equipment-杠铃"); click("exercise-picker-filter-done")
+        node("exercise-picker").assertExists()
+        text("exercise-search", "wo tui")
+        await("exercise-select-${first.exerciseID.value}")
+        lateinit var expectedMatches: List<ExerciseRecord>
+        f.test { expectedMatches = ok(exerciseRepository.search("wo tui")) }
+        compose.waitUntil(15_000) { exerciseState.entries == expectedMatches }
+
+        val count = exerciseState.sections("胸", "杠铃").single().entries.size
+        node("exercise-picker-section-胸").assertTextEquals("胸 · $count")
+        full("exercise-select-${first.exerciseID.value}", "exercise-picker-content")
+        click("exercise-select-${first.exerciseID.value}"); gone("exercise-picker")
+        assertEquals(first.exerciseID, selected?.sourceID)
+        assertEquals(ExerciseSourceKind.builtIn, selected?.sourceKind)
+        // Reopen and select from the separate recent row, not the complete list.
+        compose.runOnIdle { visible = true }
+        await("exercise-picker-recent-${first.exerciseID.value}")
+        full("exercise-picker-recent-${first.exerciseID.value}", "exercise-picker-content")
+        click("exercise-picker-recent-${first.exerciseID.value}"); gone("exercise-picker")
+        assertEquals(first.exerciseID, selected?.sourceID)
+    }
+
+    @Test fun archivedCustomCanBeRestoredFromHiddenLibraryList() {
+        val item = custom()
+        f.test { ok(exerciseUseCases.archiveCustom(item.exerciseID)) }
+        library(); await("exercise-library-search")
+        node("exercise-options-${item.exerciseID.value}").assertDoesNotExist()
+        click("exercise-library-filter"); click("exercise-show-hidden"); click("exercise-library-filter-done")
+        await("exercise-options-${item.exerciseID.value}")
+        click("exercise-options-${item.exerciseID.value}"); click("exercise-edit")
+        click("exercise-archive")
+        compose.waitUntil(15_000) { !exerciseState.busy }
+        click("exercise-editor-cancel")
+        await("exercise-options-${item.exerciseID.value}")
+        f.test { assertEquals(ExerciseLifecycle.active, ok(exerciseUseCases.search(item.canonicalName)).single().lifecycle) }
+    }
+
     @Test fun customCreateEditArchiveRestoreAndBackUseVisibleControlsAndRealRoom() {
         library(); click("exercise-library-trailing")
         text("exercise-name", "虚构新动作"); click("exercise-mode-reps")
@@ -178,7 +373,7 @@ class ExerciseTemplateEntryLayoutTests {
         options(); click("exercise-unilateral"); gone("exercise-alias")
         options(); click("exercise-hide"); gone("exercise-alias")
         f.test { assertTrue(ok(exerciseUseCases.search("")).isEmpty()) }
-        click("exercise-show-hidden"); options(); click("exercise-hide"); gone("exercise-alias")
+        click("exercise-library-filter"); click("exercise-show-hidden"); click("exercise-library-filter-done"); options(); click("exercise-hide"); gone("exercise-alias")
         f.test {
             val p = ok(f.exercises.preference(item.exerciseID))!!
             assertEquals("虚构显示名", p.alias); assertTrue(p.isFavorite); assertTrue(p.isAssisted); assertEquals(true, p.isUnilateral); assertFalse(p.isHidden)
@@ -228,7 +423,7 @@ class ExerciseTemplateEntryLayoutTests {
     @Test fun reusablePickerPinyinSelectionPersistsStableCatalogSnapshot() {
         val item = custom("虚构深蹲"); val session = session(); picker(session)
         text("exercise-search", "shen dun"); await("exercise-select-${item.exerciseID.value}")
-        full("exercise-search", "exercise-picker-content"); click("exercise-select-${item.exerciseID.value}"); gone("exercise-picker")
+        full("exercise-picker-search-row", "exercise-picker-content"); click("exercise-select-${item.exerciseID.value}"); gone("exercise-picker")
         f.test {
             val snapshot = ok(f.useCases.load(session.sessionID))!!.exercises.single()
             assertEquals(item.exerciseID, snapshot.sourceID); assertEquals(ExerciseSourceKind.custom, snapshot.sourceKind)
@@ -292,7 +487,11 @@ class ExerciseTemplateEntryLayoutTests {
 
     @Test fun templateAddPickerMoveExerciseToSectionAndUnsectionedAndRemove() {
         val original = template(); val item = custom("虚构模板新增动作"); editor(original)
-        click("template-add-exercise"); text("exercise-search", item.canonicalName); await("exercise-select-${item.exerciseID.value}")
+        click("template-add-exercise")
+        node("exercise-picker-filter").assertDoesNotExist()
+        node("exercise-picker-muscles").assertDoesNotExist()
+        node("exercise-picker-recent").assertDoesNotExist()
+        text("exercise-search", item.canonicalName); await("exercise-select-${item.exerciseID.value}")
         click("exercise-select-${item.exerciseID.value}"); gone("exercise-picker")
         val added = read(original.template.templateID).exercises.last()
         assertEquals(item.exerciseID, added.sourceID)

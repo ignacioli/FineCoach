@@ -2,37 +2,54 @@ package com.ignacioli.finecoach.features.exercises
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import com.ignacioli.finecoach.R
 import com.ignacioli.finecoach.core.application.*
 import com.ignacioli.finecoach.core.domain.common.*
 import com.ignacioli.finecoach.designsystem.*
 import kotlinx.coroutines.launch
 
+@Composable
+fun ExercisePicker(state: ExerciseUiState, onSelect: suspend (ExerciseSelection) -> ApplicationResult<Unit>,
+    onDismiss: () -> Unit) = ExercisePicker(state, onSelect, null, onDismiss = onDismiss)
+
 /** Used by T013a and templates. No template route or template state is required. */
+
 @Composable
 fun ExercisePicker(
     state: ExerciseUiState,
     onSelect: suspend (ExerciseSelection) -> ApplicationResult<Unit>,
+    studentID: StudentID?,
+    isTemplateContext: Boolean = false,
     onDismiss: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     var query by remember { mutableStateOf("") }
     var mode by remember { mutableStateOf(RecordMode.weightReps) }
-    LaunchedEffect(query) { state.search(query) }
-    FcBottomSheet("添加动作", onDismiss = { if (!state.busy) onDismiss() }, modifier = Modifier.testTag("exercise-picker")) {
+    var muscle by remember { mutableStateOf<String?>(null) }
+    var equipment by remember { mutableStateOf<String?>(null) }
+    var filters by remember { mutableStateOf(false) }
+    LaunchedEffect(query, studentID, isTemplateContext) {
+        state.reload(query, studentID = studentID, recentEnabled = !isTemplateContext)
+    }
+
+    FcBottomSheet("添加动作", onDismiss = { if (!state.busy) onDismiss() }, modifier = Modifier.testTag("exercise-picker"), skipPartiallyExpanded = true) {
         Column(Modifier.fillMaxWidth().imePadding().heightIn(max = FcComponentMetrics.row * 7)
             .verticalScroll(rememberScrollState()).testTag("exercise-picker-content"),
             verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
-            FcSearchField("搜索动作、拼音或名称", query, { query = it }, Modifier.testTag("exercise-search"))
-            state.entries.forEach { item ->
-                FcListRow(state.selection(item).name, Modifier.testTag("exercise-select-${item.exerciseID.value}"),
-                    subtitle = exerciseModeTitle(item.recordMode), mode = if (state.busy) FcRowMode.Unavailable("保存中") else FcRowMode.Action {
-                        scope.launch { state.perform({ onSelect(state.selection(item)) }) { onDismiss() } }
-                    })
+            ExerciseSearchRow(query, { query = it }, equipment != null, "exercise-search", "exercise-picker", showFilters = !isTemplateContext) { filters = true }
+            if (!isTemplateContext) ExerciseMuscleChips(muscle, { muscle = it }, "exercise-picker")
+            ExerciseBrowseRows(state, query, muscle, equipment, studentID, "exercise-picker",
+                { "exercise-select-${it.exerciseID.value}" }, !state.busy, showRecent = !isTemplateContext) { item ->
+                scope.launch { state.perform({ onSelect(state.selection(item)) }) { onDismiss() } }
             }
             ExerciseModePicker(mode, { mode = it }, !state.busy, "quick-mode")
             if (state.catalogUnavailable) FcListRow("动作库暂不可用", Modifier.testTag("exercise-catalog-unavailable"))
@@ -49,6 +66,88 @@ fun ExercisePicker(
             }
             FcSecondaryButton("取消", Modifier.testTag("exercise-picker-cancel"), !state.busy, onDismiss)
         }
+    }
+    if (filters && !isTemplateContext) ExerciseFilterSheet(equipment, { equipment = it }, null, {}, "exercise-picker", { filters = false })
+}
+
+/** Feature composition of existing DS components; both surfaces share the same browse anatomy. */
+@Composable
+private fun ExerciseSearchRow(query: String, onQuery: (String) -> Unit, active: Boolean,
+    searchTag: String, prefix: String, showFilters: Boolean = true, onFilters: () -> Unit) {
+    Row(Modifier.fillMaxWidth().testTag("$prefix-search-row"), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+        FcSearchField("搜索动作", query, onQuery, Modifier.weight(1f).testTag(searchTag))
+        if (showFilters) FcTitleIconButton("筛选", painterResource(R.drawable.ic_ms_filter_list),
+            Modifier.testTag("$prefix-filter").semantics { stateDescription = if (active) "已筛选" else "" }, onFilters)
+    }
+}
+
+@Composable
+private fun ExerciseMuscleChips(muscle: String?, onMuscle: (String?) -> Unit, prefix: String) {
+    Row(Modifier.fillMaxWidth().testTag("$prefix-muscles").horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+        FcFilterChip("全部", muscle == null, Modifier.testTag("$prefix-muscle-all")) { onMuscle(null) }
+        ExerciseBrowse.muscles.forEach { value ->
+            FcFilterChip(value, muscle == value, Modifier.testTag("$prefix-muscle-$value")) { onMuscle(value) }
+        }
+    }
+}
+
+@Composable
+private fun ExerciseFilterSheet(equipment: String?, onEquipment: (String?) -> Unit, hidden: Boolean?,
+    onHidden: (Boolean) -> Unit, prefix: String, onDismiss: () -> Unit) {
+    FcBottomSheet("筛选", onDismiss, Modifier.testTag("$prefix-filter-sheet"), skipPartiallyExpanded = true) {
+        Column(Modifier.fillMaxWidth().heightIn(max = FcComponentMetrics.row * 7)
+            .verticalScroll(rememberScrollState()).testTag("$prefix-filter-content"),
+            verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+            FcSectionLabel("器械")
+            FlowRow(Modifier.fillMaxWidth().testTag("$prefix-equipment"), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+                FcFilterChip("全部", equipment == null, Modifier.testTag("$prefix-equipment-all")) { onEquipment(null) }
+                ExerciseBrowse.equipment.forEach { value ->
+                    FcFilterChip(value, equipment == value, Modifier.testTag("$prefix-equipment-$value")) { onEquipment(value) }
+                }
+            }
+            if (hidden != null) {
+                FcListRowDivider()
+                FcLabelValueRow("显示已隐藏") {
+                    FcToggle("显示已隐藏", hidden, onHidden, Modifier.testTag("exercise-show-hidden"))
+                }
+
+            }
+            FcLinkButton("完成", Modifier.fillMaxWidth().testTag("$prefix-filter-done"), onClick = onDismiss)
+        }
+    }
+}
+
+@Composable
+private fun ExerciseBrowseRows(state: ExerciseUiState, query: String, muscle: String?, equipment: String?,
+    studentID: StudentID?, prefix: String, rowTag: (ExerciseRecord) -> String, enabled: Boolean = true, showRecent: Boolean = true,
+    onClick: (ExerciseRecord) -> Unit) {
+    val recent = state.recentEntries
+    @Composable fun row(item: ExerciseRecord, tag: String) {
+        FcListRow(state.selection(item).name, Modifier.testTag(tag), subtitle = state.subtitle(item),
+            mode = if (enabled) FcRowMode.Action { onClick(item) } else FcRowMode.Unavailable("保存中"))
+        FcListRowDivider()
+    }
+    state.historyError?.let { FcListRow(exerciseErrorTitle(it), Modifier.testTag("$prefix-history-error")) }
+    if (showRecent && ExerciseBrowse.showsRecent(query, muscle, equipment, recent)) {
+        Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+            FcSectionLabel("最近练过", Modifier.testTag("$prefix-recent"))
+            Column(Modifier.fillMaxWidth()) {
+                FcListRowDivider()
+                recent.forEach { row(it, "$prefix-recent-${it.exerciseID.value}") }
+            }
+        }
+        Spacer(Modifier.height(FcSpacing.space4))
+    }
+    state.sections(muscle, equipment).forEach { section ->
+        Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+            FcSectionLabel("${section.title} · ${section.entries.size}", Modifier.testTag("$prefix-section-${section.id}"))
+            Column(Modifier.fillMaxWidth()) {
+                FcListRowDivider()
+                section.entries.forEach { row(it, rowTag(it)) }
+            }
+        }
+        Spacer(Modifier.height(FcSpacing.space4))
     }
 }
 
@@ -69,30 +168,32 @@ fun ExerciseLibraryScreen(state: ExerciseUiState, onBack: () -> Unit) {
     var creating by remember { mutableStateOf(false) }
     var options by remember { mutableStateOf<ExerciseRecord?>(null) }
     var refresh by remember { mutableIntStateOf(0) }
+    var muscle by remember { mutableStateOf<String?>(null) }
+    var equipment by remember { mutableStateOf<String?>(null) }
+    var filters by remember { mutableStateOf(false) }
+
     val scope = rememberCoroutineScope()
-    LaunchedEffect(query, hidden, refresh) { state.search(query, hidden) }
+    LaunchedEffect(query, hidden, refresh) { state.reload(query, hidden) }
     if (creating || edit != null) {
         CustomExerciseEditor(state, edit, { creating = false; edit = null; refresh++ })
         return
     }
     FcPlatformShell(onBack) {
-        FcPageHeader("动作库", onBack = onBack, tag = "exercise-library", trailingTitle = "新建", onTrailing = { creating = true })
+        FcPageHeader("动作库", onBack = onBack, tag = "exercise-library", trailingTitle = "＋ 自定义", onTrailing = { creating = true })
         Column(Modifier.fillMaxWidth().weight(1f).imePadding().verticalScroll(rememberScrollState()).testTag("exercise-library-content"),
             verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
-            FcSearchField("搜索动作或拼音", query, { query = it }, Modifier.testTag("exercise-library-search"))
-            FcFilterChip("显示已隐藏动作", hidden, Modifier.testTag("exercise-show-hidden")) { hidden = !hidden }
+            ExerciseSearchRow(query, { query = it }, equipment != null || hidden, "exercise-library-search", "exercise-library") { filters = true }
+            ExerciseMuscleChips(muscle, { muscle = it }, "exercise-library")
             if (state.catalogUnavailable) FcListRow("动作库暂不可用", Modifier.testTag("exercise-catalog-unavailable"))
             state.error?.let { FcListRow(exerciseErrorTitle(it), Modifier.testTag("exercise-error")) }
-            state.entries.forEach { item ->
-                val p = state.preference(item.exerciseID)
-                FcListRow(p.alias ?: item.canonicalName, Modifier.testTag("exercise-options-${item.exerciseID.value}"),
-                    subtitle = if (p.isHidden || item.lifecycle == ExerciseLifecycle.archived) "已隐藏" else exerciseModeTitle(item.recordMode),
-                    mode = FcRowMode.Action { options = item })
-                FcListRowDivider()
-            }
+            ExerciseBrowseRows(state, query, muscle, equipment, null, "exercise-library",
+                { "exercise-options-${it.exerciseID.value}" }) { options = it }
+
         }
     }
+    if (filters) ExerciseFilterSheet(equipment, { equipment = it }, hidden, { hidden = it }, "exercise-library", { filters = false })
     options?.let { item ->
+
         val p = state.preference(item.exerciseID)
         var alias by remember(item.exerciseID) { mutableStateOf(p.alias ?: "") }
         fun update(command: UpdateExercisePreferenceCommand) {

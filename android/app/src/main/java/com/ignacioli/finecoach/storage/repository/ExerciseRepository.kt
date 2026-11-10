@@ -18,8 +18,9 @@ import java.util.concurrent.ConcurrentHashMap
 
 class ExerciseRepository(
     private val database: FineCoachDatabase,
-    private val loader: ExerciseCatalogLoader,
+    loader: ExerciseCatalogLoader,
     private val clock: AppClock,
+    private val readCatalog: () -> LoadedExerciseCatalog = { loader.load(clock.now()) },
 ) : ExerciseRepositoryPort {
     private val dao get() = database.t006bExerciseDao()
     private val base get() = database.s1Dao()
@@ -40,13 +41,32 @@ class ExerciseRepository(
         dao.catalog().map { it.record() }
     }
 
-    override suspend fun search(query: String): ApplicationResult<List<ExerciseRecord>> = transaction {
-        val metadata = try { loader.load(clock.now()).metadata }
+    private data class BrowseMetadataSnapshot(
+        val entries: Map<StableExerciseID, ExerciseCatalogMetadata> = emptyMap(),
+        val unavailable: Boolean = false,
+    )
+    @Volatile private var browseSnapshot = BrowseMetadataSnapshot()
+    val browseMetadata: Map<StableExerciseID, ExerciseCatalogMetadata> get() = browseSnapshot.entries
+    val browseMetadataUnavailable: Boolean get() = browseSnapshot.unavailable
+
+    private fun loadCatalog(): LoadedExerciseCatalog = try {
+        readCatalog().also { browseSnapshot = BrowseMetadataSnapshot(it.metadata.toMap()) }
+    } catch (cancelled: CancellationException) {
+        throw cancelled
+    } catch (failure: Exception) {
+        browseSnapshot = browseSnapshot.copy(unavailable = true)
+        throw failure
+    }
+
+    override suspend fun search(query: String) = search(query, includeHidden = false)
+
+    suspend fun search(query: String, includeHidden: Boolean): ApplicationResult<List<ExerciseRecord>> = transaction {
+        val metadata = try { loadCatalog().metadata }
         catch (cancelled: CancellationException) { throw cancelled }
         catch (failure: Exception) {
-            // Existing durable catalog remains searchable when bundled metadata cannot be read.
+            // Existing durable catalog and last successful facets remain usable on bundle read failure.
             if (dao.catalog().none { it.kind == ExerciseKind.builtIn }) throw failure
-            emptyMap()
+            browseSnapshot.entries
         }
         val preferences = dao.preferences().associateBy { it.exerciseID }
         val occupied = dao.claims().filter { it.ownerKind != ExerciseSourceKind.builtIn }.map { it.normalizedName }.toSet()
@@ -55,7 +75,10 @@ class ExerciseRepository(
         dao.catalog().filter { item ->
             val preference = preferences[item.id]
             val facet = metadata[StableExerciseID.parse(item.id)]
-            item.lifecycle == ExerciseLifecycle.active && !item.isRetired && preference?.isHidden != true &&
+            // Keep the existing library path to restore archived custom exercises.
+            (item.lifecycle == ExerciseLifecycle.active || (includeHidden && item.kind == ExerciseKind.custom)) &&
+                !item.isRetired && (includeHidden || preference?.isHidden != true) &&
+
                 !(item.kind == ExerciseKind.builtIn && item.normalizedName in occupied) &&
                 (normalizedQuery.isEmpty() || listOfNotNull(item.canonicalName, preference?.alias,
                     facet?.primaryMuscleGroup, facet?.equipmentClass).any { fold(it).contains(normalizedQuery) } ||
@@ -64,7 +87,7 @@ class ExerciseRepository(
     }
 
     suspend fun synchronizeCatalog(): ApplicationResult<Unit> = transaction {
-        val catalog = loader.load(clock.now())
+        val catalog = loadCatalog()
         val existing = dao.catalog().associateBy { it.id }
         val incomingIDs = catalog.records.map { it.exerciseID.value }.toSet()
         for (record in catalog.records) {
