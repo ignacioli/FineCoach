@@ -415,8 +415,6 @@ tasks.withType<Test>().matching { it.name == "testDebugUnitTest" || it.name == "
 // Reserve the approved interfaces. Each is replaced by its owning task only
 // when the full, non-empty test/report contract is implemented (plan section 4).
 val pendingGates = mapOf(
-    "s0G3" to "T018: design value scan",
-    "s0G4" to "T017: entry and layout harness",
     "s0G8" to "T004-T010: complete privacy and scope checks",
 )
 pendingGates.forEach { (gate, owner) ->
@@ -1003,3 +1001,134 @@ screenshotGate.configure {
     finalizedBy(baselineUnchanged)
 }
 registerVisualGate("s0Conformance", "TrainingConformanceTests", 1)
+
+val entryLayoutClasses = listOf("com.ignacioli.finecoach.EntryLayoutHarnessTests")
+val entryLayoutGate = tasks.register<Test>("s0G4") {
+    group = "verification"
+    description = "Reusable entry and layout assertion fixtures"
+    val debugTest = tasks.named<Test>("testDebugUnitTest").get()
+    testClassesDirs = debugTest.testClassesDirs
+    classpath = debugTest.classpath
+    javaLauncher.set(debugTest.javaLauncher)
+    setJvmArgs(debugTest.jvmArgs)
+    jvmArgumentProviders.addAll(debugTest.jvmArgumentProviders)
+    systemProperties(debugTest.systemProperties)
+    workingDir = debugTest.workingDir
+    filter {
+        setIncludePatterns(*entryLayoutClasses.toTypedArray())
+        isFailOnNoMatchingTests = true
+    }
+    failOnNoDiscoveredTests.set(true)
+    reports.junitXml.required.set(true)
+    reports.junitXml.outputLocation.set(layout.buildDirectory.dir("test-results/s0G4"))
+    reports.html.outputLocation.set(layout.buildDirectory.dir("reports/tests/s0G4"))
+    binaryResultsDirectory.set(layout.buildDirectory.dir("test-results/s0G4/binary"))
+    outputs.upToDateWhen { false }
+    outputs.doNotCacheIf("G4 evidence must execute on this host") { true }
+}
+val validateEntryLayoutGate = tasks.register("validateS0G4Results") {
+    doLast {
+        val gate = entryLayoutGate.get()
+        check(!gate.state.skipped && gate.state.failure == null) {
+            "s0G4 did not successfully execute: ${gate.state.skipMessage ?: gate.state.failure}"
+        }
+        val xmlFiles = gate.reports.junitXml.outputLocation.get().asFile
+            .listFiles { file -> file.name.startsWith("TEST-") && file.extension == "xml" }.orEmpty()
+        check(xmlFiles.isNotEmpty()) { "s0G4 has no JUnit XML" }
+        val factory = DocumentBuilderFactory.newInstance().apply {
+            setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
+            setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+            setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "")
+            setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "")
+        }
+        val counts = mutableMapOf<String, Int>()
+        for (xml in xmlFiles) {
+            val suite = factory.newDocumentBuilder().parse(xml).documentElement
+            val name = suite.getAttribute("name")
+            check(name in entryLayoutClasses) { "Unexpected G4 suite: $name" }
+            val cases = suite.getElementsByTagName("testcase")
+            val count = suite.getAttribute("tests").toInt()
+            check(count > 0 && count == cases.length) { "Empty/inconsistent G4 suite: $name" }
+            for (attribute in listOf("failures", "errors", "skipped")) {
+                check(suite.getAttribute(attribute).toInt() == 0) { "$name has $attribute" }
+            }
+            for (index in 0 until cases.length) {
+                val case = cases.item(index) as Element
+                check(listOf("skipped", "failure", "error").all {
+                    case.getElementsByTagName(it).length == 0
+                }) { "Unsuccessful G4 testcase: $name.${case.getAttribute("name")}" }
+            }
+            check(counts.put(name, count) == null) { "Duplicate G4 suite: $name" }
+        }
+        check(counts.keys == entryLayoutClasses.toSet()) { "Missing G4 suites: ${entryLayoutClasses - counts.keys}" }
+        logger.lifecycle("s0G4: ${counts.values.sum()} tests, 0 failures/errors/skips; $counts")
+    }
+}
+entryLayoutGate.configure { finalizedBy(validateEntryLayoutGate) }
+
+val designScanClasses = listOf("com.ignacioli.finecoach.DesignValueScanTests")
+val designScanGate = tasks.register<Test>("s0G3") {
+    group = "verification"
+    description = "Design value source scan and positive/negative fixtures"
+    val debugTest = tasks.named<Test>("testDebugUnitTest").get()
+    testClassesDirs = debugTest.testClassesDirs
+    classpath = debugTest.classpath
+    javaLauncher.set(debugTest.javaLauncher)
+    setJvmArgs(debugTest.jvmArgs)
+    jvmArgumentProviders.addAll(debugTest.jvmArgumentProviders)
+    systemProperties(debugTest.systemProperties)
+    workingDir = debugTest.workingDir
+    inputs.dir(layout.projectDirectory.dir("src/main"))
+    inputs.dir(layout.projectDirectory.dir("src/debug"))
+    systemProperty("finecoach.sourceRoot", layout.projectDirectory.dir("src").asFile.absolutePath)
+    filter {
+        setIncludePatterns(*designScanClasses.toTypedArray())
+        isFailOnNoMatchingTests = true
+    }
+    failOnNoDiscoveredTests.set(true)
+    reports.junitXml.required.set(true)
+    reports.junitXml.outputLocation.set(layout.buildDirectory.dir("test-results/s0G3"))
+    reports.html.outputLocation.set(layout.buildDirectory.dir("reports/tests/s0G3"))
+    binaryResultsDirectory.set(layout.buildDirectory.dir("test-results/s0G3/binary"))
+    outputs.upToDateWhen { false }
+    outputs.doNotCacheIf("G3 evidence must execute on this host") { true }
+}
+val validateDesignScanGate = tasks.register("validateS0G3Results") {
+    doLast {
+        val gate = designScanGate.get()
+        check(!gate.state.skipped && gate.state.failure == null) {
+            "s0G3 did not successfully execute: ${gate.state.skipMessage ?: gate.state.failure}"
+        }
+        val xmlFiles = gate.reports.junitXml.outputLocation.get().asFile
+            .listFiles { file -> file.name.startsWith("TEST-") && file.extension == "xml" }.orEmpty()
+        check(xmlFiles.isNotEmpty()) { "s0G3 has no JUnit XML" }
+        val factory = DocumentBuilderFactory.newInstance().apply {
+            setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
+            setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+            setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "")
+            setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "")
+        }
+        val counts = mutableMapOf<String, Int>()
+        for (xml in xmlFiles) {
+            val suite = factory.newDocumentBuilder().parse(xml).documentElement
+            val name = suite.getAttribute("name")
+            check(name in designScanClasses) { "Unexpected G3 suite: $name" }
+            val cases = suite.getElementsByTagName("testcase")
+            val count = suite.getAttribute("tests").toInt()
+            check(count > 0 && count == cases.length) { "Empty/inconsistent G3 suite: $name" }
+            for (attribute in listOf("failures", "errors", "skipped")) {
+                check(suite.getAttribute(attribute).toInt() == 0) { "$name has $attribute" }
+            }
+            for (index in 0 until cases.length) {
+                val case = cases.item(index) as Element
+                check(listOf("skipped", "failure", "error").all {
+                    case.getElementsByTagName(it).length == 0
+                }) { "Unsuccessful G3 testcase: $name.${case.getAttribute("name")}" }
+            }
+            check(counts.put(name, count) == null) { "Duplicate G3 suite: $name" }
+        }
+        check(counts.keys == designScanClasses.toSet()) { "Missing G3 suites: ${designScanClasses - counts.keys}" }
+        logger.lifecycle("s0G3: ${counts.values.sum()} tests, 0 failures/errors/skips; $counts")
+    }
+}
+designScanGate.configure { finalizedBy(validateDesignScanGate) }
