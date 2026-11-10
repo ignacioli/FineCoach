@@ -152,35 +152,50 @@ ending it first. An earlier implementation ended the old package
 automatically, with no confirmation. That reading should have been
 confirmed, not assumed.
 
-## UX/UI acceptance — no screenshot-loop automation
+## UX/UI acceptance — visual conformance gate, no screenshot loops
 
-**Never use a "screenshot → compare → fix" loop as the acceptance
-mechanism for UX/UI work, at any time, unless the project owner
-explicitly asks for it in that instance.** This applies to the iOS
-Simulator control tool and any other screenshot-capable tool.
+The target is the approved **design** (Penpot「M1-B G5 Design」,
+`design/*/screens/*.png`, `design/design-system/README.md` and
+`components.md`, and assets such as `design/m1-b-hifi/icons/`). iOS code
+is a reference implementation of that design, not the target itself.
+iOS system conventions in the design (swipe appearance, toggles, date
+pickers, back gestures, and so on) reach Android only through a
+registered Android design delta (AD-xx); anything not registered follows
+the design (product owner, 2026-11-10, S1-D25).
 
-Android's approved regression gate (ADR-001 Q11) uses a human-approved
-baseline plus deterministic automated pixel comparison. Only the product
-owner may approve and update baselines; agents must not modify them.
-Agents read test text results only (failed cases and difference ratios),
-never screenshot or difference images. This is not a screenshot → judge
-→ fix loop: no model judges the images. Baselines follow the owner's
-first walkthrough of core screens against the approved iOS designs;
-JVM regression results do not replace physical-device walkthroughs.
+Visual verification is never deferred to go faster. Before the product
+owner's single walkthrough of a core screen, the agent delivers that
+screen as machine-proven equivalent to its screens PNG: a screen fixture
+with the same content as the PNG, a screenshot at the same viewport,
+Penpot layer geometry compared with rendered element bounds within a
+stated tolerance, and an image difference map. The owner then looks at
+one "design | Android | difference" sheet per core screen, tries the
+interaction, and approves the baseline. Human walkthrough of core
+screens stays mandatory; it is not replaced by automation, and it is not
+spent on finding drift that a machine can find.
 
+- A one-shot, checklist-based review of a screenshot by a model is
+  allowed: one pass per screen per change, each checklist item answered
+  with evidence. This replaces the earlier "agents never look at images"
+  rule (product owner, 2026-11-10).
+- Repeated screenshotting to converge on a look — screenshot, judge,
+  edit, screenshot again — is not allowed, with any tool. If an agent
+  finds itself taking repeated screenshots, the approach is wrong: stop
+  immediately and run a retrospective.
+- Android's regression gate (ADR-001 Q11) is a product-owner-approved
+  baseline plus deterministic pixel comparison. Only the product owner
+  approves and updates baselines; agents must not modify them. JVM
+  regression results do not replace physical-device walkthroughs.
 - A small number of manual screenshots taken *while debugging* a
   specific, already-identified visual issue is fine.
-- Building an automated cycle that takes a screenshot, judges it,
-  edits code, and repeats — as a general-purpose way to "verify the UI
-  looks right" — is not fine. It did not exist as a gate before this
-  rule and must not be reintroduced informally.
-- When a human needs to eyeball Feature UI, seed the simulator with
-  data and hand control to them (as in the earlier manual acceptance
-  walkthroughs) rather than iterating on screenshots yourself.
-- The iOS Simulator control tool is token-expensive per round trip
-  (each screenshot is an image, and coordinate-guessing loops multiply
-  that). Treat it as a tool for a human-guided walkthrough, not a
-  default verification step for routine changes.
+- Dispatch prompts for UI work name the screens PNG, the components
+  anatomy entries, and the `design/` assets the screen uses. "No
+  matching asset" is not a reason to omit a design element until
+  `design/` has been checked (S1 drift: the 21 equipment SVGs and the
+  code-drawn steam were wrongly reported as missing).
+- The iOS Simulator control tool is token-expensive per round trip.
+  Treat it as a tool for a human-guided walkthrough or a one-off
+  targeted check, not a default verification step.
 
 ## Visual design authority
 
