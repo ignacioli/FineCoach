@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.unit.width
+import androidx.compose.ui.unit.height
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.graphics.Insets
@@ -73,6 +74,7 @@ class SessionRecoveryEntryLayoutTests {
     private fun show(original: SessionContentRecord) {
         compose.setContent { FineCoachTheme { ActiveSessionScreen(state, original.session.sessionID, exercises, templates, { back++ }, {}) } }
         await("session-add-exercise")
+        compose.waitUntil(15_000) { !state.busy }
     }
     private fun read(id: SessionID): SessionContentRecord {
         compose.waitUntil(15_000) { !state.busy }
@@ -87,6 +89,8 @@ class SessionRecoveryEntryLayoutTests {
         val original = content(); show(original)
         f.test { f.failWrites("training_sets", "INSERT") }
         click("session-set-${original.exercises.first().sets.first().trainingSetID.value}-confirm")
+        compose.waitUntil(15_000) { !state.busy }
+        assertEquals("confirm failure: ${state.error?.code}", FcSaveState.Failed, state.saveState)
         await("save-retry"); node("session-finish").assertIsNotEnabled()
         full("save-retry", "save-status-content")
         assertEquals(original, read(original.session.sessionID))
@@ -101,12 +105,40 @@ class SessionRecoveryEntryLayoutTests {
         val other = SessionID.parse("abcdef00-0000-4000-8000-000000000099")
         compose.runOnIdle { state.rests.start(other) }
         click("session-set-${original.exercises.first().sets.first().trainingSetID.value}-confirm"); await("rest-content")
-        full("rest-plus", "rest-content"); full("rest-minus", "rest-content"); full("rest-skip", "rest-content")
+        full("rest-content", "platform-content")
+        val bar = node("rest-content").getUnclippedBoundsInRoot()
+        val finish = node("session-finish").getUnclippedBoundsInRoot()
+        assertTrue(bar.bottom <= finish.top)
+        listOf("rest-plus", "rest-minus", "rest-skip").forEach { tag ->
+            node(tag).assertIsDisplayed().assertHasClickAction().assertWidthIsAtLeast(FcComponentMetrics.touch).assertHeightIsAtLeast(FcComponentMetrics.touch)
+            val button = node(tag).getUnclippedBoundsInRoot()
+            assertTrue(button.left >= bar.left && button.right <= bar.right)
+            assertTrue(button.top >= bar.top && button.bottom <= bar.bottom)
+        }
+        assertTrue(node("rest-minus").getUnclippedBoundsInRoot().right <= node("rest-plus").getUnclippedBoundsInRoot().left)
+        assertTrue(node("rest-plus").getUnclippedBoundsInRoot().right <= node("rest-skip").getUnclippedBoundsInRoot().left)
+        node("rest-remaining").assertTextEquals("2:00")
         click("rest-plus"); assertEquals(135L, state.rests.remaining(original.session.sessionID))
         click("rest-minus"); assertEquals(120L, state.rests.remaining(original.session.sessionID))
+        compose.runOnIdle {
+            ViewCompat.dispatchApplyWindowInsets(compose.activity.window.decorView,
+                WindowInsetsCompat.Builder().setInsets(WindowInsetsCompat.Type.ime(), Insets.of(0, 0, 0, 280)).setVisible(WindowInsetsCompat.Type.ime(), true).build())
+        }
+        gone("rest-content"); assertNotNull(state.rests.end(original.session.sessionID))
+        compose.runOnIdle {
+            ViewCompat.dispatchApplyWindowInsets(compose.activity.window.decorView,
+                WindowInsetsCompat.Builder().setInsets(WindowInsetsCompat.Type.ime(), Insets.NONE).setVisible(WindowInsetsCompat.Type.ime(), false).build())
+        }
+        await("rest-skip")
         click("rest-skip"); gone("rest-content"); assertNotNull(state.rests.end(other))
         compose.runOnIdle { state.rests.start(original.session.sessionID); f.time = f.now.plusSeconds(120) }
-        await("rest-close"); full("rest-close", "rest-content"); click("rest-close"); gone("rest-content")
+        await("rest-close"); full("rest-content", "platform-content")
+        node("rest-close").assertIsDisplayed().assertWidthIsAtLeast(FcComponentMetrics.touch)
+        node("rest-ended").assertTextEquals("休息结束，可以开始下一组")
+        compose.runOnIdle { f.time = f.now.plusSeconds(125) }
+        compose.mainClock.advanceTimeBy(1100); await("rest-overdue")
+        node("rest-overdue").assertTextEquals("已超时 0:05")
+        click("rest-close"); gone("rest-content")
     }
     @Test fun checkpointAndLaunchRecoveryRestoreMultipleSessionsAcrossDatabaseReopen() {
         val original = content(true)

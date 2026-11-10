@@ -102,6 +102,9 @@ class HistoryEntryLayoutTests {
         f.test { original = f.content(sourceID = exercise); f.finish(original) }
         compose.setContent { FineCoachTheme { HistoryListScreen(state, f.zone, {}, {}) } }
         await("history-open-${original.session.sessionID.value}")
+        // Records are published before list() finishes loading filter options.
+        compose.waitUntil(15_000) { !state.busy && exercise in state.exerciseOptions }
+        node("history-filter-exercise").assertIsEnabled()
         click("history-filter-exercise"); click("history-filter-cancel"); assertTrue(state.query.exerciseIDs.isEmpty())
         click("history-filter-exercise"); click("history-filter-exercise-${exercise.value}")
         assertEquals(setOf(exercise), state.query.exerciseIDs); assertEquals(original.session.sessionID, state.records.single().sessionID)

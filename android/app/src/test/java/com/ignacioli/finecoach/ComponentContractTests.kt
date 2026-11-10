@@ -344,10 +344,19 @@ class ComponentContractTests {
     }
     @Test fun setRow() {
         var confirms = 0; var edits = 0
-        show { FcSetRow(1, "12.5 × 8", false, true, { confirms++ }, { edits++ }, Modifier.testTag("set"), tag = "set") }
+        var completed by mutableStateOf(false)
+        var undos = 0
+        show { FcSetRow(1, "12.5 × 8", completed, !completed, { confirms++ }, { edits++ }, Modifier.testTag("set"), tag = "set",
+            onUndo = if (completed) ({ undos++ }) else null) }
         full("set"); touch("set-confirm"); touch("set-edit")
+        node("set-edit").assertContentDescriptionEquals("编辑组")
         node("set-confirm").assertIsDisplayed().performClick(); node("set-edit").assertIsDisplayed().performClick()
-        compose.runOnIdle { assertEquals(1, confirms); assertEquals(1, edits) }
+        compose.runOnIdle { assertEquals(1, confirms); assertEquals(1, edits); completed = true }
+        node("set-confirm").assertIsNotEnabled()
+        node("set-undo").assertIsDisplayed().assertHasClickAction().performClick()
+        node("set-edit").assertIsDisplayed().assertHasClickAction()
+        full("set"); touch("set-undo")
+        compose.runOnIdle { assertEquals(1, undos) }
     }
     @Test fun multiHeroCard() {
         var opened = ""

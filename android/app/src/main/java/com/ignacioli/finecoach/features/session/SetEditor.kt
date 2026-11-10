@@ -2,6 +2,10 @@ package com.ignacioli.finecoach.features.session
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
@@ -20,7 +24,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SetEditor(state: ActiveSessionUiState, exercise: SessionExerciseRecord, target: TrainingSetRecord?,
     unilateral: Boolean, assisted: Boolean, onDismiss: () -> Unit) {
-    val initial = target ?: (exercise.sets.lastOrNull { it.state == SetRecordingState.completed } ?: exercise.sets.lastOrNull() ?: state.previous[exercise.sessionExerciseID])
+    val initial = target ?: state.entryPrefill?.takeIf { it.sessionExerciseID == exercise.sessionExerciseID } ?: (exercise.sets.lastOrNull { it.state == SetRecordingState.completed } ?: exercise.sets.lastOrNull() ?: state.previous[exercise.sessionExerciseID])
         .takeIf { exercise.recordModeSnapshot == RecordMode.weightReps || exercise.recordModeSnapshot == RecordMode.reps }
     var weight by remember { mutableStateOf(initial?.weightValue?.toPlainString() ?: "") }
     var reps by remember { mutableStateOf(initial?.repetitionCount?.toPlainString() ?: "") }
@@ -34,37 +38,53 @@ fun SetEditor(state: ActiveSessionUiState, exercise: SessionExerciseRecord, targ
     val sideEntry = exercise.recordModeSnapshot == RecordMode.weightReps && (unilateral || initial?.side == SetSide.bilateral)
     val scope = rememberCoroutineScope()
     val keyboard = LocalSoftwareKeyboardController.current
+    LaunchedEffect(state.entryPrefillVersion) {
+        val restored = state.entryPrefill?.takeIf { target == null && it.sessionExerciseID == exercise.sessionExerciseID }
+        if (restored != null) {
+            weight = restored.weightValue?.toPlainString().orEmpty(); reps = restored.repetitionCount?.toPlainString().orEmpty()
+            duration = DurationTextParser.formatForEditing(restored.durationSeconds?.toPlainString())
+            distance = restored.distanceValue?.toPlainString().orEmpty(); speed = restored.speedValue?.toPlainString().orEmpty()
+            resistance = restored.resistanceValue?.toPlainString().orEmpty()
+            left = restored.leftValue?.toPlainString().orEmpty(); right = restored.rightValue?.toPlainString().orEmpty()
+            split = restored.leftValue != restored.rightValue
+        }
+    }
+    val numberKeyboard = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done)
+    val done = KeyboardActions(onDone = { keyboard?.hide() })
     BackHandler { if (!state.busy) onDismiss() }
-    FcBottomSheet(if (target == null) "记录一组" else "编辑组", { if (!state.busy) onDismiss() }, skipPartiallyExpanded = true) {
-        Column(Modifier.fillMaxWidth().imePadding().verticalScroll(rememberScrollState()).testTag("set-editor-content"),
+    key(exercise.sessionExerciseID, target?.trainingSetID) {
+        Column(Modifier.fillMaxWidth().testTag(if (target == null) "set-add-editor-content" else "set-editor-content"),
             verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
             if (assisted) FcListRow("辅助重量")
             if (exercise.recordModeSnapshot == RecordMode.weightReps) {
                 if (sideEntry && split) {
                     SetNumber("左侧重量", left, { left = it }, SetValueStepping.Field.weight, "set-left")
                     SetNumber("右侧重量", right, { right = it }, SetValueStepping.Field.weight, "set-right")
-                } else SetNumber(if (sideEntry) "每侧重量" else "重量", weight, { weight = it }, SetValueStepping.Field.weight, "set-weight")
-                FcListRow("重量每次调整 2.5")
+                } else SetNumber(if (sideEntry) "每侧重量 kg" else "重量 kg", weight, { weight = it }, SetValueStepping.Field.weight, "set-weight")
             }
             when (exercise.recordModeSnapshot) {
                 RecordMode.weightReps, RecordMode.reps -> SetNumber("次数", reps, { reps = it }, SetValueStepping.Field.reps, "set-reps")
-                RecordMode.duration, RecordMode.cardio -> FcTextField("时长（秒或分秒）", duration, { duration = it }, Modifier.testTag("set-duration"), enabled = !state.busy)
+                RecordMode.duration, RecordMode.cardio -> FcTextField("时长（秒或分秒）", duration, { duration = it }, Modifier.testTag("set-duration"), enabled = !state.busy, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), keyboardActions = done)
             }
+            if (exercise.recordModeSnapshot == RecordMode.weightReps) androidx.compose.material3.Text(
+                "每次 ±2.5 kg · 点数字可直接输入", Modifier.padding(start = FcComponentMetrics.label).testTag("set-weight-hint"),
+                style = FcTypography.caption, color = FcColors.textSecondary)
             if (sideEntry) FcLinkButton(if (split) "左右相同" else "左右不同", Modifier.testTag("set-split"), !state.busy) {
                 if (!split) { left = weight; right = weight } else weight = recordedSideWeight(left, right, assisted)
                 split = !split
             }
             if (initial?.side == SetSide.left || initial?.side == SetSide.right) {
-                FcTextField("左侧", left, { left = it }, Modifier.testTag("set-left"))
-                FcTextField("右侧", right, { right = it }, Modifier.testTag("set-right"))
+                FcTextField("左侧", left, { left = it }, Modifier.testTag("set-left"), keyboardOptions = numberKeyboard, keyboardActions = done)
+                FcTextField("右侧", right, { right = it }, Modifier.testTag("set-right"), keyboardOptions = numberKeyboard, keyboardActions = done)
             }
             if (exercise.recordModeSnapshot == RecordMode.cardio) {
-                FcTextField("距离", distance, { distance = it }, Modifier.testTag("set-distance"), enabled = !state.busy)
-                FcTextField("速度（可选）", speed, { speed = it }, Modifier.testTag("set-speed"), enabled = !state.busy)
-                FcTextField("阻力（可选）", resistance, { resistance = it }, Modifier.testTag("set-resistance"), enabled = !state.busy)
+                FcTextField("距离", distance, { distance = it }, Modifier.testTag("set-distance"), enabled = !state.busy, keyboardOptions = numberKeyboard, keyboardActions = done)
+                FcTextField("速度（可选）", speed, { speed = it }, Modifier.testTag("set-speed"), enabled = !state.busy, keyboardOptions = numberKeyboard, keyboardActions = done)
+                FcTextField("阻力（可选）", resistance, { resistance = it }, Modifier.testTag("set-resistance"), enabled = !state.busy, keyboardOptions = numberKeyboard, keyboardActions = done)
             }
             state.error?.let { FcListRow(exerciseErrorTitle(it), Modifier.testTag("set-error")) }
-            FcButton(if (target == null) "确认本组" else "保存修改", Modifier.testTag("set-save"), !state.busy) {
+            Row(Modifier.fillMaxWidth().testTag("set-editor-actions"), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+            FcButton(if (target == null) "确认" else "保存", Modifier.weight(1f).testTag("set-save"), !state.busy) {
                 keyboard?.hide()
                 val mode = exercise.recordModeSnapshot
                 val input = TrainingSetInput(mode,
@@ -76,19 +96,23 @@ fun SetEditor(state: ActiveSessionUiState, exercise: SessionExerciseRecord, targ
                     leftValue = if (sideEntry) if (split) left else weight else left.takeIf { initial?.side == SetSide.left || initial?.side == SetSide.right },
                     rightValue = if (sideEntry) if (split) right else weight else right.takeIf { initial?.side == SetSide.left || initial?.side == SetSide.right },
                     distanceValue = distance.takeIf { mode == RecordMode.cardio }, speedValue = speed.takeIf { mode == RecordMode.cardio }, resistanceValue = resistance.takeIf { mode == RecordMode.cardio })
-                scope.launch { if (state.saveSet(exercise.sessionExerciseID, target?.trainingSetID, input) is ApplicationResult.Success) onDismiss() }
+                scope.launch { if (state.saveSet(exercise.sessionExerciseID, target?.trainingSetID, input) is ApplicationResult.Success && target != null) onDismiss() }
             }
-            FcSecondaryButton(if (target == null) "取消" else "取消修改", Modifier.testTag("set-cancel"), !state.busy, onDismiss)
+            if (target != null) FcLinkButton("取消", Modifier.testTag("set-cancel"), !state.busy) { keyboard?.hide(); onDismiss() }
+            }
         }
     }
 }
 
 @Composable
 private fun SetNumber(title: String, text: String, change: (String) -> Unit, field: SetValueStepping.Field, tag: String) {
+    val keyboard = LocalSoftwareKeyboardController.current
     FcLabelValueRow(title) {
         FcStepperField(title, text, change, SetValueStepping.canStepDown(text, field),
             painterResource(R.drawable.ic_ms_remove), painterResource(R.drawable.ic_ms_add),
-            { change(SetValueStepping.stepped(text, field, false)) }, { change(SetValueStepping.stepped(text, field, true)) }, tag = tag)
+            { change(SetValueStepping.stepped(text, field, false)) }, { change(SetValueStepping.stepped(text, field, true)) }, tag = tag,
+            keyboardOptions = KeyboardOptions(keyboardType = if (field == SetValueStepping.Field.reps) KeyboardType.Number else KeyboardType.Decimal, imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { keyboard?.hide() }))
     }
 }
 

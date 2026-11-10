@@ -162,10 +162,10 @@ class TodayNavigationEntryLayoutTests {
         click("package-list-back"); await(StudentTestTags.DETAIL_START_TRAINING); click(StudentTestTags.DETAIL_START_TRAINING); await("session-add-exercise")
         var started: SessionID? = null
         f.test { started = f.ok(graph.sessions.listActiveSessions()).single().sessionID }; readyActive(requireNotNull(started))
-        click("session-add-exercise"); await("exercise-search"); text("exercise-search", "虚构全流程动作"); click("quick-mode-reps"); click("exercise-session-only"); gone("exercise-picker")
+        click("session-add-exercise"); click("session-add-library"); await("exercise-search"); text("exercise-search", "虚构全流程动作"); click("quick-mode-reps"); click("exercise-session-only"); gone("exercise-picker")
         lateinit var session: SessionContentRecord
         f.test { session = f.ok(graph.sessions.loadContent(f.ok(graph.sessions.listActiveSessions()).single().sessionID))!! }
-        click("session-exercise-${session.exercises.single().sessionExerciseID.value}"); text("set-reps-input", "8"); click("set-save"); gone("set-editor-content")
+        click("session-exercise-${session.exercises.single().sessionExerciseID.value}"); text("set-reps-input", "8"); click("set-save"); node("set-add-editor-content").assertExists(); readyActive(session.session.sessionID)
         click("session-finish"); await("finish-credit-accept"); click("finish-credit-accept"); await("summary-public"); text("summary-public", "虚构全流程完成"); click("summary-save"); await("today-empty")
         f.test {
             val saved = f.ok(graph.sessions.loadContent(session.session.sessionID))!!

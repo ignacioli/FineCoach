@@ -18,6 +18,7 @@ import com.ignacioli.finecoach.features.session.*
 import com.ignacioli.finecoach.features.exercises.*
 import com.ignacioli.finecoach.features.templates.*
 import com.ignacioli.finecoach.storage.repository.HistoryRepository
+import com.ignacioli.finecoach.storage.repository.StudentRepository
 import java.time.ZoneOffset
 import org.junit.*
 import org.junit.Assert.*
@@ -47,6 +48,25 @@ class ActiveSessionEntryLayoutTests {
     }
     private fun text(tag: String, value: String) { node(tag).performScrollTo().assertIsDisplayed().performTextReplacement(value) }
     private fun full(tag: String, parent: String) = assertEquals(node(parent).getUnclippedBoundsInRoot().width, node(tag).getUnclippedBoundsInRoot().width)
+    private fun editorActionsFillWidth() {
+        full("set-editor-actions", if (exists("set-editor-content")) "set-editor-content" else "set-add-editor-content")
+        val actions = node("set-editor-actions").getUnclippedBoundsInRoot()
+        val save = node("set-save").getUnclippedBoundsInRoot()
+        assertEquals(actions.left, save.left)
+        if (exists("set-editor-content")) {
+            val cancel = node("set-cancel").getUnclippedBoundsInRoot()
+            assertEquals(actions.right, cancel.right)
+            assertTrue(save.right < cancel.left)
+        } else {
+            assertEquals(actions.right, save.right)
+            compose.onNodeWithTag("set-save").assertTextEquals("确认")
+            node("set-cancel").assertDoesNotExist()
+        }
+    }
+    private fun swipe(tag: String) {
+        node(tag).performScrollTo().assertIsDisplayed().performTouchInput { swipeLeft(startX = width * 0.9f, endX = width * 0.5f) }
+        compose.waitForIdle()
+    }
     @Before fun prepare() {
         f = T008Fixture()
         f.test {
@@ -69,8 +89,9 @@ class ActiveSessionEntryLayoutTests {
         return result
     }
     private fun show(original: SessionContentRecord) {
-        compose.setContent { FineCoachTheme { ActiveSessionScreen(state, original.session.sessionID, exercises, templates, { back++ }, {}) } }
+        compose.setContent { FineCoachTheme { ActiveSessionScreen(state, original.session.sessionID, exercises, templates, { back++ }, {}, students = StudentRepository(f.db, f.clock)) } }
         await("session-add-exercise")
+        compose.waitUntil(15_000) { !state.busy }
     }
     private fun read(id: SessionID): SessionContentRecord {
         compose.waitUntil(15_000) { !state.busy }
@@ -81,21 +102,22 @@ class ActiveSessionEntryLayoutTests {
         compose.runOnUiThread { compose.activity.setContent { } }; compose.waitForIdle()
         f.test { f.db.runInTransaction { }; f.reopen() }
     }
-    private fun options(set: TrainingSetRecord) = click("session-set-options-${set.trainingSetID.value}")
+    private fun options(set: TrainingSetRecord) = swipe("session-set-${set.trainingSetID.value}-swipe")
+    private fun change(action: (SectionedSession) -> SectionedSession) { f.test { ok(state.mutate(action)) }; compose.waitForIdle() }
     @Test fun confirmCopyPendingEditKeepsCompletionTimeAndUndoRoundtrip() {
         val original = content(); show(original)
         val set = original.exercises.first().sets.first()
         click("session-set-${set.trainingSetID.value}-confirm")
         val confirmed = read(original.session.sessionID).exercises.first().sets.first()
         assertEquals(SetRecordingState.completed, confirmed.state)
-        options(confirmed); click("session-set-copy"); gone("session-set-copy")
+        change { it.copy(session = it.session.copyingSet(confirmed.trainingSetID, f.ids.newTrainingSetID(), f.now)) }; gone("session-set-copy")
         val copied = read(original.session.sessionID).exercises.first().sets.last()
         assertNotEquals(confirmed.trainingSetID, copied.trainingSetID); assertEquals(SetRecordingState.pending, copied.state); assertNull(copied.completedAtUTC)
         click("session-set-${confirmed.trainingSetID.value}-edit"); text("set-weight-input", "15")
         click("set-save"); gone("set-editor-content")
         val edited = read(original.session.sessionID).exercises.first().sets.first()
         assertEquals(confirmed.completedAtUTC, edited.completedAtUTC); assertEquals(SetRecordingState.completed, edited.state)
-        options(edited); click("session-set-unconfirm"); gone("session-set-unconfirm")
+        change { it.copy(session = it.session.undoingSet(edited.trainingSetID, f.now)) }; gone("session-set-unconfirm")
         assertEquals(SetRecordingState.pending, read(original.session.sessionID).exercises.first().sets.first().state)
         options(copied); click("session-set-delete"); gone("session-set-delete")
         assertEquals(1, read(original.session.sessionID).exercises.first().sets.size)
@@ -111,7 +133,7 @@ class ActiveSessionEntryLayoutTests {
         click("session-set-${row.sets.first().trainingSetID.value}-edit"); text("set-weight-input", "99"); click("set-cancel")
         assertEquals(original, read(original.session.sessionID))
         click("session-exercise-${row.sessionExerciseID.value}"); text("set-weight-input", "88")
-        compose.runOnIdle { compose.activity.onBackPressedDispatcher.onBackPressed() }; gone("set-editor-content")
+        compose.runOnIdle { compose.activity.onBackPressedDispatcher.onBackPressed() }; gone("set-add-editor-content")
         click("active-session-back"); assertEquals(1, back)
         assertEquals(original, read(original.session.sessionID))
     }
@@ -135,7 +157,7 @@ class ActiveSessionEntryLayoutTests {
                 RecordMode.duration -> text("set-duration", "1分30秒")
                 RecordMode.cardio -> { text("set-duration", "2分"); text("set-distance", "0.125"); text("set-speed", "3.25"); text("set-resistance", "2") }
             }
-            full("set-save", "set-editor-content"); click("set-save"); gone("set-editor-content")
+            editorActionsFillWidth(); click("set-save"); node("set-add-editor-content").assertExists()
             val saved = read(original.session.sessionID).exercises.first { it.sessionExerciseID == row.sessionExerciseID }.sets.single()
             assertEquals(SetRecordingState.completed, saved.state)
             when (row.recordModeSnapshot) {
@@ -148,7 +170,7 @@ class ActiveSessionEntryLayoutTests {
     }
     @Test fun nonemptySectionCancelThenMoveOutPreservesSetsAndIDsAcrossReopen() {
         val original = content(true); show(original); val section = original.sections.first()
-        fun request() { click("session-section-${section.sectionID.value}"); click("session-section-delete") }
+        fun request() { swipe("session-section-${section.sectionID.value}-swipe"); click("session-section-delete") }
         request(); click("session-delete-section-confirm-cancel"); assertEquals(original, read(original.session.sessionID))
         request(); click("session-delete-section-confirm-accept"); gone("session-delete-section-confirm-card")
         val saved = read(original.session.sessionID)
@@ -162,19 +184,27 @@ class ActiveSessionEntryLayoutTests {
         click("session-add-section"); text("session-section-name", "虚构取消"); click("session-section-cancel"); assertEquals(original, read(original.session.sessionID))
         click("session-add-section"); text("session-section-name", "虚构新段"); full("session-section-save", "session-section-form-content"); click("session-section-save"); gone("session-section-name")
         val section = read(original.session.sessionID).sections.last()
-        click("session-section-${section.sectionID.value}"); click("session-section-rename"); text("session-section-name", "虚构改名"); click("session-section-save"); gone("session-section-name")
+        change { it.renamingSection(section.sectionID, "虚构改名", f.now) }; gone("session-section-name")
+        node("session-section-${section.sectionID.value}").performScrollTo().assertTextEquals("虚构改名")
         assertEquals("虚构改名", read(original.session.sessionID).sections.last().name)
         val row = original.exercises.first()
-        click("session-exercise-options-${row.sessionExerciseID.value}"); click("session-exercise-move"); click("session-move-${section.sectionID.value}"); gone("session-move-cancel")
+        val beforeMove = read(original.session.sessionID)
+        swipe("session-exercise-${row.sessionExerciseID.value}-swipe"); click("session-exercise-move"); click("session-move-cancel")
+        gone("session-move-cancel"); assertEquals(beforeMove, read(original.session.sessionID))
+        swipe("session-exercise-${row.sessionExerciseID.value}-swipe"); click("session-exercise-move"); click("session-move-${section.sectionID.value}"); gone("session-move-cancel")
         assertEquals(section.sectionID, read(original.session.sessionID).exercises.first().sectionID)
-        click("session-exercise-options-${row.sessionExerciseID.value}"); click("session-exercise-move"); click("session-move-unsectioned"); gone("session-move-cancel")
-        click("session-section-${section.sectionID.value}"); click("session-section-delete"); gone("session-section-${section.sectionID.value}")
+        swipe("session-exercise-${row.sessionExerciseID.value}-swipe"); click("session-exercise-move"); click("session-move-unsectioned"); gone("session-move-cancel")
+        swipe("session-section-${section.sectionID.value}-swipe"); click("session-section-delete"); gone("session-section-${section.sectionID.value}")
         node("session-delete-section-confirm-card").assertDoesNotExist()
         assertNull(read(original.session.sessionID).exercises.first().sectionID)
     }
     @Test fun completedExerciseDeleteRequiresExplicitFullScreenConfirmCancelHasNoWrites() {
         val original = content(true); show(original); val row = original.exercises.first()
-        fun request() { click("session-exercise-options-${row.sessionExerciseID.value}"); click("session-exercise-delete") }
+        fun request() { swipe("session-exercise-${row.sessionExerciseID.value}-swipe"); click("session-exercise-delete") }
+        request(); node("session-delete-exercise-title").assertIsDisplayed()
+        node("session-delete-exercise-back").assertDoesNotExist()
+        compose.runOnIdle { compose.activity.onBackPressedDispatcher.onBackPressed() }
+        gone("session-delete-exercise-title"); assertEquals(original, read(original.session.sessionID))
         request(); click("session-delete-exercise-cancel"); assertEquals(original, read(original.session.sessionID))
         request(); click("session-delete-exercise-confirm"); gone("session-delete-exercise-confirm")
         assertFalse(read(original.session.sessionID).exercises.any { it.sessionExerciseID == row.sessionExerciseID })
@@ -195,7 +225,9 @@ class ActiveSessionEntryLayoutTests {
             ViewCompat.dispatchApplyWindowInsets(compose.activity.window.decorView,
                 WindowInsetsCompat.Builder().setInsets(WindowInsetsCompat.Type.ime(), Insets.of(0, 0, 0, 280)).setVisible(WindowInsetsCompat.Type.ime(), true).build())
         }
-        full("set-save", "set-editor-content"); click("set-save"); gone("set-editor-content")
+        compose.onNodeWithTag("set-save").performScrollTo().assertIsDisplayed().assertIsEnabled().assertTextEquals("确认")
+        node("set-weight-input").performImeAction()
+        editorActionsFillWidth(); click("set-save"); node("set-add-editor-content").assertExists()
         assertEquals(2, read(original.session.sessionID).exercises.first().sets.size)
     }
     @Test fun historicalFirstSetPrefillIsStudentAndSnapshotScopedAndNotCompleted() {
@@ -212,7 +244,7 @@ class ActiveSessionEntryLayoutTests {
         click("session-exercise-${next.exercises.first().sessionExerciseID.value}")
         node("set-weight-input").assertTextEquals("12.125"); node("set-reps-input").assertTextEquals("8")
         assertTrue(read(next.session.sessionID).exercises.first().sets.isEmpty())
-        click("set-cancel"); assertEquals(next, read(next.session.sessionID))
+        compose.runOnIdle { compose.activity.onBackPressedDispatcher.onBackPressed() }; gone("set-add-editor-content"); assertEquals(next, read(next.session.sessionID))
     }
     @Test fun bilateralSplitUsesHeavierAndAssistedLighterWeightAndKeepsExactSides() {
         var original = content()
@@ -234,25 +266,27 @@ class ActiveSessionEntryLayoutTests {
     }
     @Test fun sectionReorderAndExerciseMoveUpDownPreserveMembers() {
         val original = content(); show(original); val section = original.sections.last()
-        click("session-section-${section.sectionID.value}"); click("session-section-up"); gone("session-section-up")
+        change { it.reordering(sessionShiftAxis(original, section.sectionID.value, -1), f.now) }; gone("session-section-up")
         assertEquals(section.sectionID, read(original.session.sessionID).sections.minBy { it.orderIndex }.sectionID)
-        click("session-section-${section.sectionID.value}"); click("session-section-down"); gone("session-section-down")
+        val reordered = read(original.session.sessionID)
+        change { it.reordering(sessionShiftAxis(reordered, section.sectionID.value, 1), f.now) }; gone("session-section-down")
         val row = original.exercises.last()
-        click("session-exercise-options-${row.sessionExerciseID.value}"); click("session-exercise-move"); click("session-move-unsectioned"); gone("session-move-cancel")
+        swipe("session-exercise-${row.sessionExerciseID.value}-swipe"); click("session-exercise-move"); click("session-move-unsectioned"); gone("session-move-cancel")
         val before = read(original.session.sessionID)
-        click("session-exercise-options-${row.sessionExerciseID.value}"); click("session-exercise-up"); gone("session-exercise-up")
+        change { it.reordering(sessionShiftAxis(before, row.sessionExerciseID.value, -1), f.now) }; gone("session-exercise-up")
         assertTrue(read(original.session.sessionID).exercises.last().orderIndex < before.exercises.last().orderIndex)
-        click("session-exercise-options-${row.sessionExerciseID.value}"); click("session-exercise-down"); gone("session-exercise-down")
+        val shifted = read(original.session.sessionID)
+        change { it.reordering(sessionShiftAxis(shifted, row.sessionExerciseID.value, 1), f.now) }; gone("session-exercise-down")
         assertEquals(before.exercises, read(original.session.sessionID).exercises)
     }
     @Test fun quickAddAndPendingExerciseDirectDeleteAreDurableAndCancelIsZeroWrite() {
         val original = content(); show(original)
-        click("session-add-exercise"); text("exercise-search", "虚构取消动作"); click("exercise-picker-cancel"); gone("exercise-picker")
+        click("session-add-exercise"); click("session-add-library"); text("exercise-search", "虚构取消动作"); click("exercise-picker-cancel"); gone("exercise-picker")
         assertEquals(original, read(original.session.sessionID))
-        click("session-add-exercise"); text("exercise-search", "虚构临时动作"); click("quick-mode-reps"); click("exercise-session-only"); gone("exercise-picker")
+        click("session-add-exercise"); click("session-add-library"); text("exercise-search", "虚构临时动作"); click("quick-mode-reps"); click("exercise-session-only"); gone("exercise-picker")
         val row = read(original.session.sessionID).exercises.last()
         assertEquals(RecordMode.reps, row.recordModeSnapshot); assertEquals(ExerciseSourceKind.sessionOnly, row.sourceKind)
-        click("session-exercise-options-${row.sessionExerciseID.value}"); click("session-exercise-delete"); gone("session-exercise-delete")
+        swipe("session-exercise-${row.sessionExerciseID.value}-swipe"); click("session-exercise-delete"); gone("session-exercise-delete")
         node("session-delete-exercise-confirm").assertDoesNotExist()
         assertEquals(original.exercises, read(original.session.sessionID).exercises)
     }
@@ -275,7 +309,7 @@ class ActiveSessionEntryLayoutTests {
         }
         templates = TemplateUiState(TemplateUseCases(pendingList, f.clock), f.clock, f.ids)
         show(original)
-        click("session-apply-template"); await("template-apply-content")
+        click("session-add-exercise"); click("session-apply-template"); await("template-apply-content")
         node("template-apply-content").assertIsDisplayed()
         try {
             compose.waitUntil(15_000) { requested.isCompleted && templates.busy }
@@ -291,19 +325,109 @@ class ActiveSessionEntryLayoutTests {
         assertEquals(original, read(original.session.sessionID))
     }
 
+    @Test fun inlineEditSteppersSaveExactValuesCancelWritesNothingAndHeaderCountsReadBack() {
+        val original = content(true); show(original)
+        val row = original.exercises.first(); val set = row.sets.first()
+        node("session-student").assertTextEquals("虚构学员1")
+        node("session-stats").assertTextEquals("已完成组数 ${original.exercises.sumOf { e -> e.sets.count { it.state == SetRecordingState.completed } }}")
+        click("session-set-${set.trainingSetID.value}-edit")
+        node("session-set-${set.trainingSetID.value}").assertExists()
+        full("session-set-${set.trainingSetID.value}", "active-session-content")
+        full("set-editor-content", "active-session-content")
+        val setBounds = node("session-set-${set.trainingSetID.value}").getUnclippedBoundsInRoot()
+        val editorBounds = node("set-editor-content").getUnclippedBoundsInRoot()
+        assertTrue(editorBounds.top >= setBounds.bottom)
+        text("set-weight-input", "20"); text("set-reps-input", "8")
+        click("set-weight-plus"); node("set-weight-input").assertTextEquals("22.5")
+        click("set-weight-minus"); node("set-weight-input").assertTextEquals("20")
+        click("set-reps-plus"); node("set-reps-input").assertTextEquals("9")
+        click("set-save"); gone("set-editor-content")
+        val saved = read(original.session.sessionID).exercises.first().sets.first()
+        assertEquals("20", saved.weightValue!!.toPlainString()); assertEquals("9", saved.repetitionCount!!.toPlainString())
+        assertEquals(set.completedAtUTC, saved.completedAtUTC)
+        click("session-set-${set.trainingSetID.value}-edit"); click("set-weight-plus"); click("set-cancel")
+        assertEquals(saved, read(original.session.sessionID).exercises.first().sets.first())
+    }
+
+    @Test fun swipeDeleteShowsExplicitControlAndUndoRestoresCompletedSetAtOriginalPosition() {
+        val original = content(true); show(original)
+        val row = original.exercises.first(); val set = row.sets.first()
+        node("session-set-delete").assertDoesNotExist()
+        swipe("session-set-${set.trainingSetID.value}-swipe")
+        node("session-set-delete").assertIsDisplayed().assertHasClickAction()
+        assertEquals(original, read(original.session.sessionID))
+        click("session-set-delete")
+        assertTrue(read(original.session.sessionID).exercises.first().sets.isEmpty())
+        click("session-deleted-action")
+        assertEquals(row.sets, read(original.session.sessionID).exercises.first().sets)
+        node("session-set-${set.trainingSetID.value}-undo").assertDoesNotExist()
+    }
+
+    @Test fun emptySessionHasVisibleRecordingPrompt() {
+        lateinit var empty: SessionContentRecord
+        f.test { val session = f.start(); empty = ok(f.sessions.loadContent(session.sessionID))!! }
+        show(empty)
+        node("session-empty-hint").assertIsDisplayed().assertTextEquals("先添加动作，再记录组数。")
+        node("session-add-exercise").assertIsDisplayed().assertHasClickAction()
+        node("session-stats").assertTextEquals("已完成组数 0")
+    }
+
+    @Test fun unfinishedSetFullSwipeDeletesButCompletedSetOnlyRevealsAction() {
+        val original = content(); show(original)
+        val row = original.exercises.first(); val set = row.sets.first()
+        node("session-set-${set.trainingSetID.value}-swipe").performScrollTo().performTouchInput { swipeLeft() }
+        compose.waitUntil(15_000) { !state.busy && state.content?.exercises?.first()?.sets?.isEmpty() == true }
+        assertTrue(read(original.session.sessionID).exercises.first().sets.isEmpty())
+        node("session-set-${set.trainingSetID.value}").assertDoesNotExist()
+        val other = original.exercises.last().sets.first()
+        click("session-set-${other.trainingSetID.value}-confirm")
+        val confirmed = read(original.session.sessionID).exercises.last().sets.single()
+        node("session-set-${other.trainingSetID.value}-swipe").performScrollTo().performTouchInput { swipeLeft() }
+        node("session-set-delete").assertIsDisplayed()
+        assertEquals(confirmed, read(original.session.sessionID).exercises.last().sets.single())
+    }
+
+    @Test fun addPanelCancelWritesNothing() {
+        val original = content(); show(original)
+        click("session-add-exercise"); node("session-add-library").assertIsDisplayed()
+        node("session-apply-template").assertIsDisplayed(); click("session-add-cancel")
+        gone("session-add-tabs"); assertEquals(original, read(original.session.sessionID))
+    }
+
+    @Test fun recentConfirmUndoUsesRowStatus() {
+        val original = content(); show(original)
+        val row = original.exercises.first()
+        click("session-exercise-${row.sessionExerciseID.value}")
+        text("set-weight-input", "20"); text("set-reps-input", "8"); click("set-save")
+        node("set-add-editor-content").assertExists()
+        node("set-weight-input").assertTextEquals("20"); node("set-reps-input").assertTextEquals("8")
+        val saved = read(original.session.sessionID).exercises.first().sets.last()
+        text("set-weight-input", "99"); text("set-reps-input", "3")
+        click("session-set-${saved.trainingSetID.value}-undo")
+        val remaining = read(original.session.sessionID).exercises.first().sets
+        assertFalse(remaining.any { it.trainingSetID == saved.trainingSetID })
+        assertEquals(row.sets, remaining)
+        gone("rest-content"); assertNull(state.rests.end(original.session.sessionID))
+        node("set-weight-input").performScrollTo().assertTextEquals(saved.weightValue!!.toPlainString())
+        node("set-reps-input").performScrollTo().assertTextEquals(saved.repetitionCount!!.toPlainString())
+    }
+
     @Test fun operationMenusAndSetEditCancelHaveVisibleZeroWriteEntries() {
         val original = content(true); show(original)
         val row = original.exercises.first(); val set = row.sets.first()
         f.test { f.blockAllWrites(listOf("sessions", "session_exercises", "training_sets", "session_sections")) }
-        click("session-section-${original.sections.first().sectionID.value}")
-        click("session-section-options-cancel"); gone("session-section-options-cancel")
+        val sectionSwipe = "session-section-${original.sections.first().sectionID.value}-swipe"
+        swipe(sectionSwipe); node("session-section-delete").assertIsDisplayed()
+        node(sectionSwipe).performTouchInput { swipeRight() }; gone("session-section-delete")
         assertEquals(original, read(original.session.sessionID))
-        click("session-exercise-options-${row.sessionExerciseID.value}")
-        click("session-exercise-options-cancel"); gone("session-exercise-options-cancel")
+        val exerciseSwipe = "session-exercise-${row.sessionExerciseID.value}-swipe"
+        swipe(exerciseSwipe); node("session-exercise-delete").assertIsDisplayed()
+        node(exerciseSwipe).performTouchInput { swipeRight() }; gone("session-exercise-delete")
         assertEquals(original, read(original.session.sessionID))
-        options(set); click("session-set-options-cancel"); gone("session-set-options-cancel")
+        options(set); node("session-set-delete").assertIsDisplayed()
+        node("session-set-${set.trainingSetID.value}-swipe").performTouchInput { swipeRight() }; gone("session-set-delete")
         assertEquals(original, read(original.session.sessionID))
-        options(set); click("session-set-edit"); await("set-editor-content")
+        click("session-set-${set.trainingSetID.value}-edit"); await("set-editor-content")
         node("set-editor-content").assertIsDisplayed()
         assertEquals(original, read(original.session.sessionID))
         text("set-weight-input", "88"); click("set-cancel"); gone("set-editor-content")
