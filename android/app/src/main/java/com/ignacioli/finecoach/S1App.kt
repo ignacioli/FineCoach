@@ -159,13 +159,13 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
         }
         composable(S1Routes.STUDENT_HISTORY) { entry ->
             val id = StudentID.parse(requireNotNull(entry.arguments?.getString(S1Routes.ARG_STUDENT_ID)))
-            val state = remember(id) { HistoryUiState(graph.history, id) }
+            val state = remember(id) { HistoryUiState(graph.history, id, graph.students) }
             OnResume { state.list() }
             HistoryListScreen(state, graph.zone, navigator::open, back)
         }
         composable(S1Routes.HISTORY_DETAIL) { entry ->
             val id = SessionID.parse(requireNotNull(entry.arguments?.getString(S1Routes.ARG_SESSION_ID)))
-            val state = remember(id) { HistoryUiState(graph.history, null) }
+            val state = remember(id) { HistoryUiState(graph.history, null, graph.students) }
             val templates = remember(id) { HistoryTemplateState(graph.templates, graph.clock, graph.ids) }
             HistoryDetailScreen(state, id, graph.zone, back, templates)
         }

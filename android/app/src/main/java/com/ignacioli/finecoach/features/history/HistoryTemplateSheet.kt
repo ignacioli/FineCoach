@@ -55,13 +55,12 @@ class HistoryTemplateState(private val templates: TemplateUseCases, private val 
 fun HistoryTemplateEntry(state: HistoryTemplateState, source: SessionContentRecord) {
     var open by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-    FcActionRow("另存为模板", Modifier.testTag("history-save-template"), subtitle = state.saved?.template?.name) { state.begin(); open = true }
-    if (open) FcBottomSheet("另存为模板", { if (!state.busy) open = false }, skipPartiallyExpanded = true) {
+    FcActionRow("另存为模板", Modifier.testTag("history-save-template"), detail = if (state.saved != null) "已保存为模板" else null) { state.begin(); open = true }
+    if (open) FcBottomSheet("另存为模板", { if (!state.busy) open = false }, subtitle = "只保存动作和组的计划，不含备注与学员信息。", skipPartiallyExpanded = true) {
         Column(Modifier.fillMaxWidth().imePadding().verticalScroll(rememberScrollState()).testTag("history-template-content")) {
-            FcListRow("仅保存动作与计划组，不包含学员身份或任何备注。")
             FcTextField("模板名称", state.name, { state.name = it }, Modifier.testTag("history-template-name"), enabled = !state.busy && state.created == null)
             state.error?.let { FcListRow("保存失败，可重试；已创建的模板会复用", Modifier.testTag("history-template-error")) }
-            FcButton("保存模板", Modifier.testTag("history-template-save"), !state.busy) { scope.launch { state.save(source) { open = false } } }
+            FcButton("保存模板", Modifier.testTag("history-template-save"), !state.busy && state.name.isNotBlank()) { scope.launch { state.save(source) { open = false } } }
             FcSecondaryButton("取消", Modifier.testTag("history-template-cancel"), !state.busy) { open = false }
         }
     }
