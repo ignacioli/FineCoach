@@ -20,8 +20,8 @@ import com.ignacioli.finecoach.storage.repository.ExerciseRepository
 @Composable
 fun ResourceHubScreen(exercises: ExerciseRepository, templates: TemplateUseCases,
     onNavigate: (String) -> Unit, onBack: () -> Unit) {
-    var exerciseSummary by remember { mutableStateOf("正在加载") }
-    var templateSummary by remember { mutableStateOf("正在加载") }
+    var exerciseSummary by remember { mutableStateOf<String?>(null) }
+    var templateSummary by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(exercises, templates) {
         exerciseSummary = when (val result = exercises.listCatalog()) {
             is ApplicationResult.Failure -> "动作数量加载失败"
@@ -44,7 +44,7 @@ fun ResourceHubScreen(exercises: ExerciseRepository, templates: TemplateUseCases
                 FcHubRow("动作库", painterResource(R.drawable.ic_ms_grid_view), Modifier.testTag("resource-hub-exercises"), subtitle = exerciseSummary,
                     mode = FcRowMode.Action { onNavigate(S1Routes.EXERCISES) })
                 FcListRowDivider()
-                FcHubRow("训练模板", painterResource(R.drawable.ic_ms_grid_view), Modifier.testTag("resource-hub-templates"), subtitle = templateSummary,
+                FcHubRow("训练模板", null, Modifier.testTag("resource-hub-templates"), subtitle = templateSummary,
                     mode = FcRowMode.Action { onNavigate(S1Routes.TEMPLATES) })
                 FcListRowDivider()
             }

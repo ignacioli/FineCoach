@@ -141,12 +141,69 @@ class StudentEntryLayoutTests {
         load.value = true
         await { viewModel.uiState.isTrulyEmpty }
         node(StudentTestTags.STUDENT_LIST_EMPTY).assertIsDisplayed()
+        node("student-list-empty-mascot").assertIsDisplayed()
+        assertEquals(220.dp, node("student-list-empty-mascot").getUnclippedBoundsInRoot().width)
         compose.onNodeWithText("还没有学员").assertIsDisplayed()
         node(StudentTestTags.STUDENT_LIST_EMPTY_ADD).assertIsDisplayed().assertHasClickAction()
         assertFillsContent(StudentTestTags.STUDENT_LIST_EMPTY_ADD)
         node(StudentTestTags.STUDENT_LIST_EMPTY_ADD).performClick()
         assertEquals(S1Routes.STUDENT_CREATE, route.get())
         assertEquals(0L, tableCount("students"))
+    }
+
+    @Test fun listReadFailureUsesCaptionAndVisibleRetryWithoutInventingAnEmptyLibrary() {
+        val student = createStudent("虚构恢复学员")
+        val viewModel = StudentFeatureFactory.listViewModel(useCases, clock = clock, zoneId = zoneId)
+        offMain { db.openHelper.writableDatabase.execSQL("ALTER TABLE students RENAME TO fictional_unavailable_students") }
+        try {
+            show { StudentListScreen(viewModel, onRoute = {}) }
+            await { viewModel.uiState.errorMessage != null && viewModel.isIdle }
+            node(StudentTestTags.STUDENT_LIST_ERROR).assertIsDisplayed().assertTextEquals(viewModel.uiState.errorMessage!!)
+            assertTrue(missing(StudentTestTags.STUDENT_LIST_EMPTY))
+            val retry = "${StudentTestTags.STUDENT_LIST_ERROR}-retry"
+            node(retry).assertIsDisplayed().assertIsEnabled().assertHasClickAction()
+            assertFillsContent(retry)
+            offMain { db.openHelper.writableDatabase.execSQL("ALTER TABLE fictional_unavailable_students RENAME TO students") }
+            node(retry).performClick()
+            await { viewModel.isIdle && viewModel.uiState.errorMessage == null }
+            node(StudentTestTags.studentRow(student.studentID)).assertIsDisplayed()
+            assertTrue(missing(StudentTestTags.STUDENT_LIST_ERROR))
+            assertEquals(1L, tableCount("students"))
+        } finally {
+            offMain {
+                db.openHelper.writableDatabase.query("SELECT name FROM sqlite_master WHERE type='table' AND name='fictional_unavailable_students'").use {
+                    if (it.moveToFirst()) db.openHelper.writableDatabase.execSQL("ALTER TABLE fictional_unavailable_students RENAME TO students")
+                }
+            }
+        }
+    }
+
+    @Test fun archivedListReadFailureUsesCaptionAndVisibleRetryWithoutInventingAnEmptyLibrary() {
+        val student = createStudent("虚构恢复学员")
+        offMain { assertTrue(useCases.archive(student.studentID) is ApplicationResult.Success) }
+        val viewModel = StudentFeatureFactory.listViewModel(useCases, showsArchived = true, clock = clock, zoneId = zoneId)
+        offMain { db.openHelper.writableDatabase.execSQL("ALTER TABLE students RENAME TO fictional_unavailable_students") }
+        try {
+            show { StudentListScreen(viewModel, onRoute = {}) }
+            await { viewModel.uiState.errorMessage != null && viewModel.isIdle }
+            node(StudentTestTags.ARCHIVED_ERROR).assertIsDisplayed().assertTextEquals(viewModel.uiState.errorMessage!!)
+            assertTrue(missing(StudentTestTags.STUDENT_LIST_EMPTY))
+            val retry = "${StudentTestTags.ARCHIVED_ERROR}-retry"
+            node(retry).assertIsDisplayed().assertIsEnabled().assertHasClickAction()
+            assertFillsContent(retry)
+            offMain { db.openHelper.writableDatabase.execSQL("ALTER TABLE fictional_unavailable_students RENAME TO students") }
+            node(retry).performClick()
+            await { viewModel.isIdle && viewModel.uiState.errorMessage == null }
+            node(StudentTestTags.studentRow(student.studentID)).assertIsDisplayed()
+            assertTrue(missing(StudentTestTags.ARCHIVED_ERROR))
+            assertEquals(1L, tableCount("students"))
+        } finally {
+            offMain {
+                db.openHelper.writableDatabase.query("SELECT name FROM sqlite_master WHERE type='table' AND name='fictional_unavailable_students'").use {
+                    if (it.moveToFirst()) db.openHelper.writableDatabase.execSQL("ALTER TABLE fictional_unavailable_students RENAME TO students")
+                }
+            }
+        }
     }
 
     @Test fun searchMissStaysDistinctFromAnEmptyLibrary() {
