@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
 import androidx.compose.ui.test.*
+import androidx.compose.ui.unit.width
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -88,12 +89,57 @@ class TodayNavigationEntryLayoutTests {
         await("notification-unavailable-card"); click("notification-unavailable-accept")
         f.test { assertEquals(0L, f.count("sessions")) }
     }
+    @Test fun coldLaunchSeedsCatalogAndHubCountsAndRepeatedGraphLaunchKeepsStableRows() {
+        show(); await("today-empty")
+        compose.onNodeWithText("训练资料").assertDoesNotExist()
+        node("today-exercises").assertDoesNotExist(); node("today-templates").assertDoesNotExist()
+        click("root-1"); await("student-list-resource-hub"); click("student-list-resource-hub")
+        await("resource-hub-exercises")
+        compose.waitUntil(15_000) { compose.onAllNodesWithText("内置 541 个 · 自定义 0 个", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithText("0 个模板", useUnmergedTree = true).assertIsDisplayed()
+        for (tag in listOf("resource-hub-exercises", "resource-hub-templates")) {
+            node(tag).assertIsDisplayed().assertHasClickAction()
+            assertEquals(node("resource-hub-content").getUnclippedBoundsInRoot().width, node(tag).getUnclippedBoundsInRoot().width)
+        }
+        click("resource-hub-exercises"); compose.waitUntil(15_000) { compose.onAllNodesWithText("杠铃平板卧推", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty() }; compose.onNodeWithText("杠铃平板卧推", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
+        f.test {
+            val before = f.ok(graph.exerciseRepository.listCatalog())
+            val second = S1AppGraph(f.db, f.clock, f.ids, f.generation, graph.context)
+            second.prepareExerciseCatalog()
+            assertEquals(before, f.ok(second.exerciseRepository.listCatalog()))
+        }
+    }
+
     @Test fun resourceRoutesTemplateAndExerciseEditorCancelReturnConsistently() {
-        show(); await("today-empty"); click("today-exercises"); await("exercise-library-content")
-        click("exercise-library-back"); await("today-content"); click("today-templates"); await("template-new")
+        show(); await("today-empty"); click("root-1"); await("student-list-resource-hub"); click("student-list-resource-hub"); await("resource-hub-exercises"); click("resource-hub-exercises"); await("exercise-library-content")
+        click("exercise-library-back"); await("resource-hub-content"); click("resource-hub-templates"); await("template-new")
         click("template-new"); text("template-create-name", "虚构导航模板"); click("template-create-save"); await("template-add-exercise")
-        click("template-editor-back"); await("template-new"); click("templates-back"); await("today-content")
+        click("template-editor-back"); await("template-new"); click("templates-back"); await("resource-hub-content"); click("resource-hub-back"); await(StudentTestTags.STUDENT_LIST_ROOT)
         f.test { assertEquals(1L, f.count("training_templates")); assertEquals(0L, f.count("sessions")) }
+        // SQLite cannot trigger on SELECT: preserve rows in a renamed table to fail catalog reads.
+        // The template repository uses the existing store-generation guard.
+        try {
+            f.test {
+                f.db.openHelper.writableDatabase.execSQL("ALTER TABLE exercise_catalog RENAME TO fictional_unavailable_catalog")
+                f.db.openHelper.writableDatabase.execSQL("UPDATE store_metadata SET value = ? WHERE `key` = 'store_generation'",
+                    arrayOf("abcdef00-0000-4000-8000-000000000099"))
+                assertTrue(graph.exerciseRepository.listCatalog() is ApplicationResult.Failure)
+                assertTrue(graph.templates.list() is ApplicationResult.Failure)
+            }
+            click("student-list-resource-hub"); await("resource-hub-content")
+            compose.waitUntil(15_000) {
+                compose.onAllNodesWithText("动作数量加载失败", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty() &&
+                    compose.onAllNodesWithText("模板数量加载失败", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty()
+            }
+            compose.onNodeWithText("动作数量加载失败", useUnmergedTree = true).assertIsDisplayed()
+            compose.onNodeWithText("模板数量加载失败", useUnmergedTree = true).assertIsDisplayed()
+        } finally {
+            f.test {
+                f.db.openHelper.writableDatabase.execSQL("ALTER TABLE fictional_unavailable_catalog RENAME TO exercise_catalog")
+                f.db.openHelper.writableDatabase.execSQL("UPDATE store_metadata SET value = ? WHERE `key` = 'store_generation'",
+                    arrayOf(graph.generation.toString()))
+            }
+        }
     }
     @Test fun existingSessionFinishSaveSummaryRefreshesTodayAndHistoryWithoutLosingSets() {
         lateinit var original: SessionContentRecord
@@ -195,7 +241,7 @@ class TodayNavigationEntryLayoutTests {
             first = f.ok(graph.templates.save(SaveTemplateCommand(null, "虚构模板甲", emptySet(), null)))
             second = f.ok(graph.templates.save(SaveTemplateCommand(null, "虚构模板乙", emptySet(), null)))
         }
-        show(); await("today-empty"); click("today-templates"); await("template-open-${first.templateID.value}")
+        show(); await("today-empty"); click("root-1"); await("student-list-resource-hub"); click("student-list-resource-hub"); await("resource-hub-templates"); compose.waitUntil(15_000) { compose.onAllNodesWithText("2 个模板", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty() }; compose.waitForIdle(); compose.onNodeWithText("2 个模板", useUnmergedTree = true).assertIsDisplayed(); click("resource-hub-templates"); await("template-open-${first.templateID.value}")
         click("template-open-${first.templateID.value}"); await("template-add-exercise")
         compose.onNodeWithText(first.name, useUnmergedTree = true).assertIsDisplayed()
         click("template-editor-back"); await("template-open-${second.templateID.value}")

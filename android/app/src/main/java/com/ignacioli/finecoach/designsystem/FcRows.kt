@@ -176,7 +176,11 @@ fun FcActionRow(title: String, modifier: Modifier = Modifier, subtitle: String? 
             Text(title, style = if (subtitle == null) FcTypography.body else FcTypography.headline, color = color)
             subtitle?.let { Text(it, style = FcTypography.caption, color = FcColors.textSecondary) }
         }
-        detail?.let { Text(it, style = FcTypography.caption, color = FcColors.textSecondary) }
+        detail?.let {
+            Box(Modifier.widthIn(max = FcComponentMetrics.label), contentAlignment = Alignment.CenterEnd) {
+                Text(it, style = FcTypography.caption, color = FcColors.textSecondary)
+            }
+        }
         if (!destructive) FcSymbol(FcGlyph.Forward, tint = if (enabled) FcColors.textSecondary else FcColors.textDisabled)
     }
 }

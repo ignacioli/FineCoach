@@ -16,24 +16,20 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.util.UUID
+import org.json.JSONObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /** Explicit shell-only installation; never called by Application.onCreate or by Release code. */
 internal object S1DebugSeed {
-    const val VERSION = 1
     const val PREFIX = "s1_debug_seed."
     const val VERSION_KEY = "${PREFIX}version"
     const val STATUS_KEY = "${PREFIX}status"
     const val ROWS_KEY = "${PREFIX}rows"
     const val DATASET_KEY = "${PREFIX}dataset"
-    const val DATASET = "fictional-s1-coach-core-v1"
-    val NOW: Instant = Instant.parse("2026-11-09T00:00:00Z")
-    val studentIDs = (1..7).map { StudentID.parse(uuid(it)) }
-    fun uuid(n: Int) = "72000000-0000-4000-8000-${n.toString().padStart(12, '0')}"
-
     suspend fun load(context: Context, scenario: String = "multi"): SeedResult = withContext(Dispatchers.IO) {
-        require(scenario in setOf("empty", "single", "multi"))
+        val fixture = S1SeedFixture.read(context)
+        require(scenario in fixture.records("scenarios").map { it.getString("key") })
         val app = context.applicationContext
         require(!context.isDeviceProtectedStorage && !app.isDeviceProtectedStorage)
         // Cross-process lock protects explicit installers; it is not a product startup hook.
@@ -41,54 +37,55 @@ internal object S1DebugSeed {
             val lock = checkNotNull(channel.tryLock()) { "Seed installer is already running" }
             try {
                 val existed = app.getDatabasePath(FineCoachDatabaseFactory.DATABASE_NAME).exists()
-                if (existed) preflight(app, scenario)
+                if (existed) preflight(app, scenario, fixture)
                 val database = FineCoachDatabaseFactory.create(app)
                 try {
                     val metadata = database.storeMetadataDao()
                     if (existed) {
                         check(metadata.find("${PREFIX}scenario")?.value == scenario) { "Seed scenario mismatch" }
                         // Even an empty non-seed database belongs to its user. Never adopt or clear it.
-                        check(metadata.find(DATASET_KEY)?.value == DATASET) { "Non-seed database rejected" }
-                        check(metadata.find(VERSION_KEY)?.value == VERSION.toString()) { "Seed version mismatch" }
+                        check(metadata.find(DATASET_KEY)?.value == fixture.dataset) { "Non-seed database rejected" }
+                        check(metadata.find(VERSION_KEY)?.value == fixture.version.toString()) { "Seed version mismatch" }
                         check(metadata.find(STATUS_KEY)?.value == "complete") { "Incomplete seed rejected" }
-                        return@withContext storedResult(database)
+                        return@withContext storedResult(database, fixture)
                     }
                     check(businessRows(database) == 0) { "Non-empty database rejected" }
                     val generation = UUID.fromString(checkNotNull(metadata.find(FineCoachDatabaseFactory.GENERATION_KEY)).value)
                     database.runInTransaction {
-                        metadata.insert(StoreMetadata(DATASET_KEY, DATASET))
-                        metadata.insert(StoreMetadata(VERSION_KEY, VERSION.toString()))
+                        metadata.insert(StoreMetadata(DATASET_KEY, fixture.dataset))
+                        metadata.insert(StoreMetadata(VERSION_KEY, fixture.version.toString()))
                         metadata.insert(StoreMetadata(STATUS_KEY, "installing"))
                         metadata.insert(StoreMetadata("${PREFIX}scenario", scenario))
                     }
                     val graph = graph(database, app, generation)
-                    if (scenario != "empty") populate(graph, scenario)
+                    graph.prepareExerciseCatalog()
+                    check(!graph.exerciseRepository.catalogUnavailable) { "Seed catalog unavailable" }
+                    if (scenario != "empty") populate(graph, scenario, fixture)
                     verifyInitial(graph, scenario)
                     val ownedMetadata = database.openHelper.readableDatabase.query(
                         "SELECT COUNT(*) FROM store_metadata WHERE substr(`key`,1,?)=?", arrayOf<Any>(PREFIX.length, PREFIX)
                     ).use { it.moveToFirst(); it.getInt(0) }
                     val rows = businessRows(database) + ownedMetadata + 1 // include the not-yet-inserted rows key
-                    check(rows > 0)
+                    check(rows == fixture.json.getJSONObject("expectedRows").getInt(scenario)) { "Seed inventory mismatch" }
                     // Success is visible only after all repository writes and integrity reads succeeded.
                     database.runInTransaction {
                         metadata.insert(StoreMetadata(ROWS_KEY, rows.toString()))
-                        database.openHelper.writableDatabase.execSQL(
-                            "UPDATE store_metadata SET value = ? WHERE `key` = ?", arrayOf("complete", STATUS_KEY))
+                        check(metadata.update(StoreMetadata(STATUS_KEY, "complete")) == 1)
                     }
-                    storedResult(database)
+                    storedResult(database, fixture)
                 } finally { database.close() }
             } finally { lock.release() }
         }
     }
 
     // Inspect ownership before Room can run a migration or otherwise write an existing file.
-    private fun preflight(context: Context, scenario: String) {
+    private fun preflight(context: Context, scenario: String, fixture: S1SeedFixture) {
         android.database.sqlite.SQLiteDatabase.openDatabase(
             context.getDatabasePath(FineCoachDatabaseFactory.DATABASE_NAME).absolutePath, null,
             android.database.sqlite.SQLiteDatabase.OPEN_READONLY,
         ).use { raw ->
             check(raw.version == 2) { "Non-seed schema rejected" }
-            val expected = mapOf(DATASET_KEY to DATASET, VERSION_KEY to VERSION.toString(),
+            val expected = mapOf(DATASET_KEY to fixture.dataset, VERSION_KEY to fixture.version.toString(),
                 STATUS_KEY to "complete", "${PREFIX}scenario" to scenario)
             for ((key, value) in expected) {
                 raw.rawQuery("SELECT value FROM store_metadata WHERE `key`=?", arrayOf(key)).use {
@@ -99,19 +96,21 @@ internal object S1DebugSeed {
     }
 
     /** Reopen verification is read-only and permits walkthrough edits/deletions after initialization. */
-    fun storedResult(database: FineCoachDatabase): SeedResult {
+    fun storedResult(database: FineCoachDatabase, fixture: S1SeedFixture): SeedResult {
         val metadata = database.storeMetadataDao()
-        check(metadata.find(DATASET_KEY)?.value == DATASET)
-        check(metadata.find(VERSION_KEY)?.value == VERSION.toString())
+        check(metadata.find(DATASET_KEY)?.value == fixture.dataset)
+        check(metadata.find(VERSION_KEY)?.value == fixture.version.toString())
         check(metadata.find(STATUS_KEY)?.value == "complete")
         val rows = checkNotNull(metadata.find(ROWS_KEY)?.value?.toIntOrNull())
         check(rows > 0)
-        return SeedResult(VERSION, rows)
+        return SeedResult(fixture.version, rows)
     }
 
     fun graph(db: FineCoachDatabase, context: Context, generation: UUID = UUID.fromString(
         checkNotNull(db.storeMetadataDao().find(FineCoachDatabaseFactory.GENERATION_KEY)).value)) =
-        S1AppGraph(db, AppClock { NOW }, S1SeedIDs(), generation, context, ZoneOffset.UTC)
+        S1SeedFixture.read(context).let { fixture ->
+            S1AppGraph(db, S1FixtureClock(fixture), S1SeedIDs(fixture), generation, context, ZoneOffset.UTC)
+        }
 
     fun businessRows(db: FineCoachDatabase): Int {
         val tables = mutableListOf<String>()
@@ -129,109 +128,194 @@ internal object S1DebugSeed {
         }
     }
 
-    private suspend fun populate(g: S1AppGraph, scenario: String) {
-        studentIDs.forEachIndexed { i, sid ->
-            val draft = StudentDraft(if (i < 2) "虚构同名学员" else "虚构学员${i + 1}",
-                StudentSex.entries[i % StudentSex.entries.size], trainingGoal = "虚构训练目标", privateCoachNote = "虚构体验数据",
-                phone = "000-010${i}", wechatID = "fictional-seed-${i + 1}")
-            // Fixed IDs are supplied to the same repository used by StudentUseCases.
-            val d = draft.makeStudent(sid, NOW)
+    private suspend fun populate(g: S1AppGraph, variant: String, fixture: S1SeedFixture) {
+        val clock = g.clock as S1FixtureClock
+        fun at(row: JSONObject, field: String = "offsetSeconds") { clock.offsetSeconds = row.getLong(field) }
+        val catalog = success(g.exerciseRepository.listCatalog())
+        // Resolve every built-in reference before the first business write. Never silently substitute.
+        (fixture.selected("sessions", variant) + fixture.selected("templates", variant))
+            .flatMap { it.objects("exercises") }.forEach { source(it, catalog) }
+        for (row in fixture.selected("students", variant)) {
+            at(row)
+            val sid = StudentID.parse(fixture.uuid(row.getInt("id")))
+            val draft = StudentDraft(row.getString("name"), StudentSex.valueOf(row.getString("sex")),
+                row.optional("trainingGoal").orEmpty(), row.optional("injuryNotes").orEmpty(), row.optional("privateCoachNote").orEmpty(),
+                row.optional("phone").orEmpty(), row.optional("wechatID").orEmpty())
+            val d = draft.makeStudent(sid, clock.now())
             success(g.studentRepository.save(StudentRecord(sid, d.displayName.value, d.sex, d.trainingGoal?.value,
-                d.injuryNotes?.value, d.privateCoachNote?.value, d.phone?.value, d.wechatID?.value, d.lifecycle, NOW, NOW)))
-        }
-        success(g.students.archive(studentIDs[6]))
-        // Student1 has no package. Student2 available; 3 expired; 4 exhausted; 5 ended; 6 replacement history.
-        for (i in 1..5) {
-            val expired = i == 2
-            val p = success(g.credits.createActivePackage(studentIDs[i], "虚构课包${i}", 8,
-                LocalDate.of(2026, 11, 1), if (expired) LocalDate.of(2026, 11, 2) else LocalDate.of(2099, 12, 31)))
-            val record = (p as? SaveCoursePackageResult.Saved)?.record ?: error("Seed package rejected")
-            if (i == 3) success(g.credits.recordManualCorrection(record.coursePackageID, CreditDirection.debit, 8, "虚构耗尽演示"))
-            if (i == 4) success(g.credits.endPackage(record.coursePackageID))
-            if (i == 5) {
-                val ctx = g.credits.loadCreationContext(studentIDs[i])
-                success(g.credits.createPackageWithContext(ctx, "虚构替换课包", 12, confirmedByCoach = true))
+                d.injuryNotes?.value, d.privateCoachNote?.value, d.phone?.value, d.wechatID?.value,
+                d.lifecycle, clock.now(), clock.now())))
+            when (StudentLifecycle.valueOf(row.getString("lifecycle"))) {
+                StudentLifecycle.archived -> success(g.students.archive(sid))
+                StudentLifecycle.active -> Unit
             }
         }
-        // Completed historical Session, including all record modes and a real ad-hoc ledger entry.
-        val historical = session(g, studentIDs[1], allCompleted = true)
-        val completed = success(g.active.complete(CompleteSessionCommand(historical.session.sessionID,
-            historical.session.revision, NOW, false)))
-        val p = checkNotNull(success(g.credits.activePackage(studentIDs[1])))
-        success(g.finisher.debitAdhoc(completed.sessionID, p.coursePackageID))
-        success(g.sessions.saveCompletedSummary(SaveCompletedSessionSummaryCommand(completed.sessionID, completed.revision,
-            emptySet(), "虚构公开总结", "虚构私密备注", NOW)))
-        // Two Students each have one active Session; each hero can be opened independently.
-        session(g, studentIDs[0], allCompleted = false)
-        if (scenario == "multi") session(g, studentIDs[1], allCompleted = false)
-        val template = success(g.templates.save(SaveTemplateCommand(null, "虚构分段模板", emptySet(), null)))
-        val section = SectionID.parse(uuid(900))
-        val sections = listOf(SectionRecord(section, SessionSectionOwnerKind.template, null, template.templateID, "虚构分段", 0u))
-        val exercises = RecordMode.entries.mapIndexed { i, mode ->
-            val eid = TemplateExerciseID.parse(uuid(910 + i))
-            val planned = TemplatePlannedSet.copyingValuesFrom(training(mode, SessionExerciseID.parse(uuid(920+i)),
-                TrainingSetID.parse(uuid(930+i)), SetRecordingState.pending)).toRecord()
-            TemplateExerciseRecord(eid, template.templateID, section, (i+1).toUInt(), ExerciseSourceKind.sessionOnly, null,
-                "虚构计划动作${i+1}", mode, listOf(planned))
+        val packages = mutableMapOf<String, CoursePackageRecord>()
+        for (row in fixture.selected("packages", variant)) {
+            at(row)
+            val sid = StudentID.parse(fixture.uuid(row.getInt("studentID")))
+            val context = g.credits.loadCreationContext(sid)
+            val saved = success(g.credits.createPackageWithContext(context, row.optional("name"), row.getLong("totalCredits"),
+                row.optional("startDate")?.let(LocalDate::parse), row.optional("endDate")?.let(LocalDate::parse),
+                confirmedByCoach = row.getBoolean("confirmedReplacement")))
+            val record = (saved as? SaveCoursePackageResult.Saved)?.record ?: error("Seed package rejected")
+            packages[row.getString("key")] = record
+            when (CoursePackageStatus.valueOf(row.getString("state"))) {
+                CoursePackageStatus.ended -> success(g.credits.endPackage(record.coursePackageID))
+                CoursePackageStatus.active -> Unit
+            }
         }
-        success(g.templateRepository.saveContent(SaveTemplateContentCommand(template.templateID, template.revision, sections, exercises)))
+        val sessions = mutableMapOf<String, SessionRecord>()
+        for (row in fixture.selected("sessions", variant)) {
+            at(row, "startOffsetSeconds")
+            val started = success(g.active.startOrOpen(StudentID.parse(fixture.uuid(row.getInt("studentID"))),
+                row.strings("trainingFocus").map { BodyPart.valueOf(it) }.toSet()))
+            val sections = row.objects("sections").map {
+                SectionRecord(SectionID.parse(fixture.uuid(it.getInt("id"))), SessionSectionOwnerKind.session,
+                    started.sessionID, null, it.getString("name"), it.getInt("orderIndex").toUInt())
+            }
+            val exercises = row.objects("exercises").map { exercise ->
+                val id = SessionExerciseID.parse(fixture.uuid(exercise.getInt("id")))
+                val mode = RecordMode.valueOf(exercise.getString("recordMode"))
+                val item = source(exercise, catalog)
+                SessionExerciseRecord(id, started.sessionID, exercise.getInt("orderIndex").toUInt(),
+                    ExerciseSourceKind.valueOf(exercise.getString("sourceKind")), item?.exerciseID,
+                    item?.canonicalName ?: exercise.getString("canonicalName"), mode, null,
+                    SectionID.parse(fixture.uuid(exercise.getInt("sectionID"))),
+                    exercise.objects("sets").map { training(it, mode, id, fixture).toRecord() })
+            }
+            val content = success(g.active.saveContent(SaveSessionContentCommand(started.sessionID, started.revision, sections, exercises)))
+            val record = when (SessionState.valueOf(row.getString("state"))) {
+                SessionState.inProgress -> content.session
+                SessionState.completed -> {
+                    at(row, "finishOffsetSeconds")
+                    success(g.active.complete(CompleteSessionCommand(started.sessionID, content.session.revision, clock.now(), false)))
+                }
+                else -> error("Unsupported seed session state")
+            }
+            sessions[row.getString("key")] = record
+            row.optJSONObject("summary")?.let { summary ->
+                check(record.state == SessionState.completed)
+                at(summary)
+                success(g.sessions.saveCompletedSummary(SaveCompletedSessionSummaryCommand(record.sessionID, record.revision,
+                    record.trainingFocus, summary.optional("publicSummary"), summary.optional("privateCoachNote"), clock.now())))
+            }
+        }
+        for (row in fixture.selected("ledger", variant)) {
+            at(row)
+            val pkg = packages.getValue(row.getString("packageKey"))
+            when (row.getString("kind")) {
+                "manualCorrection" -> success(g.credits.recordManualCorrection(pkg.coursePackageID,
+                    CreditDirection.valueOf(row.getString("direction")), row.getLong("amount"), row.optional("note")))
+                "adhocDebit" -> success(g.finisher.debitAdhoc(sessions.getValue(row.getString("sessionKey")).sessionID, pkg.coursePackageID))
+                else -> error("Unsupported seed ledger kind")
+            }
+        }
+        for (row in fixture.selected("templates", variant)) {
+            at(row)
+            val template = success(g.templates.save(SaveTemplateCommand(null, row.getString("name"),
+                row.strings("trainingFocus").map { BodyPart.valueOf(it) }.toSet(), null)))
+            val sections = row.objects("sections").map {
+                SectionRecord(SectionID.parse(fixture.uuid(it.getInt("id"))), SessionSectionOwnerKind.template,
+                    null, template.templateID, it.getString("name"), it.getInt("orderIndex").toUInt())
+            }
+            val exercises = row.objects("exercises").map { exercise ->
+                val item = source(exercise, catalog)
+                val mode = RecordMode.valueOf(exercise.getString("recordMode"))
+                val owner = SessionExerciseID.parse(fixture.uuid(exercise.getInt("id")))
+                TemplateExerciseRecord(TemplateExerciseID.parse(fixture.uuid(exercise.getInt("id"))), template.templateID,
+                    SectionID.parse(fixture.uuid(exercise.getInt("sectionID"))), exercise.getInt("orderIndex").toUInt(),
+                    ExerciseSourceKind.valueOf(exercise.getString("sourceKind")), item?.exerciseID,
+                    item?.canonicalName ?: exercise.getString("canonicalName"), mode,
+                    exercise.objects("sets").map { TemplatePlannedSet.copyingValuesFrom(training(it, mode, owner, fixture)).toRecord() })
+            }
+            success(g.templateRepository.saveContent(SaveTemplateContentCommand(template.templateID, template.revision, sections, exercises)))
+        }
+        clock.offsetSeconds = 0
     }
 
-    private suspend fun session(g: S1AppGraph, student: StudentID, allCompleted: Boolean): SessionContentRecord {
-        val started = success(g.active.startOrOpen(student))
-        val section = SectionID.parse(uuid(if (allCompleted) 800 else if (student==studentIDs[0]) 801 else 802))
-        val sections = listOf(SectionRecord(section, SessionSectionOwnerKind.session, started.sessionID, null, "虚构训练分段", 0u))
-        val exercises = RecordMode.entries.mapIndexed { i, mode ->
-            val eid = g.ids.newSessionExerciseID()
-            val state = if (allCompleted || i==0) SetRecordingState.completed else if (i==1) SetRecordingState.pending else SetRecordingState.draft
-            val set = training(mode, eid, g.ids.newTrainingSetID(), state).toRecord()
-            SessionExerciseRecord(eid, started.sessionID, (i+1).toUInt(), ExerciseSourceKind.sessionOnly, null,
-                "虚构动作${i+1}", mode, null, section, listOf(set))
+    internal fun source(row: JSONObject, catalog: List<ExerciseRecord>): ExerciseRecord? {
+        if (row.getString("sourceKind") == ExerciseSourceKind.sessionOnly.name) return null
+        check(row.getString("sourceKind") == ExerciseSourceKind.builtIn.name)
+        val matches = catalog.filter {
+            it.kind == ExerciseKind.builtIn && !it.isRetired && it.lifecycle == ExerciseLifecycle.active &&
+                if (row.has("stableID")) it.exerciseID.value == row.getString("stableID")
+                else it.canonicalName == row.getString("canonicalName")
         }
-        return success(g.active.saveContent(SaveSessionContentCommand(started.sessionID, started.revision, sections, exercises)))
+        val item = matches.singleOrNull() ?: error("Seed catalog reference unavailable")
+        check(item.recordMode.name == row.getString("recordMode")) { "Seed catalog mode mismatch" }
+        return item
     }
 
-    private fun training(mode: RecordMode, eid: SessionExerciseID, sid: TrainingSetID, state: SetRecordingState): TrainingSet {
-        val input = when(mode) {
-            RecordMode.weightReps -> TrainingSetInput(mode, weightValue="20", repetitionCount="8", unit=MeasurementUnit.kilograms)
-            RecordMode.reps -> TrainingSetInput(mode, repetitionCount="10", unit=MeasurementUnit.repetitions)
-            RecordMode.duration -> TrainingSetInput(mode, durationSeconds="45", unit=MeasurementUnit.seconds)
-            RecordMode.cardio -> TrainingSetInput(mode, durationSeconds="300", unit=MeasurementUnit.seconds, distanceValue="1.25", speedValue="15", resistanceValue="2")
-        }
-        val draft = TrainingSet.makeDraft(sid, eid, 0u, input, NOW)
-        return when (state) {
-            SetRecordingState.completed -> draft.confirmed(NOW)
-            SetRecordingState.pending -> draft.confirmed(NOW).copiedAsPending(sid, 0u, NOW)
+    private fun training(row: JSONObject, mode: RecordMode, owner: SessionExerciseID, fixture: S1SeedFixture): TrainingSet {
+        val input = TrainingSetInput(mode, weightValue = row.optional("weightValue"), repetitionCount = row.optional("repetitionCount"),
+            durationSeconds = row.optional("durationSeconds"), unit = MeasurementUnit.valueOf(row.getString("unit")),
+            distanceValue = row.optional("distanceValue"), speedValue = row.optional("speedValue"), resistanceValue = row.optional("resistanceValue"))
+        val id = TrainingSetID.parse(fixture.uuid(row.getInt("id")))
+        val time = fixture.at(row.getLong("offsetSeconds"))
+        val draft = TrainingSet.makeDraft(id, owner, row.getInt("orderIndex").toUInt(), input, time)
+        return when (SetRecordingState.valueOf(row.getString("state"))) {
+            SetRecordingState.completed -> draft.confirmed(time)
+            SetRecordingState.pending -> draft.confirmed(time).copiedAsPending(id, row.getInt("orderIndex").toUInt(), time)
             SetRecordingState.draft -> draft
         }
     }
 
     suspend fun verifyInitial(g: S1AppGraph, scenario: String = "multi") {
-        if (scenario == "empty") {
-            check(success(g.students.list(StudentQuery(includeArchived=true))).isEmpty())
-            check(success(g.sessions.listActiveSessions()).isEmpty())
-            return
+        val fixture = S1SeedFixture.read(g.context)
+        val catalog = success(g.exerciseRepository.listCatalog())
+        check(catalog.count { it.kind == ExerciseKind.builtIn } == fixture.json.getInt("catalogCount"))
+        val students = success(g.students.list(StudentQuery(includeArchived = true)))
+        val expectedStudents = fixture.selected("students", scenario)
+        check(students.size == expectedStudents.size)
+        for (row in expectedStudents) {
+            val student = students.single { it.studentID.value == fixture.uuid(row.getInt("id")) }
+            check(student.displayName == row.getString("name") && student.lifecycle.name == row.getString("lifecycle"))
+            check(student.trainingGoal == row.optional("trainingGoal") && student.privateCoachNote == row.optional("privateCoachNote"))
         }
-        val students = success(g.students.list(StudentQuery(includeArchived=true)))
-        check(students.size==7 && students.map { it.studentID }.toSet()==studentIDs.toSet())
-        check(students.count { it.displayName == "虚构同名学员" }==2 && students.count { it.lifecycle==StudentLifecycle.archived }==1)
-        check(success(g.sessions.listActiveSessions()).size==(if (scenario=="multi") 2 else 1))
+        val expectedSessions = fixture.selected("sessions", scenario)
         val active = success(g.sessions.listActiveSessions())
-        val contents = active.map { checkNotNull(success(g.sessions.loadContent(it.sessionID))) }
-        check(contents.all { it.sections.isNotEmpty() && it.exercises.map { e -> e.recordModeSnapshot }.toSet()==RecordMode.entries.toSet() })
-        check(contents.all { it.exercises.flatMap { e -> e.sets }.map { s -> s.state }.toSet()==SetRecordingState.entries.toSet() })
-        check(success(g.credits.packages(studentIDs[0])).isEmpty())
-        check(checkNotNull(success(g.credits.activePackage(studentIDs[1]))).remainingCreditsCache==7L)
-        check(checkNotNull(success(g.credits.activePackage(studentIDs[2]))).endDate!! < NOW.atZone(ZoneOffset.UTC).toLocalDate())
-        check(checkNotNull(success(g.credits.activePackage(studentIDs[3]))).remainingCreditsCache==0L)
-        check(success(g.credits.packages(studentIDs[4])).single().status==CoursePackageStatus.ended)
-        check(success(g.credits.packages(studentIDs[5])).size==2)
-        check(success(g.historyRepository.list(HistoryQuery(studentID=studentIDs[1]))).size==1)
-        check(success(g.credits.ledger(studentIDs[1])).size==1)
-        val templates=success(g.templates.list())
-        check(templates.size==1)
-        val template=checkNotNull(success(g.templates.load(templates.single().templateID)))
-        check(template.sections.size==1 && template.exercises.size==4 && template.exercises.all { it.plannedSets.size==1 })
+        check(active.size == expectedSessions.count { it.getString("state") == SessionState.inProgress.name })
+        check(success(g.templates.list()).size == fixture.selected("templates", scenario).size)
+        for (row in expectedSessions) {
+            val sid = StudentID.parse(fixture.uuid(row.getInt("studentID")))
+            val record = if (row.getString("state") == SessionState.completed.name) {
+                val history = success(g.historyRepository.list(HistoryQuery(studentID = sid)))
+                history.single { it.completedAtUTC == fixture.at(row.getLong("finishOffsetSeconds")) }.let { success(g.sessions.find(it.sessionID))!! }
+            } else success(g.sessions.active(sid))!!
+            val content = success(g.sessions.loadContent(record.sessionID))!!
+            check(record.state.name == row.getString("state"))
+            check(content.sections.map { it.name } == row.objects("sections").sortedBy { it.getInt("orderIndex") }.map { it.getString("name") })
+            check(content.exercises.size == row.objects("exercises").size)
+            for (exercise in row.objects("exercises")) {
+                val actual = content.exercises.single { it.sessionExerciseID.value == fixture.uuid(exercise.getInt("id")) }
+                check(actual.displayNameSnapshot == (source(exercise, catalog)?.canonicalName ?: exercise.getString("canonicalName")))
+                check(actual.sets == exercise.objects("sets").map { training(it, actual.recordModeSnapshot, actual.sessionExerciseID, fixture).toRecord() })
+            }
+            row.optJSONObject("summary")?.let { check(record.studentFacingSummary == it.optional("publicSummary") && record.privateCoachNote == it.optional("privateCoachNote")) }
+        }
+        for (student in students) {
+            val expected = fixture.selected("packages", scenario).filter { fixture.uuid(it.getInt("studentID")) == student.studentID.value }
+            val packages = success(g.credits.packages(student.studentID))
+            check(packages.size == expected.size)
+            for ((index, row) in expected.withIndex()) {
+                val actual = packages.single { it.name == row.optional("name") }
+                val ended = row.getString("state") == CoursePackageStatus.ended.name || index < expected.lastIndex
+                check(actual.status == if (ended) CoursePackageStatus.ended else CoursePackageStatus.active)
+                check(actual.totalCredits == row.getLong("totalCredits") && actual.endDate == row.optional("endDate")?.let(LocalDate::parse))
+                if (!ended) {
+                    val adjustments = fixture.selected("ledger", scenario).filter { it.getString("packageKey") == row.getString("key") }
+                    val remaining = row.getLong("totalCredits") - adjustments.sumOf { if (it.getString("kind") == "adhocDebit") 1L else it.getLong("amount") * if (it.getString("direction") == "debit") 1 else -1 }
+                    check(actual.remainingCreditsCache == remaining)
+                }
+            }
+        }
+        for (row in fixture.selected("templates", scenario)) {
+            val template = success(g.templates.list()).single { it.name == row.getString("name") }
+            val content = success(g.templates.load(template.templateID))!!
+            check(content.sections.size == row.objects("sections").size && content.exercises.size == row.objects("exercises").size)
+            check(content.exercises.all { actual -> actual.plannedSets.size == row.objects("exercises").single { it.getInt("id").let(fixture::uuid) == actual.templateExerciseID.value }.objects("sets").size })
+        }
     }
 
     private fun <T> success(result: ApplicationResult<T>): T = when(result) {
@@ -240,9 +324,9 @@ internal object S1DebugSeed {
     }
 }
 
-private class S1SeedIDs : StableIDGenerator {
-    private var index=1000
-    private fun next()=S1DebugSeed.uuid(index++)
+private class S1SeedIDs(private val fixture: S1SeedFixture) : StableIDGenerator {
+    private var index=fixture.json.getInt("generatedIDStart")
+    private fun next()=fixture.uuid(index++)
     override fun newStudentID()=StudentID.parse(next())
     override fun newCoursePackageID()=CoursePackageID.parse(next())
     override fun newCreditAdjustmentID()=CreditAdjustmentID.parse(next())
@@ -253,4 +337,9 @@ private class S1SeedIDs : StableIDGenerator {
     override fun newTemplateExerciseID()=TemplateExerciseID.parse(next())
     override fun newTrainingSetID()=TrainingSetID.parse(next())
     override fun newExerciseID()=StableExerciseID.parse(next())
+}
+
+private class S1FixtureClock(private val fixture: S1SeedFixture) : AppClock {
+    var offsetSeconds = 0L
+    override fun now() = fixture.at(offsetSeconds)
 }

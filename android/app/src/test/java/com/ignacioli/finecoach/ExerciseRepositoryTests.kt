@@ -169,6 +169,31 @@ class ExerciseRepositoryTests {
         }
     }
 
+    @Test fun failedLaunchWithoutCatalogIsUnavailableAndKeepsDatabaseUsable() = runBlocking {
+        withContext(Dispatchers.IO) {
+            database.openHelper.writableDatabase.execSQL("CREATE TRIGGER fictional_catalog_failure BEFORE INSERT ON exercise_catalog BEGIN SELECT RAISE(ABORT, 'fictional failure'); END")
+        }
+        repository.prepareCatalog()
+        assertTrue(repository.catalogUnavailable)
+        assertTrue(ok(repository.listCatalog()).isEmpty())
+        withContext(Dispatchers.IO) { database.openHelper.writableDatabase.execSQL("DROP TRIGGER fictional_catalog_failure") }
+        repository.prepareCatalog()
+        assertFalse(repository.catalogUnavailable)
+        assertEquals(542, ok(repository.listCatalog()).size)
+    }
+
+    @Test fun failedLaunchWithExistingCatalogSilentlyPreservesSearchAndStableRows() = runBlocking {
+        repository.prepareCatalog()
+        val before = ok(repository.listCatalog())
+        withContext(Dispatchers.IO) {
+            database.openHelper.writableDatabase.execSQL("CREATE TRIGGER fictional_catalog_failure BEFORE UPDATE ON exercise_catalog BEGIN SELECT RAISE(ABORT, 'fictional failure'); END")
+        }
+        repository.prepareCatalog()
+        assertFalse(repository.catalogUnavailable)
+        assertEquals(before, ok(repository.listCatalog()))
+        assertTrue(ok(repository.search("杠铃平板卧推")).isNotEmpty())
+    }
+
     @Test fun syncIsIdempotentPreservesPreferencesAndReopensWithSameStableIDs() = runBlocking {
         ok(repository.synchronizeCatalog())
         val original = ok(repository.listCatalog())

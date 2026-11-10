@@ -41,6 +41,7 @@ import com.ignacioli.finecoach.core.application.StudentUseCases
 import com.ignacioli.finecoach.core.domain.common.BodyPart
 import com.ignacioli.finecoach.core.domain.common.StudentID
 import com.ignacioli.finecoach.core.domain.common.StudentLifecycle
+import com.ignacioli.finecoach.designsystem.FcTitleIconButton
 import com.ignacioli.finecoach.designsystem.FcButton
 import com.ignacioli.finecoach.designsystem.FcColors
 import com.ignacioli.finecoach.designsystem.FcHintBar
@@ -330,6 +331,8 @@ fun StudentListScreen(
                         style = FcTypography.display,
                         color = FcColors.actionPrimary,
                     )
+                    FcTitleIconButton("资料库", painterResource(R.drawable.ic_ms_grid_view),
+                        Modifier.testTag("student-list-resource-hub")) { onRoute(S1Routes.RESOURCE_HUB) }
                 }
                 if (showRootSwitch) {
                     FcSegmentedSwitch(

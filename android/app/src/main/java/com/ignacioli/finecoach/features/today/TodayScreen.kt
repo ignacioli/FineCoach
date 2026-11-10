@@ -58,9 +58,6 @@ fun TodayScreen(state: TodayUiState, onNavigate: (String) -> Unit) {
                     Modifier.testTag("hero-${row.id}"), "继续训练", { onNavigate(S1Routes.activeSession(SessionID.parse(row.id))) }) }
                 else -> FcMultiHeroCard(state.items, { onNavigate(S1Routes.activeSession(SessionID.parse(it))) }, Modifier.testTag("today-hero"))
             }
-            FcSectionLabel("训练资料")
-            FcActionRow("动作库", Modifier.testTag("today-exercises")) { onNavigate(S1Routes.EXERCISES) }
-            FcActionRow("训练模板", Modifier.testTag("today-templates")) { onNavigate(S1Routes.TEMPLATES) }
         }
     }
 }

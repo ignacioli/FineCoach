@@ -226,12 +226,19 @@ class ComponentContractTests {
         var calls = 0
         var dialog by mutableStateOf(false)
         show {
+            FcActionRow("归档学员", Modifier.testTag("short-detail"), detail = "可恢复") { }
             FcActionRow("普通", Modifier.testTag("normal")) { calls++ }
-            FcActionRow("删除样例", Modifier.testTag("danger"), destructive = true, trash = icon) { dialog = true }
+            FcActionRow("删除样例", Modifier.testTag("danger"), detail = "删除学员和训练记录；课包与课时流水仍保留，需二次确认", destructive = true, trash = icon) { dialog = true }
             FcActionRow("禁用", Modifier.testTag("disabled"), enabled = false) { calls++ }
             if (dialog) FcConfirmationDialog("确认删除？", "虚构数据", "删除", { calls++; dialog = false }, { dialog = false })
         }
-        listOf("normal", "danger", "disabled").forEach { full(it); touch(it) }
+        listOf("normal", "danger", "disabled", "short-detail").forEach { full(it); touch(it) }
+        val shortTitle = compose.onNodeWithText("归档学员", useUnmergedTree = true).fetchSemanticsNode().layoutInfo.parentInfo!!
+        val shortDetail = compose.onNodeWithText("可恢复", useUnmergedTree = true).fetchSemanticsNode().layoutInfo.parentInfo!!
+        assertTrue("Short detail must not reserve half the row", shortTitle.width > shortDetail.width)
+        val title = compose.onNodeWithText("删除样例", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        assertTrue("Long trailing detail must reserve title width", title.width >= 64.dp)
+        compose.onNodeWithText("删除学员和训练记录；课包与课时流水仍保留，需二次确认", useUnmergedTree = true).assertIsDisplayed()
         node("disabled").assertIsNotEnabled().performTouchInput { click() }
         node("danger").performClick(); node("confirm-accept").assertIsDisplayed()
         compose.runOnIdle { assertEquals(0, calls) }

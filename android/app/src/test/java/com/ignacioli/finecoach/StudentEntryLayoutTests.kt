@@ -260,6 +260,16 @@ class StudentEntryLayoutTests {
         assertEquals(0L, tableCount("students"))
     }
 
+    @Test fun permanentDeleteKeepsSingleLineTitleAndVisibleNoteAt320dp() {
+        val created = createStudent("虚构排版学员")
+        showEditorForDelete(created, AtomicInteger(0))
+        node(StudentTestTags.DETAIL_DELETE).performScrollTo().assertIsDisplayed()
+        assertFillsContent(StudentTestTags.DETAIL_DELETE)
+        val title = compose.onNodeWithText("永久删除", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        assertTrue("Four title characters need their own width", title.width >= 64.dp)
+        compose.onNodeWithText("删除学员和训练记录；课包与课时流水仍保留，需二次确认", useUnmergedTree = true).assertIsDisplayed()
+    }
+
     @Test fun editorFieldsAndSaveButtonFillTheContentWidth() {
         val viewModel = StudentFeatureFactory.editorViewModel(StudentEditorMode.Add, useCases)
         show { StudentEditorScreen(viewModel, onCancel = {}, onSaved = {}) }

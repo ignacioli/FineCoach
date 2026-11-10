@@ -1101,7 +1101,7 @@ cursor-agent 独立复核及 T023/T024 完成门禁均 **未确认**。不修改
 Release APK 不携带 instrumentation。宿主需验证普通应用触发被拒及三个 API 的 shell session
 可用性，不能把静态源码依据视作设备安全验证。只对专用虚构模拟器运行安装任务。
 
-**已停用的 S0 独立触发与输出合同（历史记录）**：S0 曾通过独立 instrumentation 验证 metadata 样例及固定数值日志。当前入口已由 T019 接管，不再使用本段旧触发/输出约定；实际命令、失败非零规则和唯一预期输出见本文「S1 T019：真实 seed 与一键安装」（rows 66/55/5）。seed 日志仍只含版本/计数/固定状态，PID/时间仅用于关联本次事件，不含业务内容。
+**已停用的 S0 独立触发与输出合同（历史记录）**：S0 曾通过独立 instrumentation 验证 metadata 样例及固定数值日志。当前入口已由 T019 接管，不再使用本段旧触发/输出约定；实际命令、失败非零规则和唯一预期输出见本文「S1 T019：真实 seed 与一键安装」（rows 1149/1138/1088）。seed 日志仍只含版本/计数/固定状态，PID/时间仅用于关联本次事件，不含业务内容。
 
 ### 种子记录表与持久性
 
@@ -1150,7 +1150,7 @@ contributor 失败整笔 rollback；降级、固定值冲突、同版本缺行/�
   catalog/debug Application/入口名；包含二进制 manifest、资源表和所有 dex，不能只扫文件名。
   预期 `s0SeedIsolation: status=ok apk=… sha256=… dex=… manifest=1 resources=1`。
   当前不启用 shrinking/obfuscation；以后开启时必须重新评估名字扫描的证明边界。
-- **已停用的 S0 安装合同（仅历史记录）**：原 `s0InstallSeededDebug` 曾通过 AGP `installDebug` 安装 S0 metadata 样例。该流程及其旧输出约定已由 T019 替代，不再用作当前安装/验收命令。当前实际流程、serial 参数及唯一预期输出见本文「S1 T019：真实 seed 与一键安装」（multi/single/empty 的 rows 分别为66/55/5）。
+- **已停用的 S0 安装合同（仅历史记录）**：原 `s0InstallSeededDebug` 曾通过 AGP `installDebug` 安装 S0 metadata 样例。该流程及其旧输出约定已由 T019 替代，不再用作当前安装/验收命令。当前实际流程、serial 参数及唯一预期输出见本文「S1 T019：真实 seed 与一键安装」（multi/single/empty 的 rows 分别为1149/1138/1088）。
 
 隐私合同跟随本轮批准的固定 seed event 更新，只有指定 debug 入口中的一条精确 call 可用，
 其他 source 日志仍拒绝；Release dex 额外拒绝 seed 包/tag。宿主还需回归：
@@ -1295,7 +1295,7 @@ adb shell am start -n com.ignacioli.finecoach/.MainActivity --ez finecoachS0Shel
 
 这一条命令 build Debug APK → `adb -s SERIAL install -r -t` → 停止目标进程以串行初始化 → shell-only `am instrument` → 关闭重开数据库验证 complete/version/rows → 校验 instrumentation code/result 和本次 PID/时间的唯一数值日志 → `am start -W` 启动默认 S1。S1-D20 已在基线实现，不需要启动开关。每条 adb 命令都携带 serial；缺设备、冲突 serial、授权失败、安装/seed/日志/启动失败均非零。没有 `pm clear`、uninstall、reset 或自动库切换。相同命令可再执行一次，仍返回初始 inventory，保留教练体验更改。
 
-场景参数：`multi`（默认，两位学员各一进行中，初始 `SEED version=1 rows=66 status=ok`）、`single`（一进行中，rows=55）、`empty`（无学员/训练，rows=5）。场景只在首次空数据目录安装时选择；已有 seed 切换参数会拒绝，不能靠参数重建。dataset=`fictional-s1-coach-core-v1`，版本1，clock=`2026-11-09T00:00:00Z`，UUID 以 `72000000-0000-4000-8000-` 为前缀，学员尾号1～7；其余生成ID使用固定顺序1000起，显式分段/计划组使用800～933。只含虚构内容。
+场景参数：`multi`（默认，两位学员各一进行中，初始 `SEED version=3 rows=1149 status=ok`）、`single`（一进行中，rows=1138）、`empty`（无学员/训练，rows=1088）。场景只在首次空数据目录安装时选择；已有 seed 切换参数会拒绝，不能靠参数重建。dataset=`fictional-s1-coach-core-v3`，版本3，clock=`2026-11-09T00:00:00Z`，UUID 以 `72000000-0000-4000-8000-` 为前缀，学员尾号1～7；其余生成ID使用固定顺序1000起，显式分段使用800～900，动作/组使用10000～13053（以 JSON 为准）。只含虚构内容。
 
 `rows` 是首次成功初始化时实际查询到的业务行数加 S1 自有 metadata 行数（含 rows 本身，不计框架、generation、created_at）；不是后续体验中的当前行数。重跑不要求已经删除/编辑的 seed 内容恢复到初始值。首次 marker 之前经 Repository 读取核验初始状态；重开持久性由 JVM 文件库测试与 instrumentation 二次 open 证明。写入失败会保留 installing 并失败，人工决定如何处置。
 
@@ -1305,7 +1305,7 @@ adb shell am start -n com.ignacioli.finecoach/.MainActivity --ez finecoachS0Shel
 ./gradlew --offline :app:s0SeedIsolation
 ```
 
-实际执行 `S1DebugSeedTests` 9例与 `S1SeedIsolationTests` 4例（报告 `app/build/test-results/s1SeedChecks/`），精确非零、0 failures/errors/skips；随后检查实际 Release APK 的全部条目和 UTF-8/UTF-16 dex/manifest/resources 字节，拒绝 S0/S1 seed、fixture入口及标记。预期包含两条 `S1-SEED-CHECK suite=… tests=9/4 failures=0 errors=0 skips=0`，以及 `s0SeedIsolation: status=ok apk=… sha256=… dex=… manifest=1 resources=1`。不连接设备。
+实际执行 `S1DebugSeedTests` 12例与 `S1SeedIsolationTests` 4例（报告 `app/build/test-results/s1SeedChecks/`），精确非零、0 failures/errors/skips；随后检查实际 Release APK 的全部条目和 UTF-8/UTF-16 dex/manifest/resources 字节，拒绝 S0/S1 seed、fixture入口及标记。预期包含两条 `S1-SEED-CHECK suite=… tests=12/4 failures=0 errors=0 skips=0`，以及 `s0SeedIsolation: status=ok apk=… sha256=… dex=… manifest=1 resources=1`。不连接设备。
 
 完整改动清单、实测日志、初始场景与未验证项见 [T019](docs/s1/T019.md)；共享13向量与宿主 iOS 命令见 [T017](docs/s1/T017.md)；入口总表及未确认断言见 [implementation map](docs/s1/implementation-map.md)。安装/界面 runtime、负责人走查、独立复核与 T020 仍由宿主执行，不能用 JVM/Release 扫描代替。
 
@@ -1318,3 +1318,7 @@ adb shell am start -n com.ignacioli.finecoach/.MainActivity --ez finecoachS0Shel
 ```
 
 [负责人走查：安装条件、核心页与交互清单](docs/s1/walkthrough.md) · [entry/layout总表](docs/s1/implementation-map.md) · [T020宿主证据与PENDING](docs/s1/T020.md)
+
+T020 fix1：seed v2 使用周十节（同名两人）、李思远、林小禾、王小明、长名字样例与孙已归档等合成数据。session/模板引用内置杠铃平板卧推、俯卧撑、平板支撑；catalog 没有 cardio mode，跑步机使用 sessionOnly。所有场景先走与启动相同的 catalog 同步路径，新增 542 catalog + 541 name claim 行，multi/single/empty 分别为 1149/1138/1088。旧 v1 seed 由宿主决定卸载后重装，agent 不执行清库。详见 [T020-fix1](docs/s1/T020-fix1.md)。
+
+负责人追加的明文数据入口：[seed fixture 字段与重装指南](docs/s1/seed-fixture.md)。内容统一在 `app/src/debug/assets/seed/s1-seed.json`，当前 v3 保持 rows 1149/1138/1088；loader 与 installer 从该文件读取版本、时间、业务内容与预期行数。Release 不包含 fixture，内置引用缺失直接失败。

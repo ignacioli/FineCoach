@@ -35,6 +35,7 @@ fun ExercisePicker(
                     })
             }
             ExerciseModePicker(mode, { mode = it }, !state.busy, "quick-mode")
+            if (state.catalogUnavailable) FcListRow("动作库暂不可用", Modifier.testTag("exercise-catalog-unavailable"))
             state.error?.let { FcListRow(exerciseErrorTitle(it), Modifier.testTag("exercise-error")) }
             FcButton("仅本节使用", Modifier.testTag("exercise-session-only"), !state.busy && query.isNotBlank()) {
                 scope.launch { state.perform({ onSelect(ExerciseSelection(query.trim(), mode, ExerciseSourceKind.sessionOnly, null)) }) { onDismiss() } }
@@ -80,6 +81,7 @@ fun ExerciseLibraryScreen(state: ExerciseUiState, onBack: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
             FcSearchField("搜索动作或拼音", query, { query = it }, Modifier.testTag("exercise-library-search"))
             FcFilterChip("显示已隐藏动作", hidden, Modifier.testTag("exercise-show-hidden")) { hidden = !hidden }
+            if (state.catalogUnavailable) FcListRow("动作库暂不可用", Modifier.testTag("exercise-catalog-unavailable"))
             state.error?.let { FcListRow(exerciseErrorTitle(it), Modifier.testTag("exercise-error")) }
             state.entries.forEach { item ->
                 val p = state.preference(item.exerciseID)

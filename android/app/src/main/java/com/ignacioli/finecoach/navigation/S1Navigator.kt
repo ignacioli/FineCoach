@@ -20,6 +20,7 @@ class S1Navigator(private val nav: NavHostController) {
             route == S1Routes.TODAY -> nav.navigate(S1Routes.TODAY) { popUpTo(S1Routes.TODAY); launchSingleTop = true }
             route == S1Routes.STUDENTS -> nav.navigate(S1Routes.STUDENTS) { popUpTo(S1Routes.TODAY); launchSingleTop = true }
             route == S1Routes.STUDENT_CREATE -> nav.navigate(S1Routes.STUDENT_CREATE)
+            route == S1Routes.RESOURCE_HUB -> nav.navigate(S1Routes.RESOURCE_HUB)
             route == S1Routes.TEMPLATES -> nav.navigate(S1Routes.TEMPLATES)
             route == S1Routes.EXERCISES -> nav.navigate(S1Routes.EXERCISES)
             parts.size in 2..3 && parts[0] == S1Routes.STUDENTS -> {
