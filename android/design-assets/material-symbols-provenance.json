@@ -207,6 +207,21 @@
       "upstreamPath": "symbols/web/info/materialsymbolsoutlined/info_wght600_24px.svg",
       "drawable": "app/src/main/res/drawable/ic_ms_info.xml",
       "drawableSha256": "82221780c26009b9aadcaf1363cce9e5cebbd89cf574f5200ebe389107e0fd9a"
+    },
+    {
+      "symbol": "edit",
+      "style": "outlined",
+      "weight": 400,
+      "iosSymbol": "pencil",
+      "components": [
+        "DS-SET-ROW"
+      ],
+      "sourceSvg": "material-symbols-svg/edit.svg",
+      "sourceSha256": "f3f51206ef9bf7d34db55058aa6be3e4f307c2d749fb8071785c360a84fa1622",
+      "upstreamCommit": "10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7",
+      "upstreamPath": "symbols/web/edit/materialsymbolsoutlined/edit_24px.svg",
+      "drawable": "app/src/main/res/drawable/ic_ms_edit.xml",
+      "drawableSha256": "e164b7ce326919806cfc9c63a1161e197e313afdcf694e1b647d156bf8abfe60"
     }
   ]
 }

@@ -17,26 +17,47 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: ExerciseUiState, templates: TemplateUiState,
-    onBack: () -> Unit, onFinish: () -> Unit, recoverySlot: @Composable () -> Unit = {}, restSlot: @Composable () -> Unit = {}) {
+    onBack: () -> Unit, onFinish: () -> Unit, recoverySlot: @Composable () -> Unit = {}, restSlot: @Composable () -> Unit = {}, students: StudentRepositoryPort? = null) {
     val scope = rememberCoroutineScope()
+    var addSheet by remember { mutableStateOf(false) }
     var picker by remember { mutableStateOf(false) }
+    var revealed by remember { mutableStateOf<String?>(null) }
     var review by remember { mutableStateOf(false) }
     var apply by remember { mutableStateOf(false) }
     var sectionForm by remember { mutableStateOf(false) }
     var section by remember { mutableStateOf<SectionRecord?>(null) }
-    var sectionOptions by remember { mutableStateOf<SectionRecord?>(null) }
-    var exerciseOptions by remember { mutableStateOf<SessionExerciseRecord?>(null) }
-    var setOptions by remember { mutableStateOf<TrainingSetRecord?>(null) }
     var editor by remember { mutableStateOf<SessionExerciseRecord?>(null) }
     var editing by remember { mutableStateOf<TrainingSetRecord?>(null) }
     var moving by remember { mutableStateOf<SessionExerciseID?>(null) }
     var confirmSection by remember { mutableStateOf<SectionRecord?>(null) }
     var deleteExercise by remember { mutableStateOf<SessionExerciseRecord?>(null) }
     val content = state.content?.takeIf { it.session.sessionID == id }
+    var studentName by remember(id) { mutableStateOf("") }
+    LaunchedEffect(content?.session?.studentID) {
+        content?.session?.studentID?.let { studentID ->
+            when (val result = students?.find(studentID)) {
+                is ApplicationResult.Success -> studentName = result.value?.displayName.orEmpty()
+                is ApplicationResult.Failure -> studentName = "学员信息暂不可用"
+                null -> Unit
+            }
+        }
+    }
     val back = { if (!state.busy) onBack() }
-    LaunchedEffect(id) { state.load(id); exercises.search("") }
+    LaunchedEffect(id) { state.load(id); editor = state.content?.exercises?.lastOrNull(); exercises.search("") }
+    LaunchedEffect(state.undoableSetID) {
+        val recent = state.undoableSetID
+        kotlinx.coroutines.delay(4_000) // FCUndoRow.undoWindow, components.md §4.4.
+        state.expireRecentUndo(recent)
+    }
+    val imeVisible = WindowInsets.isImeVisible
+    var wasImeVisible by remember { mutableStateOf(false) }
+    LaunchedEffect(imeVisible) {
+        if (wasImeVisible && !imeVisible && state.rests.end(id) != null && state.rests.remaining(id) == 0L) state.rests.clear(id)
+        wasImeVisible = imeVisible
+    }
     val lifecycle = LocalLifecycleOwner.current
     DisposableEffect(lifecycle, id) {
         val observer = LifecycleEventObserver { _, event ->
@@ -49,61 +70,113 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
         scope.launch { if (state.mutate(action) is ApplicationResult.Success) done() }
     }
     fun openEditor(row: SessionExerciseRecord, set: TrainingSetRecord? = null) { editing = set; editor = row }
-    FcPlatformShell(back) {
-        FcPageHeader("训练记录", onBack = back, tag = "active-session")
-        SaveStatusView(state)
-        recoverySlot()
-        Column(Modifier.fillMaxWidth().weight(1f).imePadding().verticalScroll(rememberScrollState()).testTag("active-session-content"),
+    FcPlatformShell(back, Modifier.imePadding()) {
+
+        Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).testTag("active-session-content"),
             verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+            SessionHeader(studentName, content, state.clock, back)
+            SaveStatusView(state)
+            recoverySlot()
+            if (state.rests.end(id) != null) com.ignacioli.finecoach.notifications.RestPermissionEntry()
             state.error?.let { FcListRow(exerciseErrorTitle(it), Modifier.testTag("active-session-error")) }
             if (content != null) {
+                if (content.exercises.isEmpty()) androidx.compose.material3.Text("先添加动作，再记录组数。", Modifier.testTag("session-empty-hint"),
+                    style = FcTypography.style("callout", 400), color = FcColors.textSecondary)
                 if (content.session.durationNeedsReview) FcButton("确认训练时长", Modifier.testTag("session-review-duration"), !state.busy) { review = true }
                 val axis = (content.sections.map { it.orderIndex to it } + content.exercises.filter { it.sectionID == null }.map { it.orderIndex to it }).sortedBy { it.first }
                 @Composable fun exercise(row: SessionExerciseRecord) {
-                    FcListRow(row.displayNameSnapshot, Modifier.testTag("session-exercise-${row.sessionExerciseID.value}"),
-                        mode = FcRowMode.Action { openEditor(row) })
-                    state.previous[row.sessionExerciseID]?.let { FcListRow("上次：${it.toDomain().displaySummary()}", Modifier.testTag("session-previous-${row.sessionExerciseID.value}")) }
+                    val exerciseTag = "session-exercise-${row.sessionExerciseID.value}"
+                    SessionSwipeRow("$exerciseTag-swipe", revealed == exerciseTag, !state.busy, { revealed = if (it) exerciseTag else null },
+                        buildList {
+                            add(SessionSwipeAction("删除", "session-exercise-delete", destructive = true) {
+                                if (row.sets.any { it.state == SetRecordingState.completed }) deleteExercise = row
+                                else scope.launch { state.removeExercise(row.sessionExerciseID, false) }
+                            })
+                            if (content.sections.isNotEmpty()) add(SessionSwipeAction("移入分区", "session-exercise-move") { moving = row.sessionExerciseID })
+                        }) {
+                        SessionExerciseHeader(row, state.previous[row.sessionExerciseID], state.previousCounts[row.sessionExerciseID] ?: 0, editor?.sessionExerciseID == row.sessionExerciseID, !state.busy) { openEditor(row) }
+                    }
                     row.sets.sortedBy { it.orderIndex }.forEachIndexed { index, set ->
                         val deleted = state.deleted
                         if (deleted?.sessionExerciseID == row.sessionExerciseID && deleted.orderIndex.toInt() == index)
-                            FcUndoRow("已删除第 ${index + 1} 组", tag = "session-deleted") { scope.launch { state.restoreSet() } }
+                            FcUndoRow("第 ${index + 1} 组已删除", tag = "session-deleted") { scope.launch { state.restoreSet() } }
+                        val setTag = "session-set-${set.trainingSetID.value}"
+                        val removeSet = {
+                            scope.launch { state.deleteSet(set.toDomain()); if (state.error == null && editing?.trainingSetID == set.trainingSetID) { editor = null; editing = null } }
+                            Unit
+                        }
+                        SessionSwipeRow("$setTag-swipe", revealed == setTag, !state.busy, { revealed = if (it) setTag else null },
+                            listOf(SessionSwipeAction("删除", "session-set-delete", destructive = true, run = removeSet)),
+                            onFullSwipe = if (set.state != SetRecordingState.completed) removeSet else null) {
                         FcSetRow(index + 1, set.toDomain().displaySummary(), set.state == SetRecordingState.completed,
                             set.state == SetRecordingState.pending,
                             { change({ it.copy(session = it.session.confirmingSet(set.trainingSetID, state.clock.now())) }) },
-                            { openEditor(row, set) }, Modifier.testTag("session-set-${set.trainingSetID.value}"), !state.busy, "session-set-${set.trainingSetID.value}")
-                        FcLinkButton("组操作", Modifier.testTag("session-set-options-${set.trainingSetID.value}"), !state.busy) { setOptions = set }
+                            { openEditor(row, set) }, Modifier.testTag("session-set-${set.trainingSetID.value}"), !state.busy, "session-set-${set.trainingSetID.value}",
+                            onUndo = if (state.undoableSetID == set.trainingSetID) ({ scope.launch { state.undoRecentSet(); if (state.error == null) { editor = row; editing = null } }; Unit }) else null)
+                        }
+                        if (editor?.sessionExerciseID == row.sessionExerciseID && editing?.trainingSetID == set.trainingSetID) {
+                            key(set.trainingSetID) { SetEditor(state, row, set,
+                                row.sourceID?.let { exercises.preference(it).isUnilateral } == true,
+                                row.sourceID?.let { exercises.preference(it).isAssisted } == true) { editing = null } }
+                        }
                     }
                     if (state.deleted?.sessionExerciseID == row.sessionExerciseID && state.deleted!!.orderIndex.toInt() >= row.sets.size)
-                        FcUndoRow("已删除一组", tag = "session-deleted") { scope.launch { state.restoreSet() } }
-                    FcLinkButton("动作操作", Modifier.testTag("session-exercise-options-${row.sessionExerciseID.value}"), !state.busy) { exerciseOptions = row }
+                        FcUndoRow("第 ${state.deleted!!.orderIndex.toInt() + 1} 组已删除", tag = "session-deleted") { scope.launch { state.restoreSet() } }
+                    if (editor?.sessionExerciseID == row.sessionExerciseID && editing == null) {
+                        key(row.sessionExerciseID, "new") { SetEditor(state, row, null,
+                            row.sourceID?.let { exercises.preference(it).isUnilateral } == true,
+                            row.sourceID?.let { exercises.preference(it).isAssisted } == true) { editor = null } }
+                    }
+                    FcListRowDivider()
                 }
                 axis.forEach { (_, item) -> when (item) {
                     is SectionRecord -> {
-                        FcGroupEntryRow(item.name, content.exercises.count { it.sectionID == item.sectionID }, Modifier.testTag("session-section-${item.sectionID.value}")) { sectionOptions = item }
+                        val sectionTag = "session-section-${item.sectionID.value}"
+                        SessionSwipeRow("$sectionTag-swipe", revealed == sectionTag, !state.busy, { revealed = if (it) sectionTag else null },
+                            listOf(SessionSwipeAction("删除分区", "session-section-delete", destructive = true) {
+                                if (content.exercises.none { it.sectionID == item.sectionID })
+                                    change({ it.deletingSection(item.sectionID, SessionSectionDeletionDisposition.DeleteWithExercises, state.clock.now()) })
+                                else confirmSection = item
+                            })) {
+                            androidx.compose.material3.Text(item.name, Modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.touch).testTag(sectionTag),
+                                style = FcTypography.sectionLabel, color = FcColors.textSecondary)
+                        }
                         content.exercises.filter { it.sectionID == item.sectionID }.sortedBy { it.orderIndex }.forEach { exercise(it) }
                     }
                     is SessionExerciseRecord -> exercise(item)
                 } }
-                FcButton("添加动作", Modifier.testTag("session-add-exercise"), !state.busy) { picker = true }
-                FcSecondaryButton("应用模板", Modifier.testTag("session-apply-template"), !state.busy) { apply = true }
-                FcSecondaryButton("新建分段", Modifier.testTag("session-add-section"), !state.busy) { section = null; sectionForm = true }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space6)) {
+                    FcLinkButton("＋ 添加动作", Modifier.testTag("session-add-exercise"), !state.busy) { addSheet = true }
+                    FcLinkButton("＋ 新建分区", Modifier.testTag("session-add-section"), !state.busy) { section = null; sectionForm = true }
+                }
             }
         }
         restSlot()
-        RestTimerView(state.rests, id)
+        RestTimerView(state.rests, id, state.clock, !WindowInsets.isImeVisible)
         FcButton("结束训练", Modifier.testTag("session-finish"), content != null && !state.busy && state.saveState != FcSaveState.Failed) {
             if (content?.session?.durationNeedsReview == true) review = true else onFinish()
         }
     }
-    if (picker) ExercisePicker(exercises, state::addExercise, studentID = content?.session?.studentID) { picker = false }
+    if (addSheet) FcBottomSheet("添加动作", { addSheet = false }, skipPartiallyExpanded = true) {
+        Row(Modifier.fillMaxWidth().testTag("session-add-tabs"), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+            FcFilterChip("动作库", true, Modifier.testTag("session-add-library")) { addSheet = false; picker = true }
+            FcFilterChip("从模板", false, Modifier.testTag("session-apply-template")) { addSheet = false; apply = true }
+        }
+        FcLinkButton("取消", Modifier.testTag("session-add-cancel")) { addSheet = false }
+    }
+    if (picker) ExercisePicker(exercises, { selection ->
+        val result = state.addExercise(selection)
+        if (result is ApplicationResult.Success) { editor = state.content?.exercises?.lastOrNull(); editing = null }
+        result
+    }, studentID = content?.session?.studentID) { picker = false }
     if (apply && content != null) ApplyTemplateSheet(templates, content.session, state::accept) { apply = false }
     if (sectionForm) {
         var name by remember(section) { mutableStateOf(section?.name ?: "") }
-        FcBottomSheet(if (section == null) "新建分段" else "重命名分段", { if (!state.busy) sectionForm = false }, skipPartiallyExpanded = true) {
+        FcBottomSheet(if (section == null) "新建分区" else "重命名分区", { if (!state.busy) sectionForm = false }, skipPartiallyExpanded = true) {
             Column(Modifier.fillMaxWidth().imePadding().verticalScroll(rememberScrollState()).testTag("session-section-form-content")) {
-                FcTextField("分段名称", name, { name = it }, Modifier.testTag("session-section-name"))
+                FcTextField("分区名称", name, { name = it }, Modifier.testTag("session-section-name"))
                 state.error?.let { FcListRow(exerciseErrorTitle(it)) }
-                FcButton("保存分段", Modifier.testTag("session-section-save"), !state.busy) {
+                FcButton("新建分区", Modifier.testTag("session-section-save"), !state.busy) {
                     change({ original -> section?.let { original.renamingSection(it.sectionID, name, state.clock.now()) }
                         ?: original.addingSection(state.ids.newSectionID(), name, state.clock.now()) }) { sectionForm = false }
                 }
@@ -111,53 +184,23 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
             }
         }
     }
-    sectionOptions?.let { row ->
-        FcBottomSheet("分段操作", { sectionOptions = null }, skipPartiallyExpanded = true) {
-            FcActionRow("重命名", Modifier.testTag("session-section-rename"), enabled = !state.busy) { section = row; sectionOptions = null; sectionForm = true }
-            listOf(-1 to "上移", 1 to "下移").forEach { (delta, title) -> FcActionRow(title,
-                Modifier.testTag(if (delta < 0) "session-section-up" else "session-section-down"), enabled = !state.busy) {
-                change({ it.reordering(sessionShiftAxis(content!!, row.sectionID.value, delta), state.clock.now()) }) { sectionOptions = null }
-            } }
-            FcActionRow("删除分段", Modifier.testTag("session-section-delete"), destructive = true, enabled = !state.busy) {
-                sectionOptions = null
-                if (content!!.exercises.none { it.sectionID == row.sectionID })
-                    change({ it.deletingSection(row.sectionID, SessionSectionDeletionDisposition.DeleteWithExercises, state.clock.now()) })
-                else confirmSection = row
-            }
-            FcSecondaryButton("取消", Modifier.testTag("session-section-options-cancel")) { sectionOptions = null }
-        }
-    }
-    exerciseOptions?.let { row ->
-        FcBottomSheet("动作操作", { exerciseOptions = null }, skipPartiallyExpanded = true) {
-            FcActionRow("移入分段", Modifier.testTag("session-exercise-move"), enabled = !state.busy) { moving = row.sessionExerciseID; exerciseOptions = null }
-            listOf(-1 to "上移", 1 to "下移").forEach { (delta, title) -> FcActionRow(title,
-                Modifier.testTag(if (delta < 0) "session-exercise-up" else "session-exercise-down"), enabled = !state.busy) {
-                change({ it.reordering(sessionShiftAxis(content!!, row.sessionExerciseID.value, delta), state.clock.now()) }) { exerciseOptions = null }
-            } }
-            FcActionRow("删除动作", Modifier.testTag("session-exercise-delete"), destructive = true, enabled = !state.busy) {
-                exerciseOptions = null
-                if (row.sets.any { it.state == SetRecordingState.completed }) deleteExercise = row
-                else scope.launch { state.removeExercise(row.sessionExerciseID, false) }
-            }
-            FcSecondaryButton("取消", Modifier.testTag("session-exercise-options-cancel")) { exerciseOptions = null }
-        }
-    }
-    if (moving != null && content != null) FcBottomSheet("移入分段", { moving = null }, skipPartiallyExpanded = true) {
+    if (moving != null && content != null) FcBottomSheet("移入分区", { moving = null }, skipPartiallyExpanded = true) {
         Column(Modifier.fillMaxWidth().heightIn(max = FcComponentMetrics.row * 6).verticalScroll(rememberScrollState())) {
             (listOf<SectionRecord?>(null) + content.sections).forEach { target ->
-                FcActionRow(target?.name ?: "未分段", Modifier.testTag("session-move-${target?.sectionID?.value ?: "unsectioned"}"), enabled = !state.busy) {
+                FcActionRow(target?.name ?: "未分区", Modifier.testTag("session-move-${target?.sectionID?.value ?: "unsectioned"}"), enabled = !state.busy) {
                     change({ it.movingExercise(moving!!, target?.sectionID, state.clock.now()) }) { moving = null }
                 }
             }
             FcSecondaryButton("取消", Modifier.testTag("session-move-cancel")) { moving = null }
         }
     }
-    confirmSection?.let { row -> FcConfirmationDialog("删除分段“${row.name}”", "分段内的动作将移到“未分段”，动作和训练组会保留。", "删除分段",
+    confirmSection?.let { row -> FcConfirmationDialog("删除分区「${row.name}」？", "分区里的 ${content?.exercises?.count { it.sectionID == row.sectionID } ?: 0} 个动作会移到「无分区」", "删除分区",
         { change({ it.deletingSection(row.sectionID, SessionSectionDeletionDisposition.MoveExercisesTo(null), state.clock.now()) }) { confirmSection = null } },
         { if (!state.busy) confirmSection = null }, tag = "session-delete-section-confirm") }
     deleteExercise?.let { row ->
         FcPlatformShell({ if (!state.busy) deleteExercise = null }) {
-            FcPageHeader("删除动作", onBack = { if (!state.busy) deleteExercise = null }, tag = "session-delete-exercise")
+            androidx.compose.material3.Text("删除动作", Modifier.fillMaxWidth().testTag("session-delete-exercise-title"),
+                style = FcTypography.titleLarge, color = FcColors.textPrimary)
             FcListRow("该动作包含已完成组，删除后无法恢复。")
             state.error?.let { FcListRow(exerciseErrorTitle(it)) }
             FcButton("删除动作", Modifier.testTag("session-delete-exercise-confirm"), !state.busy) {
@@ -166,22 +209,6 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
             FcSecondaryButton("取消", Modifier.testTag("session-delete-exercise-cancel"), !state.busy) { deleteExercise = null }
         }
     }
-    setOptions?.let { set -> FcBottomSheet("组操作", { setOptions = null }, skipPartiallyExpanded = true) {
-        FcActionRow("编辑", Modifier.testTag("session-set-edit"), enabled = !state.busy) { openEditor(content!!.exercises.first { it.sessionExerciseID == set.sessionExerciseID }, set); setOptions = null }
-        FcActionRow("复制", Modifier.testTag("session-set-copy"), enabled = !state.busy) {
-            change({ it.copy(session = it.session.copyingSet(set.trainingSetID, state.ids.newTrainingSetID(), state.clock.now())) }) { setOptions = null }
-        }
-        if (set.state == SetRecordingState.completed) FcActionRow("撤回确认", Modifier.testTag("session-set-unconfirm"), enabled = !state.busy) {
-            change({ it.copy(session = it.session.undoingSet(set.trainingSetID, state.clock.now())) }) { setOptions = null }
-        }
-        FcActionRow("删除组", Modifier.testTag("session-set-delete"), destructive = true, enabled = !state.busy) {
-            scope.launch { state.deleteSet(set.toDomain()); if (state.error == null) setOptions = null }
-        }
-        FcSecondaryButton("取消", Modifier.testTag("session-set-options-cancel")) { setOptions = null }
-    } }
-    editor?.let { row -> SetEditor(state, row, editing,
-        row.sourceID?.let { exercises.preference(it).isUnilateral } == true,
-        row.sourceID?.let { exercises.preference(it).isAssisted } == true) { editor = null } }
     if (review) SessionRecoveryReview(state, { review = false }, { review = false })
 }
 

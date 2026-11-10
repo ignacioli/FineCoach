@@ -17,10 +17,10 @@ const sums = new Map(fs.readFileSync(path.join(input, 'SHA256SUMS'), 'utf8').tri
   assert(match, `Unexpected checksum row: ${line}`);
   return [match[2], match[1]];
 }));
-assert.equal(sums.size, 14);
+assert.equal(sums.size, 15);
 const rows = fs.readFileSync(path.join(here, 'material-symbols-manifest.txt'), 'utf8').split('\n')
   .filter(line => line && !line.startsWith('#')).map(line => line.split('|').map(s => s.trim()));
-assert.equal(rows.length, 13);
+assert.equal(rows.length, 14);
 const drawableDir = path.resolve(here, '../app/src/main/res/drawable');
 const originals = path.join(here, 'material-symbols-svg');
 fs.mkdirSync(drawableDir, { recursive: true });
@@ -64,5 +64,5 @@ fs.writeFileSync(path.join(packaged, 'material-symbols-LICENSE.txt'), license);
 const notice = `Material Symbols by Google\nSource: https://github.com/google/material-design-icons\nCommit: ${commit}\nLicensed under the Apache License, Version 2.0.\nSee material-symbols-LICENSE.txt for the full license.\nModified for Android: SVG paths retained verbatim; converted to vector drawable,\nY translated by 960; white placeholder fill colored by Compose tint.\n`;
 fs.writeFileSync(path.join(packaged, 'material-symbols-NOTICE.txt'), notice);
 fs.writeFileSync(path.join(here, 'material-symbols-NOTICE.txt'), notice);
-console.log(`Verified ${records.length} SVG SHA-256 values and LICENSE; wrote 13 vectors and provenance.`);
+console.log(`Verified ${records.length} SVG SHA-256 values and LICENSE; wrote ${records.length} vectors and provenance.`);
 console.log(`Packaged license SHA-256: ${sha(license)}; notice SHA-256: ${sha(notice)}`);

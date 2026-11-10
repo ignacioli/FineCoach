@@ -31,7 +31,21 @@ class ActiveSessionUiState(
     var busy by mutableStateOf(false); private set
     var deleted by mutableStateOf<TrainingSet?>(null); private set
     private var deletedIndex = 0
+    var undoableSetID by mutableStateOf<TrainingSetID?>(null); private set
+    fun expireRecentUndo(id: TrainingSetID?) { if (undoableSetID == id) undoableSetID = null }
+    var entryPrefill by mutableStateOf<TrainingSetRecord?>(null); private set
+    var entryPrefillVersion by mutableIntStateOf(0); private set
+    suspend fun undoRecentSet() {
+        val id = undoableSetID ?: return
+        val set = content?.exercises?.flatMap { it.sets }?.firstOrNull { it.trainingSetID == id } ?: return
+        if (mutate { it.copy(session = it.session.deletingSet(id, clock.now())) } is ApplicationResult.Success) {
+            content?.session?.sessionID?.let(rests::clear)
+            entryPrefill = set
+            entryPrefillVersion++
+        }
+    }
     val previous = mutableStateMapOf<SessionExerciseID, TrainingSetRecord>()
+    val previousCounts = mutableStateMapOf<SessionExerciseID, Int>()
 
     suspend fun load(id: SessionID) = perform({ useCases.load(id) }) { loaded ->
         content = loaded
@@ -40,6 +54,7 @@ class ActiveSessionUiState(
     }
     private suspend fun loadPrevious(current: SessionContentRecord) {
         previous.clear()
+        previousCounts.clear()
         when (val rows = history.list(HistoryQuery(studentID = current.session.studentID))) {
             is ApplicationResult.Failure -> error = rows.error
             is ApplicationResult.Success -> for (row in rows.value.sortedByDescending { it.completedAtUTC }) {
@@ -50,10 +65,11 @@ class ActiveSessionUiState(
                         if (old.session.state != SessionState.completed) continue
                         current.exercises.forEach { exercise ->
                             if (exercise.sessionExerciseID !in previous) {
-                                old.exercises.lastOrNull { it.recordModeSnapshot == exercise.recordModeSnapshot &&
-                                    it.displayNameSnapshot == exercise.displayNameSnapshot && it.sourceID == exercise.sourceID }
-                                    ?.sets?.firstOrNull { it.state == SetRecordingState.completed }
-                                    ?.let { previous[exercise.sessionExerciseID] = it }
+                                old.exercises.firstOrNull { it.recordModeSnapshot == exercise.recordModeSnapshot &&
+                                    it.sourceID == exercise.sourceID && (exercise.sourceID != null || it.displayNameSnapshot == exercise.displayNameSnapshot) &&
+                                    it.sets.any { set -> set.state == SetRecordingState.completed } }
+                                    ?.sets?.filter { it.state == SetRecordingState.completed }
+                                    ?.let { previous[exercise.sessionExerciseID] = it.first(); previousCounts[exercise.sessionExerciseID] = it.size }
                             }
                         }
                     }
@@ -112,7 +128,9 @@ class ActiveSessionUiState(
     private fun acceptMutation(value: SessionContentRecord) {
         val completed = content?.exercises?.flatMap { it.sets }?.filter { it.state == SetRecordingState.completed }?.map { it.trainingSetID }?.toSet().orEmpty()
         content = value
-        if (value.exercises.flatMap { it.sets }.any { it.state == SetRecordingState.completed && it.trainingSetID !in completed }) rests.start(value.session.sessionID)
+        val newlyCompleted = value.exercises.flatMap { it.sets }.lastOrNull { it.state == SetRecordingState.completed && it.trainingSetID !in completed }
+        if (newlyCompleted != null) { undoableSetID = newlyCompleted.trainingSetID; rests.start(value.session.sessionID) }
+        else if (value.exercises.flatMap { it.sets }.none { it.trainingSetID == undoableSetID && it.state == SetRecordingState.completed }) undoableSetID = null
     }
     private suspend fun loadAfterRetry(id: SessionID) {
         when (val loaded = useCases.load(id)) {
@@ -205,6 +223,8 @@ class ActiveSessionUiState(
             val id = ids.newTrainingSetID()
             it.session.addingSet(exercise, id, input, now).confirmingSet(id, now)
         })
+    }.also { result ->
+        if (result is ApplicationResult.Success && target == null) entryPrefill = null
     }
     suspend fun removeExercise(id: SessionExerciseID, confirmed: Boolean): ApplicationResult<Unit> = mutate { original ->
         val removed = original.session.removingExercise(id, confirmed, clock.now())
@@ -217,6 +237,11 @@ class ActiveSessionUiState(
     }
     suspend fun restoreSet() {
         val set = deleted ?: return
-        if (mutate { it.copy(session = it.session.restoringSet(set, deletedIndex, clock.now())) } is ApplicationResult.Success) deleted = null
+        val previousUndo = undoableSetID
+        if (mutate { it.copy(session = it.session.restoringSet(set, deletedIndex, clock.now())) } is ApplicationResult.Success) {
+            deleted = null
+            // Restoring is not a new confirmation event. Keep any unrelated undo window.
+            undoableSetID = previousUndo
+        }
     }
 }

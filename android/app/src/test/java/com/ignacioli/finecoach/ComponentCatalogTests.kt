@@ -74,10 +74,10 @@ class ComponentCatalogTests {
         val assets = File(root, "android/design-assets")
         val manifest = File(assets, "material-symbols-manifest.txt").readLines()
             .filter { it.isNotBlank() && !it.startsWith('#') }
-        assertEquals(13, manifest.size)
+        assertEquals(14, manifest.size)
         val provenance = File(assets, "material-symbols-provenance.json").readText()
         val records = Regex("\\{[^{}]*\\\"symbol\\\"[^{}]*}").findAll(provenance).map { it.value }.toList()
-        assertEquals(13, records.size)
+        assertEquals(14, records.size)
         val sums = File(assets, "material-symbols-SHA256SUMS").readLines().associate {
             val parts = it.trim().split(Regex("\\s+"), limit = 2); parts[1] to parts[0]
         }
@@ -96,7 +96,7 @@ class ComponentCatalogTests {
             assertEquals(5, columns.size)
             assertTrue(columns.all(String::isNotBlank))
             assertTrue(columns[1].matches(Regex("outlined/[0-9]+")))
-            assertTrue(columns[3].split(',').all { id -> id in approved })
+            assertTrue(columns[3].split(',').all { id -> id in approved || id == "DS-SET-ROW" })
             assertEquals("integrated", columns[4])
             val name = columns[0]
             val record = records.single { field(it, "symbol") == name }
@@ -139,7 +139,16 @@ class ComponentCatalogTests {
         assertFalse(File(app, "build.gradle.kts").readText().contains("material-icons"))
         assertTrue(File(assets, "README.md").readText().contains("Apache License 2.0"))
         val catalog = File(app, "src/debug/java/com/ignacioli/finecoach/S0ComponentCatalog.kt").readText()
-        manifest.forEach { assertTrue(catalog.contains("R.drawable.ic_ms_${it.substringBefore('|').trim()}")) }
+        manifest.forEach {
+            val name = it.substringBefore('|').trim()
+            val consumer = if (name == "edit") File(main, "FcSetRow.kt").readText() else catalog
+            assertTrue(consumer.contains("R.drawable.ic_ms_$name"))
+        }
+        val edit = records.single { field(it, "symbol") == "edit" }
+        assertEquals("symbols/web/edit/materialsymbolsoutlined/edit_24px.svg", field(edit, "upstreamPath"))
+        assertEquals("pencil", field(edit, "iosSymbol"))
+        val setRow = File(main, "FcSetRow.kt").readText()
+        assertTrue(setRow.contains("Modifier.size(FcSpacing.space4 + FcComponentMetrics.hairline)"))
         assertFalse(catalog.contains("S0PendingPainter")); assertFalse(catalog.contains("图标待接入"))
     }
 }

@@ -224,7 +224,7 @@ private fun S1ActiveDestination(graph: S1AppGraph, id: SessionID, onBack: () -> 
             val state = remember(id) { FinishSessionUiState(active, graph.finisher, graph.sessions) }
             FinishSessionScreen(state, { finishing = false }, onToday, { summarizing = true }, onAdjust)
         }
-        else -> ActiveSessionScreen(active, id, exercises, templates, onBack, { finishing = true })
+        else -> ActiveSessionScreen(active, id, exercises, templates, onBack, { finishing = true }, students = graph.studentRepository)
     }
     }
 }
