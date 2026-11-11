@@ -38,11 +38,7 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
     var studentName by remember(id) { mutableStateOf("") }
     LaunchedEffect(content?.session?.studentID) {
         content?.session?.studentID?.let { studentID ->
-            when (val result = students?.find(studentID)) {
-                is ApplicationResult.Success -> studentName = result.value?.displayName.orEmpty()
-                is ApplicationResult.Failure -> studentName = "学员信息暂不可用"
-                null -> Unit
-            }
+            state.studentDisplayName(students, studentID)?.let { studentName = it }
         }
     }
     val back = { if (!state.busy) onBack() }
@@ -55,7 +51,7 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
     val imeVisible = WindowInsets.isImeVisible
     var wasImeVisible by remember { mutableStateOf(false) }
     LaunchedEffect(imeVisible) {
-        if (wasImeVisible && !imeVisible && state.rests.end(id) != null && state.rests.remaining(id) == 0L) state.rests.clear(id)
+        if (wasImeVisible && !imeVisible) state.keyboardHidden(id)
         wasImeVisible = imeVisible
     }
     val lifecycle = LocalLifecycleOwner.current
@@ -66,8 +62,8 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
         lifecycle.lifecycle.addObserver(observer)
         onDispose { lifecycle.lifecycle.removeObserver(observer) }
     }
-    fun change(action: (SectionedSession) -> SectionedSession, done: () -> Unit = {}) {
-        scope.launch { if (state.mutate(action) is ApplicationResult.Success) done() }
+    fun change(action: suspend () -> ApplicationResult<Unit>, done: () -> Unit = {}) {
+        scope.launch { if (action() is ApplicationResult.Success) done() }
     }
     fun openEditor(row: SessionExerciseRecord, set: TrainingSetRecord? = null) { editing = set; editor = row }
     FcPlatformShell(back, Modifier.imePadding()) {
@@ -112,7 +108,7 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
                             onFullSwipe = if (set.state != SetRecordingState.completed) removeSet else null) {
                         FcSetRow(index + 1, set.toDomain().displaySummary(), set.state == SetRecordingState.completed,
                             set.state == SetRecordingState.pending,
-                            { change({ it.copy(session = it.session.confirmingSet(set.trainingSetID, state.clock.now())) }) },
+                            { change({ state.confirmSet(set.trainingSetID) }) },
                             { openEditor(row, set) }, Modifier.testTag("session-set-${set.trainingSetID.value}"), !state.busy, "session-set-${set.trainingSetID.value}",
                             onUndo = if (state.undoableSetID == set.trainingSetID) ({ scope.launch { state.undoRecentSet(); if (state.error == null) { editor = row; editing = null } }; Unit }) else null)
                         }
@@ -141,7 +137,7 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
                         SessionSwipeRow("$sectionTag-swipe", revealed == sectionTag, !state.busy, { revealed = if (it) sectionTag else null },
                             listOf(SessionSwipeAction("删除分区", "session-section-delete", destructive = true) {
                                 if (content.exercises.none { it.sectionID == item.sectionID })
-                                    change({ it.deletingSection(item.sectionID, SessionSectionDeletionDisposition.DeleteWithExercises, state.clock.now()) })
+                                    change({ state.deleteSection(item.sectionID, false) })
                                 else confirmSection = item
                             })) {
                             FcText(item.name, Modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.touch).testTag(sectionTag),
@@ -187,8 +183,7 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
                 FcTextField("分区名称", name, { name = it }, Modifier.testTag("session-section-name"))
                 state.error?.let { FcListRow(exerciseErrorTitle(it)) }
                 FcButton("新建分区", Modifier.testTag("session-section-save"), !state.busy) {
-                    change({ original -> section?.let { original.renamingSection(it.sectionID, name, state.clock.now()) }
-                        ?: original.addingSection(state.ids.newSectionID(), name, state.clock.now()) }) { sectionForm = false }
+                    change({ state.saveSection(section?.sectionID, name) }) { sectionForm = false }
                 }
                 FcSecondaryButton("取消", Modifier.testTag("session-section-cancel"), !state.busy) { sectionForm = false }
             }
@@ -198,14 +193,14 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
         Column(Modifier.fillMaxWidth().heightIn(max = FcComponentMetrics.row * 6).verticalScroll(rememberScrollState())) {
             (listOf<SectionRecord?>(null) + content.sections).forEach { target ->
                 FcActionRow(target?.name ?: "未分区", Modifier.testTag("session-move-${target?.sectionID?.value ?: "unsectioned"}"), enabled = !state.busy) {
-                    change({ it.movingExercise(moving!!, target?.sectionID, state.clock.now()) }) { moving = null }
+                    change({ state.moveExercise(moving!!, target?.sectionID) }) { moving = null }
                 }
             }
             FcSecondaryButton("取消", Modifier.testTag("session-move-cancel")) { moving = null }
         }
     }
     confirmSection?.let { row -> FcConfirmationDialog("删除分区「${row.name}」？", "分区里的 ${content?.exercises?.count { it.sectionID == row.sectionID } ?: 0} 个动作会移到「无分区」", "删除分区",
-        { change({ it.deletingSection(row.sectionID, SessionSectionDeletionDisposition.MoveExercisesTo(null), state.clock.now()) }) { confirmSection = null } },
+        { change({ state.deleteSection(row.sectionID, true) }) { confirmSection = null } },
         { if (!state.busy) confirmSection = null }, tag = "session-delete-section-confirm") }
     deleteExercise?.let { row ->
         FcPlatformShell({ if (!state.busy) deleteExercise = null }) {
@@ -220,26 +215,4 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
         }
     }
     if (review) SessionRecoveryReview(state, { review = false }, { review = false })
-}
-
-/** Sections move as blocks; members move only inside their section. */
-internal fun sessionShiftAxis(content: SessionContentRecord, key: String, delta: Int): List<SessionSectionAxisItem> {
-    val blocks = (content.sections.map { section -> section.orderIndex to
-        (listOf<SessionSectionAxisItem>(SessionSectionAxisItem.Section(section.sectionID)) + content.exercises
-            .filter { it.sectionID == section.sectionID }.sortedBy { it.orderIndex }.map { SessionSectionAxisItem.Exercise(it.sessionExerciseID.value) }) } +
-        content.exercises.filter { it.sectionID == null }.map { it.orderIndex to listOf<SessionSectionAxisItem>(SessionSectionAxisItem.Exercise(it.sessionExerciseID.value)) })
-        .sortedBy { it.first }.map { it.second.toMutableList() }.toMutableList()
-    val row = content.exercises.firstOrNull { it.sessionExerciseID.value == key }
-    if (row?.sectionID != null) {
-        val block = blocks.first { it.any { item -> item is SessionSectionAxisItem.Exercise && item.id == key } }
-        val index = block.indexOfFirst { it is SessionSectionAxisItem.Exercise && it.id == key }
-        if (index + delta in 1 until block.size) java.util.Collections.swap(block, index, index + delta)
-    } else {
-        val index = blocks.indexOfFirst { block -> when (val item = block.first()) {
-            is SessionSectionAxisItem.Section -> item.id.value == key
-            is SessionSectionAxisItem.Exercise -> item.id == key
-        } }
-        if (index >= 0 && index + delta in blocks.indices) java.util.Collections.swap(blocks, index, index + delta)
-    }
-    return blocks.flatten()
 }
