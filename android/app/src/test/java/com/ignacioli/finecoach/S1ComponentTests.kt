@@ -113,6 +113,39 @@ class S1ComponentTests {
             }
         }
     }
+    // S1-D38 (amended 2026-11-10): each 44dp hit box is centered on its visible graphic. The circle sits 3dp
+    // below the row center, so its box spans row top..+44 (6dp into the next row); the edit box spans ±3dp.
+    // Inside an overlap band the lower (later-placed) row wins; the band never covers a visible graphic.
+    @Test fun overlapBandsBetweenAdjacentRowsResolveToTheLowerRow() {
+        val hits = IntArray(4)
+        show {
+            Column(Modifier.padding(16.dp)) {
+                repeat(2) { row ->
+                    FcSetRow(row + 1, "20 kg × 8", false, true, { hits[row * 2]++ }, { hits[row * 2 + 1]++ },
+                        Modifier.testTag("band-$row"), tag = "band-$row")
+                }
+            }
+        }
+        val boundary = node("band-1").getUnclippedBoundsInRoot().top
+        val circleX = node("band-0-circle").getUnclippedBoundsInRoot().let { (it.left + it.right) / 2 }
+        val editX = node("band-0-edit-icon").getUnclippedBoundsInRoot().let { (it.left + it.right) / 2 }
+        listOf(node("band-0-circle"), node("band-1-circle"), node("band-0-edit-icon"), node("band-1-edit-icon")).forEach {
+            val b = it.getUnclippedBoundsInRoot()
+            assertTrue("graphic outside overlap bands", b.bottom <= boundary - 3.dp || b.top >= boundary + 6.dp)
+        }
+        fun tap(x: androidx.compose.ui.unit.Dp, y: androidx.compose.ui.unit.Dp): IntArray {
+            hits.fill(0)
+            compose.onRoot().performTouchInput { click(androidx.compose.ui.geometry.Offset(x.toPx(), y.toPx())) }
+            return hits.copyOf()
+        }
+        // Circle band: 0..6dp below the boundary is inside both circle boxes and belongs to row 2.
+        assertArrayEquals(intArrayOf(0, 0, 1, 0), tap(circleX, boundary + 5.dp))
+        assertArrayEquals(intArrayOf(1, 0, 0, 0), tap(circleX, boundary - 1.dp))
+        // Edit band: boundary ±3dp is inside both edit boxes and belongs to row 2.
+        assertArrayEquals(intArrayOf(0, 0, 0, 1), tap(editX, boundary - 2.dp))
+        assertArrayEquals(intArrayOf(0, 0, 0, 1), tap(editX, boundary + 2.dp))
+        assertArrayEquals(intArrayOf(0, 1, 0, 0), tap(editX, boundary - 4.dp))
+    }
     @Test fun fieldSymbolsDrawRealInkInsideTheirAdvanceFrames() {
         show { FcStepperField("次数", "8", {}, true,
             androidx.compose.ui.res.painterResource(com.ignacioli.finecoach.R.drawable.ic_ms_remove),

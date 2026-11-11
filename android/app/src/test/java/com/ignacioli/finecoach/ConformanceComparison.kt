@@ -79,13 +79,18 @@ internal object ConformanceComparison {
             val parent = layers.singleOrNull { it.getString("path") == entry.optString("parentPath") }
             val parentRow = rowList.singleOrNull { it.getString("path") == entry.optString("parentPath") }
             val row = rowList.single { it.getString("path") == entry.getString("path") }
+            // A wrong selector must stay MISSING: the internal path's own selector has to resolve to the very
+            // node its parent icon row observed before the path may be marked unobservable.
+            if (row.getString("status") == "MISSING") { row.put("reason", "不可观测标记的前提：本行选择器必须命中父图标节点；${row.optString("reason")}"); continue }
+            val ownNodeIsParent = vectorSelectorHitsParent(row, parentRow)
             val evidence = provenanceValid(androidRoot, entry.optString("asset"))
-            val valid = vectorUnobservable(layer, parent, entry, parentRow?.optBoolean("geometryMatches") == true, evidence)
+            val valid = ownNodeIsParent && vectorUnobservable(layer, parent, entry, parentRow?.optBoolean("geometryMatches") == true, evidence)
             row.put("parentGeometryPassed", parentRow?.optBoolean("geometryMatches") == true).put("assetProvenanceVerified", evidence)
+                .put("selectorHitsParentNode", ownNodeIsParent)
             if (valid) row.put("status", "UNOBSERVABLE_VECTOR_INTERNAL").put("category", "UNOBSERVABLE_VECTOR_INTERNAL")
                 .put("reason", "不可观测（矢量内部）；父图标几何通过，源SVG/drawable与来源记录hash一致；不计PASS或偏差")
             else row.put("status", "FAIL").put("category", "UI_DEVIATION")
-                .put("reason", "不可观测标记前提不成立：须批准的内部path、父group/icon几何通过且同名资产来源hash有效")
+                .put("reason", "不可观测标记前提不成立：本行选择器须命中父图标节点，且须批准的内部path、父group/icon几何通过、同名资产来源hash有效")
         }
         val missing = rowList.count { it.getString("status") == "MISSING" }
         val invisible = rowList.count { it.getString("category") == "INVISIBLE_OR_CLIPPED" }
@@ -119,6 +124,14 @@ internal object ConformanceComparison {
             .put("humanReadSummary", "本轮未打开新图；上轮仅对无效 fixture 进行过一次图片清单审查，其结论不移植为本轮有效图的人工判断。以下分类与摘要依据节点和几何文字证据；负责人视觉验收仍 PENDING。")
             .put("androidOnlyTextNodes", JSONArray(actual.filter { it.getInt("id") !in used && it.getString("text").isNotEmpty() }))
         return result
+    }
+
+    /** Both rows must have observed a node, and it must be the same node (same id). */
+    internal fun vectorSelectorHitsParent(row: JSONObject, parentRow: JSONObject?): Boolean {
+        val own = row.optJSONObject("actual") ?: return false
+        val parentNode = parentRow?.optJSONObject("actual") ?: return false
+        return row.optString("status") != "MISSING" && parentRow.optString("status") != "MISSING" &&
+            own.has("id") && own.getInt("id") == parentNode.optInt("id", -1)
     }
 
     internal fun vectorUnobservable(layer: JSONObject, parent: JSONObject?, entry: JSONObject, parentGeometryPassed: Boolean, provenanceValid: Boolean): Boolean {
