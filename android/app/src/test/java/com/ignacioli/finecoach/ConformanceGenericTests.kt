@@ -147,4 +147,30 @@ class ConformanceGenericTests {
         assertNull(ConformanceComparison.pixelMode(image, n, true))
     }
 
+    @Test fun duplicateConformanceTagsUseTheSameReadingAndNearestRulesAsText() {
+        fun shape(path: String, y: Int) = layer(path, y = y).put("type", "rectangle").put("name", "Divider")
+        val entries = ConformanceMapping.entries(listOf(shape("a", 100), shape("b", 150)), emptyList(),
+            listOf(node(2, y = 50).put("tag", "conformance:Divider"), node(1).put("tag", "conformance:Divider")), emptyMap(), -100.0)
+        assertEquals(listOf(1, 2), entries.map { it.getInt("nodeID") })
+    }
+    @Test fun duplicateConformanceTagsRejectTiesExtrasMissingAndNearestOrderDisagreement() {
+        fun shape(path: String, y: Int) = layer(path, y = y).put("type", "rectangle").put("name", "testTag:Chip")
+        fun tagged(id: Int, y: Int) = node(id, y = y).put("tag", "Chip")
+        for (actual in listOf(listOf(tagged(1, 0), tagged(2, 0)), listOf(tagged(1, 0), tagged(2, 50), tagged(3, 100)),
+            listOf(tagged(1, 0)), listOf(tagged(1, 100), tagged(2, 150)))) {
+            val entries = ConformanceMapping.entries(listOf(shape("a", 0), shape("b", 50)), emptyList(), actual, emptyMap())
+            assertTrue(entries.any { it.has("mappingError") })
+            assertTrue(entries.filter { it.has("mappingError") }.none { it.has("nodeID") })
+        }
+        val absent = ConformanceMapping.entries(listOf(shape("a", 0)), emptyList(), emptyList(), emptyMap()).single()
+        assertTrue(ConformanceComparison.select(emptyList(), absent).isEmpty())
+    }
+    @Test fun registeredBoardFixMovesDuplicateMatchingCentersAndUsesApprovedCaption() {
+        val fix = org.json.JSONObject().put("path", "a").put("pendingBoardFix", org.json.JSONObject()
+            .put("decision", "S1-D46").put("reason", "domain caption").put("text", "绳索").put("dy", 100))
+        val entries = ConformanceMapping.entries(listOf(layer("a", "龙门架"), layer("b", "绳索", 150)), listOf(fix),
+            listOf(node(1, "绳索", 100), node(2, "绳索", 150)), emptyMap())
+        assertEquals(listOf(1, 2), entries.map { it.getInt("nodeID") })
+    }
+
 }

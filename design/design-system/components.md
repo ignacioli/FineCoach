@@ -665,3 +665,9 @@ S0 恢复第 3 步已将 S1 目标移至 §8.1；HERO/HINT 已有映射，本轮
 ### S0 恢复第 3 步（2026-11-10）
 
 S1 的九项按 §4 anatomy 正式落地：HERO/HINT 既有实现保留，SET 正式登记，AMBIENT 迁移，其余见 §8.1。G2 固定计数 27/66/6/5 不变，新不变量在 `S1ComponentTests`、`S1ComponentAssetTests`、`S1CatalogStateTests`。差异与五行执行记录见 `android/docs/s1/S0-step3-components.md`。
+
+### P4 D2b Android drift repair（2026-11-12）
+
+D 类，复用 DS-PAGE-HEADER / DS-TEXT-FIELD / DS-CHIP / DS-SECTION / DS-LIST-ROW。
+FcListRow 增加显式 exerciseLibrary 变体，对应本文件 C′2b 的 space.4 横向、space.3 上下间距；默认普通行不变。既有组件增加可选的 visual modifier / tag，挂在真实图形上，点击区 tag 保留。只动作库开启，picker 保留当前组合。
+差异：FcListRow 动作库间距 12/8 → 16/12，修复 anatomy 偏差；不可观测的 glyph / chip / field / icon → 可选视觉 tag，不改变交互；其余消费者默认值保留。S1-D46 的行高及绳索 caption 由 map 登记；其余画板冲突仍待决定。

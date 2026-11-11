@@ -49,7 +49,7 @@ internal object ConformanceComparison {
                 used += n.getInt("id")
                 val geometry = geometry(n, layer, anchor, offset, tolerance, entry)
                 val deltas = geometry.getJSONObject("delta")
-                val textMatches = !layer.has("text") || layer.getString("text") == n.getString("text")
+                val textMatches = !layer.has("text") || (entry.optJSONObject("pendingBoardFix")?.optString("text", layer.getString("text")) ?: layer.getString("text")) == n.getString("text")
                 val expectedHex = ConformanceColors.expected(layer, layers, tokens).orEmpty()
                 val expectedToken = hexToken(expectedHex)
                 val observedHex = if (entry.getString("colorMethod") == "textLayout") observedTextColor(android, n)
@@ -131,8 +131,10 @@ internal object ConformanceComparison {
         ImageIO.write(triptych, "png", File(out, "$screen.triptych.png"))
         val top = rowList.filter { it.has("delta") && it.getString("category") == "UI_DEVIATION" }.sortedByDescending { row -> listOf("x", "y", "w", "h").maxOf { abs(row.getJSONObject("delta").getDouble(it)) } }.take(10)
         val invalidCapture = capture?.optString("status") == "INVALID_CAPTURE"
+        val manualExceptions = exceptions.count { e -> listOf("tag", "scope", "text", "commonLayoutParentOfTags", "anchor", "geometryRule").any(e::has) }
         val result = JSONObject().put("screen", screen).put("capture", capture ?: JSONObject.NULL).put("captureFailures", if (invalidCapture) 1 else 0)
-            .put("colorTokenCount", tokens.size).put("colorTokenNames", JSONArray(tokens.map { it.name })).put("manualExceptionEntries", exceptions.size).put("manualExceptionRatio", exceptions.size.toDouble() / layers.size)
+            .put("colorTokenCount", tokens.size).put("colorTokenNames", JSONArray(tokens.map { it.name })).put("manualExceptionEntries", manualExceptions).put("manualExceptionRatio", manualExceptions.toDouble() / layers.size)
+            .put("pendingBoardFixEntries", exceptions.count { it.has("pendingBoardFix") })
             .put("automaticMapped", rowList.count { it.getString("mapping").startsWith("AUTO") && it.has("actual") })
             .put("automaticMappingRate", rowList.count { it.getString("mapping").startsWith("AUTO") && it.has("actual") }.toDouble() / layers.size)
             .put("unmappedLayers", JSONArray(rowList.filter { !it.has("actual") }.map { JSONObject().put("path", it.getString("path")).put("name", it.getString("name")).put("reason", it.optString("reason")) }))

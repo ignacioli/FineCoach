@@ -879,3 +879,27 @@ P2 最终五行执行记录：
 原索引中局部 helper `request` / `options` 不再作为独立测试 case 链接；所在的具名测试链接保留，未删除测试或缩小断言。
 
 复审验证结果：本轮 1,255 个 `#L` 链接（336 source / 919 test）均通过「文件存在 + 行号有效 + 对应 tag/控件/方法」检查，输出 `.handoff/logs/S0-step3-review-map-validation.log`。早期表中原菜单声明已移入上方移除登记；当前训练行为以 T020 fix3 为准。测试集合 14 类 254/0，G2 27/66/6/5 不变；逐 P2 处置见 `S0-step3-components.md` 复审章节。
+
+## P4 D2b pilot，round 1（2026-11-12）
+
+- 分类与依据：D；目标 `design/m1-b-hifi/screens/20-exercise-library.png`（D2b；只查看一次），anatomy 为 components.md 的 C′2b / DS-PAGE-HEADER / DS-TEXT-FIELD / DS-CHIP / DS-SECTION / DS-LIST-ROW。
+- 范围：复用 FcPageHeader、FcSearchField、FcTitleIconButton、FcFilterChip、FcSectionLabel、FcListRow、FcListRowDivider、FcEquipmentIcon；既有组件新增可选 visual tag 与显式动作库 row variant；默认消费者保持原值。
+- 设计决定：沿用 S1-D44/45/46。动作库行改为 space.4 horizontal / space.3 vertical，69.7dp divider step；原 56dp 画板不作实现目标。fixture 使用领域「绳索」及 cable-crossover.svg。资产均来自 design/m1-b-hifi/icons 与已登记的 drawable；不修改 Penpot 或截图基线。
+- 实现与检查：P4ExerciseLibraryTests 验证 anatomy、真实 shape tag、满宽 row、可见收藏入口及持久 preference；ConformanceGenericTests 补重复 tag 正反例及待改 caption。完整宿主和 G3/G4/conformance 的实际结果见下方报告；L3 负责人走查 PENDING。
+- 结果：尚未完成页面验收；逐层结果、门禁数字和待定冲突以 `.handoff/subagent/2026-11-12-p4-exercise-library.md` 为本轮证据。无 commit。
+
+入口与布局（页面源码 `features/exercises/ExerciseScreens.kt`）：
+
+| Screen → visible control | testTag | Mutates data | Width owner |
+|---|---|---|---|
+| 动作库 → ‹ | exercise-library-back | 否，返回 callback | FcPageHeader / platform-content；独立 44dp hit area |
+| 动作库 → ＋ 自定义 | exercise-library-trailing | 否，打开既有 editor；保存才写入 | FcPageHeader trailing slot |
+| 动作库 → 搜索动作 | exercise-library-search | 否，query/filter state | exercise-library-search-row 的 weight(1f) field；剩余空间为 filter |
+| 动作库 → 筛选 | exercise-library-filter | 否，打开既有 sheet | exercise-library-search-row，44dp hit area |
+| 动作库 → 部位 chip | exercise-library-muscle-all / exercise-library-muscle-$value | 否，过滤 state | exercise-library-muscles 满宽横向 scroll |
+| 动作库 → 动作行 | exercise-options-$exerciseID | 否，打开既有 options sheet | FcListRow.fillMaxWidth / exercise-library-content |
+| 动作选项 → 收藏 / 取消收藏 | exercise-favorite | 是，既有 updatePreference | FcActionRow / exercise-options-content 满宽 |
+
+视觉 tag：Search / Chip / Divider / icon / ‹ › 的观察点位于实际 shape 或 FcText 行盒，点击区标签独立保留。未把自动化通过当成人工视觉批准。
+
+P4 round 1 最终：full host 950/0；G3=42/0、G4=12/0、训练 conformance=1/0；D2b gate FAIL（2 passed / 64 failed / 28 missing / 0 BOARD_FIX_PENDING，42 registered pending，manual exception=0%）。三联图与热力图已生成，未作人工视觉验收。约14分钟确认未收敛后停止；完整归因及待定项见本轮报告。

@@ -161,7 +161,14 @@ class ExerciseConformanceTests {
         ConformanceComparison.writeReports(out, result)
         ConformanceSsimAlignment.evaluate(File(System.getProperty("finecoach.storageProjectDirectory")), out.parentFile)
         println("S0_CONFORMANCE "+name+" total="+result.getInt("total")+" passed="+result.getInt("passed")+" failed="+result.getInt("failed"))
-        // Diagnostic task: page failures are data, not a gate. Invalid captures must remain failures in the report.
+        if (!sheet) {
+            Assert.assertTrue("D2b: only S1-D46 board fixes are approved", result.getJSONArray("elements").let { rows ->
+                (0 until rows.length()).all { i -> rows.getJSONObject(i).getJSONObject("selector").optJSONObject("pendingBoardFix")?.optString("decision")?.let { it == "S1-D46" } ?: true }
+            })
+            Assert.assertTrue("D2b manual exceptions exceed 10%", result.getDouble("manualExceptionRatio") <= 0.1)
+            Assert.assertTrue("D2b conformance: " + result.toString(), result.getBoolean("gatePassed") && stability.getBoolean("stable"))
+        }
+        // D8c remains diagnostic only. Invalid captures must remain failures in the report.
         if (result.getString("artifactStatus") == "INVALID_CAPTURE") Assert.assertTrue(result.getInt("failed") > 0)
         Assert.assertEquals(2, hashes.size)
     }

@@ -12,7 +12,7 @@ import com.ignacioli.finecoach.storage.repository.ExerciseRepository
 internal class ExerciseConformanceFixture : AutoCloseable {
     val room = T008Fixture()
     val names = listOf("杠铃平板卧推", "哑铃上斜卧推", "蝴蝶机夹胸", "器械推胸", "史密斯上斜卧推", "绳索夹胸", "俯卧撑")
-    private val equipment = listOf("杠铃", "哑铃", "固定器械", "固定器械", "史密斯机", "龙门架", "徒手")
+    private val equipment = listOf("杠铃", "哑铃", "固定器械", "固定器械", "史密斯机", "绳索", "徒手")
     private val records = (0 until 21).map { index -> ExerciseRecord(StableExerciseID.parse("fictional-conformance-$index"),
         ExerciseKind.builtIn, "${index.toString().padStart(2, '0')} 虚构动作", RecordMode.weightReps, "fictional.1",
         ExerciseLifecycle.active, false, "fictional-source", room.now, room.now) }

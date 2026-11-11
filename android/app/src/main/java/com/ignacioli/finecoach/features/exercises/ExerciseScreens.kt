@@ -94,9 +94,11 @@ fun ExercisePicker(
 private fun ExerciseSearchRow(query: String, onQuery: (String) -> Unit, active: Boolean,
     searchTag: String, prefix: String, showFilters: Boolean = true, onFilters: () -> Unit) {
     Row(Modifier.fillMaxWidth().testTag("$prefix-search-row"), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
-        FcSearchField("搜索动作", query, onQuery, Modifier.weight(1f).testTag(searchTag))
+        FcSearchField("搜索动作", query, onQuery, Modifier.weight(1f).testTag(searchTag),
+            visualModifier = if (prefix == "exercise-library") Modifier.testTag("conformance:Search") else Modifier)
         if (showFilters) FcTitleIconButton("筛选", painterResource(if (active) R.drawable.ic_ms_filter_alt_filled else R.drawable.ic_ms_filter_alt),
-            Modifier.testTag("$prefix-filter").semantics { stateDescription = if (active) "已筛选" else "" }, onFilters)
+            Modifier.testTag("$prefix-filter").semantics { stateDescription = if (active) "已筛选" else "" },
+            visualModifier = if (prefix == "exercise-library") Modifier.testTag("conformance:icon / filter") else Modifier, onClick = onFilters)
     }
 }
 
@@ -104,9 +106,11 @@ private fun ExerciseSearchRow(query: String, onQuery: (String) -> Unit, active: 
 private fun ExerciseMuscleChips(muscle: String?, onMuscle: (String?) -> Unit, prefix: String) {
     Row(Modifier.fillMaxWidth().testTag("$prefix-muscles").horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
-        FcFilterChip("全部", muscle == null, Modifier.testTag("$prefix-muscle-all")) { onMuscle(null) }
+        FcFilterChip("全部", muscle == null, Modifier.testTag("$prefix-muscle-all"),
+            visualModifier = if (prefix == "exercise-library") Modifier.testTag("conformance:Chip") else Modifier) { onMuscle(null) }
         ExerciseBrowse.muscles.forEach { value ->
-            FcFilterChip(value, muscle == value, Modifier.testTag("$prefix-muscle-$value")) { onMuscle(value) }
+            FcFilterChip(value, muscle == value, Modifier.testTag("$prefix-muscle-$value"),
+                visualModifier = if (prefix == "exercise-library") Modifier.testTag("conformance:Chip") else Modifier) { onMuscle(value) }
         }
     }
 }
@@ -142,20 +146,28 @@ private fun ExerciseBrowseRows(state: ExerciseUiState, query: String, muscle: St
     studentID: StudentID?, prefix: String, rowTag: (ExerciseRecord) -> String, enabled: Boolean = true, showRecent: Boolean = true,
     onClick: (ExerciseRecord) -> Unit) {
     val recent = state.recentEntries
+    val library = prefix == "exercise-library"
+    val divider = if (library) Modifier.testTag("conformance:Divider") else Modifier
     @Composable fun row(item: ExerciseRecord, tag: String) {
+        val icon = state.metadata[item.exerciseID].takeIf { item.kind == ExerciseKind.builtIn }?.let {
+            FcEquipmentIcon.icon(it.equipmentClass, it.primaryMuscleGroup)
+        }
         FcListRow(state.selection(item).name, Modifier.testTag(tag), subtitle = state.subtitle(item),
             leading = state.metadata[item.exerciseID].takeIf { item.kind == ExerciseKind.builtIn }?.let { facet ->
                 FcEquipmentIcon.icon(facet.equipmentClass, facet.primaryMuscleGroup)?.let { painterResource(it.drawable) }
             }, reservesLeading = true, favorite = state.preference(item.exerciseID).isFavorite,
+            exerciseLibrary = library,
+            leadingModifier = if (library && icon != null) Modifier.testTag("conformance:icon / ${icon.name.replace('_', '-')}") else Modifier,
+            disclosureVisualTag = if (library) "conformance:›" else null,
             mode = if (enabled) FcRowMode.Action { onClick(item) } else FcRowMode.Unavailable("保存中"))
-        FcListRowDivider()
+        FcListRowDivider(divider)
     }
     state.historyError?.let { FcListRow(exerciseErrorTitle(it), Modifier.testTag("$prefix-history-error")) }
     if (showRecent && ExerciseBrowse.showsRecent(query, muscle, equipment, recent)) {
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
             FcSectionLabel("最近练过", Modifier.testTag("$prefix-recent"))
             Column(Modifier.fillMaxWidth()) {
-                FcListRowDivider()
+                FcListRowDivider(divider)
                 recent.forEach { row(it, "$prefix-recent-${it.exerciseID.value}") }
             }
         }
@@ -165,7 +177,7 @@ private fun ExerciseBrowseRows(state: ExerciseUiState, query: String, muscle: St
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
             FcSectionLabel("${section.title} · ${section.entries.size}", Modifier.testTag("$prefix-section-${section.id}"))
             Column(Modifier.fillMaxWidth()) {
-                FcListRowDivider()
+                FcListRowDivider(divider)
                 section.entries.forEach { row(it, rowTag(it)) }
             }
         }
@@ -201,7 +213,8 @@ fun ExerciseLibraryScreen(state: ExerciseUiState, onBack: () -> Unit) {
         return
     }
     FcPlatformShell(onBack) {
-        FcPageHeader("动作库", onBack = onBack, tag = "exercise-library", trailingTitle = "＋ 自定义", onTrailing = { creating = true })
+        FcPageHeader("动作库", onBack = onBack, tag = "exercise-library", backVisualTag = "conformance:Back", trailingTitle = "＋ 自定义", onTrailing = { creating = true })
+        Spacer(Modifier.height(FcSpacing.space1))
         Column(Modifier.fillMaxWidth().weight(1f).imePadding().verticalScroll(rememberScrollState()).testTag("exercise-library-content"),
             verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
             ExerciseSearchRow(query, { query = it }, equipment != null || hidden, "exercise-library-search", "exercise-library") { filters = true }

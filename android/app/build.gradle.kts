@@ -1004,6 +1004,9 @@ screenshotGate.configure {
 registerVisualGate("s0Conformance", "TrainingConformanceTests", 1)
 // Diagnostic reports only: page deviations do not join the training conformance gate.
 registerVisualGate("p1ExerciseConformance", "ExerciseConformanceTests", 2)
+registerVisualGate("p4ExerciseLibraryConformance", "ExerciseConformanceTests", 1).configure {
+    filter { setIncludePatterns("com.ignacioli.finecoach.ExerciseConformanceTests.exerciseLibraryConformance") }
+}
 
 val entryLayoutClasses = listOf("com.ignacioli.finecoach.EntryLayoutHarnessTests")
 val entryLayoutGate = tasks.register<Test>("s0G4") {
