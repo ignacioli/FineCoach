@@ -212,7 +212,7 @@ class ExerciseTemplateEntryLayoutTests {
         library()
         await("exercise-library-section-胸")
         full("exercise-library-muscles", "exercise-library-content")
-        full("exercise-library-search-row", "exercise-library-content")
+        full("exercise-library-search-row", "platform-content")
         // Every horizontally reachable chip has its own real click action.
         ExerciseBrowse.muscles.forEach { muscle ->
             click("exercise-library-muscle-$muscle")
@@ -240,7 +240,7 @@ class ExerciseTemplateEntryLayoutTests {
         assertTrue(rows.isNotEmpty())
         node("exercise-library-section-胸").assertTextEquals("胸 · ${rows.size}")
         val tag = "exercise-options-${rows.first().exerciseID.value}"
-        full(tag, "exercise-library-content"); click(tag); click("exercise-options-cancel")
+        full(tag, "platform-content"); click(tag); click("exercise-options-cancel")
         click("exercise-library-filter"); click("exercise-library-equipment-all"); click("exercise-library-filter-done")
         click("exercise-library-muscle-all")
         node("exercise-library-muscle-all").assertIsSelected()
@@ -271,7 +271,7 @@ class ExerciseTemplateEntryLayoutTests {
         }
         library(); await("exercise-library-recent")
         val recentTag = "exercise-library-recent-${item.exerciseID.value}"
-        full(recentTag, "exercise-library-content"); click(recentTag); click("exercise-options-cancel")
+        full(recentTag, "platform-content"); click(recentTag); click("exercise-options-cancel")
         // Complete list intentionally retains the same action as a separate row/tag.
         node("exercise-options-${item.exerciseID.value}").assertExists()
         text("exercise-library-search", "虚构"); gone("exercise-library-recent")

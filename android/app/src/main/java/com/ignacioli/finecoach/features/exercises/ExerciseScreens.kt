@@ -104,7 +104,8 @@ private fun ExerciseSearchRow(query: String, onQuery: (String) -> Unit, active: 
 
 @Composable
 private fun ExerciseMuscleChips(muscle: String?, onMuscle: (String?) -> Unit, prefix: String) {
-    Row(Modifier.fillMaxWidth().testTag("$prefix-muscles").horizontalScroll(rememberScrollState()),
+    Row(Modifier.fillMaxWidth().testTag("$prefix-muscles").horizontalScroll(rememberScrollState())
+        .then(if (prefix == "exercise-library") Modifier.padding(horizontal = FcSpacing.space4) else Modifier),
         horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
         FcFilterChip("全部", muscle == null, Modifier.testTag("$prefix-muscle-all"),
             visualModifier = if (prefix == "exercise-library") Modifier.testTag("conformance:Chip") else Modifier) { onMuscle(null) }
@@ -215,15 +216,20 @@ fun ExerciseLibraryScreen(state: ExerciseUiState, onBack: () -> Unit) {
     FcPlatformShell(onBack) {
         FcPageHeader("动作库", onBack = onBack, tag = "exercise-library", backVisualTag = "conformance:Back", trailingTitle = "＋ 自定义", onTrailing = { creating = true })
         Spacer(Modifier.height(FcSpacing.space1))
-        Column(Modifier.fillMaxWidth().weight(1f).imePadding().verticalScroll(rememberScrollState()).testTag("exercise-library-content"),
-            verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
-            ExerciseSearchRow(query, { query = it }, equipment != null || hidden, "exercise-library-search", "exercise-library") { filters = true }
-            ExerciseMuscleChips(muscle, { muscle = it }, "exercise-library")
-            if (state.catalogUnavailable) FcListRow("动作库暂不可用", Modifier.testTag("exercise-catalog-unavailable"))
-            state.error?.let { FcListRow(exerciseErrorTitle(it), Modifier.testTag("exercise-error")) }
-            ExerciseBrowseRows(state, query, muscle, equipment, null, "exercise-library",
-                { "exercise-options-${it.exerciseID.value}" }) { options = it }
-
+        BoxWithConstraints(Modifier.fillMaxWidth().weight(1f)) {
+            Column(Modifier.requiredWidth(maxWidth + FcSpacing.space8).imePadding().verticalScroll(rememberScrollState()).testTag("exercise-library-content"),
+                verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+                Box(Modifier.padding(horizontal = FcSpacing.space4)) {
+                    ExerciseSearchRow(query, { query = it }, equipment != null || hidden, "exercise-library-search", "exercise-library") { filters = true }
+                }
+                ExerciseMuscleChips(muscle, { muscle = it }, "exercise-library")
+                Column(Modifier.padding(horizontal = FcSpacing.space4), verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+                    if (state.catalogUnavailable) FcListRow("动作库暂不可用", Modifier.testTag("exercise-catalog-unavailable"))
+                    state.error?.let { FcListRow(exerciseErrorTitle(it), Modifier.testTag("exercise-error")) }
+                    ExerciseBrowseRows(state, query, muscle, equipment, null, "exercise-library",
+                        { "exercise-options-${it.exerciseID.value}" }) { options = it }
+                }
+            }
         }
     }
     if (filters) ExerciseFilterSheet(equipment, { equipment = it }, hidden, { hidden = it }, "exercise-library", { filters = false })

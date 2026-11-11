@@ -182,7 +182,7 @@ fun FcBodyPartChip(title: String, selected: Boolean, modifier: Modifier = Modifi
 
 @Composable
 private fun FcChip(title: String, selected: Boolean, body: Boolean, modifier: Modifier, onClick: () -> Unit, visualModifier: Modifier = Modifier) {
-    Box(modifier.touch().semantics { this.selected = selected }.clickable(role = Role.Checkbox, onClick = onClick), contentAlignment = Alignment.Center) {
+    Box(modifier.then(if (body) Modifier.touch() else Modifier).semantics { this.selected = selected }.clickable(role = Role.Checkbox, onClick = onClick), contentAlignment = Alignment.Center) {
         Box(visualModifier.heightIn(min = if (body) FcSpacing.space6 + FcSpacing.space1 else FcSpacing.space8 - FcSpacing.space1 / 2)
             .widthIn(min = if (body) FcComponentMetrics.field else 0.dp).clip(FcShapes.capsule)
             .background(if (selected) FcColors.actionPrimary else FcColors.surfaceSelected)

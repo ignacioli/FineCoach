@@ -60,13 +60,15 @@ class ExerciseConformanceTests {
         val state = if (f != null) f.exercises else ExerciseConformanceFixture().also { library = it }.state
         compose.runOnUiThread { compose.activity.setContent {
             CompositionLocalProvider(LocalDensity provides Density(2f, 1f)) {
-                FineCoachTheme { Box(Modifier.requiredSize(390.dp, 844.dp).testTag("conformance-viewport")) {
+                FineCoachTheme { ConformanceViewport {
                     if (f == null) ExerciseLibraryScreen(state, {}) else ActiveSessionScreen(f.state,
                         f.content.session.sessionID, state, f.templates, {}, {}, students = StudentRepository(f.room.db, f.room.clock))
                 } }
             }
         } }
         compose.waitUntil(15_000) { exists(if (sheet) "session-add-exercise" else "exercise-library-muscle-胸") }
+        compose.runOnIdle { simulateConformanceStatusBar(compose.activity) }
+        node("platform-content").assertTopPositionInRootIsEqualTo(52.dp)
         val baseline = node("conformance-viewport").captureToImage().asAndroidBitmap()
         val baselineFile = File(out, "before.png")
         baselineFile.outputStream().use { baseline.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }

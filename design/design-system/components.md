@@ -199,6 +199,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
   - `FCBodyPartChip`：高 28、最小宽 48、水平内边距 `space.4`；`FCBodyPartPicker` 按 `BodyPart.allCases` 的 spec 顺序排出 8 个，通过 `FCFlowLayout` 自动换行。
 - **状态**：未选中 `surface.selected` 底 + `text.primary` 字；选中 `action.primary` 底 + `action.on` 字，并带 `.isSelected` 属性。
 - **不变量**：视觉高度保持 28/30，点击区补足到 ≥ 44（自动）；`FCBodyPartPicker` 胶囊之间的视觉行距为 8，通过负的布局行距抵消 44pt 点击区（`space.2 - (44 - 28)`，可自动）；部位顺序与 spec 一致（可自动）。
+- **Android（S1-D50）**：非 body `FcFilterChip` 的 layout 与 visual 均为文字宽 + 2×`space.3`、高30；删除44dp最小布局约束，Compose minimum touch-target 向外扩展，点击目标≥44且不占布局空间。横向部位筛选 row 贯穿屏幕，首尾 content padding 为 `space.4`；body variant 保留既有布局。
 - **可访问性标识扩展**：`FCBodyPartPicker` 可选接收 `BodyPart -> String` identifier factory，默认 `nil`；非 `nil` 时将结果赋给对应的真实 `FCBodyPartChip` Button，`nil` 时不设置 identifier。该扩展只增加自动化定位能力，不改变视觉、布局或默认消费者行为。
 - **复用边界**：多选与单选共用同一套外观；是单选还是多选由调用方的绑定决定。不要新造第三种胶囊尺寸；确实需要时按「扩展」流程处理。
 
@@ -362,6 +363,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 - **部件**：可选内联返回 `‹`（`back:`，22/400 `text.secondary`，Noto Sans SC 字形 `FCSymbol(.pageBack)`；与标题首行基线对齐，布局宽 16，所以标题从 x=32 开始，实测 M2-02a/02b/03、M1 26/36 的 PNG：`‹` 墨迹 x 17–21.5、y 74–82.5，标题墨迹 x 32.5–33、y 58；点击区 44×44 以 overlay 方式覆盖在字形周围，不占布局；无障碍名称「返回」（`common.back`），标识由调用方传入；`handler` 为空时执行 `dismiss`，流程内的「上一步」传自己的 handler）。调用页用 `.fcSecondaryPage(swipeBackEnabled:)` 隐藏系统导航栏并保持（或在流程步骤页关闭）边缘右滑返回——系统导航栏隐藏后 `interactivePopGestureRecognizer` 会拒绝开始，所以该修饰符换上自己的 delegate（有上一页即允许），页面消失时恢复。无标题（`title: ""`）时只画返回与尾部操作（29 分享预览）→ 页面内标题（默认 `titleLarge`，训练中页用 `titleEmphasis`；`text.primary`，带 `.isHeader`）→ 可选副标题（`callout` 400 `text.secondary`，与标题间距 `space.2`）→ 可选尾部操作（与标题首行同一行右侧，`callout` 600 `action.primary` 文字按钮，例如 26「编辑资料」）。
 - **状态**：只有静态内容；尾部操作可禁用（`text.disabled`）。
 - **不变量**：标题带 header 无障碍属性（可自动）；尾部操作点击区 ≥ 44（可自动：`TouchTargetComponentTests` 扩展）；标题与副标题随动态字体换行，不截断（人工，组件引入时看一次）；尾部操作存在时标题宽度让出操作文字，标题换行而不是与操作重叠（人工）。
+- **Android 页头位置（S1-D50）**：`FcPageHeader` 直接位于状态栏下方，无顶部 `space.2` padding；Insets 由 shell 消费一次。以下 iOS 历史位置决定不变。
 - **页头位置**：页头行盒顶 = 安全区顶 + `space.2`（8pt，`FCPageHeader` 自带上边距），不伸进状态栏。画稿标题墨迹顶 y=58（行盒顶约 y=52，落在状态栏安全区内），这是画稿绘制时状态栏占位不准，不是设计意图；以实现为准（产品负责人 2026-10-10 授权由实施方定）。理由：①iOS 惯例，状态栏下方留白，不与状态栏争视觉；②44×44 返回点击区以 22pt 字形为中心向上延伸约 11pt，留白后不与状态栏触控区（点按回到顶部）重叠；③全部二级页统一一个值，灵动岛 / 非灵动岛机型都相对安全区计算。
 - **复用边界**：所有二级页页头都用它；一级页（今日、学员、查看模式首页）不用，见 `DS-PAGE-PRIMARY`。35 训练记录详情与 M2-13 原先把「训练记录」放在导航栏 inline 标题，2026-10-23 起同样使用本组件（README §10 C18），页面内日期与训练标题在页头之下。
 - **迁移范围**：M2 新页面全部使用；2026-10-10 产品负责人走查发现系统导航栏的返回按钮（iOS 26 液态玻璃大圆钮）单独占一行、标题被挤到下一行，与画稿不符，所有 `titleLarge` 二级页（动作库、设置、资料库、日历、课包、课时调整、预约编辑、学员编辑 / 详情 / 已归档、趋势、训练历史、模板、备份、身体数据、分享报告 2 页、M2 导出流程）统一迁移到 `FCPageHeader` + `.fcSecondaryPage()`。训练中（`ActiveSessionView`，11/30）同样改为内联返回，标题保持 22/700（`titleStyle: .titleEmphasis`，产品负责人 2026-10-10：返回方式全 App 一致，以后发现不一致直接改）。仍使用系统导航栏的只有标题放在导航栏的页面（返回与居中标题同一行）。35 与 M2-13 原属此类，2026-10-23 起也迁移到本组件（README §10 C18）；2026-10-23 导航排查后第一批迁移：编辑训练重点、编辑模板、自定义动作（返回标识 `customExercise.back`）、记录指标（原有自定义指标的「…」与页头并排，2026-10-27 起移到页面底部操作行，见 §4.8 左滑操作扩展）。第二批（README §10 C20）：训练总结改为页内页头、无返回；全屏确认流程（结束训练、复核时长、删除动作、归档 / 永久删除学员）不用本组件，统一为页内标题 + 页内「取消」，不挂系统导航栏；无入口的应用模板页删除。此后全 App 不再使用系统导航栏标题。
@@ -673,3 +675,5 @@ FcListRow 增加显式 exerciseLibrary 变体，对应本文件 C′2b 的 space
 差异：FcListRow 动作库间距 12/8 → 16/12，修复 anatomy 偏差；不可观测的 glyph / chip / field / icon → 可选视觉 tag，不改变交互；其余消费者默认值保留。S1-D46 的行高及绳索 caption 由 map 登记；其余画板冲突仍待决定。
 
 P4 round 2 drift repair：Search 可见框固定 40dp，由外层 ≥44dp editor 在上下向外扩展 hit area；动作库 search-row 的 gap 使用 space.1，使可见框为 310dp，filter 保留 44dp 点击区。FcSectionLabel 保留满宽外层，调用方 tag 和 heading 移到实际文字；删除文字自身 fillMaxWidth。目标仍是批准的 D2b，不修改 token、Penpot 或 baseline。
+
+P4 round 3（S1-D50）：Android FcPageHeader 删除顶部 space.2，直接位于 status inset 下；非 body FcFilterChip 删除44dp最小布局，visual/layout均为文字+2×space.3、高30，触区由Compose向外补到48dp。动作库横向chip row从358dp裁剪容器→390dp edge-to-edge，首尾space.4，搜索与列表仍space.4内边距。body chip与iOS不变；无新视觉决定。ComponentContractTests验证框外tap和layout/touch分离；P4ExerciseLibraryTests验证390dp row与358dp列表；完整结果与未解决的页面组合差异见r3执行记录/报告。

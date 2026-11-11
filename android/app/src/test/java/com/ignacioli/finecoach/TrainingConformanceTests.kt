@@ -53,7 +53,7 @@ class TrainingConformanceTests {
         compose.mainClock.autoAdvance = false
         compose.runOnUiThread { compose.activity.setContent {
             CompositionLocalProvider(LocalDensity provides Density(2f, 1f)) {
-                FineCoachTheme { Box(Modifier.requiredSize(390.dp, 844.dp).testTag("conformance-viewport")) {
+                FineCoachTheme { ConformanceViewport {
                     ActiveSessionScreen(f.state, f.content.session.sessionID, f.exercises, f.templates, {}, {},
                         students = StudentRepository(f.room.db, f.room.clock))
                 } }
@@ -66,6 +66,8 @@ class TrainingConformanceTests {
             compose.mainClock.advanceTimeByFrame()
             exists("session-add-exercise") && !f.state.busy
         }
+        compose.runOnIdle { simulateConformanceStatusBar(compose.activity) }
+        node("platform-content").assertTopPositionInRootIsEqualTo(52.dp)
         f.confirmSecondAndReferences()
         compose.mainClock.advanceTimeBy(320)
         node("session-exercise-${f.squat.sessionExerciseID.value}").performClick()

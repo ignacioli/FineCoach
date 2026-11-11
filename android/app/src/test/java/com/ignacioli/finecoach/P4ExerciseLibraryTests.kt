@@ -45,7 +45,7 @@ class P4ExerciseLibraryTests {
         assertEquals(12f, (title.top - row.top).value, 0.1f)
         node("icon").assertWidthIsEqualTo(24.dp).assertHeightIsEqualTo(24.dp)
         node("disclosure").assertIsDisplayed()
-        node("chip").assertHeightIsAtLeast(44.dp)
+        node("chip").assertHeightIsEqualTo(30.dp).assertTouchHeightIsEqualTo(48.dp).assertTouchWidthIsEqualTo(48.dp)
         node("chip-shape").assertHeightIsEqualTo(30.dp)
     }
     @Test fun libraryVisibleControlsPreserveDurablePreferenceAndFullWidthRows() {
@@ -54,7 +54,9 @@ class P4ExerciseLibraryTests {
             compose.setContent { FineCoachTheme { ExerciseLibraryScreen(fixture.state) {} } }
             compose.waitUntil(15_000) { compose.onAllNodesWithTag("exercise-options-fictional-conformance-0", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty() }
             val row = node("exercise-options-fictional-conformance-0")
-            assertEquals(node("exercise-library-content").getUnclippedBoundsInRoot().width, row.getUnclippedBoundsInRoot().width)
+            assertEquals(node("platform-content").getUnclippedBoundsInRoot().width, row.getUnclippedBoundsInRoot().width)
+            node("exercise-library-content").assertWidthIsEqualTo(390.dp)
+            node("exercise-library-muscles").assertWidthIsEqualTo(390.dp)
             val search = node("exercise-library-search").assertIsDisplayed().assertHeightIsAtLeast(44.dp)
             node("conformance:Search").assertWidthIsEqualTo(310.dp).assertHeightIsEqualTo(40.dp)
             node("exercise-library-section-胸").assertTextEquals("胸 · 21")

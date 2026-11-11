@@ -139,7 +139,7 @@ fun FcLabelValueText(label: String, value: String, modifier: Modifier = Modifier
 fun FcPageHeader(title: String, modifier: Modifier = Modifier, subtitle: String? = null,
     onBack: (() -> Unit)? = null, tag: String = "page", trailingTitle: String? = null,
     trailingEnabled: Boolean = true, backVisualTag: String? = null, onTrailing: () -> Unit = {}) {
-    Column(modifier.fillMaxWidth().padding(top = FcSpacing.space2)) {
+    Column(modifier.fillMaxWidth()) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
             if (onBack != null) Box(Modifier.width(FcSpacing.space4).height(FcComponentMetrics.touch)) {
                 Box(Modifier.requiredSize(FcComponentMetrics.touch)

@@ -913,3 +913,11 @@ P4 round 1 最终：full host 950/0；G3=42/0、G4=12/0、训练 conformance=1/0
 - 结果：以 `.handoff/subagent/2026-11-12-p4-exercise-library-r2.md` 的最终门禁数字与逐项剩余偏差为准；L3 负责人走查 PENDING，未 commit。
 
 P4 round 2 最终：FAIL；host 952/0、G3 42/0、G4 12/0、训练conformance 1/0；D2b 4 PASS / 72 failed（28 missing）/ 4 AD-01内部不可观测，registered pending与pending均0，manual exceptions 0%。比较器专项41/0；Search 310×40及44dp hit area、section text tag测试通过；剩余header/chips/viewport/整体行起点决策点见r2报告。未作人工视觉批准，无commit。
+
+## P4 D2b pilot，round 3（2026-11-12）
+
+- 分类与依据：D；目标 D2b 不变，按 S1-D50 实施 DS-PAGE-HEADER / DS-CHIP 与共享 conformance status inset。
+- 范围：所有 FcPageHeader 消费者删除顶部 space.2；所有非 body FcFilterChip 的44dp最小 layout → 文字+2×space.3 / 30dp，Compose minimum touch expansion 不占 layout；body 不变。动作库 scroll 从358→390，搜索及列表保留 space.4 内边距，chip row 首尾 space.4。上表 row width owner 现为 platform-content / 内层 padded Column；scroll 自身390dp。
+- 设计决定：沿用 S1-D50，不改 originOffsetY、训练 map、Penpot 或 baseline。3dp 臀露出与当前字体实际 advance / 板中文字框宽度不一致；上游间距及 header 内部残差列入 r3 报告，未加 offset 或例外。共享 capture 真实分发52dp statusBars Insets；platform-shell 保持390×844，platform-content 从y52开始。
+- 实现与检查：ComponentContractTests 新增框外真实 tap（左3dp、上5dp）与30dp layout / 48dp touch断言；header 标题顶等于header顶。P4ExerciseLibraryTests 保留durability/满宽检查，改比较358dp platform-content，并新增390dp scroll/chip row断言。G2测试数27→28；G3/G4和所有受影响screen的既有入口布局测试由full host验证。L3负责人走查 PENDING。
+- 结果：未收敛；最终 before/after、所有剩余偏差、screen覆盖与gate数字见 `.handoff/subagent/2026-11-12-p4-exercise-library-r3.md`；不提交、不委派。
