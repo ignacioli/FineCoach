@@ -1,6 +1,7 @@
 package com.ignacioli.finecoach.designsystem
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -27,9 +28,15 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.*
 import androidx.compose.ui.text.TextStyle
@@ -58,15 +65,15 @@ object FcComponentMetrics {
 private fun Modifier.touch() = sizeIn(minWidth = FcComponentMetrics.touch, minHeight = FcComponentMetrics.touch)
 
 @Composable
-fun FcButton(title: String, modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) =
-    FcButtonContent(title, modifier, enabled, false, onClick)
+fun FcButton(title: String, modifier: Modifier = Modifier, enabled: Boolean = true, labelModifier: Modifier = Modifier, onClick: () -> Unit) =
+    FcButtonContent(title, modifier, enabled, false, labelModifier, onClick)
 
 @Composable
 fun FcSecondaryButton(title: String, modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) =
-    FcButtonContent(title, modifier, enabled, true, onClick)
+    FcButtonContent(title, modifier, enabled, true, Modifier, onClick)
 
 @Composable
-private fun FcButtonContent(title: String, modifier: Modifier, enabled: Boolean, secondary: Boolean, onClick: () -> Unit) {
+private fun FcButtonContent(title: String, modifier: Modifier, enabled: Boolean, secondary: Boolean, labelModifier: Modifier, onClick: () -> Unit) {
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
     val foreground = if (!enabled) FcColors.textSecondary else if (secondary) FcColors.actionPrimary else FcColors.actionOn
@@ -81,7 +88,7 @@ private fun FcButtonContent(title: String, modifier: Modifier, enabled: Boolean,
         .background(background).then(if (secondary) Modifier.border(BorderStroke(FcComponentMetrics.stroke, foreground), shape) else Modifier)
         .clickable(enabled = enabled, role = Role.Button, interactionSource = interaction, indication = null, onClick = onClick)
         .padding(horizontal = FcSpacing.space4, vertical = FcSpacing.space2), contentAlignment = Alignment.Center) {
-        Text(title, style = FcTypography.headline, color = foreground, textAlign = TextAlign.Center)
+        Text(title, labelModifier, style = FcTypography.headline, color = foreground, textAlign = TextAlign.Center)
     }
 }
 
@@ -95,14 +102,17 @@ fun FcLinkButton(title: String, modifier: Modifier = Modifier, enabled: Boolean 
 enum class FcGlyph(val glyph: String) { PageBack("‹"), Back("‹"), Forward("›"), Check("✓"), CheckOnFill("✓") }
 
 @Composable
-fun FcSymbol(kind: FcGlyph, modifier: Modifier = Modifier, tint: Color? = null) {
+fun FcSymbol(kind: FcGlyph, modifier: Modifier = Modifier, tint: Color? = null, visualTag: String? = null) {
     val style = when (kind) {
         FcGlyph.PageBack -> FcTypography.title.copy(fontWeight = FcTypography.body.fontWeight)
         FcGlyph.Back, FcGlyph.Forward -> FcTypography.exerciseTitle.copy(fontWeight = FcTypography.body.fontWeight)
         FcGlyph.Check -> FcTypography.style("callout", 600)
         FcGlyph.CheckOnFill -> FcTypography.sectionLabel
     }
-    Text(kind.glyph, modifier.clearAndSetSemantics { }, style = style,
+    // Keep the glyph decorative while allowing a real TextLayoutResult observation.
+    val observation = if (visualTag == null) modifier.clearAndSetSemantics { }
+        else modifier.testTag(visualTag).semantics { hideFromAccessibility() }
+    Text(kind.glyph, observation, style = style,
         color = tint ?: when (kind) {
             FcGlyph.Check -> FcColors.actionPrimary
             FcGlyph.CheckOnFill -> FcColors.actionOn
@@ -274,14 +284,44 @@ fun FcStepperField(label: String, value: String, onValueChange: (String) -> Unit
     minus: Painter, plus: Painter, onDecrement: () -> Unit, onIncrement: () -> Unit,
     modifier: Modifier = Modifier, tag: String = "stepper-field", keyboardOptions: KeyboardOptions = KeyboardOptions.Default, keyboardActions: KeyboardActions = KeyboardActions.Default) {
     var focused by remember { mutableStateOf(false) }
+    val focus = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
+    @Composable fun step(increment: Boolean) {
+        val suffix = if (increment) "plus" else "minus"
+        val enabled = increment || canDecrement
+        Box(Modifier.size(FcComponentMetrics.touch).testTag("$tag-$suffix")
+            .semantics { contentDescription = (if (increment) "增加" else "减少") + label }
+            .clickable(enabled = enabled, role = Role.Button, onClick = if (increment) onIncrement else onDecrement), contentAlignment = Alignment.Center) {
+            val painter = if (increment) plus else minus
+            val tint = if (enabled) FcColors.textPrimary else FcColors.textDisabled
+            // P0-a2's 14x26 symbol advance frame. Keep the approved 20dp Material
+            // viewport/ink scale; discard only its transparent side bearings.
+            Canvas(Modifier.offset(x = if (increment) -FcSpacing.space1 else FcSpacing.space1, y = -FcSpacing.space1 / 2)
+                .size(FcSpacing.space3 + FcComponentMetrics.hairline * 2, FcComponentMetrics.icon + FcComponentMetrics.hairline * 2)
+                .testTag("$tag-$suffix-glyph").semantics {
+                    text = AnnotatedString(if (increment) "+" else "−"); hideFromAccessibility()
+                }) {
+                val viewport = FcShapes.xl.toPx()
+                translate((size.width - viewport) / 2, (size.height - viewport) / 2) {
+                    with(painter) { draw(Size(viewport, viewport), colorFilter = ColorFilter.tint(tint)) }
+                }
+            }
+        }
+    }
     Row(modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.field).background(FcColors.surfaceCanvas, FcShapes.capsule)
         .then(if (focused) Modifier.border(FcComponentMetrics.stroke, FcColors.actionPrimary, FcShapes.capsule) else Modifier),
         verticalAlignment = Alignment.CenterVertically) {
-        FcStepButton("减少$label", minus, canDecrement, Modifier.testTag("$tag-minus"), onDecrement)
-        BasicTextField(value, onValueChange, Modifier.weight(1f).heightIn(min = FcComponentMetrics.touch)
+        step(false)
+        Box(Modifier.weight(1f).heightIn(min = FcComponentMetrics.touch).testTag("$tag-input-touch")
+            .clickable { focus.requestFocus(); keyboard?.show() }, contentAlignment = Alignment.Center) {
+        BasicTextField(value, onValueChange, Modifier.widthIn(min = FcSpacing.space4).width(IntrinsicSize.Min).focusRequester(focus)
             .testTag("$tag-input").onFocusChanged { focused = it.isFocused }.semantics { contentDescription = label },
-            textStyle = FcTypography.numeralLarge.copy(color = FcColors.textPrimary, textAlign = TextAlign.Center),
+            // The outer value slot centers the intrinsic-width editor. CoreTextField's
+            // horizontally scrolling paragraph can be wider than that editor: center
+            // alignment inside that paragraph moves glyphs outside the visible field.
+            textStyle = FcTypography.numeralLarge.copy(color = FcColors.textPrimary, textAlign = TextAlign.Start),
             singleLine = true, keyboardOptions = keyboardOptions, keyboardActions = keyboardActions, cursorBrush = SolidColor(FcColors.actionPrimary))
-        FcStepButton("增加$label", plus, true, Modifier.testTag("$tag-plus"), onIncrement)
+        }
+        step(true)
     }
 }

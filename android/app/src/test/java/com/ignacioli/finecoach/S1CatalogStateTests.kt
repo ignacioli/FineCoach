@@ -29,7 +29,7 @@ class S1CatalogStateTests(private val id: String, private val state: String) {
             }
             "DS-EQUIPMENT-ICON" -> component.assertWidthIsEqualTo(24.dp).assertHeightIsEqualTo(24.dp)
             "DS-SET-ROW" -> {
-                component.assertWidthIsEqualTo(320.dp).assertHeightIsAtLeast(52.dp)
+                component.assertWidthIsEqualTo(320.dp).assertHeightIsEqualTo(38.dp)
                 compose.onNodeWithTag("$id-$state-confirm", useUnmergedTree = true)
                     .assertIsDisplayed().assertWidthIsAtLeast(44.dp).assertHeightIsAtLeast(44.dp)
             }

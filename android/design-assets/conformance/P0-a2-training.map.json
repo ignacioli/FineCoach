@@ -71,19 +71,24 @@
     },
     {
       "path": "7",
-      "missingReason": "无独立可定位的 Compose semantics 节点；保留图层并报 missing，不用近似矩形替代 SVG/分割线。",
       "expectedToken": null,
       "colorMethod": "exactPixelMode",
       "textPolicy": "exact",
-      "anchor": "top"
+      "anchor": "top",
+      "tag": "session-icon-$squatID",
+      "note": "真实可见节点；触控区另保留44dp，非空代理。"
     },
     {
       "path": "7/1",
-      "missingReason": "无独立可定位的 Compose semantics 节点；保留图层并报 missing，不用近似矩形替代 SVG/分割线。",
       "expectedToken": "color.action.primary",
-      "colorMethod": "exactPixelMode",
+      "colorMethod": "iconInk",
       "textPolicy": "exact",
-      "anchor": "top"
+      "anchor": "top",
+      "tag": "session-icon-$squatID",
+      "note": "S1-D37：矢量内部path不可独立观测；仅父图标几何通过且同名来源资产hash验证通过时单列，不计PASS或偏差。",
+      "unobservable": "VECTOR_INTERNAL_PATH",
+      "parentPath": "7",
+      "asset": "barbell"
     },
     {
       "path": "8",
@@ -95,8 +100,8 @@
     },
     {
       "path": "9",
-      "tag": "$set1-confirm",
-      "note": "触控容器；圆形本身无独立 semantics bounds，应暴露尺寸差",
+      "tag": "$set1-circle",
+      "note": "真实可见节点；触控区另保留44dp，非空代理。",
       "expectedToken": "color.action.primary",
       "colorMethod": "exactPixelMode",
       "textPolicy": "exact",
@@ -104,12 +109,12 @@
     },
     {
       "path": "10",
-      "scope": "$set1-confirm",
-      "text": "✓",
       "expectedToken": "color.surface.page",
       "colorMethod": "textLayout",
       "textPolicy": "exact",
-      "anchor": "top"
+      "anchor": "top",
+      "tag": "$set1-check",
+      "note": "真实可见节点；触控区另保留44dp，非空代理。"
     },
     {
       "path": "11",
@@ -132,31 +137,36 @@
       "path": "13",
       "scope": "$set1",
       "text": "已完成",
-      "expectedToken": "color.action.primary",
+      "expectedToken": "color.text.secondary",
       "colorMethod": "textLayout",
       "textPolicy": "exact",
       "anchor": "top"
     },
     {
       "path": "45",
-      "tag": "$set1-edit",
+      "tag": "$set1-edit-icon",
       "expectedToken": null,
       "colorMethod": "exactPixelMode",
       "textPolicy": "exact",
-      "anchor": "top"
+      "anchor": "top",
+      "note": "真实可见节点；触控区另保留44dp，非空代理。"
     },
     {
       "path": "45/1",
-      "missingReason": "无独立可定位的 Compose semantics 节点；保留图层并报 missing，不用近似矩形替代 SVG/分割线。",
       "expectedToken": "color.action.primary",
-      "colorMethod": "exactPixelMode",
+      "colorMethod": "iconInk",
       "textPolicy": "exact",
-      "anchor": "top"
+      "anchor": "top",
+      "tag": "$set1-edit-icon",
+      "note": "S1-D37：矢量内部path不可独立观测；仅父图标几何通过且同名来源资产hash验证通过时单列，不计PASS或偏差。",
+      "unobservable": "VECTOR_INTERNAL_PATH",
+      "parentPath": "45",
+      "asset": "edit"
     },
     {
       "path": "14",
-      "tag": "$set2-confirm",
-      "note": "触控容器；圆形本身无独立 semantics bounds，应暴露尺寸差",
+      "tag": "$set2-circle",
+      "note": "真实可见节点；触控区另保留44dp，非空代理。",
       "expectedToken": "color.action.primary",
       "colorMethod": "exactPixelMode",
       "textPolicy": "exact",
@@ -164,12 +174,12 @@
     },
     {
       "path": "15",
-      "scope": "$set2-confirm",
-      "text": "✓",
       "expectedToken": "color.surface.page",
       "colorMethod": "textLayout",
       "textPolicy": "exact",
-      "anchor": "top"
+      "anchor": "top",
+      "tag": "$set2-check",
+      "note": "真实可见节点；触控区另保留44dp，非空代理。"
     },
     {
       "path": "16",
@@ -199,19 +209,24 @@
     },
     {
       "path": "46",
-      "tag": "$set2-edit",
+      "tag": "$set2-edit-icon",
       "expectedToken": null,
       "colorMethod": "exactPixelMode",
       "textPolicy": "exact",
-      "anchor": "top"
+      "anchor": "top",
+      "note": "真实可见节点；触控区另保留44dp，非空代理。"
     },
     {
       "path": "46/1",
-      "missingReason": "无独立可定位的 Compose semantics 节点；保留图层并报 missing，不用近似矩形替代 SVG/分割线。",
       "expectedToken": "color.action.primary",
-      "colorMethod": "exactPixelMode",
+      "colorMethod": "iconInk",
       "textPolicy": "exact",
-      "anchor": "top"
+      "anchor": "top",
+      "tag": "$set2-edit-icon",
+      "note": "S1-D37：矢量内部path不可独立观测；仅父图标几何通过且同名来源资产hash验证通过时单列，不计PASS或偏差。",
+      "unobservable": "VECTOR_INTERNAL_PATH",
+      "parentPath": "46",
+      "asset": "edit"
     },
     {
       "path": "19",
@@ -236,11 +251,11 @@
     },
     {
       "path": "21",
-      "tag": "set-weight-minus",
+      "tag": "set-weight-minus-glyph",
       "expectedToken": "color.text.primary",
       "colorMethod": "iconInk",
       "textPolicy": "exact",
-      "note": "Android 为 painter 图标，无文字 semantics；原文精确比对仍失败。颜色取节点截图中排除白底/canvas 后的实际 RGB 众数。",
+      "note": "真实可见节点；触控区另保留44dp，非空代理。",
       "anchor": "top"
     },
     {
@@ -253,11 +268,11 @@
     },
     {
       "path": "23",
-      "tag": "set-weight-plus",
+      "tag": "set-weight-plus-glyph",
       "expectedToken": "color.text.primary",
       "colorMethod": "iconInk",
       "textPolicy": "exact",
-      "note": "Android 为 painter 图标，无文字 semantics；原文精确比对仍失败。颜色取节点截图中排除白底/canvas 后的实际 RGB 众数。",
+      "note": "真实可见节点；触控区另保留44dp，非空代理。",
       "anchor": "top"
     },
     {
@@ -283,11 +298,11 @@
     },
     {
       "path": "26",
-      "tag": "set-reps-minus",
+      "tag": "set-reps-minus-glyph",
       "expectedToken": "color.text.primary",
       "colorMethod": "iconInk",
       "textPolicy": "exact",
-      "note": "Android 为 painter 图标，无文字 semantics；原文精确比对仍失败。颜色取节点截图中排除白底/canvas 后的实际 RGB 众数。",
+      "note": "真实可见节点；触控区另保留44dp，非空代理。",
       "anchor": "top"
     },
     {
@@ -300,11 +315,11 @@
     },
     {
       "path": "28",
-      "tag": "set-reps-plus",
+      "tag": "set-reps-plus-glyph",
       "expectedToken": "color.text.primary",
       "colorMethod": "iconInk",
       "textPolicy": "exact",
-      "note": "Android 为 painter 图标，无文字 semantics；原文精确比对仍失败。颜色取节点截图中排除白底/canvas 后的实际 RGB 众数。",
+      "note": "真实可见节点；触控区另保留44dp，非空代理。",
       "anchor": "top"
     },
     {
@@ -334,27 +349,33 @@
     },
     {
       "path": "32",
-      "missingReason": "无独立可定位的 Compose semantics 节点；保留图层并报 missing，不用近似矩形替代 SVG/分割线。",
       "expectedToken": "color.surface.divider",
       "colorMethod": "exactPixelMode",
       "textPolicy": "exact",
-      "anchor": "top"
+      "anchor": "top",
+      "tag": "session-divider-$squatID",
+      "note": "真实可见节点；触控区另保留44dp，非空代理。"
     },
     {
       "path": "33",
-      "missingReason": "无独立可定位的 Compose semantics 节点；保留图层并报 missing，不用近似矩形替代 SVG/分割线。",
       "expectedToken": null,
       "colorMethod": "exactPixelMode",
       "textPolicy": "exact",
-      "anchor": "top"
+      "anchor": "top",
+      "tag": "session-icon-$benchID",
+      "note": "真实可见节点；触控区另保留44dp，非空代理。"
     },
     {
       "path": "33/1",
-      "missingReason": "无独立可定位的 Compose semantics 节点；保留图层并报 missing，不用近似矩形替代 SVG/分割线。",
       "expectedToken": "color.action.primary",
-      "colorMethod": "exactPixelMode",
+      "colorMethod": "iconInk",
       "textPolicy": "exact",
-      "anchor": "top"
+      "anchor": "top",
+      "tag": "session-icon-$benchID",
+      "note": "S1-D37：矢量内部path不可独立观测；仅父图标几何通过且同名来源资产hash验证通过时单列，不计PASS或偏差。",
+      "unobservable": "VECTOR_INTERNAL_PATH",
+      "parentPath": "33",
+      "asset": "barbell"
     },
     {
       "path": "34",
@@ -375,11 +396,12 @@
     },
     {
       "path": "36",
-      "missingReason": "无独立可定位的 Compose semantics 节点；保留图层并报 missing，不用近似矩形替代 SVG/分割线。",
       "expectedToken": "color.surface.divider",
       "colorMethod": "exactPixelMode",
       "textPolicy": "exact",
-      "anchor": "top"
+      "anchor": "top",
+      "tag": "session-divider-$benchID",
+      "note": "真实可见节点；触控区另保留44dp，非空代理。"
     },
     {
       "path": "37",
@@ -450,6 +472,15 @@
       "colorMethod": "textLayout",
       "textPolicy": "exact",
       "anchor": "bottom"
+    },
+    {
+      "path": "47",
+      "tag": "active-session-back-glyph",
+      "expectedToken": "color.text.secondary",
+      "colorMethod": "textLayout",
+      "textPolicy": "exact",
+      "anchor": "top",
+      "note": "DS-PAGE-HEADER真实Noto Sans SC返回字形；44dp active-session-back是独立overlay，不作为图层bounds。"
     }
   ]
 }

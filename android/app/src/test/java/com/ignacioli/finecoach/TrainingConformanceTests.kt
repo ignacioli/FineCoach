@@ -83,6 +83,18 @@ class TrainingConformanceTests {
         compose.waitForIdle()
         compose.mainClock.autoAdvance = false
         node("set-weight-input").assertTextEquals("122.5")
+        // S1-D37: assert actual rendered glyphs, not just EditableText semantics.
+        for (tag in listOf("set-weight-input", "set-reps-input")) {
+            val layouts = mutableListOf<TextLayoutResult>()
+            node(tag).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { Assert.assertTrue(it(layouts)) }
+            Assert.assertEquals(1, layouts.size)
+            val bounds = node(tag).fetchSemanticsNode().boundsInRoot
+            val layout = layouts.single()
+            val glyphs = layout.layoutInput.text.indices.map { layout.getBoundingBox(it) }
+            Assert.assertTrue("Numeric glyphs must fit the visible editor", glyphs.all {
+                it.left >= 0 && it.top >= 0 && it.right <= bounds.width && it.bottom <= bounds.height
+            })
+        }
         val image = node("conformance-viewport").captureToImage().asAndroidBitmap()
         File(out, "P0-a2-training.android.png").outputStream().use { image.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }
         File(out, "P0-a2-training.run$run.png").writeBytes(File(out, "P0-a2-training.android.png").readBytes())

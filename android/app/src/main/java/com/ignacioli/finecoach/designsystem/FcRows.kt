@@ -112,11 +112,14 @@ fun FcGroupEntryRow(title: String, count: Int, modifier: Modifier = Modifier, on
 
 @Composable
 fun FcLabelValueRow(label: String, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null,
+    labelModifier: Modifier = Modifier,
     value: @Composable RowScope.() -> Unit) {
     Row(modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.row)
         .then(if (onClick != null) Modifier.semantics(mergeDescendants = true) { }.clickable(role = Role.Button, onClick = onClick) else Modifier),
         verticalAlignment = Alignment.CenterVertically) {
-        Text(label, Modifier.width(FcComponentMetrics.label), style = FcTypography.style("callout", 400), color = FcColors.textSecondary)
+        Box(Modifier.width(FcComponentMetrics.label)) {
+            Text(label, labelModifier, style = FcTypography.style("callout", 400), color = FcColors.textSecondary)
+        }
         Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, content = value)
         if (onClick != null) FcSymbol(FcGlyph.Forward)
     }

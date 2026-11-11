@@ -169,7 +169,12 @@ class ComponentCatalogTests {
             columns[3].split(',').forEach { owner ->
                 val file = File(app, consumers.getValue(owner).getValue(name))
                 assertTrue(file.path, file.isFile)
-                assertTrue("$name must be used by $owner in " + file.path, file.readText().contains("R.drawable.ic_ms_$name"))
+                if (name == "check_circle_filled" && owner == "feature:session-exercise-header") {
+                    // S1-D39 retires this consumer; its asset/hash/provenance remain validated above.
+                    assertFalse(file.readText().contains("R.drawable.ic_ms_$name"))
+                    assertFalse(file.readText().contains("FcSymbol(FcGlyph.Check)"))
+                    assertTrue(file.readText().contains("this.selected = selected"))
+                } else assertTrue("$name must be used by $owner in " + file.path, file.readText().contains("R.drawable.ic_ms_$name"))
             }
         }
         assertEquals(19, File(assets, "material-symbols-svg").listFiles()!!.count { it.extension == "svg" })
@@ -178,7 +183,8 @@ class ComponentCatalogTests {
         assertEquals("symbols/web/edit/materialsymbolsoutlined/edit_24px.svg", field(edit, "upstreamPath"))
         assertEquals("pencil", field(edit, "iosSymbol"))
         val setRow = File(main, "FcSetRow.kt").readText()
-        assertTrue(setRow.contains("Modifier.size(FcSpacing.space4 + FcComponentMetrics.hairline)"))
+        // P0-a2 paths 45/46: the visible pencil viewport is 20dp; the separate hit target remains 44dp.
+        assertTrue(setRow.contains("Modifier.size(FcSpacing.space4 + FcSpacing.space1)"))
         assertFalse(catalog.contains("S0PendingPainter")); assertFalse(catalog.contains("图标待接入"))
     }
 }
