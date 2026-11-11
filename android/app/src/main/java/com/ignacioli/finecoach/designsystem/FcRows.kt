@@ -140,18 +140,22 @@ fun FcPageHeader(title: String, modifier: Modifier = Modifier, subtitle: String?
     onBack: (() -> Unit)? = null, tag: String = "page", trailingTitle: String? = null,
     trailingEnabled: Boolean = true, backVisualTag: String? = null, onTrailing: () -> Unit = {}) {
     Column(modifier.fillMaxWidth()) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
-            if (onBack != null) Box(Modifier.width(FcSpacing.space4).height(FcComponentMetrics.touch)) {
-                Box(Modifier.requiredSize(FcComponentMetrics.touch)
-                .testTag("$tag-back").semantics { contentDescription = "返回" }.clickable(role = Role.Button, onClick = onBack),
-                contentAlignment = Alignment.Center) { FcSymbol(FcGlyph.PageBack, visualTag = backVisualTag) }
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            if (onBack != null) Box(Modifier.width(FcSpacing.space4).alignByBaseline()
+                .testTag("$tag-back").semantics { contentDescription = "返回" }
+                .clickable(role = Role.Button, onClick = onBack)) {
+                FcSymbol(FcGlyph.PageBack, visualTag = backVisualTag)
             }
-            Column(Modifier.weight(1f)) {
-                FcText(title, Modifier.semantics { heading() }, style = FcTypography.titleLarge, color = FcColors.textPrimary)
-                subtitle?.let { FcText(it, Modifier.padding(top = FcSpacing.space2), style = FcTypography.style("callout", 400), color = FcColors.textSecondary) }
+            Box(Modifier.weight(1f).alignByBaseline()) {
+                FcText(title, Modifier.semantics { heading() },
+                    style = FcTypography.titleLarge, color = FcColors.textPrimary)
             }
-            trailingTitle?.let { FcLinkButton(it, Modifier.testTag("$tag-trailing"), trailingEnabled, onClick = onTrailing) }
+            trailingTitle?.let { FcLinkButton(it, Modifier.testTag("$tag-trailing"), trailingEnabled,
+                compactLayout = true, onClick = onTrailing) }
         }
+        subtitle?.let { FcText(it, Modifier.padding(top = FcSpacing.space2,
+            start = if (onBack != null) FcSpacing.space4 else 0.dp),
+            style = FcTypography.style("callout", 400), color = FcColors.textSecondary) }
     }
 }
 

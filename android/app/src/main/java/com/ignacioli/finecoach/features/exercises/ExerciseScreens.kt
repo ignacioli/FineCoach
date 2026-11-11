@@ -93,7 +93,7 @@ fun ExercisePicker(
 @Composable
 private fun ExerciseSearchRow(query: String, onQuery: (String) -> Unit, active: Boolean,
     searchTag: String, prefix: String, showFilters: Boolean = true, onFilters: () -> Unit) {
-    Row(Modifier.fillMaxWidth().testTag("$prefix-search-row"), horizontalArrangement = Arrangement.spacedBy(if (prefix == "exercise-library") FcSpacing.space1 else FcSpacing.space2)) {
+    Row(Modifier.fillMaxWidth().testTag("$prefix-search-row"), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
         FcSearchField("搜索动作", query, onQuery, Modifier.weight(1f).testTag(searchTag),
             visualModifier = if (prefix == "exercise-library") Modifier.testTag("conformance:Search") else Modifier)
         if (showFilters) FcTitleIconButton("筛选", painterResource(if (active) R.drawable.ic_ms_filter_alt_filled else R.drawable.ic_ms_filter_alt),
@@ -215,15 +215,15 @@ fun ExerciseLibraryScreen(state: ExerciseUiState, onBack: () -> Unit) {
     }
     FcPlatformShell(onBack) {
         FcPageHeader("动作库", onBack = onBack, tag = "exercise-library", backVisualTag = "conformance:Back", trailingTitle = "＋ 自定义", onTrailing = { creating = true })
-        Spacer(Modifier.height(FcSpacing.space1))
+        Spacer(Modifier.height(FcSpacing.space4))
         BoxWithConstraints(Modifier.fillMaxWidth().weight(1f)) {
             Column(Modifier.requiredWidth(maxWidth + FcSpacing.space8).imePadding().verticalScroll(rememberScrollState()).testTag("exercise-library-content"),
-                verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+                verticalArrangement = Arrangement.spacedBy(FcSpacing.space4)) {
                 Box(Modifier.padding(horizontal = FcSpacing.space4)) {
                     ExerciseSearchRow(query, { query = it }, equipment != null || hidden, "exercise-library-search", "exercise-library") { filters = true }
                 }
                 ExerciseMuscleChips(muscle, { muscle = it }, "exercise-library")
-                Column(Modifier.padding(horizontal = FcSpacing.space4), verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+                Column(Modifier.padding(horizontal = FcSpacing.space4)) {
                     if (state.catalogUnavailable) FcListRow("动作库暂不可用", Modifier.testTag("exercise-catalog-unavailable"))
                     state.error?.let { FcListRow(exerciseErrorTitle(it), Modifier.testTag("exercise-error")) }
                     ExerciseBrowseRows(state, query, muscle, equipment, null, "exercise-library",

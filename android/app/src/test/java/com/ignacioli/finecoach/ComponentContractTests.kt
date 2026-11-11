@@ -222,7 +222,7 @@ class ComponentContractTests {
     @Test fun pageHeader() {
         var calls = 0
         show { FcPageHeader("很长的虚构标题", Modifier.testTag("header"), "副标题", { calls++ }, "header", "编辑", onTrailing = { calls++ }) }
-        full("header"); assertEquals(node("header").getUnclippedBoundsInRoot().top, compose.onNodeWithText("很长的虚构标题").getUnclippedBoundsInRoot().top); touch("header-back"); touch("header-trailing")
+        full("header"); assertEquals(node("header").getUnclippedBoundsInRoot().top, compose.onNodeWithText("很长的虚构标题").getUnclippedBoundsInRoot().top); node("header-back").assertWidthIsEqualTo(16.dp).assertTouchWidthIsEqualTo(48.dp).assertTouchHeightIsEqualTo(48.dp); node("header-trailing").assertTouchHeightIsEqualTo(48.dp)
         compose.onNodeWithText("很长的虚构标题").assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading))
         node("header-back").assertContentDescriptionEquals("返回").performClick(); node("header-trailing").performClick()
         compose.runOnIdle { assertEquals(2, calls) }

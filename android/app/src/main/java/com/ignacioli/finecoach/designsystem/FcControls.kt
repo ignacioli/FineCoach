@@ -93,8 +93,8 @@ private fun FcButtonContent(title: String, modifier: Modifier, enabled: Boolean,
 
 @Composable
 fun FcLinkButton(title: String, modifier: Modifier = Modifier, enabled: Boolean = true,
-    contentAlignment: Alignment = Alignment.Center, onClick: () -> Unit) {
-    Box(modifier.touch().clickable(enabled = enabled, role = Role.Button, onClick = onClick), contentAlignment = contentAlignment) {
+    contentAlignment: Alignment = Alignment.Center, compactLayout: Boolean = false, onClick: () -> Unit) {
+    Box(modifier.then(if (compactLayout) Modifier else Modifier.touch()).clickable(enabled = enabled, role = Role.Button, onClick = onClick), contentAlignment = contentAlignment) {
         FcText(title, style = FcTypography.style("callout", 600), color = if (enabled) FcColors.actionPrimary else FcColors.textSecondary)
     }
 }

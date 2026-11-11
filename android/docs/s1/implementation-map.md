@@ -921,3 +921,11 @@ P4 round 2 最终：FAIL；host 952/0、G3 42/0、G4 12/0、训练conformance 1/
 - 设计决定：沿用 S1-D50，不改 originOffsetY、训练 map、Penpot 或 baseline。3dp 臀露出与当前字体实际 advance / 板中文字框宽度不一致；上游间距及 header 内部残差列入 r3 报告，未加 offset 或例外。共享 capture 真实分发52dp statusBars Insets；platform-shell 保持390×844，platform-content 从y52开始。
 - 实现与检查：ComponentContractTests 新增框外真实 tap（左3dp、上5dp）与30dp layout / 48dp touch断言；header 标题顶等于header顶。P4ExerciseLibraryTests 保留durability/满宽检查，改比较358dp platform-content，并新增390dp scroll/chip row断言。G2测试数27→28；G3/G4和所有受影响screen的既有入口布局测试由full host验证。L3负责人走查 PENDING。
 - 结果：未收敛；最终 before/after、所有剩余偏差、screen覆盖与gate数字见 `.handoff/subagent/2026-11-12-p4-exercise-library-r3.md`；不提交、不委派。
+
+## P4 D2b pilot，round 4（S1-D51）
+
+- 分类与依据：页面组合 B（负责人已批准 S1-D51，board 待 dispatcher 更新）；DS-PAGE-HEADER 为 D，按既有 anatomy 修复；C′2b / DS-CHIP 复用，不改行高或 chip width 机制。
+- 范围：动作库 header→search、search→chips、chips→section 与 section→section 为 space.4；section label→rows 和 search HStack 为 space.2；横向 space.4，chip row 仍390dp edge-to-edge。Header 所有消费者共用 Back 16dp leading slot / first-baseline 与 trailing centerY 修复；触区由 Compose 扩展≥44，不占布局。移除44dp Back/trailing布局占位与space.1/space.2页面外层间距，不引入offset。
+- 设计决定：沿用 S1-D50/D51；› 实测 glyph advance box x368/w6、右缘374，旧板 x360/w8 右缘368，+8 来自 board placement 而非额外 padding；实现不移动。proposed-board.json 只提出 composition/chip/Back/› 相关层，其他差异见r4报告；Penpot/baseline仍由负责人批准更新。
+- 实现与检查：ComponentContractTests 保留28项、验证Back16dp layout及48dp touch；P4ExerciseLibraryTests 保留2项、加入header文字advance宽84、trailing centerY、16/16/16外层gap、section8dp与›右缘。无新增交互，沿用上方入口与layout map（header-back/trailing、search/filter、muscle chips、exercise-options；数据变更仍由可见options控制，row width owner=platform-content）。L3未触发新的实施截图走查，board更新及负责人验收PENDING。
+- 结果：最终gate数字、proposal层数与坐标、decision points、耗时和失败原始日志见 `.handoff/subagent/2026-11-12-p4-exercise-library-r4.md`；未commit、未委派。

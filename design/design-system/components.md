@@ -677,3 +677,5 @@ FcListRow 增加显式 exerciseLibrary 变体，对应本文件 C′2b 的 space
 P4 round 2 drift repair：Search 可见框固定 40dp，由外层 ≥44dp editor 在上下向外扩展 hit area；动作库 search-row 的 gap 使用 space.1，使可见框为 310dp，filter 保留 44dp 点击区。FcSectionLabel 保留满宽外层，调用方 tag 和 heading 移到实际文字；删除文字自身 fillMaxWidth。目标仍是批准的 D2b，不修改 token、Penpot 或 baseline。
 
 P4 round 3（S1-D50）：Android FcPageHeader 删除顶部 space.2，直接位于 status inset 下；非 body FcFilterChip 删除44dp最小布局，visual/layout均为文字+2×space.3、高30，触区由Compose向外补到48dp。动作库横向chip row从358dp裁剪容器→390dp edge-to-edge，首尾space.4，搜索与列表仍space.4内边距。body chip与iOS不变；无新视觉决定。ComponentContractTests验证框外tap和layout/touch分离；P4ExerciseLibraryTests验证390dp row与358dp列表；完整结果与未解决的页面组合差异见r3执行记录/报告。
+
+P4 round 4（S1-D51）：动作库 header→search→chips→section 使用 space.4；section label→rows 与 search HStack 使用 space.2，水平 space.4、chips edge-to-edge。Android DS-PAGE-HEADER Back layout 宽 space.4、字形 leading 对齐并与标题首行 baseline 对齐，Compose 扩展点击区≥44，不占 layout；trailing 以 token line box 与标题首行 centerY 对齐，点击区向外扩展。移除 Back/trailing 44dp 布局占位，不新增 offset；行 › 的 glyph advance 右缘等于内容右缘，board 文字框应跟随真实 advance。Penpot 由 dispatcher 根据 proposed-board.json 更新，本轮不改板。
