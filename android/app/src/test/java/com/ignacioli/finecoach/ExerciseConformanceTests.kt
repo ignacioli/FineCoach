@@ -75,13 +75,16 @@ class ExerciseConformanceTests {
             node("session-apply-template").performClick()
             compose.waitUntil(15_000) { exists("template-apply-content") }
         } else {
-            node("exercise-library-muscle-胸").performClick()
+            // Seed the static selected state through the real visible control's handler.
+            // Touch injection also starts a platform ripple (not governed by the Compose clock).
+            node("exercise-library-muscle-胸").performSemanticsAction(SemanticsActions.OnClick) { Assert.assertTrue(it()) }
             compose.waitUntil(15_000) { exists("exercise-library-section-胸") && !state.entries.isEmpty() }
             Assert.assertTrue(state.recentEntries.isEmpty())
         }
         compose.waitForIdle()
         compose.mainClock.autoAdvance = false
         compose.mainClock.advanceTimeBy(1000)
+        compose.waitForIdle()
         val image = node("conformance-viewport").captureToImage().asAndroidBitmap()
         check(image.width == 780 && image.height == 1688) { "Wrong viewport "+image.width+"x"+image.height }
         File(out, (if (sheet) "D8c-add-exercise" else "D2b-exercise-library") + ".android.png").outputStream().use { image.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }
@@ -119,10 +122,12 @@ class ExerciseConformanceTests {
             val windows = compose.onAllNodes(isRoot(), useUnmergedTree = true).fetchSemanticsNodes()
                 .filter { root -> all.any { n -> n.config.contains(SemanticsProperties.IsDialog) && generateSequence(n) { it.parent }.any { it.id == root.id } } }
                 .map { root ->
-                    val bitmap = compose.onNode(isRoot() and SemanticsMatcher("root id") { it.id == root.id }, useUnmergedTree = true).captureToImage().asAndroidBitmap()
+                    val dialog = all.single { n -> n.config.contains(SemanticsProperties.IsDialog) && generateSequence(n) { it.parent }.any { it.id == root.id } }
+                    // captureToImage(root) has no IsDialog ancestor and falls back to the activity window.
+                    val bitmap = compose.onNode(SemanticsMatcher("dialog id") { it.id == dialog.id }, useUnmergedTree = true).captureToImage().asAndroidBitmap()
                     val file = File(out, "window-${root.id}.png")
                     file.outputStream().use { bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }
-                    ConformanceCapture.Window(javax.imageio.ImageIO.read(file), (root.boundsInWindow.left).toInt(), (root.boundsInWindow.top).toInt())
+                    ConformanceCapture.Window(javax.imageio.ImageIO.read(file), (dialog.boundsInWindow.left).toInt(), (dialog.boundsInWindow.top).toInt())
                 }
             val activityImage = javax.imageio.ImageIO.read(File(out, "D8c-add-exercise.android.png"))
             val composed = ConformanceCapture.composite(activityImage, windows)

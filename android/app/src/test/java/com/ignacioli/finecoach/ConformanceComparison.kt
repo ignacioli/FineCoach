@@ -18,7 +18,7 @@ internal object ConformanceComparison {
         val map = JSONObject(File(assets, "$screen.map.json").readText())
         val exceptions = map.getJSONArray("elements").objects()
         val actual = nodes.objects()
-        val contentTop = actual.firstOrNull { it.getString("tag") == "platform-content" }?.getDouble("y") ?: 0.0
+        val contentTop = contentTop(actual)
         val offset = map.getDouble("originOffsetY") + contentTop
         val entries = ConformanceMapping.entries(layers, exceptions, actual, bindings, offset)
         val tolerance = map.getDouble("toleranceDp")
@@ -52,9 +52,7 @@ internal object ConformanceComparison {
                 val textMatches = !layer.has("text") || layer.getString("text") == n.getString("text")
                 val expectedHex = ConformanceColors.expected(layer, layers, tokens).orEmpty()
                 val expectedToken = hexToken(expectedHex)
-                val observedHex = if (entry.getString("colorMethod") == "textLayout") n.optString("hex", "").takeUnless { it == "null" || it.isEmpty() }?.let { hex ->
-                    if (n.optDouble("alpha", 1.0) == 1.0) hex else pixelMode(android, n)?.let { background -> ConformanceColors.composite(hex, n.getDouble("alpha"), background) }
-                }
+                val observedHex = if (entry.getString("colorMethod") == "textLayout") observedTextColor(android, n)
                     else pixelMode(android, n, entry.getString("colorMethod") == "iconInk")
                 val observedToken = hexToken(observedHex)
                 val tokenObservable = expectedHex.isEmpty() || observedHex != null
@@ -314,6 +312,30 @@ internal object ConformanceComparison {
             appendLine("\nmissing 表示无可定位的独立 semantics 节点，不证明屏幕上没有图形。mapped bounds 若是触控容器而非内部图形，只能证明容器与图层几何不同，不能宣称图形轮廓错误。不可见/裁剪节点单列失败，不把零 bounds 的位移混入 UI 偏差 top10。")
         })
     }
+    internal fun contentTop(nodes: List<JSONObject>): Double =
+        nodes.filter { it.optString("tag") == "platform-content" }.single().getDouble("y")
+
+    /** Layout color is a source, not proof that text ink reached the screenshot. */
+    internal fun observedTextColor(image: BufferedImage, n: JSONObject): String? {
+        val source = n.optString("hex", "").takeUnless { it == "null" || it.isEmpty() } ?: return null
+        val alpha = n.optDouble("alpha", 1.0)
+        val color = if (alpha == 1.0) source else {
+            val background = pixelMode(image, n) ?: return null
+            ConformanceColors.composite(source, alpha, background)
+        }
+        val rgb = color.removePrefix("#").toInt(16)
+        val left = (n.getDouble("x") * 2).toInt().coerceIn(0, image.width)
+        val top = (n.getDouble("y") * 2).toInt().coerceIn(0, image.height)
+        val right = ((n.getDouble("x") + n.getDouble("w")) * 2).toInt().coerceIn(0, image.width)
+        val bottom = ((n.getDouble("y") + n.getDouble("h")) * 2).toInt().coerceIn(0, image.height)
+        return color.takeIf { (top until bottom).any { y -> (left until right).any { x -> image.getRGB(x, y) and 0xffffff == rgb } } }
+    }
+
+    private fun uniqueMode(counts: Map<Int, Int>): Int? {
+        val max = counts.values.maxOrNull() ?: return null
+        return counts.filterValues { it == max }.keys.singleOrNull()
+    }
+
     internal fun pixelMode(image: BufferedImage, n: JSONObject, inkOnly: Boolean = false): String? {
         val counts = mutableMapOf<Int, Int>()
         val left = (n.getDouble("x") * 2).toInt().coerceIn(0, image.width)
@@ -329,12 +351,13 @@ internal object ConformanceComparison {
                 val rgb = image.getRGB(x, y) and 0xffffff; boundary[rgb] = (boundary[rgb] ?: 0) + 1
             }
         }
-        val background = boundary.maxByOrNull { it.value }?.key
+        val background = uniqueMode(boundary)
+        if (inkOnly && background == null) return null
         for (y in top until bottom) for (x in left until right) {
             val rgb = image.getRGB(x,y) and 0xffffff
             if (!inkOnly || rgb != background) counts[rgb] = (counts[rgb] ?: 0) + 1
         }
-        return counts.maxByOrNull { it.value }?.key?.let { "#%06x".format(it) }
+        return uniqueMode(counts)?.let { "#%06x".format(it) }
     }
     private fun sha(file: File) = MessageDigest.getInstance("SHA-256").digest(file.readBytes()).joinToString("") { "%02x".format(it) }
     private fun JSONArray.objects() = (0 until length()).map { getJSONObject(it) }
