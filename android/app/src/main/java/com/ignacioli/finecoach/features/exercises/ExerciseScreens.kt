@@ -17,6 +17,26 @@ import com.ignacioli.finecoach.core.domain.common.*
 import com.ignacioli.finecoach.designsystem.*
 import kotlinx.coroutines.launch
 
+/** State commands live here to keep this refactor within the screen file's ownership. */
+internal suspend fun ExerciseUiState.createLibraryExercise(query: String, mode: RecordMode) {
+    perform({ useCases.createCustom(query, mode) }) { }
+    if (error == null) search(query)
+}
+
+internal suspend fun ExerciseUiState.updateLibraryPreference(command: UpdateExercisePreferenceCommand, onSaved: () -> Unit) {
+    perform({ useCases.updatePreference(command) }) { onSaved() }
+}
+
+internal suspend fun ExerciseUiState.saveCustomExercise(item: ExerciseRecord?, name: String, mode: RecordMode, onSaved: () -> Unit) {
+    perform({ item?.let { useCases.updateCustom(it.exerciseID, name, mode) }
+        ?: useCases.createCustom(name, mode) }) { onSaved() }
+}
+
+internal suspend fun ExerciseUiState.setCustomExerciseArchived(record: ExerciseRecord, active: Boolean, onSaved: (ExerciseRecord) -> Unit) {
+    perform({ if (active) useCases.archiveCustom(record.exerciseID)
+        else useCases.restoreCustom(record.exerciseID) }, onSaved)
+}
+
 @Composable
 fun ExercisePicker(state: ExerciseUiState, onSelect: suspend (ExerciseSelection) -> ApplicationResult<Unit>,
     onDismiss: () -> Unit) = ExercisePicker(state, onSelect, null, onDismiss = onDismiss)
@@ -60,8 +80,7 @@ fun ExercisePicker(
             FcSecondaryButton("加入动作库", Modifier.testTag("exercise-create-library"), !state.busy && query.isNotBlank()) {
                 scope.launch {
                     // Explicit library creation is durable independently of the consuming feature.
-                    state.perform({ state.useCases.createCustom(query, mode) }) { }
-                    if (state.error == null) state.search(query)
+                    state.createLibraryExercise(query, mode)
                 }
             }
             FcSecondaryButton("取消", Modifier.testTag("exercise-picker-cancel"), !state.busy, onDismiss)
@@ -200,7 +219,7 @@ fun ExerciseLibraryScreen(state: ExerciseUiState, onBack: () -> Unit) {
         val p = state.preference(item.exerciseID)
         var alias by remember(item.exerciseID) { mutableStateOf(p.alias ?: "") }
         fun update(command: UpdateExercisePreferenceCommand) {
-            scope.launch { state.perform({ state.useCases.updatePreference(command) }) { options = null; refresh++ } }
+            scope.launch { state.updateLibraryPreference(command) { options = null; refresh++ } }
         }
         fun command(aliasValue: String? = p.alias, favorite: Boolean = p.isFavorite, isHidden: Boolean = p.isHidden,
             assisted: Boolean = p.isAssisted, unilateral: Boolean? = p.isUnilateral) =
@@ -239,13 +258,11 @@ fun CustomExerciseEditor(state: ExerciseUiState, existing: ExerciseRecord?, onBa
             ExerciseModePicker(mode, { mode = it }, active && !state.busy, "exercise-mode")
             state.error?.let { FcListRow(exerciseErrorTitle(it), Modifier.testTag("exercise-error")) }
             FcButton("保存", Modifier.testTag("exercise-save"), active && !state.busy) {
-                scope.launch { state.perform({ item?.let { state.useCases.updateCustom(it.exerciseID, name, mode) }
-                    ?: state.useCases.createCustom(name, mode) }) { onBack() } }
+                scope.launch { state.saveCustomExercise(item, name, mode) { onBack() } }
             }
             item?.let { record ->
                 FcSecondaryButton(if (active) "隐藏自定义动作" else "恢复自定义动作", Modifier.testTag("exercise-archive"), !state.busy) {
-                    scope.launch { state.perform({ if (active) state.useCases.archiveCustom(record.exerciseID)
-                        else state.useCases.restoreCustom(record.exerciseID) }) { item = it } }
+                    scope.launch { state.setCustomExerciseArchived(record, active) { item = it } }
                 }
             }
             FcSecondaryButton("取消", Modifier.testTag("exercise-editor-cancel"), !state.busy, back)
