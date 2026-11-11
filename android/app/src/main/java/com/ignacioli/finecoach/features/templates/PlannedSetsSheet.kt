@@ -8,22 +8,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.ignacioli.finecoach.core.application.*
 import com.ignacioli.finecoach.core.domain.common.*
-import com.ignacioli.finecoach.core.domain.template.TemplatePlannedSet
 import com.ignacioli.finecoach.core.domain.training.*
 import com.ignacioli.finecoach.designsystem.*
 import com.ignacioli.finecoach.features.exercises.exerciseErrorTitle
 import kotlinx.coroutines.launch
-
-/** Drafts contain only input values; no completion state or training identity is written. */
-private data class PlannedInput(
-    val weight: String = "", val reps: String = "", val duration: String = "", val left: String = "",
-    val right: String = "", val distance: String = "", val speed: String = "", val resistance: String = "",
-    val unit: MeasurementUnit, val side: SetSide = SetSide.none,
-) {
-    fun input(mode: RecordMode) = TrainingSetInput(mode, weight.ifBlank { null }, reps.ifBlank { null },
-        duration.ifBlank { null }, unit, side, left.ifBlank { null }, right.ifBlank { null },
-        distance.ifBlank { null }, speed.ifBlank { null }, resistance.ifBlank { null })
-}
 
 @Composable
 internal fun PlannedSetsSheet(state: TemplateUiState, row: TemplateExerciseRecord, onDismiss: () -> Unit) {
@@ -81,11 +69,7 @@ internal fun PlannedSetsSheet(state: TemplateUiState, row: TemplateExerciseRecor
             state.error?.let { FcListRow(exerciseErrorTitle(it), Modifier.testTag("planned-error")) }
             FcButton("保存计划组", Modifier.testTag("planned-save"), !state.busy) {
                 scope.launch {
-                    val result = state.mutate { template ->
-                        val values = drafts.map { draft -> TemplatePlannedSet.copyingValuesFrom(TrainingSet.makeDraft(
-                            state.ids.newTrainingSetID(), state.ids.newSessionExerciseID(), 0u, draft.input(row.recordModeSnapshot), state.clock.now())) }
-                        template.replacingPlannedSets(row.templateExerciseID, values, state.clock.now())
-                    }
+                    val result = state.savePlannedSets(row, drafts)
                     if (result is ApplicationResult.Success) onDismiss()
                 }
             }
