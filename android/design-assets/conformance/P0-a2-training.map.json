@@ -23,24 +23,11 @@
     },
     {
       "path": "6",
-      "pendingBoardFix": {
-        "dx": 2.5,
-        "decision": "S1-D42",
-        "reason": "DS-BUTTON 文字在按钮内水平居中；P0-a2 的「结束训练」文字框比按钮中心偏左 2.5pt（同页「确认」居中），待 Penpot 居中后重导出"
-      },
       "anchor": "bottom"
     },
     {
       "path": "7",
       "tag": "session-icon-$squatID"
-    },
-    {
-      "path": "8",
-      "pendingBoardFix": {
-        "dy": 1,
-        "decision": "S1-D42",
-        "reason": "同一动作标题行组件：第二个动作（path 34/35）「上次」与标题同中心；第一个动作的「上次」比标题高 1pt，待 Penpot 对齐后重导出"
-      }
     },
     {
       "path": "9",
@@ -57,14 +44,6 @@
     {
       "path": "46",
       "tag": "$set2-edit-icon"
-    },
-    {
-      "path": "19",
-      "pendingBoardFix": {
-        "dy": 2.5,
-        "decision": "S1-D42",
-        "reason": "DS-LABEL-VALUE 行标签与字段垂直居中；P0-a2 的「重量 kg」比胶囊中心高 2.5pt，待 Penpot 下移后重导出"
-      }
     },
     {
       "path": "20",
@@ -93,14 +72,6 @@
       "symbolSizeDp": 20,
       "tag": "set-weight-plus-glyph",
       "colorMethod": "iconInk"
-    },
-    {
-      "path": "24",
-      "pendingBoardFix": {
-        "dy": 2.5,
-        "decision": "S1-D42",
-        "reason": "DS-LABEL-VALUE 行标签与字段垂直居中；P0-a2 的「次数」比胶囊中心高 2.5pt，待 Penpot 下移后重导出"
-      }
     },
     {
       "path": "25",
@@ -136,59 +107,24 @@
     },
     {
       "path": "32",
-      "tag": "session-divider-$squatID"
+      "tag": "session-divider-$squatID",
+      "pendingBoardFix": {
+        "dy": -3,
+        "decision": "S1-D47",
+        "reason": "2026-11-12 P0-a2 改稿误把分隔线随编辑器以下内容一起下移 3pt；Android 分隔线位置与原画板一致，只有行内容低 3pt。待 Penpot 将本分隔线上移 3pt 后重导出"
+      }
     },
     {
       "path": "33",
-      "tag": "session-icon-$benchID",
-      "pendingBoardFix": {
-        "dy": 3,
-        "decision": "S1-D42",
-        "reason": "编辑器在画板中比 Android 按 token 堆叠矮约 3pt；方案 (a)：编辑器以下内容在 Penpot 下移 3pt 后重新导出"
-      }
-    },
-    {
-      "path": "33/1",
-      "pendingBoardFix": {
-        "dy": 3,
-        "decision": "S1-D42",
-        "reason": "编辑器在画板中比 Android 按 token 堆叠矮约 3pt；方案 (a)：编辑器以下内容在 Penpot 下移 3pt 后重新导出"
-      }
-    },
-    {
-      "path": "34",
-      "pendingBoardFix": {
-        "dy": 3,
-        "decision": "S1-D42",
-        "reason": "编辑器在画板中比 Android 按 token 堆叠矮约 3pt；方案 (a)：编辑器以下内容在 Penpot 下移 3pt 后重新导出"
-      }
-    },
-    {
-      "path": "35",
-      "pendingBoardFix": {
-        "dy": 3,
-        "decision": "S1-D42",
-        "reason": "编辑器在画板中比 Android 按 token 堆叠矮约 3pt；方案 (a)：编辑器以下内容在 Penpot 下移 3pt 后重新导出"
-      }
+      "tag": "session-icon-$benchID"
     },
     {
       "path": "36",
-      "tag": "session-divider-$benchID"
-    },
-    {
-      "path": "37",
+      "tag": "session-divider-$benchID",
       "pendingBoardFix": {
-        "dy": 3,
-        "decision": "S1-D42",
-        "reason": "编辑器在画板中比 Android 按 token 堆叠矮约 3pt；方案 (a)：编辑器以下内容在 Penpot 下移 3pt 后重新导出"
-      }
-    },
-    {
-      "path": "38",
-      "pendingBoardFix": {
-        "dy": 3,
-        "decision": "S1-D42",
-        "reason": "编辑器在画板中比 Android 按 token 堆叠矮约 3pt；方案 (a)：编辑器以下内容在 Penpot 下移 3pt 后重新导出"
+        "dy": -3,
+        "decision": "S1-D47",
+        "reason": "2026-11-12 P0-a2 改稿误把分隔线随编辑器以下内容一起下移 3pt；Android 分隔线位置与原画板一致，只有行内容低 3pt。待 Penpot 将本分隔线上移 3pt 后重导出"
       }
     },
     {
@@ -206,29 +142,14 @@
     },
     {
       "path": "42",
-      "pendingBoardFix": {
-        "dy": 3,
-        "decision": "S1-D42",
-        "reason": "DS-REST-TIMER 链接在 Android 按容器垂直居中（结构规则，anatomy 未另行规定）；P0-a2 画板链接比容器中心高 3dp，待 Penpot 下移 3pt 并重新导出后撤掉本登记。"
-      },
       "anchor": "bottom"
     },
     {
       "path": "43",
-      "pendingBoardFix": {
-        "dy": 3,
-        "decision": "S1-D42",
-        "reason": "DS-REST-TIMER 链接在 Android 按容器垂直居中（结构规则，anatomy 未另行规定）；P0-a2 画板链接比容器中心高 3dp，待 Penpot 下移 3pt 并重新导出后撤掉本登记。"
-      },
       "anchor": "bottom"
     },
     {
       "path": "44",
-      "pendingBoardFix": {
-        "dy": 3,
-        "decision": "S1-D42",
-        "reason": "DS-REST-TIMER 链接在 Android 按容器垂直居中（结构规则，anatomy 未另行规定）；P0-a2 画板链接比容器中心高 3dp，待 Penpot 下移 3pt 并重新导出后撤掉本登记。"
-      },
       "anchor": "bottom"
     }
   ]
