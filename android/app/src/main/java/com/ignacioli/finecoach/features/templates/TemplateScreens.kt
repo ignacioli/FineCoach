@@ -40,7 +40,7 @@ fun TemplateListScreen(state: TemplateUiState, onNavigate: (String) -> Unit, onB
             FcTextField("模板名称", name, { name = it }, Modifier.testTag("template-create-name"), enabled = !state.busy)
             state.error?.let { FcListRow(exerciseErrorTitle(it), Modifier.testTag("template-create-error")) }
             FcButton("创建", Modifier.testTag("template-create-save"), !state.busy) {
-                scope.launch { state.perform({ state.useCases.save(SaveTemplateCommand(null, name, emptySet(), null)) }) {
+                scope.launch { state.create(name) {
                     create = false; onNavigate(S1Routes.templateDetail(it.templateID))
                 } }
             }
@@ -63,8 +63,7 @@ fun ApplyTemplateSheet(state: TemplateUiState, target: SessionRecord, onApplied:
                     applying = true
                     scope.launch {
                         try {
-                            state.perform({ state.useCases.apply(ApplyTemplateSnapshotCommand(template.templateID,
-                                target.sessionID, template.revision, target.revision, state.clock.now())) }) { onApplied(it); onDismiss() }
+                            state.apply(template, target) { onApplied(it); onDismiss() }
                         } finally { applying = false }
                     }
                 }
@@ -92,9 +91,8 @@ fun TemplateEditorScreen(state: TemplateUiState, id: TemplateID, exercises: Exer
     val back = { if (!state.busy) onBack() }
     LaunchedEffect(id) { state.load(id) }
     val content = state.content?.takeIf { it.template.templateID == id }
-    fun change(action: (com.ignacioli.finecoach.core.domain.template.TrainingTemplate) -> com.ignacioli.finecoach.core.domain.template.TrainingTemplate,
-        done: () -> Unit = {}) {
-        scope.launch { if (state.mutate(action) is ApplicationResult.Success) done() }
+    fun change(action: suspend () -> ApplicationResult<Unit>, done: () -> Unit = {}) {
+        scope.launch { if (action() is ApplicationResult.Success) done() }
     }
     FcPlatformShell(back) {
         FcPageHeader(content?.template?.name ?: "训练模板", onBack = back, tag = "template-editor",
@@ -147,8 +145,7 @@ fun TemplateEditorScreen(state: TemplateUiState, id: TemplateID, exercises: Exer
                 FcTextField("分段名称", name, { name = it }, Modifier.testTag("template-section-name"), enabled = !state.busy)
                 state.error?.let { FcListRow(exerciseErrorTitle(it), Modifier.testTag("template-section-error")) }
                 FcButton("保存分段", Modifier.testTag("template-section-save"), !state.busy) {
-                    change({ template -> renameSection?.let { template.renamingSection(it.sectionID, name, state.clock.now()) }
-                        ?: template.addingSection(state.ids.newSectionID(), name, state.clock.now()) }) { sectionForm = false }
+                    change({ state.saveSection(renameSection?.sectionID, name) }) { sectionForm = false }
                 }
                 FcSecondaryButton("取消", Modifier.testTag("template-section-cancel"), !state.busy) { sectionForm = false }
             }
@@ -158,15 +155,15 @@ fun TemplateEditorScreen(state: TemplateUiState, id: TemplateID, exercises: Exer
         FcBottomSheet("分段操作", { sectionOptions = null }) {
             FcActionRow("重命名", Modifier.testTag("template-section-rename"), enabled = !state.busy) { renameSection = section; sectionOptions = null; sectionForm = true }
             FcActionRow("上移", Modifier.testTag("template-section-up"), enabled = !state.busy) {
-                change({ it.reordering(shiftAxis(content!!, section.sectionID.value, -1), state.clock.now()) }) { sectionOptions = null }
+                change({ state.reorder(content!!, section.sectionID.value, -1) }) { sectionOptions = null }
             }
             FcActionRow("下移", Modifier.testTag("template-section-down"), enabled = !state.busy) {
-                change({ it.reordering(shiftAxis(content!!, section.sectionID.value, 1), state.clock.now()) }) { sectionOptions = null }
+                change({ state.reorder(content!!, section.sectionID.value, 1) }) { sectionOptions = null }
             }
             FcActionRow("删除分段", Modifier.testTag("template-section-delete"), destructive = true, enabled = !state.busy) {
                 sectionOptions = null
                 if (content!!.exercises.none { it.sectionID == section.sectionID }) {
-                    change({ it.deletingSection(section.sectionID, SessionSectionDeletionDisposition.DeleteWithExercises, state.clock.now()) })
+                    change({ state.deleteSection(section.sectionID, SessionSectionDeletionDisposition.DeleteWithExercises) })
                 } else confirmSection = section
             }
             FcSecondaryButton("取消", Modifier.testTag("template-section-options-cancel")) { sectionOptions = null }
@@ -177,27 +174,27 @@ fun TemplateEditorScreen(state: TemplateUiState, id: TemplateID, exercises: Exer
             FcActionRow("计划组", Modifier.testTag("template-planned-sets"), enabled = !state.busy) { planned = row; exerciseOptions = null }
             FcActionRow("移入分段", Modifier.testTag("template-exercise-move"), enabled = !state.busy) { moving = row.templateExerciseID; exerciseOptions = null }
             FcActionRow("上移", Modifier.testTag("template-exercise-up"), enabled = !state.busy) {
-                change({ it.reordering(shiftAxis(content!!, row.templateExerciseID.value, -1), state.clock.now()) }) { exerciseOptions = null }
+                change({ state.reorder(content!!, row.templateExerciseID.value, -1) }) { exerciseOptions = null }
             }
             FcActionRow("下移", Modifier.testTag("template-exercise-down"), enabled = !state.busy) {
-                change({ it.reordering(shiftAxis(content!!, row.templateExerciseID.value, 1), state.clock.now()) }) { exerciseOptions = null }
+                change({ state.reorder(content!!, row.templateExerciseID.value, 1) }) { exerciseOptions = null }
             }
             FcActionRow("移除动作", Modifier.testTag("template-exercise-remove"), destructive = true, enabled = !state.busy) { removeExercise = row.templateExerciseID; exerciseOptions = null }
             FcSecondaryButton("取消", Modifier.testTag("template-exercise-options-cancel")) { exerciseOptions = null }
         }
     }
     if (moving != null && content != null) SectionTargetSheet(content.sections, state.busy, "template-move", { moving = null }) { target ->
-        change({ it.movingExercise(moving!!, target, state.clock.now()) }) { moving = null }
+        change({ state.moveExercise(moving!!, target) }) { moving = null }
     }
     confirmSection?.let { section ->
         FcConfirmationDialog("删除分段“${section.name}”", "分段内的动作将移到“未分段”，动作和计划组会保留。", "删除分段",
-            { change({ it.deletingSection(section.sectionID, SessionSectionDeletionDisposition.MoveExercisesTo(null), state.clock.now()) }) { confirmSection = null } },
+            { change({ state.deleteSection(section.sectionID, SessionSectionDeletionDisposition.MoveExercisesTo(null)) }) { confirmSection = null } },
             { if (!state.busy) confirmSection = null }, tag = "template-delete-section-confirm")
     }
     removeExercise?.let { exercise -> FcConfirmationDialog("移除动作", "删除该动作的计划组。", "移除",
-        { change({ it.removingExercise(exercise, state.clock.now()) }) { removeExercise = null } }, { if (!state.busy) removeExercise = null }, tag = "template-remove-confirm") }
+        { change({ state.removeExercise(exercise) }) { removeExercise = null } }, { if (!state.busy) removeExercise = null }, tag = "template-remove-confirm") }
     if (deleteTemplate) FcConfirmationDialog("删除模板", "已应用到训练的独立记录不受影响。", "删除", {
-        scope.launch { state.perform({ state.useCases.delete(id) }) { deleteTemplate = false; onBack() } }
+        scope.launch { state.delete(id) { deleteTemplate = false; onBack() } }
     }, { if (!state.busy) deleteTemplate = false }, tag = "template-delete-confirm")
     planned?.let { row -> PlannedSetsSheet(state, row) { planned = null } }
 }
@@ -211,30 +208,4 @@ private fun SectionTargetSheet(sections: List<SectionRecord>, busy: Boolean, tag
             FcSecondaryButton("取消", Modifier.testTag("$tag-cancel"), !busy, onDismiss)
         }
     }
-}
-
-/** Move a section as a block; member moves stay inside their current section. */
-private fun shiftAxis(content: TemplateContentRecord, key: String, delta: Int): List<SessionSectionAxisItem> {
-    val blocks = (content.sections.map { section -> section.orderIndex to
-        (listOf<SessionSectionAxisItem>(SessionSectionAxisItem.Section(section.sectionID)) + content.exercises
-            .filter { it.sectionID == section.sectionID }.sortedBy { it.orderIndex }.map { SessionSectionAxisItem.Exercise(it.templateExerciseID.value) }) } +
-        content.exercises.filter { it.sectionID == null }.map { it.orderIndex to listOf<SessionSectionAxisItem>(SessionSectionAxisItem.Exercise(it.templateExerciseID.value)) })
-        .sortedBy { it.first }.map { it.second.toMutableList() }.toMutableList()
-    val section = content.sections.firstOrNull { it.sectionID.value == key }
-    val row = content.exercises.firstOrNull { it.templateExerciseID.value == key }
-    if (section != null || row?.sectionID == null) {
-        val index = blocks.indexOfFirst { block -> block.first().let { when (it) {
-            is SessionSectionAxisItem.Section -> it.id.value == key
-            is SessionSectionAxisItem.Exercise -> it.id == key
-        } } }
-        val target = index + delta
-        if (index >= 0 && target in blocks.indices) java.util.Collections.swap(blocks, index, target)
-    } else {
-        val block = blocks.firstOrNull { it.first() == SessionSectionAxisItem.Section(row.sectionID) }
-        if (block != null) {
-            val index = block.indexOf(SessionSectionAxisItem.Exercise(key)); val target = index + delta
-            if (index > 0 && target in 1 until block.size) java.util.Collections.swap(block, index, target)
-        }
-    }
-    return blocks.flatten()
 }
