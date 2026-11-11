@@ -102,7 +102,7 @@ internal object ConformanceComparison {
         check(design.width == android.width && design.height == android.height)
         val ssim = ConformanceSsim.compare(design, android)
         ImageIO.write(ssim.heatmap(), "png", File(out, "$screen.ssim-heatmap.png"))
-        val ssimReport = ssim.json(screen == "P0-a2-training").put("heatmap", "$screen.ssim-heatmap.png")
+        val ssimReport = ssim.json(false).put("heatmap", "$screen.ssim-heatmap.png")
         val pendingRegions = JSONArray()
         rowList.filter { it.has("pendingBoardFix") }.forEach { row ->
             val layer = layers.single { it.getString("path") == row.getString("path") }
@@ -145,7 +145,7 @@ internal object ConformanceComparison {
             .put("androidOnlyTextNodes", JSONArray(actual.filter { it.getInt("id") !in used && it.getString("text").isNotEmpty() }))
         result.put("ssim", ssimReport)
         result.put("designPath", designPath)
-        result.put("gatePassed", !invalidCapture && result.getInt("failed") == 0 && (screen != "P0-a2-training" || ssim.passes()))
+        result.put("gatePassed", !invalidCapture && result.getInt("failed") == 0)
         return result
     }
 

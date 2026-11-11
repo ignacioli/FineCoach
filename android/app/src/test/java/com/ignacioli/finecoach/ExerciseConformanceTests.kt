@@ -159,6 +159,7 @@ class ExerciseConformanceTests {
         if (!stability.getBoolean("stable") && result.getString("artifactStatus") != "INVALID_CAPTURE") result.put("artifactStatus", "INVALID_FIXTURE_UNSTABLE")
         result.put("humanReadSummary", "仅一次查看批准 PNG；未打开 Android 截图。节点几何与稳定性见本报告；负责人视觉验收 PENDING。")
         ConformanceComparison.writeReports(out, result)
+        ConformanceSsimAlignment.evaluate(File(System.getProperty("finecoach.storageProjectDirectory")), out.parentFile)
         println("S0_CONFORMANCE "+name+" total="+result.getInt("total")+" passed="+result.getInt("passed")+" failed="+result.getInt("failed"))
         // Diagnostic task: page failures are data, not a gate. Invalid captures must remain failures in the report.
         if (result.getString("artifactStatus") == "INVALID_CAPTURE") Assert.assertTrue(result.getInt("failed") > 0)
