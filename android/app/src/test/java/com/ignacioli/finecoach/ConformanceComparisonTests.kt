@@ -98,6 +98,18 @@ class ConformanceComparisonTests {
         parent.put("type", "group").put("name", "icon / dumbbell")
         assertFalse(ConformanceComparison.vectorUnobservable(layer, parent, entry, true, true))
     }
+    @Test fun vectorInternalRequiresItsOwnSelectorToHitTheParentNode() {
+        val parentRow = JSONObject().put("status", "PASS").put("actual", JSONObject().put("id", 7))
+        val hit = JSONObject().put("status", "PASS").put("actual", JSONObject().put("id", 7))
+        assertTrue(ConformanceComparison.vectorSelectorHitsParent(hit, parentRow))
+        // Selector found nothing: the row stays MISSING and cannot be marked unobservable.
+        assertFalse(ConformanceComparison.vectorSelectorHitsParent(JSONObject().put("status", "MISSING"), parentRow))
+        // Selector found a different node than the parent icon.
+        assertFalse(ConformanceComparison.vectorSelectorHitsParent(JSONObject().put("status", "FAIL").put("actual", JSONObject().put("id", 8)), parentRow))
+        // Parent row itself missing.
+        assertFalse(ConformanceComparison.vectorSelectorHitsParent(hit, JSONObject().put("status", "MISSING")))
+        assertFalse(ConformanceComparison.vectorSelectorHitsParent(hit, null))
+    }
     @Test fun vectorMarkCannotHideTextOrAnUnapprovedLayer() {
         val parent = JSONObject("""{"path":"45","type":"group","name":"edit"}""")
         val entry = JSONObject("""{"unobservable":"VECTOR_INTERNAL_PATH","parentPath":"45","asset":"edit"}""")

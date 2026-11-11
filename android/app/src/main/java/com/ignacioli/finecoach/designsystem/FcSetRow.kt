@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import com.ignacioli.finecoach.R
 
-// S1-D38: 38dp visual rhythm, independent 44dp hit targets (3dp overlap per edge).
+// S1-D38: 38dp visual rhythm; each 44dp hit target is centered on its visible graphic (edit ±3dp, circle 0/+6dp); overlap bands go to the lower row.
 private val setVisualRhythm = FcComponentMetrics.touch - FcSpacing.space3 / 2
 
 // Prefer the approved size whenever it fits. The default step grid (min=13.6,
