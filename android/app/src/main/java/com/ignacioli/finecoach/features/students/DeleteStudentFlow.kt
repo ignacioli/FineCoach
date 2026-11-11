@@ -129,6 +129,20 @@ class DeleteStudentViewModel(
         )
     }
 
+    suspend fun archive(): Boolean {
+        uiState = uiState.copy(isDeleting = true, errorMessage = null)
+        return when (val result = useCases.archive(studentID)) {
+            is ApplicationResult.Success -> {
+                uiState = uiState.copy(isDeleting = false)
+                true
+            }
+            is ApplicationResult.Failure -> {
+                uiState = uiState.copy(isDeleting = false, errorMessage = StudentPresentation.errorMessage(result.error))
+                false
+            }
+        }
+    }
+
     suspend fun confirmDelete(): Boolean {
         activeOps += 1
         uiState = uiState.copy(isDeleting = true, errorMessage = null)
@@ -188,8 +202,9 @@ fun StudentArchiveConfirmationView(
     onArchived: () -> Unit,
     insets: WindowInsets = WindowInsets.safeDrawing,
 ) {
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-    var isArchiving by remember { mutableStateOf(false) }
+    val state = remember(studentID, useCases) { DeleteStudentViewModel(studentID, useCases) }
+    val errorMessage = state.uiState.errorMessage
+    val isArchiving = state.uiState.isDeleting
     val scope = rememberCoroutineScope()
 
     FcPlatformShell(
@@ -273,18 +288,7 @@ fun StudentArchiveConfirmationView(
                     enabled = !isArchiving,
                     onClick = {
                         scope.launch {
-                            isArchiving = true
-                            errorMessage = null
-                            when (val res = useCases.archive(studentID)) {
-                                is ApplicationResult.Success -> {
-                                    isArchiving = false
-                                    onArchived()
-                                }
-                                is ApplicationResult.Failure -> {
-                                    isArchiving = false
-                                    errorMessage = StudentPresentation.errorMessage(res.error)
-                                }
-                            }
+                            if (state.archive()) onArchived()
                         }
                     },
                 )

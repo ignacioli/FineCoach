@@ -15,13 +15,13 @@ import com.ignacioli.finecoach.designsystem.*
 import com.ignacioli.finecoach.navigation.S1Routes
 import com.ignacioli.finecoach.storage.repository.ExerciseRepository
 
-/** Coach-owned resources; neither row mutates student or training data. */
-@Composable
-fun ResourceHubScreen(exercises: ExerciseRepository, templates: TemplateUseCases,
-    onNavigate: (String) -> Unit, onBack: () -> Unit) {
-    var exerciseSummary by remember { mutableStateOf<String?>(null) }
-    var templateSummary by remember { mutableStateOf<String?>(null) }
-    LaunchedEffect(exercises, templates) {
+internal class ResourceHubState {
+    var exerciseSummary by mutableStateOf<String?>(null)
+        private set
+    var templateSummary by mutableStateOf<String?>(null)
+        private set
+
+    suspend fun load(exercises: ExerciseRepository, templates: TemplateUseCases) {
         exerciseSummary = when (val result = exercises.listCatalog()) {
             is ApplicationResult.Failure -> "动作数量加载失败"
             is ApplicationResult.Success -> if (exercises.catalogUnavailable) "动作库暂不可用" else {
@@ -34,15 +34,23 @@ fun ResourceHubScreen(exercises: ExerciseRepository, templates: TemplateUseCases
             is ApplicationResult.Success -> "${result.value.size} 个模板"
         }
     }
+}
+
+/** Coach-owned resources; neither row mutates student or training data. */
+@Composable
+fun ResourceHubScreen(exercises: ExerciseRepository, templates: TemplateUseCases,
+    onNavigate: (String) -> Unit, onBack: () -> Unit) {
+    val state = remember { ResourceHubState() }
+    LaunchedEffect(exercises, templates) { state.load(exercises, templates) }
     FcPageSecondary("资料库", onBack, tag = "resource-hub") {
         Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).testTag("resource-hub-content"),
             verticalArrangement = Arrangement.spacedBy(FcSpacing.space4)) {
             Column(Modifier.fillMaxWidth()) {
                 FcListRowDivider()
-                FcHubRow("动作库", painterResource(R.drawable.ic_ms_grid_view), Modifier.testTag("resource-hub-exercises"), subtitle = exerciseSummary,
+                FcHubRow("动作库", painterResource(R.drawable.ic_ms_grid_view), Modifier.testTag("resource-hub-exercises"), subtitle = state.exerciseSummary,
                     mode = FcRowMode.Action { onNavigate(S1Routes.EXERCISES) })
                 FcListRowDivider()
-                FcHubRow("训练模板", painterResource(R.drawable.ic_ms_list_alt), Modifier.testTag("resource-hub-templates"), subtitle = templateSummary,
+                FcHubRow("训练模板", painterResource(R.drawable.ic_ms_list_alt), Modifier.testTag("resource-hub-templates"), subtitle = state.templateSummary,
                     mode = FcRowMode.Action { onNavigate(S1Routes.TEMPLATES) })
                 FcListRowDivider()
             }

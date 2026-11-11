@@ -50,21 +50,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-private enum class PickingDate { Start, End }
+internal enum class PickingDate { Start, End }
 
-private data class EditorContext(
+internal data class EditorContext(
     val asOf: LocalDate,
     val existing: CoursePackageRecord?,
     val balance: Long,
     val requiresConfirmation: Boolean,
 )
 
-private data class PackageConfirmation(
+internal data class PackageConfirmation(
     val packageId: CoursePackageID?,
     val message: String,
 )
 
-private class CoursePackageEditorState(
+internal class CoursePackageEditorState(
     private val studentID: StudentID,
     private val useCases: CreditUseCases,
     private val clock: AppClock,
@@ -173,6 +173,17 @@ private class CoursePackageEditorState(
                 )
             },
         )
+    }
+
+    suspend fun reloadConfirmation() {
+        reload()
+        val current = context
+        val existingPackage = current?.existing
+        confirmation = if (current != null && current.requiresConfirmation && existingPackage != null) {
+            confirmationFor(existingPackage, current.balance)
+        } else {
+            null
+        }
     }
 
     fun cancelConfirmation() {
@@ -390,20 +401,7 @@ fun CoursePackageEditorScreen(
                         if (!state.tryBegin()) return@FcConfirmationDialog
                         scope.launch {
                             try {
-                                state.reload()
-                                val current = state.context
-                                val existingPackage = current?.existing
-                                state.confirmation = if (current != null && current.requiresConfirmation && existingPackage != null) {
-                                    PackageConfirmation(
-                                        existingPackage.coursePackageID,
-                                        replacementConfirmMessage(
-                                            packageDisplayName(existingPackage.name, existingPackage.startDate),
-                                            current.balance,
-                                        ),
-                                    )
-                                } else {
-                                    null
-                                }
+                                state.reloadConfirmation()
                             } finally {
                                 state.endBusy()
                             }
