@@ -63,27 +63,51 @@ class ConformanceComparisonTests {
         val selector = JSONObject().put("commonLayoutParentOfTags", JSONArray(listOf("minus", "plus"))).put("containsTag", "input")
         assertEquals(2, ConformanceComparison.select(listOf(JSONObject(selector.toString()), JSONObject(selector.toString())), selector).size)
     }
-    @Test fun textHeightIsReportOnlyWhileItsCenterAndWidthRemainStrict() {
-        val design = rect(16.0, 100.0, 86.0, 20.0).put("type", "text")
-        val actual = rect(16.0, 95.0, 86.0, 30.0)
-        val result = ConformanceComparison.geometry(actual, design, "top", 0.0)
-        assertTrue(result.getBoolean("matches")); assertEquals(10.0, result.getJSONObject("delta").getDouble("h"), 0.0)
-        assertEquals(0.0, result.getJSONObject("delta").getDouble("centerY"), 0.0)
-        actual.put("w", 88.001)
-        assertFalse(ConformanceComparison.geometry(actual, design, "top", 0.0).getBoolean("matches"))
-        actual.put("w", 86.0).put("x", 18.001)
-        assertFalse(ConformanceComparison.geometry(actual, design, "top", 0.0).getBoolean("matches"))
+    @Test fun designTextBoxIsNormalizedToTokenLineHeightAroundItsCenter() {
+        // 17pt/400 = body, README multiplier 1.4 → 23.8; Penpot exported 20 tall at y=100 (center 110).
+        val design = rect(16.0, 100.0, 86.0, 20.0).put("type", "text").put("fontSize", 17).put("fontWeight", 400)
+        val box = ConformanceComparison.designBox(design)
+        assertEquals(23.8, box.getDouble("h"), 0.001); assertEquals(110.0, box.getDouble("y") + box.getDouble("h") / 2, 0.001)
+        val actual = rect(16.0, 98.1, 86.0, 24.0)
+        assertTrue(ConformanceComparison.geometry(actual, design, "top", 0.0).getBoolean("matches"))
     }
-    @Test fun textCentersHonorTopOriginBottomAnchorAndInclusiveTolerance() {
-        val design = rect(16.0, 775.0, 69.0, 20.0).put("type", "text")
-        val actual = rect(16.0, 770.0, 69.0, 30.0)
-        assertTrue(ConformanceComparison.geometry(actual, design, "bottom", -52.0).getBoolean("matches"))
-        actual.put("y", 772.0)
-        assertTrue(ConformanceComparison.geometry(actual, design, "bottom", -52.0).getBoolean("matches"))
-        actual.put("y", 772.001)
-        assertFalse(ConformanceComparison.geometry(actual, design, "bottom", -52.0).getBoolean("matches"))
-        actual.put("y", 718.0)
-        assertTrue(ConformanceComparison.geometry(actual, design, "top", -52.0).getBoolean("matches"))
+    @Test fun textIsJudgedOnAllFourAxesAfterNormalization() {
+        val design = rect(16.0, 100.0, 86.0, 20.0).put("type", "text").put("fontSize", 17).put("fontWeight", 400)
+        // A natural 24.5→30 box with the same center no longer passes: height is strict now.
+        val tall = rect(16.0, 95.0, 86.0, 30.0)
+        val g = ConformanceComparison.geometry(tall, design, "top", 0.0)
+        assertFalse(g.getBoolean("matches")); assertFalse(g.getJSONObject("withinTolerance").getBoolean("h"))
+        assertEquals(0.0, g.getJSONObject("delta").getDouble("centerY"), 0.001)
+        for ((axis, value) in listOf("x" to 18.001, "w" to 88.001)) {
+            val off = rect(16.0, 98.1, 86.0, 23.8).put(axis, value)
+            assertFalse(axis, ConformanceComparison.geometry(off, design, "top", 0.0).getBoolean("matches"))
+        }
+    }
+    @Test fun normalizedTextHonorsTopOriginAndBottomAnchor() {
+        // 17pt/600 headline: 23.8 tall around the exported center 785.
+        val design = rect(16.0, 775.0, 69.0, 20.0).put("type", "text").put("fontSize", 17).put("fontWeight", 600)
+        val bottom = rect(16.0, 773.1, 69.0, 23.8)
+        assertTrue(ConformanceComparison.geometry(bottom, design, "bottom", -52.0).getBoolean("matches"))
+        assertFalse(ConformanceComparison.geometry(rect(16.0, 775.2, 69.0, 23.8), design, "bottom", -52.0).getBoolean("matches"))
+        assertTrue(ConformanceComparison.geometry(rect(16.0, 721.1, 69.0, 23.8), design, "top", -52.0).getBoolean("matches"))
+    }
+    @Test fun editableTextFieldIsJudgedByCenterAndReportsItsRawHeight() {
+        val layer = JSONObject("""{"path":"22","type":"text","fontSize":24,"fontWeight":600,"x":211,"y":215.1,"w":65,"h":28.8}""")
+        val rule = JSONObject("""{"geometryRule":"EDITABLE_TEXT_FIELD"}""")
+        val centered = ConformanceComparison.geometry(JSONObject("""{"x":211.5,"y":212,"w":63.5,"h":35}"""), layer, "top", 0.0, rule = rule)
+        assertTrue(centered.getBoolean("matches"))
+        assertEquals(35.0, centered.getJSONObject("editableTextField").getDouble("rawH"), 0.001)
+        val shifted = ConformanceComparison.geometry(JSONObject("""{"x":211.5,"y":215,"w":63.5,"h":35}"""), layer, "top", 0.0, rule = rule)
+        assertFalse("A 3dp center shift still fails", shifted.getBoolean("matches"))
+        assertFalse("Without the rule the height is judged", ConformanceComparison.geometry(
+            JSONObject("""{"x":211.5,"y":212,"w":63.5,"h":35}"""), layer, "top", 0.0).getBoolean("matches"))
+    }
+
+    @Test fun tokenLineHeightUsesWeightThenSizeAndFailsWhenAmbiguous() {
+        assertEquals(22 * 1.3, ConformanceComparison.tokenLineHeight(22.0, 400), 0.001) // ‹: no 22/400 style, all 22pt styles share 1.3
+        assertEquals(14 * 1.2, ConformanceComparison.tokenLineHeight(14.0, 400), 0.001) // compact, not chipLabel
+        assertEquals(14 * 1.3, ConformanceComparison.tokenLineHeight(14.0, 500), 0.001) // chipLabel
+        assertThrows(IllegalStateException::class.java) { ConformanceComparison.tokenLineHeight(19.0, 400) }
     }
     @Test fun vectorInternalIsUnobservableOnlyWithMatchingParentAndProvenance() {
         val layer = JSONObject("""{"path":"7/1","type":"path"}""")

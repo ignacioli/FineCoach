@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,7 +52,7 @@ internal fun SessionSwipeRow(tag: String, open: Boolean, enabled: Boolean, revea
                     verticalArrangement = Arrangement.Center) {
                     if (action.destructive) FcSymbol(painterResource(R.drawable.ic_ms_delete), tint = FcColors.actionOn)
                     if (action.tag == "session-exercise-move") FcSymbol(painterResource(R.drawable.ic_ms_folder), tint = FcColors.actionOn)
-                    Text(action.title, style = FcTypography.caption, color = FcColors.actionOn, maxLines = 1)
+                    FcText(action.title, style = FcTypography.caption, color = FcColors.actionOn, maxLines = 1)
                 }
             }
         }

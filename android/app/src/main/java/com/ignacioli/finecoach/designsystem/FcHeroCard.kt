@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,7 +60,7 @@ fun FcHeroCard(
                 .padding(horizontal = FcSpacing.space2),
             contentAlignment = Alignment.Center,
         ) {
-            Text(
+            FcText(
                 text = badgeText,
                 style = FcTypography.sectionLabel,
                 color = FcColors.actionPrimary,
@@ -77,14 +76,14 @@ fun FcHeroCard(
                     .alignBy(FirstBaseline),
                 verticalArrangement = Arrangement.spacedBy(FcSpacing.space1),
             ) {
-                Text(
+                FcText(
                     text = title,
                     modifier = Modifier.semantics { heading() },
                     style = FcTypography.headline,
                     color = FcColors.actionOn,
                 )
                 if (subtitle.isNotEmpty()) {
-                    Text(
+                    FcText(
                         text = subtitle,
                         style = FcTypography.callout,
                         color = FcColors.textOnActionSecondary,
@@ -92,7 +91,7 @@ fun FcHeroCard(
                 }
             }
             if (actionTitle != null) {
-                Text(
+                FcText(
                     text = actionTitle,
                     modifier = Modifier.alignBy(FirstBaseline),
                     style = FcTypography.style("callout", 600),
@@ -112,7 +111,7 @@ fun FcMultiHeroCard(entries: List<FcHeroEntry>, onOpen: (String) -> Unit, modifi
         .padding(FcSpacing.space4), verticalArrangement = Arrangement.spacedBy(FcSpacing.space3)) {
         Box(Modifier.widthIn(min = FcComponentMetrics.touch + FcSpacing.space3).height(FcComponentMetrics.icon)
             .clip(FcShapes.capsule).background(FcColors.surfaceCanvas).padding(horizontal = FcSpacing.space2), contentAlignment = Alignment.Center) {
-            Text("进行中 · ${entries.size}", style = FcTypography.sectionLabel, color = FcColors.actionPrimary)
+            FcText("进行中 · ${entries.size}", style = FcTypography.sectionLabel, color = FcColors.actionPrimary)
         }
         entries.forEachIndexed { index, entry ->
             if (index > 0) Box(Modifier.fillMaxWidth().height(FcComponentMetrics.hairline).background(FcColors.surfaceDividerOnAction))
@@ -120,10 +119,10 @@ fun FcMultiHeroCard(entries: List<FcHeroEntry>, onOpen: (String) -> Unit, modifi
                 .then(Modifier.semantics { }).testTag("hero-${entry.id}"), verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
                 Column(Modifier.weight(1f)) {
-                    Text(entry.title, style = FcTypography.headline, color = FcColors.actionOn)
-                    Text(entry.subtitle, style = FcTypography.callout, color = FcColors.textOnActionSecondary)
+                    FcText(entry.title, style = FcTypography.headline, color = FcColors.actionOn)
+                    FcText(entry.subtitle, style = FcTypography.callout, color = FcColors.textOnActionSecondary)
                 }
-                Text("继续 ›", style = FcTypography.style("callout", 600), color = FcColors.actionOn)
+                FcText("继续 ›", style = FcTypography.style("callout", 600), color = FcColors.actionOn)
             }
         }
     }

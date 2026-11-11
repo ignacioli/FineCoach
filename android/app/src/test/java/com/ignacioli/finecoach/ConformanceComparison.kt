@@ -38,7 +38,10 @@ internal object ConformanceComparison {
             val candidates = select(actual, entry, ::expand)
             val n = candidates.singleOrNull()
             val anchor = entry.getString("anchor")
-            val expected = expectedBounds(layer, anchor, offset)
+            entry.optJSONObject("pendingBoardFix")?.let { fix ->
+                check(fix.optString("decision").startsWith("S1-D") && fix.optString("reason").isNotBlank()) { "pendingBoardFix needs a decision and reason at ${layer.getString("path")}" }
+            }
+            val expected = expectedBounds(layer, anchor, offset, entry)
             val row = JSONObject().put("path", layer.getString("path")).put("name", layer.getString("name"))
                 .put("anchor", anchor).put("toleranceDp", tolerance).put("topOriginApplied", anchor == "top")
                 .put("expectedText", layer.optString("text", "")).put("selector", entry)
@@ -48,7 +51,7 @@ internal object ConformanceComparison {
                     .put("textMatches", false).put("tokenMatches", false)
             } else {
                 used += n.getInt("id")
-                val geometry = geometry(n, layer, anchor, offset, tolerance)
+                val geometry = geometry(n, layer, anchor, offset, tolerance, entry)
                 val deltas = geometry.getJSONObject("delta")
                 val textMatches = !layer.has("text") || layer.getString("text") == n.getString("text")
                 val expectedHex = layer.optString("fill", "").ifEmpty { layer.optJSONObject("stroke")?.optString("color").orEmpty() }
@@ -70,6 +73,8 @@ internal object ConformanceComparison {
                     .put("visibility", visibility).put("geometryMatches", geometryMatches)
                     .put("category", if (!visible) "INVISIBLE_OR_CLIPPED" else if (geometryMatches && textMatches && tokenMatches) "PASS" else "UI_DEVIATION")
                     .put("status", if (visible && geometryMatches && textMatches && tokenMatches) "PASS" else "FAIL")
+                if (row.getString("status") == "PASS" && entry.has("pendingBoardFix"))
+                    row.put("status", "BOARD_FIX_PENDING").put("category", "BOARD_FIX_PENDING").put("pendingBoardFix", entry.getJSONObject("pendingBoardFix"))
             }
             rows.put(row)
         }
@@ -97,6 +102,7 @@ internal object ConformanceComparison {
         val uiDeviations = rowList.count { it.getString("category") == "UI_DEVIATION" }
         val passed = rowList.count { it.getString("status") == "PASS" }
         val unobservable = rowList.count { it.getString("status") == "UNOBSERVABLE_VECTOR_INTERNAL" }
+        val boardFixPending = rowList.count { it.getString("status") == "BOARD_FIX_PENDING" }
         val design = ImageIO.read(File(androidRoot.parentFile, "design/experience-p0/screens/P0-a2-training.png"))
         check(design.width == android.width && design.height == android.height)
         val diff = BufferedImage(design.width, design.height, BufferedImage.TYPE_INT_RGB)
@@ -116,7 +122,7 @@ internal object ConformanceComparison {
         }
         ImageIO.write(triptych, "png", File(out, "P0-a2-training.triptych.png"))
         val top = rowList.filter { it.has("delta") && it.getString("category") == "UI_DEVIATION" }.sortedByDescending { row -> listOf("x", "y", "w", "h").maxOf { abs(row.getJSONObject("delta").getDouble(it)) } }.take(10)
-        val result = JSONObject().put("artifactStatus", "VALID_FIXTURE").put("invisible", invisible).put("uiDeviations", uiDeviations).put("total", rows.length()).put("passed", passed).put("failed", rows.length() - passed - unobservable).put("missing", missing)
+        val result = JSONObject().put("artifactStatus", "VALID_FIXTURE").put("invisible", invisible).put("uiDeviations", uiDeviations).put("total", rows.length()).put("passed", passed).put("failed", rows.length() - passed - unobservable - boardFixPending).put("boardFixPending", boardFixPending).put("missing", missing)
             .put("unobservableVectorInternal", unobservable)
             .put("toleranceDp", tolerance).put("measuredContentTop", contentTop).put("effectiveOriginOffsetY", offset)
             .put("originReason", map.getString("originRule")).put("differentPixelRatio", different.toDouble() / (design.width.toLong() * design.height))
@@ -172,21 +178,65 @@ internal object ConformanceComparison {
         }
     }
 
-    private fun expectedBounds(layer: JSONObject, anchor: String, offset: Double): JSONObject {
-        require(anchor in setOf("top", "bottom", "viewport")) { "Unknown anchor: $anchor" }
-        return if (anchor == "viewport") JSONObject().put("x", 0).put("y", 0).put("w", 390).put("h", 844)
-        else JSONObject().put("x", layer.getDouble("x")).put("y", layer.getDouble("y") + if (anchor == "top") offset else 0.0)
-            .put("w", layer.getDouble("w")).put("h", layer.getDouble("h"))
+    /**
+     * S1-D40 R2: a design text box is re-expressed in the token line-box model, keeping its center
+     * (glyph position does not move): h = fontSize × the README line-height multiplier of the style
+     * with that size and weight. Layers without font metadata keep their exported box.
+     */
+    internal fun tokenLineHeight(fontSize: Double, fontWeight: Int): Double {
+        val styles = com.ignacioli.finecoach.designsystem.FcTypography.styles
+        val sameSize = styles.filter { (_, s) -> s.fontSize.value.toDouble() == fontSize }
+        val byWeight = sameSize.filter { (name, _) -> fontWeight in com.ignacioli.finecoach.designsystem.FcTypography.allowedWeights.getValue(name) }
+        val multipliers = (byWeight.ifEmpty { sameSize }).keys.map { com.ignacioli.finecoach.designsystem.FcTypography.lineHeightMultipliers.getValue(it).toDouble() }.toSet()
+        check(multipliers.size == 1) { "No unique README line-height token for ${fontSize}pt/$fontWeight: $multipliers" }
+        return fontSize * multipliers.single()
     }
 
-    internal fun geometry(actual: JSONObject, layer: JSONObject, anchor: String, offset: Double, tolerance: Double = 2.0): JSONObject {
+    /**
+     * Map rules (both explicit per entry, never inferred):
+     * - `geometryRule=SYMBOL_CENTER` (S1-D40 R4): a design text glyph that AD-01 maps to a Material
+     *   symbol is compared as a `symbolSizeDp` square centered on the glyph box center.
+     * - `geometryRule=EDITABLE_TEXT_FIELD` (S1-D42): the platform text field keeps its natural single-line
+     *   minimum height outside the caller's modifiers, so the actual editor box is normalized to the design
+     *   token line box around its own center; x, w and the center are judged, the raw height is reported.
+     * - `pendingBoardFix` (S1-D42): a registered board drift awaiting a Penpot fix shifts the expected
+     *   box by `dx`/`dy`; such a row is reported as BOARD_FIX_PENDING, never as PASS.
+     */
+    internal fun designBox(layer: JSONObject, rule: JSONObject? = null): JSONObject {
+        val box = JSONObject().put("x", layer.getDouble("x")).put("y", layer.getDouble("y")).put("w", layer.getDouble("w")).put("h", layer.getDouble("h"))
+        if (rule?.optString("geometryRule") == "SYMBOL_CENTER") {
+            val size = rule.getDouble("symbolSizeDp")
+            box.put("x", layer.getDouble("x") + layer.getDouble("w") / 2 - size / 2).put("y", layer.getDouble("y") + layer.getDouble("h") / 2 - size / 2)
+                .put("w", size).put("h", size)
+        } else if (layer.optString("type") == "text" && layer.has("fontSize")) {
+            val h = tokenLineHeight(layer.getDouble("fontSize"), layer.optInt("fontWeight", 400))
+            box.put("y", layer.getDouble("y") + layer.getDouble("h") / 2 - h / 2).put("h", h)
+        }
+        rule?.optJSONObject("pendingBoardFix")?.let { fix ->
+            box.put("x", box.getDouble("x") + fix.optDouble("dx", 0.0)).put("y", box.getDouble("y") + fix.optDouble("dy", 0.0))
+        }
+        return box
+    }
+
+    private fun expectedBounds(layer: JSONObject, anchor: String, offset: Double, rule: JSONObject? = null): JSONObject {
+        require(anchor in setOf("top", "bottom", "viewport")) { "Unknown anchor: $anchor" }
+        if (anchor == "viewport") return JSONObject().put("x", 0).put("y", 0).put("w", 390).put("h", 844)
+        val box = designBox(layer, rule)
+        return box.put("y", box.getDouble("y") + if (anchor == "top") offset else 0.0)
+    }
+
+    internal fun geometry(actual: JSONObject, layer: JSONObject, anchor: String, offset: Double, tolerance: Double = 2.0, rule: JSONObject? = null): JSONObject {
         require(tolerance == 2.0) { "Approved tolerance is ±2dp" }
-        val expected = expectedBounds(layer, anchor, offset)
+        val expected = expectedBounds(layer, anchor, offset, rule)
+        val design = designBox(layer, rule)
+        val rawActual = actual
+        @Suppress("NAME_SHADOWING") val actual = if (rule?.optString("geometryRule") == "EDITABLE_TEXT_FIELD") JSONObject(actual.toString())
+            .put("y", actual.getDouble("y") + actual.getDouble("h") / 2 - expected.getDouble("h") / 2).put("h", expected.getDouble("h")) else actual
         val delta = JSONObject()
         val within = JSONObject()
         for (axis in listOf("x", "y", "w", "h")) {
             val value = if (axis == "y" && anchor == "bottom")
-                (844.0 - actual.getDouble("y") - actual.getDouble("h")) - (844.0 - layer.getDouble("y") - layer.getDouble("h"))
+                (844.0 - actual.getDouble("y") - actual.getDouble("h")) - (844.0 - design.getDouble("y") - design.getDouble("h"))
             else actual.getDouble(axis) - expected.getDouble(axis)
             delta.put(axis, value); within.put(axis, abs(value) <= tolerance)
         }
@@ -196,13 +246,14 @@ internal object ConformanceComparison {
             delta.put("centerY", center); within.put("centerY", abs(center) <= tolerance)
         }
         return JSONObject().put("delta", delta).put("withinTolerance", within)
-            .put("matches", (if (text) listOf("x", "w", "centerY") else listOf("x", "y", "w", "h")).all { within.getBoolean(it) })
-            .put("comparisonAxes", JSONArray(if (text) listOf("x", "w", "centerY") else listOf("x", "y", "w", "h")))
-            .put("heightReportOnly", text)
+            .put("matches", listOf("x", "y", "w", "h").all { within.getBoolean(it) })
+            .put("comparisonAxes", JSONArray(listOf("x", "y", "w", "h")))
+            .put("textLineBox", if (text) "TOKEN_LINE_HEIGHT_CENTERED" else JSONObject.NULL)
             .put("rawYDelta", actual.getDouble("y") - layer.getDouble("y"))
+            .apply { if (rawActual !== actual) put("editableTextField", JSONObject().put("rawH", rawActual.getDouble("h")).put("rawY", rawActual.getDouble("y"))) }
             .put("yComparison", if (anchor == "bottom") "BOTTOM_GAP" else if (anchor == "viewport") "VIEWPORT_NOT_APPLICABLE_TO_TOP_ORIGIN" else "TOP_POSITION_WITH_ORIGIN")
             .apply { if (anchor == "bottom") {
-                put("designBottomGap", 844.0 - layer.getDouble("y") - layer.getDouble("h"))
+                put("designBottomGap", 844.0 - design.getDouble("y") - design.getDouble("h"))
                 put("actualBottomGap", 844.0 - actual.getDouble("y") - actual.getDouble("h"))
             } }
     }
@@ -238,11 +289,12 @@ internal object ConformanceComparison {
         File(out, "P0-a2-training.report.md").writeText(buildString {
             appendLine("# P0-a2 训练页设计一致性")
             appendLine("\nartifactStatus=${result.getString("artifactStatus")}；总数 ${result.getInt("total")}；通过 ${result.getInt("passed")}；失败 ${result.getInt("failed")}（UI 偏差 ${result.getInt("uiDeviations")}、missing ${result.getInt("missing")}、不可见/裁剪 ${result.getInt("invisible")}）；像素差异比例 ${result.getDouble("differentPixelRatio")}")
+            appendLine("\n画板待改（已登记，S1-D42）：${result.optInt("boardFixPending")}，不计入PASS或偏差；画板修正并重新导出后撤掉登记。")
             appendLine("\n不可观测（矢量内部）：${result.getInt("unobservableVectorInternal")}，不计入PASS或偏差。仅父图标几何通过且同名资产来源hash验证通过时成立（S1-D37）。")
             appendLine("\noriginOffsetY=${result.getDouble("effectiveOriginOffsetY")}；Android content top=${result.getDouble("measuredContentTop")}；${result.getString("originReason")}")
             result.optJSONObject("stability")?.let { appendLine("\n双次 fresh Room/composition 渲染：$it") }
-            appendLine("\nS1-D37：文字仅判定x/w/垂直中心，Δh只报告；其余图形x/y/w/h各自判定。容差均为±2dp含边界。top原点、bottom底距规则不变，文字中心按各anchor的expected矩形计算，无新增偏移。")
-            appendLine("\n| path | 元素 | anchor | 容差dp | Δx | Δy | Δw | Δh(文字仅报告) | ΔcenterY | text | token | category | 原因 |")
+            appendLine("\nS1-D40 R2：画稿文字框以中心为准换算为 token 行盒（高 = 字号 × README 行高倍率），文字与其他图形一样判定 x/y/w/h；ΔcenterY 仅报告。容差均为±2dp含边界。top原点、bottom底距规则不变，无新增偏移。")
+            appendLine("\n| path | 元素 | anchor | 容差dp | Δx | Δy | Δw | Δh | ΔcenterY(报告) | text | token | category | 原因 |")
             appendLine("|---|---|---|---:|---:|---:|---:|---:|---:|---|---|---|---|")
             rows.forEach { r ->
                 val d = r.optJSONObject("delta")

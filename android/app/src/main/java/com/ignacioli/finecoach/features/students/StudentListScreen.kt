@@ -1,5 +1,6 @@
 package com.ignacioli.finecoach.features.students
 
+import com.ignacioli.finecoach.designsystem.FcText
 import androidx.compose.foundation.Image
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.size
@@ -17,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -374,7 +374,7 @@ fun StudentListScreen(
                     }
 
                     state.errorMessage?.let { message ->
-                        Text(
+                        FcText(
                             text = message,
                             style = FcTypography.caption,
                             color = FcColors.statusDestructive,
@@ -478,14 +478,14 @@ fun ArchivedStudentListScreen(
                 tag = StudentTestTags.ARCHIVED_HEADER,
             )
 
-            Text(
+            FcText(
                 text = "归档学员不出现在学员列表与今日，历史记录全部保留。",
                 style = FcTypography.style("callout", 400),
                 color = FcColors.textSecondary,
             )
 
             state.errorMessage?.let { message ->
-                Text(
+                FcText(
                     text = message,
                     style = FcTypography.caption,
                     color = FcColors.statusDestructive,
@@ -505,12 +505,12 @@ fun ArchivedStudentListScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(FcSpacing.space2),
                 ) {
-                    Text(
+                    FcText(
                         text = "没有已归档学员",
                         style = FcTypography.headline,
                         color = FcColors.textPrimary,
                     )
-                    Text(
+                    FcText(
                         text = "归档后的学员会出现在这里，历史仍保留并可恢复。",
                         style = FcTypography.caption,
                         color = FcColors.textSecondary,
@@ -560,12 +560,12 @@ private fun SearchStudentsEmptyState() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(FcSpacing.space2),
     ) {
-        Text(
+        FcText(
             text = "没有找到匹配的学员",
             style = FcTypography.headline,
             color = FcColors.textPrimary,
         )
-        Text(
+        FcText(
             text = "试试显示名称中的其他字，或清空搜索。",
             style = FcTypography.caption,
             color = FcColors.textSecondary,

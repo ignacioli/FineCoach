@@ -1,5 +1,6 @@
 package com.ignacioli.finecoach.features.students
 
+import com.ignacioli.finecoach.designsystem.FcText
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,19 +54,19 @@ internal fun StudentActiveRow(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(FcSpacing.space1),
         ) {
-            Text(
+            FcText(
                 text = displayName,
                 style = FcTypography.headline,
                 color = FcColors.textPrimary,
             )
-            Text(
+            FcText(
                 text = focusSubtitle,
                 style = FcTypography.caption,
                 color = FcColors.textSecondary,
             )
         }
         if (trailingDetail != null) {
-            Text(
+            FcText(
                 text = trailingDetail,
                 style = FcTypography.caption,
                 color = FcColors.textSecondary,
@@ -109,12 +109,12 @@ internal fun StudentArchivedRow(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(FcSpacing.space1),
             ) {
-                Text(
+                FcText(
                     text = displayName,
                     style = FcTypography.headline,
                     color = FcColors.textPrimary,
                 )
-                Text(
+                FcText(
                     text = archivedOnSubtitle,
                     style = FcTypography.caption,
                     color = FcColors.textSecondary,
@@ -154,7 +154,7 @@ internal fun StudentOverviewRow(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(FcSpacing.space1),
         ) {
-            Text(
+            FcText(
                 text = kicker,
                 style = FcTypography.caption,
                 color = FcColors.textSecondary,
@@ -203,7 +203,7 @@ internal fun StudentInlineFieldRow(
                     contentAlignment = Alignment.CenterStart,
                 ) {
                     if (value.isEmpty()) {
-                        Text(
+                        FcText(
                             text = placeholder,
                             style = FcTypography.body,
                             color = FcColors.textSecondary,

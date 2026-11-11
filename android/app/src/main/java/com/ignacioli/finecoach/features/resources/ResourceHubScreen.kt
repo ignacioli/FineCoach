@@ -4,7 +4,6 @@ package com.ignacioli.finecoach.features.resources
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -47,7 +46,7 @@ fun ResourceHubScreen(exercises: ExerciseRepository, templates: TemplateUseCases
                     mode = FcRowMode.Action { onNavigate(S1Routes.TEMPLATES) })
                 FcListRowDivider()
             }
-            Text("资料库存放教练自己的动作与模板，不属于某一名学员。", style = FcTypography.caption, color = FcColors.textSecondary)
+            FcText("资料库存放教练自己的动作与模板，不属于某一名学员。", style = FcTypography.caption, color = FcColors.textSecondary)
         }
     }
 }

@@ -3,7 +3,6 @@ package com.ignacioli.finecoach
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -54,7 +53,7 @@ internal fun S0ComponentCatalog(onBack: () -> Unit) {
                 FcGroupEntryRow(entry.id, entry.states.size, Modifier.testTag("catalog-${entry.id}")) { selectedId = entry.id }
             } else {
                 val entry = (S0CatalogEntries + S1CatalogEntries).single { it.id == selectedId }
-                Text("虚构样例 · 无持久化", style = FcTypography.caption, color = FcColors.textSecondary)
+                FcText("虚构样例 · 无持久化", style = FcTypography.caption, color = FcColors.textSecondary)
                 entry.states.forEach { state ->
                     FcSectionLabel(state)
                     if (entry in S1CatalogEntries) S1ComponentState(entry.id, state) else S0ComponentState(entry.id, state)
@@ -77,7 +76,7 @@ internal fun S0ComponentState(id: String, state: String) {
     val modifier = Modifier.testTag(tag)
     Column(Modifier.fillMaxWidth().testTag("$tag-parent")) {
         when (id) {
-            "DS-BASE" -> Text("虚构教练 · 字体与主题", modifier, style = FcTypography.body, color = FcColors.textPrimary)
+            "DS-BASE" -> FcText("虚构教练 · 字体与主题", modifier, style = FcTypography.body, color = FcColors.textPrimary)
             "DS-BUTTON" -> when (state) {
                 "secondary" -> FcSecondaryButton("次按钮样例", modifier, onClick = tap)
                 "link" -> FcLinkButton("链接样例", modifier, onClick = tap)
@@ -121,7 +120,7 @@ internal fun S0ComponentState(id: String, state: String) {
                 "text" -> FcLabelValueText("虚构标签", "虚构值", modifier)
                 "slot" -> FcLabelValueRow("虚构开关", modifier) { FcToggle("值开关", checked, { checked = it }, Modifier.testTag("$tag-toggle")) }
                 else -> {
-                    FcLabelValueRow("虚构日期", modifier, onClick = { open = true }) { Text(date?.let { DateTimeFormatter.ofPattern("yyyy年M月d日").withZone(ZoneOffset.UTC).format(Instant.ofEpochMilli(it)) } ?: "选择日期", style = FcTypography.body, color = FcColors.textPrimary) }
+                    FcLabelValueRow("虚构日期", modifier, onClick = { open = true }) { FcText(date?.let { DateTimeFormatter.ofPattern("yyyy年M月d日").withZone(ZoneOffset.UTC).format(Instant.ofEpochMilli(it)) } ?: "选择日期", style = FcTypography.body, color = FcColors.textPrimary) }
                     if (open) FcDatePickerDialog(date, { date = it; open = false }, { open = false })
                 }
             }
@@ -169,6 +168,6 @@ internal fun S0ComponentState(id: String, state: String) {
             } else FcSymbol(FcGlyph.entries.single { it.name.replaceFirstChar(Char::lowercase) == state }, modifier)
             else -> error("Unknown catalog ID: $id")
         }
-        Text("样例交互计数：$count", Modifier.testTag("$tag-count"), style = FcTypography.caption, color = FcColors.textSecondary)
+        FcText("样例交互计数：$count", Modifier.testTag("$tag-count"), style = FcTypography.caption, color = FcColors.textSecondary)
     }
 }

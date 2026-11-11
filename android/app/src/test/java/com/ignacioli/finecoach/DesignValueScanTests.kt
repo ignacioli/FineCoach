@@ -19,7 +19,7 @@ internal object DesignValueScanner {
         "materialTheme" to Regex("\\bMaterialTheme\\s*\\.\\s*(?:typography|colorScheme)\\b"),
     )
     // Preserve offsets/newlines while excluding comments and string literals.
-    private fun code(source: String): String {
+    internal fun code(source: String): String {
         val ignored = Regex("\"\"\"[\\s\\S]*?\"\"\"|\"(?:\\\\.|[^\"\\\\])*\"|'(?:\\\\.|[^'\\\\])*'|//[^\\n]*|/\\*[\\s\\S]*?\\*/")
         return ignored.replace(source) { m -> m.value.map { if (it == '\n') '\n' else ' ' }.joinToString("") }
     }
@@ -101,7 +101,72 @@ internal object DesignValueScanner {
     }
 }
 
+/**
+ * S1-D40 R5 line-box guard (G3). Scans all of main (design system included) and debug:
+ * - `rawText`: material3 `Text(` or `BasicText(` outside the allowlist; text goes through `FcText`.
+ * - `offset`: `.offset` / `.absoluteOffset` (argument or lambda form) outside the allowlist; alignment comes from tokens or anatomy.
+ * Each allowlist entry is file + category + exact count + reason, so a new use fails until reviewed.
+ */
+internal object LineBoxScanner {
+    data class Allowed(val path: String, val category: String, val count: Int, val reason: String)
+    private val rules = listOf(
+        "rawText" to Regex("""(?<![\w])(?:Basic)?Text\s*\("""),
+        "offset" to Regex("""\.\s*(?:absoluteOffset|offset)\s*[({]"""),
+    )
+    val allowlist = listOf(
+        Allowed("main/java/com/ignacioli/finecoach/designsystem/FcText.kt", "rawText", 2, "FcText wraps the platform Text with the line box"),
+        Allowed("main/java/com/ignacioli/finecoach/designsystem/FcSetRow.kt", "rawText", 1, "set values use BasicText auto-size with fcLineBox"),
+        Allowed("debug/java/com/ignacioli/finecoach/S0DebugApplication.kt", "rawText", 1, "S0 debug sample text, not a design screen"),
+        Allowed("main/java/com/ignacioli/finecoach/features/session/SessionChrome.kt", "offset", 1, "back button 44dp hit area extends outward from the visible glyph"),
+        Allowed("main/java/com/ignacioli/finecoach/features/session/SessionSwipeRow.kt", "offset", 1, "swipe drag translation, runtime value"),
+    )
+    fun scan(path: String, source: String): Map<String, Int> {
+        val text = DesignValueScanner.code(source)
+        return rules.associate { (category, pattern) -> category to pattern.findAll(text).count() }.filterValues { it > 0 }
+    }
+    fun violations(root: File): List<String> {
+        val files = (root.resolve("main").walkTopDown() + root.resolve("debug").walkTopDown()).filter { it.isFile && it.extension == "kt" }.toList()
+        check(files.isNotEmpty()) { "empty line-box scan" }
+        val found = files.flatMap { file -> val path = file.relativeTo(root).invariantSeparatorsPath
+            scan(path, file.readText()).map { (category, count) -> Triple(path, category, count) } }
+        val unexpected = found.filter { (path, category, count) -> allowlist.none { it.path == path && it.category == category && it.count == count } }
+            .map { (path, category, count) -> "$path: $category x$count (not on the S1-D40 R5 allowlist)" }
+        val stale = allowlist.filter { a -> found.none { it.first == a.path && it.second == a.category && it.third == a.count } }
+            .map { "${it.path}: ${it.category} allowlist entry is stale" }
+        return unexpected + stale
+    }
+}
+
 class DesignValueScanTests {
+    @Test fun lineBoxRulesHoldInSource() {
+        val root = File(requireNotNull(System.getProperty("finecoach.sourceRoot")))
+        val violations = LineBoxScanner.violations(root)
+        violations.forEach { println("G3 lineBox $it") }
+        assertEquals("S1-D40 R5: raw Text or offset outside the allowlist", emptyList<String>(), violations)
+    }
+    @Test fun lineBoxScannerRecognizesRawTextAndOffset() {
+        assertEquals(mapOf("rawText" to 3), LineBoxScanner.scan("f.kt", "Text(\"a\"); androidx.compose.material3.Text(\"b\"); BasicText(\"c\")"))
+        assertEquals(emptyMap<String, Int>(), LineBoxScanner.scan("f.kt", "FcText(\"a\"); BasicTextField(v, f); RichText(x) // Text(\"d\")"))
+        assertEquals(mapOf("offset" to 2), LineBoxScanner.scan("f.kt", "Modifier.offset(y = FcSpacing.space1 - FcSpacing.hairline).offset { IntOffset(0, 0) }"))
+    }
+    @Test fun lineBoxScannerRecognizesQualifiedPrimitivesAndAbsoluteOffset() {
+        listOf("androidx.compose.foundation.text.BasicText", "androidx.compose.material.Text", "androidx.compose.material3.Text").forEach {
+            assertEquals(it, mapOf("rawText" to 1), LineBoxScanner.scan("f.kt", "$it(value)"))
+        }
+        assertEquals(mapOf("offset" to 2), LineBoxScanner.scan("f.kt",
+            "Modifier.absoluteOffset(x = value).absoluteOffset { IntOffset(0, 0) }"))
+    }
+    @Test fun lineBoxScannerIgnoresOtherNamesCommentsAndStrings() {
+        assertEquals(emptyMap<String, Int>(), LineBoxScanner.scan("f.kt", """
+            FcText(value); BasicTextField(value, changed); RichText(value)
+            androidx.compose.foundation.text.BasicTextField(value, changed)
+            // androidx.compose.foundation.text.BasicText(value); Modifier.absoluteOffset(x)
+            /* androidx.compose.material.Text(value); Modifier.offset { x } */
+            val example = "androidx.compose.material3.Text(value); Modifier.absoluteOffset(x)"
+            val multiline = ${'"'}${'"'}${'"'}BasicText(value); Modifier.offset(x)${'"'}${'"'}${'"'}
+            Modifier.myabsoluteOffset(x); Modifier.offsetSomething(x)
+        """.trimIndent()))
+    }
     @Test fun actualSourceUsesTokens() {
         val root = File(requireNotNull(System.getProperty("finecoach.sourceRoot")))
         val result = DesignValueScanner.scanRoot(root)

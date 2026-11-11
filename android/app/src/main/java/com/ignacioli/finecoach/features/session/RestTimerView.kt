@@ -5,7 +5,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,17 +39,17 @@ fun RestTimerView(store: RestTimerStore, id: SessionID, clock: AppClock, visible
                 horizontalArrangement = Arrangement.spacedBy(FcSpacing.space4)) {
                 if (remaining > 0) {
                     Column(Modifier.weight(1f).align(Alignment.Top).padding(top = FcSpacing.space2)) {
-                        Text("组间休息", style = FcTypography.caption, color = FcColors.textSecondary)
-                        Text(restTime(remaining), Modifier.offset(y = -FcComponentMetrics.hairline).testTag("rest-remaining"), style = FcTypography.numeralLarge, color = FcColors.textPrimary)
+                        FcText("组间休息", style = FcTypography.caption, color = FcColors.textSecondary)
+                        FcText(restTime(remaining), Modifier.testTag("rest-remaining"), style = FcTypography.numeralLarge, color = FcColors.textPrimary)
                     }
-                    FcLinkButton("−15 秒", Modifier.offset(y = -FcSpacing.space3 / 4).testTag("rest-minus")) { store.adjust(id, -15) }
-                    FcLinkButton("+15 秒", Modifier.offset(y = -FcSpacing.space3 / 4).testTag("rest-plus")) { store.adjust(id, 15) }
-                    FcLinkButton("跳过", Modifier.offset(y = -FcSpacing.space3 / 4).testTag("rest-skip")) { store.clear(id) }
+                    FcLinkButton("−15 秒", Modifier.testTag("rest-minus")) { store.adjust(id, -15) }
+                    FcLinkButton("+15 秒", Modifier.testTag("rest-plus")) { store.adjust(id, 15) }
+                    FcLinkButton("跳过", Modifier.testTag("rest-skip")) { store.clear(id) }
                 } else {
                     FcSymbol(FcGlyph.Check)
                     Column(Modifier.weight(1f)) {
-                        Text("休息结束，可以开始下一组", Modifier.testTag("rest-ended"), style = FcTypography.headline, color = FcColors.textPrimary)
-                        if (overdue > 0) Text("已超时 ${restTime(overdue)}", Modifier.testTag("rest-overdue"), style = FcTypography.caption, color = FcColors.textSecondary)
+                        FcText("休息结束，可以开始下一组", Modifier.testTag("rest-ended"), style = FcTypography.headline, color = FcColors.textPrimary)
+                        if (overdue > 0) FcText("已超时 ${restTime(overdue)}", Modifier.testTag("rest-overdue"), style = FcTypography.caption, color = FcColors.textSecondary)
                     }
                     FcLinkButton("关闭", Modifier.testTag("rest-close")) { store.clear(id) }
                 }

@@ -1,5 +1,6 @@
 package com.ignacioli.finecoach.features.packages
 
+import com.ignacioli.finecoach.designsystem.FcText
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -300,7 +300,7 @@ fun CoursePackageEditorScreen(
                         Modifier.testTag("package-editor-start"),
                         onClick = { state.picking = PickingDate.Start },
                     ) {
-                        Text(packageDateText(state.startDate), style = FcTypography.body, color = FcColors.textPrimary)
+                        FcText(packageDateText(state.startDate), style = FcTypography.body, color = FcColors.textPrimary)
                     }
                 }
                 FcListRowDivider()
@@ -319,13 +319,13 @@ fun CoursePackageEditorScreen(
                         Modifier.testTag("package-editor-end"),
                         onClick = { state.picking = PickingDate.End },
                     ) {
-                        Text(packageDateText(state.endDate), style = FcTypography.body, color = FcColors.textPrimary)
+                        FcText(packageDateText(state.endDate), style = FcTypography.body, color = FcColors.textPrimary)
                     }
                 }
                 FcListRowDivider()
                 val existing = state.context?.existing
                 if (state.ready && existing != null) {
-                    Text(
+                    FcText(
                         replacementWarning(
                             packageDisplayName(existing.name, existing.startDate),
                             state.context?.balance ?: existing.remainingCreditsCache,
@@ -355,7 +355,7 @@ fun CoursePackageEditorScreen(
                     )
                 }
                 state.saveError?.let { message ->
-                    Text(
+                    FcText(
                         message,
                         Modifier.padding(vertical = FcSpacing.space2).testTag("package-editor-error"),
                         style = FcTypography.style("callout", 400),

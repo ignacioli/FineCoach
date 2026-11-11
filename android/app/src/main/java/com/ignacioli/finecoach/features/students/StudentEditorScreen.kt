@@ -1,5 +1,6 @@
 package com.ignacioli.finecoach.features.students
 
+import com.ignacioli.finecoach.designsystem.FcText
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,7 +15,6 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -472,7 +472,7 @@ fun StudentEditorScreen(
                 )
                 FcListRowDivider()
 
-                Text(
+                FcText(
                     text = "电话与微信由教练手输。不读取系统通讯录，不询问联系人权限。",
                     modifier = Modifier.padding(top = FcSpacing.space3),
                     style = FcTypography.caption,
@@ -560,7 +560,7 @@ private fun EditorErrorText(
     tag: String,
 ) {
     if (message != null) {
-        Text(
+        FcText(
             text = message,
             modifier = Modifier
                 .padding(bottom = FcSpacing.space2)

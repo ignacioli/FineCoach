@@ -1,7 +1,6 @@
 package com.ignacioli.finecoach.features.history
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -28,14 +27,14 @@ internal fun historyFocus(focus: Set<BodyPart>): String = BodyPart.entries.filte
 
 @Composable
 internal fun HistoryCaption(text: String, modifier: Modifier = Modifier) {
-    Text(text, modifier, style = FcTypography.caption, color = FcColors.textSecondary)
+    FcText(text, modifier, style = FcTypography.caption, color = FcColors.textSecondary)
 }
 
 @Composable
 internal fun HistoryEmpty(title: String, body: String, tag: String) {
     Column(Modifier.fillMaxWidth().padding(vertical = FcSpacing.space4).testTag(tag),
         verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
-        Text(title, style = FcTypography.headline, color = FcColors.textPrimary)
+        FcText(title, style = FcTypography.headline, color = FcColors.textPrimary)
         HistoryCaption(body)
     }
 }
@@ -60,16 +59,16 @@ internal fun HistoryRecordCard(detail: HistoryDetail, zone: ZoneId, studentName:
         verticalArrangement = Arrangement.spacedBy(FcSpacing.space6)) {
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(FcSpacing.space1)) {
             session.completedAtUTC?.let {
-                Text(historyDay(it, zone), Modifier.testTag("history-record-date"), style = FcTypography.style("callout", 400), color = FcColors.textSecondary)
+                FcText(historyDay(it, zone), Modifier.testTag("history-record-date"), style = FcTypography.style("callout", 400), color = FcColors.textSecondary)
             }
-            Text(historyFocus(session.trainingFocus).let { if (it.isEmpty()) "训练报告" else "${it}训练" },
+            FcText(historyFocus(session.trainingFocus).let { if (it.isEmpty()) "训练报告" else "${it}训练" },
                 Modifier.testTag("history-record-title"), style = FcTypography.titleLarge, color = FcColors.textPrimary)
-            if (studentName.isNotEmpty()) Text(studentName, Modifier.testTag("history-student-name"),
+            if (studentName.isNotEmpty()) FcText(studentName, Modifier.testTag("history-student-name"),
                 style = FcTypography.style("callout", 400), color = FcColors.textSecondary)
         }
         if (stats.isNotEmpty()) Row(Modifier.fillMaxWidth().testTag("history-record-stats"), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space4)) {
             stats.forEach { (value, label) -> Column(Modifier.weight(1f).testTag("history-stat-$label"), verticalArrangement = Arrangement.spacedBy(FcSpacing.space1)) {
-                Text(value, style = FcTypography.numeralLarge, color = FcColors.textPrimary)
+                FcText(value, style = FcTypography.numeralLarge, color = FcColors.textPrimary)
                 HistoryCaption(label)
             } }
         }
@@ -78,15 +77,15 @@ internal fun HistoryRecordCard(detail: HistoryDetail, zone: ZoneId, studentName:
                 Column(Modifier.fillMaxWidth().padding(bottom = FcSpacing.space4), verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
                     Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(FcSpacing.space3)) {
                     FcEquipmentIconForExercise(exercise.sourceID.takeUnless { exercise.sourceKind == ExerciseSourceKind.sessionOnly })
-                    Text(exercise.displayNameSnapshot, Modifier.testTag("history-snapshot-${exercise.sessionExerciseID.value}"),
+                    FcText(exercise.displayNameSnapshot, Modifier.testTag("history-snapshot-${exercise.sessionExerciseID.value}"),
                         style = FcTypography.headline, color = FcColors.textPrimary)
                     }
                     exercise.sets.filter { it.state == SetRecordingState.completed }.sortedBy { it.orderIndex }.chunked(3).forEachIndexed { rowIndex, row ->
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
                             row.forEachIndexed { index, set ->
                                 Row(Modifier.weight(1f).testTag("history-set-${set.trainingSetID.value}"), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space1)) {
-                                    Text("${rowIndex * 3 + index + 1}", style = FcTypography.caption, color = FcColors.textDisabled)
-                                    Text(set.toDomain().displaySummary(), style = FcTypography.style("callout", 400), color = FcColors.textPrimary)
+                                    FcText("${rowIndex * 3 + index + 1}", style = FcTypography.caption, color = FcColors.textDisabled)
+                                    FcText(set.toDomain().displaySummary(), style = FcTypography.style("callout", 400), color = FcColors.textPrimary)
                                 }
                             }
                             repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
@@ -97,7 +96,7 @@ internal fun HistoryRecordCard(detail: HistoryDetail, zone: ZoneId, studentName:
         }
         session.studentFacingSummary?.takeIf { it.isNotEmpty() }?.let { summary ->
             HistoryRecordSection("课后总结", "history-record-summary") {
-                Text(summary, style = FcTypography.body, color = FcColors.textPrimary)
+                FcText(summary, style = FcTypography.body, color = FcColors.textPrimary)
             }
         }
     }

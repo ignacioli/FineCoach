@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,10 +38,10 @@ fun FcListRow(title: String, modifier: Modifier = Modifier, subtitle: String? = 
         horizontalArrangement = Arrangement.spacedBy(FcSpacing.space3), verticalAlignment = Alignment.CenterVertically) {
         if (leading != null || reservesLeading) Box(Modifier.size(FcComponentMetrics.icon)) { leading?.let { FcSymbol(it, tint = FcColors.actionPrimary) } }
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(FcSpacing.space1)) {
-            Text(title, style = FcTypography.headline, color = if (mode is FcRowMode.Unavailable) FcColors.textDisabled else FcColors.textPrimary)
-            subtitle?.let { Text(it, style = FcTypography.caption, color = FcColors.textSecondary) }
+            FcText(title, style = FcTypography.headline, color = if (mode is FcRowMode.Unavailable) FcColors.textDisabled else FcColors.textPrimary)
+            subtitle?.let { FcText(it, style = FcTypography.caption, color = FcColors.textSecondary) }
         }
-        (if (mode is FcRowMode.Unavailable) mode.reason else detail)?.let { Text(it, style = FcTypography.caption, color = FcColors.textSecondary) }
+        (if (mode is FcRowMode.Unavailable) mode.reason else detail)?.let { FcText(it, style = FcTypography.caption, color = FcColors.textSecondary) }
         if (favorite) FcSymbol(androidx.compose.ui.res.painterResource(com.ignacioli.finecoach.R.drawable.ic_ms_star_filled),
             Modifier.testTag("favorite-star"), tint = FcColors.actionPrimary)
         when (mode) {
@@ -81,7 +80,7 @@ fun FcListGroupRow(title: String, childSelections: List<Boolean>, expanded: Bool
         }, verticalAlignment = Alignment.CenterVertically) {
         Row(Modifier.weight(1f).heightIn(min = FcComponentMetrics.touch).testTag("$tag-expand")
             .clickable(role = Role.Button, onClick = onExpand), verticalAlignment = Alignment.CenterVertically) {
-            Text(title, Modifier.weight(1f), style = FcTypography.headline, color = FcColors.textPrimary)
+            FcText(title, Modifier.weight(1f), style = FcTypography.headline, color = FcColors.textPrimary)
             FcSymbol(collapse, Modifier.rotate(if (expanded) 180f else 0f))
         }
         Box(Modifier.sizeIn(minWidth = FcComponentMetrics.touch, minHeight = FcComponentMetrics.touch)
@@ -98,14 +97,14 @@ fun FcListRowDivider(modifier: Modifier = Modifier, indented: Boolean = false) {
 
 @Composable
 fun FcSectionLabel(title: String, modifier: Modifier = Modifier) {
-    Text(title, modifier.fillMaxWidth().semantics { heading() }, style = FcTypography.sectionLabel, color = FcColors.textSecondary)
+    FcText(title, modifier.fillMaxWidth().semantics { heading() }, style = FcTypography.sectionLabel, color = FcColors.textSecondary)
 }
 
 @Composable
 fun FcGroupEntryRow(title: String, count: Int, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Row(modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.touch).semantics(mergeDescendants = true) { }
         .clickable(role = Role.Button, onClick = onClick), verticalAlignment = Alignment.CenterVertically) {
-        Text("$title · $count", Modifier.weight(1f), style = FcTypography.sectionLabel, color = FcColors.textSecondary)
+        FcText("$title · $count", Modifier.weight(1f), style = FcTypography.sectionLabel, color = FcColors.textSecondary)
         FcSymbol(FcGlyph.Forward)
     }
 }
@@ -118,7 +117,7 @@ fun FcLabelValueRow(label: String, modifier: Modifier = Modifier, onClick: (() -
         .then(if (onClick != null) Modifier.semantics(mergeDescendants = true) { }.clickable(role = Role.Button, onClick = onClick) else Modifier),
         verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.width(FcComponentMetrics.label)) {
-            Text(label, labelModifier, style = FcTypography.style("callout", 400), color = FcColors.textSecondary)
+            FcText(label, labelModifier, style = FcTypography.style("callout", 400), color = FcColors.textSecondary)
         }
         Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, content = value)
         if (onClick != null) FcSymbol(FcGlyph.Forward)
@@ -128,7 +127,7 @@ fun FcLabelValueRow(label: String, modifier: Modifier = Modifier, onClick: (() -
 @Composable
 fun FcLabelValueText(label: String, value: String, modifier: Modifier = Modifier) {
     FcLabelValueRow(label, modifier.semantics(mergeDescendants = true) { }) {
-        Text(value, style = FcTypography.body, color = FcColors.textPrimary)
+        FcText(value, style = FcTypography.body, color = FcColors.textPrimary)
     }
 }
 
@@ -144,10 +143,10 @@ fun FcPageHeader(title: String, modifier: Modifier = Modifier, subtitle: String?
                 contentAlignment = Alignment.Center) { FcSymbol(FcGlyph.PageBack) }
             }
             Column(Modifier.weight(1f)) {
-                Text(title, Modifier.semantics { heading() }, style = FcTypography.titleLarge, color = FcColors.textPrimary)
-                subtitle?.let { Text(it, Modifier.padding(top = FcSpacing.space2), style = FcTypography.style("callout", 400), color = FcColors.textSecondary) }
+                FcText(title, Modifier.semantics { heading() }, style = FcTypography.titleLarge, color = FcColors.textPrimary)
+                subtitle?.let { FcText(it, Modifier.padding(top = FcSpacing.space2), style = FcTypography.style("callout", 400), color = FcColors.textSecondary) }
             }
-            trailingTitle?.let { FcLinkButton(it, Modifier.testTag("$tag-trailing"), trailingEnabled, onTrailing) }
+            trailingTitle?.let { FcLinkButton(it, Modifier.testTag("$tag-trailing"), trailingEnabled, onClick = onTrailing) }
         }
     }
 }
@@ -160,10 +159,10 @@ fun FcHubRow(title: String, icon: Painter?, modifier: Modifier = Modifier, subti
         horizontalArrangement = Arrangement.spacedBy(FcSpacing.space4), verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.size(FcComponentMetrics.icon)) { icon?.let { FcSymbol(it, tint = if (mode is FcRowMode.Unavailable) FcColors.textDisabled else FcColors.actionPrimary) } }
         Column(Modifier.weight(1f)) {
-            Text(title, style = FcTypography.headline, color = if (mode is FcRowMode.Unavailable) FcColors.textDisabled else FcColors.textPrimary)
-            subtitle?.let { Text(it, style = FcTypography.caption, color = FcColors.textSecondary) }
+            FcText(title, style = FcTypography.headline, color = if (mode is FcRowMode.Unavailable) FcColors.textDisabled else FcColors.textPrimary)
+            subtitle?.let { FcText(it, style = FcTypography.caption, color = FcColors.textSecondary) }
         }
-        (if (mode is FcRowMode.Unavailable) mode.reason else detail)?.let { Text(it, style = FcTypography.caption, color = FcColors.textSecondary) }
+        (if (mode is FcRowMode.Unavailable) mode.reason else detail)?.let { FcText(it, style = FcTypography.caption, color = FcColors.textSecondary) }
         if (mode is FcRowMode.Action) FcSymbol(FcGlyph.Forward)
     }
 }
@@ -178,12 +177,12 @@ fun FcActionRow(title: String, modifier: Modifier = Modifier, subtitle: String? 
         horizontalArrangement = Arrangement.spacedBy(FcSpacing.space3), verticalAlignment = Alignment.CenterVertically) {
         if (destructive && trash != null) FcSymbol(trash, tint = color)
         Column(Modifier.weight(1f)) {
-            Text(title, style = if (subtitle == null) FcTypography.body else FcTypography.headline, color = color)
-            subtitle?.let { Text(it, style = FcTypography.caption, color = FcColors.textSecondary) }
+            FcText(title, style = if (subtitle == null) FcTypography.body else FcTypography.headline, color = color)
+            subtitle?.let { FcText(it, style = FcTypography.caption, color = FcColors.textSecondary) }
         }
         detail?.let {
             Box(Modifier.widthIn(max = FcComponentMetrics.label), contentAlignment = Alignment.CenterEnd) {
-                Text(it, style = FcTypography.caption, color = FcColors.textSecondary)
+                FcText(it, style = FcTypography.caption, color = FcColors.textSecondary)
             }
         }
         if (!destructive) FcSymbol(FcGlyph.Forward, tint = if (enabled) FcColors.textSecondary else FcColors.textDisabled)
@@ -195,7 +194,7 @@ fun FcUndoRow(description: String, modifier: Modifier = Modifier, tag: String = 
     Row(modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.row).semantics(mergeDescendants = true) {
         customActions = listOf(CustomAccessibilityAction("撤销") { onUndo(); true })
     }, verticalAlignment = Alignment.CenterVertically) {
-        Text(description, Modifier.weight(1f), style = FcTypography.body, color = FcColors.textSecondary)
+        FcText(description, Modifier.weight(1f), style = FcTypography.body, color = FcColors.textSecondary)
         FcLinkButton("撤销", Modifier.testTag("$tag-action"), onClick = onUndo)
     }
 }

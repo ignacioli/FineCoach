@@ -67,7 +67,7 @@ fun FcStatusLabel(text: String, glyph: String, color: Color, icon: Painter, modi
     Row(modifier.clearAndSetSemantics { contentDescription = text }, verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
         FcStatusBadge(glyph, color, icon = icon)
-        Text(text, style = FcTypography.caption, color = FcColors.textSecondary)
+        FcText(text, style = FcTypography.caption, color = FcColors.textSecondary)
     }
 }
 
@@ -79,7 +79,7 @@ fun FcSaveStatusView(state: FcSaveState, icon: Painter, modifier: Modifier = Mod
     Row(modifier.heightIn(min = FcComponentMetrics.touch).clearAndSetSemantics { contentDescription = state.text },
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
         FcSymbol(icon, tint = color)
-        Text(state.text, style = FcTypography.body, color = color)
+        FcText(state.text, style = FcTypography.body, color = color)
     }
 }
 
@@ -94,9 +94,9 @@ fun FcInlineResult(variant: FcResultVariant, title: String, description: String,
         Column(Modifier.fillMaxWidth().semantics(mergeDescendants = true) { }) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
                 FcStatusBadge(variant.glyph, if (failure) FcColors.statusDestructive else FcColors.actionPrimary, icon = icon)
-                Text(title, style = FcTypography.style("callout", 600), color = if (failure) FcColors.statusDestructive else FcColors.textPrimary)
+                FcText(title, style = FcTypography.style("callout", 600), color = if (failure) FcColors.statusDestructive else FcColors.textPrimary)
             }
-            Text(description, style = FcTypography.caption, color = FcColors.textSecondary)
+            FcText(description, style = FcTypography.caption, color = FcColors.textSecondary)
         }
         onRetry?.let { FcLinkButton(retryTitle, Modifier.align(Alignment.CenterHorizontally).testTag("$tag-retry"), onClick = it) }
     }
@@ -106,7 +106,7 @@ fun FcInlineResult(variant: FcResultVariant, title: String, description: String,
 fun FcAvatar(name: String, modifier: Modifier = Modifier) {
     Box(modifier.size(FcComponentMetrics.touch).background(FcColors.surfaceSelected, CircleShape).clearAndSetSemantics { },
         contentAlignment = Alignment.Center) {
-        Text(name.take(1), style = FcTypography.headline, color = FcColors.actionPrimary)
+        FcText(name.take(1), style = FcTypography.headline, color = FcColors.actionPrimary)
     }
 }
 
@@ -127,8 +127,8 @@ fun FcBottomSheet(title: String, onDismiss: () -> Unit, modifier: Modifier = Mod
         RegisterOverlayWindow()
         Column(Modifier.fillMaxWidth().padding(horizontal = FcSpacing.space4).padding(bottom = FcSpacing.space6)
             .testTag("sheet-content"), verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
-            Text(title, Modifier.semantics { heading() }, style = FcTypography.headline, color = FcColors.textPrimary)
-            subtitle?.let { Text(it, style = FcTypography.style("callout", 400), color = FcColors.textSecondary) }
+            FcText(title, Modifier.semantics { heading() }, style = FcTypography.headline, color = FcColors.textPrimary)
+            subtitle?.let { FcText(it, style = FcTypography.style("callout", 400), color = FcColors.textSecondary) }
             content()
         }
     }
@@ -147,8 +147,8 @@ fun FcConfirmationDialog(title: String, message: String, confirmTitle: String, o
                 .clickable(interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }, indication = null) { }
                 .testTag("$tag-card").padding(FcSpacing.space4), horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
-                Text(title, Modifier.semantics { heading() }, style = FcTypography.headline, color = FcColors.textPrimary, textAlign = TextAlign.Center)
-                Text(message, Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()),
+                FcText(title, Modifier.semantics { heading() }, style = FcTypography.headline, color = FcColors.textPrimary, textAlign = TextAlign.Center)
+                FcText(message, Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()),
                     style = FcTypography.caption, color = FcColors.textSecondary, textAlign = TextAlign.Center)
                 BoxWithConstraints(Modifier.fillMaxWidth()) {
                     val measurer = rememberTextMeasurer()
@@ -177,7 +177,7 @@ private fun DialogAction(title: String, primary: Boolean, modifier: Modifier, on
         Box(Modifier.fillMaxWidth().heightIn(min = FcSpacing.space8 + FcSpacing.space1)
             .background(if (primary) FcColors.actionPrimary else FcColors.surfaceSelected, RoundedCornerShape(FcShapes.dialogAction))
             .padding(horizontal = FcSpacing.space2, vertical = FcSpacing.space1), contentAlignment = Alignment.Center) {
-            Text(title, style = FcTypography.style("callout", 600), color = if (primary) FcColors.actionOn else FcColors.actionPrimary, textAlign = TextAlign.Center)
+            FcText(title, style = FcTypography.style("callout", 600), color = if (primary) FcColors.actionOn else FcColors.actionPrimary, textAlign = TextAlign.Center)
         }
     }
 }
