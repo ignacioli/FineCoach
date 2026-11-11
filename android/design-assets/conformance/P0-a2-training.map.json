@@ -107,12 +107,7 @@
     },
     {
       "path": "32",
-      "tag": "session-divider-$squatID",
-      "pendingBoardFix": {
-        "dy": -3,
-        "decision": "S1-D47",
-        "reason": "2026-11-12 P0-a2 改稿误把分隔线随编辑器以下内容一起下移 3pt；Android 分隔线位置与原画板一致，只有行内容低 3pt。待 Penpot 将本分隔线上移 3pt 后重导出"
-      }
+      "tag": "session-divider-$squatID"
     },
     {
       "path": "33",
@@ -120,12 +115,7 @@
     },
     {
       "path": "36",
-      "tag": "session-divider-$benchID",
-      "pendingBoardFix": {
-        "dy": -3,
-        "decision": "S1-D47",
-        "reason": "2026-11-12 P0-a2 改稿误把分隔线随编辑器以下内容一起下移 3pt；Android 分隔线位置与原画板一致，只有行内容低 3pt。待 Penpot 将本分隔线上移 3pt 后重导出"
-      }
+      "tag": "session-divider-$benchID"
     },
     {
       "path": "39",
