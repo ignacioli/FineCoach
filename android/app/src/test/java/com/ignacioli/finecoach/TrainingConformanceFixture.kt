@@ -57,5 +57,10 @@ internal class TrainingConformanceFixture : AutoCloseable {
         state.previousCounts[bench.sessionExerciseID] = 3
         state.rests.adjust(content.session.sessionID, -15)
     }
+    fun bindings(): Map<String, String> = mapOf("squatID" to squat.sessionExerciseID.value, "benchID" to bench.sessionExerciseID.value,
+            "squat" to "session-exercise-${squat.sessionExerciseID.value}", "bench" to "session-exercise-${bench.sessionExerciseID.value}",
+            "set1" to "session-set-${state.content!!.exercises.first().sets[0].trainingSetID.value}",
+            "set2" to "session-set-${state.content!!.exercises.first().sets[1].trainingSetID.value}")
+
     override fun close() = room.close()
 }

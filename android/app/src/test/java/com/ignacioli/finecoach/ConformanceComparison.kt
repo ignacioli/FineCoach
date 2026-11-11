@@ -12,63 +12,60 @@ import org.json.JSONObject
 
 /** Test-only comparison. Missing observations are failures, never inferred from expected values. */
 internal object ConformanceComparison {
-    fun run(androidRoot: File, out: File, nodes: JSONArray, bindings: Map<String, String>): JSONObject {
+    fun run(androidRoot: File, out: File, nodes: JSONArray, bindings: Map<String, String>, screen: String = "P0-a2-training", designPath: String = "design/experience-p0/screens/P0-a2-training.png", capture: JSONObject? = null): JSONObject {
         val assets = File(androidRoot, "design-assets/conformance")
-        val layers = JSONObject(File(assets, "P0-a2-training.layers.json").readText()).getJSONArray("layers").objects()
-        val map = JSONObject(File(assets, "P0-a2-training.map.json").readText())
-        val entries = map.getJSONArray("elements").objects()
-        check(entries.map { it.getString("path") }.toSet() == layers.map { it.getString("path") }.toSet() && entries.size == layers.size) { "Map must cover every unique exported layer exactly once" }
+        val layers = JSONObject(File(assets, "$screen.layers.json").readText()).getJSONArray("layers").objects()
+        val map = JSONObject(File(assets, "$screen.map.json").readText())
+        val exceptions = map.getJSONArray("elements").objects()
         val actual = nodes.objects()
-        val contentTop = actual.single { it.getString("tag") == "platform-content" }.getDouble("y")
+        val contentTop = actual.firstOrNull { it.getString("tag") == "platform-content" }?.getDouble("y") ?: 0.0
         val offset = map.getDouble("originOffsetY") + contentTop
+        val entries = ConformanceMapping.entries(layers, exceptions, actual, bindings, offset)
         val tolerance = map.getDouble("toleranceDp")
         check(tolerance == 2.0) { "Approved tolerance is ±2dp" }
-        val android = ImageIO.read(File(out, "P0-a2-training.android.png"))
-        val tokens = parseTokens(File(androidRoot.parentFile, "design/design-system/README.md"))
-        fun expand(raw: String): String {
-            var value = raw
-            bindings.entries.sortedByDescending { it.key.length }.forEach { (key, replacement) -> value = value.replace("$$key", replacement) }
-            return value
-        }
-        fun hexToken(hex: String?): String? = hex?.let { tokens[it.lowercase()] }
+        val android = ImageIO.read(File(out, "$screen.android.png"))
+        val tokens = ConformanceColors.tokens(File(androidRoot.parentFile, "design/design-system/README.md").readText())
+        fun expand(raw: String) = ConformanceMapping.expand(raw, bindings)
+        fun hexToken(hex: String?): String? = tokens.lastOrNull { it.hex == hex?.lowercase() && it.alpha == 1.0 }?.name
         val rows = JSONArray()
         val used = mutableSetOf<Int>()
         for (entry in entries) {
             val layer = layers.single { it.getString("path") == entry.getString("path") }
-            val candidates = select(actual, entry, ::expand)
+            val candidates = if (entry.has("mappingError")) emptyList() else select(actual, entry, ::expand)
             val n = candidates.singleOrNull()
-            val anchor = entry.getString("anchor")
+            val anchor = entry.optString("anchor", "top")
             entry.optJSONObject("pendingBoardFix")?.let { fix ->
                 check(fix.optString("decision").startsWith("S1-D") && fix.optString("reason").isNotBlank()) { "pendingBoardFix needs a decision and reason at ${layer.getString("path")}" }
             }
             val expected = expectedBounds(layer, anchor, offset, entry)
             val row = JSONObject().put("path", layer.getString("path")).put("name", layer.getString("name"))
-                .put("anchor", anchor).put("toleranceDp", tolerance).put("topOriginApplied", anchor == "top")
+                .put("mapping", entry.getString("mapping")).put("anchor", anchor).put("toleranceDp", tolerance).put("topOriginApplied", anchor == "top")
                 .put("expectedText", layer.optString("text", "")).put("selector", entry)
                 .put("expected", expected)
             if (n == null) {
-                row.put("status", "MISSING").put("category", "MISSING").put("visibility", JSONObject.NULL).put("reason", if (candidates.size > 1) "ambiguous: ${candidates.size} nodes" else entry.optString("missingReason", "selector has no matching node (含原文 selector 不匹配；不能据此认定 UI 图形不存在)"))
+                row.put("status", "MISSING").put("category", "MISSING").put("visibility", JSONObject.NULL).put("reason", if (entry.has("mappingError")) entry.getString("mappingError") else if (candidates.size > 1) "ambiguous: ${candidates.size} nodes" else entry.optString("missingReason", "selector has no matching node (含原文 selector 不匹配；不能据此认定 UI 图形不存在)"))
                     .put("textMatches", false).put("tokenMatches", false)
             } else {
                 used += n.getInt("id")
                 val geometry = geometry(n, layer, anchor, offset, tolerance, entry)
                 val deltas = geometry.getJSONObject("delta")
                 val textMatches = !layer.has("text") || layer.getString("text") == n.getString("text")
-                val expectedHex = layer.optString("fill", "").ifEmpty { layer.optJSONObject("stroke")?.optString("color").orEmpty() }
+                val expectedHex = ConformanceColors.expected(layer, layers, tokens).orEmpty()
                 val expectedToken = hexToken(expectedHex)
-                check(expectedToken == (if (entry.isNull("expectedToken")) null else entry.getString("expectedToken"))) { "Token map drift at ${layer.getString("path")}" }
-                val observedHex = if (entry.getString("colorMethod") == "textLayout") n.optString("hex", "").takeUnless { it == "null" || it.isEmpty() }
+                val observedHex = if (entry.getString("colorMethod") == "textLayout") n.optString("hex", "").takeUnless { it == "null" || it.isEmpty() }?.let { hex ->
+                    if (n.optDouble("alpha", 1.0) == 1.0) hex else pixelMode(android, n)?.let { background -> ConformanceColors.composite(hex, n.getDouble("alpha"), background) }
+                }
                     else pixelMode(android, n, entry.getString("colorMethod") == "iconInk")
                 val observedToken = hexToken(observedHex)
                 val tokenObservable = expectedHex.isEmpty() || observedHex != null
-                val tokenMatches = tokenObservable && (expectedHex.isEmpty() || expectedToken != null && expectedToken == observedToken)
+                val tokenMatches = tokenObservable && (expectedHex.isEmpty() || tokens.any { it.hex == layer.optString("fill").ifEmpty { layer.optJSONObject("stroke")?.optString("color").orEmpty() }.lowercase() } && expectedHex == observedHex)
                 val visibility = visibility(n)
                 val visible = visibility.getString("state") == "VISIBLE"
                 val geometryMatches = geometry.getBoolean("matches")
                 row.put("actual", n).put("delta", deltas).put("geometry", geometry).put("textMatches", textMatches)
                     .put("expectedToken", expectedToken ?: JSONObject.NULL).put("actualToken", observedToken ?: JSONObject.NULL)
                     .put("colorObservation", if (observedHex == null) "UNOBSERVABLE" else "OBSERVED")
-                    .put("observedHex", observedHex ?: JSONObject.NULL).put("tokenMatches", if (tokenObservable) tokenMatches else JSONObject.NULL)
+                    .put("expectedCompositeHex", expectedHex).put("observedHex", observedHex ?: JSONObject.NULL).put("tokenMatches", if (tokenObservable) tokenMatches else JSONObject.NULL)
                     .put("tokenComparison", if (expectedHex.isEmpty()) "NOT_APPLICABLE" else if (!tokenObservable) "UNOBSERVABLE" else if (tokenMatches) "MATCH" else "MISMATCH")
                     .put("visibility", visibility).put("geometryMatches", geometryMatches)
                     .put("category", if (!visible) "INVISIBLE_OR_CLIPPED" else if (geometryMatches && textMatches && tokenMatches) "PASS" else "UI_DEVIATION")
@@ -95,7 +92,7 @@ internal object ConformanceComparison {
             if (valid) row.put("status", "UNOBSERVABLE_VECTOR_INTERNAL").put("category", "UNOBSERVABLE_VECTOR_INTERNAL")
                 .put("reason", "不可观测（矢量内部）；父图标几何通过，源SVG/drawable与来源记录hash一致；不计PASS或偏差")
             else row.put("status", "FAIL").put("category", "UI_DEVIATION")
-                .put("reason", "不可观测标记前提不成立：本行选择器须命中父图标节点，且须批准的内部path、父group/icon几何通过、同名资产来源hash有效")
+                .put("reason", "不可观测标记前提不成立：本行选择器须命中父图标节点，且须为真实内部path、父group/icon几何通过、同名资产来源hash有效")
         }
         val missing = rowList.count { it.getString("status") == "MISSING" }
         val invisible = rowList.count { it.getString("category") == "INVISIBLE_OR_CLIPPED" }
@@ -103,7 +100,7 @@ internal object ConformanceComparison {
         val passed = rowList.count { it.getString("status") == "PASS" }
         val unobservable = rowList.count { it.getString("status") == "UNOBSERVABLE_VECTOR_INTERNAL" }
         val boardFixPending = rowList.count { it.getString("status") == "BOARD_FIX_PENDING" }
-        val design = ImageIO.read(File(androidRoot.parentFile, "design/experience-p0/screens/P0-a2-training.png"))
+        val design = ImageIO.read(File(androidRoot.parentFile, designPath))
         check(design.width == android.width && design.height == android.height)
         val diff = BufferedImage(design.width, design.height, BufferedImage.TYPE_INT_RGB)
         var different = 0L
@@ -120,15 +117,22 @@ internal object ConformanceComparison {
             drawString("Design / 画稿", 16, 27); drawString("Android", design.width + 16, 27); drawString("Diff / 差异", design.width * 2 + 16, 27)
             drawImage(design, 0, 40, null); drawImage(android, design.width, 40, null); drawImage(diff, design.width * 2, 40, null); dispose()
         }
-        ImageIO.write(triptych, "png", File(out, "P0-a2-training.triptych.png"))
+        ImageIO.write(triptych, "png", File(out, "$screen.triptych.png"))
         val top = rowList.filter { it.has("delta") && it.getString("category") == "UI_DEVIATION" }.sortedByDescending { row -> listOf("x", "y", "w", "h").maxOf { abs(row.getJSONObject("delta").getDouble(it)) } }.take(10)
-        val result = JSONObject().put("artifactStatus", "VALID_FIXTURE").put("invisible", invisible).put("uiDeviations", uiDeviations).put("total", rows.length()).put("passed", passed).put("failed", rows.length() - passed - unobservable - boardFixPending).put("boardFixPending", boardFixPending).put("missing", missing)
+        val invalidCapture = capture?.optString("status") == "INVALID_CAPTURE"
+        val result = JSONObject().put("screen", screen).put("capture", capture ?: JSONObject.NULL).put("captureFailures", if (invalidCapture) 1 else 0)
+            .put("colorTokenCount", tokens.size).put("colorTokenNames", JSONArray(tokens.map { it.name })).put("manualExceptionEntries", exceptions.size).put("manualExceptionRatio", exceptions.size.toDouble() / layers.size)
+            .put("automaticMapped", rowList.count { it.getString("mapping").startsWith("AUTO") && it.has("actual") })
+            .put("automaticMappingRate", rowList.count { it.getString("mapping").startsWith("AUTO") && it.has("actual") }.toDouble() / layers.size)
+            .put("unmappedLayers", JSONArray(rowList.filter { !it.has("actual") }.map { JSONObject().put("path", it.getString("path")).put("name", it.getString("name")).put("reason", it.optString("reason")) }))
+            .put("artifactStatus", if (invalidCapture) "INVALID_CAPTURE" else "VALID_FIXTURE").put("invisible", invisible).put("uiDeviations", uiDeviations).put("total", rows.length()).put("passed", passed).put("failed", rows.length() - passed - unobservable - boardFixPending).put("boardFixPending", boardFixPending).put("missing", missing)
             .put("unobservableVectorInternal", unobservable)
             .put("toleranceDp", tolerance).put("measuredContentTop", contentTop).put("effectiveOriginOffsetY", offset)
             .put("originReason", map.getString("originRule")).put("differentPixelRatio", different.toDouble() / (design.width.toLong() * design.height))
-            .put("sha256", sha(File(out, "P0-a2-training.android.png"))).put("elements", rows).put("top10", JSONArray(top))
-            .put("humanReadSummary", "本轮未打开新图；上轮仅对无效 fixture 进行过一次图片清单审查，其结论不移植为本轮有效图的人工判断。以下分类与摘要依据节点和几何文字证据；负责人视觉验收仍 PENDING。")
+            .put("sha256", sha(File(out, "$screen.android.png"))).put("elements", rows).put("top10", JSONArray(top))
+            .put("humanReadSummary", "本轮未进行人工图片审查；以下分类依据节点、几何及像素证据。负责人视觉验收仍 PENDING。")
             .put("androidOnlyTextNodes", JSONArray(actual.filter { it.getInt("id") !in used && it.getString("text").isNotEmpty() }))
+        result.put("gatePassed", !invalidCapture && result.getInt("failed") == 0)
         return result
     }
 
@@ -141,40 +145,43 @@ internal object ConformanceComparison {
     }
 
     internal fun vectorUnobservable(layer: JSONObject, parent: JSONObject?, entry: JSONObject, parentGeometryPassed: Boolean, provenanceValid: Boolean): Boolean {
-        val approved = mapOf("7/1" to ("7" to "barbell"), "33/1" to ("33" to "barbell"),
-            "45/1" to ("45" to "edit"), "46/1" to ("46" to "edit"))
-        val pair = approved[layer.optString("path")] ?: return false
-        return entry.optString("unobservable") == "VECTOR_INTERNAL_PATH" && entry.optString("parentPath") == pair.first &&
-            entry.optString("asset") == pair.second && layer.optString("type") == "path" && parent != null &&
-            parent.optString("path") == pair.first && parent.optString("type") in setOf("group", "icon") &&
-            parent.optString("name").contains(pair.second) && parentGeometryPassed && provenanceValid
+        val parentPath = entry.optString("parentPath")
+        val asset = entry.optString("asset")
+        return entry.optString("unobservable") == "VECTOR_INTERNAL_PATH" && asset.isNotBlank() &&
+            layer.optString("type") == "path" && parent != null &&
+            layer.optString("path").startsWith(parentPath + "/") && parent.optString("path") == parentPath &&
+            parent.optString("type") in setOf("group", "icon") && ConformanceMapping.assetName(parent.optString("name")) == asset &&
+            parentGeometryPassed && provenanceValid
     }
 
-    private fun provenanceValid(androidRoot: File, name: String): Boolean {
-        if (name !in setOf("barbell", "edit")) return false
-        val equipment = name == "barbell"
+    internal fun provenanceValid(androidRoot: File, name: String): Boolean {
+        if (name.isBlank()) return false
         val assets = File(androidRoot, "design-assets")
-        val file = File(assets, if (equipment) "equipment-provenance.json" else "material-symbols-provenance.json")
-        val record = JSONObject(file.readText()).getJSONArray("icons").objects().singleOrNull {
-            it.optString(if (equipment) "name" else "symbol") == name
-        } ?: return false
-        val root = androidRoot.parentFile.canonicalFile
-        val source = File(if (equipment) root else assets, record.getString(if (equipment) "source" else "sourceSvg")).canonicalFile
-        val drawable = File(androidRoot, record.getString("drawable")).canonicalFile
-        return listOf(source, drawable).all { it.toPath().startsWith(root.toPath()) && it.isFile } &&
-            sha(source) == record.getString("sourceSha256") && sha(drawable) == record.getString("drawableSha256")
+        for ((fileName, equipment) in listOf("equipment-provenance.json" to true, "material-symbols-provenance.json" to false)) {
+            val file = File(assets, fileName)
+            val record = JSONObject(file.readText()).getJSONArray("icons").objects().singleOrNull {
+                it.optString(if (equipment) "name" else "symbol") == name
+            } ?: continue
+            val root = androidRoot.parentFile.canonicalFile
+            val source = File(if (equipment) root else assets, record.getString(if (equipment) "source" else "sourceSvg")).canonicalFile
+            val drawable = File(androidRoot, record.getString("drawable")).canonicalFile
+            return listOf(source, drawable).all { it.toPath().startsWith(root.toPath()) && it.isFile } &&
+                sha(source) == record.getString("sourceSha256") && sha(drawable) == record.getString("drawableSha256")
+        }
+        return false
     }
 
     internal fun select(actual: List<JSONObject>, entry: JSONObject, expand: (String) -> String = { it }): List<JSONObject> {
+        if (entry.has("nodeID")) return actual.filter { it.optInt("id", -1) == entry.getInt("nodeID") }
         if (entry.has("commonLayoutParentOfTags")) return actual.filter {
-            it.optJSONArray("commonLayoutParentOfTags")?.toString() == entry.getJSONArray("commonLayoutParentOfTags").toString() &&
-                it.optString("containsTag") == entry.getString("containsTag")
+            it.optJSONArray("commonLayoutParentOfTags")?.toString() == JSONArray(entry.getJSONArray("commonLayoutParentOfTags").strings().map(expand)).toString() &&
+                it.optString("containsTag") == expand(entry.getString("containsTag"))
         }
         if (!entry.has("tag") && !entry.has("text") && !entry.has("scope")) return emptyList()
         return actual.filter { n ->
             (!entry.has("tag") || n.getString("tag") == expand(entry.getString("tag"))) &&
             (!entry.has("scope") || n.getString("tag") == expand(entry.getString("scope")) || expand(entry.getString("scope")) in n.getJSONArray("ancestors").strings()) &&
-            (!entry.has("text") || n.getString("text") == entry.getString("text"))
+            (!entry.has("text") || n.getString("text") == expand(entry.getString("text")))
         }
     }
 
@@ -284,10 +291,12 @@ internal object ConformanceComparison {
     }
 
     fun writeReports(out: File, result: JSONObject) {
-        File(out, "P0-a2-training.report.json").writeText(result.toString(2))
+        val screen = result.optString("screen", "P0-a2-training")
+        File(out, "$screen.report.json").writeText(result.toString(2))
         val rows = result.getJSONArray("elements").objects()
-        File(out, "P0-a2-training.report.md").writeText(buildString {
-            appendLine("# P0-a2 训练页设计一致性")
+        File(out, "$screen.report.md").writeText(buildString {
+            appendLine("# $screen 设计一致性")
+            appendLine("自动映射率=${result.optDouble("automaticMappingRate")}；例外=${result.optInt("manualExceptionEntries")}/${result.getInt("total")}；未映射=${result.optJSONArray("unmappedLayers")}")
             appendLine("\nartifactStatus=${result.getString("artifactStatus")}；总数 ${result.getInt("total")}；通过 ${result.getInt("passed")}；失败 ${result.getInt("failed")}（UI 偏差 ${result.getInt("uiDeviations")}、missing ${result.getInt("missing")}、不可见/裁剪 ${result.getInt("invisible")}）；像素差异比例 ${result.getDouble("differentPixelRatio")}")
             appendLine("\n画板待改（已登记，S1-D42）：${result.optInt("boardFixPending")}，不计入PASS或偏差；画板修正并重新导出后撤掉登记。")
             appendLine("\n不可观测（矢量内部）：${result.getInt("unobservableVectorInternal")}，不计入PASS或偏差。仅父图标几何通过且同名资产来源hash验证通过时成立（S1-D37）。")
@@ -301,25 +310,31 @@ internal object ConformanceComparison {
                 appendLine("| ${r.getString("path")} | ${r.getString("name")} | ${r.getString("anchor")} | ±${r.getDouble("toleranceDp")} | ${d?.optDouble("x")} | ${d?.optDouble("y")} | ${d?.optDouble("w")} | ${d?.optDouble("h")} | ${if (d?.has("centerY") == true) d.getDouble("centerY") else "N/A"} | ${r.getBoolean("textMatches")} | ${r.optString("tokenComparison", "MISSING")} | ${r.getString("category")} | ${r.optString("reason").ifEmpty { r.optJSONObject("visibility")?.optString("reason") ?: "" }} |")
             }
             appendLine("\n## 人读摘要\n\n${result.getString("humanReadSummary")}")
-            appendLine("\n颜色读取：文字来自真实 TextLayoutResult；填充来自节点矩形内 exact RGB 众数；iconInk 排除白底/canvas 后取实际众数，无近色匹配。无颜色观测写 UNOBSERVABLE，不能据此声称真实 token 不一致，仍不通过。相同 hex 的 token aliases 归一到 map 使用的语义 token。")
+            appendLine("\n颜色读取：文字来自真实 TextLayoutResult；填充来自节点矩形内 exact RGB 众数；iconInk 排除节点边界采样的背景众数后取实际众数，无近色匹配。无颜色观测写 UNOBSERVABLE，不能据此声称真实 token 不一致，仍不通过。README 所有 primitive/semantic token 均自动读取，保留同色 aliases；按精确 RGB 比较。带 opacity 的填色按前序覆盖背景逐层 source-over，不使用近色容差。")
             appendLine("\nmissing 表示无可定位的独立 semantics 节点，不证明屏幕上没有图形。mapped bounds 若是触控容器而非内部图形，只能证明容器与图层几何不同，不能宣称图形轮廓错误。不可见/裁剪节点单列失败，不把零 bounds 的位移混入 UI 偏差 top10。")
         })
     }
-    private fun pixelMode(image: BufferedImage, n: JSONObject, inkOnly: Boolean = false): String? {
+    internal fun pixelMode(image: BufferedImage, n: JSONObject, inkOnly: Boolean = false): String? {
         val counts = mutableMapOf<Int, Int>()
         val left = (n.getDouble("x") * 2).toInt().coerceIn(0, image.width)
         val top = (n.getDouble("y") * 2).toInt().coerceIn(0, image.height)
         val right = ((n.getDouble("x") + n.getDouble("w")) * 2).toInt().coerceIn(0, image.width)
         val bottom = ((n.getDouble("y") + n.getDouble("h")) * 2).toInt().coerceIn(0, image.height)
-        for (y in top until bottom) for (x in left until right) { val rgb = image.getRGB(x,y) and 0xffffff; if (!inkOnly || rgb != 0xffffff && rgb != 0xf7f4ee) counts[rgb] = (counts[rgb] ?: 0) + 1 }
+        val boundary = mutableMapOf<Int, Int>()
+        if (inkOnly && left < right && top < bottom) {
+            for (x in left until right) for (y in listOf(top, bottom - 1)) {
+                val rgb = image.getRGB(x, y) and 0xffffff; boundary[rgb] = (boundary[rgb] ?: 0) + 1
+            }
+            for (y in top until bottom) for (x in listOf(left, right - 1)) {
+                val rgb = image.getRGB(x, y) and 0xffffff; boundary[rgb] = (boundary[rgb] ?: 0) + 1
+            }
+        }
+        val background = boundary.maxByOrNull { it.value }?.key
+        for (y in top until bottom) for (x in left until right) {
+            val rgb = image.getRGB(x,y) and 0xffffff
+            if (!inkOnly || rgb != background) counts[rgb] = (counts[rgb] ?: 0) + 1
+        }
         return counts.maxByOrNull { it.value }?.key?.let { "#%06x".format(it) }
-    }
-    private fun parseTokens(readme: File): Map<String, String> {
-        val names = setOf("surface.page", "text.primary", "text.secondary", "action.primary", "surface.canvas", "surface.divider")
-        val result = mutableMapOf<String,String>()
-        val pattern = Regex("\\| `color\\.([^`]+)` \\|[^\\n]*?`(#[0-9A-Fa-f]{6})`")
-        pattern.findAll(readme.readText()).forEach { m -> if (m.groupValues[1] in names) result[m.groupValues[2].lowercase()] = "color.${m.groupValues[1]}" }
-        check(result.size == names.size) { "Cannot resolve required README token names" }; return result
     }
     private fun sha(file: File) = MessageDigest.getInstance("SHA-256").digest(file.readBytes()).joinToString("") { "%02x".format(it) }
     private fun JSONArray.objects() = (0 until length()).map { getJSONObject(it) }

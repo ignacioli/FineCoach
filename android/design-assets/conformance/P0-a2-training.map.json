@@ -14,94 +14,28 @@
     {
       "path": "0",
       "tag": "platform-shell",
-      "expectedToken": "color.surface.page",
-      "colorMethod": "exactPixelMode",
-      "textPolicy": "exact",
       "anchor": "viewport"
-    },
-    {
-      "path": "1",
-      "text": "训练中",
-      "expectedToken": "color.text.primary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top"
-    },
-    {
-      "path": "2",
-      "tag": "session-student",
-      "expectedToken": "color.text.secondary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top"
-    },
-    {
-      "path": "3",
-      "tag": "session-clock",
-      "expectedToken": "color.action.primary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top"
-    },
-    {
-      "path": "4",
-      "scope": "$squat",
-      "text": "深蹲",
-      "expectedToken": "color.text.primary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top"
     },
     {
       "path": "5",
       "tag": "session-finish",
-      "expectedToken": "color.action.primary",
-      "colorMethod": "exactPixelMode",
-      "textPolicy": "exact",
       "anchor": "bottom"
     },
     {
       "path": "6",
-      "scope": "session-finish",
-      "text": "结束训练",
-      "expectedToken": "color.surface.page",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "bottom",
       "pendingBoardFix": {
         "dx": 2.5,
         "decision": "S1-D42",
         "reason": "DS-BUTTON 文字在按钮内水平居中；P0-a2 的「结束训练」文字框比按钮中心偏左 2.5pt（同页「确认」居中），待 Penpot 居中后重导出"
-      }
+      },
+      "anchor": "bottom"
     },
     {
       "path": "7",
-      "expectedToken": null,
-      "colorMethod": "exactPixelMode",
-      "textPolicy": "exact",
-      "anchor": "top",
-      "tag": "session-icon-$squatID",
-      "note": "真实可见节点；触控区另保留44dp，非空代理。"
-    },
-    {
-      "path": "7/1",
-      "expectedToken": "color.action.primary",
-      "colorMethod": "iconInk",
-      "textPolicy": "exact",
-      "anchor": "top",
-      "tag": "session-icon-$squatID",
-      "note": "S1-D37：矢量内部path不可独立观测；仅父图标几何通过且同名来源资产hash验证通过时单列，不计PASS或偏差。",
-      "unobservable": "VECTOR_INTERNAL_PATH",
-      "parentPath": "7",
-      "asset": "barbell"
+      "tag": "session-icon-$squatID"
     },
     {
       "path": "8",
-      "tag": "session-previous-$squatID",
-      "expectedToken": "color.text.secondary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top",
       "pendingBoardFix": {
         "dy": 1,
         "decision": "S1-D42",
@@ -110,141 +44,22 @@
     },
     {
       "path": "9",
-      "tag": "$set1-circle",
-      "note": "真实可见节点；触控区另保留44dp，非空代理。",
-      "expectedToken": "color.action.primary",
-      "colorMethod": "exactPixelMode",
-      "textPolicy": "exact",
-      "anchor": "top"
-    },
-    {
-      "path": "10",
-      "expectedToken": "color.surface.page",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top",
-      "tag": "$set1-check",
-      "note": "真实可见节点；触控区另保留44dp，非空代理。"
-    },
-    {
-      "path": "11",
-      "scope": "$set1",
-      "text": "第 1 组",
-      "expectedToken": "color.text.primary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top"
-    },
-    {
-      "path": "12",
-      "tag": "$set1-values",
-      "expectedToken": "color.text.primary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top"
-    },
-    {
-      "path": "13",
-      "scope": "$set1",
-      "text": "已完成",
-      "expectedToken": "color.text.secondary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top"
+      "tag": "$set1-circle"
     },
     {
       "path": "45",
-      "tag": "$set1-edit-icon",
-      "expectedToken": null,
-      "colorMethod": "exactPixelMode",
-      "textPolicy": "exact",
-      "anchor": "top",
-      "note": "真实可见节点；触控区另保留44dp，非空代理。"
-    },
-    {
-      "path": "45/1",
-      "expectedToken": "color.action.primary",
-      "colorMethod": "iconInk",
-      "textPolicy": "exact",
-      "anchor": "top",
-      "tag": "$set1-edit-icon",
-      "note": "S1-D37：矢量内部path不可独立观测；仅父图标几何通过且同名来源资产hash验证通过时单列，不计PASS或偏差。",
-      "unobservable": "VECTOR_INTERNAL_PATH",
-      "parentPath": "45",
-      "asset": "edit"
+      "tag": "$set1-edit-icon"
     },
     {
       "path": "14",
-      "tag": "$set2-circle",
-      "note": "真实可见节点；触控区另保留44dp，非空代理。",
-      "expectedToken": "color.action.primary",
-      "colorMethod": "exactPixelMode",
-      "textPolicy": "exact",
-      "anchor": "top"
-    },
-    {
-      "path": "15",
-      "expectedToken": "color.surface.page",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top",
-      "tag": "$set2-check",
-      "note": "真实可见节点；触控区另保留44dp，非空代理。"
-    },
-    {
-      "path": "16",
-      "scope": "$set2",
-      "text": "第 2 组",
-      "expectedToken": "color.text.primary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top"
-    },
-    {
-      "path": "17",
-      "tag": "$set2-values",
-      "expectedToken": "color.text.primary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top"
-    },
-    {
-      "path": "18",
-      "scope": "$set2-undo",
-      "text": "撤销",
-      "expectedToken": "color.action.primary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top"
+      "tag": "$set2-circle"
     },
     {
       "path": "46",
-      "tag": "$set2-edit-icon",
-      "expectedToken": null,
-      "colorMethod": "exactPixelMode",
-      "textPolicy": "exact",
-      "anchor": "top",
-      "note": "真实可见节点；触控区另保留44dp，非空代理。"
-    },
-    {
-      "path": "46/1",
-      "expectedToken": "color.action.primary",
-      "colorMethod": "iconInk",
-      "textPolicy": "exact",
-      "anchor": "top",
-      "tag": "$set2-edit-icon",
-      "note": "S1-D37：矢量内部path不可独立观测；仅父图标几何通过且同名来源资产hash验证通过时单列，不计PASS或偏差。",
-      "unobservable": "VECTOR_INTERNAL_PATH",
-      "parentPath": "46",
-      "asset": "edit"
+      "tag": "$set2-edit-icon"
     },
     {
       "path": "19",
-      "text": "重量 kg",
-      "expectedToken": "color.text.secondary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top",
       "pendingBoardFix": {
         "dy": 2.5,
         "decision": "S1-D42",
@@ -253,56 +68,34 @@
     },
     {
       "path": "20",
-      "expectedToken": "color.surface.canvas",
-      "colorMethod": "exactPixelMode",
-      "textPolicy": "exact",
-      "anchor": "top",
       "commonLayoutParentOfTags": [
         "set-weight-minus",
         "set-weight-plus"
       ],
-      "containsTag": "set-weight-input",
-      "note": "测试侧读取minus/plus最近共同LayoutInfo父容器，且input祖先链必须包含它；不使用目标尺寸反选、不构造子节点union。"
+      "containsTag": "set-weight-input"
     },
     {
       "path": "21",
-      "tag": "set-weight-minus-glyph",
-      "expectedToken": "color.text.primary",
-      "colorMethod": "iconInk",
-      "textPolicy": "exact",
-      "note": "S1-D40 R4：画稿以文字字形画 −/+，AD-01 映射为 Material 矢量；按图标自然 20dp 边界的中心对字形框中心比较，宽高按 20dp 判定。",
-      "anchor": "top",
       "geometryRule": "SYMBOL_CENTER",
-      "symbolSizeDp": 20
+      "symbolSizeDp": 20,
+      "tag": "set-weight-minus-glyph",
+      "colorMethod": "iconInk"
     },
     {
       "path": "22",
-      "tag": "set-weight-input",
-      "expectedToken": "color.text.primary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top",
       "geometryRule": "EDITABLE_TEXT_FIELD",
-      "note": "S1-D42：平台输入框保持自然单行最小高度，按中心比较。"
+      "tag": "set-weight-input",
+      "colorMethod": "textLayout"
     },
     {
       "path": "23",
-      "tag": "set-weight-plus-glyph",
-      "expectedToken": "color.text.primary",
-      "colorMethod": "iconInk",
-      "textPolicy": "exact",
-      "note": "S1-D40 R4：画稿以文字字形画 −/+，AD-01 映射为 Material 矢量；按图标自然 20dp 边界的中心对字形框中心比较，宽高按 20dp 判定。",
-      "anchor": "top",
       "geometryRule": "SYMBOL_CENTER",
-      "symbolSizeDp": 20
+      "symbolSizeDp": 20,
+      "tag": "set-weight-plus-glyph",
+      "colorMethod": "iconInk"
     },
     {
       "path": "24",
-      "text": "次数",
-      "expectedToken": "color.text.secondary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top",
       "pendingBoardFix": {
         "dy": 2.5,
         "decision": "S1-D42",
@@ -311,91 +104,43 @@
     },
     {
       "path": "25",
-      "expectedToken": "color.surface.canvas",
-      "colorMethod": "exactPixelMode",
-      "textPolicy": "exact",
-      "anchor": "top",
       "commonLayoutParentOfTags": [
         "set-reps-minus",
         "set-reps-plus"
       ],
-      "containsTag": "set-reps-input",
-      "note": "测试侧读取minus/plus最近共同LayoutInfo父容器，且input祖先链必须包含它；不使用目标尺寸反选、不构造子节点union。"
+      "containsTag": "set-reps-input"
     },
     {
       "path": "26",
-      "tag": "set-reps-minus-glyph",
-      "expectedToken": "color.text.primary",
-      "colorMethod": "iconInk",
-      "textPolicy": "exact",
-      "note": "S1-D40 R4：画稿以文字字形画 −/+，AD-01 映射为 Material 矢量；按图标自然 20dp 边界的中心对字形框中心比较，宽高按 20dp 判定。",
-      "anchor": "top",
       "geometryRule": "SYMBOL_CENTER",
-      "symbolSizeDp": 20
+      "symbolSizeDp": 20,
+      "tag": "set-reps-minus-glyph",
+      "colorMethod": "iconInk"
     },
     {
       "path": "27",
-      "tag": "set-reps-input",
-      "expectedToken": "color.text.primary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top",
       "geometryRule": "EDITABLE_TEXT_FIELD",
-      "note": "S1-D42：平台输入框保持自然单行最小高度，按中心比较。"
+      "tag": "set-reps-input",
+      "colorMethod": "textLayout"
     },
     {
       "path": "28",
-      "tag": "set-reps-plus-glyph",
-      "expectedToken": "color.text.primary",
-      "colorMethod": "iconInk",
-      "textPolicy": "exact",
-      "note": "S1-D40 R4：画稿以文字字形画 −/+，AD-01 映射为 Material 矢量；按图标自然 20dp 边界的中心对字形框中心比较，宽高按 20dp 判定。",
-      "anchor": "top",
       "geometryRule": "SYMBOL_CENTER",
-      "symbolSizeDp": 20
-    },
-    {
-      "path": "29",
-      "tag": "set-weight-hint",
-      "expectedToken": "color.text.secondary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top"
+      "symbolSizeDp": 20,
+      "tag": "set-reps-plus-glyph",
+      "colorMethod": "iconInk"
     },
     {
       "path": "30",
-      "tag": "set-save",
-      "expectedToken": "color.action.primary",
-      "colorMethod": "exactPixelMode",
-      "textPolicy": "exact",
-      "anchor": "top"
-    },
-    {
-      "path": "31",
-      "scope": "set-save",
-      "text": "确认",
-      "expectedToken": "color.surface.page",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top"
+      "tag": "set-save"
     },
     {
       "path": "32",
-      "expectedToken": "color.surface.divider",
-      "colorMethod": "exactPixelMode",
-      "textPolicy": "exact",
-      "anchor": "top",
-      "tag": "session-divider-$squatID",
-      "note": "真实可见节点；触控区另保留44dp，非空代理。"
+      "tag": "session-divider-$squatID"
     },
     {
       "path": "33",
-      "expectedToken": null,
-      "colorMethod": "exactPixelMode",
-      "textPolicy": "exact",
-      "anchor": "top",
       "tag": "session-icon-$benchID",
-      "note": "真实可见节点；触控区另保留44dp，非空代理。",
       "pendingBoardFix": {
         "dy": 3,
         "decision": "S1-D42",
@@ -404,15 +149,6 @@
     },
     {
       "path": "33/1",
-      "expectedToken": "color.action.primary",
-      "colorMethod": "iconInk",
-      "textPolicy": "exact",
-      "anchor": "top",
-      "tag": "session-icon-$benchID",
-      "note": "S1-D37：矢量内部path不可独立观测；仅父图标几何通过且同名来源资产hash验证通过时单列，不计PASS或偏差。",
-      "unobservable": "VECTOR_INTERNAL_PATH",
-      "parentPath": "33",
-      "asset": "barbell",
       "pendingBoardFix": {
         "dy": 3,
         "decision": "S1-D42",
@@ -421,12 +157,6 @@
     },
     {
       "path": "34",
-      "scope": "$bench",
-      "text": "卧推",
-      "expectedToken": "color.text.primary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top",
       "pendingBoardFix": {
         "dy": 3,
         "decision": "S1-D42",
@@ -435,11 +165,6 @@
     },
     {
       "path": "35",
-      "tag": "session-previous-$benchID",
-      "expectedToken": "color.text.secondary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top",
       "pendingBoardFix": {
         "dy": 3,
         "decision": "S1-D42",
@@ -448,21 +173,10 @@
     },
     {
       "path": "36",
-      "expectedToken": "color.surface.divider",
-      "colorMethod": "exactPixelMode",
-      "textPolicy": "exact",
-      "anchor": "top",
-      "tag": "session-divider-$benchID",
-      "note": "真实可见节点；触控区另保留44dp，非空代理。"
+      "tag": "session-divider-$benchID"
     },
     {
       "path": "37",
-      "scope": "session-add-exercise",
-      "text": "＋ 添加动作",
-      "expectedToken": "color.action.primary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top",
       "pendingBoardFix": {
         "dy": 3,
         "decision": "S1-D42",
@@ -471,12 +185,6 @@
     },
     {
       "path": "38",
-      "scope": "session-add-section",
-      "text": "＋ 新建分区",
-      "expectedToken": "color.action.primary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top",
       "pendingBoardFix": {
         "dy": 3,
         "decision": "S1-D42",
@@ -486,78 +194,42 @@
     {
       "path": "39",
       "tag": "rest-content",
-      "expectedToken": "color.surface.canvas",
-      "colorMethod": "exactPixelMode",
-      "textPolicy": "exact",
       "anchor": "bottom"
     },
     {
       "path": "40",
-      "scope": "rest-content",
-      "text": "组间休息",
-      "expectedToken": "color.text.secondary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
       "anchor": "bottom"
     },
     {
       "path": "41",
-      "tag": "rest-remaining",
-      "expectedToken": "color.text.primary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
       "anchor": "bottom"
     },
     {
       "path": "42",
-      "scope": "rest-minus",
-      "text": "−15 秒",
-      "expectedToken": "color.action.primary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "bottom",
       "pendingBoardFix": {
         "dy": 3,
         "decision": "S1-D42",
         "reason": "DS-REST-TIMER 链接在 Android 按容器垂直居中（结构规则，anatomy 未另行规定）；P0-a2 画板链接比容器中心高 3dp，待 Penpot 下移 3pt 并重新导出后撤掉本登记。"
-      }
+      },
+      "anchor": "bottom"
     },
     {
       "path": "43",
-      "scope": "rest-plus",
-      "text": "+15 秒",
-      "expectedToken": "color.action.primary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "bottom",
       "pendingBoardFix": {
         "dy": 3,
         "decision": "S1-D42",
         "reason": "DS-REST-TIMER 链接在 Android 按容器垂直居中（结构规则，anatomy 未另行规定）；P0-a2 画板链接比容器中心高 3dp，待 Penpot 下移 3pt 并重新导出后撤掉本登记。"
-      }
+      },
+      "anchor": "bottom"
     },
     {
       "path": "44",
-      "scope": "rest-skip",
-      "text": "跳过",
-      "expectedToken": "color.action.primary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "bottom",
       "pendingBoardFix": {
         "dy": 3,
         "decision": "S1-D42",
         "reason": "DS-REST-TIMER 链接在 Android 按容器垂直居中（结构规则，anatomy 未另行规定）；P0-a2 画板链接比容器中心高 3dp，待 Penpot 下移 3pt 并重新导出后撤掉本登记。"
-      }
-    },
-    {
-      "path": "47",
-      "tag": "active-session-back-glyph",
-      "expectedToken": "color.text.secondary",
-      "colorMethod": "textLayout",
-      "textPolicy": "exact",
-      "anchor": "top",
-      "note": "DS-PAGE-HEADER真实Noto Sans SC返回字形；44dp active-session-back是独立overlay，不作为图层bounds。"
+      },
+      "anchor": "bottom"
     }
   ]
 }
