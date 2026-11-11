@@ -117,4 +117,34 @@ class ConformanceGenericTests {
         assertEquals("#ede9e2", ConformanceComparison.pixelMode(image, bounds))
     }
 
+    @Test fun contentOriginRequiresExactlyOnePlatformContent() {
+        val content = node(1).put("tag", "platform-content").put("y", 24)
+        assertEquals(24.0, ConformanceComparison.contentTop(listOf(content)), 0.0)
+        assertThrows(NoSuchElementException::class.java) { ConformanceComparison.contentTop(emptyList()) }
+        assertThrows(IllegalArgumentException::class.java) { ConformanceComparison.contentTop(listOf(content, content)) }
+    }
+
+    @Test fun opaqueTextWithoutAlphaStillRequiresRealPixelInk() {
+        val image = BufferedImage(20, 20, BufferedImage.TYPE_INT_RGB)
+        val n = node(1)
+        assertNull(ConformanceComparison.observedTextColor(image, n))
+        image.setRGB(5, 5, 0x211f1b)
+        assertEquals("#211f1b", ConformanceComparison.observedTextColor(image, n))
+        n.put("alpha", 1.0)
+        assertEquals("#211f1b", ConformanceComparison.observedTextColor(image, n))
+    }
+
+    @Test fun translucentTextRequiresUniqueBackgroundAndCompositeInk() {
+        val image = BufferedImage(20, 20, BufferedImage.TYPE_INT_RGB)
+        val n = node(1).put("alpha", 0.4)
+        for (y in 0 until 20) for (x in 0 until 20) image.setRGB(x, y, 0xffffff)
+        assertNull(ConformanceComparison.observedTextColor(image, n))
+        image.setRGB(5, 5, 0xa6a5a4)
+        assertEquals("#a6a5a4", ConformanceComparison.observedTextColor(image, n))
+        for (y in 0 until 20) for (x in 0 until 20) image.setRGB(x, y, if (x < 10) 0xffffff else 0xede9e2)
+        assertNull(ConformanceComparison.pixelMode(image, n))
+        assertNull(ConformanceComparison.observedTextColor(image, n))
+        assertNull(ConformanceComparison.pixelMode(image, n, true))
+    }
+
 }
