@@ -90,17 +90,8 @@ fun SetEditor(state: ActiveSessionUiState, exercise: SessionExerciseRecord, targ
             Row(Modifier.fillMaxWidth().padding(top = FcSpacing.space2).testTag("set-editor-actions"), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
             FcButton(if (target == null) "确认" else "保存", Modifier.weight(1f).testTag("set-save"), !state.busy) {
                 keyboard?.hide()
-                val mode = exercise.recordModeSnapshot
-                val input = TrainingSetInput(mode,
-                    weightValue = if (mode == RecordMode.weightReps) if (sideEntry && split) recordedSideWeight(left, right, assisted) else weight else null,
-                    repetitionCount = reps.takeIf { mode == RecordMode.weightReps || mode == RecordMode.reps },
-                    durationSeconds = if (mode == RecordMode.duration || mode == RecordMode.cardio) DurationTextParser.parseSeconds(duration) ?: duration else null,
-                    unit = initial?.unit ?: when (mode) { RecordMode.weightReps -> MeasurementUnit.kilograms; RecordMode.reps -> MeasurementUnit.repetitions; else -> MeasurementUnit.seconds },
-                    side = if (sideEntry) SetSide.bilateral else initial?.side ?: SetSide.none,
-                    leftValue = if (sideEntry) if (split) left else weight else left.takeIf { initial?.side == SetSide.left || initial?.side == SetSide.right },
-                    rightValue = if (sideEntry) if (split) right else weight else right.takeIf { initial?.side == SetSide.left || initial?.side == SetSide.right },
-                    distanceValue = distance.takeIf { mode == RecordMode.cardio }, speedValue = speed.takeIf { mode == RecordMode.cardio }, resistanceValue = resistance.takeIf { mode == RecordMode.cardio })
-                scope.launch { if (state.saveSet(exercise.sessionExerciseID, target?.trainingSetID, input) is ApplicationResult.Success && target != null) onDismiss() }
+                val values = SetEntryValues(weight, reps, duration, distance, speed, resistance, left, right, split)
+                scope.launch { if (state.saveSetEntry(exercise, target, initial, sideEntry, assisted, values) is ApplicationResult.Success && target != null) onDismiss() }
             }
             if (target != null) FcLinkButton("取消", Modifier.testTag("set-cancel"), !state.busy) { keyboard?.hide(); onDismiss() }
             }
@@ -118,10 +109,4 @@ private fun SetNumber(title: String, text: String, change: (String) -> Unit, fie
             keyboardOptions = KeyboardOptions(keyboardType = if (field == SetValueStepping.Field.reps) KeyboardType.Number else KeyboardType.Decimal, imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { keyboard?.hide() }))
     }
-}
-
-internal fun recordedSideWeight(left: String, right: String, assisted: Boolean): String {
-    val l = left.trim().toBigDecimalOrNull() ?: return ""
-    val r = right.trim().toBigDecimalOrNull() ?: return ""
-    return (if (assisted) minOf(l, r) else maxOf(l, r)).stripTrailingZeros().toPlainString()
 }

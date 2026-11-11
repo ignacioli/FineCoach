@@ -16,6 +16,33 @@ class ActiveSessionUiState(
     val rests: RestTimerStore = RestTimerStore(clock),
 ) {
     companion object {
+        /** Sections move as blocks; members move only inside their section. */
+        internal fun sessionShiftAxis(content: SessionContentRecord, key: String, delta: Int): List<SessionSectionAxisItem> {
+            val blocks = (content.sections.map { section -> section.orderIndex to
+                (listOf<SessionSectionAxisItem>(SessionSectionAxisItem.Section(section.sectionID)) + content.exercises
+                    .filter { it.sectionID == section.sectionID }.sortedBy { it.orderIndex }.map { SessionSectionAxisItem.Exercise(it.sessionExerciseID.value) }) } +
+                content.exercises.filter { it.sectionID == null }.map { it.orderIndex to listOf<SessionSectionAxisItem>(SessionSectionAxisItem.Exercise(it.sessionExerciseID.value)) })
+                .sortedBy { it.first }.map { it.second.toMutableList() }.toMutableList()
+            val row = content.exercises.firstOrNull { it.sessionExerciseID.value == key }
+            if (row?.sectionID != null) {
+                val block = blocks.first { it.any { item -> item is SessionSectionAxisItem.Exercise && item.id == key } }
+                val index = block.indexOfFirst { it is SessionSectionAxisItem.Exercise && it.id == key }
+                if (index + delta in 1 until block.size) java.util.Collections.swap(block, index, index + delta)
+            } else {
+                val index = blocks.indexOfFirst { block -> when (val item = block.first()) {
+                    is SessionSectionAxisItem.Section -> item.id.value == key
+                    is SessionSectionAxisItem.Exercise -> item.id == key
+                } }
+                if (index >= 0 && index + delta in blocks.indices) java.util.Collections.swap(blocks, index, index + delta)
+            }
+            return blocks.flatten()
+        }
+        internal fun recordedSideWeight(left: String, right: String, assisted: Boolean): String {
+            val l = left.trim().toBigDecimalOrNull() ?: return ""
+            val r = right.trim().toBigDecimalOrNull() ?: return ""
+            return (if (assisted) minOf(l, r) else maxOf(l, r)).stripTrailingZeros().toPlainString()
+        }
+
         private val operationGates = java.util.WeakHashMap<ActiveSessionUseCases, Mutex>()
         private fun gateFor(useCases: ActiveSessionUseCases): Mutex = synchronized(operationGates) {
             operationGates.getOrPut(useCases) { Mutex() }
@@ -217,6 +244,52 @@ class ActiveSessionUiState(
         if (error != null) retryAction = ({ perform({ useCases.retry(current.session.sessionID) }) { loadAfterRetry(current.session.sessionID) } })
         return error?.let { ApplicationResult.Failure(it) } ?: ApplicationResult.Success(Unit)
     }
+
+    suspend fun studentDisplayName(students: StudentRepositoryPort?, studentID: StudentID): String? =
+        when (val result = students?.find(studentID)) {
+            is ApplicationResult.Success -> result.value?.displayName.orEmpty()
+            is ApplicationResult.Failure -> "学员信息暂不可用"
+            null -> null
+        }
+
+    fun keyboardHidden(id: SessionID) {
+        if (rests.end(id) != null && rests.remaining(id) == 0L) rests.clear(id)
+    }
+
+    suspend fun confirmSet(id: TrainingSetID): ApplicationResult<Unit> = mutate {
+        it.copy(session = it.session.confirmingSet(id, clock.now()))
+    }
+
+    suspend fun saveSection(id: SectionID?, name: String): ApplicationResult<Unit> = mutate { original ->
+        id?.let { original.renamingSection(it, name, clock.now()) }
+            ?: original.addingSection(ids.newSectionID(), name, clock.now())
+    }
+
+    suspend fun deleteSection(id: SectionID, moveExercises: Boolean): ApplicationResult<Unit> = mutate {
+        it.deletingSection(id, if (moveExercises) SessionSectionDeletionDisposition.MoveExercisesTo(null)
+            else SessionSectionDeletionDisposition.DeleteWithExercises, clock.now())
+    }
+
+    suspend fun moveExercise(id: SessionExerciseID, target: SectionID?): ApplicationResult<Unit> = mutate {
+        it.movingExercise(id, target, clock.now())
+    }
+
+    suspend fun saveSetEntry(exercise: SessionExerciseRecord, target: TrainingSetRecord?, initial: TrainingSetRecord?,
+        sideEntry: Boolean, assisted: Boolean, values: SetEntryValues): ApplicationResult<Unit> {
+        val (weight, reps, duration, distance, speed, resistance, left, right, split) = values
+        val mode = exercise.recordModeSnapshot
+        val input = TrainingSetInput(mode,
+            weightValue = if (mode == RecordMode.weightReps) if (sideEntry && split) recordedSideWeight(left, right, assisted) else weight else null,
+            repetitionCount = reps.takeIf { mode == RecordMode.weightReps || mode == RecordMode.reps },
+            durationSeconds = if (mode == RecordMode.duration || mode == RecordMode.cardio) DurationTextParser.parseSeconds(duration) ?: duration else null,
+            unit = initial?.unit ?: when (mode) { RecordMode.weightReps -> MeasurementUnit.kilograms; RecordMode.reps -> MeasurementUnit.repetitions; else -> MeasurementUnit.seconds },
+            side = if (sideEntry) SetSide.bilateral else initial?.side ?: SetSide.none,
+            leftValue = if (sideEntry) if (split) left else weight else left.takeIf { initial?.side == SetSide.left || initial?.side == SetSide.right },
+            rightValue = if (sideEntry) if (split) right else weight else right.takeIf { initial?.side == SetSide.left || initial?.side == SetSide.right },
+            distanceValue = distance.takeIf { mode == RecordMode.cardio }, speedValue = speed.takeIf { mode == RecordMode.cardio }, resistanceValue = resistance.takeIf { mode == RecordMode.cardio })
+        return saveSet(exercise.sessionExerciseID, target?.trainingSetID, input)
+    }
+
     suspend fun saveSet(exercise: SessionExerciseID, target: TrainingSetID?, input: TrainingSetInput): ApplicationResult<Unit> = mutate {
         val now = clock.now()
         it.copy(session = if (target != null) it.session.editingSet(target, input, now) else {
@@ -245,3 +318,15 @@ class ActiveSessionUiState(
         }
     }
 }
+
+internal fun sessionShiftAxis(content: SessionContentRecord, key: String, delta: Int): List<SessionSectionAxisItem> =
+    ActiveSessionUiState.sessionShiftAxis(content, key, delta)
+
+internal fun recordedSideWeight(left: String, right: String, assisted: Boolean): String =
+    ActiveSessionUiState.recordedSideWeight(left, right, assisted)
+
+data class SetEntryValues(
+    val weight: String = "", val reps: String = "", val duration: String = "", val distance: String = "",
+    val speed: String = "", val resistance: String = "", val left: String = "", val right: String = "",
+    val split: Boolean = false,
+)
