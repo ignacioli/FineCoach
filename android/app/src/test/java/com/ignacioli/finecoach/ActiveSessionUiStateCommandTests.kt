@@ -36,7 +36,12 @@ class ActiveSessionUiStateCommandTests {
         assertTrue("Expected success: $result", result is ApplicationResult.Success)
         return (result as ApplicationResult.Success).value
     }
-    private fun failed(result: ApplicationResult<*>) { assertTrue("Expected failure: $result", result is ApplicationResult.Failure) }
+    private fun failed(result: ApplicationResult<*>) {
+        assertTrue("Expected failure: $result", result is ApplicationResult.Failure)
+        assertFalse(state.busy)
+        assertNotNull(state.error)
+        assertEquals((result as ApplicationResult.Failure).error, state.error)
+    }
     private suspend fun persisted() = ok(graph.sessions.loadContent(content.session.sessionID))!!
 
     @Before fun prepare() = runBlocking {
@@ -65,10 +70,13 @@ class ActiveSessionUiStateCommandTests {
     }
     @Test fun confirmMissingSetDoesNotPersistOrStartRest() = runBlocking {
         val before = persisted()
-        failed(state.confirmSet(ids.newTrainingSetID()))
-        assertEquals(before, persisted())
-        assertNull(state.rests.end(content.session.sessionID))
-        assertNull(state.undoableSetID)
+        val missing = ids.newTrainingSetID()
+        repeat(2) {
+            failed(state.confirmSet(missing))
+            assertEquals(before, persisted())
+            assertNull(state.rests.end(content.session.sessionID))
+            assertNull(state.undoableSetID)
+        }
     }
     @Test fun saveSectionCreatesAndRenamesButRejectsBlankName() = runBlocking {
         ok(state.saveSection(null, "虚构分区"))
@@ -99,8 +107,11 @@ class ActiveSessionUiStateCommandTests {
     @Test fun deleteMissingSectionRejectsBothDispositionsWithoutWrites() = runBlocking {
         val before = persisted()
         for (move in listOf(true, false)) {
-            failed(state.deleteSection(ids.newSectionID(), move))
-            assertEquals(before, persisted())
+            val missing = ids.newSectionID()
+            repeat(2) {
+                failed(state.deleteSection(missing, move))
+                assertEquals(before, persisted())
+            }
         }
     }
     @Test fun moveExercisePersistsMembershipAndUnsectionedDestination() = runBlocking {
