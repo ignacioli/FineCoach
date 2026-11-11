@@ -142,6 +142,8 @@ class TemplateUiStateTests {
         assertEquals(sets, state.content!!.exercises.first().plannedSets)
         f.ok(state.deleteSection(before.sections.last().sectionID, SessionSectionDeletionDisposition.DeleteWithExercises))
         assertTrue(state.content!!.sections.isEmpty())
+        assertEquals(before.exercises.size, state.content!!.exercises.size)
+        assertEquals(before.exercises.map { it.templateExerciseID }, state.content!!.exercises.map { it.templateExerciseID })
     }
     @Test fun deleteSectionMissingPreservesContent() = f.test {
         val before = seed()
