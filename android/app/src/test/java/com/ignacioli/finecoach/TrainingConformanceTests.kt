@@ -175,9 +175,12 @@ class TrainingConformanceTests {
         val (nodes, bindings) = checkNotNull(snapshot)
         val result = ConformanceComparison.run(File(System.getProperty("finecoach.storageProjectDirectory")).parentFile, out, nodes, bindings)
         result.put("stability", stability)
+        result.put("ssimCalibration", ConformanceSsimCalibration.evaluate(File(checkNotNull(System.getProperty("finecoach.storageProjectDirectory"))), out))
         ConformanceComparison.writeReports(out, result)
+        ConformanceSsimAlignment.evaluate(File(System.getProperty("finecoach.storageProjectDirectory")), out)
         println("S0_CONFORMANCE total=${result.getInt("total")} passed=${result.getInt("passed")} failed=${result.getInt("failed")} missing=${result.getInt("missing")} invisible=${result.getInt("invisible")} hashes=$hashes")
         Assert.assertTrue("Two fresh fixture renders must have identical PNG hashes: $hashes", stability.getBoolean("stable"))
+        ConformanceSsimCalibration.assertDiagnostics(result.getJSONObject("ssimCalibration"))
         Assert.assertTrue("Capture and comparison must both pass", result.getBoolean("gatePassed"))
         Assert.assertEquals("Conformance deviations; see build/outputs/conformance/P0-a2-training.report.md", 0, result.getInt("failed"))
     }

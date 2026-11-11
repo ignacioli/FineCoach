@@ -100,6 +100,19 @@ internal object ConformanceComparison {
         val boardFixPending = rowList.count { it.getString("status") == "BOARD_FIX_PENDING" }
         val design = ImageIO.read(File(androidRoot.parentFile, designPath))
         check(design.width == android.width && design.height == android.height)
+        val ssim = ConformanceSsim.compare(design, android)
+        ImageIO.write(ssim.heatmap(), "png", File(out, "$screen.ssim-heatmap.png"))
+        val ssimReport = ssim.json(false).put("heatmap", "$screen.ssim-heatmap.png")
+        val pendingRegions = JSONArray()
+        rowList.filter { it.has("pendingBoardFix") }.forEach { row ->
+            val layer = layers.single { it.getString("path") == row.getString("path") }
+            val b = JSONObject().put("x",layer.getDouble("x")).put("y",layer.getDouble("y"))
+                .put("w",layer.getDouble("w")).put("h",layer.getDouble("h"))
+            val region = ssim.contribution((b.getDouble("x")*2).toInt(), (b.getDouble("y")*2).toInt(),
+                ((b.getDouble("x")+b.getDouble("w"))*2).toInt(), ((b.getDouble("y")+b.getDouble("h"))*2).toInt())
+            pendingRegions.put(region.put("path",row.getString("path")).put("name",row.getString("name")).put("boundsDp",b))
+        }
+        ssimReport.put("pendingBoardFixRegions", pendingRegions).put("pendingRegionNote", "按原始画稿 layer bounds 的窗口中心归因；区域可能重叠，不能相加；无屏蔽、无位移补偿。")
         val diff = BufferedImage(design.width, design.height, BufferedImage.TYPE_INT_RGB)
         var different = 0L
         for (y in 0 until design.height) for (x in 0 until design.width) {
@@ -130,6 +143,8 @@ internal object ConformanceComparison {
             .put("sha256", sha(File(out, "$screen.android.png"))).put("elements", rows).put("top10", JSONArray(top))
             .put("humanReadSummary", "本轮未进行人工图片审查；以下分类依据节点、几何及像素证据。负责人视觉验收仍 PENDING。")
             .put("androidOnlyTextNodes", JSONArray(actual.filter { it.getInt("id") !in used && it.getString("text").isNotEmpty() }))
+        result.put("ssim", ssimReport)
+        result.put("designPath", designPath)
         result.put("gatePassed", !invalidCapture && result.getInt("failed") == 0)
         return result
     }
@@ -296,6 +311,19 @@ internal object ConformanceComparison {
             appendLine("# $screen 设计一致性")
             appendLine("自动映射率=${result.optDouble("automaticMappingRate")}；例外=${result.optInt("manualExceptionEntries")}/${result.getInt("total")}；未映射=${result.optJSONArray("unmappedLayers")}")
             appendLine("\nartifactStatus=${result.getString("artifactStatus")}；总数 ${result.getInt("total")}；通过 ${result.getInt("passed")}；失败 ${result.getInt("failed")}（UI 偏差 ${result.getInt("uiDeviations")}、missing ${result.getInt("missing")}、不可见/裁剪 ${result.getInt("invisible")}）；像素差异比例 ${result.getDouble("differentPixelRatio")}")
+            result.optJSONObject("ssim")?.let { metric ->
+                appendLine("\n## 整屏 SSIM\n\n全局=${metric.getDouble("global")}；最低48dp横条=${metric.getDouble("minimumStrip")}；阈值=${metric.getDouble("globalThreshold")}/${metric.getDouble("minimumStripThreshold")}；门禁=${metric.getBoolean("gated")}；达标=${metric.getBoolean("thresholdPassed")}；热力图=${metric.getString("heatmap")}（绿=1，红=0或负值，灰=无完整窗口的5px边缘）。")
+                appendLine("最低5块（y范围半开，px/dp）：${metric.getJSONArray("lowest5")}")
+                appendLine("pendingBoardFix 区域贡献（未屏蔽）：${metric.getJSONArray("pendingBoardFixRegions")}")
+            }
+            result.optJSONObject("ssimCalibration")?.let { calibration ->
+                appendLine("\nSSIM 校准：${calibration.getString("mutations")}")
+                appendLine("| 样本 | 全局SSIM | 最低横条SSIM | 通过 |")
+                appendLine("|---|---:|---:|---|")
+                calibration.getJSONArray("samples").objects().forEach { sample ->
+                    appendLine("| ${sample.getString("sample")} | ${sample.getDouble("global")} | ${sample.getDouble("minimumStrip")} | ${sample.getBoolean("thresholdPassed")} |")
+                }
+            }
             appendLine("\n画板待改（已登记，S1-D42）：${result.optInt("boardFixPending")}，不计入PASS或偏差；画板修正并重新导出后撤掉登记。")
             appendLine("\n不可观测（矢量内部）：${result.getInt("unobservableVectorInternal")}，不计入PASS或偏差。仅父图标几何通过且同名资产来源hash验证通过时成立（S1-D37）。")
             appendLine("\noriginOffsetY=${result.getDouble("effectiveOriginOffsetY")}；Android content top=${result.getDouble("measuredContentTop")}；${result.getString("originReason")}")
