@@ -399,6 +399,7 @@ tasks.withType<Test>().matching { it.name == "testDebugUnitTest" || it.name == "
     filter {
         if (!recordRequested.get().equals("true", ignoreCase = true)) excludeTestsMatching("com.ignacioli.finecoach.ComponentScreenshotTests")
         excludeTestsMatching("com.ignacioli.finecoach.TrainingConformanceTests")
+        excludeTestsMatching("com.ignacioli.finecoach.ExerciseConformanceTests")
     }
     inputs.file(privacyDependencyReport)
     inputs.file(rootProject.layout.projectDirectory.file("dependency-allowlist/resolved.txt"))
@@ -1001,6 +1002,8 @@ screenshotGate.configure {
     finalizedBy(baselineUnchanged)
 }
 registerVisualGate("s0Conformance", "TrainingConformanceTests", 1)
+// Diagnostic reports only: page deviations do not join the training conformance gate.
+registerVisualGate("p1ExerciseConformance", "ExerciseConformanceTests", 2)
 
 val entryLayoutClasses = listOf("com.ignacioli.finecoach.EntryLayoutHarnessTests")
 val entryLayoutGate = tasks.register<Test>("s0G4") {

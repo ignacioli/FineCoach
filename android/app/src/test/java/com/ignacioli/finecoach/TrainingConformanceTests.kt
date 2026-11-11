@@ -125,7 +125,7 @@ class TrainingConformanceTests {
                 .put("ancestors", JSONArray(ancestors)).put("text", editable ?: texts.joinToString("\n"))
                 .put("placed", n.layoutInfo.isPlaced).put("attached", n.layoutInfo.isAttached)
                 .put("unclipped", unclipped).put("scrollAncestors", scrollAncestors)
-                .put("hex", argb ?: JSONObject.NULL)
+                .put("hex", argb ?: JSONObject.NULL).put("alpha", if (color != null && color != androidx.compose.ui.graphics.Color.Unspecified) color.alpha.toDouble() else 1.0)
                 .put("x", bounds.left / 2).put("y", bounds.top / 2).put("w", bounds.width / 2).put("h", bounds.height / 2))
         }
         // Test-side observation of a real layout with no semantics. Never infer
@@ -155,10 +155,7 @@ class TrainingConformanceTests {
                     .put("w", common.coordinates.size.width / 2.0).put("h", common.coordinates.size.height / 2.0)))
         }
         File(out, "P0-a2-training.nodes.json").writeText(JSONObject().put("nodes", nodes).put("viewport", "390x844@2").toString(2))
-        val bindings = mapOf("squatID" to f.squat.sessionExerciseID.value, "benchID" to f.bench.sessionExerciseID.value,
-            "squat" to "session-exercise-${f.squat.sessionExerciseID.value}", "bench" to "session-exercise-${f.bench.sessionExerciseID.value}",
-            "set1" to "session-set-${f.state.content!!.exercises.first().sets[0].trainingSetID.value}",
-            "set2" to "session-set-${f.state.content!!.exercises.first().sets[1].trainingSetID.value}")
+        val bindings = f.bindings()
         return nodes to bindings
     }
 
@@ -181,6 +178,7 @@ class TrainingConformanceTests {
         ConformanceComparison.writeReports(out, result)
         println("S0_CONFORMANCE total=${result.getInt("total")} passed=${result.getInt("passed")} failed=${result.getInt("failed")} missing=${result.getInt("missing")} invisible=${result.getInt("invisible")} hashes=$hashes")
         Assert.assertTrue("Two fresh fixture renders must have identical PNG hashes: $hashes", stability.getBoolean("stable"))
+        Assert.assertTrue("Capture and comparison must both pass", result.getBoolean("gatePassed"))
         Assert.assertEquals("Conformance deviations; see build/outputs/conformance/P0-a2-training.report.md", 0, result.getInt("failed"))
     }
 }
