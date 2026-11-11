@@ -11,13 +11,13 @@ import com.ignacioli.finecoach.storage.repository.ExerciseRepository
 
 internal class ExerciseConformanceFixture : AutoCloseable {
     val room = T008Fixture()
-    val names = listOf("杠铃平板卧推", "哑铃上斜卧推", "蝴蝶机夹胸", "器械推胸", "史密斯上斜卧推", "绳索夹胸", "俯卧撑")
-    private val equipment = listOf("杠铃", "哑铃", "固定器械", "固定器械", "史密斯机", "绳索", "徒手")
+    val names = listOf("杠铃平板卧推", "哑铃上斜卧推", "蝴蝶机夹胸", "器械推胸", "史密斯上斜卧推", "绳索夹胸", "俯卧撑", "哑铃飞鸟", "双杠臂屈伸")
+    private val equipment = listOf("杠铃", "哑铃", "固定器械", "固定器械", "史密斯机", "绳索", "徒手", "哑铃", "徒手")
     private val records = (0 until 21).map { index -> ExerciseRecord(StableExerciseID.parse("fictional-conformance-$index"),
         ExerciseKind.builtIn, "${index.toString().padStart(2, '0')} 虚构动作", RecordMode.weightReps, "fictional.1",
         ExerciseLifecycle.active, false, "fictional-source", room.now, room.now) }
     private val metadata = records.mapIndexed { index, record -> record.exerciseID to ExerciseCatalogMetadata("胸",
-        equipment.getOrElse(index) { "杠铃" }, if (index in listOf(2, 5)) listOf("肩") else listOf("肩", "臂"), false) }.toMap()
+        equipment.getOrElse(index) { "杠铃" }, if (index in listOf(2, 5, 7)) listOf("肩") else if (index == 8) listOf("臂", "肩") else listOf("肩", "臂"), false) }.toMap()
     private val repository = ExerciseRepository(room.db, ExerciseCatalogLoader(ApplicationProvider.getApplicationContext<Context>().assets),
         room.clock, readCatalog = { LoadedExerciseCatalog(records, emptyMap(), metadata) })
     val state = ExerciseUiState(ExerciseUseCases(repository, room.clock, room.ids), repository)
@@ -27,6 +27,7 @@ internal class ExerciseConformanceFixture : AutoCloseable {
             names.getOrElse(index) { "虚构动作 $index" }, false, false, false, null))) }
         state.reload("")
         check(state.entries.size == 21 && state.sections("胸", null).single().entries.size == 21)
+        check(state.sections("胸", null).single().entries.take(9).map { state.selection(it).name } == names)
         check(room.count("sessions") == 0L)
     } }
     override fun close() = room.close()

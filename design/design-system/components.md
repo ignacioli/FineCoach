@@ -671,3 +671,5 @@ S1 的九项按 §4 anatomy 正式落地：HERO/HINT 既有实现保留，SET �
 D 类，复用 DS-PAGE-HEADER / DS-TEXT-FIELD / DS-CHIP / DS-SECTION / DS-LIST-ROW。
 FcListRow 增加显式 exerciseLibrary 变体，对应本文件 C′2b 的 space.4 横向、space.3 上下间距；默认普通行不变。既有组件增加可选的 visual modifier / tag，挂在真实图形上，点击区 tag 保留。只动作库开启，picker 保留当前组合。
 差异：FcListRow 动作库间距 12/8 → 16/12，修复 anatomy 偏差；不可观测的 glyph / chip / field / icon → 可选视觉 tag，不改变交互；其余消费者默认值保留。S1-D46 的行高及绳索 caption 由 map 登记；其余画板冲突仍待决定。
+
+P4 round 2 drift repair：Search 可见框固定 40dp，由外层 ≥44dp editor 在上下向外扩展 hit area；动作库 search-row 的 gap 使用 space.1，使可见框为 310dp，filter 保留 44dp 点击区。FcSectionLabel 保留满宽外层，调用方 tag 和 heading 移到实际文字；删除文字自身 fillMaxWidth。目标仍是批准的 D2b，不修改 token、Penpot 或 baseline。

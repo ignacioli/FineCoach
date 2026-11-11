@@ -101,7 +101,7 @@ fun FcListRowDivider(modifier: Modifier = Modifier, indented: Boolean = false) {
 
 @Composable
 fun FcSectionLabel(title: String, modifier: Modifier = Modifier) {
-    FcText(title, modifier.fillMaxWidth().semantics { heading() }, style = FcTypography.sectionLabel, color = FcColors.textSecondary)
+    Box(Modifier.fillMaxWidth()) { FcText(title, modifier.semantics { heading() }, style = FcTypography.sectionLabel, color = FcColors.textSecondary) }
 }
 
 @Composable

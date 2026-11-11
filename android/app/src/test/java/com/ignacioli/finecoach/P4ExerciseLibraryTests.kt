@@ -55,7 +55,10 @@ class P4ExerciseLibraryTests {
             compose.waitUntil(15_000) { compose.onAllNodesWithTag("exercise-options-fictional-conformance-0", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty() }
             val row = node("exercise-options-fictional-conformance-0")
             assertEquals(node("exercise-library-content").getUnclippedBoundsInRoot().width, row.getUnclippedBoundsInRoot().width)
-            val search = node("exercise-library-search").assertIsDisplayed()
+            val search = node("exercise-library-search").assertIsDisplayed().assertHeightIsAtLeast(44.dp)
+            node("conformance:Search").assertWidthIsEqualTo(310.dp).assertHeightIsEqualTo(40.dp)
+            node("exercise-library-section-胸").assertTextEquals("胸 · 21")
+            assertTrue(node("exercise-library-section-胸").getUnclippedBoundsInRoot().width < node("exercise-library-content").getUnclippedBoundsInRoot().width)
             val searchRow = node("exercise-library-search-row").getUnclippedBoundsInRoot()
             assertEquals(searchRow.left, search.getUnclippedBoundsInRoot().left)
             assertEquals(searchRow.right, node("exercise-library-filter").getUnclippedBoundsInRoot().right)

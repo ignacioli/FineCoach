@@ -12,6 +12,31 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [36])
 class ConformanceGenericTests {
+    @Test fun viewportIncludesPartialGeometryAndExcludesOutsideNodesAndLayers() {
+        val partial = layer("edge").put("x", 387).put("w", 39)
+        assertTrue(ConformanceMapping.intersectsViewport(partial))
+        assertFalse(ConformanceMapping.intersectsViewport(layer("outside").put("x", 390)))
+        assertFalse(ConformanceMapping.intersectsViewport(layer("below", y = 844)))
+        val entries = ConformanceMapping.entries(listOf(layer("a"), layer("outside", y = 900)), emptyList(),
+            listOf(node(1), node(2, y = 900)), emptyMap())
+        assertEquals(1, entries.size)
+        assertEquals(1, entries.single().getInt("nodeID"))
+        val clipped = JSONObject(partial.toString()).put("w", 3).put("unclipped", partial)
+        assertTrue(ConformanceComparison.geometry(clipped, partial, "top", 0.0).getBoolean("matches"))
+        assertFalse(ConformanceComparison.geometry(clipped, JSONObject(partial.toString()).put("x", 380), "top", 0.0).getBoolean("matches"))
+    }
+    @Test fun ad01MappingUsesParentGeometryAndVerifiedMaterialSourceOnly() {
+        val parent = layer("1").put("type", "group").put("name", "icon / filter")
+        val child = layer("1/0").put("type", "ellipse").put("name", "circle")
+        val n = node(1).put("tag", "conformance:icon / filter")
+        val entry = ConformanceMapping.entries(listOf(parent, child), emptyList(), listOf(n), emptyMap()).last()
+        assertEquals("AD-01 / S1-D28", entry.getString("source"))
+        assertEquals("filter_alt", entry.getString("asset"))
+        assertTrue(ConformanceComparison.ad01Unobservable(parent, entry, true, true))
+        assertFalse(ConformanceComparison.ad01Unobservable(parent, entry, false, true))
+        assertFalse(ConformanceComparison.ad01Unobservable(parent, entry, true, false))
+        assertFalse(ConformanceComparison.ad01Unobservable(JSONObject(parent.toString()).put("name", "icon / unknown"), entry, true, true))
+    }
     private fun layer(path: String, text: String = "应用", y: Int = 0) = JSONObject()
         .put("path", path).put("name", "Text").put("type", "text").put("text", text).put("x", 0).put("y", y).put("w", 10).put("h", 10)
     private fun node(id: Int, text: String = "应用", y: Int = 0) = layer("unused", text, y).put("id", id).put("tag", "").put("hex", "#211f1b")

@@ -903,3 +903,13 @@ P2 最终五行执行记录：
 视觉 tag：Search / Chip / Divider / icon / ‹ › 的观察点位于实际 shape 或 FcText 行盒，点击区标签独立保留。未把自动化通过当成人工视觉批准。
 
 P4 round 1 最终：full host 950/0；G3=42/0、G4=12/0、训练 conformance=1/0；D2b gate FAIL（2 passed / 64 failed / 28 missing / 0 BOARD_FIX_PENDING，42 registered pending，manual exception=0%）。三联图与热力图已生成，未作人工视觉验收。约14分钟确认未收敛后停止；完整归因及待定项见本轮报告。
+
+## P4 D2b pilot，round 2（2026-11-12）
+
+- 分类与依据：D；沿用重新导出的 D2b（81 layers）、C′2b 与 S1-D49，目标设计不变。
+- 范围：复用 DS-TEXT-FIELD / DS-SECTION；Search 44dp 可见框→40dp，hit area 保留≥44dp；search-row gap space.2→space.1，使 Search 宽306→310；section tag 满宽文字框→实际文字框。其余入口和上表保持。
+- 设计决定：删除全部42条 S1-D46 pendingBoardFix；fixture 前9行及 caption 按新 board，21行总数、canonicalName 排序及真实 preference alias 不变。AD-01 平台图标只比父框和颜色，内部非 PASS。
+- 实现与检查：通用 viewport 相交筛选；部分可见节点按完整布局几何比较；重复节点仍要求 reading order 与 unique nearest 一致。ConformanceGenericTests 正反例、P4ExerciseLibraryTests 的 search 40/44 与 section text tag，以及原有 durability / entry map 一并验证。
+- 结果：以 `.handoff/subagent/2026-11-12-p4-exercise-library-r2.md` 的最终门禁数字与逐项剩余偏差为准；L3 负责人走查 PENDING，未 commit。
+
+P4 round 2 最终：FAIL；host 952/0、G3 42/0、G4 12/0、训练conformance 1/0；D2b 4 PASS / 72 failed（28 missing）/ 4 AD-01内部不可观测，registered pending与pending均0，manual exceptions 0%。比较器专项41/0；Search 310×40及44dp hit area、section text tag测试通过；剩余header/chips/viewport/整体行起点决策点见r2报告。未作人工视觉批准，无commit。

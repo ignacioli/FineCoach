@@ -93,7 +93,7 @@ fun ExercisePicker(
 @Composable
 private fun ExerciseSearchRow(query: String, onQuery: (String) -> Unit, active: Boolean,
     searchTag: String, prefix: String, showFilters: Boolean = true, onFilters: () -> Unit) {
-    Row(Modifier.fillMaxWidth().testTag("$prefix-search-row"), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+    Row(Modifier.fillMaxWidth().testTag("$prefix-search-row"), horizontalArrangement = Arrangement.spacedBy(if (prefix == "exercise-library") FcSpacing.space1 else FcSpacing.space2)) {
         FcSearchField("搜索动作", query, onQuery, Modifier.weight(1f).testTag(searchTag),
             visualModifier = if (prefix == "exercise-library") Modifier.testTag("conformance:Search") else Modifier)
         if (showFilters) FcTitleIconButton("筛选", painterResource(if (active) R.drawable.ic_ms_filter_alt_filled else R.drawable.ic_ms_filter_alt),

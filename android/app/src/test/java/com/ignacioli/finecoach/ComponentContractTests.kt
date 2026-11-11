@@ -179,7 +179,10 @@ class ComponentContractTests {
         var calls = 0
         show { FcSectionLabel("区段", Modifier.testTag("label")); FcGroupEntryRow("分组", 2, Modifier.testTag("entry")) { calls++ } }
         node("label").assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading))
-        full("label"); full("entry"); touch("entry"); node("entry").performClick()
+        node("label").assertTextEquals("区段")
+        assertTrue(node("label").getUnclippedBoundsInRoot().width < node("parent").getUnclippedBoundsInRoot().width)
+        assertEquals(node("parent").fetchSemanticsNode().layoutInfo.width, node("label").fetchSemanticsNode().layoutInfo.parentInfo!!.width)
+        full("entry"); touch("entry"); node("entry").performClick()
         compose.runOnIdle { assertEquals(1, calls) }
     }
 

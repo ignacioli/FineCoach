@@ -162,9 +162,8 @@ class ExerciseConformanceTests {
         ConformanceSsimAlignment.evaluate(File(System.getProperty("finecoach.storageProjectDirectory")), out.parentFile)
         println("S0_CONFORMANCE "+name+" total="+result.getInt("total")+" passed="+result.getInt("passed")+" failed="+result.getInt("failed"))
         if (!sheet) {
-            Assert.assertTrue("D2b: only S1-D46 board fixes are approved", result.getJSONArray("elements").let { rows ->
-                (0 until rows.length()).all { i -> rows.getJSONObject(i).getJSONObject("selector").optJSONObject("pendingBoardFix")?.optString("decision")?.let { it == "S1-D46" } ?: true }
-            })
+            Assert.assertEquals("D2b pendingBoardFix registrations must be removed after board export", 0, result.getInt("pendingBoardFixEntries"))
+            Assert.assertEquals("D2b must have no pending board fixes", 0, result.getInt("boardFixPending"))
             Assert.assertTrue("D2b manual exceptions exceed 10%", result.getDouble("manualExceptionRatio") <= 0.1)
             Assert.assertTrue("D2b conformance: " + result.toString(), result.getBoolean("gatePassed") && stability.getBoolean("stable"))
         }

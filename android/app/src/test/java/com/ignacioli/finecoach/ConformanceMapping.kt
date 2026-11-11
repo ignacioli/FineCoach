@@ -20,6 +20,61 @@ internal object ConformanceMapping {
     fun entries(layers: List<JSONObject>, exceptions: List<JSONObject>, actual: List<JSONObject>, bindings: Map<String, String>, originOffsetY: Double = 0.0): List<JSONObject> {
         require(exceptions.map { it.getString("path") }.distinct().size == exceptions.size)
         require(exceptions.all { e -> layers.any { it.getString("path") == e.getString("path") } })
+        val visibleLayers = layers.filter { intersectsViewport(it) }
+        val visibleActual = actual.filter { intersectsViewport(it) && it.getDouble("w") > 0 && it.getDouble("h") > 0 && it.optBoolean("attached", true) && it.optBoolean("placed", true) }
+        return visibleEntries(visibleLayers, exceptions.filter { e -> visibleLayers.any { it.getString("path") == e.getString("path") } }, visibleActual, bindings, originOffsetY)
+    }
+
+    /** Geometry, including partial nodes, is compared using the complete layout box. */
+    internal fun intersectsViewport(box: JSONObject): Boolean {
+        val raw = box.optJSONObject("unclipped") ?: box
+        return raw.getDouble("w") > 0 && raw.getDouble("h") > 0 &&
+            raw.getDouble("x") < 390 && raw.getDouble("y") < 844 &&
+            raw.getDouble("x") + raw.getDouble("w") > 0 && raw.getDouble("y") + raw.getDouble("h") > 0
+    }
+
+    // AD-01 / S1-D28, canonical mapping table in android/docs/s1/S0-step3-components.md.
+    internal val platformIcons = mapOf(
+        "filter" to "filter_alt",
+        "gearshape" to "settings",
+        "calendar" to "calendar_month",
+        "line.3.horizontal.decrease.circle" to "filter_alt",
+        "line.3.horizontal.decrease.circle.fill" to "filter_alt_filled",
+        "plus" to "add",
+        "externaldrive" to "hard_drive",
+        "info.circle" to "info",
+        "chevron.left.forwardslash.chevron.right" to "code",
+        "slider.horizontal.3" to "tune",
+        "bell" to "notifications",
+        "book" to "menu_book",
+        "textformat" to "text_fields",
+        "list.bullet.rectangle" to "list_alt",
+        "figure.stand" to "accessibility_new",
+        "chart.line.uptrend.xyaxis" to "trending_up",
+        "chart.xyaxis.line" to "show_chart",
+        "doc.text" to "description",
+        "iphone" to "smartphone",
+        "lock" to "lock",
+        "person" to "person",
+        "arrow.down.doc" to "download",
+        "exclamationmark" to "priority_high",
+        "info" to "info_i",
+        "arrow.triangle.2.circlepath" to "sync",
+        "checkmark.circle" to "check_circle",
+        "exclamationmark.triangle" to "warning",
+        "trash" to "delete",
+        "pencil" to "edit",
+        "folder" to "folder",
+        "checkmark.circle.fill" to "check_circle_filled",
+        "star.fill" to "star_filled",
+        "bell.slash" to "notifications_off",
+        "lock.fill" to "lock_filled",
+        "minus" to "remove",
+        "chevron.down" to "expand_more"
+    )
+    internal fun platformIcon(name: String): String? = platformIcons[name.removePrefix("icon / ")]
+
+    private fun visibleEntries(layers: List<JSONObject>, exceptions: List<JSONObject>, actual: List<JSONObject>, bindings: Map<String, String>, originOffsetY: Double): List<JSONObject> {
         val byPath = exceptions.associateBy { it.getString("path") }
         val result = layers.map { layer ->
             val exception = byPath[layer.getString("path")]
@@ -33,6 +88,7 @@ internal object ConformanceMapping {
                 }
             }
             entry.put("mapping", if (manualSelector) "MANUAL" else if (layer.optString("type") == "text") "AUTO_TEXT" else "AUTO_TAG")
+            if (platformIcon(layer.optString("name")) != null) entry.put("colorMethod", "iconInk")
             if (!entry.has("anchor")) entry.put("anchor", "top")
             if (!entry.has("colorMethod")) entry.put("colorMethod", if (layer.optString("type") == "text") "textLayout" else "exactPixelMode")
             entry
@@ -60,7 +116,7 @@ internal object ConformanceMapping {
                 }
             }
         }
-        for (layer in layers.filter { it.optString("type") == "path" }) {
+        for (layer in layers.filter { it.optString("type") == "path" || layers.any { p -> platformIcon(p.optString("name")) != null && it.getString("path").startsWith(p.getString("path") + "/") } }) {
             val parent = layers.filter { it.optString("type") in setOf("icon", "group") && layer.getString("path").startsWith(it.getString("path") + "/") }
                 .maxByOrNull { it.getString("path").length } ?: continue
             val entry = result.single { it.getString("path") == layer.getString("path") }
@@ -70,6 +126,12 @@ internal object ConformanceMapping {
             entry.remove("tag")
             for (key in listOf("tag", "scope", "nodeID")) if (parentEntry.has(key)) entry.put(key, parentEntry.get(key))
             entry.put("anchor", parentEntry.getString("anchor"))
+            platformIcon(parent.getString("name"))?.let { symbol ->
+                entry.put("parentPath", parent.getString("path")).put("unobservable", "AD01_VECTOR_INTERNAL")
+                    .put("asset", symbol).put("source", "AD-01 / S1-D28").put("mapping", "AUTO_VECTOR_PARENT")
+                return@let
+            }
+            if (entry.optString("unobservable") == "AD01_VECTOR_INTERNAL") continue
             entry.put("parentPath", parent.getString("path")).put("unobservable", "VECTOR_INTERNAL_PATH")
                 .put("asset", assetName(parent.getString("name"))).put("mapping", "AUTO_VECTOR_PARENT")
         }

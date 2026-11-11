@@ -228,7 +228,7 @@ fun FcTextField(title: String, value: String, onValueChange: (String) -> Unit, m
         textStyle = (if (search) FcTypography.style("callout", 400) else FcTypography.body).copy(color = FcColors.textPrimary),
         visualTransformation = if (secure) PasswordVisualTransformation() else VisualTransformation.None,
         cursorBrush = SolidColor(FcColors.actionPrimary), decorationBox = { field ->
-            Box(visualModifier.fillMaxWidth().heightIn(min = if (search) FcSpacing.space8 + FcSpacing.space2 else FcComponentMetrics.field)
+            Box(Modifier.fillMaxWidth().wrapContentHeight(unbounded = true).then(visualModifier).then(if (search) Modifier.height(FcSpacing.space8 + FcSpacing.space2) else Modifier.heightIn(min = FcComponentMetrics.field))
                 .background(FcColors.surfaceCanvas, RoundedCornerShape(FcShapes.sm)).padding(horizontal = FcSpacing.space4, vertical = FcSpacing.space2),
                 contentAlignment = Alignment.CenterStart) {
                 if (value.isEmpty()) FcText(title, style = FcTypography.style("callout", 400), color = FcColors.textSecondary)
