@@ -1,5 +1,6 @@
 package com.ignacioli.finecoach.features.packages
 
+import com.ignacioli.finecoach.designsystem.FcText
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -133,7 +133,7 @@ fun ManualCreditAdjustmentScreen(
                     )
                 }
                 FcListRowDivider()
-                Text(
+                FcText(
                     "调整原因（必填）",
                     Modifier.padding(top = FcSpacing.space4),
                     style = FcTypography.style("callout", 400),
@@ -148,7 +148,7 @@ fun ManualCreditAdjustmentScreen(
                     )
                 }
                 state.error?.let { message ->
-                    Text(
+                    FcText(
                         message,
                         Modifier.padding(vertical = FcSpacing.space2).testTag("package-manual-error"),
                         style = FcTypography.style("callout", 400),

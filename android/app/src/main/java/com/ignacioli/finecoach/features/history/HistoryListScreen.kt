@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
-import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.ignacioli.finecoach.core.application.*
@@ -26,7 +25,7 @@ fun HistoryListScreen(state: HistoryUiState, zone: ZoneId, onNavigate: (String) 
             verticalArrangement = Arrangement.spacedBy(FcSpacing.space4)) {
             Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
                 FcPageHeader("训练历史", onBack = onBack, tag = "history-list")
-                if (state.studentName.isNotEmpty()) Text(state.studentName, Modifier.testTag("history-student-name"),
+                if (state.studentName.isNotEmpty()) FcText(state.studentName, Modifier.testTag("history-student-name"),
                     style = FcTypography.headline, color = FcColors.textSecondary)
             }
             Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
@@ -51,7 +50,7 @@ fun HistoryListScreen(state: HistoryUiState, zone: ZoneId, onNavigate: (String) 
                 }
             }
             Column(Modifier.fillMaxWidth().testTag("history-results"), verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
-                state.error?.let { Text("加载失败，请返回重试", Modifier.testTag("history-error"), style = FcTypography.caption, color = FcColors.statusDestructive) }
+                state.error?.let { FcText("加载失败，请返回重试", Modifier.testTag("history-error"), style = FcTypography.caption, color = FcColors.statusDestructive) }
                 if (state.busy && state.records.isEmpty()) HistoryCaption("正在加载", Modifier.testTag("history-loading"))
                 else when (state.emptyState) {
                     HistoryEmptyState.noHistory -> HistoryEmpty("还没有完成的训练", "完成一次训练后会出现在这里。", "history-empty")

@@ -67,7 +67,12 @@
       "expectedToken": "color.surface.page",
       "colorMethod": "textLayout",
       "textPolicy": "exact",
-      "anchor": "bottom"
+      "anchor": "bottom",
+      "pendingBoardFix": {
+        "dx": 2.5,
+        "decision": "S1-D42",
+        "reason": "DS-BUTTON 文字在按钮内水平居中；P0-a2 的「结束训练」文字框比按钮中心偏左 2.5pt（同页「确认」居中），待 Penpot 居中后重导出"
+      }
     },
     {
       "path": "7",
@@ -96,7 +101,12 @@
       "expectedToken": "color.text.secondary",
       "colorMethod": "textLayout",
       "textPolicy": "exact",
-      "anchor": "top"
+      "anchor": "top",
+      "pendingBoardFix": {
+        "dy": 1,
+        "decision": "S1-D42",
+        "reason": "同一动作标题行组件：第二个动作（path 34/35）「上次」与标题同中心；第一个动作的「上次」比标题高 1pt，待 Penpot 对齐后重导出"
+      }
     },
     {
       "path": "9",
@@ -234,7 +244,12 @@
       "expectedToken": "color.text.secondary",
       "colorMethod": "textLayout",
       "textPolicy": "exact",
-      "anchor": "top"
+      "anchor": "top",
+      "pendingBoardFix": {
+        "dy": 2.5,
+        "decision": "S1-D42",
+        "reason": "DS-LABEL-VALUE 行标签与字段垂直居中；P0-a2 的「重量 kg」比胶囊中心高 2.5pt，待 Penpot 下移后重导出"
+      }
     },
     {
       "path": "20",
@@ -255,8 +270,10 @@
       "expectedToken": "color.text.primary",
       "colorMethod": "iconInk",
       "textPolicy": "exact",
-      "note": "真实可见节点；触控区另保留44dp，非空代理。",
-      "anchor": "top"
+      "note": "S1-D40 R4：画稿以文字字形画 −/+，AD-01 映射为 Material 矢量；按图标自然 20dp 边界的中心对字形框中心比较，宽高按 20dp 判定。",
+      "anchor": "top",
+      "geometryRule": "SYMBOL_CENTER",
+      "symbolSizeDp": 20
     },
     {
       "path": "22",
@@ -264,7 +281,9 @@
       "expectedToken": "color.text.primary",
       "colorMethod": "textLayout",
       "textPolicy": "exact",
-      "anchor": "top"
+      "anchor": "top",
+      "geometryRule": "EDITABLE_TEXT_FIELD",
+      "note": "S1-D42：平台输入框保持自然单行最小高度，按中心比较。"
     },
     {
       "path": "23",
@@ -272,8 +291,10 @@
       "expectedToken": "color.text.primary",
       "colorMethod": "iconInk",
       "textPolicy": "exact",
-      "note": "真实可见节点；触控区另保留44dp，非空代理。",
-      "anchor": "top"
+      "note": "S1-D40 R4：画稿以文字字形画 −/+，AD-01 映射为 Material 矢量；按图标自然 20dp 边界的中心对字形框中心比较，宽高按 20dp 判定。",
+      "anchor": "top",
+      "geometryRule": "SYMBOL_CENTER",
+      "symbolSizeDp": 20
     },
     {
       "path": "24",
@@ -281,7 +302,12 @@
       "expectedToken": "color.text.secondary",
       "colorMethod": "textLayout",
       "textPolicy": "exact",
-      "anchor": "top"
+      "anchor": "top",
+      "pendingBoardFix": {
+        "dy": 2.5,
+        "decision": "S1-D42",
+        "reason": "DS-LABEL-VALUE 行标签与字段垂直居中；P0-a2 的「次数」比胶囊中心高 2.5pt，待 Penpot 下移后重导出"
+      }
     },
     {
       "path": "25",
@@ -302,8 +328,10 @@
       "expectedToken": "color.text.primary",
       "colorMethod": "iconInk",
       "textPolicy": "exact",
-      "note": "真实可见节点；触控区另保留44dp，非空代理。",
-      "anchor": "top"
+      "note": "S1-D40 R4：画稿以文字字形画 −/+，AD-01 映射为 Material 矢量；按图标自然 20dp 边界的中心对字形框中心比较，宽高按 20dp 判定。",
+      "anchor": "top",
+      "geometryRule": "SYMBOL_CENTER",
+      "symbolSizeDp": 20
     },
     {
       "path": "27",
@@ -311,7 +339,9 @@
       "expectedToken": "color.text.primary",
       "colorMethod": "textLayout",
       "textPolicy": "exact",
-      "anchor": "top"
+      "anchor": "top",
+      "geometryRule": "EDITABLE_TEXT_FIELD",
+      "note": "S1-D42：平台输入框保持自然单行最小高度，按中心比较。"
     },
     {
       "path": "28",
@@ -319,8 +349,10 @@
       "expectedToken": "color.text.primary",
       "colorMethod": "iconInk",
       "textPolicy": "exact",
-      "note": "真实可见节点；触控区另保留44dp，非空代理。",
-      "anchor": "top"
+      "note": "S1-D40 R4：画稿以文字字形画 −/+，AD-01 映射为 Material 矢量；按图标自然 20dp 边界的中心对字形框中心比较，宽高按 20dp 判定。",
+      "anchor": "top",
+      "geometryRule": "SYMBOL_CENTER",
+      "symbolSizeDp": 20
     },
     {
       "path": "29",
@@ -363,7 +395,12 @@
       "textPolicy": "exact",
       "anchor": "top",
       "tag": "session-icon-$benchID",
-      "note": "真实可见节点；触控区另保留44dp，非空代理。"
+      "note": "真实可见节点；触控区另保留44dp，非空代理。",
+      "pendingBoardFix": {
+        "dy": 3,
+        "decision": "S1-D42",
+        "reason": "编辑器在画板中比 Android 按 token 堆叠矮约 3pt；方案 (a)：编辑器以下内容在 Penpot 下移 3pt 后重新导出"
+      }
     },
     {
       "path": "33/1",
@@ -375,7 +412,12 @@
       "note": "S1-D37：矢量内部path不可独立观测；仅父图标几何通过且同名来源资产hash验证通过时单列，不计PASS或偏差。",
       "unobservable": "VECTOR_INTERNAL_PATH",
       "parentPath": "33",
-      "asset": "barbell"
+      "asset": "barbell",
+      "pendingBoardFix": {
+        "dy": 3,
+        "decision": "S1-D42",
+        "reason": "编辑器在画板中比 Android 按 token 堆叠矮约 3pt；方案 (a)：编辑器以下内容在 Penpot 下移 3pt 后重新导出"
+      }
     },
     {
       "path": "34",
@@ -384,7 +426,12 @@
       "expectedToken": "color.text.primary",
       "colorMethod": "textLayout",
       "textPolicy": "exact",
-      "anchor": "top"
+      "anchor": "top",
+      "pendingBoardFix": {
+        "dy": 3,
+        "decision": "S1-D42",
+        "reason": "编辑器在画板中比 Android 按 token 堆叠矮约 3pt；方案 (a)：编辑器以下内容在 Penpot 下移 3pt 后重新导出"
+      }
     },
     {
       "path": "35",
@@ -392,7 +439,12 @@
       "expectedToken": "color.text.secondary",
       "colorMethod": "textLayout",
       "textPolicy": "exact",
-      "anchor": "top"
+      "anchor": "top",
+      "pendingBoardFix": {
+        "dy": 3,
+        "decision": "S1-D42",
+        "reason": "编辑器在画板中比 Android 按 token 堆叠矮约 3pt；方案 (a)：编辑器以下内容在 Penpot 下移 3pt 后重新导出"
+      }
     },
     {
       "path": "36",
@@ -410,7 +462,12 @@
       "expectedToken": "color.action.primary",
       "colorMethod": "textLayout",
       "textPolicy": "exact",
-      "anchor": "top"
+      "anchor": "top",
+      "pendingBoardFix": {
+        "dy": 3,
+        "decision": "S1-D42",
+        "reason": "编辑器在画板中比 Android 按 token 堆叠矮约 3pt；方案 (a)：编辑器以下内容在 Penpot 下移 3pt 后重新导出"
+      }
     },
     {
       "path": "38",
@@ -419,7 +476,12 @@
       "expectedToken": "color.action.primary",
       "colorMethod": "textLayout",
       "textPolicy": "exact",
-      "anchor": "top"
+      "anchor": "top",
+      "pendingBoardFix": {
+        "dy": 3,
+        "decision": "S1-D42",
+        "reason": "编辑器在画板中比 Android 按 token 堆叠矮约 3pt；方案 (a)：编辑器以下内容在 Penpot 下移 3pt 后重新导出"
+      }
     },
     {
       "path": "39",
@@ -453,7 +515,12 @@
       "expectedToken": "color.action.primary",
       "colorMethod": "textLayout",
       "textPolicy": "exact",
-      "anchor": "bottom"
+      "anchor": "bottom",
+      "pendingBoardFix": {
+        "dy": 3,
+        "decision": "S1-D42",
+        "reason": "DS-REST-TIMER 链接在 Android 按容器垂直居中（结构规则，anatomy 未另行规定）；P0-a2 画板链接比容器中心高 3dp，待 Penpot 下移 3pt 并重新导出后撤掉本登记。"
+      }
     },
     {
       "path": "43",
@@ -462,7 +529,12 @@
       "expectedToken": "color.action.primary",
       "colorMethod": "textLayout",
       "textPolicy": "exact",
-      "anchor": "bottom"
+      "anchor": "bottom",
+      "pendingBoardFix": {
+        "dy": 3,
+        "decision": "S1-D42",
+        "reason": "DS-REST-TIMER 链接在 Android 按容器垂直居中（结构规则，anatomy 未另行规定）；P0-a2 画板链接比容器中心高 3dp，待 Penpot 下移 3pt 并重新导出后撤掉本登记。"
+      }
     },
     {
       "path": "44",
@@ -471,7 +543,12 @@
       "expectedToken": "color.action.primary",
       "colorMethod": "textLayout",
       "textPolicy": "exact",
-      "anchor": "bottom"
+      "anchor": "bottom",
+      "pendingBoardFix": {
+        "dy": 3,
+        "decision": "S1-D42",
+        "reason": "DS-REST-TIMER 链接在 Android 按容器垂直居中（结构规则，anatomy 未另行规定）；P0-a2 画板链接比容器中心高 3dp，待 Penpot 下移 3pt 并重新导出后撤掉本登记。"
+      }
     },
     {
       "path": "47",

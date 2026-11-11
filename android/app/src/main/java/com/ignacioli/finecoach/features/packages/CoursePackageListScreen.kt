@@ -1,11 +1,11 @@
 package com.ignacioli.finecoach.features.packages
 
+import com.ignacioli.finecoach.designsystem.FcText
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -208,14 +208,14 @@ fun CoursePackageListScreen(
                 )
             } else if (state.ready) {
                 if (!state.studentName.isNullOrEmpty()) {
-                    Text(
+                    FcText(
                         state.studentName.orEmpty(),
                         Modifier.padding(top = FcSpacing.space4),
                         style = FcTypography.headline,
                         color = FcColors.textSecondary,
                     )
                 }
-                Text(
+                FcText(
                     noActivePackage,
                     Modifier.padding(top = FcSpacing.space4).testTag("package-list-none"),
                     style = FcTypography.style("callout", 400),
@@ -234,7 +234,7 @@ fun CoursePackageListScreen(
                 )
             }
             state.actionError?.let { message ->
-                Text(
+                FcText(
                     message,
                     Modifier.padding(vertical = FcSpacing.space2).testTag("package-list-error"),
                     style = FcTypography.caption,

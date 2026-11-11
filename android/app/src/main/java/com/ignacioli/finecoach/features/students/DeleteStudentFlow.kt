@@ -1,5 +1,6 @@
 package com.ignacioli.finecoach.features.students
 
+import com.ignacioli.finecoach.designsystem.FcText
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -209,13 +209,13 @@ fun StudentArchiveConfirmationView(
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(FcSpacing.space4),
             ) {
-                Text(
+                FcText(
                     text = "归档学员",
                     modifier = Modifier.semantics { heading() },
                     style = FcTypography.title,
                     color = FcColors.textPrimary,
                 )
-                Text(
+                FcText(
                     text = "归档之后：",
                     style = FcTypography.body,
                     color = FcColors.textPrimary,
@@ -224,34 +224,34 @@ fun StudentArchiveConfirmationView(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(FcSpacing.space2),
                 ) {
-                    Text(
+                    FcText(
                         text = "• 从活跃学员列表中隐藏",
                         style = FcTypography.body,
                         color = FcColors.textPrimary,
                     )
-                    Text(
+                    FcText(
                         text = "• 不能开始新训练",
                         style = FcTypography.body,
                         color = FcColors.textPrimary,
                     )
-                    Text(
+                    FcText(
                         text = "• 仍可查看训练历史",
                         style = FcTypography.body,
                         color = FcColors.textPrimary,
                     )
-                    Text(
+                    FcText(
                         text = "• 之后可以恢复为活跃",
                         style = FcTypography.body,
                         color = FcColors.textPrimary,
                     )
                 }
-                Text(
+                FcText(
                     text = "归档不是删除。永久删除在编辑页的「永久删除」。",
                     style = FcTypography.body,
                     color = FcColors.textSecondary,
                 )
                 errorMessage?.let { message ->
-                    Text(
+                    FcText(
                         text = message,
                         modifier = Modifier.testTag(StudentTestTags.ARCHIVE_ERROR),
                         style = FcTypography.caption,
@@ -341,7 +341,7 @@ fun DeleteStudentScreen(
                             .fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(FcSpacing.space4),
                     ) {
-                        Text(
+                        FcText(
                             text = "学员已永久删除",
                             modifier = Modifier
                                 .testTag(StudentTestTags.DELETE_DONE)
@@ -365,7 +365,7 @@ fun DeleteStudentScreen(
                             .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(FcSpacing.space4),
                     ) {
-                        Text(
+                        FcText(
                             text = "${impact.displayName} 有进行中的训练，不能永久删除。",
                             modifier = Modifier
                                 .testTag(StudentTestTags.DELETE_BLOCKED)
@@ -373,7 +373,7 @@ fun DeleteStudentScreen(
                             style = FcTypography.title,
                             color = FcColors.textPrimary,
                         )
-                        Text(
+                        FcText(
                             text = "状态不只靠颜色：当前为「训练中」，须先结束或继续完成该训练。",
                             style = FcTypography.body,
                             color = FcColors.textSecondary,
@@ -412,40 +412,40 @@ fun DeleteStudentScreen(
                             .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(FcSpacing.space3),
                     ) {
-                        Text(
+                        FcText(
                             text = "永久删除",
                             modifier = Modifier.semantics { heading() },
                             style = FcTypography.title,
                             color = FcColors.textPrimary,
                         )
-                        Text(
+                        FcText(
                             text = "将永久删除「${impact.displayName}」及其在本机的关联数据。",
                             style = FcTypography.body,
                             color = FcColors.textPrimary,
                         )
-                        Text(
+                        FcText(
                             text = "将一并删除",
                             style = FcTypography.headline,
                             color = FcColors.textPrimary,
                         )
-                        Text(
+                        FcText(
                             text = "• 显示名称、性别、训练目标",
                             style = FcTypography.body,
                             color = FcColors.textPrimary,
                         )
-                        Text(
+                        FcText(
                             text = "• 伤病 / 注意事项、教练备注、电话与微信",
                             style = FcTypography.body,
                             color = FcColors.textPrimary,
                         )
                         impact.completedSessionCount?.let { count ->
-                            Text(
+                            FcText(
                                 text = "• $count 条已完成训练记录",
                                 style = FcTypography.body,
                                 color = FcColors.textPrimary,
                             )
                         }
-                        Text(
+                        FcText(
                             text = "输入显示名称以确认",
                             style = FcTypography.body,
                             color = FcColors.textPrimary,
@@ -458,14 +458,14 @@ fun DeleteStudentScreen(
                             enabled = !state.isDeleting,
                         )
                         state.errorMessage?.let { message ->
-                            Text(
+                            FcText(
                                 text = message,
                                 modifier = Modifier.testTag(StudentTestTags.DELETE_ERROR),
                                 style = FcTypography.caption,
                                 color = FcColors.statusDestructive,
                             )
                         }
-                        Text(
+                        FcText(
                             text = "删除后无法从本页恢复。已分享的旧图片和自行保存的备份不会被远程改写或删除。",
                             style = FcTypography.caption,
                             color = FcColors.textSecondary,
@@ -504,7 +504,7 @@ fun DeleteStudentScreen(
                         verticalArrangement = Arrangement.spacedBy(FcSpacing.space4),
                     ) {
                         state.errorMessage?.let { message ->
-                            Text(
+                            FcText(
                                 text = message,
                                 modifier = Modifier.testTag(StudentTestTags.DELETE_ERROR),
                                 style = FcTypography.caption,

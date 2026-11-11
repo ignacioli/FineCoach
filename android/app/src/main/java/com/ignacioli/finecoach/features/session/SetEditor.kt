@@ -62,13 +62,16 @@ fun SetEditor(state: ActiveSessionUiState, exercise: SessionExerciseRecord, targ
                     SetNumber("右侧重量", right, { right = it }, SetValueStepping.Field.weight, "set-right")
                 } else SetNumber(if (sideEntry) "每侧重量 kg" else "重量 kg", weight, { weight = it }, SetValueStepping.Field.weight, "set-weight")
             }
-            when (exercise.recordModeSnapshot) {
-                RecordMode.weightReps, RecordMode.reps -> SetNumber("次数", reps, { reps = it }, SetValueStepping.Field.reps, "set-reps")
-                RecordMode.duration, RecordMode.cardio -> FcTextField("时长（秒或分秒）", duration, { duration = it }, Modifier.testTag("set-duration"), enabled = !state.busy, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), keyboardActions = done)
+            // S1-D42: the stepping hint is helper text of the last field row, space.1 below it (P0-a2).
+            Column(verticalArrangement = Arrangement.spacedBy(FcSpacing.space1)) {
+                when (exercise.recordModeSnapshot) {
+                    RecordMode.weightReps, RecordMode.reps -> SetNumber("次数", reps, { reps = it }, SetValueStepping.Field.reps, "set-reps")
+                    RecordMode.duration, RecordMode.cardio -> FcTextField("时长（秒或分秒）", duration, { duration = it }, Modifier.testTag("set-duration"), enabled = !state.busy, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), keyboardActions = done)
+                }
+                if (exercise.recordModeSnapshot == RecordMode.weightReps) FcText(
+                    "每次 ±2.5 kg · 点数字可直接输入", Modifier.padding(start = FcComponentMetrics.label).testTag("set-weight-hint"),
+                    style = FcTypography.caption, color = FcColors.textSecondary)
             }
-            if (exercise.recordModeSnapshot == RecordMode.weightReps) androidx.compose.material3.Text(
-                "每次 ±2.5 kg · 点数字可直接输入", Modifier.padding(start = FcComponentMetrics.label).offset(y = -FcSpacing.space1).testTag("set-weight-hint"),
-                style = FcTypography.caption, color = FcColors.textSecondary)
             if (sideEntry) FcLinkButton(if (split) "左右相同" else "左右不同", Modifier.testTag("set-split"), !state.busy) {
                 if (!split) { left = weight; right = weight } else weight = recordedSideWeight(left, right, assisted)
                 split = !split
@@ -83,7 +86,8 @@ fun SetEditor(state: ActiveSessionUiState, exercise: SessionExerciseRecord, targ
                 FcTextField("阻力（可选）", resistance, { resistance = it }, Modifier.testTag("set-resistance"), enabled = !state.busy, keyboardOptions = numberKeyboard, keyboardActions = done)
             }
             state.error?.let { FcListRow(exerciseErrorTitle(it), Modifier.testTag("set-error")) }
-            Row(Modifier.fillMaxWidth().testTag("set-editor-actions"), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+            // S1-D42: actions sit space.4 below the fields (column space.2 + space.2 top inset).
+            Row(Modifier.fillMaxWidth().padding(top = FcSpacing.space2).testTag("set-editor-actions"), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
             FcButton(if (target == null) "确认" else "保存", Modifier.weight(1f).testTag("set-save"), !state.busy) {
                 keyboard?.hide()
                 val mode = exercise.recordModeSnapshot
@@ -107,7 +111,7 @@ fun SetEditor(state: ActiveSessionUiState, exercise: SessionExerciseRecord, targ
 @Composable
 private fun SetNumber(title: String, text: String, change: (String) -> Unit, field: SetValueStepping.Field, tag: String) {
     val keyboard = LocalSoftwareKeyboardController.current
-    FcLabelValueRow(title, labelModifier = Modifier.offset(y = -FcSpacing.space3 / 4)) {
+    FcLabelValueRow(title, labelModifier = Modifier) {
         FcStepperField(title, text, change, SetValueStepping.canStepDown(text, field),
             painterResource(R.drawable.ic_ms_remove), painterResource(R.drawable.ic_ms_add),
             { change(SetValueStepping.stepped(text, field, false)) }, { change(SetValueStepping.stepped(text, field, true)) }, tag = tag,

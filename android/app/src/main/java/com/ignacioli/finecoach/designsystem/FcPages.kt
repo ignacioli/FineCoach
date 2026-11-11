@@ -3,7 +3,6 @@ package com.ignacioli.finecoach.designsystem
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,11 +20,12 @@ fun FcPagePrimary(title: String, modifier: Modifier = Modifier, segments: (@Comp
     Column(modifier.fillMaxWidth().background(FcColors.surfacePage), verticalArrangement = Arrangement.spacedBy(FcSpacing.space4)) {
         segments?.invoke()
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(FcSpacing.space1)) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(title, Modifier.weight(1f).semantics { heading() }, style = FcTypography.display, color = FcColors.actionPrimary)
+            // S1-D42: header row keeps the 44dp touch row with or without actions
+            Row(Modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.touch), verticalAlignment = Alignment.CenterVertically) {
+                FcText(title, Modifier.weight(1f).semantics { heading() }, style = FcTypography.display, color = FcColors.actionPrimary)
                 actions()
             }
-            subtitle?.let { Text(it, subtitleModifier, style = FcTypography.style("callout", 400), color = FcColors.textSecondary) }
+            subtitle?.let { FcText(it, subtitleModifier, style = FcTypography.style("callout", 400), color = FcColors.textSecondary) }
         }
         content()
     }
@@ -51,8 +51,8 @@ fun FcEmptyState(title: String, description: String, modifier: Modifier = Modifi
         verticalArrangement = Arrangement.spacedBy(FcSpacing.space3)) {
         if (ambient) FcAmbientScene() else Image(painterResource(R.drawable.mascot_empty_state), null,
             Modifier.size(FcComponentMetrics.illustration).testTag(illustrationTag))
-        Text(title, style = FcTypography.headline, color = FcColors.actionPrimary, textAlign = TextAlign.Center)
-        Text(description, style = FcTypography.caption, color = FcColors.textSecondary, textAlign = TextAlign.Center)
+        FcText(title, style = FcTypography.headline, color = FcColors.actionPrimary, textAlign = TextAlign.Center)
+        FcText(description, style = FcTypography.caption, color = FcColors.textSecondary, textAlign = TextAlign.Center)
         actionTitle?.let {
             Spacer(Modifier.weight(1f))
             FcButton(it, Modifier.padding(bottom = FcSpacing.space8).testTag(actionTag), onClick = onAction)

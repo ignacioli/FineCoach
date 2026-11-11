@@ -146,13 +146,14 @@ class S1ComponentTests {
         assertArrayEquals(intArrayOf(0, 0, 0, 1), tap(editX, boundary + 2.dp))
         assertArrayEquals(intArrayOf(0, 1, 0, 0), tap(editX, boundary - 4.dp))
     }
-    @Test fun fieldSymbolsDrawRealInkInsideTheirAdvanceFrames() {
+    // S1-D40 R4: the AD-01 Material symbol is drawn at its natural 20dp bounds (no design-glyph frame).
+    @Test fun fieldSymbolsDrawRealInkInsideTheirNaturalBounds() {
         show { FcStepperField("次数", "8", {}, true,
             androidx.compose.ui.res.painterResource(com.ignacioli.finecoach.R.drawable.ic_ms_remove),
             androidx.compose.ui.res.painterResource(com.ignacioli.finecoach.R.drawable.ic_ms_add), {}, {}, tag = "ink") }
         listOf("minus", "plus").forEach { symbol ->
             val glyph = node("ink-$symbol-glyph")
-            glyph.assertWidthIsEqualTo(14.dp).assertHeightIsEqualTo(26.dp)
+            glyph.assertWidthIsEqualTo(20.dp).assertHeightIsEqualTo(20.dp)
             touch("ink-$symbol")
             val pixels = glyph.captureToImage().toPixelMap()
             val ink = mutableListOf<Pair<Int, Int>>()
@@ -160,7 +161,7 @@ class S1ComponentTests {
                 if (pixels[x, y] == FcColors.textPrimary) ink += x to y
             }
             assertTrue("The symbol must draw actual vector ink", ink.isNotEmpty())
-            assertTrue("The vector must not be cut at the advance frame", ink.all {
+            assertTrue("The vector must not be cut at its bounds", ink.all {
                 it.first > 0 && it.first < pixels.width - 1 && it.second > 0 && it.second < pixels.height - 1
             })
         }

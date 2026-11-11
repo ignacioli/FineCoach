@@ -1,12 +1,12 @@
 package com.ignacioli.finecoach.features.packages
 
+import com.ignacioli.finecoach.designsystem.FcText
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,9 +42,9 @@ internal fun PackageDetailBody(
 ) {
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(FcSpacing.space4)) {
         if (!studentName.isNullOrEmpty()) {
-            Text(studentName, style = FcTypography.headline, color = FcColors.textSecondary)
+            FcText(studentName, style = FcTypography.headline, color = FcColors.textSecondary)
         }
-        Text(
+        FcText(
             balance.toString(),
             modifier = Modifier
                 .testTag("$tagPrefix-balance")
@@ -62,7 +62,7 @@ internal fun PackageDetailBody(
         }
         FcSectionLabel("课时调整")
         if (adjustments.isEmpty()) {
-            Text(
+            FcText(
                 ledgerEmpty,
                 modifier = Modifier.testTag("$tagPrefix-empty"),
                 style = FcTypography.style("callout", 400),
@@ -99,9 +99,9 @@ private fun AdjustmentRow(
     ) {
         FcSymbol(if (debit) minus else plus)
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(FcSpacing.space1)) {
-            Text(adjustmentTitle(adjustment), style = FcTypography.body, color = FcColors.textPrimary)
-            Text(adjustmentReason(adjustment), style = FcTypography.caption, color = FcColors.textSecondary)
+            FcText(adjustmentTitle(adjustment), style = FcTypography.body, color = FcColors.textPrimary)
+            FcText(adjustmentReason(adjustment), style = FcTypography.caption, color = FcColors.textSecondary)
         }
-        Text(adjustmentDay(adjustment.createdAtUTC, zoneID), style = FcTypography.caption, color = FcColors.textSecondary)
+        FcText(adjustmentDay(adjustment.createdAtUTC, zoneID), style = FcTypography.caption, color = FcColors.textSecondary)
     }
 }

@@ -1,11 +1,11 @@
 package com.ignacioli.finecoach.features.packages
 
+import com.ignacioli.finecoach.designsystem.FcText
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -127,7 +127,7 @@ fun CreditAdjustmentTrailScreen(
                 tag = "package-trail",
             )
             if (state.loadError) {
-                Text(
+                FcText(
                     "记录暂不可用，再试一次。",
                     Modifier.padding(vertical = FcSpacing.space2),
                     style = FcTypography.caption,

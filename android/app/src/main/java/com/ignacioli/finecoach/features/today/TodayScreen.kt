@@ -1,7 +1,6 @@
 package com.ignacioli.finecoach.features.today
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -63,7 +62,7 @@ fun TodayScreen(state: TodayUiState, onNavigate: (String) -> Unit) {
             subtitleModifier = Modifier.testTag("today-date"), subtitle = state.todayDate.format(DateTimeFormatter.ofPattern("M月d日 · EEE", Locale.SIMPLIFIED_CHINESE))) {
         Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).testTag("today-content"), verticalArrangement = Arrangement.spacedBy(FcSpacing.space4)) {
             if (state.error != null) {
-                Text("加载今日安排失败，再试一次。", Modifier.testTag("today-error"), style = FcTypography.caption, color = FcColors.statusDestructive)
+                FcText("加载今日安排失败，再试一次。", Modifier.testTag("today-error"), style = FcTypography.caption, color = FcColors.statusDestructive)
                 FcButton("重试", Modifier.testTag("today-retry")) { scope.launch { state.load() } }
             }
             when {

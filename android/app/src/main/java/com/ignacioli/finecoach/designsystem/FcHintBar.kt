@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,7 +39,7 @@ fun FcHintBar(
                 .padding(horizontal = FcSpacing.space4),
             contentAlignment = Alignment.CenterStart,
         ) {
-            Text(text = text, style = FcTypography.caption, color = FcColors.actionPrimary)
+            FcText(text = text, style = FcTypography.caption, color = FcColors.actionPrimary)
         }
     } else {
         Row(
@@ -51,13 +50,13 @@ fun FcHintBar(
             horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
+            FcText(
                 text = text,
                 modifier = Modifier.weight(1f),
                 style = FcTypography.caption,
                 color = FcColors.actionPrimary,
             )
-            Text(
+            FcText(
                 text = title,
                 style = FcTypography.style("callout", 600),
                 color = FcColors.actionPrimary,

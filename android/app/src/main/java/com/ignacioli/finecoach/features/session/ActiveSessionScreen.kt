@@ -81,7 +81,7 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
             state.error?.let { FcListRow(exerciseErrorTitle(it), Modifier.testTag("active-session-error")) }
             if (content != null) {
                 Column(Modifier.fillMaxWidth().testTag("session-exercises"), verticalArrangement = Arrangement.spacedBy(FcSpacing.space3)) {
-                if (content.exercises.isEmpty()) androidx.compose.material3.Text("先添加动作，再记录组数。", Modifier.testTag("session-empty-hint"),
+                if (content.exercises.isEmpty()) FcText("先添加动作，再记录组数。", Modifier.testTag("session-empty-hint"),
                     style = FcTypography.style("callout", 400), color = FcColors.textSecondary)
                 if (content.session.durationNeedsReview) FcButton("确认训练时长", Modifier.testTag("session-review-duration"), !state.busy) { review = true }
                 val axis = (content.sections.map { it.orderIndex to it } + content.exercises.filter { it.sectionID == null }.map { it.orderIndex to it }).sortedBy { it.first }
@@ -144,7 +144,7 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
                                     change({ it.deletingSection(item.sectionID, SessionSectionDeletionDisposition.DeleteWithExercises, state.clock.now()) })
                                 else confirmSection = item
                             })) {
-                            androidx.compose.material3.Text(item.name, Modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.touch).testTag(sectionTag),
+                            FcText(item.name, Modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.touch).testTag(sectionTag),
                                 style = FcTypography.sectionLabel, color = FcColors.textSecondary)
                         }
                         content.exercises.filter { it.sectionID == item.sectionID }.sortedBy { it.orderIndex }.forEach { exercise(it) }
@@ -162,7 +162,7 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
         RestTimerView(state.rests, id, state.clock, !WindowInsets.isImeVisible)
         Box(Modifier.fillMaxWidth().padding(bottom = FcSpacing.space8)) {
         FcButton("结束训练", Modifier.testTag("session-finish"), content != null && !state.busy && state.saveState != FcSaveState.Failed,
-            labelModifier = Modifier.offset(x = -FcSpacing.space1 / 2)) {
+            labelModifier = Modifier) {
             if (content?.session?.durationNeedsReview == true) review = true else onFinish()
         }
         }
@@ -209,7 +209,7 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
         { if (!state.busy) confirmSection = null }, tag = "session-delete-section-confirm") }
     deleteExercise?.let { row ->
         FcPlatformShell({ if (!state.busy) deleteExercise = null }) {
-            androidx.compose.material3.Text("删除动作", Modifier.fillMaxWidth().testTag("session-delete-exercise-title"),
+            FcText("删除动作", Modifier.fillMaxWidth().testTag("session-delete-exercise-title"),
                 style = FcTypography.titleLarge, color = FcColors.textPrimary)
             FcListRow("该动作包含已完成组，删除后无法恢复。")
             state.error?.let { FcListRow(exerciseErrorTitle(it)) }

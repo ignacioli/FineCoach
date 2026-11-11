@@ -1,5 +1,6 @@
 package com.ignacioli.finecoach.features.students
 
+import com.ignacioli.finecoach.designsystem.FcText
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -334,7 +334,7 @@ fun StudentDetailScreen(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         FcAvatar(name = student.displayName)
-                        Text(
+                        FcText(
                             text = StudentPresentation.goalText(student.trainingGoal),
                             style = FcTypography.callout,
                             color = FcColors.textSecondary,
@@ -346,7 +346,7 @@ fun StudentDetailScreen(
                                 text = "已归档",
                                 modifier = Modifier.testTag(StudentTestTags.DETAIL_ARCHIVED_STATUS),
                             )
-                            Text(
+                            FcText(
                                 text = "不能开始新训练。仍可查看下方历史，或恢复为活跃学员。",
                                 style = FcTypography.caption,
                                 color = FcColors.textSecondary,
@@ -443,12 +443,12 @@ private fun OverviewSection(
                         horizontalArrangement = Arrangement.spacedBy(FcSpacing.space1),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text(
+                        FcText(
                             text = summary.balance.toString(),
                             style = FcTypography.numeralLarge,
                             color = FcColors.textPrimary,
                         )
-                        Text(
+                        FcText(
                             text = StudentPresentation.packageDetailText(summary.totalCredits, summary.endDate),
                             style = FcTypography.callout,
                             color = FcColors.textSecondary,
@@ -456,7 +456,7 @@ private fun OverviewSection(
                     }
                 }
                 state.packageQueried -> {
-                    Text(
+                    FcText(
                         text = "新建课包后，上完课会按课时扣减",
                         style = FcTypography.body,
                         color = FcColors.textSecondary,
@@ -478,7 +478,7 @@ private fun OverviewSection(
             },
         ) {
             if (state.recentQueried) {
-                Text(
+                FcText(
                     text = StudentPresentation.recentTrainingText(state.recent, zoneId),
                     style = FcTypography.body,
                     color = if (state.recent == null) FcColors.textSecondary else FcColors.textPrimary,
@@ -556,7 +556,7 @@ private fun ProfileSection(
                 notesExpanded -> student.injuryNotes.orEmpty()
                 else -> "已隐藏 · 点击查看"
             }
-            Text(
+            FcText(
                 text = text,
                 modifier = if (hasNotes && notesExpanded) Modifier.testTag(StudentTestTags.DETAIL_NOTES_BODY) else Modifier,
                 style = FcTypography.body,
@@ -564,7 +564,7 @@ private fun ProfileSection(
             )
         }
         if (hasNotes && notesExpanded) {
-            Text(
+            FcText(
                 text = "此内容不是医疗诊断或医疗建议。仅教练可见，不进入分享报告。",
                 modifier = Modifier.padding(bottom = FcSpacing.space3),
                 style = FcTypography.caption,
@@ -572,7 +572,7 @@ private fun ProfileSection(
             )
         }
         FcListRowDivider()
-        Text(
+        FcText(
             text = "电话与微信由教练手输。不读取系统通讯录，不询问联系人权限。",
             modifier = Modifier.padding(top = FcSpacing.space3),
             style = FcTypography.caption,

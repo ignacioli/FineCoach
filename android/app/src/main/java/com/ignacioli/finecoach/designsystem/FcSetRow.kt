@@ -8,7 +8,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.text.modifiers.TextAutoSizeLayoutScope
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -72,7 +71,7 @@ fun FcSetRow(ordinal: Int, values: String, completed: Boolean, pending: Boolean,
             .clickable(enabled = enabled && !completed, onClick = onConfirm), contentAlignment = Alignment.Center) {
             if (completed) Box(Modifier.size(FcComponentMetrics.badge).testTag("$tag-circle")
                 .background(FcColors.actionPrimary, CircleShape), contentAlignment = Alignment.Center) {
-                Text(FcGlyph.CheckOnFill.glyph, Modifier.testTag("$tag-check").semantics { hideFromAccessibility() },
+                FcText(FcGlyph.CheckOnFill.glyph, Modifier.testTag("$tag-check").semantics { hideFromAccessibility() },
                     style = FcTypography.sectionLabel, color = FcColors.actionOn)
             } else Canvas(Modifier.size(FcComponentMetrics.badge).testTag("$tag-circle")) {
                 drawCircle(if (pending) FcColors.borderControl else FcColors.textSecondary,
@@ -81,21 +80,25 @@ fun FcSetRow(ordinal: Int, values: String, completed: Boolean, pending: Boolean,
                             (FcSpacing.space1 - FcComponentMetrics.hairline).toPx(), (FcSpacing.space1 / 2).toPx()))))
             }
         }
-        Text("第 $ordinal 组", style = FcTypography.body, color = if (completed) FcColors.textPrimary else FcColors.textSecondary)
+        FcText("第 $ordinal 组", style = FcTypography.body, color = if (completed) FcColors.textPrimary else FcColors.textSecondary)
         Box(Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
-            BasicText(values, Modifier.offset(x = FcSpacing.space1 / 2).testTag("$tag-values"),
+            BasicText(values, Modifier.testTag("$tag-values").fcLineBox(FcTypography.body, FcLineCount()),
                 style = FcTypography.body.copy(color = FcColors.textPrimary, textAlign = TextAlign.Start),
                 maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis,
                 autoSize = SetValueAutoSize)
         }
-        Box(Modifier.widthIn(min = FcComponentMetrics.field - FcComponentMetrics.hairline), contentAlignment = Alignment.CenterStart) {
-            if (onUndo != null) FcLinkButton("撤销", Modifier.setHitLayout().testTag("$tag-undo"), enabled, onUndo)
-            else Text(if (completed) "已完成" else if (pending) "待完成" else "草稿", Modifier.offset(x = FcSpacing.space1),
-                style = FcTypography.style("callout", 400), color = FcColors.textSecondary)
-        }
-        Box(Modifier.setHitLayout(FcSpacing.space4 + FcSpacing.space1).size(FcComponentMetrics.touch).testTag("$tag-edit")
-            .semantics { contentDescription = "编辑组" }.clickable(enabled = enabled, onClick = onEdit), contentAlignment = Alignment.Center) {
-            FcSymbol(painterResource(R.drawable.ic_ms_edit), Modifier.size(FcSpacing.space4 + FcSpacing.space1).testTag("$tag-edit-icon"), tint = FcColors.actionPrimary)
+        // S1-D42: P0-a2 trailing cluster on token gaps — values → space.3 + space.1 → status column
+        // (field width) → space.1 → edit; keeps the 38dp rhythm and each 44dp hit box.
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(FcSpacing.space1)) {
+            Box(Modifier.padding(start = FcSpacing.space1).widthIn(min = FcComponentMetrics.field), contentAlignment = Alignment.CenterStart) {
+                if (onUndo != null) FcLinkButton("撤销", Modifier.setHitLayout().testTag("$tag-undo"), enabled, contentAlignment = Alignment.CenterStart, onClick = onUndo)
+                else FcText(if (completed) "已完成" else if (pending) "待完成" else "草稿",
+                    style = FcTypography.style("callout", 400), color = FcColors.textSecondary)
+            }
+            Box(Modifier.setHitLayout(FcSpacing.space4 + FcSpacing.space1).size(FcComponentMetrics.touch).testTag("$tag-edit")
+                .semantics { contentDescription = "编辑组" }.clickable(enabled = enabled, onClick = onEdit), contentAlignment = Alignment.Center) {
+                FcSymbol(painterResource(R.drawable.ic_ms_edit), Modifier.size(FcSpacing.space4 + FcSpacing.space1).testTag("$tag-edit-icon"), tint = FcColors.actionPrimary)
+            }
         }
     }
 }
