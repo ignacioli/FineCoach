@@ -606,7 +606,7 @@ AD-01 的 35 项完整逐行对照、三类状态与名称差异清单见 [T031]
 | DS-HINT-BAR | FcHintBar | FcHintBar.kt | info;continue | Components/FCHintBar.swift | hintBar | 提示与训练中条同一组件；整条可点。单行，不改其他 DS |
 | DS-HERO-CARD | FcHeroCard | FcHeroCard.kt | single | Components/FCHeroCard.swift | heroCard | 单行默认不变；多行 `FcMultiHeroCard` 是已实现的变体，见 651-655 |
 | DS-AMBIENT-SCENE | FcAmbientScene | FcAmbientScene.kt | today;calendar | Components/FCAmbientEmptyScene.swift | ambientScene | C 类迁移；四层与暂停逻辑复用，未做人工视觉验收 |
-| DS-SET-ROW | FcSetRow | FcSetRow.kt | draft;pending;completed;disabled;undo | Components/FCSetRow.swift | setRow | C 类正式登记；G2 计数保持，新增检查在 S1ComponentTests |
+| DS-SET-ROW | FcSetRow | FcSetRow.kt | draft;pending;completed;disabled;undo | Components/FCSetRow.swift | setRow | C 类正式登记；G2 计数保持，新增检查在 S1ComponentTests。Android 可见步距 38dp（P0-a2），44dp 点击区向外扩展、可上下各重叠 3dp，依据 S1-D38；iOS 行高 ≥44 为已知两端差异 |
 | DS-EQUIPMENT-ICON | FcEquipmentIcon;FcEquipmentIconView;FcEquipmentIconForExercise | FcEquipmentIcon.kt | barbell;bike;bodyweight;cable_crossover;cable_machine;dumbbell;hack_squat;hip_adduction;jump_rope;kettlebell;leg_extension;pec_deck;plate_loaded;pull_up_bar;resistance_band;rowing_machine;shoulder_press;smith_machine;suspension_trainer;tbar_row;treadmill | Components/FCEquipmentIcon.swift | equipmentIcons | C 类产品自有 21 SVG，路径/圆头描边保留；未人工视觉验收 |
 | DS-PAGE-PRIMARY | FcPagePrimary | FcPages.kt | coach;viewer | Components/FCPageHeader.swift | primaryPage | C 类组合；分段→display 标题，调用方提供入口 |
 | DS-PAGE-SECONDARY | FcPageSecondary | FcPages.kt | back;bottom | Components/FCPageHeader.swift | secondaryPage | C 类组合；FcPlatformShell 唯一 Insets 与返回 owner |

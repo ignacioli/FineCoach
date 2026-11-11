@@ -74,10 +74,24 @@ internal object ConformanceComparison {
             rows.put(row)
         }
         val rowList = rows.objects()
+        for (entry in entries.filter { it.has("unobservable") }) {
+            val layer = layers.single { it.getString("path") == entry.getString("path") }
+            val parent = layers.singleOrNull { it.getString("path") == entry.optString("parentPath") }
+            val parentRow = rowList.singleOrNull { it.getString("path") == entry.optString("parentPath") }
+            val row = rowList.single { it.getString("path") == entry.getString("path") }
+            val evidence = provenanceValid(androidRoot, entry.optString("asset"))
+            val valid = vectorUnobservable(layer, parent, entry, parentRow?.optBoolean("geometryMatches") == true, evidence)
+            row.put("parentGeometryPassed", parentRow?.optBoolean("geometryMatches") == true).put("assetProvenanceVerified", evidence)
+            if (valid) row.put("status", "UNOBSERVABLE_VECTOR_INTERNAL").put("category", "UNOBSERVABLE_VECTOR_INTERNAL")
+                .put("reason", "不可观测（矢量内部）；父图标几何通过，源SVG/drawable与来源记录hash一致；不计PASS或偏差")
+            else row.put("status", "FAIL").put("category", "UI_DEVIATION")
+                .put("reason", "不可观测标记前提不成立：须批准的内部path、父group/icon几何通过且同名资产来源hash有效")
+        }
         val missing = rowList.count { it.getString("status") == "MISSING" }
         val invisible = rowList.count { it.getString("category") == "INVISIBLE_OR_CLIPPED" }
         val uiDeviations = rowList.count { it.getString("category") == "UI_DEVIATION" }
         val passed = rowList.count { it.getString("status") == "PASS" }
+        val unobservable = rowList.count { it.getString("status") == "UNOBSERVABLE_VECTOR_INTERNAL" }
         val design = ImageIO.read(File(androidRoot.parentFile, "design/experience-p0/screens/P0-a2-training.png"))
         check(design.width == android.width && design.height == android.height)
         val diff = BufferedImage(design.width, design.height, BufferedImage.TYPE_INT_RGB)
@@ -97,13 +111,39 @@ internal object ConformanceComparison {
         }
         ImageIO.write(triptych, "png", File(out, "P0-a2-training.triptych.png"))
         val top = rowList.filter { it.has("delta") && it.getString("category") == "UI_DEVIATION" }.sortedByDescending { row -> listOf("x", "y", "w", "h").maxOf { abs(row.getJSONObject("delta").getDouble(it)) } }.take(10)
-        val result = JSONObject().put("artifactStatus", "VALID_FIXTURE").put("invisible", invisible).put("uiDeviations", uiDeviations).put("total", rows.length()).put("passed", passed).put("failed", rows.length() - passed).put("missing", missing)
+        val result = JSONObject().put("artifactStatus", "VALID_FIXTURE").put("invisible", invisible).put("uiDeviations", uiDeviations).put("total", rows.length()).put("passed", passed).put("failed", rows.length() - passed - unobservable).put("missing", missing)
+            .put("unobservableVectorInternal", unobservable)
             .put("toleranceDp", tolerance).put("measuredContentTop", contentTop).put("effectiveOriginOffsetY", offset)
             .put("originReason", map.getString("originRule")).put("differentPixelRatio", different.toDouble() / (design.width.toLong() * design.height))
             .put("sha256", sha(File(out, "P0-a2-training.android.png"))).put("elements", rows).put("top10", JSONArray(top))
             .put("humanReadSummary", "本轮未打开新图；上轮仅对无效 fixture 进行过一次图片清单审查，其结论不移植为本轮有效图的人工判断。以下分类与摘要依据节点和几何文字证据；负责人视觉验收仍 PENDING。")
             .put("androidOnlyTextNodes", JSONArray(actual.filter { it.getInt("id") !in used && it.getString("text").isNotEmpty() }))
         return result
+    }
+
+    internal fun vectorUnobservable(layer: JSONObject, parent: JSONObject?, entry: JSONObject, parentGeometryPassed: Boolean, provenanceValid: Boolean): Boolean {
+        val approved = mapOf("7/1" to ("7" to "barbell"), "33/1" to ("33" to "barbell"),
+            "45/1" to ("45" to "edit"), "46/1" to ("46" to "edit"))
+        val pair = approved[layer.optString("path")] ?: return false
+        return entry.optString("unobservable") == "VECTOR_INTERNAL_PATH" && entry.optString("parentPath") == pair.first &&
+            entry.optString("asset") == pair.second && layer.optString("type") == "path" && parent != null &&
+            parent.optString("path") == pair.first && parent.optString("type") in setOf("group", "icon") &&
+            parent.optString("name").contains(pair.second) && parentGeometryPassed && provenanceValid
+    }
+
+    private fun provenanceValid(androidRoot: File, name: String): Boolean {
+        if (name !in setOf("barbell", "edit")) return false
+        val equipment = name == "barbell"
+        val assets = File(androidRoot, "design-assets")
+        val file = File(assets, if (equipment) "equipment-provenance.json" else "material-symbols-provenance.json")
+        val record = JSONObject(file.readText()).getJSONArray("icons").objects().singleOrNull {
+            it.optString(if (equipment) "name" else "symbol") == name
+        } ?: return false
+        val root = androidRoot.parentFile.canonicalFile
+        val source = File(if (equipment) root else assets, record.getString(if (equipment) "source" else "sourceSvg")).canonicalFile
+        val drawable = File(androidRoot, record.getString("drawable")).canonicalFile
+        return listOf(source, drawable).all { it.toPath().startsWith(root.toPath()) && it.isFile } &&
+            sha(source) == record.getString("sourceSha256") && sha(drawable) == record.getString("drawableSha256")
     }
 
     internal fun select(actual: List<JSONObject>, entry: JSONObject, expand: (String) -> String = { it }): List<JSONObject> {
@@ -137,8 +177,15 @@ internal object ConformanceComparison {
             else actual.getDouble(axis) - expected.getDouble(axis)
             delta.put(axis, value); within.put(axis, abs(value) <= tolerance)
         }
+        val text = layer.optString("type") == "text"
+        if (text) {
+            val center = actual.getDouble("y") + actual.getDouble("h") / 2 - expected.getDouble("y") - expected.getDouble("h") / 2
+            delta.put("centerY", center); within.put("centerY", abs(center) <= tolerance)
+        }
         return JSONObject().put("delta", delta).put("withinTolerance", within)
-            .put("matches", listOf("x", "y", "w", "h").all { within.getBoolean(it) })
+            .put("matches", (if (text) listOf("x", "w", "centerY") else listOf("x", "y", "w", "h")).all { within.getBoolean(it) })
+            .put("comparisonAxes", JSONArray(if (text) listOf("x", "w", "centerY") else listOf("x", "y", "w", "h")))
+            .put("heightReportOnly", text)
             .put("rawYDelta", actual.getDouble("y") - layer.getDouble("y"))
             .put("yComparison", if (anchor == "bottom") "BOTTOM_GAP" else if (anchor == "viewport") "VIEWPORT_NOT_APPLICABLE_TO_TOP_ORIGIN" else "TOP_POSITION_WITH_ORIGIN")
             .apply { if (anchor == "bottom") {
@@ -178,14 +225,15 @@ internal object ConformanceComparison {
         File(out, "P0-a2-training.report.md").writeText(buildString {
             appendLine("# P0-a2 训练页设计一致性")
             appendLine("\nartifactStatus=${result.getString("artifactStatus")}；总数 ${result.getInt("total")}；通过 ${result.getInt("passed")}；失败 ${result.getInt("failed")}（UI 偏差 ${result.getInt("uiDeviations")}、missing ${result.getInt("missing")}、不可见/裁剪 ${result.getInt("invisible")}）；像素差异比例 ${result.getDouble("differentPixelRatio")}")
+            appendLine("\n不可观测（矢量内部）：${result.getInt("unobservableVectorInternal")}，不计入PASS或偏差。仅父图标几何通过且同名资产来源hash验证通过时成立（S1-D37）。")
             appendLine("\noriginOffsetY=${result.getDouble("effectiveOriginOffsetY")}；Android content top=${result.getDouble("measuredContentTop")}；${result.getString("originReason")}")
             result.optJSONObject("stability")?.let { appendLine("\n双次 fresh Room/composition 渲染：$it") }
-            appendLine("\n每项 x/y/w/h 独立判定 abs(Δ) ≤ ±2dp（包含边界）；任一超限失败。top 的 Δy 为位置差，bottom 的 Δy 为视口底距差 actualGap−designGap，viewport 不应用top offset。详细逐轴withinTolerance见JSON geometry。")
-            appendLine("\n| path | 元素 | anchor | 容差dp | Δx | Δy | Δw | Δh | text | token | category | 原因 |")
-            appendLine("|---|---|---|---:|---:|---:|---:|---:|---|---|---|---|")
+            appendLine("\nS1-D37：文字仅判定x/w/垂直中心，Δh只报告；其余图形x/y/w/h各自判定。容差均为±2dp含边界。top原点、bottom底距规则不变，文字中心按各anchor的expected矩形计算，无新增偏移。")
+            appendLine("\n| path | 元素 | anchor | 容差dp | Δx | Δy | Δw | Δh(文字仅报告) | ΔcenterY | text | token | category | 原因 |")
+            appendLine("|---|---|---|---:|---:|---:|---:|---:|---:|---|---|---|---|")
             rows.forEach { r ->
                 val d = r.optJSONObject("delta")
-                appendLine("| ${r.getString("path")} | ${r.getString("name")} | ${r.getString("anchor")} | ±${r.getDouble("toleranceDp")} | ${d?.optDouble("x")} | ${d?.optDouble("y")} | ${d?.optDouble("w")} | ${d?.optDouble("h")} | ${r.getBoolean("textMatches")} | ${r.optString("tokenComparison", "MISSING")} | ${r.getString("category")} | ${r.optJSONObject("visibility")?.optString("reason") ?: r.optString("reason")} |")
+                appendLine("| ${r.getString("path")} | ${r.getString("name")} | ${r.getString("anchor")} | ±${r.getDouble("toleranceDp")} | ${d?.optDouble("x")} | ${d?.optDouble("y")} | ${d?.optDouble("w")} | ${d?.optDouble("h")} | ${if (d?.has("centerY") == true) d.getDouble("centerY") else "N/A"} | ${r.getBoolean("textMatches")} | ${r.optString("tokenComparison", "MISSING")} | ${r.getString("category")} | ${r.optString("reason").ifEmpty { r.optJSONObject("visibility")?.optString("reason") ?: "" }} |")
             }
             appendLine("\n## 人读摘要\n\n${result.getString("humanReadSummary")}")
             appendLine("\n颜色读取：文字来自真实 TextLayoutResult；填充来自节点矩形内 exact RGB 众数；iconInk 排除白底/canvas 后取实际众数，无近色匹配。无颜色观测写 UNOBSERVABLE，不能据此声称真实 token 不一致，仍不通过。相同 hex 的 token aliases 归一到 map 使用的语义 token。")

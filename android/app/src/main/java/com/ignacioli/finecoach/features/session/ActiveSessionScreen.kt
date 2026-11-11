@@ -73,18 +73,20 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
     FcPlatformShell(back, Modifier.imePadding()) {
 
         Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).testTag("active-session-content"),
-            verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+            verticalArrangement = Arrangement.spacedBy(if (state.saveState == FcSaveState.Saved) FcSpacing.space3 else FcSpacing.space4)) {
             SessionHeader(studentName, content, state.clock, back)
-            SaveStatusView(state)
+            if (state.saveState != FcSaveState.Saved) SaveStatusView(state)
             recoverySlot()
             if (state.rests.end(id) != null) com.ignacioli.finecoach.notifications.RestPermissionEntry()
             state.error?.let { FcListRow(exerciseErrorTitle(it), Modifier.testTag("active-session-error")) }
             if (content != null) {
+                Column(Modifier.fillMaxWidth().testTag("session-exercises"), verticalArrangement = Arrangement.spacedBy(FcSpacing.space3)) {
                 if (content.exercises.isEmpty()) androidx.compose.material3.Text("先添加动作，再记录组数。", Modifier.testTag("session-empty-hint"),
                     style = FcTypography.style("callout", 400), color = FcColors.textSecondary)
                 if (content.session.durationNeedsReview) FcButton("确认训练时长", Modifier.testTag("session-review-duration"), !state.busy) { review = true }
                 val axis = (content.sections.map { it.orderIndex to it } + content.exercises.filter { it.sectionID == null }.map { it.orderIndex to it }).sortedBy { it.first }
                 @Composable fun exercise(row: SessionExerciseRecord) {
+                    Column(Modifier.fillMaxWidth()) {
                     val exerciseTag = "session-exercise-${row.sessionExerciseID.value}"
                     SessionSwipeRow("$exerciseTag-swipe", revealed == exerciseTag, !state.busy, { revealed = if (it) exerciseTag else null },
                         buildList {
@@ -115,6 +117,7 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
                             onUndo = if (state.undoableSetID == set.trainingSetID) ({ scope.launch { state.undoRecentSet(); if (state.error == null) { editor = row; editing = null } }; Unit }) else null)
                         }
                         if (editor?.sessionExerciseID == row.sessionExerciseID && editing?.trainingSetID == set.trainingSetID) {
+                            Spacer(Modifier.height(FcSpacing.space3))
                             key(set.trainingSetID) { SetEditor(state, row, set,
                                 row.sourceID?.let { exercises.preference(it).isUnilateral } == true,
                                 row.sourceID?.let { exercises.preference(it).isAssisted } == true) { editing = null } }
@@ -123,11 +126,14 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
                     if (state.deleted?.sessionExerciseID == row.sessionExerciseID && state.deleted!!.orderIndex.toInt() >= row.sets.size)
                         FcUndoRow("第 ${state.deleted!!.orderIndex.toInt() + 1} 组已删除", tag = "session-deleted") { scope.launch { state.restoreSet() } }
                     if (editor?.sessionExerciseID == row.sessionExerciseID && editing == null) {
+                        Spacer(Modifier.height(FcSpacing.space3))
                         key(row.sessionExerciseID, "new") { SetEditor(state, row, null,
                             row.sourceID?.let { exercises.preference(it).isUnilateral } == true,
                             row.sourceID?.let { exercises.preference(it).isAssisted } == true) { editor = null } }
                     }
-                    FcListRowDivider()
+                    Spacer(Modifier.height(if (editor?.sessionExerciseID == row.sessionExerciseID) FcSpacing.space1 else FcSpacing.space4))
+                    FcListRowDivider(Modifier.testTag("session-divider-${row.sessionExerciseID.value}"))
+                    }
                 }
                 axis.forEach { (_, item) -> when (item) {
                     is SectionRecord -> {
@@ -145,16 +151,20 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
                     }
                     is SessionExerciseRecord -> exercise(item)
                 } }
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space6)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space6 + FcSpacing.space1)) {
                     FcLinkButton("＋ 添加动作", Modifier.testTag("session-add-exercise"), !state.busy) { addSheet = true }
                     FcLinkButton("＋ 新建分区", Modifier.testTag("session-add-section"), !state.busy) { section = null; sectionForm = true }
+                }
                 }
             }
         }
         restSlot()
         RestTimerView(state.rests, id, state.clock, !WindowInsets.isImeVisible)
-        FcButton("结束训练", Modifier.testTag("session-finish"), content != null && !state.busy && state.saveState != FcSaveState.Failed) {
+        Box(Modifier.fillMaxWidth().padding(bottom = FcSpacing.space8)) {
+        FcButton("结束训练", Modifier.testTag("session-finish"), content != null && !state.busy && state.saveState != FcSaveState.Failed,
+            labelModifier = Modifier.offset(x = -FcSpacing.space1 / 2)) {
             if (content?.session?.durationNeedsReview == true) review = true else onFinish()
+        }
         }
     }
     if (addSheet) FcBottomSheet("添加动作", { addSheet = false }, skipPartiallyExpanded = true) {

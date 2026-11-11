@@ -11,6 +11,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SaveStatusView(state: ActiveSessionUiState) {
+    // S1-D35: the page renders saving/failure only; the shared catalog keeps all states.
+    if (state.saveState == FcSaveState.Saved) return
     val scope = rememberCoroutineScope()
     Column(Modifier.fillMaxWidth().testTag("save-status-content")) {
         FcSaveStatusView(state.saveState, painterResource(if (state.saveState == FcSaveState.Failed) R.drawable.ic_ms_priority_high else R.drawable.ic_ms_check_circle),

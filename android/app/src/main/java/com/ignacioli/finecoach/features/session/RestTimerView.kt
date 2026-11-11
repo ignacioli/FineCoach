@@ -22,7 +22,7 @@ internal const val SessionMotionDurationMillis = 250
 @Composable
 fun RestTimerView(store: RestTimerStore, id: SessionID, clock: AppClock, visible: Boolean = true) {
     val end = store.end(id)
-    AnimatedVisibility(end != null && visible,
+    AnimatedVisibility(end != null && visible, modifier = Modifier.padding(bottom = FcSpacing.space3),
         enter = slideInVertically(tween(SessionMotionDurationMillis)) { it } + fadeIn(tween(SessionMotionDurationMillis)),
         exit = fadeOut(tween(SessionMotionDurationMillis))) {
         if (end != null) {
@@ -37,15 +37,15 @@ fun RestTimerView(store: RestTimerStore, id: SessionID, clock: AppClock, visible
             }
             Row(Modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.hub)
                 .testTag("rest-content").background(FcColors.surfaceCanvas, RoundedCornerShape(FcShapes.lg)).padding(horizontal = FcSpacing.space4), verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+                horizontalArrangement = Arrangement.spacedBy(FcSpacing.space4)) {
                 if (remaining > 0) {
-                    Column(Modifier.weight(1f)) {
+                    Column(Modifier.weight(1f).align(Alignment.Top).padding(top = FcSpacing.space2)) {
                         Text("组间休息", style = FcTypography.caption, color = FcColors.textSecondary)
-                        Text(restTime(remaining), Modifier.testTag("rest-remaining"), style = FcTypography.numeralLarge, color = FcColors.textPrimary)
+                        Text(restTime(remaining), Modifier.offset(y = -FcComponentMetrics.hairline).testTag("rest-remaining"), style = FcTypography.numeralLarge, color = FcColors.textPrimary)
                     }
-                    FcLinkButton("−15 秒", Modifier.testTag("rest-minus")) { store.adjust(id, -15) }
-                    FcLinkButton("+15 秒", Modifier.testTag("rest-plus")) { store.adjust(id, 15) }
-                    FcLinkButton("跳过", Modifier.testTag("rest-skip")) { store.clear(id) }
+                    FcLinkButton("−15 秒", Modifier.offset(y = -FcSpacing.space3 / 4).testTag("rest-minus")) { store.adjust(id, -15) }
+                    FcLinkButton("+15 秒", Modifier.offset(y = -FcSpacing.space3 / 4).testTag("rest-plus")) { store.adjust(id, 15) }
+                    FcLinkButton("跳过", Modifier.offset(y = -FcSpacing.space3 / 4).testTag("rest-skip")) { store.clear(id) }
                 } else {
                     FcSymbol(FcGlyph.Check)
                     Column(Modifier.weight(1f)) {

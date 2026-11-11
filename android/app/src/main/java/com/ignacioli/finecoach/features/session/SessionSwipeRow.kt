@@ -35,7 +35,7 @@ internal fun SessionSwipeRow(tag: String, open: Boolean, enabled: Boolean, revea
     var width by remember { mutableIntStateOf(0) }
     val fullSwipe by rememberUpdatedState(onFullSwipe)
     val offset by animateFloatAsState(if (open) -distance else 0f, tween(SessionMotionDurationMillis), label = "session-swipe")
-    Box(Modifier.fillMaxWidth().clipToBounds().testTag(tag).onSizeChanged { width = it.width }.pointerInput(enabled, open) {
+    Box(Modifier.fillMaxWidth().then(if (open) Modifier.clipToBounds() else Modifier).testTag(tag).onSizeChanged { width = it.width }.pointerInput(enabled, open) {
         if (enabled) {
             var drag = 0f
             detectHorizontalDragGestures(onDragStart = { drag = 0f }, onDragEnd = {

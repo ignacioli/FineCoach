@@ -63,4 +63,45 @@ class ConformanceComparisonTests {
         val selector = JSONObject().put("commonLayoutParentOfTags", JSONArray(listOf("minus", "plus"))).put("containsTag", "input")
         assertEquals(2, ConformanceComparison.select(listOf(JSONObject(selector.toString()), JSONObject(selector.toString())), selector).size)
     }
+    @Test fun textHeightIsReportOnlyWhileItsCenterAndWidthRemainStrict() {
+        val design = rect(16.0, 100.0, 86.0, 20.0).put("type", "text")
+        val actual = rect(16.0, 95.0, 86.0, 30.0)
+        val result = ConformanceComparison.geometry(actual, design, "top", 0.0)
+        assertTrue(result.getBoolean("matches")); assertEquals(10.0, result.getJSONObject("delta").getDouble("h"), 0.0)
+        assertEquals(0.0, result.getJSONObject("delta").getDouble("centerY"), 0.0)
+        actual.put("w", 88.001)
+        assertFalse(ConformanceComparison.geometry(actual, design, "top", 0.0).getBoolean("matches"))
+        actual.put("w", 86.0).put("x", 18.001)
+        assertFalse(ConformanceComparison.geometry(actual, design, "top", 0.0).getBoolean("matches"))
+    }
+    @Test fun textCentersHonorTopOriginBottomAnchorAndInclusiveTolerance() {
+        val design = rect(16.0, 775.0, 69.0, 20.0).put("type", "text")
+        val actual = rect(16.0, 770.0, 69.0, 30.0)
+        assertTrue(ConformanceComparison.geometry(actual, design, "bottom", -52.0).getBoolean("matches"))
+        actual.put("y", 772.0)
+        assertTrue(ConformanceComparison.geometry(actual, design, "bottom", -52.0).getBoolean("matches"))
+        actual.put("y", 772.001)
+        assertFalse(ConformanceComparison.geometry(actual, design, "bottom", -52.0).getBoolean("matches"))
+        actual.put("y", 718.0)
+        assertTrue(ConformanceComparison.geometry(actual, design, "top", -52.0).getBoolean("matches"))
+    }
+    @Test fun vectorInternalIsUnobservableOnlyWithMatchingParentAndProvenance() {
+        val layer = JSONObject("""{"path":"7/1","type":"path"}""")
+        val parent = JSONObject("""{"path":"7","type":"group","name":"icon / barbell"}""")
+        val entry = JSONObject("""{"unobservable":"VECTOR_INTERNAL_PATH","parentPath":"7","asset":"barbell"}""")
+        assertTrue(ConformanceComparison.vectorUnobservable(layer, parent, entry, true, true))
+        assertFalse(ConformanceComparison.vectorUnobservable(layer, parent, entry, false, true))
+        assertFalse(ConformanceComparison.vectorUnobservable(layer, parent, entry, true, false))
+        assertFalse(ConformanceComparison.vectorUnobservable(layer, null, entry, true, true))
+        parent.put("type", "rectangle")
+        assertFalse(ConformanceComparison.vectorUnobservable(layer, parent, entry, true, true))
+        parent.put("type", "group").put("name", "icon / dumbbell")
+        assertFalse(ConformanceComparison.vectorUnobservable(layer, parent, entry, true, true))
+    }
+    @Test fun vectorMarkCannotHideTextOrAnUnapprovedLayer() {
+        val parent = JSONObject("""{"path":"45","type":"group","name":"edit"}""")
+        val entry = JSONObject("""{"unobservable":"VECTOR_INTERNAL_PATH","parentPath":"45","asset":"edit"}""")
+        assertFalse(ConformanceComparison.vectorUnobservable(JSONObject("""{"path":"45/1","type":"text"}"""), parent, entry, true, true))
+        assertFalse(ConformanceComparison.vectorUnobservable(JSONObject("""{"path":"45/2","type":"path"}"""), parent, entry, true, true))
+    }
 }

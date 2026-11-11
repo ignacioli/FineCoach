@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
 import androidx.compose.ui.test.*
+import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.unit.width
 import androidx.core.view.ViewCompat
@@ -78,8 +79,16 @@ class ActiveSessionEntryLayoutTests {
                 HistoryRepository(f.db, f.clock, f.generation, ZoneOffset.UTC), useCases)
         }
     }
+    private fun disposeContent() {
+        // Dispose after pending recompositions instead of scheduling new content during teardown.
+        compose.runOnIdle {
+            val root = compose.activity.findViewById<android.view.ViewGroup>(android.R.id.content)
+            (root.getChildAt(0) as AbstractComposeView).disposeComposition()
+        }
+        compose.waitForIdle()
+    }
     @After fun close() {
-        compose.runOnUiThread { compose.activity.setContent { } }; compose.waitForIdle()
+        disposeContent()
         f.test { f.db.runInTransaction { } }; f.close()
     }
     private fun <T> ok(result: ApplicationResult<T>) = f.ok(result)
@@ -99,7 +108,7 @@ class ActiveSessionEntryLayoutTests {
         f.test { result = ok(f.sessions.loadContent(id))!! }; return result
     }
     private fun reopen() {
-        compose.runOnUiThread { compose.activity.setContent { } }; compose.waitForIdle()
+        disposeContent()
         f.test { f.db.runInTransaction { }; f.reopen() }
     }
     private fun options(set: TrainingSetRecord) = swipe("session-set-${set.trainingSetID.value}-swipe")
@@ -329,7 +338,27 @@ class ActiveSessionEntryLayoutTests {
         val original = content(true); show(original)
         val row = original.exercises.first(); val set = row.sets.first()
         node("session-student").assertTextEquals("虚构学员1")
-        node("session-stats").assertTextEquals("已完成组数 ${original.exercises.sumOf { e -> e.sets.count { it.state == SetRecordingState.completed } }}")
+        node("session-stats").assertDoesNotExist()
+        node("save-status-saved").assertDoesNotExist()
+        node("save-status-content").assertDoesNotExist()
+        val glyph = node("active-session-back-glyph")
+        glyph.assertTextEquals("‹")
+        node("active-session-back").assertContentDescriptionEquals("返回").assertHasClickAction()
+        assertTrue(glyph.getUnclippedBoundsInRoot().width < node("active-session-back").getUnclippedBoundsInRoot().width)
+        val glyphLayouts = mutableListOf<androidx.compose.ui.text.TextLayoutResult>()
+        val titleLayouts = mutableListOf<androidx.compose.ui.text.TextLayoutResult>()
+        val title = compose.onNodeWithText("训练中", useUnmergedTree = true)
+        glyph.performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.GetTextLayoutResult) { assertTrue(it(glyphLayouts)) }
+        title.performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.GetTextLayoutResult) { assertTrue(it(titleLayouts)) }
+        assertEquals(title.fetchSemanticsNode().boundsInRoot.top + titleLayouts.single().firstBaseline,
+            glyph.fetchSemanticsNode().boundsInRoot.top + glyphLayouts.single().firstBaseline, 0.001f)
+        val header = "session-exercise-${row.sessionExerciseID.value}"
+        val headerParts = node(header).onChildren().fetchSemanticsNodes().size
+        click(header)
+        node(header).assertIsSelected()
+        node(header).onChildren().assertCountEquals(headerParts)
+        node(header).onChildren().filter(hasText("已完成")).assertCountEquals(0)
+        node(header).onChildren().filter(SemanticsMatcher.expectValue(androidx.compose.ui.semantics.SemanticsProperties.StateDescription, "动作已完成")).assertCountEquals(0)
         click("session-set-${set.trainingSetID.value}-edit")
         node("session-set-${set.trainingSetID.value}").assertExists()
         full("session-set-${set.trainingSetID.value}", "active-session-content")
@@ -369,7 +398,7 @@ class ActiveSessionEntryLayoutTests {
         show(empty)
         node("session-empty-hint").assertIsDisplayed().assertTextEquals("先添加动作，再记录组数。")
         node("session-add-exercise").assertIsDisplayed().assertHasClickAction()
-        node("session-stats").assertTextEquals("已完成组数 0")
+        node("session-stats").assertDoesNotExist()
     }
 
     @Test fun unfinishedSetFullSwipeDeletesButCompletedSetOnlyRevealsAction() {

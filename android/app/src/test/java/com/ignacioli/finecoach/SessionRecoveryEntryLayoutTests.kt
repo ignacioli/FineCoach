@@ -92,13 +92,48 @@ class SessionRecoveryEntryLayoutTests {
         compose.waitUntil(15_000) { !state.busy }
         assertEquals("confirm failure: ${state.error?.code}", FcSaveState.Failed, state.saveState)
         await("save-retry"); node("session-finish").assertIsNotEnabled()
+        node("save-status-failed").assertIsDisplayed().assertContentDescriptionEquals("保存失败")
+        node("save-finish-blocked").assertIsDisplayed()
+        node("save-status-saved").assertDoesNotExist()
         full("save-retry", "save-status-content")
         assertEquals(original, read(original.session.sessionID))
         f.test { f.clearFailure() }; click("save-retry")
-        await("save-status-saved"); gone("save-retry")
+        gone("save-status-content"); gone("save-retry"); node("save-status-saved").assertDoesNotExist()
         assertEquals(SetRecordingState.completed, read(original.session.sessionID).exercises.first().sets.first().state)
         assertNotNull(state.rests.end(original.session.sessionID))
         node("session-finish").assertIsEnabled()
+    }
+    @Test fun savingRemainsAccessibleAndSavedRemovesTheWholePageStatusSlot() {
+        val original = content()
+        val entered = CompletableDeferred<Unit>()
+        val release = CompletableDeferred<Unit>()
+        f.test {
+            val delegate = f.sessions
+            val suspended = object : SessionRepositoryPort by delegate {
+                override suspend fun saveContent(command: SaveSessionContentCommand): ApplicationResult<SessionContentRecord> {
+                    entered.complete(Unit)
+                    release.await()
+                    return delegate.saveContent(command)
+                }
+            }
+            state = ActiveSessionUiState(ActiveSessionUseCases(suspended, f.clock, f.ids), f.clock, f.ids,
+                suspended, HistoryRepository(f.db, f.clock, f.generation, ZoneOffset.UTC),
+                ExerciseUseCases(f.exercises, f.clock, f.ids))
+        }
+        show(original)
+        node("save-status-content").assertDoesNotExist()
+        click("session-set-${original.exercises.first().sets.first().trainingSetID.value}-confirm")
+        try {
+            compose.waitUntil(15_000) { entered.isCompleted }
+            await("save-status-saving")
+            node("save-status-saving").assertIsDisplayed().assertContentDescriptionEquals("保存中")
+            node("save-status-saved").assertDoesNotExist()
+            node("session-finish").assertIsNotEnabled()
+        } finally { release.complete(Unit) }
+        gone("save-status-content")
+        node("save-status-saved").assertDoesNotExist()
+        assertEquals(FcSaveState.Saved, state.saveState)
+        assertEquals(SetRecordingState.completed, read(original.session.sessionID).exercises.first().sets.first().state)
     }
     @Test fun confirmedSetStartsRestAndVisibleAdjustSkipCloseAreIsolatedAndFullWidth() {
         val original = content(); show(original)
@@ -241,7 +276,7 @@ class SessionRecoveryEntryLayoutTests {
         await("save-retry")
         node("session-finish").assertIsNotEnabled()
         click("save-retry")
-        await("save-status-saved"); gone("save-retry")
+        gone("save-status-content"); gone("save-retry"); node("save-status-saved").assertDoesNotExist()
         node("session-finish").assertIsEnabled()
         val saved = read(original.session.sessionID)
         assertEquals(3, attempts.get())

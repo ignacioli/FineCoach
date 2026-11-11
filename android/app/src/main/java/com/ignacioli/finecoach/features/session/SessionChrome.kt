@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.semantics.*
 import com.ignacioli.finecoach.core.application.*
 import com.ignacioli.finecoach.core.domain.common.*
@@ -17,15 +18,26 @@ import java.time.Duration
 
 @Composable
 internal fun SessionHeader(student: String, content: SessionContentRecord?, clock: AppClock, back: () -> Unit) {
-    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(FcComponentMetrics.touch).testTag("active-session-back")
-                .semantics { contentDescription = "返回" }.clickable(onClick = back), contentAlignment = Alignment.CenterStart) { FcSymbol(FcGlyph.PageBack) }
-            Text("训练中", Modifier.semantics { heading() }, style = FcTypography.style("titleEmphasis", 700), color = FcColors.textPrimary)
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(FcSpacing.space3)) {
+        Box(Modifier.fillMaxWidth()) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.width(FcSpacing.space4).alignByBaseline()) {
+                    FcSymbol(FcGlyph.PageBack, visualTag = "active-session-back-glyph")
+                }
+                Text("训练中", Modifier.alignByBaseline().semantics { heading() }, style = FcTypography.style("titleEmphasis", 700), color = FcColors.textPrimary)
+            }
+            // DS-PAGE-HEADER: the 44dp hit area overlays the 16dp leading slot.
+            Box(Modifier.matchParentSize(), contentAlignment = Alignment.TopStart) {
+                Box(Modifier.wrapContentSize(Alignment.TopStart, unbounded = true)
+                    .offset(x = -(FcComponentMetrics.touch - FcSpacing.space4) / 2).requiredSize(FcComponentMetrics.touch)
+                    .testTag("active-session-back").semantics { contentDescription = "返回" }
+                    .clickable(onClick = back)) { }
+            }
         }
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth().padding(end = FcSpacing.space6 + FcSpacing.space1).testTag("session-meta"), verticalAlignment = Alignment.CenterVertically) {
             val focus = content?.session?.trainingFocus.orEmpty().sortedBy { it.ordinal }.joinToString("、") { FcBodyParts[it.ordinal] }
-            Text(student + if (focus.isNotEmpty()) " · $focus" else "", Modifier.weight(1f).testTag("session-student"), style = FcTypography.headline, color = FcColors.textSecondary)
+            Text(student + if (focus.isNotEmpty()) " · $focus" else "", Modifier.testTag("session-student"), style = FcTypography.headline, color = FcColors.textSecondary)
+            Spacer(Modifier.weight(1f))
             content?.let {
                 var seconds by remember(it.session.startedAtUTC) { mutableLongStateOf(0) }
                 LaunchedEffect(it.session.startedAtUTC) {
@@ -33,36 +45,32 @@ internal fun SessionHeader(student: String, content: SessionContentRecord?, cloc
                 }
                 val elapsed = if (seconds >= 3600) "%d:%02d:%02d".format(seconds / 3600, seconds / 60 % 60, seconds % 60)
                     else "%02d:%02d".format(seconds / 60, seconds % 60)
-                Text(elapsed, Modifier.testTag("session-clock"), style = FcTypography.headline, color = FcColors.textPrimary)
+                Text(elapsed, Modifier.testTag("session-clock"), style = FcTypography.headline, color = FcColors.actionPrimary)
             }
         }
-        Text("已完成组数 ${content?.exercises?.sumOf { row -> row.sets.count { it.state == SetRecordingState.completed } } ?: 0}",
-            Modifier.testTag("session-stats"), style = FcTypography.caption, color = FcColors.textSecondary)
     }
 }
 
 @Composable
 internal fun SessionExerciseHeader(row: SessionExerciseRecord, previous: TrainingSetRecord?, previousCount: Int, selected: Boolean, enabled: Boolean, onSelect: () -> Unit) {
-    Row(Modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.touch)
+    Row(Modifier.fillMaxWidth().layout { measurable, constraints ->
+        val natural = measurable.minIntrinsicHeight(constraints.maxWidth)
+        val measured = measurable.measure(constraints.copy(minHeight = FcComponentMetrics.touch.roundToPx()))
+        // Keep the full hit region; its trailing padding does not push the visible set rows down.
+        layout(measured.width, maxOf(natural, measured.height - (FcSpacing.space2 + FcComponentMetrics.hairline).roundToPx())) { measured.placeRelative(0, 0) }
+    }
         .testTag("session-exercise-${row.sessionExerciseID.value}").semantics { this.selected = selected }
         .clickable(enabled = enabled, onClick = onSelect), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
-        FcEquipmentIconForExercise(row.sourceID.takeUnless { row.sourceKind == ExerciseSourceKind.sessionOnly })
-        Text(row.displayNameSnapshot, Modifier.weight(1f), style = FcTypography.exerciseTitle, color = FcColors.textPrimary)
+        FcEquipmentIconForExercise(row.sourceID.takeUnless { row.sourceKind == ExerciseSourceKind.sessionOnly }, Modifier.testTag("session-icon-${row.sessionExerciseID.value}"))
+        Text(row.displayNameSnapshot, style = FcTypography.exerciseTitle, color = FcColors.textPrimary)
+        Spacer(Modifier.weight(1f))
         Text(previous?.let { "上次 ${it.toDomain().displaySummary()} · $previousCount 组" } ?: when (row.recordModeSnapshot) {
             com.ignacioli.finecoach.core.domain.common.RecordMode.weightReps -> "重量与次数"
             com.ignacioli.finecoach.core.domain.common.RecordMode.reps -> "次数"
             com.ignacioli.finecoach.core.domain.common.RecordMode.duration -> "时长"
             com.ignacioli.finecoach.core.domain.common.RecordMode.cardio -> "有氧"
-        }, Modifier.testTag(if (previous != null) "session-previous-${row.sessionExerciseID.value}" else "session-mode-${row.sessionExerciseID.value}"),
+        }, Modifier.offset(y = -FcComponentMetrics.hairline).testTag(if (previous != null) "session-previous-${row.sessionExerciseID.value}" else "session-mode-${row.sessionExerciseID.value}"),
             style = FcTypography.caption, color = FcColors.textSecondary)
-        if (selected) FcSymbol(FcGlyph.Check)
-        if (row.sets.isNotEmpty() && row.sets.all { it.state == SetRecordingState.completed }) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(FcSpacing.space1),
-                modifier = Modifier.semantics(mergeDescendants = true) { stateDescription = "动作已完成" }) {
-                FcSymbol(androidx.compose.ui.res.painterResource(com.ignacioli.finecoach.R.drawable.ic_ms_check_circle_filled))
-                Text("已完成", style = FcTypography.caption, color = FcColors.textSecondary)
-            }
-        }
     }
 }
