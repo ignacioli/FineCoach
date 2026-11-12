@@ -102,13 +102,31 @@ class ComponentContractTests {
             FcFilterChip("样例", selected, Modifier.testTag("chip")) { selected = !selected }
             FcBodyPartPicker(setOf(0), {}, tag = "body")
         }
-        touch("chip"); node("chip").assertIsNotSelected().performClick(); node("chip").assertIsSelected()
+        node("chip").assertHeightIsEqualTo(30.dp); node("chip").assertTouchHeightIsEqualTo(48.dp); node("chip").assertTouchWidthIsEqualTo(52.dp); node("chip").assertIsNotSelected().performClick(); node("chip").assertIsSelected()
         FcBodyParts.indices.forEach { touch("body-$it") }
         val rowTops = FcBodyParts.indices.map { node("body-$it").getUnclippedBoundsInRoot().top }.distinct().sorted()
         assertTrue(rowTops.size > 1)
         rowTops.zipWithNext().forEach { (a, b) -> assertEquals(36.dp, b - a) }
         assertEquals(listOf("胸", "肩", "背", "大腿", "小腿", "臂", "臀", "核心"), FcBodyParts)
         node("body-0").assertIsSelected(); node("body-1").assertIsNotSelected()
+    }
+
+    @Test fun filterChipExpandedTouchTargetDoesNotTakeLayoutSpace() {
+        var calls = 0
+        show {
+            Box(Modifier.fillMaxWidth().height(80.dp).testTag("chip-area")) {
+                FcFilterChip("胸", false, Modifier.padding(start = 20.dp, top = 20.dp).testTag("expanded-chip"),
+                    visualModifier = Modifier.testTag("chip-visual")) { calls++ }
+            }
+        }
+        node("chip-visual").assertWidthIsEqualTo(38.dp).assertHeightIsEqualTo(30.dp)
+        val visual = node("chip-visual").getUnclippedBoundsInRoot()
+        // Tap 5dp above and 3dp left of the visual: outside both visual dimensions,
+        // inside Compose's expanded minimum target (48dp >= the required 44dp).
+        node("chip-area").performTouchInput {
+            click(androidx.compose.ui.geometry.Offset((visual.left.value - 3).dp.toPx(), (visual.top.value - 5).dp.toPx()))
+        }
+        compose.runOnIdle { assertEquals(1, calls) }
     }
 
     @Test fun toggle() {
@@ -179,7 +197,10 @@ class ComponentContractTests {
         var calls = 0
         show { FcSectionLabel("区段", Modifier.testTag("label")); FcGroupEntryRow("分组", 2, Modifier.testTag("entry")) { calls++ } }
         node("label").assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading))
-        full("label"); full("entry"); touch("entry"); node("entry").performClick()
+        node("label").assertTextEquals("区段")
+        assertTrue(node("label").getUnclippedBoundsInRoot().width < node("parent").getUnclippedBoundsInRoot().width)
+        assertEquals(node("parent").fetchSemanticsNode().layoutInfo.width, node("label").fetchSemanticsNode().layoutInfo.parentInfo!!.width)
+        full("entry"); touch("entry"); node("entry").performClick()
         compose.runOnIdle { assertEquals(1, calls) }
     }
 
@@ -201,7 +222,7 @@ class ComponentContractTests {
     @Test fun pageHeader() {
         var calls = 0
         show { FcPageHeader("很长的虚构标题", Modifier.testTag("header"), "副标题", { calls++ }, "header", "编辑", onTrailing = { calls++ }) }
-        full("header"); touch("header-back"); touch("header-trailing")
+        full("header"); assertEquals(node("header").getUnclippedBoundsInRoot().top, compose.onNodeWithText("很长的虚构标题").getUnclippedBoundsInRoot().top); node("header-back").assertWidthIsEqualTo(16.dp).assertTouchWidthIsEqualTo(48.dp).assertTouchHeightIsEqualTo(48.dp); node("header-trailing").assertTouchHeightIsEqualTo(48.dp)
         compose.onNodeWithText("很长的虚构标题").assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading))
         node("header-back").assertContentDescriptionEquals("返回").performClick(); node("header-trailing").performClick()
         compose.runOnIdle { assertEquals(2, calls) }

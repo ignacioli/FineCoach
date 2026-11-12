@@ -60,13 +60,15 @@ class ExerciseConformanceTests {
         val state = if (f != null) f.exercises else ExerciseConformanceFixture().also { library = it }.state
         compose.runOnUiThread { compose.activity.setContent {
             CompositionLocalProvider(LocalDensity provides Density(2f, 1f)) {
-                FineCoachTheme { Box(Modifier.requiredSize(390.dp, 844.dp).testTag("conformance-viewport")) {
+                FineCoachTheme { ConformanceViewport {
                     if (f == null) ExerciseLibraryScreen(state, {}) else ActiveSessionScreen(f.state,
                         f.content.session.sessionID, state, f.templates, {}, {}, students = StudentRepository(f.room.db, f.room.clock))
                 } }
             }
         } }
         compose.waitUntil(15_000) { exists(if (sheet) "session-add-exercise" else "exercise-library-muscle-胸") }
+        compose.runOnIdle { simulateConformanceStatusBar(compose.activity) }
+        node("platform-content").assertTopPositionInRootIsEqualTo(52.dp)
         val baseline = node("conformance-viewport").captureToImage().asAndroidBitmap()
         val baselineFile = File(out, "before.png")
         baselineFile.outputStream().use { baseline.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }
@@ -161,7 +163,13 @@ class ExerciseConformanceTests {
         ConformanceComparison.writeReports(out, result)
         ConformanceSsimAlignment.evaluate(File(System.getProperty("finecoach.storageProjectDirectory")), out.parentFile)
         println("S0_CONFORMANCE "+name+" total="+result.getInt("total")+" passed="+result.getInt("passed")+" failed="+result.getInt("failed"))
-        // Diagnostic task: page failures are data, not a gate. Invalid captures must remain failures in the report.
+        if (!sheet) {
+            Assert.assertEquals("D2b pendingBoardFix registrations must be removed after board export", 0, result.getInt("pendingBoardFixEntries"))
+            Assert.assertEquals("D2b must have no pending board fixes", 0, result.getInt("boardFixPending"))
+            Assert.assertTrue("D2b manual exceptions exceed 10%", result.getDouble("manualExceptionRatio") <= 0.1)
+            Assert.assertTrue("D2b conformance: " + result.toString(), result.getBoolean("gatePassed") && stability.getBoolean("stable"))
+        }
+        // D8c remains diagnostic only. Invalid captures must remain failures in the report.
         if (result.getString("artifactStatus") == "INVALID_CAPTURE") Assert.assertTrue(result.getInt("failed") > 0)
         Assert.assertEquals(2, hashes.size)
     }

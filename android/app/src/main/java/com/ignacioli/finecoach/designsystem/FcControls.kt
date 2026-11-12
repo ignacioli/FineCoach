@@ -93,8 +93,8 @@ private fun FcButtonContent(title: String, modifier: Modifier, enabled: Boolean,
 
 @Composable
 fun FcLinkButton(title: String, modifier: Modifier = Modifier, enabled: Boolean = true,
-    contentAlignment: Alignment = Alignment.Center, onClick: () -> Unit) {
-    Box(modifier.touch().clickable(enabled = enabled, role = Role.Button, onClick = onClick), contentAlignment = contentAlignment) {
+    contentAlignment: Alignment = Alignment.Center, compactLayout: Boolean = false, onClick: () -> Unit) {
+    Box(modifier.then(if (compactLayout) Modifier else Modifier.touch()).clickable(enabled = enabled, role = Role.Button, onClick = onClick), contentAlignment = contentAlignment) {
         FcText(title, style = FcTypography.style("callout", 600), color = if (enabled) FcColors.actionPrimary else FcColors.textSecondary)
     }
 }
@@ -134,11 +134,15 @@ fun FcSymbol(painter: Painter, modifier: Modifier = Modifier, tint: Color = FcCo
 }
 
 @Composable
-fun FcTitleIconButton(label: String, painter: Painter, modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun FcTitleIconButton(label: String, painter: Painter, modifier: Modifier = Modifier, onClick: () -> Unit) =
+    FcTitleIconButton(label, painter, modifier, Modifier, onClick)
+
+@Composable
+fun FcTitleIconButton(label: String, painter: Painter, modifier: Modifier = Modifier, visualModifier: Modifier, onClick: () -> Unit) {
     require(label.isNotBlank())
     Box(modifier.touch().semantics { contentDescription = label }
         .clickable(role = Role.Button, onClick = onClick), contentAlignment = Alignment.Center) {
-        Icon(painter, null, Modifier.size(FcComponentMetrics.badge, FcShapes.xl), tint = FcColors.textSecondary)
+        Icon(painter, null, visualModifier.size(FcComponentMetrics.badge, FcShapes.xl), tint = FcColors.textSecondary)
     }
 }
 
@@ -169,17 +173,17 @@ fun FcSegmentedSwitch(options: List<String>, selection: Int, onSelect: (Int) -> 
 }
 
 @Composable
-fun FcFilterChip(title: String, selected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) =
-    FcChip(title, selected, false, modifier, onClick)
+fun FcFilterChip(title: String, selected: Boolean, modifier: Modifier = Modifier, visualModifier: Modifier = Modifier, onClick: () -> Unit) =
+    FcChip(title, selected, false, modifier, onClick, visualModifier)
 
 @Composable
 fun FcBodyPartChip(title: String, selected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) =
     FcChip(title, selected, true, modifier, onClick)
 
 @Composable
-private fun FcChip(title: String, selected: Boolean, body: Boolean, modifier: Modifier, onClick: () -> Unit) {
-    Box(modifier.touch().semantics { this.selected = selected }.clickable(role = Role.Checkbox, onClick = onClick), contentAlignment = Alignment.Center) {
-        Box(Modifier.heightIn(min = if (body) FcSpacing.space6 + FcSpacing.space1 else FcSpacing.space8 - FcSpacing.space1 / 2)
+private fun FcChip(title: String, selected: Boolean, body: Boolean, modifier: Modifier, onClick: () -> Unit, visualModifier: Modifier = Modifier) {
+    Box(modifier.then(if (body) Modifier.touch() else Modifier).semantics { this.selected = selected }.clickable(role = Role.Checkbox, onClick = onClick), contentAlignment = Alignment.Center) {
+        Box(visualModifier.heightIn(min = if (body) FcSpacing.space6 + FcSpacing.space1 else FcSpacing.space8 - FcSpacing.space1 / 2)
             .widthIn(min = if (body) FcComponentMetrics.field else 0.dp).clip(FcShapes.capsule)
             .background(if (selected) FcColors.actionPrimary else FcColors.surfaceSelected)
             .padding(horizontal = if (body) FcSpacing.space4 else FcSpacing.space3), contentAlignment = Alignment.Center) {
@@ -218,13 +222,13 @@ fun FcToggle(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit
 @Composable
 fun FcTextField(title: String, value: String, onValueChange: (String) -> Unit, modifier: Modifier = Modifier,
     secure: Boolean = false, enabled: Boolean = true, search: Boolean = false,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default, keyboardActions: KeyboardActions = KeyboardActions.Default) {
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default, keyboardActions: KeyboardActions = KeyboardActions.Default, visualModifier: Modifier = Modifier) {
     BasicTextField(value, onValueChange, modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.touch)
         .semantics { contentDescription = title }, enabled = enabled, singleLine = true, keyboardOptions = keyboardOptions, keyboardActions = keyboardActions,
         textStyle = (if (search) FcTypography.style("callout", 400) else FcTypography.body).copy(color = FcColors.textPrimary),
         visualTransformation = if (secure) PasswordVisualTransformation() else VisualTransformation.None,
         cursorBrush = SolidColor(FcColors.actionPrimary), decorationBox = { field ->
-            Box(Modifier.fillMaxWidth().heightIn(min = if (search) FcSpacing.space8 + FcSpacing.space2 else FcComponentMetrics.field)
+            Box(Modifier.fillMaxWidth().wrapContentHeight(unbounded = true).then(visualModifier).then(if (search) Modifier.height(FcSpacing.space8 + FcSpacing.space2) else Modifier.heightIn(min = FcComponentMetrics.field))
                 .background(FcColors.surfaceCanvas, RoundedCornerShape(FcShapes.sm)).padding(horizontal = FcSpacing.space4, vertical = FcSpacing.space2),
                 contentAlignment = Alignment.CenterStart) {
                 if (value.isEmpty()) FcText(title, style = FcTypography.style("callout", 400), color = FcColors.textSecondary)
@@ -234,8 +238,8 @@ fun FcTextField(title: String, value: String, onValueChange: (String) -> Unit, m
 }
 
 @Composable
-fun FcSearchField(title: String, value: String, onValueChange: (String) -> Unit, modifier: Modifier = Modifier) =
-    FcTextField(title, value, onValueChange, modifier, search = true)
+fun FcSearchField(title: String, value: String, onValueChange: (String) -> Unit, modifier: Modifier = Modifier, visualModifier: Modifier = Modifier) =
+    FcTextField(title, value, onValueChange, modifier, search = true, visualModifier = visualModifier)
 
 fun fcStepped(value: Int, delta: Int, range: IntRange): Int {
     require(!range.isEmpty() && delta in listOf(-1, 1))

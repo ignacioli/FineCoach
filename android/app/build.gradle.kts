@@ -845,7 +845,7 @@ val validateComponentGate = tasks.register("validateS0G2Results") {
         val expectedCounts = mapOf(
             "com.ignacioli.finecoach.ComponentCatalogTests" to 6,
             "com.ignacioli.finecoach.ComponentCatalogStateTests" to 66,
-            "com.ignacioli.finecoach.ComponentContractTests" to 27,
+            "com.ignacioli.finecoach.ComponentContractTests" to 28,
             "com.ignacioli.finecoach.PlatformShellTests" to 5,
         )
         check(counts == expectedCounts) { "Unexpected G2 testcase counts: $counts; expected $expectedCounts" }
@@ -1004,6 +1004,9 @@ screenshotGate.configure {
 registerVisualGate("s0Conformance", "TrainingConformanceTests", 1)
 // Diagnostic reports only: page deviations do not join the training conformance gate.
 registerVisualGate("p1ExerciseConformance", "ExerciseConformanceTests", 2)
+registerVisualGate("p4ExerciseLibraryConformance", "ExerciseConformanceTests", 1).configure {
+    filter { setIncludePatterns("com.ignacioli.finecoach.ExerciseConformanceTests.exerciseLibraryConformance") }
+}
 
 val entryLayoutClasses = listOf("com.ignacioli.finecoach.EntryLayoutHarnessTests")
 val entryLayoutGate = tasks.register<Test>("s0G4") {

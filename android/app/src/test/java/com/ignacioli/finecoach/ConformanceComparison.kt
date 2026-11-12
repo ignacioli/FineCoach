@@ -14,10 +14,11 @@ import org.json.JSONObject
 internal object ConformanceComparison {
     fun run(androidRoot: File, out: File, nodes: JSONArray, bindings: Map<String, String>, screen: String = "P0-a2-training", designPath: String = "design/experience-p0/screens/P0-a2-training.png", capture: JSONObject? = null): JSONObject {
         val assets = File(androidRoot, "design-assets/conformance")
-        val layers = JSONObject(File(assets, "$screen.layers.json").readText()).getJSONArray("layers").objects()
+        val exportedLayers = JSONObject(File(assets, "$screen.layers.json").readText()).getJSONArray("layers").objects()
+        val layers = exportedLayers.filter { ConformanceMapping.intersectsViewport(it) }
         val map = JSONObject(File(assets, "$screen.map.json").readText())
         val exceptions = map.getJSONArray("elements").objects()
-        val actual = nodes.objects()
+        val actual = nodes.objects().filter { ConformanceMapping.intersectsViewport(it) && it.getDouble("w") > 0 && it.getDouble("h") > 0 && it.optBoolean("attached", true) && it.optBoolean("placed", true) }
         val contentTop = contentTop(actual)
         val offset = map.getDouble("originOffsetY") + contentTop
         val entries = ConformanceMapping.entries(layers, exceptions, actual, bindings, offset)
@@ -45,20 +46,29 @@ internal object ConformanceComparison {
             if (n == null) {
                 row.put("status", "MISSING").put("category", "MISSING").put("visibility", JSONObject.NULL).put("reason", if (entry.has("mappingError")) entry.getString("mappingError") else if (candidates.size > 1) "ambiguous: ${candidates.size} nodes" else entry.optString("missingReason", "selector has no matching node (含原文 selector 不匹配；不能据此认定 UI 图形不存在)"))
                     .put("textMatches", false).put("tokenMatches", false)
+            } else if (entry.optString("unobservable") == "AD01_VECTOR_INTERNAL") {
+                // AD-01 replaces the entire icon: internal iOS geometry and paint are never compared.
+                used += n.getInt("id")
+                row.remove("expected")
+                row.put("actual", n).put("status", "UNOBSERVABLE_CANDIDATE").put("category", "UNOBSERVABLE_CANDIDATE")
+                    .put("textMatches", false).put("tokenMatches", JSONObject.NULL).put("tokenComparison", "NOT_APPLICABLE")
             } else {
                 used += n.getInt("id")
                 val geometry = geometry(n, layer, anchor, offset, tolerance, entry)
                 val deltas = geometry.getJSONObject("delta")
-                val textMatches = !layer.has("text") || layer.getString("text") == n.getString("text")
-                val expectedHex = ConformanceColors.expected(layer, layers, tokens).orEmpty()
+                val textMatches = !layer.has("text") || (entry.optJSONObject("pendingBoardFix")?.optString("text", layer.getString("text")) ?: layer.getString("text")) == n.getString("text")
+                val ad01 = ConformanceMapping.platformIcon(layer.optString("name")) != null
+                val expectedHex = if (ad01) layers.filter { it.getString("path").startsWith(layer.getString("path") + "/") }
+                    .mapNotNull { ConformanceColors.expected(it, layers, tokens) }.distinct().singleOrNull().orEmpty()
+                    else ConformanceColors.expected(layer, layers, tokens).orEmpty()
                 val expectedToken = hexToken(expectedHex)
                 val observedHex = if (entry.getString("colorMethod") == "textLayout") observedTextColor(android, n)
                     else pixelMode(android, n, entry.getString("colorMethod") == "iconInk")
                 val observedToken = hexToken(observedHex)
-                val tokenObservable = expectedHex.isEmpty() || observedHex != null
-                val tokenMatches = tokenObservable && (expectedHex.isEmpty() || tokens.any { it.hex == layer.optString("fill").ifEmpty { layer.optJSONObject("stroke")?.optString("color").orEmpty() }.lowercase() } && expectedHex == observedHex)
+                val tokenObservable = if (ad01) expectedHex.isNotEmpty() && observedHex != null else expectedHex.isEmpty() || observedHex != null
+                val tokenMatches = tokenObservable && (expectedHex.isEmpty() || (if (ad01) tokens.any { it.hex == expectedHex } else tokens.any { it.hex == layer.optString("fill").ifEmpty { layer.optJSONObject("stroke")?.optString("color").orEmpty() }.lowercase() }) && expectedHex == observedHex)
                 val visibility = visibility(n)
-                val visible = visibility.getString("state") == "VISIBLE"
+                val visible = ConformanceMapping.intersectsViewport(n) && n.optBoolean("attached", true) && n.optBoolean("placed", true) && n.getDouble("w") > 0 && n.getDouble("h") > 0
                 val geometryMatches = geometry.getBoolean("matches")
                 row.put("actual", n).put("delta", deltas).put("geometry", geometry).put("textMatches", textMatches)
                     .put("expectedToken", expectedToken ?: JSONObject.NULL).put("actualToken", observedToken ?: JSONObject.NULL)
@@ -84,11 +94,11 @@ internal object ConformanceComparison {
             if (row.getString("status") == "MISSING") { row.put("reason", "不可观测标记的前提：本行选择器必须命中父图标节点；${row.optString("reason")}"); continue }
             val ownNodeIsParent = vectorSelectorHitsParent(row, parentRow)
             val evidence = provenanceValid(androidRoot, entry.optString("asset"))
-            val valid = ownNodeIsParent && vectorUnobservable(layer, parent, entry, parentRow?.optBoolean("geometryMatches") == true, evidence)
+            val valid = ownNodeIsParent && (ad01Unobservable(parent, entry, parentRow?.optString("status") == "PASS", evidence) || vectorUnobservable(layer, parent, entry, parentRow?.optBoolean("geometryMatches") == true, evidence))
             row.put("parentGeometryPassed", parentRow?.optBoolean("geometryMatches") == true).put("assetProvenanceVerified", evidence)
                 .put("selectorHitsParentNode", ownNodeIsParent)
             if (valid) row.put("status", "UNOBSERVABLE_VECTOR_INTERNAL").put("category", "UNOBSERVABLE_VECTOR_INTERNAL")
-                .put("reason", "不可观测（矢量内部）；父图标几何通过，源SVG/drawable与来源记录hash一致；不计PASS或偏差")
+                .put("reason", "不可观测（矢量内部）；父图标几何通过，来源hash有效；${entry.optString("source", "S1-D37")}；不计PASS或偏差")
             else row.put("status", "FAIL").put("category", "UI_DEVIATION")
                 .put("reason", "不可观测标记前提不成立：本行选择器须命中父图标节点，且须为真实内部path、父group/icon几何通过、同名资产来源hash有效")
         }
@@ -131,8 +141,10 @@ internal object ConformanceComparison {
         ImageIO.write(triptych, "png", File(out, "$screen.triptych.png"))
         val top = rowList.filter { it.has("delta") && it.getString("category") == "UI_DEVIATION" }.sortedByDescending { row -> listOf("x", "y", "w", "h").maxOf { abs(row.getJSONObject("delta").getDouble(it)) } }.take(10)
         val invalidCapture = capture?.optString("status") == "INVALID_CAPTURE"
+        val manualExceptions = exceptions.count { e -> listOf("tag", "scope", "text", "commonLayoutParentOfTags", "anchor", "geometryRule").any(e::has) }
         val result = JSONObject().put("screen", screen).put("capture", capture ?: JSONObject.NULL).put("captureFailures", if (invalidCapture) 1 else 0)
-            .put("colorTokenCount", tokens.size).put("colorTokenNames", JSONArray(tokens.map { it.name })).put("manualExceptionEntries", exceptions.size).put("manualExceptionRatio", exceptions.size.toDouble() / layers.size)
+            .put("outsideBoardLayers", exportedLayers.size - layers.size).put("partialVisibilityRule", "FULL_LAYOUT_GEOMETRY").put("colorTokenCount", tokens.size).put("colorTokenNames", JSONArray(tokens.map { it.name })).put("manualExceptionEntries", manualExceptions).put("manualExceptionRatio", manualExceptions.toDouble() / layers.size)
+            .put("pendingBoardFixEntries", exceptions.count { it.has("pendingBoardFix") })
             .put("automaticMapped", rowList.count { it.getString("mapping").startsWith("AUTO") && it.has("actual") })
             .put("automaticMappingRate", rowList.count { it.getString("mapping").startsWith("AUTO") && it.has("actual") }.toDouble() / layers.size)
             .put("unmappedLayers", JSONArray(rowList.filter { !it.has("actual") }.map { JSONObject().put("path", it.getString("path")).put("name", it.getString("name")).put("reason", it.optString("reason")) }))
@@ -156,6 +168,12 @@ internal object ConformanceComparison {
         return row.optString("status") != "MISSING" && parentRow.optString("status") != "MISSING" &&
             own.has("id") && own.getInt("id") == parentNode.optInt("id", -1)
     }
+
+    internal fun ad01Unobservable(parent: JSONObject?, entry: JSONObject, geometryPassed: Boolean, provenance: Boolean): Boolean =
+        entry.optString("unobservable") == "AD01_VECTOR_INTERNAL" && parent != null &&
+            parent.optString("type") in setOf("group", "icon") && parent.optString("path") == entry.optString("parentPath") &&
+            ConformanceMapping.platformIcon(parent.optString("name")) == entry.optString("asset") &&
+            entry.optString("source") == "AD-01 / S1-D28" && geometryPassed && provenance
 
     internal fun vectorUnobservable(layer: JSONObject, parent: JSONObject?, entry: JSONObject, parentGeometryPassed: Boolean, provenanceValid: Boolean): Boolean {
         val parentPath = entry.optString("parentPath")
@@ -250,8 +268,9 @@ internal object ConformanceComparison {
         val expected = expectedBounds(layer, anchor, offset, rule)
         val design = designBox(layer, rule)
         val rawActual = actual
-        @Suppress("NAME_SHADOWING") val actual = if (rule?.optString("geometryRule") == "EDITABLE_TEXT_FIELD") JSONObject(actual.toString())
-            .put("y", actual.getDouble("y") + actual.getDouble("h") / 2 - expected.getDouble("h") / 2).put("h", expected.getDouble("h")) else actual
+        val layoutActual = actual.optJSONObject("unclipped") ?: actual
+        @Suppress("NAME_SHADOWING") val actual = if (rule?.optString("geometryRule") == "EDITABLE_TEXT_FIELD") JSONObject(layoutActual.toString())
+            .put("y", actual.getDouble("y") + actual.getDouble("h") / 2 - expected.getDouble("h") / 2).put("h", expected.getDouble("h")) else layoutActual
         val delta = JSONObject()
         val within = JSONObject()
         for (axis in listOf("x", "y", "w", "h")) {

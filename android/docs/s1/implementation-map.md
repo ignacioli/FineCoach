@@ -879,3 +879,53 @@ P2 最终五行执行记录：
 原索引中局部 helper `request` / `options` 不再作为独立测试 case 链接；所在的具名测试链接保留，未删除测试或缩小断言。
 
 复审验证结果：本轮 1,255 个 `#L` 链接（336 source / 919 test）均通过「文件存在 + 行号有效 + 对应 tag/控件/方法」检查，输出 `.handoff/logs/S0-step3-review-map-validation.log`。早期表中原菜单声明已移入上方移除登记；当前训练行为以 T020 fix3 为准。测试集合 14 类 254/0，G2 27/66/6/5 不变；逐 P2 处置见 `S0-step3-components.md` 复审章节。
+
+## P4 D2b pilot，round 1（2026-11-12）
+
+- 分类与依据：D；目标 `design/m1-b-hifi/screens/20-exercise-library.png`（D2b；只查看一次），anatomy 为 components.md 的 C′2b / DS-PAGE-HEADER / DS-TEXT-FIELD / DS-CHIP / DS-SECTION / DS-LIST-ROW。
+- 范围：复用 FcPageHeader、FcSearchField、FcTitleIconButton、FcFilterChip、FcSectionLabel、FcListRow、FcListRowDivider、FcEquipmentIcon；既有组件新增可选 visual tag 与显式动作库 row variant；默认消费者保持原值。
+- 设计决定：沿用 S1-D44/45/46。动作库行改为 space.4 horizontal / space.3 vertical，69.7dp divider step；原 56dp 画板不作实现目标。fixture 使用领域「绳索」及 cable-crossover.svg。资产均来自 design/m1-b-hifi/icons 与已登记的 drawable；不修改 Penpot 或截图基线。
+- 实现与检查：P4ExerciseLibraryTests 验证 anatomy、真实 shape tag、满宽 row、可见收藏入口及持久 preference；ConformanceGenericTests 补重复 tag 正反例及待改 caption。完整宿主和 G3/G4/conformance 的实际结果见下方报告；L3 负责人走查 PENDING。
+- 结果：尚未完成页面验收；逐层结果、门禁数字和待定冲突以 `.handoff/subagent/2026-11-12-p4-exercise-library.md` 为本轮证据。无 commit。
+
+入口与布局（页面源码 `features/exercises/ExerciseScreens.kt`）：
+
+| Screen → visible control | testTag | Mutates data | Width owner |
+|---|---|---|---|
+| 动作库 → ‹ | exercise-library-back | 否，返回 callback | FcPageHeader / platform-content；独立 44dp hit area |
+| 动作库 → ＋ 自定义 | exercise-library-trailing | 否，打开既有 editor；保存才写入 | FcPageHeader trailing slot |
+| 动作库 → 搜索动作 | exercise-library-search | 否，query/filter state | exercise-library-search-row 的 weight(1f) field；剩余空间为 filter |
+| 动作库 → 筛选 | exercise-library-filter | 否，打开既有 sheet | exercise-library-search-row，44dp hit area |
+| 动作库 → 部位 chip | exercise-library-muscle-all / exercise-library-muscle-$value | 否，过滤 state | exercise-library-muscles 满宽横向 scroll |
+| 动作库 → 动作行 | exercise-options-$exerciseID | 否，打开既有 options sheet | FcListRow.fillMaxWidth / exercise-library-content |
+| 动作选项 → 收藏 / 取消收藏 | exercise-favorite | 是，既有 updatePreference | FcActionRow / exercise-options-content 满宽 |
+
+视觉 tag：Search / Chip / Divider / icon / ‹ › 的观察点位于实际 shape 或 FcText 行盒，点击区标签独立保留。未把自动化通过当成人工视觉批准。
+
+P4 round 1 最终：full host 950/0；G3=42/0、G4=12/0、训练 conformance=1/0；D2b gate FAIL（2 passed / 64 failed / 28 missing / 0 BOARD_FIX_PENDING，42 registered pending，manual exception=0%）。三联图与热力图已生成，未作人工视觉验收。约14分钟确认未收敛后停止；完整归因及待定项见本轮报告。
+
+## P4 D2b pilot，round 2（2026-11-12）
+
+- 分类与依据：D；沿用重新导出的 D2b（81 layers）、C′2b 与 S1-D49，目标设计不变。
+- 范围：复用 DS-TEXT-FIELD / DS-SECTION；Search 44dp 可见框→40dp，hit area 保留≥44dp；search-row gap space.2→space.1，使 Search 宽306→310；section tag 满宽文字框→实际文字框。其余入口和上表保持。
+- 设计决定：删除全部42条 S1-D46 pendingBoardFix；fixture 前9行及 caption 按新 board，21行总数、canonicalName 排序及真实 preference alias 不变。AD-01 平台图标只比父框和颜色，内部非 PASS。
+- 实现与检查：通用 viewport 相交筛选；部分可见节点按完整布局几何比较；重复节点仍要求 reading order 与 unique nearest 一致。ConformanceGenericTests 正反例、P4ExerciseLibraryTests 的 search 40/44 与 section text tag，以及原有 durability / entry map 一并验证。
+- 结果：以 `.handoff/subagent/2026-11-12-p4-exercise-library-r2.md` 的最终门禁数字与逐项剩余偏差为准；L3 负责人走查 PENDING，未 commit。
+
+P4 round 2 最终：FAIL；host 952/0、G3 42/0、G4 12/0、训练conformance 1/0；D2b 4 PASS / 72 failed（28 missing）/ 4 AD-01内部不可观测，registered pending与pending均0，manual exceptions 0%。比较器专项41/0；Search 310×40及44dp hit area、section text tag测试通过；剩余header/chips/viewport/整体行起点决策点见r2报告。未作人工视觉批准，无commit。
+
+## P4 D2b pilot，round 3（2026-11-12）
+
+- 分类与依据：D；目标 D2b 不变，按 S1-D50 实施 DS-PAGE-HEADER / DS-CHIP 与共享 conformance status inset。
+- 范围：所有 FcPageHeader 消费者删除顶部 space.2；所有非 body FcFilterChip 的44dp最小 layout → 文字+2×space.3 / 30dp，Compose minimum touch expansion 不占 layout；body 不变。动作库 scroll 从358→390，搜索及列表保留 space.4 内边距，chip row 首尾 space.4。上表 row width owner 现为 platform-content / 内层 padded Column；scroll 自身390dp。
+- 设计决定：沿用 S1-D50，不改 originOffsetY、训练 map、Penpot 或 baseline。3dp 臀露出与当前字体实际 advance / 板中文字框宽度不一致；上游间距及 header 内部残差列入 r3 报告，未加 offset 或例外。共享 capture 真实分发52dp statusBars Insets；platform-shell 保持390×844，platform-content 从y52开始。
+- 实现与检查：ComponentContractTests 新增框外真实 tap（左3dp、上5dp）与30dp layout / 48dp touch断言；header 标题顶等于header顶。P4ExerciseLibraryTests 保留durability/满宽检查，改比较358dp platform-content，并新增390dp scroll/chip row断言。G2测试数27→28；G3/G4和所有受影响screen的既有入口布局测试由full host验证。L3负责人走查 PENDING。
+- 结果：未收敛；最终 before/after、所有剩余偏差、screen覆盖与gate数字见 `.handoff/subagent/2026-11-12-p4-exercise-library-r3.md`；不提交、不委派。
+
+## P4 D2b pilot，round 4（S1-D51）
+
+- 分类与依据：页面组合 B（负责人已批准 S1-D51，board 待 dispatcher 更新）；DS-PAGE-HEADER 为 D，按既有 anatomy 修复；C′2b / DS-CHIP 复用，不改行高或 chip width 机制。
+- 范围：动作库 header→search、search→chips、chips→section 与 section→section 为 space.4；section label→rows 和 search HStack 为 space.2；横向 space.4，chip row 仍390dp edge-to-edge。Header 所有消费者共用 Back 16dp leading slot / first-baseline 与 trailing centerY 修复；触区由 Compose 扩展≥44，不占布局。移除44dp Back/trailing布局占位与space.1/space.2页面外层间距，不引入offset。
+- 设计决定：沿用 S1-D50/D51；› 实测 glyph advance box x368/w6、右缘374，旧板 x360/w8 右缘368，+8 来自 board placement 而非额外 padding；实现不移动。proposed-board.json 只提出 composition/chip/Back/› 相关层，其他差异见r4报告；Penpot/baseline仍由负责人批准更新。
+- 实现与检查：ComponentContractTests 保留28项、验证Back16dp layout及48dp touch；P4ExerciseLibraryTests 保留2项、加入header文字advance宽84、trailing centerY、16/16/16外层gap、section8dp与›右缘。无新增交互，沿用上方入口与layout map（header-back/trailing、search/filter、muscle chips、exercise-options；数据变更仍由可见options控制，row width owner=platform-content）。L3未触发新的实施截图走查，board更新及负责人验收PENDING。
+- 结果：最终gate数字、proposal层数与坐标、decision points、耗时和失败原始日志见 `.handoff/subagent/2026-11-12-p4-exercise-library-r4.md`；未commit、未委派。
