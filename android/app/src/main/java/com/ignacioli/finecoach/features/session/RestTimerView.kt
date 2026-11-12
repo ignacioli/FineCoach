@@ -42,9 +42,11 @@ fun RestTimerView(store: RestTimerStore, id: SessionID, clock: AppClock, visible
                         FcText("组间休息", style = FcTypography.caption, color = FcColors.textSecondary)
                         FcText(restTime(remaining), Modifier.testTag("rest-remaining"), style = FcTypography.numeralLarge, color = FcColors.textPrimary)
                     }
-                    FcLinkButton("−15 秒", Modifier.testTag("rest-minus")) { store.adjust(id, -15) }
-                    FcLinkButton("+15 秒", Modifier.testTag("rest-plus")) { store.adjust(id, 15) }
-                    FcLinkButton("跳过", Modifier.testTag("rest-skip")) { store.clear(id) }
+                    Row(horizontalArrangement = Arrangement.spacedBy(FcSpacing.space3), verticalAlignment = Alignment.CenterVertically) {
+                        FcLinkButton("−15 秒", Modifier.testTag("rest-minus"), compactLayout = true) { store.adjust(id, -15) }
+                        FcLinkButton("+15 秒", Modifier.testTag("rest-plus"), compactLayout = true) { store.adjust(id, 15) }
+                        FcLinkButton("跳过", Modifier.testTag("rest-skip"), compactLayout = true) { store.clear(id) }
+                    }
                 } else {
                     FcSymbol(FcGlyph.Check)
                     Column(Modifier.weight(1f)) {

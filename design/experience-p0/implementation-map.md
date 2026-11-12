@@ -129,6 +129,7 @@ agent 按上述决定补充的细节（产品负责人在 P0-a2 画稿上确认�
 代码是 `RestTimerBar`，只在训练页、结束训练按钮上方。画板 2 倍导出：`boards/P0-b-component-states.png`（Penpot P0-b，2026-10-24 导出，含 C25 的「刚结束 / 已超时」两态）。
 
 - **部件（进行中）**：说明「组间休息」（`caption`、`text.secondary`）→ 倒计时（`numeralLarge`）→ 链接按钮「−15 秒」「+15 秒」「跳过」。
+- **Android S1-D56 drift repair**：`−15→+15` 文字间距为 `space.3`（12dp）；复用 `FcLinkButton(compactLayout = true)`，layout 为文字，Compose 向外扩展 touch ≥44，不占 layout。`+15→跳过` 的导出图层间距为22dp，与 round-2 指令的12dp冲突，待负责人裁决；本轮实现12dp尚未通过 conformance，不能据此修改画板。
 - **部件（结束）**：✓ → 「休息结束，可以开始下一组」（`headline`）→ 「关闭」。
 - **部件（已超时）**：同「结束」，超时满 1 秒起主文字下多一行「已超时 m:ss」（`caption`、`text.secondary`、等宽数字），每秒加一；两行合并读屏。
 - **容器**：`surface.canvas`、`radius.lg`、最小高 64、水平内边距 `space.4`、宽度填满。
@@ -201,3 +202,10 @@ agent 按上述决定补充的细节（产品负责人在 P0-a2 画稿上确认�
   - 1 倍参考图：`boards/P0-a2-training-simplified@1x.png`、`boards/P0-a2b-partial-states@1x.png`（Penpot MCP 只能导出 1 倍，只作 review 参考，不是正式导出图）。
   - 核对时发现：已批准的 D8 画板本来就把组行画成一行，代码的两行组行和 `components.md` DS-SET-ROW「上下排列」的写法是偏离，Δ5 按 D8 改回一行，并同步 `components.md`。
   - 状态：产品负责人授权 agent 直接推进，看过后有问题再反馈（2026-10-15）。
+
+### Android S1-D56 round-2 执行记录（2026-11-12）
+- Class and basis：D，修复 P0-a2 running rest bar 的实现偏差；目标画板不变；第二段22/12dp冲突已提问，未确认。
+- Scope：DS-REST-TIMER reuse；仅 running 的 rest-minus/rest-plus/rest-skip opt in 既有 compactLayout；rest-close、其他 FcLinkButton consumers 不变。
+- Design decisions：复用 S1-D56 的0.25dp测量精度、首段 space.3、touch/layout分离；不改 tolerance、absolute、color、mapping、baseline。
+- Implementation and checks：训练中→可见 −15/+15/跳过→rest-minus/rest-plus/rest-skip→调整/清除内存计时→rest-content fillMaxWidth；48dp touch、12dp layout断言与行为测试通过；G3 42、G4 12、全量964通过。无新设计审批或人工视觉验收。
+- Result：FAIL，training 6 failed layers / 8 failed checks，D2b failed 0；证据见 `.handoff/subagent/2026-11-12-conformance-relative-r2.md`；不宣称 checkpoint 完成。

@@ -350,7 +350,7 @@ internal object ConformanceComparison {
             appendLine("\n不可观测（矢量内部）：${result.getInt("unobservableVectorInternal")}，不计入PASS或偏差。仅父图标几何通过且同名资产来源hash验证通过时成立（S1-D37）。")
             appendLine("\noriginOffsetY=${result.getDouble("effectiveOriginOffsetY")}；Android content top=${result.getDouble("measuredContentTop")}；${result.getString("originReason")}")
             result.optJSONObject("stability")?.let { appendLine("\n双次 fresh Room/composition 渲染：$it") }
-            appendLine("\nS1-D40 R2：画稿文字框以中心为准换算为 token 行盒（高 = 字号 × README 行高倍率），尺寸、间距、内边距与对齐采用±2dp含边界；绝对坐标±8dp粗界限，界内仅诊断。ΔcenterY 仅报告。top原点、bottom底距规则不变，无新增偏移。")
+            appendLine("\nS1-D40 R2：画稿文字框以中心为准换算为 token 行盒（高 = 字号 × README 行高倍率），尺寸、间距、内边距与对齐的Δ先按S1-D56取最近0.25dp，再采用±2dp含边界；绝对坐标±8dp粗界限，界内仅诊断。ΔcenterY 仅报告。top原点、bottom底距规则不变，无新增偏移。")
             appendLine("\n| path | 元素 | anchor | 容差dp | Δx | Δy | Δw | Δh | ΔcenterY(报告) | text | token | category | 原因 |")
             appendLine("|---|---|---|---:|---:|---:|---:|---:|---:|---|---|---|---|")
             rows.forEach { r ->
@@ -358,11 +358,11 @@ internal object ConformanceComparison {
                 appendLine("| ${r.getString("path")} | ${r.getString("name")} | ${r.getString("anchor")} | ±${r.getDouble("toleranceDp")} | ${d?.optDouble("x")} | ${d?.optDouble("y")} | ${d?.optDouble("w")} | ${d?.optDouble("h")} | ${if (d?.has("centerY") == true) d.getDouble("centerY") else "N/A"} | ${r.getBoolean("textMatches")} | ${r.optString("tokenComparison", "MISSING")} | ${r.getString("category")} ${r.optJSONArray("failedChecks")} | ${r.optString("reason").ifEmpty { r.optJSONObject("visibility")?.optString("reason") ?: "" }} |")
             }
             appendLine("\n## relative-spacing diagnostics\n\n${result.optJSONObject("relativeGeometry")?.optJSONObject("counts")}")
-            appendLine("| A→B | direction | design | actual | Δ |")
-            appendLine("|---|---|---:|---:|---:|")
+            appendLine("| A→B | direction | design | actual | raw Δ | rounded Δ | ")
+            appendLine("|---|---|---:|---:|---:|---:|")
             result.getJSONObject("relativeGeometry").getJSONArray("gaps").objects()
                 .sortedByDescending { abs(it.getDouble("delta")) }.take(10).forEach {
-                    appendLine("| ${it.getString("a")}→${it.getString("b")} | ${it.getString("direction")} | ${it.getDouble("design")} | ${it.getDouble("actual")} | ${it.getDouble("delta")} |")
+                    appendLine("| ${it.getString("a")}→${it.getString("b")} | ${it.getString("direction")} | ${it.getDouble("design")} | ${it.getDouble("actual")} | ${it.getDouble("delta")} | ${it.getDouble("roundedDelta")} |")
                 }
             appendLine("\n## 人读摘要\n\n${result.getString("humanReadSummary")}")
             appendLine("\n颜色读取：文字来自真实 TextLayoutResult；填充来自节点矩形内 exact RGB 众数；iconInk 排除节点边界采样的背景众数后取实际众数，无近色匹配。无颜色观测写 UNOBSERVABLE，不能据此声称真实 token 不一致，仍不通过。README 所有 primitive/semantic token 均自动读取，保留同色 aliases；按精确 RGB 比较。带 opacity 的填色按前序覆盖背景逐层 source-over，不使用近色容差。")

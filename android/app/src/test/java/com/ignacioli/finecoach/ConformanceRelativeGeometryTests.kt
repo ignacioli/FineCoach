@@ -15,6 +15,19 @@ class ConformanceRelativeGeometryTests {
             .put("delta",box(dx,dy,dw,0.0)).put("geometry",JSONObject().put("expectedBounds",design).put("actualBounds",actual))
     }
     private fun count(rows: List<JSONObject>, check: String) = ConformanceRelativeGeometry.evaluate(rows).getJSONObject("counts").getInt(check)
+    @Test fun quarterDpPrecisionAppliesToEveryRelativeCheck() {
+        for ((delta, passes) in listOf(-2.1 to true, -2.3 to false, 2.12 to true, -2.13 to false)) {
+            val expected = if (passes) 0 else 1
+            val size = ConformanceRelativeGeometry.evaluate(listOf(row("a",0.0,0.0,dw=delta)))
+            assertEquals(expected,size.getJSONObject("counts").getInt("SIZE"))
+            val detail = size.getJSONArray("checks").getJSONObject(0).getJSONObject("w")
+            assertEquals(delta,detail.getDouble("delta"),0.0)
+            assertEquals(if (passes) 2.0 else 2.25,kotlin.math.abs(detail.getDouble("roundedDelta")),0.0)
+            assertEquals(expected,count(listOf(row("a",0.0,0.0),row("b",20.0,0.0,dx=delta)),"GAP"))
+            assertEquals(expected,count(listOf(row("p",0.0,0.0,100.0,100.0),row("c",20.0,20.0,dx=delta)),"INSET"))
+            assertEquals(expected,count(listOf(row("a",0.0,0.0),row("b",0.0,20.0,w=20.0,dx=delta)),"ALIGN"))
+        }
+    }
     @Test fun wholePageFivePassesTenFailsGrossOnly() {
         for (shift in listOf(0.0,5.0,8.0,10.0)) {
             val result = ConformanceRelativeGeometry.evaluate(listOf(row("a",0.0,0.0,dx=shift,dy=shift),row("b",0.0,20.0,dx=shift,dy=shift)))
