@@ -350,6 +350,24 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 | `DS-EMPTY-STATE` 空态 | 吉祥物 220×220 居中 → 标题（`headline` `action.primary`）→ 说明（`caption` `text.secondary`）→ 底部主按钮。**动画变体**（2026-10-30 决定并定稿，README §10 C30）：插画换成「咖啡兔」分层素材（README §9）加环境动效（README §14.1 第 6 条、§14.2 `motion.ambient.*`），第一轮只用在今日、课程日历没课时；文案见 C30 | 16 | StudentList |
 | `DS-LAUNCH` 开屏页（C31 定稿） | 整屏 `surface.page` 白底，直接进入首页；无图标、无文字、无过场叠层、无开屏动画、无可交互控件。由 `LaunchScreen.storyboard` 系统静态开屏呈现，不读写数据；`LaunchScreenConfigurationTests` 检查白底、无图无字、叠层与资源移除 | G-b 说明已由 C31 取代；README §1.14 | 已实现（`654e1b8`）；`LaunchScreen.storyboard` 无 imageView，`AppRoot` 无叠层；走查证据见 `design/stage-c-empty-state/implementation-map.md` §4 |
 
+#### `DS-PAGE-FLOW` 页面纵向组合间距（2026-11-12，S1-D53）
+
+组件 anatomy 只规定组件内部；页面上组件**之间**的距离由本条规定。设计稿和两端实现都按它摆放，不手工估距离。依据：iOS 现有页面的写法（`ios/FineCoachApp/Features` 中块间 `space.4` 47 处、标签→内容 `space.2` 42 处、水平 `space.4` 70 处、底部 `space.6` 34 处），以及 D2b 动作库首屏实测（S1-D51、S1-D52）。
+
+| 关系 | 间距 | 说明 |
+|---|---|---|
+| 页面水平边距 | `space.4` | 列表、输入框、区段都在左右 16 内。横向滚动的 chip 行例外：贯穿屏幕，首尾内容内边距 `space.4`（S1-D50） |
+| 页头 → 第一个内容块 | `space.4` | Android 页头紧贴状态栏下方（S1-D50）；iOS 页头位置见 §4.7 `DS-PAGE-HEADER` |
+| 内容块 ↔ 内容块 | `space.4` | 搜索行、筛选 chip 行、区段（分组）、卡片之间；区段与区段之间也是 `space.4` |
+| 区段标签 → 该区段内容 | `space.2` | `DS-SECTION` 标签与其下方的列表或卡片 |
+| 同一行内并排控件 | `space.2` | 如搜索框与筛选按钮、chip 与 chip |
+| 内容末尾 → 可滚动页面底边 | `space.6` | 底部留白 |
+
+- **范围**：列表行内部的上下内边距和分割线属于 `DS-LIST-ROW` 等组件 anatomy，不在本条。
+- **例外**：某页需要别的值时，写进该页的组合说明或对应组件 anatomy 并登记决策，不在设计稿或实现里单独改。已知例外：动作库筛选面板里标签→选项用 `space.3`（iOS `ExerciseLibraryView` 筛选 sheet）。
+- **设计稿冲突**：画板与本条不一致时，按 S1-D49 先改画板，再比对实现；实现不去贴合画板上手工摆的距离。
+- **检查**：Android 由各屏 conformance gate 的几何比对覆盖（±2dp）；iOS 不另加检查。
+
 **DS-LAUNCH 过渡版历史记录（2026-10-29，已由 C31 取代，不作为当前规格）**：整屏 `surface.page` 底 → 正中 180×180 圆角吉祥物图标（`launch-icon`）；无文字、无可交互控件。两处呈现同一画面：① `LaunchScreen.storyboard`（系统静态开屏）；② App 根视图最上层的一次性叠层，约 0.3 s 后 `motion.duration.fast` 淡出。不变式：① ② 资源、尺寸与底色一致，「减弱动态效果」时不创建 ②，叠层不响应点击、不读写数据（`auto`：`LaunchScreenConfigurationTests`）；画面观感（`manual`：负责人真机看过，2026-10-29）
 
 ### 4.7 已定稿规格（M2 Phase 0，T001–T012 已实现）
