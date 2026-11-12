@@ -88,3 +88,7 @@ S1-D37：文字比较x、w和垂直中心，Δh只写报告；非文字比较x/y
 ## Capsule测试侧selector
 
 path20/25通过 `commonLayoutParentOfTags` 指向真实minus/plus的最近共同 `LayoutInfo.parentInfo`，要求 `containsTag` 对应input的祖先链也包含该节点。读取真实Row的coordinates.boundsInRoot与positionInRoot/size；不按目标262×48反选容器、不用子节点union伪造边界。Row本身无semantics（FcControls.kt:277），所以它作为test-only layout observation写入nodes.json，并明确geometrySource，未给产品增加tag。定位/附着失败则missing，不能回退到近似矩形。
+
+## 遮挡后的颜色观测（P4 C2b-B round 3，dispatcher 批准）
+
+`layers.json` 的后序层绘制在前序层上。通用比较器仅用唯一映射成功的后序层遮挡当前取色 crop：Android 使用其真实节点 bounds，design 使用导出 bounds；同一节点与当前图标的内部 path 不遮挡自身。文字 ink、填充众数与 iconInk 边界背景采样均排除遮挡像素；颜色 token 仍精确比较。两侧任一 crop 完全没有未遮挡像素时，COLOR 为 `UNOBSERVABLE`（`passed=null`），不记 PASS；几何和内容仍独立判定，有偏差仍 FAIL。仅颜色完全遮挡且其余检查通过的层单列 `UNOBSERVABLE_COLOR`，不计 PASS/FAIL，与矢量内部不可观测分开报告。无未遮挡颜色证据但非完全遮挡（例如众数并列或文字没有 ink）仍 FAIL。

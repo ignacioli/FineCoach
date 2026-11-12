@@ -36,7 +36,14 @@ class P4AddExerciseTests {
             node("session-add-library").assertIsDisplayed().assertHasClickAction().performClick()
             compose.waitUntil(15_000) { exists("exercise-picker-recent") }
             node("conformance:Sheet").assertHeightIsEqualTo(com.ignacioli.finecoach.designsystem.FcComponentMetrics.addExerciseSheetHeight)
-            // M3's outer modifier is measured before its anchor placement; use the visible handle.
+            // The shared surface tag must observe the same placed surface as the visible handle.
+            val sheet = node("conformance:Sheet").getUnclippedBoundsInRoot()
+            assertEquals(0.dp, sheet.left)
+            assertEquals(300.dp, sheet.top)
+            assertEquals(390.dp, sheet.width)
+            assertEquals(844.dp, sheet.bottom)
+            assertEquals(sheet.top + com.ignacioli.finecoach.designsystem.FcSpacing.space2,
+                node("conformance:Grabber").getUnclippedBoundsInRoot().top)
             assertEquals(844.dp, node("conformance:Grabber").getUnclippedBoundsInRoot().top -
                 com.ignacioli.finecoach.designsystem.FcSpacing.space2 +
                 com.ignacioli.finecoach.designsystem.FcComponentMetrics.addExerciseSheetHeight)

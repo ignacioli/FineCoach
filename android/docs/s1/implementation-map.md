@@ -954,3 +954,20 @@ P4 round 2 最终：FAIL；host 952/0、G3 42/0、G4 12/0、训练conformance 1/
 - 设计决定：新增命名 metric，由现有 spacing token 等值表达；内容区扣除真实 grabber anatomy 后约束高度，保留 M3 完整窗口的底部锚点计算。Scrim 已使用 overlay.scrim；一个手动 selector 通过 harness alias 指向真实关闭节点，不改 comparator。
 - 实现与检查：ComponentContractTests 断言 544dp；P4AddExerciseTests 断言面板高度与真实 grabber 推导的底边，保留间距、满宽、70dp pitch、筛选及 durable save 断言；自动 conformance / proposal 产物见本轮 handoff。Android capture 仅查看一次，未进行人类验收。
 - 结果：NOT CONVERGED；末次测量 SIZE 42/0、MISSING 14、manual 1/64；外层 Sheet tag 的 pre-placement 几何、Scrim 被面板遮盖后的取色、第五行可见范围仍有缺口。最终 gates、逐项分类和耗时见 `.handoff/subagent/2026-11-12-p4-add-exercise-r2.md`。未改 board、baseline、容差、anchor 或 whitelist；未 commit / delegate。
+
+## P4 second pilot：C2b-B 添加动作（round 3，board fix 后 budget round 1）
+
+- 分类与依据：D 类 drift repair，复用 DS-BOTTOM-SHEET；批准的 C2b-B / S1-D63/D64 与 RESUME 裁决不变。
+- 范围与差异：共享 FcBottomSheet 移除 pre-placement caller modifier，将其放到 M3 surface 内包含 grabber 与内容的满宽 Column；不再从 grabber 间接推算 Sheet tag 的位置。其他 sheet 同样使用此真实容器，既有 padding 与内容顺序保留。
+- 设计决定：无新增设计；通用 comparator 按导出顺序屏蔽后序 mapped layers，Android/design 各用自身 bounds；完全遮挡颜色单列 UNOBSERVABLE，不能记 PASS，其他几何/内容偏差仍失败。
+- 实现与检查：P4AddExerciseTests 直接验证 surface 为 (0,300,390,544)；ComponentContractTests 覆盖普通 sheet surface 与既有 padding；ConformanceOcclusionTests 三项覆盖部分/完全/无遮挡，ConformanceRelativeGeometryTests 证明不可观测颜色不能隐藏几何失败。下表补齐原入口 map 的源码定位；本轮没有新增交互。
+- 结果：最终 gates、逐项计数、ICON_PIXELS 与耗时见 `.handoff/subagent/2026-11-12-p4-add-exercise-r3.md`；负责人本屏走查 PENDING。本轮未打开 Android capture，未修改 board/PNG/map/baseline，未 commit / delegate。
+
+| screen → visible control | identifier | mutates data? | width owner / code |
+|---|---|---|---|
+| 添加动作 → 动作库 tab | `session-add-library` | 否 | `session-add-tabs` 满宽 Row，chip 按内容宽；[ExerciseScreens.kt:67](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L67) |
+| 添加动作 → 从模板 tab | `session-apply-template` | 否，打开既有模板面板 | 同一 Row；[ExerciseScreens.kt:69](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L69) |
+| 添加动作 → 搜索 | `exercise-search` | 否，query | `exercise-picker-search-row` 满宽，field weight(1)；[ExerciseScreens.kt:105](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L105) |
+| 添加动作 → 筛选 | `exercise-picker-filter` | 否，筛选条件 | 同一搜索 Row 的 trailing FcTitleIconButton；[ExerciseScreens.kt:108](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L108) |
+| 添加动作 → 全部/部位 chips | `exercise-picker-muscle-all` / `exercise-picker-muscle-$value` | 否 | `exercise-picker-muscles` 满宽横向滚动 Row；[ExerciseScreens.kt:116](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L116) |
+| 添加动作 → 最近/完整列表行 | `exercise-picker-recent-$id` / `exercise-select-$id` | 是，既有 durable add use case | FcListRow / picker 内水平 space.4 容器，358dp；[ExerciseScreens.kt:77](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L77)、[ExerciseScreens.kt:181](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L181) |

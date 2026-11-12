@@ -315,8 +315,15 @@ class ComponentContractTests {
 
     @Test fun bottomSheet() {
         var open by mutableStateOf(true)
-        show { if (open) FcBottomSheet("虚构面板", { open = false }) { FcActionRow("关闭", Modifier.testTag("close")) { open = false } } }
+        show { if (open) FcBottomSheet("虚构面板", { open = false }, Modifier.testTag("sheet-surface")) { FcActionRow("关闭", Modifier.testTag("close")) { open = false } } }
         node("sheet-content").assertIsDisplayed(); touch("close"); full("close", "sheet-content")
+        val surface = node("sheet-surface").getUnclippedBoundsInRoot()
+        val content = node("sheet-content").getUnclippedBoundsInRoot()
+        assertEquals(surface.top + FcSpacing.space2 + FcSpacing.space1 + FcComponentMetrics.hairline, content.top)
+        // sheet-content semantics are inside the existing horizontal/bottom padding.
+        assertEquals(surface.bottom - FcSpacing.space6, content.bottom)
+        assertEquals(surface.left + FcSpacing.space4, content.left)
+        assertEquals(surface.width - FcSpacing.space4 * 2, content.width)
         node("close").performClick(); node("sheet-content").assertDoesNotExist()
     }
 

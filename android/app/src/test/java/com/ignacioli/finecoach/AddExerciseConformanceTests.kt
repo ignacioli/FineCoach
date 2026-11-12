@@ -176,8 +176,8 @@ class AddExerciseConformanceTests {
         writeProposal(android, out, result, nodes)
         Assert.assertEquals("Capture must contain the real panel", "VALID_FIXTURE", result.getString("artifactStatus"))
         Assert.assertTrue("Fixture must be stable", stability.getBoolean("stable"))
-        // Round 1 reports the current board; strict gatePassed is expected false until the board update.
-        Assert.assertTrue("C2b-B strict current-board comparison; round-1 board update pending: " + result.toString(), result.getBoolean("gatePassed"))
+        // Strict comparison against the approved current board.
+        Assert.assertTrue("C2b-B strict current-board comparison: " + result.toString(), result.getBoolean("gatePassed"))
         Assert.assertEquals(2, hashes.size)
     }
     private fun writeProposal(android: File, out: File, result: JSONObject, nodes: JSONArray) {
