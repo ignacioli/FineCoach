@@ -49,6 +49,7 @@ fun ExercisePicker(
     onSelect: suspend (ExerciseSelection) -> ApplicationResult<Unit>,
     studentID: StudentID?,
     isTemplateContext: Boolean = false,
+    onTemplate: (() -> Unit)? = null,
     onDismiss: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
@@ -61,15 +62,22 @@ fun ExercisePicker(
         state.reload(query, studentID = studentID, recentEnabled = !isTemplateContext)
     }
 
-    FcBottomSheet("添加动作", onDismiss = { if (!state.busy) onDismiss() }, modifier = Modifier.testTag("exercise-picker"), skipPartiallyExpanded = true) {
-        Column(Modifier.fillMaxWidth().imePadding().heightIn(max = FcComponentMetrics.row * 7)
+    FcBottomSheet("添加动作", onDismiss = { if (!state.busy) onDismiss() }, modifier = Modifier.testTag(if (onTemplate != null) "conformance:Sheet" else "exercise-picker"), skipPartiallyExpanded = true, panelFlow = onTemplate != null) {
+Column(Modifier.fillMaxWidth().weight(1f, fill = false).then(if (onTemplate != null) Modifier.testTag("exercise-picker") else Modifier), verticalArrangement = Arrangement.spacedBy(FcSpacing.space3)) {
+if (onTemplate != null) Row(Modifier.fillMaxWidth().padding(horizontal = FcSpacing.space4).testTag("session-add-tabs"), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+    FcFilterChip("动作库", true, Modifier.testTag("session-add-library"), visualModifier = Modifier.testTag("conformance:Tab · 动作库")) {}
+    FcFilterChip("从模板", false, Modifier.testTag("session-apply-template"), visualModifier = Modifier.testTag("conformance:Tab · 从模板"), onClick = onTemplate)
+}
+Column(Modifier.fillMaxWidth().imePadding().then(if (onTemplate != null) Modifier.weight(1f, fill = false) else Modifier.heightIn(max = FcComponentMetrics.row * 7))
             .verticalScroll(rememberScrollState()).testTag("exercise-picker-content"),
             verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
-            ExerciseSearchRow(query, { query = it }, equipment != null, "exercise-search", "exercise-picker", showFilters = !isTemplateContext) { filters = true }
+            Box(Modifier.then(if (onTemplate != null) Modifier.padding(horizontal = FcSpacing.space4) else Modifier)) { ExerciseSearchRow(query, { query = it }, equipment != null, "exercise-search", "exercise-picker", showFilters = !isTemplateContext) { filters = true } }
             if (!isTemplateContext) ExerciseMuscleChips(muscle, { muscle = it }, "exercise-picker")
+            Column(Modifier.then(if (onTemplate != null) Modifier.padding(horizontal = FcSpacing.space4) else Modifier)) {
             ExerciseBrowseRows(state, query, muscle, equipment, studentID, "exercise-picker",
                 { "exercise-select-${it.exerciseID.value}" }, !state.busy, showRecent = !isTemplateContext) { item ->
                 scope.launch { state.perform({ onSelect(state.selection(item)) }) { onDismiss() } }
+            }
             }
             ExerciseModePicker(mode, { mode = it }, !state.busy, "quick-mode")
             if (state.catalogUnavailable) FcListRow("动作库暂不可用", Modifier.testTag("exercise-catalog-unavailable"))
@@ -86,6 +94,7 @@ fun ExercisePicker(
             FcSecondaryButton("取消", Modifier.testTag("exercise-picker-cancel"), !state.busy, onDismiss)
         }
     }
+    }
     if (filters && !isTemplateContext) ExerciseFilterSheet(equipment, { equipment = it }, null, {}, "exercise-picker", { filters = false })
 }
 
@@ -95,23 +104,23 @@ private fun ExerciseSearchRow(query: String, onQuery: (String) -> Unit, active: 
     searchTag: String, prefix: String, showFilters: Boolean = true, onFilters: () -> Unit) {
     Row(Modifier.fillMaxWidth().testTag("$prefix-search-row"), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
         FcSearchField("搜索动作", query, onQuery, Modifier.weight(1f).testTag(searchTag),
-            visualModifier = if (prefix == "exercise-library") Modifier.testTag("conformance:Search") else Modifier)
+            visualModifier = if (prefix == "exercise-library" || prefix == "exercise-picker") Modifier.testTag("conformance:Search") else Modifier)
         if (showFilters) FcTitleIconButton("筛选", painterResource(if (active) R.drawable.ic_ms_filter_alt_filled else R.drawable.ic_ms_filter_alt),
             Modifier.testTag("$prefix-filter").semantics { stateDescription = if (active) "已筛选" else "" },
-            visualModifier = if (prefix == "exercise-library") Modifier.testTag("conformance:icon / filter") else Modifier, onClick = onFilters)
+            visualModifier = if (prefix == "exercise-library" || prefix == "exercise-picker") Modifier.testTag("conformance:icon / filter") else Modifier, onClick = onFilters)
     }
 }
 
 @Composable
 private fun ExerciseMuscleChips(muscle: String?, onMuscle: (String?) -> Unit, prefix: String) {
     Row(Modifier.fillMaxWidth().testTag("$prefix-muscles").horizontalScroll(rememberScrollState())
-        .then(if (prefix == "exercise-library") Modifier.padding(horizontal = FcSpacing.space4) else Modifier),
+        .then(if (prefix == "exercise-library" || prefix == "exercise-picker") Modifier.padding(horizontal = FcSpacing.space4) else Modifier),
         horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
         FcFilterChip("全部", muscle == null, Modifier.testTag("$prefix-muscle-all"),
-            visualModifier = if (prefix == "exercise-library") Modifier.testTag("conformance:Chip") else Modifier) { onMuscle(null) }
+            visualModifier = if (prefix == "exercise-library" || prefix == "exercise-picker") Modifier.testTag("conformance:Chip") else Modifier) { onMuscle(null) }
         ExerciseBrowse.muscles.forEach { value ->
             FcFilterChip(value, muscle == value, Modifier.testTag("$prefix-muscle-$value"),
-                visualModifier = if (prefix == "exercise-library") Modifier.testTag("conformance:Chip") else Modifier) { onMuscle(value) }
+                visualModifier = if (prefix == "exercise-library" || prefix == "exercise-picker") Modifier.testTag("conformance:Chip") else Modifier) { onMuscle(value) }
         }
     }
 }
@@ -147,7 +156,7 @@ private fun ExerciseBrowseRows(state: ExerciseUiState, query: String, muscle: St
     studentID: StudentID?, prefix: String, rowTag: (ExerciseRecord) -> String, enabled: Boolean = true, showRecent: Boolean = true,
     onClick: (ExerciseRecord) -> Unit) {
     val recent = state.recentEntries
-    val library = prefix == "exercise-library"
+    val library = prefix == "exercise-library" || (prefix == "exercise-picker" && showRecent)
     val divider = if (library) Modifier.testTag("conformance:Divider") else Modifier
     @Composable fun row(item: ExerciseRecord, tag: String) {
         val icon = state.metadata[item.exerciseID].takeIf { item.kind == ExerciseKind.builtIn }?.let {

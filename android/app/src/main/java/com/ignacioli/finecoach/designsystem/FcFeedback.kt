@@ -113,23 +113,31 @@ fun FcAvatar(name: String, modifier: Modifier = Modifier) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FcBottomSheet(title: String, onDismiss: () -> Unit, modifier: Modifier = Modifier, subtitle: String? = null,
-    skipPartiallyExpanded: Boolean = false,
+    skipPartiallyExpanded: Boolean = false, panelFlow: Boolean = false,
     content: @Composable ColumnScope.() -> Unit) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
-    ModalBottomSheet(onDismissRequest = onDismiss, modifier = modifier, containerColor = FcColors.surfacePage,
+    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = FcColors.surfacePage,
         sheetState = sheetState,
         tonalElevation = 0.dp, contentColor = FcColors.textPrimary, scrimColor = FcColors.overlayScrim,
         shape = RoundedCornerShape(topStart = FcShapes.lg, topEnd = FcShapes.lg),
-        dragHandle = {
-            Box(Modifier.padding(top = FcSpacing.space2).size(FcSpacing.space8 + FcSpacing.space1,
-                FcSpacing.space1 + FcComponentMetrics.hairline).background(FcColors.surfaceDivider, FcShapes.capsule).clearAndSetSemantics { })
-        }) {
+        dragHandle = null) {
         RegisterOverlayWindow()
-        Column(Modifier.fillMaxWidth().padding(horizontal = FcSpacing.space4).padding(bottom = FcSpacing.space6)
-            .testTag("sheet-content"), verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
-            FcText(title, Modifier.semantics { heading() }, style = FcTypography.headline, color = FcColors.textPrimary)
-            subtitle?.let { FcText(it, style = FcTypography.style("callout", 400), color = FcColors.textSecondary) }
-            content()
+        // Apply caller semantics inside the anchored M3 surface, after placement.
+        Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            Box(Modifier.padding(top = FcSpacing.space2)) { Box(Modifier.size(FcSpacing.space8 + FcSpacing.space1,
+                FcSpacing.space1 + FcComponentMetrics.hairline).background(FcColors.surfaceDivider, FcShapes.capsule).clearAndSetSemantics { if (panelFlow) testTag = "conformance:Grabber" }) }
+            // Constrain content, not ModalBottomSheet's draggable viewport/anchor calculation.
+            // The custom drag handle above contributes space.2 + space.1 + hairline.
+            Column(Modifier.fillMaxWidth().then(if (panelFlow) Modifier.heightIn(max = FcComponentMetrics.addExerciseSheetHeight -
+                FcSpacing.space2 - FcSpacing.space1 - FcComponentMetrics.hairline) else Modifier)
+                .then(if (panelFlow) Modifier.padding(top = FcSpacing.space4) else Modifier.padding(horizontal = FcSpacing.space4)).padding(bottom = FcSpacing.space6)
+                .testTag("sheet-content"), verticalArrangement = Arrangement.spacedBy(if (panelFlow) FcSpacing.space4 else FcSpacing.space2)) {
+                Box(Modifier.then(if (panelFlow) Modifier.padding(horizontal = FcSpacing.space4) else Modifier)) {
+                    FcText(title, Modifier.semantics { heading() }, style = FcTypography.headline, color = FcColors.textPrimary)
+                }
+                subtitle?.let { FcText(it, style = FcTypography.style("callout", 400), color = FcColors.textSecondary) }
+                content()
+            }
         }
     }
 }

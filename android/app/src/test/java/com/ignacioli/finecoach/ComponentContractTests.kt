@@ -49,6 +49,7 @@ class ComponentContractTests {
         assertEquals(44.dp, FcComponentMetrics.touch); assertEquals(52.dp, FcComponentMetrics.row)
         assertEquals(48.dp, FcComponentMetrics.field); assertEquals(96.dp, FcComponentMetrics.label)
         assertEquals(1.5.dp, FcComponentMetrics.stroke); assertEquals(300.dp, FcComponentMetrics.dialogWidth)
+        assertEquals(544.dp, FcComponentMetrics.addExerciseSheetHeight)
         // DS-LAUNCH uses this empty shell; real startup failures/retries are covered by navigation tests.
         assertEquals(androidx.compose.ui.graphics.Color.White, FcColors.surfacePage)
         compose.setContent { FineCoachTheme { FcPlatformShell({}) {} } }
@@ -314,8 +315,15 @@ class ComponentContractTests {
 
     @Test fun bottomSheet() {
         var open by mutableStateOf(true)
-        show { if (open) FcBottomSheet("虚构面板", { open = false }) { FcActionRow("关闭", Modifier.testTag("close")) { open = false } } }
+        show { if (open) FcBottomSheet("虚构面板", { open = false }, Modifier.testTag("sheet-surface")) { FcActionRow("关闭", Modifier.testTag("close")) { open = false } } }
         node("sheet-content").assertIsDisplayed(); touch("close"); full("close", "sheet-content")
+        val surface = node("sheet-surface").getUnclippedBoundsInRoot()
+        val content = node("sheet-content").getUnclippedBoundsInRoot()
+        assertEquals(surface.top + FcSpacing.space2 + FcSpacing.space1 + FcComponentMetrics.hairline, content.top)
+        // sheet-content semantics are inside the existing horizontal/bottom padding.
+        assertEquals(surface.bottom - FcSpacing.space6, content.bottom)
+        assertEquals(surface.left + FcSpacing.space4, content.left)
+        assertEquals(surface.width - FcSpacing.space4 * 2, content.width)
         node("close").performClick(); node("sheet-content").assertDoesNotExist()
     }
 

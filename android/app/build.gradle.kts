@@ -400,6 +400,7 @@ tasks.withType<Test>().matching { it.name == "testDebugUnitTest" || it.name == "
         if (!recordRequested.get().equals("true", ignoreCase = true)) excludeTestsMatching("com.ignacioli.finecoach.ComponentScreenshotTests")
         excludeTestsMatching("com.ignacioli.finecoach.TrainingConformanceTests")
         excludeTestsMatching("com.ignacioli.finecoach.ExerciseConformanceTests")
+        excludeTestsMatching("com.ignacioli.finecoach.AddExerciseConformanceTests")
     }
     inputs.file(privacyDependencyReport)
     inputs.file(rootProject.layout.projectDirectory.file("dependency-allowlist/resolved.txt"))
@@ -1007,6 +1008,8 @@ registerVisualGate("p1ExerciseConformance", "ExerciseConformanceTests", 2)
 registerVisualGate("p4ExerciseLibraryConformance", "ExerciseConformanceTests", 1).configure {
     filter { setIncludePatterns("com.ignacioli.finecoach.ExerciseConformanceTests.exerciseLibraryConformance") }
 }
+
+registerVisualGate("p4AddExerciseConformance", "AddExerciseConformanceTests", 1)
 
 val entryLayoutClasses = listOf("com.ignacioli.finecoach.EntryLayoutHarnessTests")
 val entryLayoutGate = tasks.register<Test>("s0G4") {

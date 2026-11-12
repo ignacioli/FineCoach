@@ -15,6 +15,19 @@ class ConformanceRelativeGeometryTests {
             .put("delta",box(dx,dy,dw,0.0)).put("geometry",JSONObject().put("expectedBounds",design).put("actualBounds",actual))
     }
     private fun count(rows: List<JSONObject>, check: String) = ConformanceRelativeGeometry.evaluate(rows).getJSONObject("counts").getInt(check)
+    @Test fun occludedColorIsNeverPassAndDoesNotHideGeometryFailure() {
+        for (drift in listOf(0.0, 10.0)) {
+            val covered = row("covered", 0.0, 0.0, dx = drift)
+                .put("colorFullyOccluded", true).put("tokenMatches", JSONObject.NULL)
+            val result = ConformanceRelativeGeometry.evaluate(listOf(covered))
+            assertEquals(if (drift == 0.0) "UNOBSERVABLE_COLOR" else "FAIL", covered.getString("status"))
+            val checks = result.getJSONArray("checks")
+            val color = (0 until checks.length()).map { checks.getJSONObject(it) }.single { it.getString("check") == "COLOR" }
+            assertEquals("UNOBSERVABLE", color.getString("status"))
+            assertTrue(color.isNull("passed"))
+            assertEquals(drift == 0.0, covered.getBoolean("geometryMatches"))
+        }
+    }
     @Test fun quarterDpPrecisionAppliesToEveryRelativeCheck() {
         for ((delta, passes) in listOf(-2.1 to true, -2.3 to false, 2.12 to true, -2.13 to false, 2.125 to false, -2.125 to false)) {
             val expected = if (passes) 0 else 1

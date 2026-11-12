@@ -49,7 +49,10 @@ internal object ConformanceRelativeGeometry {
             }.all { it }
             record("SIZE", listOf(a), sizePass, sizeDetail)
             record("ABSOLUTE_GROSS", listOf(a), listOf("x","y").all { abs(d.getDouble(it)) <= 8 })
-            record("COLOR", listOf(a), a.optBoolean("tokenMatches"))
+            if (a.optBoolean("colorFullyOccluded"))
+                checks.put(JSONObject().put("check", "COLOR").put("members", JSONArray(listOf(a.getString("path"))))
+                    .put("status", "UNOBSERVABLE").put("passed", JSONObject.NULL))
+            else record("COLOR", listOf(a), a.optBoolean("tokenMatches"))
             val parent = observable.filter { it !== a && contains(it,a) }.minByOrNull { v(it,"w")*v(it,"h") }
             if (parent != null) {
                 val detail = JSONObject()
@@ -94,6 +97,11 @@ internal object ConformanceRelativeGeometry {
             r.put("geometryMatches",matches)
             val pass = matches && r.optBoolean("textMatches") && r.optBoolean("tokenMatches")
             if (r.optString("category") != "INVISIBLE_OR_CLIPPED") {
+                val unobservableColor = r.optBoolean("colorFullyOccluded") && matches && r.optBoolean("textMatches")
+                if (unobservableColor) {
+                    r.put("category", "UNOBSERVABLE_COLOR").put("status", "UNOBSERVABLE_COLOR")
+                    return@forEach
+                }
                 r.put("category",if (pass) "PASS" else "UI_DEVIATION").put("status",if (pass) "PASS" else "FAIL")
                 if (pass && r.getJSONObject("selector").has("pendingBoardFix")) r.put("category","BOARD_FIX_PENDING").put("status","BOARD_FIX_PENDING")
             }

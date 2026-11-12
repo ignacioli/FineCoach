@@ -30,6 +30,14 @@ internal object ConformanceComparison {
         fun hexToken(hex: String?): String? = tokens.lastOrNull { it.hex == hex?.lowercase() && it.alpha == 1.0 }?.name
         val rows = JSONArray()
         val used = mutableSetOf<Int>()
+        val design = ImageIO.read(File(androidRoot.parentFile, designPath))
+        val mapped = entries.associate { e -> e.getString("path") to
+            (if (e.has("mappingError")) null else select(actual, e, ::expand).singleOrNull()) }
+        fun occluders(layer: JSONObject, node: JSONObject): List<JSONObject> = layers.drop(layers.indexOf(layer) + 1).filter {
+            val observed = mapped[it.getString("path")]
+            observed != null && observed.getInt("id") != node.getInt("id") &&
+                !it.getString("path").startsWith(layer.getString("path") + "/")
+        }
         for (entry in entries) {
             val layer = layers.single { it.getString("path") == entry.getString("path") }
             val candidates = if (entry.has("mappingError")) emptyList() else select(actual, entry, ::expand)
@@ -62,8 +70,13 @@ internal object ConformanceComparison {
                     .mapNotNull { ConformanceColors.expected(it, layers, tokens) }.distinct().singleOrNull().orEmpty()
                     else ConformanceColors.expected(layer, layers, tokens).orEmpty()
                 val expectedToken = hexToken(expectedHex)
-                val observedHex = if (entry.getString("colorMethod") == "textLayout") observedTextColor(android, n)
-                    else pixelMode(android, n, entry.getString("colorMethod") == "iconInk")
+                val above = occluders(layer, n)
+                val androidMasks = above.map { mapped.getValue(it.getString("path"))!! }
+                val designMasks = above
+                val designObserved = pixelMode(design, layer, occluders = designMasks)
+                val observedHex = if (entry.getString("colorMethod") == "textLayout") observedTextColor(android, n, androidMasks)
+                    else pixelMode(android, n, entry.getString("colorMethod") == "iconInk", androidMasks)
+                val fullyOccluded = !hasUncoveredPixels(android, n, androidMasks) || !hasUncoveredPixels(design, layer, designMasks)
                 val observedToken = hexToken(observedHex)
                 val tokenObservable = if (ad01) expectedHex.isNotEmpty() && observedHex != null else expectedHex.isEmpty() || observedHex != null
                 val tokenMatches = tokenObservable && (expectedHex.isEmpty() || (if (ad01) tokens.any { it.hex == expectedHex } else tokens.any { it.hex == layer.optString("fill").ifEmpty { layer.optJSONObject("stroke")?.optString("color").orEmpty() }.lowercase() }) && expectedHex == observedHex)
@@ -78,12 +91,19 @@ internal object ConformanceComparison {
                     .put("visibility", visibility).put("geometryMatches", geometryMatches)
                     .put("category", if (!visible) "INVISIBLE_OR_CLIPPED" else if (geometryMatches && textMatches && tokenMatches) "PASS" else "UI_DEVIATION")
                     .put("status", if (visible && geometryMatches && textMatches && tokenMatches) "PASS" else "FAIL")
+                row.put("designObservedHex", designObserved ?: JSONObject.NULL)
+                    .put("occluderPaths", JSONArray(above.map { it.getString("path") }))
+                if (fullyOccluded && expectedHex.isNotEmpty()) {
+                    row.put("colorFullyOccluded", true).put("colorObservation", "UNOBSERVABLE").put("tokenComparison", "UNOBSERVABLE")
+                        .put("tokenMatches", JSONObject.NULL).put("reason", "No uncovered pixels remain in Android or design crop")
+                    if (visible && geometryMatches && textMatches)
+                        row.put("status", "UNOBSERVABLE_COLOR").put("category", "UNOBSERVABLE_COLOR")
+                }
                 if (row.getString("status") == "PASS" && entry.has("pendingBoardFix"))
                     row.put("status", "BOARD_FIX_PENDING").put("category", "BOARD_FIX_PENDING").put("pendingBoardFix", entry.getJSONObject("pendingBoardFix"))
             }
             rows.put(row)
         }
-        val design = ImageIO.read(File(androidRoot.parentFile, designPath))
         val rowList = rows.objects()
         val relative = ConformanceRelativeGeometry.evaluate(rowList)
         for (entry in entries.filter { it.has("unobservable") }) {
@@ -110,6 +130,7 @@ internal object ConformanceComparison {
         val uiDeviations = rowList.count { it.getString("category") == "UI_DEVIATION" }
         val passed = rowList.count { it.getString("status") == "PASS" }
         val unobservable = rowList.count { it.getString("status") == "UNOBSERVABLE_VECTOR_INTERNAL" }
+        val unobservableColor = rowList.count { it.getString("status") == "UNOBSERVABLE_COLOR" }
         val boardFixPending = rowList.count { it.getString("status") == "BOARD_FIX_PENDING" }
         check(design.width == android.width && design.height == android.height)
         val ssim = ConformanceSsim.compare(design, android)
@@ -150,8 +171,8 @@ internal object ConformanceComparison {
             .put("automaticMapped", rowList.count { it.getString("mapping").startsWith("AUTO") && it.has("actual") })
             .put("automaticMappingRate", rowList.count { it.getString("mapping").startsWith("AUTO") && it.has("actual") }.toDouble() / layers.size)
             .put("unmappedLayers", JSONArray(rowList.filter { !it.has("actual") }.map { JSONObject().put("path", it.getString("path")).put("name", it.getString("name")).put("reason", it.optString("reason")) }))
-            .put("artifactStatus", if (invalidCapture) "INVALID_CAPTURE" else "VALID_FIXTURE").put("invisible", invisible).put("uiDeviations", uiDeviations).put("total", rows.length()).put("passed", passed).put("failed", rows.length() - passed - unobservable - boardFixPending).put("boardFixPending", boardFixPending).put("missing", missing)
-            .put("unobservableVectorInternal", unobservable)
+            .put("artifactStatus", if (invalidCapture) "INVALID_CAPTURE" else "VALID_FIXTURE").put("invisible", invisible).put("uiDeviations", uiDeviations).put("total", rows.length()).put("passed", passed).put("failed", rows.length() - passed - unobservable - unobservableColor - boardFixPending).put("boardFixPending", boardFixPending).put("missing", missing)
+            .put("unobservableVectorInternal", unobservable).put("unobservableColor", unobservableColor)
             .put("toleranceDp", tolerance).put("measuredContentTop", contentTop).put("effectiveOriginOffsetY", offset)
             .put("originReason", map.getString("originRule")).put("differentPixelRatio", different.toDouble() / (design.width.toLong() * design.height))
             .put("sha256", sha(File(out, "$screen.android.png"))).put("elements", rows).put("top10", JSONArray(top))
@@ -369,7 +390,7 @@ internal object ConformanceComparison {
                     appendLine("| ${it.getString("a")}→${it.getString("b")} | ${it.getString("direction")} | ${it.getDouble("design")} | ${it.getDouble("actual")} | ${it.getDouble("delta")} | ${it.getDouble("roundedDelta")} |")
                 }
             appendLine("\n## 人读摘要\n\n${result.getString("humanReadSummary")}")
-            appendLine("\n颜色读取：文字来自真实 TextLayoutResult；填充来自节点矩形内 exact RGB 众数；iconInk 排除节点边界采样的背景众数后取实际众数，无近色匹配。无颜色观测写 UNOBSERVABLE，不能据此声称真实 token 不一致，仍不通过。README 所有 primitive/semantic token 均自动读取，保留同色 aliases；按精确 RGB 比较。带 opacity 的填色按前序覆盖背景逐层 source-over，不使用近色容差。")
+            appendLine("\n颜色读取：文字来自真实 TextLayoutResult；填充来自节点矩形内未被后序 mapped layer 遮挡的 exact RGB 众数（Android 用实测 bounds，design 用导出 bounds）；完全遮挡记 UNOBSERVABLE_COLOR，不计 PASS；iconInk 排除节点边界采样的背景众数后取实际众数，无近色匹配。无颜色观测写 UNOBSERVABLE，不能据此声称真实 token 不一致，仍不通过。README 所有 primitive/semantic token 均自动读取，保留同色 aliases；按精确 RGB 比较。带 opacity 的填色按前序覆盖背景逐层 source-over，不使用近色容差。")
             appendLine("\nmissing 表示无可定位的独立 semantics 节点，不证明屏幕上没有图形。mapped bounds 若是触控容器而非内部图形，只能证明容器与图层几何不同，不能宣称图形轮廓错误。不可见/裁剪节点单列失败，不把零 bounds 的位移混入 UI 偏差 top10。")
         })
     }
@@ -377,11 +398,11 @@ internal object ConformanceComparison {
         nodes.filter { it.optString("tag") == "platform-content" }.single().getDouble("y")
 
     /** Layout color is a source, not proof that text ink reached the screenshot. */
-    internal fun observedTextColor(image: BufferedImage, n: JSONObject): String? {
+    internal fun observedTextColor(image: BufferedImage, n: JSONObject, occluders: List<JSONObject> = emptyList()): String? {
         val source = n.optString("hex", "").takeUnless { it == "null" || it.isEmpty() } ?: return null
         val alpha = n.optDouble("alpha", 1.0)
         val color = if (alpha == 1.0) source else {
-            val background = pixelMode(image, n) ?: return null
+            val background = pixelMode(image, n, occluders = occluders) ?: return null
             ConformanceColors.composite(source, alpha, background)
         }
         val rgb = color.removePrefix("#").toInt(16)
@@ -389,7 +410,8 @@ internal object ConformanceComparison {
         val top = (n.getDouble("y") * 2).toInt().coerceIn(0, image.height)
         val right = ((n.getDouble("x") + n.getDouble("w")) * 2).toInt().coerceIn(0, image.width)
         val bottom = ((n.getDouble("y") + n.getDouble("h")) * 2).toInt().coerceIn(0, image.height)
-        return color.takeIf { (top until bottom).any { y -> (left until right).any { x -> image.getRGB(x, y) and 0xffffff == rgb } } }
+        val uncovered = uncoveredPredicate(occluders)
+        return color.takeIf { (top until bottom).any { y -> (left until right).any { x -> uncovered(x, y) && image.getRGB(x, y) and 0xffffff == rgb } } }
     }
 
     private fun uniqueMode(counts: Map<Int, Int>): Int? {
@@ -397,7 +419,8 @@ internal object ConformanceComparison {
         return counts.filterValues { it == max }.keys.singleOrNull()
     }
 
-    internal fun pixelMode(image: BufferedImage, n: JSONObject, inkOnly: Boolean = false): String? {
+    internal fun pixelMode(image: BufferedImage, n: JSONObject, inkOnly: Boolean = false, occluders: List<JSONObject> = emptyList()): String? {
+        val uncovered = uncoveredPredicate(occluders)
         val counts = mutableMapOf<Int, Int>()
         val left = (n.getDouble("x") * 2).toInt().coerceIn(0, image.width)
         val top = (n.getDouble("y") * 2).toInt().coerceIn(0, image.height)
@@ -406,19 +429,36 @@ internal object ConformanceComparison {
         val boundary = mutableMapOf<Int, Int>()
         if (inkOnly && left < right && top < bottom) {
             for (x in left until right) for (y in listOf(top, bottom - 1)) {
+                if (!uncovered(x, y)) continue
                 val rgb = image.getRGB(x, y) and 0xffffff; boundary[rgb] = (boundary[rgb] ?: 0) + 1
             }
             for (y in top until bottom) for (x in listOf(left, right - 1)) {
+                if (!uncovered(x, y)) continue
                 val rgb = image.getRGB(x, y) and 0xffffff; boundary[rgb] = (boundary[rgb] ?: 0) + 1
             }
         }
         val background = uniqueMode(boundary)
         if (inkOnly && background == null) return null
         for (y in top until bottom) for (x in left until right) {
+            if (!uncovered(x, y)) continue
             val rgb = image.getRGB(x,y) and 0xffffff
             if (!inkOnly || rgb != background) counts[rgb] = (counts[rgb] ?: 0) + 1
         }
         return uniqueMode(counts)?.let { "#%06x".format(it) }
+    }
+    /** Same half-open raster bounds as the existing crop; stacking order is supplied by the export. */
+    private fun uncoveredPredicate(occluders: List<JSONObject>): (Int, Int) -> Boolean {
+        val boxes = occluders.map { intArrayOf((it.getDouble("x") * 2).toInt(), (it.getDouble("y") * 2).toInt(),
+            ((it.getDouble("x") + it.getDouble("w")) * 2).toInt(), ((it.getDouble("y") + it.getDouble("h")) * 2).toInt()) }
+        return { x, y -> boxes.none { x >= it[0] && x < it[2] && y >= it[1] && y < it[3] } }
+    }
+    internal fun hasUncoveredPixels(image: BufferedImage, n: JSONObject, occluders: List<JSONObject>): Boolean {
+        val uncovered = uncoveredPredicate(occluders)
+        val left = (n.getDouble("x") * 2).toInt().coerceIn(0, image.width)
+        val top = (n.getDouble("y") * 2).toInt().coerceIn(0, image.height)
+        val right = ((n.getDouble("x") + n.getDouble("w")) * 2).toInt().coerceIn(0, image.width)
+        val bottom = ((n.getDouble("y") + n.getDouble("h")) * 2).toInt().coerceIn(0, image.height)
+        return (top until bottom).any { y -> (left until right).any { x -> uncovered(x, y) } }
     }
     private fun sha(file: File) = MessageDigest.getInstance("SHA-256").digest(file.readBytes()).joinToString("") { "%02x".format(it) }
     private fun JSONArray.objects() = (0 until length()).map { getJSONObject(it) }
