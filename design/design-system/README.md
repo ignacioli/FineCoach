@@ -361,7 +361,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 | 主按钮（页面底部） | 358×52，`radius.md`，底色 `action.primary`，按下 `action.pressed`；文字 `headline` 白色 |
 | 次按钮（样张） | 白底，1.5pt `action.primary` 描边，`radius.md`；文字 `headline` `action.primary` |
 | 链接式按钮 | 无底色，文字 `callout` 600 `action.primary`（例：「＋ 添加动作」「＋ 自定义指标」「重试」） |
-| 顶部分段切换（今日 / 学员） | 选中项 50×32 胶囊，`action.primary` 底 + `headline` 白字；未选中项为纯文字 `body` `text.secondary`。同一外观也用于页内 2–4 段（C26）的互斥短选项（37「扣减 / 返还」；趋势指标、身体数据录入单位），选项更多或文字较长时改用筛选胶囊（2026-10-05，§10 C11） |
+| 顶部分段切换（今日 / 学员） | 每个选项框最小 50×32、间距 `space.2`，文字在框内水平垂直居中；选中项的框即胶囊，`action.primary` 底 + `headline` 白字；未选中项为纯文字 `body` `text.secondary`。一级页顶部时第一个选项框左缘对齐页边距 `space.4`（S1-D70）。同一外观也用于页内 2–4 段（C26）的互斥短选项（37「扣减 / 返还」；趋势指标、身体数据录入单位），选项更多或文字较长时改用筛选胶囊（2026-10-05，§10 C11） |
 | 筛选胶囊（07） | 高 30 胶囊；未选中 `surface.selected` 底 + `chipLabel` `text.primary`；选中 `action.primary` 底 + 白字 |
 | 开关 | 44×26 胶囊，滑块 18×18 白色圆，**左关右开**（iOS 惯例，与画稿 02/12 一致）。开启：轨道 `action.primary`。关闭：轨道 `surface.divider` 底 + 1.5pt `border.control` 内描边（O7）。实现为系统原生 `Toggle` + 自定义外观样式，保留系统开关的无障碍语义；可点击区域不小于 44×44 |
 | 深色 hero 卡（01） | 358×100，`radius.lg`，`action.primary` 底；内含徽标（高 24 胶囊，最小宽 56、随文字增长，`surface.canvas` 底，`sectionLabel` `action.primary` 字）、`headline` 白字标题、`text.onActionSecondary` 副文字、`callout` 600 白字操作。每屏最多一个。**多行变体（W08-a，2026-10-22）**：多名学员同时训练时仍是一张卡，徽标「进行中 · N」，每人一行（学员名 · 部位 / 已训练 N 分钟 / 「继续 ›」），行最小高 44，行间 `surface.dividerOnAction` 分割线，按开始时间升序；每行单独可点。1 人时与 01 相同 |
