@@ -13,7 +13,7 @@
 - **−/+ 等符号**（`SYMBOL_CENTER`）：用 20dp 的符号框居中，不按文字行盒处理。
 - **墨迹溢出**：下伸部和大号数字的墨迹可以超出 token 行盒，最多（自然行高 − token 行高）/ 2，这与 CSS 一致。会裁剪内容的容器（`clipToBounds`、滚动视口的边缘）必须给这部分留出空间。
 - **间距只用 token**（R3）：`FcSpacing.*`、`FcComponentMetrics.*`。不要用 `.offset` / `.absoluteOffset` 去微调位置；这两个也受 R5 白名单约束。
-- **页面纵向组合**按 `components.md` §4.6 `DS-PAGE-FLOW`：块间 `space.4`、区段标签→内容 `space.2`、水平 `space.4`、底部 `space.6`。任务说明要列出该页用到的关系；画板与它冲突时，由调度方先改画板（S1-D49），实现不去贴合手工距离。
+- **页面纵向组合**按 `components.md` §2.1 `DS-PAGE-FLOW`：块间 `space.4`、区段标签→内容 `space.2`、水平 `space.4`、底部 `space.6`。任务说明要列出该页用到的关系；画板与它冲突时，由调度方先改画板（S1-D49），实现不去贴合手工距离。
 
 ## 2. 设计来源
 
