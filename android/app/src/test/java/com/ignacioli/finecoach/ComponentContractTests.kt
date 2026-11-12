@@ -129,6 +129,37 @@ class ComponentContractTests {
         compose.runOnIdle { assertEquals(1, calls) }
     }
 
+    @Test fun headerBackExpandedHitAreaClicks() = headerMarginClick("header-back")
+    @Test fun headerTrailingExpandedHitAreaClicks() = headerMarginClick("header-trailing")
+    private fun headerMarginClick(tag: String) {
+        var calls = 0
+        show {
+            Box(Modifier.fillMaxWidth().height(100.dp).testTag("hit-area")) {
+                FcPageHeader("虚构标题", Modifier.padding(20.dp), onBack = { calls++ },
+                    tag = "header", trailingTitle = "编辑", onTrailing = { calls++ })
+            }
+        }
+        node(tag).assertTouchWidthIsEqualTo(48.dp)
+        val visual = node(tag).getUnclippedBoundsInRoot()
+        node("hit-area").performTouchInput {
+            click(androidx.compose.ui.geometry.Offset((visual.left + visual.width / 2).toPx(), (visual.top - 3.dp).toPx()))
+        }
+        compose.runOnIdle { assertEquals(1, calls) }
+    }
+    @Test fun searchExpandedHitAreaFocuses() {
+        show {
+            Box(Modifier.fillMaxWidth().height(100.dp).testTag("hit-area")) {
+                FcSearchField("搜索", "", {}, Modifier.padding(20.dp).testTag("search"),
+                    visualModifier = Modifier.testTag("search-visual"))
+            }
+        }
+        val visual = node("search-visual").getUnclippedBoundsInRoot()
+        node("hit-area").performTouchInput {
+            click(androidx.compose.ui.geometry.Offset((visual.left + visual.width / 2).toPx(), (visual.top - 2.dp).toPx()))
+        }
+        node("search").assertIsFocused()
+    }
+
     @Test fun toggle() {
         var disabledCalls = 0
         show {

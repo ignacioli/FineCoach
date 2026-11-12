@@ -145,13 +145,15 @@ class SessionRecoveryEntryLayoutTests {
         val finish = node("session-finish").getUnclippedBoundsInRoot()
         assertTrue(bar.bottom <= finish.top)
         listOf("rest-plus", "rest-minus", "rest-skip").forEach { tag ->
-            node(tag).assertIsDisplayed().assertHasClickAction().assertWidthIsAtLeast(FcComponentMetrics.touch).assertHeightIsAtLeast(FcComponentMetrics.touch)
+            node(tag).assertIsDisplayed().assertHasClickAction()
+                .assertTouchWidthIsEqualTo(FcSpacing.space8 + FcSpacing.space4)
+                .assertTouchHeightIsEqualTo(FcSpacing.space8 + FcSpacing.space4)
             val button = node(tag).getUnclippedBoundsInRoot()
             assertTrue(button.left >= bar.left && button.right <= bar.right)
             assertTrue(button.top >= bar.top && button.bottom <= bar.bottom)
         }
-        assertTrue(node("rest-minus").getUnclippedBoundsInRoot().right <= node("rest-plus").getUnclippedBoundsInRoot().left)
-        assertTrue(node("rest-plus").getUnclippedBoundsInRoot().right <= node("rest-skip").getUnclippedBoundsInRoot().left)
+        assertEquals(FcSpacing.space3, node("rest-plus").getUnclippedBoundsInRoot().left - node("rest-minus").getUnclippedBoundsInRoot().right)
+        assertEquals(FcSpacing.space3, node("rest-skip").getUnclippedBoundsInRoot().left - node("rest-plus").getUnclippedBoundsInRoot().right)
         node("rest-remaining").assertTextEquals("2:00")
         click("rest-plus"); assertEquals(135L, state.rests.remaining(original.session.sessionID))
         click("rest-minus"); assertEquals(120L, state.rests.remaining(original.session.sessionID))
