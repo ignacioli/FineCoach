@@ -174,7 +174,7 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
         val result = state.addExercise(selection)
         if (result is ApplicationResult.Success) { editor = state.content?.exercises?.lastOrNull(); editing = null }
         result
-    }, studentID = content?.session?.studentID) { picker = false }
+    }, studentID = content?.session?.studentID, onTemplate = { picker = false; apply = true }) { picker = false }
     if (apply && content != null) ApplyTemplateSheet(templates, content.session, state::accept) { apply = false }
     if (sectionForm) {
         var name by remember(section) { mutableStateOf(section?.name ?: "") }

@@ -308,6 +308,8 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 - **呈现**：必须用 `View.fcBottomSheet(isPresented:)`，由它绘制 `overlay.scrim`；不要用系统 `.sheet`，因为它的遮罩颜色不在色板内。点击遮罩、向下拖超过 80pt 或无障碍 escape 都会关闭面板。
 - **不变量**：遮罩颜色为 `text.primary` 40%（自动：Vision）；面板带 `.isModal` 属性（可自动）。
 
+- **添加动作面板组合（S1-D60，DS-PAGE-FLOW panel exception）**：grabber 顶 `space.2`；grabber→title→content 各 `space.4`；tabs→list `space.3`；search→chips→最近练过各 `space.2`；最近练过 block 底 `space.2`，另由外层 flow 提供 `space.2`；sections 间 `space.4`；水平 `space.4`，chips edge-to-edge 且首尾 content padding `space.4`；底部 `space.6`。tabs 复用非 body `FcFilterChip`，动作行复用 C′2b（70dp pitch）。移除 picker 普通动作行和内缩 chips 的旧组合；不新增样式或排序规则。来源：批准 C2b-B、iOS addExerciseSheet / QuickCreateExerciseFlow / FCBottomSheet；Android 用可用高度约束滚动内容，不固定面板高度。
+
 #### `DS-CONFIRM-DIALOG` 确认弹窗
 
 - **部件**：标题（`headline` `text.primary`）→ 说明（`caption` `text.secondary`，居中）→ 按钮行：保守 / 取消按钮在左（`surface.selected` 底 + `callout` 600 `action.primary`），确认按钮在右（`action.primary` 底 + 白字）；按钮视觉高 36、`radius.dialogAction` 10、间距 `space.2`。卡片宽 300、内边距 `space.4`、`radius.lg`、`surface.elevated`。

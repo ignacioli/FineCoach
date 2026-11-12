@@ -1,0 +1,6 @@
+{
+  "toleranceDp": 2,
+  "originOffsetY": -52,
+  "originRule": "S1-D50 measured status inset; dialog uses its actual window origin",
+  "elements": []
+}

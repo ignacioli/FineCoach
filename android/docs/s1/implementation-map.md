@@ -929,3 +929,20 @@ P4 round 2 最终：FAIL；host 952/0、G3 42/0、G4 12/0、训练conformance 1/
 - 设计决定：沿用 S1-D50/D51；› 实测 glyph advance box x368/w6、右缘374，旧板 x360/w8 右缘368，+8 来自 board placement 而非额外 padding；实现不移动。proposed-board.json 只提出 composition/chip/Back/› 相关层，其他差异见r4报告；Penpot/baseline仍由负责人批准更新。
 - 实现与检查：ComponentContractTests 保留28项、验证Back16dp layout及48dp touch；P4ExerciseLibraryTests 保留2项、加入header文字advance宽84、trailing centerY、16/16/16外层gap、section8dp与›右缘。无新增交互，沿用上方入口与layout map（header-back/trailing、search/filter、muscle chips、exercise-options；数据变更仍由可见options控制，row width owner=platform-content）。L3未触发新的实施截图走查，board更新及负责人验收PENDING。
 - 结果：最终gate数字、proposal层数与坐标、decision points、耗时和失败原始日志见 `.handoff/subagent/2026-11-12-p4-exercise-library-r4.md`；未commit、未委派。
+
+## P4 second pilot：C2b-B 添加动作（S1-D60，round 1）
+
+- 分类与依据：D 类 drift repair，复用 C2b-B approved structure / S1-D60；DS-BOTTOM-SHEET 增补已批准 panel flow，DS-CHIP / TEXT-FIELD / SECTION / LIST-ROW 复用。
+- 范围：session picker 的 tabs、搜索、edge-to-edge chips、最近练过和完整列表；保留 session → library picker / template 既有路由、testTags、use cases 与排序。移除 picker 普通行变体和内缩 chips；不改 comparator、board 或 baseline。
+- 设计决定：采用 S1-D60 / D50 / D46 / D52；超出 anatomy 的问题列于本轮 handoff，不在实现里自行决定。
+- 实现与检查：`P4AddExerciseTests` 覆盖 token gap、390/358 满宽、70dp pitch、筛选隐藏 recent 和可见选择的 durable save；`AddExerciseConformanceTests` 真实生产窗口 capture 和 measured proposal。L3 待 board update 后负责人走查。
+- 结果：full host 965/0、G3 42/0、G4 12/0、训练/D2b green；C2b-B current board PASS1/FAIL63/MISSING24，NOT CONVERGED。64层 proposal 与未决 viewport/scrim mapping 见 `.handoff/subagent/2026-11-12-p4-add-exercise.md`；未进行人类视觉验收。
+
+| screen → visible control | identifier | mutates data? | width owner |
+|---|---|---|---|
+| 添加动作 → 动作库 tab | `session-add-library` | 否，保留已选 tab / 既有 picker 入口 | `session-add-tabs` 满宽，FcFilterChip visual 66×30 |
+| 添加动作 → 从模板 tab | `session-apply-template` | 否，沿用 ApplyTemplateSheet | `session-add-tabs` / FcFilterChip |
+| 添加动作 → 搜索动作 | `exercise-search` | 否，query | `exercise-picker-search-row`，搜索 weight(1)，visual 306×40 |
+| 添加动作 → 筛选 | `exercise-picker-filter` | 否，equipment filter | 搜索行 trailing FcTitleIconButton |
+| 添加动作 → 全部 / 部位 chips | `exercise-picker-muscle-all` / `exercise-picker-muscle-$value` | 否，muscle filter | `exercise-picker-muscles` edge-to-edge，首尾 space.4 |
+| 添加动作 → 最近练过 / 完整列表行 | `exercise-picker-recent-$id` / `exercise-select-$id` | 是，既有 session add use case | FcListRow exerciseLibrary，358dp content width |
