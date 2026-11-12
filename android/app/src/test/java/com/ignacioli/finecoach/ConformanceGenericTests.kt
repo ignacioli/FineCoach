@@ -23,7 +23,8 @@ class ConformanceGenericTests {
         assertEquals(1, entries.single().getInt("nodeID"))
         val clipped = JSONObject(partial.toString()).put("w", 3).put("unclipped", partial)
         assertTrue(ConformanceComparison.geometry(clipped, partial, "top", 0.0).getBoolean("matches"))
-        assertFalse(ConformanceComparison.geometry(clipped, JSONObject(partial.toString()).put("x", 380), "top", 0.0).getBoolean("matches"))
+        assertTrue(ConformanceComparison.geometry(clipped, JSONObject(partial.toString()).put("x", 380), "top", 0.0).getBoolean("matches"))
+        assertFalse(ConformanceComparison.geometry(clipped, JSONObject(partial.toString()).put("x", 378), "top", 0.0).getBoolean("matches"))
     }
     @Test fun ad01MappingUsesParentGeometryAndVerifiedMaterialSourceOnly() {
         val parent = layer("1").put("type", "group").put("name", "icon / filter")

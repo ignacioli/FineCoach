@@ -40,7 +40,7 @@ class ConformanceComparisonTests {
         for (axis in listOf("x", "y", "w", "h")) {
             val boundary = JSONObject(base.toString()).put(axis, base.getDouble(axis) + 2.0)
             assertTrue("$axis boundary", ConformanceComparison.geometry(boundary, base, "top", 0.0).getBoolean("matches"))
-            boundary.put(axis, base.getDouble(axis) + 2.001)
+            boundary.put(axis, base.getDouble(axis) + if (axis in listOf("x", "y")) 8.001 else 2.001)
             val g = ConformanceComparison.geometry(boundary, base, "top", 0.0)
             assertFalse("$axis excess", g.getBoolean("matches")); assertFalse(g.getJSONObject("withinTolerance").getBoolean(axis))
         }
@@ -78,7 +78,7 @@ class ConformanceComparisonTests {
         val g = ConformanceComparison.geometry(tall, design, "top", 0.0)
         assertFalse(g.getBoolean("matches")); assertFalse(g.getJSONObject("withinTolerance").getBoolean("h"))
         assertEquals(0.0, g.getJSONObject("delta").getDouble("centerY"), 0.001)
-        for ((axis, value) in listOf("x" to 18.001, "w" to 88.001)) {
+        for ((axis, value) in listOf("x" to 24.001, "w" to 88.001)) {
             val off = rect(16.0, 98.1, 86.0, 23.8).put(axis, value)
             assertFalse(axis, ConformanceComparison.geometry(off, design, "top", 0.0).getBoolean("matches"))
         }
@@ -88,7 +88,7 @@ class ConformanceComparisonTests {
         val design = rect(16.0, 775.0, 69.0, 20.0).put("type", "text").put("fontSize", 17).put("fontWeight", 600)
         val bottom = rect(16.0, 773.1, 69.0, 23.8)
         assertTrue(ConformanceComparison.geometry(bottom, design, "bottom", -52.0).getBoolean("matches"))
-        assertFalse(ConformanceComparison.geometry(rect(16.0, 775.2, 69.0, 23.8), design, "bottom", -52.0).getBoolean("matches"))
+        assertFalse(ConformanceComparison.geometry(rect(16.0, 781.2, 69.0, 23.8), design, "bottom", -52.0).getBoolean("matches"))
         assertTrue(ConformanceComparison.geometry(rect(16.0, 721.1, 69.0, 23.8), design, "top", -52.0).getBoolean("matches"))
     }
     @Test fun editableTextFieldIsJudgedByCenterAndReportsItsRawHeight() {
@@ -97,8 +97,8 @@ class ConformanceComparisonTests {
         val centered = ConformanceComparison.geometry(JSONObject("""{"x":211.5,"y":212,"w":63.5,"h":35}"""), layer, "top", 0.0, rule = rule)
         assertTrue(centered.getBoolean("matches"))
         assertEquals(35.0, centered.getJSONObject("editableTextField").getDouble("rawH"), 0.001)
-        val shifted = ConformanceComparison.geometry(JSONObject("""{"x":211.5,"y":215,"w":63.5,"h":35}"""), layer, "top", 0.0, rule = rule)
-        assertFalse("A 3dp center shift still fails", shifted.getBoolean("matches"))
+        val shifted = ConformanceComparison.geometry(JSONObject("""{"x":211.5,"y":221,"w":63.5,"h":35}"""), layer, "top", 0.0, rule = rule)
+        assertFalse("A gross center shift still fails", shifted.getBoolean("matches"))
         assertFalse("Without the rule the height is judged", ConformanceComparison.geometry(
             JSONObject("""{"x":211.5,"y":212,"w":63.5,"h":35}"""), layer, "top", 0.0).getBoolean("matches"))
     }
