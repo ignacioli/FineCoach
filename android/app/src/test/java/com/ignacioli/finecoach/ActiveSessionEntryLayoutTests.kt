@@ -2,10 +2,9 @@
 package com.ignacioli.finecoach
 
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
 import androidx.compose.ui.test.*
-import androidx.compose.ui.platform.AbstractComposeView
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.unit.width
 import androidx.core.view.ViewCompat
@@ -80,10 +79,14 @@ class ActiveSessionEntryLayoutTests {
         }
     }
     private fun disposeContent() {
-        // Dispose after pending recompositions instead of scheduling new content during teardown.
+        // disposeComposition() retains the content lambda and requests layout. An attached
+        // ComposeView then recreates that content on measure, restarting effects during teardown.
+        // Replace the subtree instead; the rule retains ownership of the root composition.
+        // Activity.setContent also replaces the parent context supplied by the test rule,
+        // recreating the old content before installing the new lambda. Keep that context.
         compose.runOnIdle {
             val root = compose.activity.findViewById<android.view.ViewGroup>(android.R.id.content)
-            (root.getChildAt(0) as AbstractComposeView).disposeComposition()
+            (root.getChildAt(0) as ComposeView).setContent { }
         }
         compose.waitForIdle()
     }
@@ -463,4 +466,25 @@ class ActiveSessionEntryLayoutTests {
         assertEquals(original, read(original.session.sessionID))
     }
 
+    @Test fun clearingContentDoesNotReenterHostedCompositionOnMeasure() {
+        var entered = 0
+        var disposed = 0
+        compose.setContent {
+            DisposableEffect(Unit) {
+                entered++
+                onDispose { disposed++ }
+            }
+        }
+        disposeContent()
+        compose.runOnUiThread {
+            val root = compose.activity.findViewById<android.view.ViewGroup>(android.R.id.content)
+            root.measure(
+                android.view.View.MeasureSpec.makeMeasureSpec(root.width, android.view.View.MeasureSpec.EXACTLY),
+                android.view.View.MeasureSpec.makeMeasureSpec(root.height, android.view.View.MeasureSpec.EXACTLY))
+        }
+        compose.runOnIdle {
+            assertEquals("Cleared content must not be composed again by a layout pass", 1, entered)
+            assertEquals("The hosted subtree must be disposed before closing Room", 1, disposed)
+        }
+    }
 }
