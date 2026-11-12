@@ -16,7 +16,7 @@
     "exportedAt": "2026-11-12",
     "exporter": "penpot-mcp execute_code (host)",
     "units": "pt relative to board origin; PNG is 2x",
-    "status": "S1-scope derived board (S1-D68); positions pending the implementation's proposed-board pass"
+    "status": "S1-scope derived board (S1-D68); positions pending the implementation's proposed-board pass; hero title follows DS-HERO-CARD 学员名 · 部位 (S1-D69)"
   },
   "board": {
     "w": 390,
@@ -107,10 +107,10 @@
       "path": "6",
       "x": 32,
       "y": 252,
-      "w": 145,
+      "w": 111,
       "h": 24,
       "fill": "#ffffff",
-      "text": "王小明 · 深蹲训练",
+      "text": "王小明 · 大腿",
       "fontFamily": "Noto Sans SC",
       "fontSize": 17,
       "fontWeight": 600,
