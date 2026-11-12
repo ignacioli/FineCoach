@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.width
 import androidx.compose.ui.unit.height
 import androidx.core.view.ViewCompat
@@ -155,6 +156,14 @@ class SessionRecoveryEntryLayoutTests {
         assertEquals(FcSpacing.space3, node("rest-plus").getUnclippedBoundsInRoot().left - node("rest-minus").getUnclippedBoundsInRoot().right)
         assertEquals(FcSpacing.space3, node("rest-skip").getUnclippedBoundsInRoot().left - node("rest-plus").getUnclippedBoundsInRoot().right)
         node("rest-remaining").assertTextEquals("2:00")
+        val plus = node("rest-plus").getUnclippedBoundsInRoot()
+        // Inject outside the visible text box, within its expanded touch target.
+        node("rest-content").performTouchInput {
+            click(androidx.compose.ui.geometry.Offset((plus.left + plus.width / 2 - bar.left).toPx(),
+                (plus.top - 3.dp - bar.top).toPx()))
+        }
+        assertEquals(135L, state.rests.remaining(original.session.sessionID))
+        click("rest-minus"); assertEquals(120L, state.rests.remaining(original.session.sessionID))
         click("rest-plus"); assertEquals(135L, state.rests.remaining(original.session.sessionID))
         click("rest-minus"); assertEquals(120L, state.rests.remaining(original.session.sessionID))
         compose.runOnIdle {
