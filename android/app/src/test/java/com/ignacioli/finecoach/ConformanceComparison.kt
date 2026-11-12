@@ -83,6 +83,7 @@ internal object ConformanceComparison {
             }
             rows.put(row)
         }
+        val design = ImageIO.read(File(androidRoot.parentFile, designPath))
         val rowList = rows.objects()
         val relative = ConformanceRelativeGeometry.evaluate(rowList)
         for (entry in entries.filter { it.has("unobservable") }) {
@@ -103,13 +104,13 @@ internal object ConformanceComparison {
             else row.put("status", "FAIL").put("category", "UI_DEVIATION")
                 .put("reason", "不可观测标记前提不成立：本行选择器须命中父图标节点，且须为真实内部path、父group/icon几何通过、同名资产来源hash有效")
         }
+        val iconPixels = ConformanceIconPixels.evaluate(layers, rowList, design, android)
         val missing = rowList.count { it.getString("status") == "MISSING" }
         val invisible = rowList.count { it.getString("category") == "INVISIBLE_OR_CLIPPED" }
         val uiDeviations = rowList.count { it.getString("category") == "UI_DEVIATION" }
         val passed = rowList.count { it.getString("status") == "PASS" }
         val unobservable = rowList.count { it.getString("status") == "UNOBSERVABLE_VECTOR_INTERNAL" }
         val boardFixPending = rowList.count { it.getString("status") == "BOARD_FIX_PENDING" }
-        val design = ImageIO.read(File(androidRoot.parentFile, designPath))
         check(design.width == android.width && design.height == android.height)
         val ssim = ConformanceSsim.compare(design, android)
         ImageIO.write(ssim.heatmap(), "png", File(out, "$screen.ssim-heatmap.png"))
@@ -157,6 +158,7 @@ internal object ConformanceComparison {
             .put("humanReadSummary", "本轮未进行人工图片审查；以下分类依据节点、几何及像素证据。负责人视觉验收仍 PENDING。")
             .put("androidOnlyTextNodes", JSONArray(actual.filter { it.getInt("id") !in used && it.getString("text").isNotEmpty() }))
         result.put("relativeGeometry", relative)
+        result.put("ICON_PIXELS", iconPixels)
         result.put("ssim", ssimReport)
         result.put("designPath", designPath)
         result.put("gatePassed", !invalidCapture && result.getInt("failed") == 0)
@@ -357,6 +359,8 @@ internal object ConformanceComparison {
                 val d = r.optJSONObject("delta")
                 appendLine("| ${r.getString("path")} | ${r.getString("name")} | ${r.getString("anchor")} | ±${r.getDouble("toleranceDp")} | ${d?.optDouble("x")} | ${d?.optDouble("y")} | ${d?.optDouble("w")} | ${d?.optDouble("h")} | ${if (d?.has("centerY") == true) d.getDouble("centerY") else "N/A"} | ${r.getBoolean("textMatches")} | ${r.optString("tokenComparison", "MISSING")} | ${r.getString("category")} ${r.optJSONArray("failedChecks")} | ${r.optString("reason").ifEmpty { r.optJSONObject("visibility")?.optString("reason") ?: "" }} |")
             }
+            appendLine("\n## ICON_PIXELS\n\n每个父图标中心对齐，ink IoU ≥ ${ConformanceIconPixels.minimumIou}，背景 RGB 最大通道差 > ${ConformanceIconPixels.inkThreshold}。AD-01 不适用。")
+            result.getJSONObject("ICON_PIXELS").getJSONArray("checks").objects().forEach { appendLine("- ${it.getString("path")} ${it.getString("name")}: ${it.getString("status")}; IoU=${it.opt("iou")}; scale1.4=${it.opt("scale1_4Iou")}") }
             appendLine("\n## relative-spacing diagnostics\n\n${result.optJSONObject("relativeGeometry")?.optJSONObject("counts")}")
             appendLine("| A→B | direction | design | actual | raw Δ | rounded Δ | ")
             appendLine("|---|---|---:|---:|---:|---:|")

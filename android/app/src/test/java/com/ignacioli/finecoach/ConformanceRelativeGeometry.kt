@@ -1,14 +1,15 @@
 package com.ignacioli.finecoach
 
 import kotlin.math.abs
-import kotlin.math.round
+import kotlin.math.floor
+import kotlin.math.sign
 import org.json.JSONArray
 import org.json.JSONObject
 
 /** S1-D55: relations are selected exclusively from design geometry, never from observed drift. */
 internal object ConformanceRelativeGeometry {
     private val names = listOf("SIZE", "GAP", "INSET", "ALIGN", "ABSOLUTE_GROSS", "COLOR")
-    private fun rounded(delta: Double) = round(delta * 4) / 4
+    private fun rounded(delta: Double) = sign(delta) * floor(abs(delta) * 4 + 0.5) / 4
     private fun within(delta: Double) = abs(rounded(delta)) <= 2
     private fun measurement(delta: Double) = JSONObject().put("delta", delta).put("roundedDelta", rounded(delta))
     fun evaluate(rows: List<JSONObject>): JSONObject {
@@ -77,8 +78,11 @@ internal object ConformanceRelativeGeometry {
         for (axis in listOf("left","right","centerX")) {
             val remaining = observable.sortedWith(compareBy<JSONObject> { edge(it,axis) }.thenBy { it.getString("path") }).toMutableList()
             while (remaining.isNotEmpty()) {
-                val first = remaining.first()
-                val group = remaining.takeWhile { edge(it,axis)-edge(first,axis) <= 0.5 }
+                val group = mutableListOf(remaining.first())
+                for (next in remaining.drop(1)) {
+                    if (edge(next,axis)-edge(group.last(),axis) > 0.5) break
+                    group += next
+                }
                 remaining.removeAll(group.toSet())
                 if (group.size < 2) continue
                 val spread = group.maxOf { edge(it,axis,true) }-group.minOf { edge(it,axis,true) }

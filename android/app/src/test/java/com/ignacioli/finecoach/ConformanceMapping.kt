@@ -73,6 +73,8 @@ internal object ConformanceMapping {
         "chevron.down" to "expand_more"
     )
     internal fun platformIcon(name: String): String? = platformIcons[name.removePrefix("icon / ")]
+        // Component groups use the approved Android symbol (e.g. DS-SET-ROW · edit).
+        ?: assetName(name).takeIf { it in platformIcons.values }
 
     private fun visibleEntries(layers: List<JSONObject>, exceptions: List<JSONObject>, actual: List<JSONObject>, bindings: Map<String, String>, originOffsetY: Double): List<JSONObject> {
         val byPath = exceptions.associateBy { it.getString("path") }
