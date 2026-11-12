@@ -117,7 +117,12 @@ class AddExerciseConformanceTests {
                     .put("x", b.left / 2).put("y", b.top / 2).put("w", b.width / 2).put("h", b.height / 2))
             }
             val ancestors = generateSequence(n.parent) { it.parent }.mapNotNull { it.config.getOrNull(SemanticsProperties.TestTag) }.toList()
-            nodes.put(JSONObject().put("id", n.id).put("tag", n.config.getOrNull(SemanticsProperties.TestTag) ?: "")
+            // S1-D64: project the existing dismiss semantics into the selector vocabulary.
+            // This aliases the real node, preserving its geometry and raw content description.
+            val dismissScrim = n.config.getOrNull(SemanticsProperties.ContentDescription) == listOf("关闭工作表") &&
+                n.config.contains(SemanticsActions.OnClick)
+            nodes.put(JSONObject().put("id", n.id).put("tag", n.config.getOrNull(SemanticsProperties.TestTag)
+                ?: if (dismissScrim) "semantics:关闭工作表" else "")
                 .put("ancestors", JSONArray(ancestors)).put("contentDescriptions", JSONArray(n.config.getOrNull(SemanticsProperties.ContentDescription).orEmpty())).put("clickable", n.config.contains(SemanticsActions.OnClick)).put("text", editable ?: texts.joinToString("\n"))
                 .put("placed", n.layoutInfo.isPlaced).put("attached", n.layoutInfo.isAttached)
                 .put("unclipped", unclipped).put("scrollAncestors", scrollAncestors)
@@ -235,7 +240,7 @@ class AddExerciseConformanceTests {
         }
         val target = File(android, "build/outputs/conformance/C2b-B-add-exercise").apply { mkdirs() }
         File(target, "proposed-board.json").writeText(JSONObject().put("screen", "C2b-B-add-exercise")
-            .put("status", "PROPOSAL_ONLY_NOT_APPROVED_BOARD").put("decision", "S1-D60").put("units", "dp")
+            .put("status", "PROPOSAL_ONLY_NOT_APPROVED_BOARD").put("decision", "S1-D60/S1-D63/S1-D64").put("units", "dp")
             .put("sourceReport", "android/app/build/outputs/conformance/C2b-B-add-exercise/C2b-B-add-exercise.report.json")
             .put("sourceSha256", result.getString("sha256")).put("layerCount", proposal.length()).put("layers", proposal).toString(2))
     }

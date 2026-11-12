@@ -2,5 +2,11 @@
   "toleranceDp": 2,
   "originOffsetY": -52,
   "originRule": "S1-D50 measured status inset; dialog uses its actual window origin",
-  "elements": []
+  "elements": [
+    {
+      "path": "2",
+      "tag": "semantics:关闭工作表",
+      "source": "S1-D64: existing M3 scrim ContentDescription=关闭工作表 and OnClick; capture alias only"
+    }
+  ]
 }

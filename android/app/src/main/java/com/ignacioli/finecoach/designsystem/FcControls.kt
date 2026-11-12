@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 // Geometry in components.md §4 / README §6/§8, expressed using generated tokens.
 // These are aliases for existing component dimensions, not independent token values.
 object FcComponentMetrics {
+    val addExerciseSheetHeight = FcSpacing.space8 * 17 // 544, S1-D63; capped by the available height.
     val illustration = FcSpacing.space8 * 6 + FcSpacing.space4 + FcSpacing.space3 // 220, README §9
     val calendarIllustration = FcSpacing.space8 * 5 // 160, §4.9
     val touch = FcSpacing.space8 + FcSpacing.space3 // 44

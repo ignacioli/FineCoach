@@ -35,6 +35,11 @@ class P4AddExerciseTests {
             node("session-add-exercise").assertIsDisplayed().assertHasClickAction().performClick()
             node("session-add-library").assertIsDisplayed().assertHasClickAction().performClick()
             compose.waitUntil(15_000) { exists("exercise-picker-recent") }
+            node("conformance:Sheet").assertHeightIsEqualTo(com.ignacioli.finecoach.designsystem.FcComponentMetrics.addExerciseSheetHeight)
+            // M3's outer modifier is measured before its anchor placement; use the visible handle.
+            assertEquals(844.dp, node("conformance:Grabber").getUnclippedBoundsInRoot().top -
+                com.ignacioli.finecoach.designsystem.FcSpacing.space2 +
+                com.ignacioli.finecoach.designsystem.FcComponentMetrics.addExerciseSheetHeight)
             node("exercise-picker-content").assertWidthIsEqualTo(390.dp)
             node("exercise-picker-muscles").assertWidthIsEqualTo(390.dp)
             node("conformance:Search").assertWidthIsEqualTo(306.dp).assertHeightIsEqualTo(40.dp)

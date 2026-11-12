@@ -946,3 +946,11 @@ P4 round 2 最终：FAIL；host 952/0、G3 42/0、G4 12/0、训练conformance 1/
 | 添加动作 → 筛选 | `exercise-picker-filter` | 否，equipment filter | 搜索行 trailing FcTitleIconButton |
 | 添加动作 → 全部 / 部位 chips | `exercise-picker-muscle-all` / `exercise-picker-muscle-$value` | 否，muscle filter | `exercise-picker-muscles` edge-to-edge，首尾 space.4 |
 | 添加动作 → 最近练过 / 完整列表行 | `exercise-picker-recent-$id` / `exercise-select-$id` | 是，既有 session add use case | FcListRow exerciseLibrary，358dp content width |
+
+## P4 second pilot：C2b-B 添加动作（round 2，S1-D63/D64）
+
+- 分类与依据：D 类 drift repair；落实已裁决的 544dp 上限与 Scrim semantics selector，沿用 S1-D60 组合。
+- 范围：DS-BOTTOM-SHEET 扩展 add-exercise panelFlow 高度约束；其他 sheet 不变；DS-CHIP / SECTION / LIST-ROW 复用，沿用上方入口与 layout map。
+- 设计决定：新增命名 metric，由现有 spacing token 等值表达；内容区扣除真实 grabber anatomy 后约束高度，保留 M3 完整窗口的底部锚点计算。Scrim 已使用 overlay.scrim；一个手动 selector 通过 harness alias 指向真实关闭节点，不改 comparator。
+- 实现与检查：ComponentContractTests 断言 544dp；P4AddExerciseTests 断言面板高度与真实 grabber 推导的底边，保留间距、满宽、70dp pitch、筛选及 durable save 断言；自动 conformance / proposal 产物见本轮 handoff。Android capture 仅查看一次，未进行人类验收。
+- 结果：NOT CONVERGED；末次测量 SIZE 42/0、MISSING 14、manual 1/64；外层 Sheet tag 的 pre-placement 几何、Scrim 被面板遮盖后的取色、第五行可见范围仍有缺口。最终 gates、逐项分类和耗时见 `.handoff/subagent/2026-11-12-p4-add-exercise-r2.md`。未改 board、baseline、容差、anchor 或 whitelist；未 commit / delegate。
