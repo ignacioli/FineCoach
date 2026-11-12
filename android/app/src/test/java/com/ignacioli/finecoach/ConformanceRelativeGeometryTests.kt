@@ -16,7 +16,7 @@ class ConformanceRelativeGeometryTests {
     }
     private fun count(rows: List<JSONObject>, check: String) = ConformanceRelativeGeometry.evaluate(rows).getJSONObject("counts").getInt(check)
     @Test fun quarterDpPrecisionAppliesToEveryRelativeCheck() {
-        for ((delta, passes) in listOf(-2.1 to true, -2.3 to false, 2.12 to true, -2.13 to false)) {
+        for ((delta, passes) in listOf(-2.1 to true, -2.3 to false, 2.12 to true, -2.13 to false, 2.125 to false, -2.125 to false)) {
             val expected = if (passes) 0 else 1
             val size = ConformanceRelativeGeometry.evaluate(listOf(row("a",0.0,0.0,dw=delta)))
             assertEquals(expected,size.getJSONObject("counts").getInt("SIZE"))
@@ -30,9 +30,9 @@ class ConformanceRelativeGeometryTests {
     }
     @Test fun wholePageFivePassesTenFailsGrossOnly() {
         for (shift in listOf(0.0,5.0,8.0,10.0)) {
-            val result = ConformanceRelativeGeometry.evaluate(listOf(row("a",0.0,0.0,dx=shift,dy=shift),row("b",0.0,20.0,dx=shift,dy=shift)))
+            val result = ConformanceRelativeGeometry.evaluate(listOf(row("container",-10.0,-10.0,100.0,100.0,dx=shift,dy=shift),row("a",0.0,0.0,dx=shift,dy=shift),row("b",0.0,20.0,dx=shift,dy=shift)))
             val counts = result.getJSONObject("counts")
-            assertEquals(if (shift>8) 2 else 0,counts.getInt("ABSOLUTE_GROSS"))
+            assertEquals(if (shift>8) 3 else 0,counts.getInt("ABSOLUTE_GROSS"))
             listOf("SIZE","GAP","INSET","ALIGN","COLOR").forEach { assertEquals(it,0,counts.getInt(it)) }
         }
     }
@@ -47,9 +47,27 @@ class ConformanceRelativeGeometryTests {
         }
     }
     @Test fun childInsetChoosesSmallestParent() {
-        for (shift in listOf(0.0,2.0,3.0)) {
-            assertEquals(if (shift>2) 1 else 0,count(listOf(row("outer",0.0,0.0,100.0,100.0),
-                row("parent",10.0,10.0,50.0,50.0),row("child",20.0,20.0,dx=shift)),"INSET"))
+        val result = ConformanceRelativeGeometry.evaluate(listOf(row("outer",0.0,0.0,100.0,100.0),
+            row("parent",10.0,10.0,50.0,50.0,dx=3.0),row("child",20.0,20.0)))
+        val checks = result.getJSONArray("checks")
+        val inset = (0 until checks.length()).map { checks.getJSONObject(it) }.single {
+            it.getString("check") == "INSET" && it.getJSONArray("members").getString(1) == "child"
+        }
+        assertEquals("parent",inset.getJSONArray("members").getString(0))
+        assertEquals(-3.0,inset.getJSONObject("x").getDouble("delta"),0.0)
+        assertFalse(inset.getBoolean("passed"))
+    }
+    @Test fun alignmentMembershipIsTransitive() {
+        for (shift in listOf(0.0,5.0)) {
+            val result = ConformanceRelativeGeometry.evaluate(listOf(row("a",0.0,0.0),
+                row("b",0.4,20.0,w=20.0),row("c",0.8,40.0,w=30.0,dx=shift)))
+            val checks = result.getJSONArray("checks")
+            val group = (0 until checks.length()).map { checks.getJSONObject(it) }.single {
+                it.getString("check") == "ALIGN" && it.getString("edge") == "left"
+            }
+            assertEquals(3,group.getJSONArray("members").length())
+            assertEquals(shift == 0.0,group.getBoolean("passed"))
+            assertEquals(if (shift == 0.0) 0 else 1,result.getJSONObject("counts").getInt("ALIGN"))
         }
     }
     @Test fun alignmentIsOneFailurePerEdgeGroup() {
