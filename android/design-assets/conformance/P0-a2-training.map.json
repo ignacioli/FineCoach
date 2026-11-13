@@ -13,134 +13,25 @@
   "elements": [
     {
       "path": "0",
-      "tag": "platform-shell",
       "anchor": "viewport"
     },
     {
-      "path": "5",
-      "tag": "session-finish",
-      "anchor": "bottom"
-    },
-    {
-      "path": "6",
-      "anchor": "bottom"
-    },
-    {
       "path": "7",
-      "tag": "session-icon-$squatID"
-    },
-    {
-      "path": "9",
-      "tag": "$set1-circle"
+      "tag": "session-icon-$squatID",
+      "source": "S1-D86: runtime tag stays session-icon-$id. conformance:icon / barbell would also tag the training rows behind other screens' sheets."
     },
     {
       "path": "45",
       "tag": "$set1-edit-icon"
     },
     {
-      "path": "14",
-      "tag": "$set2-circle"
-    },
-    {
       "path": "46",
       "tag": "$set2-edit-icon"
     },
     {
-      "path": "20",
-      "commonLayoutParentOfTags": [
-        "set-weight-minus",
-        "set-weight-plus"
-      ],
-      "containsTag": "set-weight-input"
-    },
-    {
-      "path": "21",
-      "geometryRule": "SYMBOL_CENTER",
-      "symbolSizeDp": 20,
-      "tag": "set-weight-minus-glyph",
-      "colorMethod": "iconInk"
-    },
-    {
-      "path": "22",
-      "geometryRule": "EDITABLE_TEXT_FIELD",
-      "tag": "set-weight-input",
-      "colorMethod": "textLayout"
-    },
-    {
-      "path": "23",
-      "geometryRule": "SYMBOL_CENTER",
-      "symbolSizeDp": 20,
-      "tag": "set-weight-plus-glyph",
-      "colorMethod": "iconInk"
-    },
-    {
-      "path": "25",
-      "commonLayoutParentOfTags": [
-        "set-reps-minus",
-        "set-reps-plus"
-      ],
-      "containsTag": "set-reps-input"
-    },
-    {
-      "path": "26",
-      "geometryRule": "SYMBOL_CENTER",
-      "symbolSizeDp": 20,
-      "tag": "set-reps-minus-glyph",
-      "colorMethod": "iconInk"
-    },
-    {
-      "path": "27",
-      "geometryRule": "EDITABLE_TEXT_FIELD",
-      "tag": "set-reps-input",
-      "colorMethod": "textLayout"
-    },
-    {
-      "path": "28",
-      "geometryRule": "SYMBOL_CENTER",
-      "symbolSizeDp": 20,
-      "tag": "set-reps-plus-glyph",
-      "colorMethod": "iconInk"
-    },
-    {
-      "path": "30",
-      "tag": "set-save"
-    },
-    {
-      "path": "32",
-      "tag": "session-divider-$squatID"
-    },
-    {
       "path": "33",
-      "tag": "session-icon-$benchID"
-    },
-    {
-      "path": "36",
-      "tag": "session-divider-$benchID"
-    },
-    {
-      "path": "39",
-      "tag": "rest-content",
-      "anchor": "bottom"
-    },
-    {
-      "path": "40",
-      "anchor": "bottom"
-    },
-    {
-      "path": "41",
-      "anchor": "bottom"
-    },
-    {
-      "path": "42",
-      "anchor": "bottom"
-    },
-    {
-      "path": "43",
-      "anchor": "bottom"
-    },
-    {
-      "path": "44",
-      "anchor": "bottom"
+      "tag": "session-icon-$benchID",
+      "source": "S1-D86: runtime tag stays session-icon-$id. conformance:icon / barbell would also tag the training rows behind other screens' sheets."
     }
   ]
 }

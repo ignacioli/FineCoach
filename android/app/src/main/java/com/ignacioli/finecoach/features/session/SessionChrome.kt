@@ -62,7 +62,8 @@ internal fun SessionExerciseHeader(row: SessionExerciseRecord, previous: Trainin
         .testTag("session-exercise-${row.sessionExerciseID.value}").semantics { this.selected = selected }
         .clickable(enabled = enabled, onClick = onSelect), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
-        FcEquipmentIconForExercise(row.sourceID.takeUnless { row.sourceKind == ExerciseSourceKind.sessionOnly }, Modifier.testTag("session-icon-${row.sessionExerciseID.value}"))
+        FcEquipmentIconForExercise(row.sourceID.takeUnless { row.sourceKind == ExerciseSourceKind.sessionOnly },
+            Modifier.testTag("session-icon-${row.sessionExerciseID.value}"))
         FcText(row.displayNameSnapshot, style = FcTypography.exerciseTitle, color = FcColors.textPrimary)
         Spacer(Modifier.weight(1f))
         FcText(previous?.let { "上次 ${it.toDomain().displaySummary()} · $previousCount 组" } ?: when (row.recordModeSnapshot) {
