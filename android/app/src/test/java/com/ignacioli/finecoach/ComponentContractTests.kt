@@ -366,9 +366,17 @@ class ComponentContractTests {
     }
 
     @Test fun avatar() {
-        show { FcAvatar("虚构", Modifier.testTag("avatar")) }
+        show {
+            Row(Modifier.testTag("avatar-row").semantics(mergeDescendants = true) { }) {
+                FcAvatar("虚构", Modifier.testTag("avatar"))
+                FcText("虚构学员", style = FcTypography.body, color = FcColors.textPrimary)
+            }
+        }
         node("avatar").assertWidthIsEqualTo(44.dp).assertHeightIsEqualTo(44.dp)
         node("avatar").assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.ContentDescription))
+        node("avatar").assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.HideFromAccessibility))
+        compose.onNodeWithText("虚", useUnmergedTree = true).assertExists()
+        compose.onNodeWithTag("avatar-row").assertTextEquals("虚构学员")
     }
 
     @Test fun symbols() {

@@ -404,6 +404,7 @@ tasks.withType<Test>().matching { it.name == "testDebugUnitTest" || it.name == "
         excludeTestsMatching("com.ignacioli.finecoach.TodayConformanceTests")
         excludeTestsMatching("com.ignacioli.finecoach.SessionDetailConformanceTests")
         excludeTestsMatching("com.ignacioli.finecoach.StudentListConformanceTests")
+        excludeTestsMatching("com.ignacioli.finecoach.StudentDetailConformanceTests")
     }
     inputs.file(privacyDependencyReport)
     inputs.file(rootProject.layout.projectDirectory.file("dependency-allowlist/resolved.txt"))
@@ -1148,3 +1149,5 @@ val validateDesignScanGate = tasks.register("validateS0G3Results") {
 designScanGate.configure { finalizedBy(validateDesignScanGate) }
 
 registerVisualGate("p4StudentListConformance", "StudentListConformanceTests", 1)
+
+registerVisualGate("p4StudentDetailConformance", "StudentDetailConformanceTests", 1)

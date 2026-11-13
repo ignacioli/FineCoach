@@ -397,16 +397,16 @@
 | 永久删除 | 取消 / 系统返回 | `student.delete.cancel` / BackHandler | 否 | 取消为 `FcLinkButton` | `DeleteStudentFlow.kt:492`、`:321` | 同上 |
 | 永久删除 | 继续训练 | `deleteStudent.continueTraining` | 否，发已有 session | `FcButton` | `DeleteStudentFlow.kt:391` | `inProgressSessionBlocksDeleteAndWritesNothing` |
 | 永久删除 | 回到详情 / 取消 | `deleteStudent.backToDetail` / `student.delete.cancel` | 否 | `FcLinkButton` | `DeleteStudentFlow.kt:396` | 同上 |
-| 详情 | 返回 | `studentDetail-back` | 否 | 页头 | `StudentDetailScreen.kt:310` | `detailNavigationEmitsRoutesWithoutWriting` |
-| 详情 | 系统返回 | BackHandler | 否 | — | `StudentDetailScreen.kt:296` | 同上 |
-| 详情 | 编辑资料 | `studentDetail-trailing` | 否，发编辑 | `FcLinkButton` | `StudentDetailScreen.kt:310` | 同上 |
-| 详情 | 课包 | `studentDetail.coursePackages` | 否，发课包路由 | `StudentOverviewRow` 撑满内容栏 | `StudentDetailScreen.kt:436` | 同上 |
-| 详情 | 最近训练 | `studentDetail.recentTraining` | 否，发历史或历史详情 | 同上 | `StudentDetailScreen.kt:470` | 同上 |
-| 详情 | 训练历史 | `studentDetail.history` | 否，发历史 | `FcActionRow` | `StudentDetailScreen.kt:505` | 同上 |
-| 详情 | 注意事项 | `studentDetail.injuryNotesFold` | 否，只展开 | `FcLabelValueRow` | `StudentDetailScreen.kt:551` | 同上 |
-| 详情 | 恢复学员 | `studentDetail.restore` | 是，`restore` | `FcButton` | `StudentDetailScreen.kt:378` | `archiveAndRestoreUseVisibleControls` |
-| 详情 | 开始训练 | `studentDetail.startTraining` | 是，`startOrOpen` 后发 `session/{id}` | `FcButton` | `StudentDetailScreen.kt:385` | `startTrainingPersistsASessionAndEmitsItsRoute` |
-| 详情 | 继续训练卡 | `studentDetail.continueTraining` | 否，发已有 session | `FcHeroCard` 撑满内容栏 | `StudentDetailScreen.kt:357` | 进行中时替换开始训练 |
+| 详情 | 返回 | `studentDetail-back` | 否 | 页头 | `StudentDetailScreen.kt:320` | `detailNavigationEmitsRoutesWithoutWriting` |
+| 详情 | 系统返回 | BackHandler | 否 | — | `StudentDetailScreen.kt:306` | 同上 |
+| 详情 | 编辑资料 | `studentDetail-trailing` | 否，发编辑 | `FcLinkButton` | `StudentDetailScreen.kt:320` | 同上 |
+| 详情 | 课包 | `studentDetail.coursePackages` | 否，发课包路由 | `StudentOverviewRow` 撑满内容栏 | `StudentDetailScreen.kt:445` | 同上 |
+| 详情 | 最近训练 | `studentDetail.recentTraining` | 否，发历史或历史详情 | 同上 | `StudentDetailScreen.kt:479` | 同上 |
+| 详情 | 训练历史 | `studentDetail.history` | 否，发历史 | `FcActionRow` | `StudentDetailScreen.kt:514` | 同上 |
+| 详情 | 注意事项（可见整行点击，默认折叠） | `studentDetail.injuryNotesFold` | 否，仅切换显示，不写存储 | `FcLabelValueRow` 撑满 ProfileSection | `StudentDetailScreen.kt:561` | `detailNavigationEmitsRoutesWithoutWriting` 验证可见、点击、满宽、展开及收起 |
+| 详情 | 恢复学员 | `studentDetail.restore` | 是，`restore` | `FcButton` | `StudentDetailScreen.kt:387` | `archiveAndRestoreUseVisibleControls` |
+| 详情 | 开始训练 | `studentDetail.startTraining` | 是，`startOrOpen` 后发 `session/{id}` | `FcButton` | `StudentDetailScreen.kt:394` | `startTrainingPersistsASessionAndEmitsItsRoute` |
+| 详情 | 继续训练卡 | `studentDetail.continueTraining` | 否，发已有 session | `FcHeroCard` 撑满内容栏 | `StudentDetailScreen.kt:372` | 进行中时替换开始训练 |
 
 ### T014
 
@@ -1042,6 +1042,31 @@ P4 round 2 最终：FAIL；host 952/0、G3 42/0、G4 12/0、训练conformance 1/
 - 设计决定：S1-D76 替代 round 1 的文案、排序、头像及图标待决项；保持真实产品排序与字符串。map 重绑 hint path30、保留按钮path24，删除旧文案 exception。移除仅供 round 1 的固定索引 proposal writer，严格 comparator 继续生成逐层报告。
 - 实现与检查：复用上表 entry/layout map，无新交互；共享影响 StudentDetail hint、TemplateEditor group entry 及所有 FcSymbol 调用页（训练、动作库、添加动作、资源库、历史等）。L0/L1/L2 与既有四屏实际 gate 结果见本轮 handoff；本轮未打开 Android capture，L3 负责人验收 PENDING。
 - 结果：NOT CONVERGED；Student gate 25 PASS / 10 FAIL / 0 MISSING，3 AD-01 vector internals，manual 2/38（5.26%）；剩余6项 GAP 为 board 文字框决策点。G3 42/0、G4 12/0，既有四屏48/0、67/0、48/0、12/0；最终 unit 981 tests / 1 PackageEntryLayoutTests 5秒 timeout（原因未确认），ExerciseTemplate class 33/0。完整证据见 `.handoff/subagent/2026-11-12-p4-students-r2.md`；不 commit、不 delegate，不改 iOS / baseline / layers / PNG / tolerance / anchors。
+
+## P4 学员详情 S1 round 1（2026-11-12，S1-D66/D77）
+
+- 分类与依据：D 类 drift repair；目标为 `design/m1-b-hifi/screens/26-student-detail-s1.png`，遵守 page-implementation-contract、DS-PAGE-FLOW / HEADER / AVATAR / SECTION / LIST-ROW / ACTION-ROW / LABEL-VALUE-ROW / BUTTON 与 caption tokens。开工 tracked / staged / untracked 均为 0，HEAD cc9f845；不 commit、不 delegate。
+- 范围与差异：移除二级页额外 top space.4，页头直接承接 safe inset；header→avatar→概览→记录→资料各 space.4，avatar→目标为 space.2，section label→首 divider 为 space.2；滚动末尾 space.6；底部主按钮 bottom space.8。保留注意事项显式展开及免责声明。ProfileValue 是 feature-owned DS-LABEL-VALUE-ROW + FcText 组合：空值占位文案不变，值仍 body，但未填写用 text.secondary。未增加下一节课、训练趋势、身体数据。
+- 设计决定：画板 rough positions 由 proposed-board 审核；画板展开注意事项但没有既有免责声明，需补稿裁决，不删除产品文字。885dp 画板超过现有 comparator 固定844dp观测边界，未修改 comparator。共享 `FcFeedback.kt` 的 avatar 改为隐藏无障碍的 semantics merge boundary，以观测字形；消费者 StudentList / StudentDetail。`FcRows.kt` / `FcControls.kt` 由并行 writer 所有，本轮未修改；其中 disclosure 若不可观测，保留 MISSING。
+- 实现与检查：fixture 使用真实 Student/Credit/Session/History repositories 与 use cases；固定 America/Los_Angeles，9月25日完成12组，20总课时真实手工扣12得8，12月31日到期；显式 toggleNotes 后截图。最近训练统计从真实 session content 读取，失败走原 retry error。ComponentContractTests.avatar 增补可观测且无障碍隐藏断言；StudentDetailConformanceTests 检查内容与四个满宽可见入口。两次固定渲染用于稳定性，无截图迭代；Android capture 未打开，L3 PENDING。
+- 结果：NOT CONVERGED，2 PASS / 40 FAIL（含9 MISSING）；SIZE 4、COLOR 0失败，footnote完全裁掉；补充host build/lint及982 tests全绿，StudentEntryLayoutTests19/0，既有五屏conformance均绿。逐check及决策见 `.handoff/subagent/2026-11-12-p4-student-detail.md`；提案 `android/build/outputs/conformance/26-student-detail-s1/proposed-board.json`，不是批准画板；未改 iOS / PNG / layers / baseline / comparator。
+
+| screen → visible control | identifier | mutates data? | width owner / code |
+|---|---|---|---|
+| 学员详情 → ‹ 返回 / 编辑资料 | `studentDetail-back` / `studentDetail-trailing` | 否，返回或编辑 route | FcPageHeader 满宽，trailing 为 FcLinkButton；StudentDetailScreen.kt 的 header |
+| 学员详情 → 课包 / 最近训练 | `studentDetail.coursePackages` / `studentDetail.recentTraining` | 否，package/history route | StudentOverviewRow 填满 platform-content，FcPlatformShell 水平 space.4 |
+| 学员详情 → 训练历史 | `studentDetail.history` | 否，student history route | FcActionRow 填满 RecordsSection / platform-content |
+| 学员详情 → 注意事项（可见整行点击，默认折叠） | `studentDetail.injuryNotesFold` | 否，仅切换显示，不写存储 | FcLabelValueRow 满宽，label token、value 占剩余宽度；折叠为「已隐藏 · 点击查看」+ ›，展开才显示内容及免责声明 |
+| 学员详情 → 开始训练 / 恢复学员 | `studentDetail.startTraining` / `studentDetail.restore` | 是，startOrOpen / restore 持久化后路由或重载 | FcButton 填满 DetailPrimaryButton / platform-content；底部操作独立于滚动区 |
+| 学员详情 → 继续训练（有 active session 时） | `studentDetail.continueTraining` | 否，active session route | FcHeroCard 满宽；本 board fixture 无 active session |
+
+## P4 学员详情 S1 round 2（2026-11-12，S1-D82）
+
+- 分类与依据：D 类；批准目标不变，S1-D82 已修订 board 为默认折叠，替代 round 1 的展开 fixture 与旧 board 提案。开工 tracked / staged / untracked 均为 0，HEAD 029a59a；不 commit、不 delegate。
+- 影响范围：复用 DS-AVATAR / LABEL-VALUE-ROW / ACTION-ROW，产品默认 notesExpanded=false 已正确；仅移除 fixture toggleNotes，不改产品字符串、iOS、共享产品代码、PNG、layers、baseline 或 comparator。
+- 设计决定：沿用 iOS notesRow 与 S1-D82；注意事项保留测试数据，默认不显示内容或免责声明。map 由新 43 layers 重建，四个 › 全走 generic AUTO_TEXT，仅主按钮为 manual selector（1/43）。
+- 实施与验证：现有 avatar 测试增加 merged row 不包含首字断言，保留 round 1 FcFeedback.kt merge boundary；全部 caller 为 StudentActiveRow、StudentArchivedRow、StudentDetailScreen、debug S0ComponentCatalog 与 ComponentContractTests。现有 StudentEntryLayoutTests 验证折叠行可见、点击、满宽和展开/收起；上表为 entry/layout map。Android capture 未打开，L3 负责人验收 PENDING。
+- 结果：FAIL（tool blocker）；strict 40 PASS / 3 FAIL / 0 MISSING，manual 1/43=2.33%；SIZE 1、GAP 2、ABSOLUTE_GROSS 1 个 check 失败，均源自 comparator 将双行 footnote 归一为单行 tokenLineHeight（ConformanceComparison.kt:274–276）。footnote 实测 (16,749.5,358,35.5)，bottom785，小于 scroll bottom793，无裁剪；原 layers 为 (16,750.25,358,34)，工具期望却为 (16,758.8,358,16.9)。未改 comparator。build/lint PASS、host unit 982/0、StudentEntryLayoutTests19/0、G2 109/0（avatar32-test suite通过，pinned未改）、G3 42/0、G4 12/0，既有五屏48/0、67/0、48/0、12/0、35/0不变；无timeout flakes。完整证据及tool决策点见 `.handoff/subagent/2026-11-12-p4-student-detail-r2.md`；负责人L3验收PENDING。
 
 ### P4 Session detail round 2（2026-11-12，S1-D80）
 

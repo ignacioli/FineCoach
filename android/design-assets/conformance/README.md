@@ -93,6 +93,10 @@ path20/25通过 `commonLayoutParentOfTags` 指向真实minus/plus的最近共同
 
 `layers.json` 的后序层绘制在前序层上。通用比较器仅用唯一映射成功的后序层遮挡当前取色 crop：Android 使用其真实节点 bounds，design 使用导出 bounds；同一节点与当前图标的内部 path 不遮挡自身。文字 ink、填充众数与 iconInk 边界背景采样均排除遮挡像素；颜色 token 仍精确比较。两侧任一 crop 完全没有未遮挡像素时，COLOR 为 `UNOBSERVABLE`（`passed=null`），不记 PASS；几何和内容仍独立判定，有偏差仍 FAIL。仅颜色完全遮挡且其余检查通过的层单列 `UNOBSERVABLE_COLOR`，不计 PASS/FAIL，与矢量内部不可观测分开报告。无未遮挡颜色证据但非完全遮挡（例如众数并列或文字没有 ink）仍 FAIL。
 
+## 多行文字行盒（S1-D84）
+
+画稿文字仍换成 token 行盒并保持画稿盒中心：`lines = max(1, round(导出高度 / tokenLineHeight))`，比较高度为 `lines × tokenLineHeight`。`tokenLineHeight` 仍是字号 × README 行高倍率（S1-D40 R2）。`round` 为 1 的层与原先单行盒相同。实测文字用节点完整 bounds，不另压成一行；`EDITABLE_TEXT_FIELD` 把实际高度换成上述设计行盒并绕实际中心对齐。容差、取整与 anchor 不变。
+
 ## 装饰性文字字形（S1-D76）
 
 `FcSymbol(FcGlyph)` 保留真实 `Text` / `GetTextLayoutResult`，使用 `hideFromAccessibility()` 对 accessibility 隐藏；既有 caller testTag 与可选 visualTag 保留。不再用 `clearAndSetSemantics` 删除观测。通用 auto-mapper 与普通文字一样按精确字形内容、阅读顺序及唯一最近中心匹配（`AUTO_TEXT`），不需要 screen 分支或手动 selector。`ComponentContractTests.symbols` 验证隐藏状态与 layout action，`ConformanceGenericTests.decorativeGlyphTextUsesAutomaticMappingAndListHubUsesAd01` 验证重复字形的自动匹配。

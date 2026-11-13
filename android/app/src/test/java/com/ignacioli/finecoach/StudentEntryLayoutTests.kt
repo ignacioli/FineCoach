@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
@@ -76,6 +77,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -632,8 +634,20 @@ class StudentEntryLayoutTests {
         assertEquals(S1Routes.studentHistory(created.studentID), route.get())
         node(StudentTestTags.DETAIL_HEADER_EDIT).performClick()
         assertEquals(S1Routes.studentEdit(created.studentID), route.get())
-        node(StudentTestTags.DETAIL_NOTES_FOLD).performScrollTo().performClick()
+        assertFalse(viewModel.uiState.notesExpanded)
+        node(StudentTestTags.DETAIL_NOTES_FOLD).performScrollTo().assertIsDisplayed().assertHasClickAction()
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "已折叠"))
+        assertFillsContent(StudentTestTags.DETAIL_NOTES_FOLD)
+        node(StudentTestTags.DETAIL_NOTES_BODY).assertDoesNotExist()
+        node(StudentTestTags.DETAIL_NOTES_FOLD).performClick()
         node(StudentTestTags.DETAIL_NOTES_BODY).assertIsDisplayed()
+        node(StudentTestTags.DETAIL_NOTES_FOLD)
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "已展开"))
+        node(StudentTestTags.DETAIL_NOTES_FOLD).performClick()
+        node(StudentTestTags.DETAIL_NOTES_BODY).assertDoesNotExist()
+        node(StudentTestTags.DETAIL_NOTES_FOLD)
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "已折叠"))
+        assertFalse(viewModel.uiState.notesExpanded)
         node(StudentTestTags.DETAIL_HEADER_BACK).performScrollTo().performClick()
         assertEquals(1, left.get())
         compose.activity.onBackPressedDispatcher.onBackPressed()
