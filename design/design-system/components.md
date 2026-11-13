@@ -203,7 +203,8 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 
 #### `DS-SEGMENTED` 顶部分段切换
 
-- **部件**：横向排列的选项，间距 `space.2`。选中项：50×32 胶囊、`action.primary` 底、`headline` 白字；未选中项：纯文字 `body` `text.secondary`，无底色。
+- **部件**：横向排列的选项框，框与框间距 `space.2`。每个选项框最小 50×32，选中与未选中同尺寸；文字在自己的框内水平、垂直居中（按 token 行盒，README §15.5）。选中项：框即胶囊，`action.primary` 底、`headline` 白字；未选中项：纯文字 `body` `text.secondary`，无底色。
+- **位置**：作为一级页顶部切换时，第一个选项框左缘对齐页边距 `space.4`，胶囊不得越出页边距（2026-11-12 S1-D70：画板曾把胶囊放在 x=8、文字偏下 3pt，已按本条改正；iOS `FCSegmentedSwitch` 本就如此）。
 - **状态**：选中项带 `.isSelected` 无障碍属性。
 - **不变量**：点击区 ≥ 44（自动）；同时只有一个选中项（类型保证：`selection` 是单个 ID）。
 - **用途**：一级页顶部「今日 / 学员」；页内 2–4 段（C26）的互斥短选项（37「扣减 / 返还」、趋势指标、身体数据录入单位），通常放在 `DS-LABEL-VALUE-ROW` 的值 slot（README §10 C11）。
@@ -363,7 +364,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 
 | ID | anatomy | 画板 | 当前实现 |
 |---|---|---|---|
-| `DS-PAGE-PRIMARY` 一级页 | 顶部 `FCSegmentedSwitch`（今日 / 学员）→ 标题行：`display` 大标题（`action.primary`）+ 右侧 `DS-TITLE-ACTION` → 内容；隐藏系统导航栏。**查看模式变体**（M2，2026-10-09 G7 批准）：没有顶部分段切换，标题行只有设置齿轮，其余相同 | 01/21/40/41；M2-11 | Today、StudentList 各自拼装 |
+| `DS-PAGE-PRIMARY` 一级页 | 标题行：`display` 大标题（`action.primary`）+ 右侧 `DS-TITLE-ACTION` →（今日页）日期行 `callout` `text.secondary` → `FCSegmentedSwitch`（今日 / 学员）→ 内容（顺序以画板 01/21/40/41 与 iOS `TodayView` 为准，2026-11-12 S1-D70 更正）；隐藏系统导航栏。**查看模式变体**（M2，2026-10-09 G7 批准）：没有顶部分段切换，标题行只有设置齿轮，其余相同 | 01/21/40/41；M2-11 | Today、StudentList 各自拼装 |
 | `DS-PAGE-SECONDARY` 二级页 | 隐藏系统导航栏（`.fcSecondaryPage()`，同时保持边缘右滑返回可用）→ 由 `fcSecondaryPage()` 提供的顶部零高度 `safeAreaInset` 遮盖（`surface.page`，背景延伸至顶部安全区；feature 不再复制遮盖）→ 紧贴状态栏下方的页头：小号 `‹`（22/400 `text.secondary`）与页面内 `titleLarge` 标题在同一行、紧靠标题左侧（标题起点 x=32），整体由 `FCPageHeader` 绘制（带 header 属性）→ 可选副标题（`callout` 400 `text.secondary`）→ 内容 → 可选底部主按钮 | 23/26/28/36/37/38 | 约 20 个 feature 文件各自拼装；页头部分已有共享组件 `FCPageHeader`（§4.7），StudentDetail 已迁移 |
 | `DS-HUB-ROW` 入口行 | 24pt 图标（`action.primary`）→ 标题（`headline`）/ 副标题（`caption` `text.secondary`）→ `›`；最小高 64，间距 `space.4` | 19/42/43 | 已提升为共享组件 `FCHubRow`（M2 T002/T010，2026-10-10）；ResourceHub、Settings 已迁移，规格见 §4.7 |
 | `DS-INLINE-RESULT` 就地结果 | 22×22 `FCStatusBadge` → 标题（`callout` 600；失败为 `status.destructive`，成功为 `text.primary`）→ 说明（`caption` `text.secondary`）→ 失败时显示居中「重试」`FCLinkButton` | 38/39 | 已提升为共享组件 `FCInlineResult`（M2 T003/T011，2026-10-10）；BackupRestoreFlow 已迁移，规格见 §4.7 |
@@ -630,7 +631,7 @@ AD-01 的 35 项完整逐行对照、三类状态与名称差异清单见 [T031]
 | DS-AMBIENT-SCENE | FcAmbientScene | FcAmbientScene.kt | today;calendar | Components/FCAmbientEmptyScene.swift | ambientScene | C 类迁移；四层与暂停逻辑复用，未做人工视觉验收 |
 | DS-SET-ROW | FcSetRow | FcSetRow.kt | draft;pending;completed;disabled;undo | Components/FCSetRow.swift | setRow | C 类正式登记；G2 计数保持，新增检查在 S1ComponentTests。Android 可见步距 38dp（P0-a2），44dp 点击区以各自可见图形为中心向外扩展（编辑按钮上下各 3dp；圆圈比行中心低 3dp，点击区为行顶至向下 44dp，伸进下一行 6dp），相邻行重叠带内归下一行，依据 S1-D38（2026-11-10 更正表述）；iOS 行高 ≥44 为已知两端差异 |
 | DS-EQUIPMENT-ICON | FcEquipmentIcon;FcEquipmentIconView;FcEquipmentIconForExercise | FcEquipmentIcon.kt | barbell;bike;bodyweight;cable_crossover;cable_machine;dumbbell;hack_squat;hip_adduction;jump_rope;kettlebell;leg_extension;pec_deck;plate_loaded;pull_up_bar;resistance_band;rowing_machine;shoulder_press;smith_machine;suspension_trainer;tbar_row;treadmill | Components/FCEquipmentIcon.swift | equipmentIcons | C 类产品自有 21 SVG，路径/圆头描边保留；未人工视觉验收 |
-| DS-PAGE-PRIMARY | FcPagePrimary | FcPages.kt | coach;viewer | Components/FCPageHeader.swift | primaryPage | C 类组合；分段→display 标题，调用方提供入口 |
+| DS-PAGE-PRIMARY | FcPagePrimary | FcPages.kt | coach;viewer | Components/FCPageHeader.swift | primaryPage | C 类组合；display 标题（+日期）→分段，调用方提供入口 |
 | DS-PAGE-SECONDARY | FcPageSecondary | FcPages.kt | back;bottom | Components/FCPageHeader.swift | secondaryPage | C 类组合；FcPlatformShell 唯一 Insets 与返回 owner |
 | DS-EMPTY-STATE | FcEmptyState | FcPages.kt | static;ambient | Components/FCAmbientEmptyScene.swift | emptyState | C 类组合；静态与 C30 动画空态，底部主按钮 |
 | DS-LAUNCH | FcLaunch | FcPages.kt | white | ../Resources/LaunchScreen.storyboard | launch | D 类 C31：纯白系统启动与 Compose 加载面，无图无字无过场；iOS 实际依据 LaunchScreen.storyboard |
