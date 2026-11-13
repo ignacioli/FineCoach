@@ -131,13 +131,13 @@ internal object ConformanceMapping {
     private fun automaticGroupKey(entry: JSONObject): String = when {
         entry.has("tagSuffix") -> "suffix:" + entry.getString("tagSuffix")
         isStepperCapsuleSelector(entry) -> "stepper-capsule"
-        entry.getString("mapping") == "AUTO_TEXT" -> "text:" + entry.getString("text")
+        entry.getString("mapping") == "AUTO_TEXT" -> "text:" + normalizeConformanceText(entry.getString("text"))
         else -> "tag:" + entry.optString("tag")
     }
     private fun matchesAutomaticGroup(node: JSONObject, sample: JSONObject): Boolean = when {
         sample.has("tagSuffix") -> node.optString("tag").endsWith(sample.getString("tagSuffix"))
         isStepperCapsuleSelector(sample) -> matchesStepperCapsule(node)
-        sample.getString("mapping") == "AUTO_TEXT" -> node.optString("text") == sample.getString("text") && !node.isNull("hex") && node.optString("hex").isNotEmpty()
+        sample.getString("mapping") == "AUTO_TEXT" -> normalizeConformanceText(node.optString("text")) == normalizeConformanceText(sample.getString("text")) && !node.isNull("hex") && node.optString("hex").isNotEmpty()
         else -> node.optString("tag") == sample.optString("tag")
     }
 

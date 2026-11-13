@@ -13,6 +13,17 @@ import org.robolectric.annotation.Config
 class ConformanceComparisonTests {
     private fun rect(x: Double = 16.0, y: Double = 760.0, w: Double = 358.0, h: Double = 52.0) =
         JSONObject().put("x", x).put("y", y).put("w", w).put("h", h)
+    @Test fun textIdentityOnlyNormalizesNbspAndKeepsDifferentValuesDistinct() {
+        val board = rect(y = 100.0).put("path", "value").put("name", "set value")
+            .put("type", "text").put("text", "60 kg × 12")
+        val node = rect(y = 100.0).put("id", 1).put("text", "60\u00a0kg ×\u00a012").put("hex", "#000000")
+        val entries = ConformanceMapping.entries(listOf(board), emptyList(), listOf(node), emptyMap())
+        assertEquals(1, entries.single().getInt("nodeID"))
+        assertEquals(listOf(node), ConformanceComparison.select(listOf(node), entries.single()))
+        val other = JSONObject().put("text", "60 kg × 13")
+        assertTrue(ConformanceComparison.select(listOf(node), other).isEmpty())
+        assertEquals(" A  B\t\n", normalizeConformanceText(" A\u00a0 B\t\n"))
+    }
     @Test fun topRetainsRegisteredOriginOffset() {
         val g = ConformanceComparison.geometry(rect(y = 708.0), rect(), "top", -52.0)
         assertTrue(g.getBoolean("matches")); assertEquals(-52.0, g.getDouble("rawYDelta"), 0.0)

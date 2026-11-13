@@ -1070,6 +1070,8 @@ P4 round 2 最终：FAIL；host 952/0、G3 42/0、G4 12/0、训练conformance 1/
 
 ### P4 Session detail round 2（2026-11-12，S1-D80）
 
+- S1-D86 / AD-09（D，feature-owned 组值，复用 callout/caption）：移除单行 Ellipsis，字号保持 token lineHeight，先缩至 token × 0.8，再由系统换行；仅数字与单位、× 与次数用 NBSP 相连，domain 不变；原 FirstBaseline Layout 与入口/宽度 map 不变，无新增交互、无画板修订；HistorySetValueFitTests 覆盖 11 组、左右/每侧、1.0/1.3/2.0 字号的完整文本、无溢出和同行 baseline；agent-test.sh：新类3/0/0、HistoryEntryLayoutTests 9/0/0（日志 agent-test-android-p4-set-value-v2-20261113-000254.log），G2 pinned count 不变；conformance 由 dispatcher 后续运行，L3 未执行。
+- S1-D86 / AD-09 Round 2：D 类 drift repair，复用既有组值格；移除单位枚举，按数字后的单位字符及 × 后的数字连接 NBSP，保留侧别后和 × 前的可换行空格；无新增交互，入口/宽度 map 不变。新增 duration/cardio 三字号完整文本、NBSP、无溢出和 baseline 验证；comparator 四处 text identity 统一仅将 U+00A0 转为空格。agent-test.sh 三类39 tests、0 failures/errors/skips（001659.log）；同 runner host.lock 下 p4SessionDetailConformance 53 PASS / 0 FAIL / 0 MISSING（001754.log，均为 agent-test-android-p4-set-value-v2-20261113 前缀），两次 render 稳定，SHA-256 `6ff3c85d892252e47ff3da3f594289bc4d0d63436ba03b2af61a5c4a980d1d65` 不变；AD-09 表格断行已修复，L3 未执行，未 commit。
 - 分类与依据：D 类 drift repair；复用 DS-PAGE-HEADER / DS-ACTION-ROW / DS-SYMBOL / DS-EQUIPMENT-ICON 与既有 feature-owned 记录组合；使用 dispatcher 重导出的 `35-session-detail-s1.layers.json`，不新增设计决定。
 - 范围与差异：移除 set cell 的 top alignment，index/value 与外层 cell row 均按 first baseline 对齐（`HistoryRecordCard.kt:88–90`），与 iOS `ShareReportCardView.swift:240–243` 一致；所有尺寸/字样式仍来自 tokens。FcActionRow 已随 main 复用可观测且 hideFromAccessibility 的 FcSymbol，本轮不重复修改共享组件。
 - 设计决定：沿用 S1-D80 的 139、callout 15/1.4、canonical equipment 路径与 x368/w6 chevrons；map 移除旧 108 的手写 selector，以新 layers 重新自动映射全部57层（manual 0/57）。layers/PNG/baseline/comparator 均保持交付内容；不增加 share 或 trained-parts。
