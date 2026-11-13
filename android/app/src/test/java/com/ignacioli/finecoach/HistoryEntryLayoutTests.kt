@@ -4,6 +4,7 @@ package com.ignacioli.finecoach
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.ui.test.*
+import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.unit.width
 import com.ignacioli.finecoach.core.application.*
@@ -136,6 +137,23 @@ class HistoryEntryLayoutTests {
         node("history-stat-总次数").onChildren().filter(hasText("32")).assertCountEquals(1)
         node("history-stat-分钟").onChildren().filter(hasText("2")).assertCountEquals(1)
         val cells = row.sets.take(4).map { node("history-set-${it.trainingSetID.value}").getUnclippedBoundsInRoot() }
+        val setTexts = node("history-set-${row.sets.first().trainingSetID.value}").onChildren()
+        setTexts.assertCountEquals(2)
+        val baselines = (0..1).map { index ->
+            val text = setTexts[index]
+            // FcText exposes the baseline after centering its natural text inside the token line box.
+            text.getUnclippedBoundsInRoot().top.value + text.getAlignmentLinePosition(FirstBaseline).value
+        }
+        assertEquals(baselines[0], baselines[1], 0.01f)
+        val valueBaselines = row.sets.take(3).map { set ->
+            val cell = node("history-set-${set.trainingSetID.value}")
+            val value = cell.onChildren()[1]
+            val baseline = value.getUnclippedBoundsInRoot().top.value + value.getAlignmentLinePosition(FirstBaseline).value
+            assertEquals(baseline, cell.getUnclippedBoundsInRoot().top.value + cell.getAlignmentLinePosition(FirstBaseline).value, 0.01f)
+            baseline
+        }
+        assertEquals(valueBaselines[0], valueBaselines[1], 0.01f)
+        assertEquals(valueBaselines[1], valueBaselines[2], 0.01f)
         assertEquals(cells[0].top, cells[1].top); assertEquals(cells[1].top, cells[2].top)
         assertTrue(cells[3].top > cells[0].top); assertEquals(cells[0].width, cells[3].width)
         assertEquals(cells[0].left, cells[3].left)

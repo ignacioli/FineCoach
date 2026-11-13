@@ -292,11 +292,11 @@
 | 历史 → 动作筛选 / 选动作 / 取消 → history-filter-exercise、history-filter-exercise-ID、history-filter-cancel | 否，仅查询 | FcFilterChip / sheet FcActionRow |
 | 历史 → 清除筛选 → history-filter-clear | 否，仅查询 | FcLinkButton / 满宽 filter Row |
 | 历史 → 打开详情 / 返回 → history-open-ID、history-list-back | 否 | FcListRow / FcPageHeader |
-| 详情 → 编辑训练重点 → history-edit-focus-entry | 否，打开表单 | FcActionRow 满宽 |
+| 详情 → 编辑训练重点 → history-edit-focus-entry | 否，打开表单 | FcActionRow 满宽；HistoryScreens.kt / history-actions；HistoryEntryLayoutTests + SessionDetailConformanceTests |
 | 重点编辑 → 重点 / 保存 / 返回 → history-edit-focus-N、history-edit-save、history-edit-back | 仅保存写 focus | FcButton / history-edit-content，imePadding；S1-D26 删除取消 |
-| 详情 / 总结 → 另存模板 → history-save-template | 否，打开命名 | FcActionRow 满宽 |
+| 详情 / 总结 → 另存模板 → history-save-template | 否，打开命名 | FcActionRow 满宽；HistoryTemplateSheet.kt / history-actions；HistoryEntryLayoutTests + SessionDetailConformanceTests |
 | 模板 → 名称 / 保存 / 取消 / 系统返回 → history-template-name/save/cancel | 仅显式保存写新快照；保存前取消零写入 | FcTextField / FcButton / history-template-content，imePadding |
-| 详情 → 返回 → history-detail-back | 否 | FcPageHeader / FcPlatformShell |
+| 详情 → 返回 → history-detail-back | 否 | FcPageHeader / FcPlatformShell；HistoryScreens.kt；HistoryEntryLayoutTests |
 
 源码索引：
 
@@ -1010,6 +1010,13 @@ P4 round 2 最终：FAIL；host 952/0、G3 42/0、G4 12/0、训练conformance 1/
 - 实现与检查：`S1ComponentTests.primaryPage` / `primaryPageViewerKeepsSharedHeaderSpacing` 和 `TodayConformanceTests` 验证共享顶部、标题居中及日期位置，保留既有顺序、间距、满宽及路由断言；无新增交互，entry/layout map 沿用上表。L3 负责人审查及设备走查 PENDING。
 - 结果：PASS；最终 full host build/lint、unit 979/0，G3 42/0、G4 12/0；Training 48/0、D2b 67/0、AddExercise 48/0；Today gatePassed=true，12 PASS / 0 FAIL / 0 MISSING，manual 1/12（8.33%），双次 fresh render hash 一致。首个有效 host 979/4（2 个既有 editor timeout、2 个新增 mdpi 断言失败）与修正后全绿结果均保留；editor class 独立重跑一次33/0。逐check计数、失败分类、耗时与日志见 `.handoff/subagent/2026-11-12-p4-today-r3.md`；未 commit / delegate，未打开 Android capture；负责人视觉验收及设备走查仍 PENDING。
 
+### P4 Session detail round 1（2026-11-12，S1-D78）
+
+- 分类与依据：D，复用 DS-PAGE-HEADER / DS-SECTION / DS-ACTION-ROW / DS-EQUIPMENT-ICON / divider；目标 `35-session-detail-s1.png`，页面遵守 `page-implementation-contract.md`。记录内容为既有 feature-owned DS-BASE 组合，不新增共享组件。
+- 范围与差异：移除 HistoryRecordCard 的上下 space4 padding；保留页头→记录 space6（README C18 / iOS SessionDetailView），元信息→统计→动作及记录→操作区 space6（ShareReportCardView.page）；动作间 space4、图标→名称 space2、标签→动作 space2；保留 divider→label space3（iOS section anatomy）。底部增加 space6；不增加 share / trained-parts。
+- 设计决定：统计 108 与十二组明细合计 139 冲突，真实统计保持 139；手写 selector 只观测此统计，不覆盖 expected text。画板位置由 proposed-board 提案交负责人裁决，禁止反向贴合。共享组件 FcHintBar/FcRows/FcControls 未修改。
+- 实施与检查：真实 Room + Session/History/Template use cases；固定 America/Los_Angeles、2025-09-25 周四、58 分钟；器械由 catalog sourceID 派生。新增 SessionDetailConformanceTests 验证可见入口、满宽、实际文案、双次渲染稳定性，先输出严格比较诊断与提案，再断言 strict conformance，保留 FAIL；L3 负责人验收 PENDING。
+- 结果：strict conformance FAIL（4 PASS / 53 FAIL，含 2 MISSING；1/57 manual exception）；full unit 980/0、HistoryEntryLayoutTests 9/0、G3 42/0、G4 12/0。最终指定 full host 被既有 AddExercise recentEntries 等待 timeout 中断，补充 host 已运行最终 Session 严格断言与 full unit；未满足仅 POSITION 失败验收。完整证据与决策点见 `.handoff/subagent/2026-11-12-p4-session-detail.md`；提案 `android/build/outputs/conformance/35-session-detail-s1/proposed-board.json` 含 55 层坐标及两个共享字形阻断 null。
 ### P4 学员列表 S1 round 1（2026-11-12，S1-D66/D72/D74）
 
 - 分类与依据：D 类 drift repair；保持批准目标，依据 `21-student-list-s1.png`、DS-PAGE-FLOW / DS-PAGE-PRIMARY anatomy；开工 tracked/staged/untracked 均为 0，分支 `feat/android-p4-students`，HEAD `9fc8a88`。
@@ -1035,3 +1042,17 @@ P4 round 2 最终：FAIL；host 952/0、G3 42/0、G4 12/0、训练conformance 1/
 - 设计决定：S1-D76 替代 round 1 的文案、排序、头像及图标待决项；保持真实产品排序与字符串。map 重绑 hint path30、保留按钮path24，删除旧文案 exception。移除仅供 round 1 的固定索引 proposal writer，严格 comparator 继续生成逐层报告。
 - 实现与检查：复用上表 entry/layout map，无新交互；共享影响 StudentDetail hint、TemplateEditor group entry 及所有 FcSymbol 调用页（训练、动作库、添加动作、资源库、历史等）。L0/L1/L2 与既有四屏实际 gate 结果见本轮 handoff；本轮未打开 Android capture，L3 负责人验收 PENDING。
 - 结果：NOT CONVERGED；Student gate 25 PASS / 10 FAIL / 0 MISSING，3 AD-01 vector internals，manual 2/38（5.26%）；剩余6项 GAP 为 board 文字框决策点。G3 42/0、G4 12/0，既有四屏48/0、67/0、48/0、12/0；最终 unit 981 tests / 1 PackageEntryLayoutTests 5秒 timeout（原因未确认），ExerciseTemplate class 33/0。完整证据见 `.handoff/subagent/2026-11-12-p4-students-r2.md`；不 commit、不 delegate，不改 iOS / baseline / layers / PNG / tolerance / anchors。
+
+### P4 Session detail round 2（2026-11-12，S1-D80）
+
+- 分类与依据：D 类 drift repair；复用 DS-PAGE-HEADER / DS-ACTION-ROW / DS-SYMBOL / DS-EQUIPMENT-ICON 与既有 feature-owned 记录组合；使用 dispatcher 重导出的 `35-session-detail-s1.layers.json`，不新增设计决定。
+- 范围与差异：移除 set cell 的 top alignment，index/value 与外层 cell row 均按 first baseline 对齐（`HistoryRecordCard.kt:88–90`），与 iOS `ShareReportCardView.swift:240–243` 一致；所有尺寸/字样式仍来自 tokens。FcActionRow 已随 main 复用可观测且 hideFromAccessibility 的 FcSymbol，本轮不重复修改共享组件。
+- 设计决定：沿用 S1-D80 的 139、callout 15/1.4、canonical equipment 路径与 x368/w6 chevrons；map 移除旧 108 的手写 selector，以新 layers 重新自动映射全部57层（manual 0/57）。layers/PNG/baseline/comparator 均保持交付内容；不增加 share 或 trained-parts。
+- 实施与检查：HistoryEntryLayoutTests 在既有用例内验证 index/value 实测 baseline 相等；严格 conformance 验证全部图层与两次 render 稳定性。没有新增交互，入口与宽度见下表；其他 FcActionRow 消费页为训练、动作编辑、模板/计划组、学员详情/编辑、课包、历史筛选/详情/另存模板。仅查看批准 PNG 一次，未打开 Android capture；L3 负责人验收 PENDING。
+- 结果：NOT CONVERGED；Session strict 51 PASS / 4 FAIL / 0 MISSING，manual 0/57（0%），两次 render hash 一致。4项均来自交付 layers 的 barbell/dumbbell 异常父组尺寸及内部 path 前提失败；leg-extension IoU 0.997475、hip-adduction 1.0，另两项 parent blocked。fresh full unit 982/0、History 9/0、G3 42/0、G4 12/0、SeedIsolation ok；既有五屏48/0、67/0、48/0、12/0、35/0。AddExercise 首次15秒 timeout，class 单独重跑一次 PASS；新增 baseline 断言首次测量口径错误，修正为真实 alignment line 后 full unit PASS，未放宽断言。merge 工作文件冲突已解决，但 sandbox 拒绝 index.lock，index 仍 UU；未 commit。完整逐check、坐标、日志及耗时见 `.handoff/subagent/2026-11-12-p4-session-detail-r2.md`；L3 PENDING。
+
+| screen → visible control | identifier | 数据改变 | width owner | evidence |
+|---|---|---|---|---|
+| 训练记录 → 返回 | `history-detail-back` | 否，导航 | FcPageHeader 的44 touch 区 | HistoryEntryLayoutTests.detailRendersStoredSnapshotAndCoachOnlyCreditNoteWithoutFutureEntries |
+| 训练记录 → 编辑训练重点 | `history-edit-focus-entry` | 否，进入 editor；保存才写入 | FcActionRow 填满 history-actions | SessionDetailConformanceTests.render；HistoryEntryLayoutTests |
+| 训练记录 → 另存为模板 | `history-save-template` | 否，打开设置 sheet；保存才写入 | FcActionRow 填满 history-actions | SessionDetailConformanceTests.render；HistoryEntryLayoutTests |
