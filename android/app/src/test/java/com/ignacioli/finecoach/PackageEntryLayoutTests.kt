@@ -8,6 +8,9 @@ import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertIsNotFocused
+import androidx.compose.ui.test.assertHeightIsAtLeast
+import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.hasAnyAncestor
@@ -26,6 +29,7 @@ import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.unit.dp
+import com.ignacioli.finecoach.designsystem.FcSpacing
 import androidx.test.core.app.ApplicationProvider
 import com.ignacioli.finecoach.core.application.ApplicationError
 import com.ignacioli.finecoach.core.application.ApplicationErrorCode
@@ -535,6 +539,7 @@ class PackageEntryLayoutTests {
         assertSameWidth("package-list-body", "package-list-add")
         node("package-list-add").performClick()
         awaitTag("package-editor-save")
+        node("package-editor-name").assertIsNotFocused()
         node("package-editor-name").performTextInput("虚构宽度课包")
         node("package-editor-save").assertIsDisplayed()
         assertSameWidth("package-editor-form", "package-editor-save")
@@ -549,6 +554,12 @@ class PackageEntryLayoutTests {
         node("package-manual-save").assertIsDisplayed()
         assertSameWidth("package-manual-form", "package-manual-save")
         assertSameWidth("package-manual-reason-slot", "package-manual-reason")
+        node("package-manual-reason").assertIsDisplayed()
+            .assertHeightIsAtLeast(FcSpacing.space8 * 2 + FcSpacing.space6)
+        node("package-manual-save").assertIsNotEnabled()
+        node("package-manual-reason").performTextReplacement("虚构第一行\n虚构第二行")
+        node("package-manual-reason").assertTextEquals("虚构第一行\n虚构第二行")
+        node("package-manual-save").assertIsEnabled()
     }
 
     @Test(timeout = 30_000)

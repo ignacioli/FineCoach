@@ -2,6 +2,8 @@
 package com.ignacioli.finecoach
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -208,6 +210,22 @@ class ComponentContractTests {
         node("input").assertTextContains("虚构")
         node("secure").assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Password))
         node("search").assertContentDescriptionEquals("搜索")
+    }
+
+    @Test fun inlineFieldKeepsEditingAndUsesTheRowSurface() {
+        show {
+            var text by remember { mutableStateOf("") }
+            Column(Modifier.fillMaxWidth().background(FcColors.surfacePage)) {
+                FcTextField("课包名称", text, { text = it }, Modifier.testTag("inline"), inline = true, placeholder = "")
+                FcTextField("默认输入框", "", {}, Modifier.testTag("default"))
+            }
+        }
+        full("inline"); touch("inline")
+        node("inline").assertContentDescriptionEquals("课包名称").assertIsNotFocused()
+        assertEquals(FcColors.surfacePage, node("inline").captureToImage().toPixelMap()[2, 22])
+        assertEquals(FcColors.surfaceCanvas, node("default").captureToImage().toPixelMap()[2, 22])
+        node("inline").performTextInput("虚构课包")
+        node("inline").assertTextEquals("虚构课包")
     }
 
     @Test fun listRows() {

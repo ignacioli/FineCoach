@@ -187,7 +187,36 @@ class ActiveSessionEntryLayoutTests {
                 RecordMode.weightReps -> { text("set-weight-input", "0"); text("set-reps-input", "6") }
                 RecordMode.reps -> { text("set-reps-input", "7"); click("set-reps-plus"); node("set-reps-input").assertTextEquals("8") }
                 RecordMode.duration -> text("set-duration", "1分30秒")
-                RecordMode.cardio -> { text("set-duration", "2分"); text("set-distance", "0.125"); text("set-speed", "3.25"); text("set-resistance", "2") }
+                RecordMode.cardio -> {
+                    listOf("set-duration", "set-distance", "set-speed", "set-resistance").forEach { tag ->
+                        node(tag).performScrollTo().assertIsDisplayed().assertIsEnabled()
+                            .assert(hasSetTextAction())
+                        full("$tag-row", "set-add-editor-content")
+                        val row = node("$tag-row").getUnclippedBoundsInRoot()
+                        val slot = node("$tag-value-slot").getUnclippedBoundsInRoot()
+                        val field = node(tag).getUnclippedBoundsInRoot()
+                        assertEquals(row.right, slot.right)
+                        assertEquals(slot.left, field.left)
+                        assertTrue(field.width.value > 0f)
+                        assertTrue(field.right < slot.right)
+                    }
+                    listOf("set-duration", "set-distance", "set-speed", "set-resistance").zipWithNext().forEach { (tag, next) ->
+                        val row = node("$tag-row").getUnclippedBoundsInRoot()
+                        val divider = node("$tag-divider").getUnclippedBoundsInRoot()
+                        val nextRow = node("$next-row").getUnclippedBoundsInRoot()
+                        assertEquals(row.bottom.value, divider.top.value, 0.5f)
+                        assertEquals(FcComponentMetrics.hairline.value, (divider.bottom - divider.top).value, 0.5f)
+                        assertEquals(divider.bottom.value, nextRow.top.value, 0.5f)
+                    }
+                    listOf("时长", "距离", "速度", "阻力", "km", "km/h").forEach { label ->
+                        compose.onNode(hasText(label).and(hasAnyAncestor(hasTestTag("set-add-editor-content"))), useUnmergedTree = true).assertExists()
+                    }
+                    compose.onAllNodesWithText("必填", useUnmergedTree = true).assertCountEquals(2)
+                    compose.onAllNodesWithText("选填", useUnmergedTree = true).assertCountEquals(2)
+                    node("set-cardio-validation-hint").performScrollTo().assertIsDisplayed()
+                        .assertContentDescriptionEquals("时长与距离均大于 0，才可标记完成")
+                    text("set-duration", "2分"); text("set-distance", "0.125"); text("set-speed", "3.25"); text("set-resistance", "2")
+                }
             }
             editorActionsFillWidth(); click("set-save"); node("set-add-editor-content").assertExists()
             val saved = read(original.session.sessionID).exercises.first { it.sessionExerciseID == row.sessionExerciseID }.sets.single()

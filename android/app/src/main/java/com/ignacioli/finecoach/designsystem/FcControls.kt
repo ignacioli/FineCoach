@@ -230,17 +230,24 @@ fun FcToggle(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit
 fun FcTextField(title: String, value: String, onValueChange: (String) -> Unit, modifier: Modifier = Modifier,
     secure: Boolean = false, enabled: Boolean = true, search: Boolean = false,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default, keyboardActions: KeyboardActions = KeyboardActions.Default, visualModifier: Modifier = Modifier,
-    singleLine: Boolean = true, placeholder: String = title) {
+    singleLine: Boolean = true, placeholder: String = title, inline: Boolean = false) {
     BasicTextField(value, onValueChange, modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.touch)
         .semantics { contentDescription = title }, enabled = enabled, singleLine = singleLine, keyboardOptions = keyboardOptions, keyboardActions = keyboardActions,
         textStyle = (if (search) FcTypography.style("callout", 400) else FcTypography.body).copy(color = FcColors.textPrimary),
         visualTransformation = if (secure) PasswordVisualTransformation() else VisualTransformation.None,
         cursorBrush = SolidColor(FcColors.actionPrimary), decorationBox = { field ->
+            if (inline) {
+                Box(Modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.touch), contentAlignment = Alignment.CenterStart) {
+                    if (value.isEmpty() && placeholder.isNotEmpty()) FcText(placeholder, style = FcTypography.style("callout", 400), color = FcColors.textSecondary)
+                    field()
+                }
+            } else {
             Box(Modifier.fillMaxWidth().wrapContentHeight(unbounded = true).then(visualModifier).then(if (search) Modifier.height(FcSpacing.space8 + FcSpacing.space2) else Modifier.heightIn(min = FcComponentMetrics.field))
                 .background(FcColors.surfaceCanvas, RoundedCornerShape(FcShapes.sm)).padding(horizontal = FcSpacing.space4, vertical = FcSpacing.space2),
                 contentAlignment = if (singleLine) Alignment.CenterStart else Alignment.TopStart) {
                 if (value.isEmpty() && placeholder.isNotEmpty()) FcText(placeholder, style = FcTypography.style("callout", 400), color = FcColors.textSecondary)
                 field()
+            }
             }
         })
 }

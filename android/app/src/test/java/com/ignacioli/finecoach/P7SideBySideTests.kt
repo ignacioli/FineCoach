@@ -301,7 +301,7 @@ private fun captureSheet(activity: Bitmap, panelTag: String): Bitmap {
     @Test fun cardio() = measure(
         "15-cardio", "ActiveSessionScreen / SetEditor (cardio)",
         "王小明；跑步机；32:00 / 5.0 / 9.4 / 阻力空；未确认",
-        "Android 使用训练中组合页面，另有学员/时间/添加动作/结束训练；有氧为 inline fields，确认为按钮文案，无 PNG 必填提示。",
+        "Android 使用训练中组合页面，另有学员/时间/添加动作/结束训练；有氧复用标签-值行，确认文案遵循 iOS；内联 editor 保持既有保存行为。",
     ) {
         val f = TrainingConformanceFixture().also { releaseFixture = it::close }
         f.room.test {
