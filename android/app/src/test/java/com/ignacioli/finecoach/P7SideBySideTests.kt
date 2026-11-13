@@ -73,7 +73,7 @@ class P7SideBySideTests {
         }
     }
 
-    private fun measure(id: String, composable: String, fixture: String, mismatches: String, sheetTag: String? = null, scrollTag: String? = null, render: () -> String) {
+    private fun measure(id: String, composable: String, fixture: String, mismatches: String, sheetTag: String? = null, scrollTag: String? = null, designPath: String? = null, render: () -> String) {
         var reason: String? = null
         val bitmap = try {
             await(render())
@@ -90,16 +90,25 @@ when {
         val range = scroll.fetchSemanticsNode().config[SemanticsProperties.VerticalScrollAxisRange]
         val before = range.value()
         val viewport = scroll.fetchSemanticsNode().boundsInRoot.height
-        scroll.performSemanticsAction(SemanticsActions.ScrollBy) { it(0f, viewport) }
-        compose.waitForIdle()
-        val after = scroll.fetchSemanticsNode().config[SemanticsProperties.VerticalScrollAxisRange].value()
-        val second = node("conformance-viewport").captureToImage().asAndroidBitmap()
-        File(p7Output(), "$id.scroll.txt").writeText("requested=$viewport px; before=$before; after=$after; max=${range.maxValue()}; two complete viewports, including repeated chrome/content if scroll range is shorter")
-        Bitmap.createBitmap(780, 3376, Bitmap.Config.ARGB_8888).also {
-            Canvas(it).apply { drawBitmap(first, 0f, 0f, null); drawBitmap(second, 0f, 1688f, null) }
-            first.recycle(); second.recycle()
+        val frames = mutableListOf(first)
+        val positions = mutableListOf(before)
+        while (range.value() < range.maxValue() && frames.size < 10) {
+            val old = range.value()
+            scroll.performSemanticsAction(SemanticsActions.ScrollBy) { it(0f, viewport) }
+            compose.mainClock.advanceTimeBy(500)
+            compose.waitForIdle()
+            if (range.value() <= old) break
+            positions += range.value()
+            frames += node("conformance-viewport").captureToImage().asAndroidBitmap()
+        }
+        check(range.value() >= range.maxValue()) { "Scroll did not reach end: ${range.value()} / ${range.maxValue()}" }
+        File(p7Output(), "$id.scroll.txt").writeText("requested=$viewport px; before=$before; after=${range.value()}; max=${range.maxValue()}; positions=$positions; viewports=${frames.size}; full viewports retain repeated chrome")
+        if (frames.size == 1) first else Bitmap.createBitmap(780, 1688 * frames.size, Bitmap.Config.ARGB_8888).also {
+            val canvas = Canvas(it)
+            frames.forEachIndexed { n, frame -> canvas.drawBitmap(frame, 0f, n * 1688f, null); frame.recycle() }
         }
     }
+
     else -> first
 }
         } catch (failure: Exception) {
@@ -109,7 +118,7 @@ when {
             reason = "${failure.javaClass.simpleName}: ${failure.message.orEmpty()}"
             P7SheetWriter.placeholder(reason)
         }
-        P7SheetWriter.write(id, bitmap, composable, fixture, mismatches, reason)
+        P7SheetWriter.write(id, bitmap, composable, fixture, mismatches, reason, designPath)
         bitmap.recycle()
     }
 
@@ -312,7 +321,7 @@ private fun captureSheet(activity: Bitmap, panelTag: String): Bitmap {
     @Test fun historyList() = measure(
         "32-training-history-v2", "HistoryListScreen",
         "王小明；2025-09-25/18/11/04（周四）；12/10/11/9 组；58/52/55/47 分钟；近30天；大腿、臀筛选",
-        "设计的课程比较/个人最佳不在 S1 HistoryListScreen；保留清除筛选及未扣课说明。右侧为滚动尝试前后两个完整 viewport；4条记录全部适配首屏，scroll range=0，故两屏重复；实际滚动量另记。",
+        "设计的课程比较/个人最佳不在 S1 HistoryListScreen；保留清除筛选及未扣课说明。4条记录全部适配首屏；scroll range=0 时仅保留一个 viewport；实际滚动范围另记。",
         scrollTag = "history-list-content",
     ) {
         val f = T009Fixture().also { releaseFixture = it::close }
@@ -339,5 +348,195 @@ private fun captureSheet(activity: Bitmap, panelTag: String): Bitmap {
         }
         show { HistoryListScreen(state, f.zone, {}, {}) }
         "history-count"
+    }
+    private fun active(f: TrainingConformanceFixture) {
+        show { ActiveSessionScreen(f.state, f.content.session.sessionID, f.exercises, f.templates, {}, {},
+            students = StudentRepository(f.room.db, f.room.clock)) }
+        await("session-add-exercise")
+        compose.waitUntil(15_000) { !f.state.busy }
+        compose.runOnIdle { simulateConformanceStatusBar(compose.activity) }
+    }
+
+    private fun swipe(tag: String) {
+        compose.mainClock.autoAdvance = true
+        node(tag).performScrollTo().assertIsDisplayed().performTouchInput { swipeLeft(startX = width * .9f, endX = width * .5f) }
+        compose.mainClock.advanceTimeBy(500)
+        compose.waitForIdle()
+    }
+
+    private fun crop(id: String, label: String, vararg tags: String, parent: Boolean = false): Bitmap {
+        compose.waitForIdle()
+        compose.mainClock.autoAdvance = false
+        compose.mainClock.advanceTimeBy(320)
+        val bounds = tags.map { if (parent) node(it).onParent().fetchSemanticsNode().boundsInRoot else node(it).fetchSemanticsNode().boundsInRoot }
+        val top = bounds.minOf { it.top }.toInt().coerceAtLeast(0)
+        val bottom = kotlin.math.ceil(bounds.maxOf { it.bottom }.toDouble()).toInt().coerceAtMost(1688)
+        check(bottom > top) { "Empty crop for $label: $bounds" }
+        val full = node("conformance-viewport").captureToImage().asAndroidBitmap()
+        val result = Bitmap.createBitmap(full, 0, top, 780, bottom - top)
+        if (result !== full) full.recycle()
+        File(p7Output(), "$id.crops.txt").appendText("$label: x=0 y=$top width=780 height=${bottom - top}; tags=${tags.toList()} parent=$parent\n")
+        return result
+    }
+
+    private fun board(id: String, path: String, composable: String, fixture: String, mismatches: String, capture: () -> List<Pair<String, Bitmap?>>) {
+        File(p7Output(), "$id.crops.txt").writeText("Native-scale state crops in design order; labels are artifact annotations.\n")
+        val bitmap = P7SheetWriter.stack(capture())
+        P7SheetWriter.write(id, bitmap, composable, fixture, mismatches, designPath = path, board = true)
+        bitmap.recycle()
+    }
+
+    @Test fun todayMultiSession() = board(
+        "W08-a-today-multi-session", "design/m1-b-hifi/screens/W08-a-today-multi-session.png", "TodayScreen / 1, 2, 3 active sessions",
+        "王小明32分钟；陈嘉怡5分钟（2人）/18分钟（3人）；李思远2分钟；真实 repository；按开始时间升序",
+        "PNG 实际含1/2/3人卡片三态，逐态裁剪；S1 hero title 来自训练重点（大腿/胸）而非深蹲训练/上肢训练/卧推训练；保留真实标题。",
+    ) {
+        val f = TodayConformanceFixture().also { releaseFixture = it::close }
+        val now = f.room.time
+        val parts = mutableListOf<Pair<String, Bitmap?>>()
+        show { com.ignacioli.finecoach.features.today.TodayScreen(f.state) {} }
+        await("hero-${f.sessionID.value}")
+        compose.runOnIdle { simulateConformanceStatusBar(compose.activity) }
+        parts += "1人：王小明 / 32分钟" to crop("W08-a-today-multi-session", "1 person", "hero-${f.sessionID.value}")
+        compose.mainClock.autoAdvance = true
+        var second: SessionID? = null
+        f.room.test {
+            f.room.student(2)
+            f.room.db.openHelper.writableDatabase.execSQL("UPDATE students SET displayName = ? WHERE id = ?", arrayOf("陈嘉怡", f.room.studentID(2).value))
+            f.room.time = now.minusSeconds(5 * 60)
+            second = f.room.ok(f.room.sessions.startOrOpen(StartOrOpenSessionCommand(f.room.studentID(2), setOf(BodyPart.chest), f.room.time))).sessionID
+            f.room.time = now
+            f.state.load()
+        }
+        await("today-hero")
+        parts += "2人：王小明32 / 陈嘉怡5分钟" to crop("W08-a-today-multi-session", "2 people", "today-hero")
+        compose.mainClock.autoAdvance = true
+        f.room.test {
+            f.room.db.openHelper.writableDatabase.execSQL("UPDATE sessions SET startedAtUTC = ?, lastCheckpointUTC = ? WHERE id = ?", arrayOf(now.minusSeconds(18 * 60).toString(), now.minusSeconds(18 * 60).toString(), checkNotNull(second).value))
+            f.room.student(3)
+            f.room.db.openHelper.writableDatabase.execSQL("UPDATE students SET displayName = ? WHERE id = ?", arrayOf("李思远", f.room.studentID(3).value))
+            f.room.time = now.minusSeconds(2 * 60)
+            f.room.ok(f.room.sessions.startOrOpen(StartOrOpenSessionCommand(f.room.studentID(3), setOf(BodyPart.chest), f.room.time)))
+            f.room.time = now
+            f.state.load()
+        }
+        parts += "3人：王小明32 / 陈嘉怡18 / 李思远2分钟" to crop("W08-a-today-multi-session", "3 people", "today-hero")
+        parts
+    }
+
+    @Test fun unilateralPartialStates() = board(
+        "P0-a2b-partial-states", "design/experience-p0/screens/P0-a2b-partial-states.png", "ActiveSessionScreen / SetEditor / swipe / recent undo",
+        "单侧深蹲：每侧12.5×10；展开后左12.5右15×10；动作左滑；刚确认组4秒内",
+        "四态均有 S1 实现；实际输入带 helper/确认按钮；动作操作顺序为删除/移入分区；刚确认组展示真实撤销；swipe 行高度/裁剪导致动作名及操作文案部分不可见，保留原始像素。",
+    ) {
+        val id = "P0-a2b-partial-states"
+        val f = TrainingConformanceFixture().also { releaseFixture = it::close }
+        f.room.test {
+            val r = f.squat.copy(sets = listOf(f.squat.sets.single().copy(weightValue = "12.5".toBigDecimal(), repetitionCount = "10".toBigDecimal(), side = SetSide.bilateral, leftValue = "12.5".toBigDecimal(), rightValue = "12.5".toBigDecimal())))
+            val section = SectionRecord(f.room.ids.newSectionID(), SessionSectionOwnerKind.session, f.content.session.sessionID, null, "辅助训练", 1u)
+            f.content = f.room.ok(f.room.sessions.saveContent(SaveSessionContentCommand(f.content.session.sessionID, f.content.session.revision, listOf(section), listOf(r))))
+            f.room.ok(f.exercises.useCases.updatePreference(UpdateExercisePreferenceCommand(checkNotNull(r.sourceID), "深蹲", false, false, false, true)))
+        }
+        active(f)
+        await("set-split")
+        val parts = mutableListOf<Pair<String, Bitmap?>>()
+        parts += "单侧动作 · 默认左右相同" to crop(id, "same sides", "set-add-editor-content")
+        compose.mainClock.autoAdvance = true
+        node("set-split").performClick()
+        node("set-right-input").performTextReplacement("15")
+        compose.runOnIdle { compose.activity.currentFocus?.clearFocus() }
+        parts += "单侧动作 · 左右不同（展开后）" to crop(id, "different sides", "set-add-editor-content")
+        swipe("session-exercise-${f.squat.sessionExerciseID.value}-swipe")
+        parts += "动作行 · 左滑后" to crop(id, "exercise swipe", "session-exercise-${f.squat.sessionExerciseID.value}-swipe")
+        compose.mainClock.autoAdvance = true
+        node("session-exercise-${f.squat.sessionExerciseID.value}-swipe").performTouchInput { swipeRight() }
+        node("set-save").performScrollTo().performClick()
+        compose.waitUntil(15_000) { !f.state.busy && f.state.undoableSetID != null }
+        compose.mainClock.autoAdvance = false
+        compose.mainClock.advanceTimeBy(320)
+        val set = checkNotNull(f.state.undoableSetID)
+        node("session-set-${set.value}").performScrollTo()
+        parts += "刚确认的组 · 4秒内" to crop(id, "just confirmed", "session-set-${set.value}")
+        parts
+    }
+
+    private fun sectionFixture(): TrainingConformanceFixture {
+        val f = TrainingConformanceFixture().also { releaseFixture = it::close }
+        f.room.test {
+            f.room.db.openHelper.writableDatabase.execSQL("UPDATE students SET displayName = ?", arrayOf("李娜"))
+            val sid = f.content.session.sessionID
+            val auxiliary = SectionRecord(f.room.ids.newSectionID(), SessionSectionOwnerKind.session, sid, null, "辅助训练", 1u)
+            val core = SectionRecord(f.room.ids.newSectionID(), SessionSectionOwnerKind.session, sid, null, "核心", 4u)
+            fun row(name: String, order: UInt, section: SectionID, mode: RecordMode = RecordMode.weightReps) = SessionExercise(
+                f.room.ids.newSessionExerciseID(), sid, order, ExerciseSourceKind.sessionOnly, null, NormalizedName.parse(name), mode, null, section, emptyList()).toRecord()
+            val squat = f.squat.copy(sets = (0..2).map { n -> f.squat.sets.single().copy(trainingSetID = f.room.ids.newTrainingSetID(), orderIndex = n.toUInt()) })
+            f.content = f.room.ok(f.room.sessions.saveContent(SaveSessionContentCommand(sid, f.content.session.revision, listOf(auxiliary, core), listOf(squat, row("哑铃飞鸟", 2u, auxiliary.sectionID), row("三头下压", 3u, auxiliary.sectionID), row("平板支撑", 5u, core.sectionID, RecordMode.duration)))))
+        }
+        return f
+    }
+
+    @Test fun sectionDeleteConfirmation() = measure(
+        "B-a-section-swipe-delete-confirm", "ActiveSessionScreen / FcConfirmationDialog",
+        "李娜；深蹲3组120×8；辅助训练含哑铃飞鸟/三头下压；核心含平板支撑；删除分区确认尚未提交",
+        "通过真实分区左滑及可见删除分区按钮打开确认框；保留 Android 训练页和 dialog 布局；标题训练重点与PNG空白课不同；实际显示逐组明细及有氧输入。",
+        sheetTag = "session-delete-section-confirm-card", designPath = "design/experience-t2/screens/B-a-section-swipe-delete-confirm.png",
+    ) {
+        val f = sectionFixture()
+        active(f)
+        swipe("session-section-${f.content.sections.first().sectionID.value}-swipe")
+        node("session-section-delete").performClick()
+        "session-delete-section-confirm-card"
+    }
+
+    @Test fun sectionPartialStates() = board(
+        "B-b-partial-states", "design/experience-t2/screens/B-b-partial-states.png", "ActiveSessionScreen / section swipe / completed set swipe / undo",
+        "辅助训练分区；深蹲第1组120kg×8；真实左滑、删除组、撤销行；其余状态逐项标 gap；分区标题左滑后名称移出左边界、操作区文案纵向裁剪是产品原状",
+        "not in S1: 身体数据单条左滑、身体数据删除后4秒（S2）；not in S1: 模板动作行左滑删除（模板本身已在S1，但当前是动作菜单移除+确认，未实现图示swipe）。",
+    ) {
+        val id = "B-b-partial-states"
+        val f = sectionFixture()
+        active(f)
+        val parts = mutableListOf<Pair<String, Bitmap?>>()
+        val section = "session-section-${f.content.sections.first().sectionID.value}-swipe"
+        swipe(section)
+        parts += "分区标题 · 左滑后" to crop(id, "section swipe", section)
+        val set = f.content.exercises.first().sets.first()
+        swipe("session-set-${set.trainingSetID.value}-swipe")
+        parts += "已完成的组 · 左滑后（Δ9）" to crop(id, "completed set swipe", "session-set-${set.trainingSetID.value}-swipe")
+        compose.mainClock.autoAdvance = true
+        node("session-set-delete").performClick()
+        await("session-deleted-action")
+        compose.waitUntil(15_000) { !f.state.busy }
+        parts += "删除后4秒内（Δ9）" to crop(id, "deleted set undo", "session-deleted-action", parent = true)
+        parts += "not in S1: 身体数据 · 单条记录左滑后（S2）" to null
+        parts += "not in S1: 身体数据 · 删除后4秒内（S2）" to null
+        parts += "not in S1: 模板 · 动作行左滑后（现有菜单移除）" to null
+        parts
+    }
+
+    @Test fun sessionGains() = measure(
+        "D-b-session-gains", "SessionSummaryScreen (S1)",
+        "完成12组/58分钟；训练重点大腿、臀；私密备注：膝盖内扣，下次降到120kg练动作。；公开总结空",
+        "S3-only 区域：本节收获（深蹲新纪录/上次120×8→本次125×5；卧推上次80×8→本次80×10；平板支撑60→75秒）、第25节课累计里程碑及PR badge。S1 时长显示3480秒而非58分钟；S1 summary 未实现生成训练报告/跳过分享，当前为保存并返回今日；templateSlot使用导航中的真实另存模板入口。滚动范围为0时只保留一个viewport，非0时滚到末尾竖拼。",
+        scrollTag = "summary-content", designPath = "design/progress-milestones/screens/D-b-session-gains.png",
+    ) {
+        val f = T009Fixture().also { releaseFixture = it::close }
+        lateinit var c: SessionContentRecord
+        lateinit var state: SessionSummaryUiState
+        f.test {
+            state = SessionSummaryUiState(f.historyCases, f.clock)
+            c = f.content()
+            val r = c.exercises.single()
+            c = f.ok(f.sessions.saveContent(SaveSessionContentCommand(c.session.sessionID, c.session.revision, emptyList(), listOf(r.copy(displayNameSnapshot = "深蹲", sets = (0 until 12).map { n -> r.sets.single().copy(trainingSetID = f.ids.newTrainingSetID(), orderIndex = n.toUInt()) } )))))
+            f.now = f.now.plusSeconds(58 * 60)
+            f.finish(c)
+            val done = f.ok(f.sessions.loadContent(c.session.sessionID))!!
+            f.ok(f.historyCases.saveSummary(SaveCompletedSessionSummaryCommand(done.session.sessionID, done.session.revision, setOf(BodyPart.thighs, BodyPart.glutes), "", "膝盖内扣，下次降到 120 kg 练动作。", f.now)))
+        }
+        lateinit var templates: HistoryTemplateState
+        f.test { templates = HistoryTemplateState(TemplateUseCases(com.ignacioli.finecoach.storage.repository.TemplateRepository(f.db, f.clock, f.ids, java.util.UUID.fromString(f.db.storeMetadataDao().find(com.ignacioli.finecoach.storage.FineCoachDatabaseFactory.GENERATION_KEY)!!.value)), f.clock), f.clock, f.ids) }
+        show { SessionSummaryScreen(state, c.session.sessionID, {}, {}) { state.detail?.let { HistoryTemplateEntry(templates, it.content) } } }
+        await("summary-save")
+        "summary-content"
     }
 }
