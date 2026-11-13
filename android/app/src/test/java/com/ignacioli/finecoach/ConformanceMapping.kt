@@ -76,6 +76,71 @@ internal object ConformanceMapping {
         // Component groups use the approved Android symbol (e.g. DS-SET-ROW · edit).
         ?: assetName(name).takeIf { it in platformIcons.values }
 
+    /**
+     * DS-STEPPER-FIELD parts, keyed by the board component name after `DS-STEPPER-FIELD · `.
+     * Glyphs use the component's own `*-minus-glyph` / `*-plus-glyph` tags. The capsule is the
+     * common layout parent of `*-minus` and `*-plus` that also contains `*-input`. Duplicates pair
+     * by reading order and nearest center. No path or screen branch.
+     */
+    internal data class StepperFieldPart(val part: String, val geometryRule: String? = null, val symbolSizeDp: Double? = null, val colorMethod: String? = null, val tagSuffix: String? = null, val capsule: Boolean = false)
+    internal val stepperFieldParts = listOf(
+        StepperFieldPart("minus", "SYMBOL_CENTER", 20.0, "iconInk", "-minus-glyph"),
+        StepperFieldPart("plus", "SYMBOL_CENTER", 20.0, "iconInk", "-plus-glyph"),
+        StepperFieldPart("value", "EDITABLE_TEXT_FIELD", colorMethod = "textLayout"),
+        StepperFieldPart("capsule", capsule = true),
+    )
+    internal fun stepperFieldPart(name: String): StepperFieldPart? {
+        val marker = "DS-STEPPER-FIELD · "
+        val index = name.indexOf(marker)
+        if (index < 0) return null
+        val part = name.substring(index + marker.length).substringBefore(' ').substringBefore('(')
+        return stepperFieldParts.firstOrNull { it.part == part }
+    }
+    internal fun isStepperCapsuleSelector(entry: JSONObject): Boolean {
+        val tags = entry.optJSONArray("commonLayoutParentOfTags") ?: return false
+        return tags.length() == 2 && tags.optString(0) == "*-minus" && tags.optString(1) == "*-plus" && entry.optString("containsTag") == "*-input"
+    }
+    /** A real stepper capsule observation: one prefix's `-minus`, `-plus`, and `-input`. */
+    internal fun matchesStepperCapsule(node: JSONObject): Boolean {
+        val tags = node.optJSONArray("commonLayoutParentOfTags") ?: return false
+        if (tags.length() != 2) return false
+        val minus = tags.optString(0)
+        val plus = tags.optString(1)
+        val prefix = minus.removeSuffix("-minus")
+        return prefix.isNotEmpty() && minus == "$prefix-minus" && plus == "$prefix-plus" && node.optString("containsTag") == "$prefix-input"
+    }
+    private fun applyStepperField(entry: JSONObject, name: String, manualSelector: Boolean) {
+        val part = stepperFieldPart(name) ?: return
+        part.geometryRule?.let { entry.put("geometryRule", it) }
+        part.symbolSizeDp?.let { entry.put("symbolSizeDp", it) }
+        part.colorMethod?.let { entry.put("colorMethod", it) }
+        if (manualSelector) return
+        part.tagSuffix?.let {
+            entry.put("tagSuffix", it)
+            entry.remove("tag")
+            entry.remove("text")
+            entry.put("mapping", "AUTO_TAG")
+        }
+        if (part.capsule) {
+            entry.put("commonLayoutParentOfTags", JSONArray(listOf("*-minus", "*-plus")))
+            entry.put("containsTag", "*-input")
+            entry.remove("tag")
+            entry.put("mapping", "AUTO_TAG")
+        }
+    }
+    private fun automaticGroupKey(entry: JSONObject): String = when {
+        entry.has("tagSuffix") -> "suffix:" + entry.getString("tagSuffix")
+        isStepperCapsuleSelector(entry) -> "stepper-capsule"
+        entry.getString("mapping") == "AUTO_TEXT" -> "text:" + entry.getString("text")
+        else -> "tag:" + entry.optString("tag")
+    }
+    private fun matchesAutomaticGroup(node: JSONObject, sample: JSONObject): Boolean = when {
+        sample.has("tagSuffix") -> node.optString("tag").endsWith(sample.getString("tagSuffix"))
+        isStepperCapsuleSelector(sample) -> matchesStepperCapsule(node)
+        sample.getString("mapping") == "AUTO_TEXT" -> node.optString("text") == sample.getString("text") && !node.isNull("hex") && node.optString("hex").isNotEmpty()
+        else -> node.optString("tag") == sample.optString("tag")
+    }
+
     private fun visibleEntries(layers: List<JSONObject>, exceptions: List<JSONObject>, actual: List<JSONObject>, bindings: Map<String, String>, originOffsetY: Double): List<JSONObject> {
         val byPath = exceptions.associateBy { it.getString("path") }
         val result = layers.map { layer ->
@@ -93,6 +158,7 @@ internal object ConformanceMapping {
             if (platformIcon(layer.optString("name")) != null) entry.put("colorMethod", "iconInk")
             if (!entry.has("anchor")) entry.put("anchor", "top")
             if (!entry.has("colorMethod")) entry.put("colorMethod", if (layer.optString("type") == "text") "textLayout" else "exactPixelMode")
+            applyStepperField(entry, layer.getString("name"), manualSelector)
             entry
         }
         // Only non-manual text selectors participate. All must have unique real text observations.
@@ -100,10 +166,10 @@ internal object ConformanceMapping {
             ConformanceComparison.select(actual, entry) { expand(it, bindings) }.singleOrNull()?.let { listOf(it.getInt("id")) }.orEmpty()
         }.toSet()
         val automatic = result.filter { it.getString("mapping") in setOf("AUTO_TEXT", "AUTO_TAG") && layers.single { l -> l.getString("path") == it.getString("path") }.optString("type") != "path" }
-        for (group in automatic.groupBy { it.getString("mapping") + ":" + it.optString("text", it.optString("tag")) }.values) {
+        for (group in automatic.groupBy { automaticGroupKey(it) }.values) {
             val ordered = group.sortedWith(compareBy({ e -> layers.single { it.getString("path") == e.getString("path") }.getDouble("y") },
                 { e -> layers.single { it.getString("path") == e.getString("path") }.getDouble("x") }))
-            val candidates = actual.filter { n -> n.getInt("id") !in reserved && (if (group.first().getString("mapping") == "AUTO_TEXT") n.optString("text") == group.first().getString("text") && !n.isNull("hex") && n.optString("hex").isNotEmpty() else n.optString("tag") == group.first().getString("tag")) }
+            val candidates = actual.filter { n -> n.getInt("id") !in reserved && matchesAutomaticGroup(n, group.first()) }
                 .sortedWith(compareBy({ it.getDouble("y") }, { it.getDouble("x") }))
             for ((index, entry) in ordered.withIndex()) {
                 if (candidates.size == 1 && ordered.size == 1) entry.put("nodeID", candidates.single().getInt("id"))

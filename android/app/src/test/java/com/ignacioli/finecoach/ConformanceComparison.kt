@@ -231,9 +231,13 @@ internal object ConformanceComparison {
 
     internal fun select(actual: List<JSONObject>, entry: JSONObject, expand: (String) -> String = { it }): List<JSONObject> {
         if (entry.has("nodeID")) return actual.filter { it.optInt("id", -1) == entry.getInt("nodeID") }
-        if (entry.has("commonLayoutParentOfTags")) return actual.filter {
-            it.optJSONArray("commonLayoutParentOfTags")?.toString() == JSONArray(entry.getJSONArray("commonLayoutParentOfTags").strings().map(expand)).toString() &&
-                it.optString("containsTag") == expand(entry.getString("containsTag"))
+        if (entry.has("tagSuffix")) return actual.filter { it.optString("tag").endsWith(entry.getString("tagSuffix")) }
+        if (entry.has("commonLayoutParentOfTags")) {
+            if (ConformanceMapping.isStepperCapsuleSelector(entry)) return actual.filter { ConformanceMapping.matchesStepperCapsule(it) }
+            return actual.filter {
+                it.optJSONArray("commonLayoutParentOfTags")?.toString() == JSONArray(entry.getJSONArray("commonLayoutParentOfTags").strings().map(expand)).toString() &&
+                    it.optString("containsTag") == expand(entry.getString("containsTag"))
+            }
         }
         if (!entry.has("tag") && !entry.has("text") && !entry.has("scope")) return emptyList()
         return actual.filter { n ->

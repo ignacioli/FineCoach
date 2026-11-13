@@ -17,6 +17,8 @@
 
 2026-11-10 宿主修订：S1-D34 将 path13 改为 15pt / 400 / #5c5a52、47×18；最终导出另将 path1 标题 x16 改为 x32，并新增 path47 返回字形（x16/y53、8×26、22pt/400/text.secondary）。本地 layers.json 与宿主交付文件逐字节一致。当前 PNG 已含 path13 修订，页头仍待负责人重新导出；agent 不改 PNG。
 
+`P0-a2-training.map.json` 只保留无法从画板名自动得到的例外。S1-D86：非图标层的 `name` 改为 `testTag:<运行时 tag>`（`$set1`、`$squatID` 等绑定仍可用）；`icon / barbell` 与 `DS-SET-ROW · edit` 的名字保持不变，因为 `assetName` / `platformIcon` / ICON_PIXELS 读取它们。编辑图标的运行时 tag `$tag-edit-icon` 被组件测试使用，所以 path 45/46 仍手写 tag。path 7/33 的运行时 tag 保持 `session-icon-$id` 并手写进 map：`conformance:icon / barbell` 也会标到其他画板 sheet 后面仍在组合树里的训练行（C2b-B）。休息条和结束按钮用默认 top：有效原点是 `originOffsetY+measuredContentTop=0`，390×844 两侧一致，设计 y 已等于 Android y。DS-STEPPER-FIELD 的几何与颜色在 `ConformanceMapping.stepperFieldParts`，不写进本屏 map。
+
 `P0-a2-training.map.json` 逐 path 覆盖全部 52 层。selector 使用真实 testTag 或 scope tag + 原文；运行时绑定随机 Room ID，不把 ID 当视觉信息。圆圈、铅笔、器材、✓、分割线、返回字形均指向真实可见节点；44dp 触控区单独由组件/entry tests 验证。仅 7/1、33/1、45/1、46/1 按 S1-D37 标记为矢量内部不可观测：须父级图标几何通过，并验证同一资产的来源记录及 drawable hash；任一前提不符仍失败，不伪造 path 矩形、不算 PASS。文字颜色来自 `TextLayoutResult`；填充色来自截图实际节点矩形内 exact RGB 众数，无近似色匹配。相同 hex 的 aliases 归一到 map 声明的语义 token，RGB 证据不能区分同值 alias。无 designOverride 或 registeredInserts。
 
 ## Anchor（宿主决策 S1-D30）
@@ -87,7 +89,7 @@ S1-D37：文字比较x、w和垂直中心，Δh只写报告；非文字比较x/y
 
 ## Capsule测试侧selector
 
-path20/25通过 `commonLayoutParentOfTags` 指向真实minus/plus的最近共同 `LayoutInfo.parentInfo`，要求 `containsTag` 对应input的祖先链也包含该节点。读取真实Row的coordinates.boundsInRoot与positionInRoot/size；不按目标262×48反选容器、不用子节点union伪造边界。Row本身无semantics（FcControls.kt:277），所以它作为test-only layout observation写入nodes.json，并明确geometrySource，未给产品增加tag。定位/附着失败则missing，不能回退到近似矩形。
+path 20/25 是 `DS-STEPPER-FIELD · capsule`：`*-minus` 与 `*-plus` 的最近共同 LayoutInfo 父节点，且该父节点包含 `*-input`。两个实例按阅读顺序与最近中心配对。−/+ 字形按运行时 tag 后缀 `-minus-glyph` / `-plus-glyph` 选择（`SYMBOL_CENTER` 20dp，iconInk），不另加 conformance tag。数值仍是真实文本，`EDITABLE_TEXT_FIELD` + textLayout。规则在 `ConformanceMapping.stepperFieldParts`，不按 path 或屏幕分支。Row 本身无 semantics。
 
 ## 遮挡后的颜色观测（P4 C2b-B round 3，dispatcher 批准）
 

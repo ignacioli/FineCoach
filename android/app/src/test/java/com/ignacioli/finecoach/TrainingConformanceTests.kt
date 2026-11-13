@@ -130,31 +130,32 @@ class TrainingConformanceTests {
                 .put("hex", argb ?: JSONObject.NULL).put("alpha", if (color != null && color != androidx.compose.ui.graphics.Color.Unspecified) color.alpha.toDouble() else 1.0)
                 .put("x", bounds.left / 2).put("y", bounds.top / 2).put("w", bounds.width / 2).put("h", bounds.height / 2))
         }
-        // Test-side observation of a real layout with no semantics. Never infer
-        // Row bounds from target dimensions or the union of child hit targets.
-        val map = JSONObject(File(System.getProperty("finecoach.storageProjectDirectory"), "../design-assets/conformance/P0-a2-training.map.json").readText())
-        val entries = map.getJSONArray("elements")
+        // Capsules have no semantics. Each `prefix-minus` / `prefix-plus` pair that also contains
+        // `prefix-input` contributes the real common LayoutInfo parent. Not inferred from the map.
         fun parents(info: LayoutInfo?) = generateSequence(info) { it.parentInfo }.toList()
-        for (index in 0 until entries.length()) {
-            val entry = entries.getJSONObject(index)
-            val tags = entry.optJSONArray("commonLayoutParentOfTags") ?: continue
-            val children = (0 until tags.length()).map { tagIndex -> all.singleOrNull { it.config.getOrNull(SemanticsProperties.TestTag) == tags.getString(tagIndex) } }
-            if (children.any { it == null } || children.isEmpty()) continue
-            val chains = children.map { parents(it!!.layoutInfo.parentInfo) }
+        val tagged = all.mapNotNull { node -> node.config.getOrNull(SemanticsProperties.TestTag)?.let { it to node } }.toMap()
+        var synthetic = 0
+        for ((tag, minusNode) in tagged) {
+            if (!tag.endsWith("-minus") || tag.endsWith("-glyph")) continue
+            val prefix = tag.removeSuffix("-minus")
+            if (prefix.isEmpty()) continue
+            val plusNode = tagged["$prefix-plus"] ?: continue
+            val input = tagged["$prefix-input"] ?: continue
+            val chains = listOf(minusNode, plusNode).map { parents(it.layoutInfo.parentInfo) }
             val common = chains.first().firstOrNull { candidate -> chains.all { chain -> chain.any { it === candidate } } } ?: continue
-            val input = all.singleOrNull { it.config.getOrNull(SemanticsProperties.TestTag) == entry.getString("containsTag") } ?: continue
             if (parents(input.layoutInfo.parentInfo).none { it === common } || !common.isAttached || !common.isPlaced) continue
             val bounds = common.coordinates.boundsInRoot()
             val position = common.coordinates.positionInRoot()
-            val source = (0 until nodes.length()).map { nodes.getJSONObject(it) }.single { it.getInt("id") == children.first()!!.id }
-            nodes.put(JSONObject().put("id", -1000 - index).put("tag", "").put("text", "").put("hex", JSONObject.NULL)
+            val source = (0 until nodes.length()).map { nodes.getJSONObject(it) }.single { it.getInt("id") == minusNode.id }
+            nodes.put(JSONObject().put("id", -1000 - synthetic).put("tag", "").put("text", "").put("hex", JSONObject.NULL)
                 .put("geometrySource", "LayoutInfo nearest common parent; input ancestry verified")
-                .put("commonLayoutParentOfTags", tags).put("containsTag", entry.getString("containsTag"))
+                .put("commonLayoutParentOfTags", JSONArray(listOf(tag, "$prefix-plus"))).put("containsTag", "$prefix-input")
                 .put("ancestors", source.getJSONArray("ancestors")).put("scrollAncestors", source.getJSONArray("scrollAncestors"))
                 .put("placed", common.isPlaced).put("attached", common.isAttached)
                 .put("x", bounds.left / 2).put("y", bounds.top / 2).put("w", bounds.width / 2).put("h", bounds.height / 2)
                 .put("unclipped", JSONObject().put("x", position.x / 2).put("y", position.y / 2)
                     .put("w", common.coordinates.size.width / 2.0).put("h", common.coordinates.size.height / 2.0)))
+            synthetic++
         }
         File(out, "P0-a2-training.nodes.json").writeText(JSONObject().put("nodes", nodes).put("viewport", "390x844@2").toString(2))
         val bindings = f.bindings()
