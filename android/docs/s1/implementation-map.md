@@ -1,5 +1,13 @@
 # S1 implementation map
 
+### P7 training summary pilot（2026-11-13）
+
+- 分类与依据：D；按 `design/progress-milestones/screens/D-b-session-gains.png` 修复 S1 总结统计、备注区与固定底部操作，批准的设计不变。
+- 范围：复用 DS-PAGE-HEADER / DS-CHIP / DS-BUTTON；DS-TEXT-FIELD 最小扩展见 components.md §4.2，仅本页开启多行、空占位和 88 高度下限，其他消费者保持默认行为。
+- 设计决定：摘要两栏 → headline 时长及 body 完成组数；原始秒数 → 复用 `historyDuration`；占位标签 → 框外可见 iOS `summary.privateNote` / `summary.studentSummary`；单行框 → 顶部对齐多行区；滚动内保存 → 固定底部。保留 chip picker、templateSlot、所有既有 testTag；S3 收获 / 课次及 S4 分享操作按本轮范围不加入。
+- 实现与检查：entry/layout map：总结 → 训练重点 chips → summary-focus-{index} → 内存 focus → 原 FcBodyPartPicker；总结 → 教练私有备注 / 课后可见总结 → summary-private / summary-public → 内存 note → 满宽 SummaryNoteField / FcTextField；总结 → 另存为模板 → templateSlot 原有 history-save-template → 原 callback → 原 FcActionRow；总结 → 保存并返回今日 → summary-save → 原 state.save 持久化 → 满宽 FcButton。沿用 StudentEditorScreen 的 weight(1f) 滚动内容 + 固定按钮结构，IME padding 包含两者。
+- 结果：已读取设计及既有对照图；本轮按指令不运行 Gradle、build 或 test、不提交、不改 baseline / comparator / iOS。自动 gate、渲染几何与视觉一致性未确认，交 dispatcher 验证；不宣称 checkpoint 或人工视觉验收通过。
+
 ### P4 review fix（2026-11-12）
 
 - 分类与依据：D；DS-SYMBOL 默认装饰性（components.md §3），批准的 `21-student-list-s1.png` 不变。
