@@ -69,16 +69,19 @@ class TodayConformanceTests {
         compose.runOnIdle { simulateConformanceStatusBar(compose.activity) }
         node("platform-content").assertTopPositionInRootIsEqualTo(52.dp)
         node("today-date").assertTextEquals("8月31日 · 周日")
-        node("hero-card-title").assertTextEquals("王小明 · 臀、大腿")
+        node("hero-card-title").assertTextEquals("王小明 · 大腿")
         compose.onNodeWithText("已训练 32 分钟", useUnmergedTree = true).assertIsDisplayed()
         val hero = node("hero-${f.sessionID.value}")
         hero.assertIsDisplayed().assertHasClickAction()
         Assert.assertEquals(node("platform-content").getUnclippedBoundsInRoot().width, hero.getUnclippedBoundsInRoot().width)
         val segments = node("root-0").getUnclippedBoundsInRoot()
         val title = compose.onNode(hasText("今日") and SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading), useUnmergedTree = true).getUnclippedBoundsInRoot()
-        // Existing DS-PAGE-PRIMARY order; board order conflict is a proposal, never an offset.
-        Assert.assertEquals(16f, (title.top - segments.bottom).value - (44f - title.height.value) / 2f, 0.5f)
-        Assert.assertEquals(16f, (hero.getUnclippedBoundsInRoot().top - node("today-date").getUnclippedBoundsInRoot().bottom).value, 0.5f)
+        // S1-D70: title/date, segmented navigation, then content, using DS-PAGE-FLOW.
+        Assert.assertTrue(title.bottom <= node("today-date").getUnclippedBoundsInRoot().top)
+        Assert.assertEquals(com.ignacioli.finecoach.designsystem.FcSpacing.space4,
+            segments.top - node("today-date").getUnclippedBoundsInRoot().bottom)
+        Assert.assertEquals(com.ignacioli.finecoach.designsystem.FcSpacing.space4,
+            hero.getUnclippedBoundsInRoot().top - segments.bottom)
         node("root-1").assertIsDisplayed().assertHasClickAction().performSemanticsAction(SemanticsActions.OnClick) { it() }
         hero.performSemanticsAction(SemanticsActions.OnClick) { it() }
         Assert.assertEquals(listOf(com.ignacioli.finecoach.navigation.S1Routes.STUDENTS,
@@ -155,8 +158,7 @@ class TodayConformanceTests {
             val entry = JSONObject().put("path", layer.getString("path")).put("name", layer.getString("name"))
                 .put("coordinateSpace", "390×844 board dp; measured production layout")
             val observed = if (layer.getString("path") in listOf("9", "11")) {
-                // Board order is reversed relative to DS-PAGE-PRIMARY. Proposal-only observation
-                // uses the real heading flag; the strict comparator retains its unchanged mapping.
+                // Distinguish the heading from the segmented label in proposal-only observations.
                 (0 until nodes.length()).map { nodes.getJSONObject(it) }.single {
                     it.optString("text") == "今日" && !it.isNull("hex") &&
                         it.optBoolean("heading") == (layer.getString("path") == "9")

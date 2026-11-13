@@ -21,7 +21,7 @@ internal class TodayConformanceFixture : AutoCloseable {
             val fixedNow = LocalDate.of(2025, 8, 31).atTime(12, 0).atZone(ZoneId.systemDefault()).toInstant()
             room.time = fixedNow.minusSeconds(32 * 60)
             seededSessionID = room.ok(room.sessions.startOrOpen(StartOrOpenSessionCommand(
-                room.studentID(1), setOf(BodyPart.thighs, BodyPart.glutes), room.time))).sessionID
+                room.studentID(1), setOf(BodyPart.thighs), room.time))).sessionID
             room.time = fixedNow
             state = TodayUiState(room.sessions, StudentUseCases(StudentRepository(room.db, room.clock), room.clock, room.ids), room.clock)
         }

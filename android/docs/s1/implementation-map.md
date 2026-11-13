@@ -982,6 +982,14 @@ P4 round 2 最终：FAIL；host 952/0、G3 42/0、G4 12/0、训练conformance 1/
 
 | screen → visible control | identifier | mutates data? | width owner / code |
 |---|---|---|---|
-| Today → 今日 / 学员 | `root-0` / `root-1` | 否，选择既有 route | FcPagePrimary / platform-content 满宽；FcSegmentedSwitch 内容宽，44dp minimum touch；`TodayScreen.kt` |
-| Today → 继续训练（整卡可点） | `hero-$sessionID` | 否，进入原 active session | FcHeroCard 满宽358dp，由 today-content / platform-content 所有；`TodayScreen.kt` |
-| Today → 加载失败时重试 | `today-retry` | 否，重新读取 repository | FcButton 填满 today-content；`TodayScreen.kt`，既有 TodayNavigationEntryLayoutTests 覆盖错误恢复 |
+| Today → 今日 / 学员 | `root-0` / `root-1` | 否，选择既有 route | 标题/日期之后 space.4；FcPagePrimary / platform-content 满宽；FcSegmentedSwitch 内容宽，44dp minimum touch；[TodayScreen.kt:61](../../app/src/main/java/com/ignacioli/finecoach/features/today/TodayScreen.kt#L61)、[FcPages.kt:31](../../app/src/main/java/com/ignacioli/finecoach/designsystem/FcPages.kt#L31) |
+| Today → 继续训练（整卡可点） | `hero-$sessionID` | 否，进入原 active session | 分段之后 space.4；FcHeroCard 满宽358dp，由 today-content / platform-content 所有；[TodayScreen.kt:72](../../app/src/main/java/com/ignacioli/finecoach/features/today/TodayScreen.kt#L72) |
+| Today → 加载失败时重试 | `today-retry` | 否，重新读取 repository | 分段下内容区；FcButton 填满 today-content；[TodayScreen.kt:66](../../app/src/main/java/com/ignacioli/finecoach/features/today/TodayScreen.kt#L66)，既有 TodayNavigationEntryLayoutTests 覆盖错误恢复 |
+
+## P4 Today S1，round 2（board fix 后 budget round 1，S1-D69/D70/D71）
+
+- 分类与依据：D 类 drift repair；目标设计不变，使用已修正的 01-today-s1 PNG 和 DS-PAGE-PRIMARY anatomy。
+- 范围与差异：复用 DS-PAGE-PRIMARY / DS-SEGMENTED / DS-HERO-CARD；移除分段在标题上方的旧顺序，改为标题/日期→分段→内容，块间仍为 space.4。分段移除占布局高度的44dp触控外框，选项布局按50×32，触控区向外扩展。共享修改同时适用于 StudentList；无分段 viewer 的执行顺序不变。
+- 设计决定：S1-D69/D70/D71 已解决 round 1 的 CONTENT/POSITION/FONT 冲突；fixture 单一 trainingFocus 大腿，保留产品 title/排序逻辑，无新增设计决定。
+- 实现与检查：S1ComponentTests.primaryPage 与 TodayConformanceTests 断言标题/日期→分段→内容及 space.4；ComponentContractTests.segmented 验证50×32布局、8dp间距和50×48触控bounds；入口 map 见上表。未打开 Android capture；L3 负责人派生板审查及设备走查 PENDING。
+- 结果：NOT CONVERGED；最终 host 978/0，G3 42/0、G4 12/0；Training 48/0、D2b 67/0、AddExercise 48/0；Today 0 PASS / 12 FAIL / 0 MISSING，manual 1/12（8.33%）。剩余页头组合与文字框 gap 决策证据、逐check计数和耗时记录于 `.handoff/subagent/2026-11-12-p4-today-r2.md`；未 commit / delegate，未改 iOS、board、baseline 或 comparator。

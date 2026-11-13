@@ -92,7 +92,11 @@ class ComponentContractTests {
 
     @Test fun segmented() {
         show { var value by remember { mutableIntStateOf(0) }; FcSegmentedSwitch(listOf("今日", "学员"), value, { value = it }, tag = "seg") }
-        touch("seg-0"); touch("seg-1")
+        listOf("seg-0", "seg-1").forEach { tag ->
+            node(tag).assertWidthIsEqualTo(50.dp).assertHeightIsEqualTo(32.dp)
+                .assertTouchWidthIsEqualTo(50.dp).assertTouchHeightIsEqualTo(48.dp)
+        }
+        assertEquals(8.dp, node("seg-1").getUnclippedBoundsInRoot().left - node("seg-0").getUnclippedBoundsInRoot().right)
         node("conformance:DS-SEGMENTED · selected").assertWidthIsEqualTo(50.dp).assertHeightIsEqualTo(32.dp)
         node("seg-0").assertIsSelected(); node("seg-1").assertIsNotSelected().performClick()
         node("seg-0").assertIsNotSelected(); node("seg-1").assertIsSelected()

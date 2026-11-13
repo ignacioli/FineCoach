@@ -13,12 +13,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import com.ignacioli.finecoach.R
 
-/** §4.6: segmented navigation precedes the display title; the caller owns routes/actions. */
+/** §4.6: display title and optional date precede segmented navigation; the caller owns routes/actions. */
 @Composable
 fun FcPagePrimary(title: String, modifier: Modifier = Modifier, segments: (@Composable () -> Unit)? = null,
     subtitle: String? = null, subtitleModifier: Modifier = Modifier, actions: @Composable RowScope.() -> Unit = {}, content: @Composable ColumnScope.() -> Unit) {
     Column(modifier.fillMaxWidth().background(FcColors.surfacePage), verticalArrangement = Arrangement.spacedBy(FcSpacing.space4)) {
-        segments?.invoke()
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(FcSpacing.space1)) {
             // S1-D42: header row keeps the 44dp touch row with or without actions
             Row(Modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.touch), verticalAlignment = Alignment.CenterVertically) {
@@ -29,6 +28,7 @@ fun FcPagePrimary(title: String, modifier: Modifier = Modifier, segments: (@Comp
             }
             subtitle?.let { FcText(it, subtitleModifier, style = FcTypography.style("callout", 400), color = FcColors.textSecondary) }
         }
+        segments?.invoke()
         content()
     }
 }

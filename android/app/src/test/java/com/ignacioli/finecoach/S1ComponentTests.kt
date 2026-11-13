@@ -170,9 +170,11 @@ class S1ComponentTests {
     @Test fun primaryPage() {
         show { FcPagePrimary("虚构首页", Modifier.testTag("primary"), segments = {
             FcSegmentedSwitch(listOf("今日", "学员"), 0, {}, Modifier.testTag("segments"))
-        }) { FcListRow("虚构内容", Modifier.testTag("content")) } }
+        }, subtitle = "虚构日期", subtitleModifier = Modifier.testTag("date")) { FcListRow("虚构内容", Modifier.testTag("content")) } }
         full("primary"); full("content")
-        assertTrue(node("segments").getUnclippedBoundsInRoot().bottom <= compose.onNodeWithText("虚构首页").getUnclippedBoundsInRoot().top)
+        assertTrue(compose.onNodeWithText("虚构首页").getUnclippedBoundsInRoot().bottom <= node("date").getUnclippedBoundsInRoot().top)
+        assertEquals(FcSpacing.space4, node("segments").getUnclippedBoundsInRoot().top - node("date").getUnclippedBoundsInRoot().bottom)
+        assertEquals(FcSpacing.space4, node("content").getUnclippedBoundsInRoot().top - node("segments").getUnclippedBoundsInRoot().bottom)
         compose.onNodeWithText("虚构首页").assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading))
     }
 

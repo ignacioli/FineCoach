@@ -162,7 +162,10 @@ fun FcSegmentedSwitch(options: List<String>, selection: Int, onSelect: (Int) -> 
     Row(modifier.selectableGroup(), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
         options.forEachIndexed { index, title ->
             val selected = index == selection
-            Box(Modifier.touch().testTag("$tag-$index").selectable(selected = selected, role = Role.Tab, onClick = { onSelect(index) }), contentAlignment = Alignment.Center) {
+            // DS-SEGMENTED: the option owns its visual size; Compose expands the touch target outward.
+            Box(Modifier.widthIn(min = FcSpacing.space8 + FcSpacing.space4 + FcSpacing.space1 / 2)
+                .heightIn(min = FcSpacing.space8).testTag("$tag-$index")
+                .selectable(selected = selected, role = Role.Tab, onClick = { onSelect(index) }), contentAlignment = Alignment.Center) {
                 Box(Modifier.clip(FcShapes.capsule)
                     .then(if (selected) Modifier.background(FcColors.actionPrimary) else Modifier)
                     .testTag(if (selected) "conformance:DS-SEGMENTED · selected" else "$tag-unselected-$index")
