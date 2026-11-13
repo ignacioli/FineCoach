@@ -83,6 +83,7 @@ class ExerciseUiState(val useCases: ExerciseUseCases, private val repository: Ex
     var busy by mutableStateOf(false)
         private set
     private var searchGeneration = 0
+    internal var openPreferenceID: StableExerciseID? = null
 
     suspend fun search(query: String, includeHidden: Boolean = false) {
         val generation = ++searchGeneration
@@ -100,11 +101,23 @@ class ExerciseUiState(val useCases: ExerciseUseCases, private val repository: Ex
                     }
                 }
                 if (generation != searchGeneration) return
+                // Only the open sheet may retain a filtered-out exercise's saved preference.
+                openPreferenceID?.takeIf { it !in prefs }?.let { id ->
+                    preferences[id]?.let { prefs[id] = it }
+                }
                 preferences = prefs
                 metadata = repository.browseMetadata
                 entries = result.value
                 error = null
             }
+        }
+    }
+
+    internal suspend fun updateLibraryPreference(command: UpdateExercisePreferenceCommand, onSaved: () -> Unit) {
+        perform({ useCases.updatePreference(command) }) { saved ->
+            ++searchGeneration
+            preferences = preferences + (saved.exerciseID to saved)
+            onSaved()
         }
     }
 

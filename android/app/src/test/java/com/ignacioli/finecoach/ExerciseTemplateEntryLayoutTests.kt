@@ -54,6 +54,18 @@ class ExerciseTemplateEntryLayoutTests {
         control.assertIsEnabled().assertHasClickAction().performClick()
         compose.waitForIdle()
     }
+    private fun toggle(tag: String, checked: Boolean) {
+        click(tag)
+        compose.waitUntil(15_000) { !exerciseState.busy }
+        if (checked) node(tag).assertIsOn() else node(tag).assertIsOff()
+    }
+    private fun dismissOptions() {
+        // performClick taps the full-window scrim's center, which is covered by the sheet.
+        compose.onNodeWithContentDescription("关闭工作表", useUnmergedTree = true)
+            .assertIsDisplayed().assertIsEnabled().assertHasClickAction()
+            .performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.OnClick) { it() }
+        gone("exercise-options-content")
+    }
     private fun text(tag: String, value: String) { node(tag).performScrollTo().assertIsDisplayed().performTextReplacement(value) }
     private fun exists(tag: String) = compose.onAllNodesWithTag(tag, useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty()
     private fun await(tag: String) { compose.waitUntil(15_000) { exists(tag) } }
@@ -240,7 +252,7 @@ class ExerciseTemplateEntryLayoutTests {
         assertTrue(rows.isNotEmpty())
         node("exercise-library-section-胸").assertTextEquals("胸 · ${rows.size}")
         val tag = "exercise-options-${rows.first().exerciseID.value}"
-        full(tag, "platform-content"); click(tag); click("exercise-options-cancel")
+        full(tag, "platform-content"); click(tag); dismissOptions()
         click("exercise-library-filter"); click("exercise-library-equipment-all"); click("exercise-library-filter-done")
         click("exercise-library-muscle-all")
         node("exercise-library-muscle-all").assertIsSelected()
@@ -271,7 +283,7 @@ class ExerciseTemplateEntryLayoutTests {
         }
         library(); await("exercise-library-recent")
         val recentTag = "exercise-library-recent-${item.exerciseID.value}"
-        full(recentTag, "platform-content"); click(recentTag); click("exercise-options-cancel")
+        full(recentTag, "platform-content"); click(recentTag); dismissOptions()
         // Complete list intentionally retains the same action as a separate row/tag.
         node("exercise-options-${item.exerciseID.value}").assertExists()
         text("exercise-library-search", "虚构"); gone("exercise-library-recent")
@@ -281,9 +293,9 @@ class ExerciseTemplateEntryLayoutTests {
         click("exercise-library-filter"); click("exercise-library-equipment-杠铃"); click("exercise-library-filter-done"); gone("exercise-library-recent")
         click("exercise-library-filter"); click("exercise-library-equipment-all"); click("exercise-show-hidden"); click("exercise-library-filter-done")
         await("exercise-library-recent")
-        click(recentTag); click("exercise-hide"); gone("exercise-alias"); gone("exercise-library-recent")
+        click(recentTag); click("exercise-hide"); node("exercise-options-content").assertExists(); dismissOptions(); gone("exercise-library-recent")
         await("exercise-options-${item.exerciseID.value}")
-        click("exercise-options-${item.exerciseID.value}"); click("exercise-hide"); await("exercise-library-recent")
+        click("exercise-options-${item.exerciseID.value}"); click("exercise-hide"); dismissOptions(); await("exercise-library-recent")
     }
 
     @Test fun pickerFiltersGroupedRowsAndStudentRecentUseSameBrowseAndSelectRealSource() {
@@ -365,19 +377,171 @@ class ExerciseTemplateEntryLayoutTests {
     }
 
     @Test fun libraryHideRestoreAliasAndRecordingPreferencesRetainEachOther() {
-        val item = custom(); library(); await("exercise-options-${item.exerciseID.value}")
-        fun options() { await("exercise-options-${item.exerciseID.value}"); click("exercise-options-${item.exerciseID.value}") }
-        options(); text("exercise-alias", "虚构显示名"); full("exercise-alias", "exercise-options-content"); click("exercise-alias-save"); gone("exercise-alias")
-        options(); click("exercise-favorite"); gone("exercise-alias")
-        options(); click("exercise-assisted"); gone("exercise-alias")
-        options(); click("exercise-unilateral"); gone("exercise-alias")
-        options(); click("exercise-hide"); gone("exercise-alias")
+        val item = custom()
+        f.test { ok(exerciseUseCases.updatePreference(UpdateExercisePreferenceCommand(item.exerciseID, "虚构显示名", false, false, false, null))) }
+        library(); await("exercise-options-${item.exerciseID.value}")
+        click("exercise-options-${item.exerciseID.value}")
+        listOf("favorite", "hide", "assisted", "unilateral").forEach {
+            full("exercise-$it-row", "exercise-options-content")
+            node("exercise-$it").assertIsDisplayed().assertIsEnabled().assertHasClickAction().assertIsOff()
+        }
+        node("exercise-alias").assertDoesNotExist(); node("exercise-alias-save").assertDoesNotExist()
+        node("exercise-options-cancel").assertDoesNotExist()
+        toggle("exercise-favorite", true)
+        f.test { assertNull(ok(f.exercises.preference(item.exerciseID))!!.isUnilateral) }
+        toggle("exercise-assisted", true)
+        f.test { assertNull(ok(f.exercises.preference(item.exerciseID))!!.isUnilateral) }
+        toggle("exercise-hide", true)
+        f.test { assertNull(ok(f.exercises.preference(item.exerciseID))!!.isUnilateral) }
+        toggle("exercise-hide", false)
+        f.test { assertNull(ok(f.exercises.preference(item.exerciseID))!!.isUnilateral) }
+        toggle("exercise-unilateral", true)
+        toggle("exercise-hide", true); compose.onNode(hasText("虚构显示名") and hasAnyAncestor(hasTestTag("sheet-content")), useUnmergedTree = true).assertIsDisplayed()
         f.test { assertTrue(ok(exerciseUseCases.search("")).isEmpty()) }
-        click("exercise-library-filter"); click("exercise-show-hidden"); click("exercise-library-filter-done"); options(); click("exercise-hide"); gone("exercise-alias")
+        toggle("exercise-hide", false)
+        dismissOptions()
         f.test {
             val p = ok(f.exercises.preference(item.exerciseID))!!
             assertEquals("虚构显示名", p.alias); assertTrue(p.isFavorite); assertTrue(p.isAssisted); assertEquals(true, p.isUnilateral); assertFalse(p.isHidden)
         }
+    }
+
+    @Test fun optionsDismissDuringWriteRemovesContentAndStillSaves() {
+        val item = custom()
+        val entered = kotlinx.coroutines.CompletableDeferred<Unit>()
+        val release = kotlinx.coroutines.CompletableDeferred<Unit>()
+        val repository = object : ExerciseRepositoryPort by exerciseRepository {
+            override suspend fun updatePreference(command: UpdateExercisePreferenceCommand): ApplicationResult<ExercisePreferenceRecord> {
+                entered.complete(Unit)
+                release.await()
+                return exerciseRepository.updatePreference(command)
+            }
+        }
+        exerciseState = ExerciseUiState(ExerciseUseCases(repository, f.clock, f.ids), exerciseRepository)
+        f.test { exerciseState.search(""); assertTrue(exerciseState.entries.any { it.exerciseID == item.exerciseID }) }
+        library(); await("exercise-options-${item.exerciseID.value}")
+        click("exercise-options-${item.exerciseID.value}")
+        try {
+            click("exercise-favorite")
+            compose.waitUntil(15_000) { entered.isCompleted }
+            compose.runOnIdle { assertTrue("Write must still be busy at dismiss", exerciseState.busy) }
+            dismissOptions()
+            compose.runOnIdle { assertTrue(exerciseState.busy) }
+        } finally { release.complete(Unit) }
+        compose.waitUntil(15_000) { !exerciseState.busy }
+        compose.waitForIdle()
+        node("exercise-options-content").assertDoesNotExist()
+        assertTrue(exerciseState.preference(item.exerciseID).isFavorite)
+        f.test { assertTrue(ok(f.exercises.preference(item.exerciseID))!!.isFavorite) }
+    }
+
+    @Test fun hiddenOptionsRetainSavedFieldsUntilClosedAndSearchDropsTheirKey() {
+        val item = custom()
+        library(); await("exercise-options-${item.exerciseID.value}")
+        click("exercise-options-${item.exerciseID.value}")
+        toggle("exercise-assisted", true)
+        toggle("exercise-unilateral", true)
+        toggle("exercise-hide", true)
+        // This disappearance proves the post-save refresh ran after generation invalidation.
+        gone("exercise-options-${item.exerciseID.value}")
+        node("exercise-hide").assertIsOn()
+        node("exercise-assisted").assertIsOn()
+        node("exercise-unilateral").assertIsOn()
+        toggle("exercise-favorite", true)
+        dismissOptions()
+        f.test {
+            exerciseState.search("")
+            assertFalse(exerciseState.preferences.containsKey(item.exerciseID))
+            val saved = ok(f.exercises.preference(item.exerciseID))!!
+            assertTrue(saved.isFavorite && saved.isHidden && saved.isAssisted)
+            assertEquals(true, saved.isUnilateral)
+        }
+    }
+
+    @Test fun optionsReopenedDuringWriteUsesSavedPreferenceForNextToggle() {
+        f.test { exerciseRepository.prepareCatalog() }
+        val id = StableExerciseID.parse("81942f3d-d92c-431c-b9d0-0da12918d1e4")
+        val entered = kotlinx.coroutines.CompletableDeferred<Unit>()
+        val release = kotlinx.coroutines.CompletableDeferred<Unit>()
+        val repository = object : ExerciseRepositoryPort by exerciseRepository {
+            override suspend fun updatePreference(command: UpdateExercisePreferenceCommand): ApplicationResult<ExercisePreferenceRecord> {
+                entered.complete(Unit)
+                release.await()
+                return exerciseRepository.updatePreference(command)
+            }
+        }
+        exerciseState = ExerciseUiState(ExerciseUseCases(repository, f.clock, f.ids), exerciseRepository)
+        f.test { exerciseState.search(""); assertTrue(exerciseState.entries.any { it.exerciseID == id }) }
+        library(); await("exercise-options-${id.value}")
+        click("exercise-options-${id.value}")
+        node("exercise-unilateral").assertIsOn()
+        try {
+            click("exercise-unilateral")
+            compose.waitUntil(15_000) { entered.isCompleted }
+            compose.runOnIdle { assertTrue(exerciseState.busy) }
+            dismissOptions()
+            click("exercise-options-${id.value}")
+            compose.runOnIdle { assertTrue(exerciseState.busy) }
+            listOf("favorite", "hide", "assisted", "unilateral").forEach {
+                node("exercise-$it").assertIsNotEnabled()
+            }
+        } finally { release.complete(Unit) }
+        compose.waitUntil(15_000) { !exerciseState.busy }
+        compose.waitForIdle()
+        node("exercise-unilateral").assertIsOff()
+        toggle("exercise-favorite", true)
+        node("exercise-unilateral").assertIsOff()
+        f.test {
+            val saved = ok(f.exercises.preference(id))!!
+            assertEquals(false, saved.isUnilateral)
+            assertTrue(saved.isFavorite)
+        }
+    }
+
+    @Test fun unilateralCatalogDefaultStaysNullUntilCoachChangesIt() {
+        f.test { exerciseRepository.prepareCatalog() }
+        val holdRefresh = java.util.concurrent.atomic.AtomicBoolean(false)
+        val refreshEntered = java.util.concurrent.CountDownLatch(1)
+        val releaseRefresh = java.util.concurrent.CountDownLatch(1)
+        val loader = ExerciseCatalogLoader(ApplicationProvider.getApplicationContext<Context>().assets)
+        val repository = com.ignacioli.finecoach.storage.repository.ExerciseRepository(f.db, loader, f.clock) {
+            if (holdRefresh.get()) {
+                refreshEntered.countDown()
+                check(releaseRefresh.await(15, java.util.concurrent.TimeUnit.SECONDS)) { "Refresh was not released" }
+            }
+            loader.load(f.clock.now())
+        }
+        exerciseState = ExerciseUiState(ExerciseUseCases(repository, f.clock, f.ids), repository)
+        library(); await("exercise-library-search")
+        text("exercise-library-search", "绳索侧平举")
+        val id = StableExerciseID.parse("81942f3d-d92c-431c-b9d0-0da12918d1e4")
+        await("exercise-options-${id.value}"); click("exercise-options-${id.value}")
+        node("exercise-unilateral").assertIsDisplayed().assertIsOn()
+        node("exercise-edit").assertDoesNotExist()
+        toggle("exercise-favorite", true)
+        node("exercise-unilateral").assertIsOn()
+        f.test { assertNull(ok(f.exercises.preference(id))!!.isUnilateral) }
+        toggle("exercise-hide", true)
+        node("exercise-unilateral").assertIsOn()
+        f.test { assertNull(ok(f.exercises.preference(id))!!.isUnilateral) }
+        toggle("exercise-hide", false)
+        toggle("exercise-assisted", true)
+        node("exercise-unilateral").assertIsOn()
+        f.test { assertNull(ok(f.exercises.preference(id))!!.isUnilateral) }
+        holdRefresh.set(true)
+        try {
+            toggle("exercise-unilateral", false)
+            compose.waitUntil(15_000) { refreshEntered.count == 0L }
+            // Search is still blocked: reopening must use the immediately updated preference map.
+            dismissOptions()
+            click("exercise-options-${id.value}"); node("exercise-unilateral").assertIsOff()
+            click("exercise-favorite")
+        } finally { releaseRefresh.countDown() }
+        compose.waitUntil(15_000) { !exerciseState.busy }
+        compose.waitForIdle()
+        node("exercise-unilateral").assertIsOff()
+        f.test { assertEquals(false, ok(f.exercises.preference(id))!!.isUnilateral) }
+        f.test { assertFalse(ok(f.exercises.preference(id))!!.isFavorite) }
     }
 
     @Test fun invalidAndConflictingExerciseNamesKeepInputAndDoNotWrite() {
@@ -651,11 +815,11 @@ class ExerciseTemplateEntryLayoutTests {
         click("exercise-save"); compose.waitUntil(15_000) { back == 1 }
         f.test { assertEquals(1, ok(exerciseUseCases.search("虚构键盘动作")).size) }
     }
-    @Test fun exerciseOptionsCancelDiscardsAliasWithoutWritingPreferenceOrCatalog() {
+    @Test fun exerciseOptionsDismissWithoutChangesWritesNeitherPreferenceNorCatalog() {
         val original = custom(); library()
         await("exercise-options-${original.exerciseID.value}")
-        click("exercise-options-${original.exerciseID.value}"); text("exercise-alias", "虚构取消显示名")
-        click("exercise-options-cancel"); gone("exercise-alias")
+        click("exercise-options-${original.exerciseID.value}")
+        dismissOptions()
         f.test {
             assertEquals(original, ok(f.exercises.listCatalog()).single())
             assertNull(ok(f.exercises.preference(original.exerciseID)))

@@ -10,6 +10,11 @@ import com.ignacioli.finecoach.features.exercises.*
 import com.ignacioli.finecoach.storage.*
 import com.ignacioli.finecoach.storage.repository.*
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlin.coroutines.CoroutineContext
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.TimeUnit
 import org.junit.*
 import org.junit.Assert.*
 import org.junit.runner.RunWith
@@ -56,17 +61,61 @@ class ExerciseStateCommandTests {
         val item = custom()
         val command = UpdateExercisePreferenceCommand(item.exerciseID, "虚构别名", true, true, true, false)
         var calls = 0
-        state.updateLibraryPreference(command) { calls++ }
+        state.updateLibraryPreference(command) {
+            calls++
+            assertTrue(state.busy)
+            assertEquals(false, state.preference(item.exerciseID).isUnilateral)
+            assertEquals("虚构别名", state.preference(item.exerciseID).alias)
+        }
         val stored = repository.preference(item.exerciseID).requireSuccess()!!
         assertEquals("虚构别名", stored.alias)
         assertTrue(stored.isFavorite && stored.isHidden && stored.isAssisted)
         assertEquals(false, stored.isUnilateral)
         assertEquals(1, calls); assertNull(state.error); assertFalse(state.busy)
+        state.openPreferenceID = item.exerciseID
+        state.search("")
+        assertTrue(state.entries.none { it.exerciseID == item.exerciseID })
+        assertEquals(stored, state.preference(item.exerciseID))
+        // The open sheet retains saved fields even when the refresh filters out the exercise.
+        val reopened = state.preference(item.exerciseID)
+        state.updateLibraryPreference(UpdateExercisePreferenceCommand(item.exerciseID, reopened.alias,
+            false, reopened.isHidden, reopened.isAssisted, reopened.isUnilateral)) {}
+        assertEquals(false, state.preference(item.exerciseID).isUnilateral)
+        assertEquals(false, repository.preference(item.exerciseID).requireSuccess()!!.isUnilateral)
+        state.openPreferenceID = null
+        state.search("")
+        assertFalse(state.preferences.containsKey(item.exerciseID))
+    }
+    @Test fun staleSearchCannotOverwriteSavedPreferenceOrNextCommand() = runBlocking {
+        val item = custom()
+        state.updateLibraryPreference(UpdateExercisePreferenceCommand(item.exerciseID, "虚构别名", false, false, false, null)) {}
+        val pending = LinkedBlockingQueue<Runnable>()
+        val dispatcher = object : CoroutineDispatcher() {
+            override fun dispatch(context: CoroutineContext, block: Runnable) { pending.add(block) }
+        }
+        fun next(): Runnable = requireNotNull(pending.poll(15, TimeUnit.SECONDS)) { "Search continuation missing" }
+        val search = launch(dispatcher) { state.search("") }
+        next().run() // Start search; repository work runs on IO.
+        next().run() // Consume results and start reading the old preference.
+        val stalePreference = next() // The old row was read, but has not reached state yet.
+        state.updateLibraryPreference(UpdateExercisePreferenceCommand(item.exerciseID, "虚构别名", false, true, true, false)) {}
+        val saved = state.preference(item.exerciseID)
+        stalePreference.run()
+        search.join()
+        assertEquals(saved, state.preference(item.exerciseID))
+        val current = state.preference(item.exerciseID)
+        state.updateLibraryPreference(UpdateExercisePreferenceCommand(item.exerciseID, current.alias,
+            true, current.isHidden, current.isAssisted, current.isUnilateral)) {}
+        val stored = repository.preference(item.exerciseID).requireSuccess()!!
+        assertTrue(stored.isFavorite && stored.isHidden && stored.isAssisted)
+        assertEquals(false, stored.isUnilateral)
+        assertEquals("虚构别名", stored.alias)
     }
     @Test fun preferenceFailureDoesNotCallSuccess() = runBlocking {
         var calls = 0
         state.updateLibraryPreference(UpdateExercisePreferenceCommand(StableExerciseID.parse("fictional-missing"), null, true, false, false, null)) { calls++ }
         assertEquals(0, calls); assertNotNull(state.error); assertFalse(state.busy)
+        assertTrue(state.preferences.isEmpty())
     }
     @Test fun saveCreatesThenUpdatesSameIdentity() = runBlocking {
         val item = custom()

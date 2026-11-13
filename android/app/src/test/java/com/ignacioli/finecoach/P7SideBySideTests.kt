@@ -263,7 +263,7 @@ private fun captureSheet(activity: Bitmap, panelTag: String): Bitmap {
     @Test fun exerciseOptionsSheet() = measure(
         "34-exercise-options-sheet", "ExerciseLibraryScreen / 动作选项",
         "ExerciseConformanceFixture；胸 21；杠铃平板卧推 favorite on / hidden off / assisted off",
-        "PNG 为动作名/副标题及 toggles；Android 为动作选项标题、显示名编辑及 action rows，另有单侧记录和取消。",
+        "S1-D92：动作名/副标题及四个即时 toggles；第四个单侧动作按 iOS 补齐，PNG 仅有三个。",
         sheetTag = "exercise-options-content",
     ) {
         val f = ExerciseConformanceFixture().also { releaseFixture = it::close }
