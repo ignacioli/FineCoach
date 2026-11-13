@@ -18,20 +18,20 @@ fun HistoryDetailScreen(state: HistoryUiState, id: SessionID, zone: ZoneId, onBa
     LaunchedEffect(id) { state.load(id) }
     if (edit) { HistoryFocusEditor(state, { edit = false }) { edit = false }; return }
     FcPlatformShell(onBack) {
-        Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).testTag("history-detail-content"), verticalArrangement = Arrangement.spacedBy(FcSpacing.space6)) {
-            FcPageHeader("训练记录", onBack = onBack, tag = "history-detail")
+        Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).padding(bottom = FcSpacing.space6).testTag("history-detail-content"), verticalArrangement = Arrangement.spacedBy(FcSpacing.space6)) {
+            FcPageHeader("训练记录", onBack = onBack, tag = "history-detail", backVisualTag = "history-detail-back-visual")
             state.error?.let { FcListRow("加载失败，请返回重试", Modifier.testTag("history-detail-error")) }
             state.detail?.let { detail ->
                 val session = detail.content.session
                 HistoryRecordCard(detail, zone, state.studentName)
                 if (detail.creditNote?.note == SessionCreditSettlementNote.noActivePackage) HistoryCaption("未扣课 · 无有效课包", Modifier.testTag("history-credit-note"))
                 Column(Modifier.fillMaxWidth().testTag("history-actions")) {
-                    FcListRowDivider()
+                    FcListRowDivider(Modifier.testTag("conformance:Divider"))
                     FcActionRow("编辑训练重点", Modifier.testTag("history-edit-focus-entry"), enabled = !state.busy) {
                         state.focus = session.trainingFocus; edit = true
                     }
-                    templates?.let { FcListRowDivider(); HistoryTemplateEntry(it, detail.content) }
-                    FcListRowDivider()
+                    templates?.let { FcListRowDivider(Modifier.testTag("conformance:Divider")); HistoryTemplateEntry(it, detail.content) }
+                    FcListRowDivider(Modifier.testTag("conformance:Divider"))
                     HistoryCaption("训练数据为只读记录，可编辑训练重点。", Modifier.padding(top = FcSpacing.space2).testTag("history-readonly"))
                 }
 

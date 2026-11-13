@@ -3,7 +3,12 @@ package com.ignacioli.finecoach.features.history
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.constrainHeight
+import androidx.compose.ui.unit.constrainWidth
 import com.ignacioli.finecoach.core.application.*
 import com.ignacioli.finecoach.core.domain.common.*
 import com.ignacioli.finecoach.designsystem.*
@@ -55,7 +60,7 @@ internal fun HistoryRecordCard(detail: HistoryDetail, zone: ZoneId, studentName:
         if (BigDecimal(detail.statistics.displayedDurationSeconds.canonicalString) > BigDecimal.ZERO)
             add(historyMinutes(detail.statistics.displayedDurationSeconds.canonicalString) to "分钟")
     }
-    Column(Modifier.fillMaxWidth().padding(vertical = FcSpacing.space4).testTag("history-record-card"),
+    Column(Modifier.fillMaxWidth().testTag("history-record-card"),
         verticalArrangement = Arrangement.spacedBy(FcSpacing.space6)) {
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(FcSpacing.space1)) {
             session.completedAtUTC?.let {
@@ -68,25 +73,25 @@ internal fun HistoryRecordCard(detail: HistoryDetail, zone: ZoneId, studentName:
         }
         if (stats.isNotEmpty()) Row(Modifier.fillMaxWidth().testTag("history-record-stats"), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space4)) {
             stats.forEach { (value, label) -> Column(Modifier.weight(1f).testTag("history-stat-$label"), verticalArrangement = Arrangement.spacedBy(FcSpacing.space1)) {
-                FcText(value, style = FcTypography.numeralLarge, color = FcColors.textPrimary)
+                FcText(value, Modifier.then(if (label == "总次数") Modifier.testTag("history-total-reps") else Modifier), style = FcTypography.numeralLarge, color = FcColors.textPrimary)
                 HistoryCaption(label)
             } }
         }
         if (exercises.isNotEmpty()) HistoryRecordSection("动作", "history-record-exercises") {
-            exercises.forEach { exercise ->
-                Column(Modifier.fillMaxWidth().padding(bottom = FcSpacing.space4), verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
-                    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(FcSpacing.space3)) {
-                    FcEquipmentIconForExercise(exercise.sourceID.takeUnless { exercise.sourceKind == ExerciseSourceKind.sessionOnly })
+            exercises.forEachIndexed { exerciseIndex, exercise ->
+                if (exerciseIndex > 0) Spacer(Modifier.height(FcSpacing.space4))
+                Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+                    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+                    FcEquipmentIconForExercise(exercise.sourceID.takeUnless { exercise.sourceKind == ExerciseSourceKind.sessionOnly },
+                        Modifier.testTag("conformance:icon / ${historyEquipmentName(exercise.sourceID)}"))
                     FcText(exercise.displayNameSnapshot, Modifier.testTag("history-snapshot-${exercise.sessionExerciseID.value}"),
                         style = FcTypography.headline, color = FcColors.textPrimary)
                     }
                     exercise.sets.filter { it.state == SetRecordingState.completed }.sortedBy { it.orderIndex }.chunked(3).forEachIndexed { rowIndex, row ->
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
                             row.forEachIndexed { index, set ->
-                                Row(Modifier.weight(1f).testTag("history-set-${set.trainingSetID.value}"), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space1)) {
-                                    FcText("${rowIndex * 3 + index + 1}", style = FcTypography.caption, color = FcColors.textDisabled)
-                                    FcText(set.toDomain().displaySummary(), style = FcTypography.style("callout", 400), color = FcColors.textPrimary)
-                                }
+                                HistorySetCell("${rowIndex * 3 + index + 1}", set.toDomain().displaySummary(),
+                                    Modifier.weight(1f).alignByBaseline().testTag("history-set-${set.trainingSetID.value}"))
                             }
                             repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
                         }
@@ -102,15 +107,49 @@ internal fun HistoryRecordCard(detail: HistoryDetail, zone: ZoneId, studentName:
     }
 }
 
+/** Publish the value baseline for the enclosing three-cell row as well as the index/value pair. */
+@Composable
+private fun HistorySetCell(index: String, value: String, modifier: Modifier) {
+    Layout(modifier = modifier, content = {
+        FcText(index, style = FcTypography.caption, color = FcColors.textDisabled)
+        FcText(value, style = FcTypography.style("callout", 400), color = FcColors.textPrimary,
+            maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis)
+    }) { measurables, constraints ->
+        val indexPlaceable = measurables[0].measure(constraints.copy(minWidth = 0, minHeight = 0))
+        val gap = FcSpacing.space1.roundToPx()
+        val valuePlaceable = measurables[1].measure(constraints.copy(minWidth = 0, minHeight = 0,
+            maxWidth = (constraints.maxWidth - indexPlaceable.width - gap).coerceAtLeast(0)))
+        val baseline = maxOf(indexPlaceable[FirstBaseline], valuePlaceable[FirstBaseline])
+        val indexY = baseline - indexPlaceable[FirstBaseline]
+        val valueY = baseline - valuePlaceable[FirstBaseline]
+        layout(constraints.constrainWidth(indexPlaceable.width + gap + valuePlaceable.width),
+            constraints.constrainHeight(maxOf(indexY + indexPlaceable.height, valueY + valuePlaceable.height)),
+            alignmentLines = mapOf(FirstBaseline to baseline)) {
+            indexPlaceable.placeRelative(0, indexY)
+            valuePlaceable.placeRelative(indexPlaceable.width + gap, valueY)
+        }
+    }
+}
+
 @Composable
 private fun HistoryRecordSection(title: String, tag: String, content: @Composable ColumnScope.() -> Unit) {
     Column(Modifier.fillMaxWidth().testTag(tag), verticalArrangement = Arrangement.spacedBy(FcSpacing.space3)) {
-        FcListRowDivider()
-        FcSectionLabel(title)
-        content()
+        FcListRowDivider(Modifier.testTag("conformance:Divider"))
+        Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+            FcSectionLabel(title)
+            Column(Modifier.fillMaxWidth(), content = content)
+        }
     }
 }
 
 private fun historyGrouped(value: BigDecimal): String = java.text.NumberFormat.getNumberInstance(Locale.SIMPLIFIED_CHINESE).apply {
     maximumFractionDigits = 1
 }.format(value)
+
+@Composable
+private fun historyEquipmentName(id: StableExerciseID?): String {
+    val assets = androidx.compose.ui.platform.LocalContext.current.applicationContext.assets
+    val metadata = androidx.compose.runtime.remember(assets) { ExerciseCatalogLoader(assets).load(Instant.EPOCH).metadata }
+    val facet = metadata[id]
+    return FcEquipmentIcon.icon(facet?.equipmentClass, facet?.primaryMuscleGroup)?.name?.replace('_', '-') ?: "unmapped"
+}
