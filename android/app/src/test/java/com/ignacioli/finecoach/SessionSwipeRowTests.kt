@@ -31,6 +31,33 @@ class SessionSwipeRowTests {
     @get:Rule val compose = createComposeRule()
     private fun node(tag: String) = compose.onNodeWithTag(tag, useUnmergedTree = true)
 
+    @Test fun closedShortRowPreservesUnwrappedHeightAndContentBounds() {
+        compose.setContent {
+            FineCoachTheme {
+                Column {
+                    Box(Modifier.fillMaxWidth().testTag("plain-row")) {
+                        FcText("辅助训练", Modifier.fillMaxWidth().testTag("plain-content"), style = FcTypography.sectionLabel)
+                    }
+                    SessionSwipeRow("wrapped-row", false, true, {}, listOf(
+                        SessionSwipeAction("删除分区", "session-section-delete", true) {})) {
+                        FcText("辅助训练", Modifier.fillMaxWidth().testTag("wrapped-content"), style = FcTypography.sectionLabel)
+                    }
+                }
+            }
+        }
+        val plain = node("plain-row").getUnclippedBoundsInRoot()
+        val wrapped = node("wrapped-row").getUnclippedBoundsInRoot()
+        val plainContent = node("plain-content").getUnclippedBoundsInRoot()
+        val wrappedContent = node("wrapped-content").getUnclippedBoundsInRoot()
+        assertTrue("Fixture must exercise a row shorter than the touch target", plain.height < FcComponentMetrics.touch)
+        assertEquals(plain.height, wrapped.height)
+        assertEquals(plain.width, wrapped.width)
+        assertEquals(plainContent.width, wrappedContent.width)
+        assertEquals(plainContent.height, wrappedContent.height)
+        assertEquals(plainContent.left - plain.left, wrappedContent.left - wrapped.left)
+        assertEquals(plainContent.top - plain.top, wrappedContent.top - wrapped.top)
+    }
+
     @Test fun exerciseTilesFollowDesignOrderWidthAndKeepLeadingContent() {
         var open by mutableStateOf(false)
         var moves = 0
@@ -69,9 +96,11 @@ class SessionSwipeRowTests {
         var deletes = 0
         compose.setContent {
             FineCoachTheme {
+                Box(Modifier.padding(vertical = FcComponentMetrics.touch)) {
                 SessionSwipeRow("row", open, true, { open = it }, listOf(
                     SessionSwipeAction("删除分区", "session-section-delete", true) { deletes++ })) {
                     FcText("辅助训练", Modifier.testTag("leading"), style = FcTypography.sectionLabel)
+                }
                 }
             }
         }
@@ -82,14 +111,19 @@ class SessionSwipeRowTests {
         assertEquals(before.left, node("leading").getUnclippedBoundsInRoot().left)
         val pill = node("session-section-delete").assertIsDisplayed().getUnclippedBoundsInRoot()
         assertEquals(FcComponentMetrics.label + FcSpacing.space4, pill.width)
-        assertTrue(pill.height >= FcComponentMetrics.touch)
         assertEquals(FcSpacing.space8 + FcSpacing.space1,
             node("session-section-delete-visual").getUnclippedBoundsInRoot().height)
         assertEquals(0, deletes)
         node("session-section-delete").performTouchInput {
-            click(Offset(center.x, FcSpacing.space1.toPx() / 2))
+            click(Offset(center.x, center.y - FcComponentMetrics.touch.toPx() / 2 + FcSpacing.space1.toPx() / 2))
         }
         compose.runOnIdle { assertEquals(1, deletes); assertFalse(open) }
+        compose.runOnIdle { open = true }
+        compose.waitForIdle()
+        node("session-section-delete").performTouchInput {
+            click(Offset(center.x, center.y + FcComponentMetrics.touch.toPx() / 2 - FcSpacing.space1.toPx() / 2))
+        }
+        compose.runOnIdle { assertEquals(2, deletes); assertFalse(open) }
     }
 
     @Test fun allTileLabelsFitAtFontScaleOnePointThree() {
@@ -122,6 +156,7 @@ class SessionSwipeRowTests {
             val text = label.getUnclippedBoundsInRoot()
             assertTrue("$title must stay inside its tile", text.left >= tile.left && text.right <= tile.right)
         }
-        assertTrue(node("session-section-delete").getUnclippedBoundsInRoot().height >= FcComponentMetrics.touch)
+        assertEquals(FcSpacing.space8 + FcSpacing.space1,
+            node("session-section-delete-visual").getUnclippedBoundsInRoot().height)
     }
 }

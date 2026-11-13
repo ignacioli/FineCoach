@@ -39,7 +39,7 @@ internal fun SessionSwipeRow(tag: String, open: Boolean, enabled: Boolean, revea
     var width by remember { mutableIntStateOf(0) }
     val fullSwipe by rememberUpdatedState(onFullSwipe)
     val revealWidth by animateFloatAsState(if (open) actionStripWidth.toFloat() else 0f, tween(SessionMotionDurationMillis), label = "session-swipe")
-    BoxWithConstraints(Modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.touch).testTag(tag).onSizeChanged { width = it.width }.pointerInput(enabled, open) {
+    BoxWithConstraints(Modifier.fillMaxWidth().testTag(tag).onSizeChanged { width = it.width }.pointerInput(enabled, open) {
         if (enabled) {
             var drag = 0f
             detectHorizontalDragGestures(onDragStart = { drag = 0f }, onDragEnd = {
@@ -54,7 +54,7 @@ internal fun SessionSwipeRow(tag: String, open: Boolean, enabled: Boolean, revea
                 orderedActions.forEach { action ->
                     val section = action.tag == "session-section-delete"
                     Box(Modifier.widthIn(min = actionWidth(action)).width(IntrinsicSize.Max)
-                        .fillMaxHeight().heightIn(min = FcComponentMetrics.touch)
+                        .fillMaxHeight().requiredHeightIn(min = FcComponentMetrics.touch)
                         .testTag(action.tag).clickable(enabled = enabled, role = Role.Button) { reveal(false); action.run() },
                         contentAlignment = Alignment.Center) {
                         Row(Modifier.fillMaxWidth().testTag("${action.tag}-visual")
@@ -73,7 +73,7 @@ internal fun SessionSwipeRow(tag: String, open: Boolean, enabled: Boolean, revea
         // Reveal only the trailing area; keep the leading title/ordinal at its original x.
         // Measure the content at the closed width so its trailing controls are clipped, not reflowed.
         Column(Modifier.fillMaxWidth().padding(end = with(density) { revealWidth.toDp() })
-            .heightIn(min = FcComponentMetrics.touch).clipToBounds()
+            .clipToBounds()
             .wrapContentWidth(Alignment.Start, unbounded = true).width(maxWidth)
             .background(FcColors.surfacePage), verticalArrangement = Arrangement.Center) { content() }
     }
