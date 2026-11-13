@@ -3,6 +3,7 @@ package com.ignacioli.finecoach
 
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.*
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -116,6 +117,25 @@ class ActiveSessionEntryLayoutTests {
     }
     private fun options(set: TrainingSetRecord) = swipe("session-set-${set.trainingSetID.value}-swipe")
     private fun change(action: (SectionedSession) -> SectionedSession) { f.test { ok(state.mutate(action)) }; compose.waitForIdle() }
+    @Test fun scrollEndKeepsAddControlsFullyAbovePinnedFinish() {
+        show(content())
+        val body = node("active-session-content")
+        assertTrue("Fixture must overflow before scrolling", body.fetchSemanticsNode().config[SemanticsProperties.VerticalScrollAxisRange].maxValue() > 0)
+        body.performScrollToNode(hasTestTag("session-add-section"))
+        repeat(10) {
+            val range = body.fetchSemanticsNode().config[SemanticsProperties.VerticalScrollAxisRange]
+            if (range.value() < range.maxValue()) body.performTouchInput { swipeUp() }
+        }
+        val range = body.fetchSemanticsNode().config[SemanticsProperties.VerticalScrollAxisRange]
+        assertEquals(range.maxValue(), range.value())
+        val cta = node("session-finish").assertIsDisplayed().fetchSemanticsNode()
+        listOf("session-add-exercise", "session-add-section").forEach { tag ->
+            val last = node(tag).assertIsDisplayed().fetchSemanticsNode()
+            assertEquals(last.size.height.toFloat(), last.boundsInRoot.height, 0.01f)
+            assertTrue("$tag must be fully above finish", last.boundsInRoot.bottom <= cta.boundsInRoot.top)
+        }
+    }
+
     @Test fun confirmCopyPendingEditKeepsCompletionTimeAndUndoRoundtrip() {
         val original = content(); show(original)
         val set = original.exercises.first().sets.first()

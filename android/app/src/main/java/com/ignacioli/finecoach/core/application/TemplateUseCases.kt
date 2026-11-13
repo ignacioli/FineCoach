@@ -9,6 +9,7 @@ class TemplateUseCases(
     private val clock: AppClock,
 ) {
     suspend fun list() = repository.list()
+    suspend fun exerciseCounts() = repository.exerciseCounts()
     suspend fun load(id: TemplateID) = repository.loadContent(id)
     suspend fun save(command: SaveTemplateCommand) = repository.save(command)
     suspend fun retry(command: SaveTemplateCommand) = repository.save(command)

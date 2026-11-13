@@ -269,12 +269,16 @@ Android P7 总结页 D 类修复例外：按 `progress-milestones/screens/D-b-se
 
 #### `DS-LABEL-VALUE-ROW` 标签-值两栏行
 
+- **P7 D 类修复（2026-11-13）**：Android 显式 `trailingControl` 变体用于 33/36/37 的 Stepper、Toggle、Segmented：标签使用 `text.primary`，保留自然宽度，控件右对齐，行最小高沿用 52；普通值列仍为 96 宽标签、左对齐，不改变 P4。
+
 - **部件**：标签列（`callout` 400 `text.secondary`，宽 96，因此值从 x=112 开始）→ 值 slot（左对齐，任意视图）→ 可选 `›`。最小高 52；行与行之间由调用方插入 `FCListRowDivider`。
 - **变体**：纯文字值（`FCLabelValueText`，`body` `text.primary`，整行合并为一个无障碍元素）；视图值（开关、日期、文字 + 尾部元素，子元素各自保持可访问）；带 `action` 时整行可点并显示 `›`；放在 `Menu` 的 label 里时可以只显示 `›`。
 - **不变量**：标签列宽固定，值列对齐（人工，23/27）；带 action 的行显示 `›`（可自动）。
 - **复用边界**：见 CG-5。CoursePackageEditor、ManualCreditAdjustment 还有各自私有的 `editorRow`。
 
 #### `DS-ACTION-ROW` 操作行
+
+- **P7 D 类修复（2026-11-13）**：无副标题且有说明时，标题保留自然宽度、不截断，说明占剩余宽度、右对齐、最多两行；移除 Android 说明固定最大 96 宽的限制。
 
 - **部件**：标题（无副标题时为 `body`，有副标题时为 `headline`）→ 可选副标题（`caption` `text.secondary`）→ 弹性空白 → 可选说明（`caption` `text.secondary`）→ `›`（仅普通操作行）。最小高 52；有副标题时上下内边距 `space.3`。
 - **变体**：`normal`；`destructive`（`status.destructive` 字、**没有** `›`）；禁用（文字和 `›` 都改为 `text.disabled`）。destructive 行暂不可用时用禁用变体，并在说明 slot 写原因，整行不可点（B-c「删除指标」，2026-10-16 已批准）。
@@ -376,6 +380,8 @@ Android P7 总结页 D 类修复例外：按 `progress-milestones/screens/D-b-se
 **DS-LAUNCH 过渡版历史记录（2026-10-29，已由 C31 取代，不作为当前规格）**：整屏 `surface.page` 底 → 正中 180×180 圆角吉祥物图标（`launch-icon`）；无文字、无可交互控件。两处呈现同一画面：① `LaunchScreen.storyboard`（系统静态开屏）；② App 根视图最上层的一次性叠层，约 0.3 s 后 `motion.duration.fast` 淡出。不变式：① ② 资源、尺寸与底色一致，「减弱动态效果」时不创建 ②，叠层不响应点击、不读写数据（`auto`：`LaunchScreenConfigurationTests`）；画面观感（`manual`：负责人真机看过，2026-10-29）
 
 ### 4.7 已定稿规格（M2 Phase 0，T001–T012 已实现）
+
+P7 Android D 类容器修复（2026-11-13）：`FcScrollBody` 复用二级页 weighted scroll 正文，末尾保留一个主按钮行高的滚动 inset；`FcPinnedAction` 独立于滚动正文、底部 `space.8`，应用于 04/05/36/37/B-a。移除 36/37 inline CTA、05 零底距及 36 行间额外 `space.2`。D-b 沿用 StudentEditor 页头的 `space.4` bottom padding，移除正文紧贴页头的组合；页头组件默认行为及 P4 不变。
 
 状态：**已审定**（2026-10-08 起草，2026-10-09 随 M2 G7 设计载体 review 通过；来源 `design/m2-hifi/implementation-map.md` §2）。已在 M2 tasks Phase 0 实现（2026-10-10），对应行已进入 §3 索引（`ComponentCatalogTests` 要求索引与 `DesignSystem/` 公开类型一一对应）。人工项（标「人工」的不变量）尚未经人工视觉检查。
 

@@ -1,6 +1,8 @@
 package com.ignacioli.finecoach.features.packages
 
 import com.ignacioli.finecoach.designsystem.FcText
+import com.ignacioli.finecoach.designsystem.FcScrollBody
+import com.ignacioli.finecoach.designsystem.FcPinnedAction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -263,15 +265,8 @@ fun CoursePackageEditorScreen(
     }
     Box(modifier.fillMaxSize().testTag("package-editor-root")) {
         FcPlatformShell(onBack = onBack, insets = windowInsets) {
-            Column(
-                Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .verticalScroll(scroll)
-                    .testTag("package-editor-form"),
-                verticalArrangement = Arrangement.spacedBy(FcSpacing.space2),
-            ) {
-                FcPageHeader("新建课包", onBack = onBack, tag = "package-editor")
+            FcScrollBody(Modifier.testTag("package-editor-form"), scroll) {
+                FcPageHeader("新建课包", Modifier.padding(bottom = FcSpacing.space4), onBack = onBack, tag = "package-editor")
                 FcListRowDivider()
                 FcLabelValueRow("课包名称") {
                     Box(Modifier.weight(1f).testTag("package-editor-name-slot")) {
@@ -284,7 +279,7 @@ fun CoursePackageEditorScreen(
                     }
                 }
                 FcListRowDivider()
-                FcLabelValueRow("总课时数") {
+                FcLabelValueRow("总课时数", trailingControl = true) {
                     FcStepper(
                         "总课时数",
                         state.totalCredits,
@@ -296,7 +291,7 @@ fun CoursePackageEditorScreen(
                     )
                 }
                 FcListRowDivider()
-                FcLabelValueRow("设置开始日期") {
+                FcLabelValueRow("设置开始日期", trailingControl = true) {
                     FcToggle(
                         "设置开始日期",
                         state.hasStartDate,
@@ -315,7 +310,7 @@ fun CoursePackageEditorScreen(
                     }
                 }
                 FcListRowDivider()
-                FcLabelValueRow("设置结束日期") {
+                FcLabelValueRow("设置结束日期", trailingControl = true) {
                     FcToggle(
                         "设置结束日期",
                         state.hasEndDate,
@@ -373,9 +368,11 @@ fun CoursePackageEditorScreen(
                         color = FcColors.statusDestructive,
                     )
                 }
+            }
+            FcPinnedAction {
                 FcButton(
                     "保存",
-                    Modifier.testTag("package-editor-save").padding(top = FcSpacing.space4, bottom = FcSpacing.space6),
+                    Modifier.testTag("package-editor-save"),
                     enabled = state.ready && !state.busy && state.confirmation == null,
                 ) {
                     if (!state.ready || state.confirmation != null || !state.tryBegin()) return@FcButton

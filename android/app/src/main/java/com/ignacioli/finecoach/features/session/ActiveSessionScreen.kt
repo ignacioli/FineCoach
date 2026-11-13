@@ -68,7 +68,7 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
     fun openEditor(row: SessionExerciseRecord, set: TrainingSetRecord? = null) { editing = set; editor = row }
     FcPlatformShell(back, Modifier.imePadding()) {
 
-        Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).testTag("active-session-content"),
+        FcScrollBody(Modifier.testTag("active-session-content"),
             verticalArrangement = Arrangement.spacedBy(if (state.saveState == FcSaveState.Saved) FcSpacing.space3 else FcSpacing.space4)) {
             SessionHeader(studentName, content, state.clock, back)
             if (state.saveState != FcSaveState.Saved) SaveStatusView(state)
@@ -156,7 +156,7 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
         }
         restSlot()
         RestTimerView(state.rests, id, state.clock, !WindowInsets.isImeVisible)
-        Box(Modifier.fillMaxWidth().padding(bottom = FcSpacing.space8)) {
+        FcPinnedAction {
         FcButton("结束训练", Modifier.testTag("session-finish"), content != null && !state.busy && state.saveState != FcSaveState.Failed,
             labelModifier = Modifier) {
             if (content?.session?.durationNeedsReview == true) review = true else onFinish()

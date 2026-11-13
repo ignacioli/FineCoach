@@ -1,5 +1,13 @@
 # S1 implementation map
 
+### P7 T1 shared layout F0–F4（2026-11-13）
+
+- 分类与依据：D；沿用 04/05/27/33/36/37、B-a、D-b 批准 PNG 及负责人本轮 F0–F4 指令，目标设计不变。
+- 范围：复用 DS-PAGE-SECONDARY 的独立 footer / weighted scroll（抽取 FcPinnedAction / FcScrollBody）；DS-LABEL-VALUE-ROW 增加显式 trailingControl；修复 DS-ACTION-ROW 说明分配、DS-LIST-ROW 空 meta。其他值列与页头默认行为保留。
+- 设计决定：36/37 inline 保存 → 固定底部；05 零底距 → space.8；04/B-a 无尾部 inset → 一个按钮行高；36 额外行间距 → token row；27 说明最大 96 宽 → 剩余宽度/最多两行；33/36/37 控件左对齐 → trailing；05 focus-only/空 meta → iOS 既有 focus + domain 动作数；D-b 无页头间距 → StudentEditor 既有 space.4。仅 F4 补齐指定 meta，无其他文案或 schema 变更。
+- 实现与检查：entry/layout map 沿用既有 tag 和数据写入路径：04 人工调整 → package-list-manual → 导航 → FcPinnedAction；05 新建模板 → template-new → 原 create → FcPinnedAction；27 归档/永久删除 → StudentTestTags.DETAIL_ARCHIVE/DETAIL_DELETE → 原确认流程 → FcActionRow；33 显示已隐藏 → exercise-show-hidden → 原筛选 → trailing FcLabelValueRow；36 保存 → package-editor-save → 原 durable save → FcPinnedAction；37 保存调整 → package-manual-save → 原 durable adjustment → FcPinnedAction；B-a 添加动作/新建分区 → session-add-exercise/session-add-section → 原流程 → FcScrollBody；结束训练 → session-finish → 原完成流程 → FcPinnedAction。ComponentContractTests 追加 trailing/row/blank-meta/footer 合同，TemplateUiStateTests 追加真实 Room 内容计数；PackageEntryLayoutTests 的固定按钮直接验证可见性，保留点击、宽度、写入断言。L3 无新设计触发，未做人工验收。
+- 结果：PARTIAL；最终定向 166/0/0（tests/failures/skips），补充批 47/0/0，末次组件/summary 补验 44/0/0，P7 capture 15/0/0。单轮查看指定七张及 D-b：F0/F2/F3/F4 已修复；F1 在 05/36/37 已修复，04 的结束课包行与 B-a 的添加操作行首屏仍贴靠/被 CTA 遮挡，保留 FAIL，不再截图迭代。常规 task 排除了 conformance 类，P4 capture hashes 未确认，交 dispatcher；未提交、无人工验收。日志与文件计数见 `.handoff/subagent/2026-11-13-p7-t1-shared.md`。
+
 ### P7 training summary pilot（2026-11-13）
 
 - 分类与依据：D；按 `design/progress-milestones/screens/D-b-session-gains.png` 修复 S1 总结统计、备注区与固定底部操作，批准的设计不变。
