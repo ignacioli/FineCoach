@@ -42,6 +42,19 @@ class TemplateRepositoryTests {
     private fun apply(template: TemplateContentRecord, session: SessionRecord) = ApplyTemplateSnapshotCommand(
         template.template.templateID, session.sessionID, template.template.revision, session.revision, f.now)
 
+    @Test fun aggregateExerciseCountsMatchContentAcrossSectionsAndIncludeEmptyTemplates() = f.test {
+        val original = content()
+        val populated = f.ok(f.templates.saveContent(SaveTemplateContentCommand(original.template.templateID,
+            original.template.revision, original.sections, original.exercises.map { it.copy(plannedSets = it.plannedSets + it.plannedSets) })))
+        val empty = f.ok(f.templates.save(SaveTemplateCommand(null, "虚构空模板", emptySet(), null)))
+        f.reopen()
+        val counts = f.ok(f.templateUseCases.exerciseCounts())
+        assertEquals(2, populated.sections.size)
+        assertEquals(4, populated.exercises.sumOf { it.plannedSets.size })
+        assertEquals(mapOf(populated.template.templateID to 2, empty.templateID to 0), counts)
+        for (id in counts.keys) assertEquals(f.ok(f.templates.loadContent(id))!!.exercises.size, counts[id])
+    }
+
     @Test fun blankCreateRenameFocusAndPlannedContentRoundtripAfterReopen() = f.test {
         val before = content()
         f.reopen()

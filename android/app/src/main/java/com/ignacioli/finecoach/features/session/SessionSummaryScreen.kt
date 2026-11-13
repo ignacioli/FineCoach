@@ -49,7 +49,8 @@ fun SessionSummaryScreen(state: SessionSummaryUiState, id: SessionID, onBack: ()
     val scope = rememberCoroutineScope()
     LaunchedEffect(id) { state.load(id) }
     FcPlatformShell({ if (!state.busy) onBack() }) {
-        FcPageHeader("训练总结", onBack = { if (!state.busy) onBack() }, tag = "summary")
+        FcPageHeader("训练总结", Modifier.padding(bottom = FcSpacing.space4),
+            onBack = { if (!state.busy) onBack() }, tag = "summary")
         Column(Modifier.fillMaxWidth().weight(1f).imePadding()) {
             Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState())
                 .padding(bottom = FcSpacing.space6).testTag("summary-content"),

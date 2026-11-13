@@ -434,6 +434,7 @@ interface SessionRepositoryPort {
 
 interface TemplateRepositoryPort {
     suspend fun list(): ApplicationResult<List<TemplateRecord>>
+    suspend fun exerciseCounts(): ApplicationResult<Map<TemplateID, Int>>
     suspend fun find(templateID: TemplateID): ApplicationResult<TemplateRecord?>
     suspend fun save(command: SaveTemplateCommand): ApplicationResult<TemplateRecord>
     suspend fun loadContent(templateID: TemplateID): ApplicationResult<TemplateContentRecord?>

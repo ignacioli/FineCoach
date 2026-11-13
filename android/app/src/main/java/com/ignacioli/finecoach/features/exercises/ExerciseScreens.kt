@@ -141,7 +141,7 @@ private fun ExerciseFilterSheet(equipment: String?, onEquipment: (String?) -> Un
             }
             if (hidden != null) {
                 FcListRowDivider()
-                FcLabelValueRow("显示已隐藏") {
+                FcLabelValueRow("显示已隐藏", trailingControl = true) {
                     FcToggle("显示已隐藏", hidden, onHidden, Modifier.testTag("exercise-show-hidden"))
                 }
 

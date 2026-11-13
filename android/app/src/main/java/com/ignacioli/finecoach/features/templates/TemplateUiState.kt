@@ -12,6 +12,8 @@ class TemplateUiState(private val useCases: TemplateUseCases, private val clock:
         private set
     var content by mutableStateOf<TemplateContentRecord?>(null)
         private set
+    var exerciseCounts by mutableStateOf<Map<TemplateID, Int>>(emptyMap())
+        private set
     var error by mutableStateOf<ApplicationError?>(null)
         private set
     var busy by mutableStateOf(false)
@@ -27,7 +29,22 @@ class TemplateUiState(private val useCases: TemplateUseCases, private val clock:
             }
         } finally { busy = false }
     }
-    suspend fun list() = perform({ useCases.list() }) { templates = it }
+    suspend fun list() = perform({ loadList() }) {
+        templates = it.first
+        exerciseCounts = it.second
+    }
+
+    private suspend fun loadList(): ApplicationResult<Pair<List<TemplateRecord>, Map<TemplateID, Int>>> {
+        val listed = when (val result = useCases.list()) {
+            is ApplicationResult.Failure -> return result
+            is ApplicationResult.Success -> result.value
+        }
+        val counts = when (val result = useCases.exerciseCounts()) {
+            is ApplicationResult.Failure -> return result
+            is ApplicationResult.Success -> result.value
+        }
+        return ApplicationResult.Success(listed to listed.associate { it.templateID to (counts[it.templateID] ?: 0) })
+    }
     suspend fun load(id: TemplateID) = perform({ useCases.load(id) }) {
         content = it
         if (it == null) error = ApplicationError(ApplicationErrorCode.notFound)
@@ -88,6 +105,13 @@ class TemplateUiState(private val useCases: TemplateUseCases, private val clock:
             ids.newTrainingSetID(), ids.newSessionExerciseID(), 0u, draft.input(row.recordModeSnapshot), clock.now())) }
         template.replacingPlannedSets(row.templateExerciseID, values, clock.now())
     }
+}
+
+internal fun templateListMeta(focus: Set<BodyPart>, count: Int?): String? {
+    if (count == null) return null
+    val description = if (focus.isEmpty()) "未设重点" else "训练重点 · " +
+        focus.sortedBy { it.ordinal }.joinToString("、") { com.ignacioli.finecoach.designsystem.FcBodyParts[it.ordinal] }
+    return "$description · $count 个动作"
 }
 
 /** Drafts contain only input values; no completion state or training identity is written. */

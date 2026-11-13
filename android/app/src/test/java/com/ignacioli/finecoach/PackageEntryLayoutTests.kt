@@ -20,6 +20,10 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollToNode
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeUp
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.unit.dp
 import androidx.test.core.app.ApplicationProvider
@@ -169,6 +173,32 @@ class PackageEntryLayoutTests {
     }
 
     @Test(timeout = 30_000)
+    @Config(qualifiers = "zh-rCN-w360dp-h640dp-notnight-mdpi")
+    fun scrollEndKeepsEndPackageFullyAbovePinnedManualAdjustment() {
+        val original = createPackage("虚构旧课包", 8, LocalDate.of(2026, 10, 1), LocalDate.of(2026, 12, 31))
+        offMain {
+            repeat(8) { index ->
+                useCases.recordManualCorrection(original.coursePackageID, CreditDirection.credit, 1,
+                    "虚构补记$index").requireSuccess("seed ledger")
+            }
+        }
+        showHost(); awaitTag("package-list-end")
+        val body = node("package-list-body")
+        assertTrue("Fixture must overflow before scrolling", body.fetchSemanticsNode().config[SemanticsProperties.VerticalScrollAxisRange].maxValue() > 0)
+        body.performScrollToNode(hasTestTag("package-list-end"))
+        repeat(10) {
+            val range = body.fetchSemanticsNode().config[SemanticsProperties.VerticalScrollAxisRange]
+            if (range.value() < range.maxValue()) body.performTouchInput { swipeUp() }
+        }
+        val range = body.fetchSemanticsNode().config[SemanticsProperties.VerticalScrollAxisRange]
+        assertEquals(range.maxValue(), range.value())
+        val last = node("package-list-end").assertIsDisplayed().fetchSemanticsNode()
+        val cta = node("package-list-manual").assertIsDisplayed().fetchSemanticsNode()
+        assertEquals(last.size.height.toFloat(), last.boundsInRoot.height, 0.01f)
+        assertTrue("End package must be fully above manual adjustment", last.boundsInRoot.bottom <= cta.boundsInRoot.top)
+    }
+
+    @Test(timeout = 30_000)
     fun noActivePackageCopyIsVisibleWithoutAnyMutation() {
         showHost(); awaitTag("package-list-none")
         node("package-list-none").performScrollTo().assertIsDisplayed()
@@ -185,7 +215,7 @@ class PackageEntryLayoutTests {
         awaitTag("package-editor-warning")
         node("package-editor-warning").performScrollTo().assertIsDisplayed()
         node("package-editor-name").performTextInput("虚构未确认课包")
-        node("package-editor-save").performScrollTo().assertIsEnabled().performClick()
+        node("package-editor-save").assertIsDisplayed().assertIsEnabled().performClick()
         awaitTag("package-replace-cancel")
         node("package-replace-accept").assertIsDisplayed().assertHasClickAction()
         node("package-replace-cancel").assertIsDisplayed().assertHasClickAction().performClick()
@@ -207,7 +237,7 @@ class PackageEntryLayoutTests {
         node("package-list-add").performClick()
         awaitTag("package-editor-save")
         node("package-editor-name").performTextInput("虚构新课包")
-        node("package-editor-save").performScrollTo().performClick()
+        node("package-editor-save").assertIsDisplayed().performClick()
         awaitText("该学员已有有效课包「虚构旧课包」，剩余 8 课时。新建将结束当前课包，历史记录会保留。确认继续？")
         node("package-replace-accept").performClick()
         awaitTag("package-list-manual")
@@ -229,7 +259,7 @@ class PackageEntryLayoutTests {
         node("package-list-add").performClick()
         awaitTag("package-editor-name")
         node("package-editor-name").performTextInput("虚构替换课包")
-        node("package-editor-save").performScrollTo().performClick()
+        node("package-editor-save").assertIsDisplayed().performClick()
         awaitTag("package-replace-accept")
         val replacement = offMain {
             useCases.endPackage(original.coursePackageID).requireSuccess("end")
@@ -274,7 +304,7 @@ class PackageEntryLayoutTests {
         node("date-accept").performClick()
         awaitText("2026年11月1日")
         node("package-editor-name").performTextInput("虚构反向日期课包")
-        node("package-editor-save").performScrollTo().performClick()
+        node("package-editor-save").assertIsDisplayed().performClick()
         awaitTag("package-list-manual")
         val reversed = packages().single()
         assertEquals(LocalDate.of(2026, 11, 6), reversed.startDate)
@@ -283,7 +313,7 @@ class PackageEntryLayoutTests {
         node("package-list-add").performScrollTo().performClick()
         awaitTag("package-editor-save")
         node("package-editor-name").performTextInput("虚构接续课包")
-        node("package-editor-save").performScrollTo().performClick()
+        node("package-editor-save").assertIsDisplayed().performClick()
         awaitTag("package-list-manual")
         assertEquals(0, compose.onAllNodesWithTag("package-replace-accept", useUnmergedTree = true).fetchSemanticsNodes().size)
         val loaded = packages()
@@ -314,7 +344,7 @@ class PackageEntryLayoutTests {
             awaitTag("date-picker")
             node("date-accept").performClick()
             awaitText("2026年11月5日")
-            node("package-editor-save").performScrollTo().performClick()
+            node("package-editor-save").assertIsDisplayed().performClick()
             awaitTag("package-replace-cancel")
             node("package-replace-cancel").performClick()
             val after = packages()
@@ -342,7 +372,7 @@ class PackageEntryLayoutTests {
         node("package-list-add").performClick()
         awaitTag("package-editor-save")
         node("package-editor-name").performTextInput("虚构续费课包")
-        node("package-editor-save").performScrollTo().performClick()
+        node("package-editor-save").assertIsDisplayed().performClick()
         awaitTag("package-list-manual")
         assertEquals(0, compose.onAllNodesWithTag("package-replace-card", useUnmergedTree = true).fetchSemanticsNodes().size)
         val loaded = packages()
@@ -415,14 +445,14 @@ class PackageEntryLayoutTests {
         node("manual-adjustment-direction-1").assertIsDisplayed().assertHasClickAction()
         node("manual-adjustment-amount-plus").performClick()
         node("package-manual-reason").performTextInput("虚构多扣")
-        node("package-manual-save").performScrollTo().assertIsEnabled().performClick()
+        node("package-manual-save").assertIsDisplayed().assertIsEnabled().performClick()
         awaitTag("package-manual-error")
         node("package-manual-error").assertTextEquals("扣减后余额将为负，检查课时数。")
         val balanceAfterReject = offMain { useCases.balance(student, original.coursePackageID).requireSuccess("balance") }
         assertEquals(1L, balanceAfterReject)
         assertEquals(0, offMain { useCases.adjustmentsForPackage(student, original.coursePackageID).requireSuccess("ledger") }.size)
         node("manual-adjustment-direction-1").performClick()
-        node("package-manual-save").performScrollTo().performClick()
+        node("package-manual-save").assertIsDisplayed().performClick()
         awaitTag("package-list-balance")
         node("package-list-balance").assertTextEquals("3")
         val ledger = offMain { useCases.adjustmentsForPackage(student, original.coursePackageID).requireSuccess("ledger") }
@@ -481,7 +511,7 @@ class PackageEntryLayoutTests {
         node("package-list-manual").performClick()
         awaitTag("package-manual-reason")
         node("package-manual-reason").performTextInput("虚构补记")
-        node("package-manual-save").performScrollTo().performClick()
+        node("package-manual-save").assertIsDisplayed().performClick()
         awaitText("扣减 1 课时")
         node("package-list-end").performScrollTo().performClick()
         node("package-end-accept").performClick()
@@ -506,7 +536,7 @@ class PackageEntryLayoutTests {
         node("package-list-add").performClick()
         awaitTag("package-editor-save")
         node("package-editor-name").performTextInput("虚构宽度课包")
-        node("package-editor-save").performScrollTo()
+        node("package-editor-save").assertIsDisplayed()
         assertSameWidth("package-editor-form", "package-editor-save")
         assertSameWidth("package-editor-name-slot", "package-editor-name")
         node("package-editor-save").assertIsEnabled().performClick()
@@ -516,7 +546,7 @@ class PackageEntryLayoutTests {
         node("package-list-add").assertIsDisplayed()
         node("package-list-manual").performClick()
         awaitTag("package-manual-save")
-        node("package-manual-save").performScrollTo()
+        node("package-manual-save").assertIsDisplayed()
         assertSameWidth("package-manual-form", "package-manual-save")
         assertSameWidth("package-manual-reason-slot", "package-manual-reason")
     }
@@ -538,7 +568,7 @@ class PackageEntryLayoutTests {
         }
         awaitTag("package-editor-name")
         node("package-editor-name").performTextInput("虚构键盘课包")
-        node("package-editor-save").performScrollTo().assertIsDisplayed().assertHasClickAction()
+        node("package-editor-save").assertIsDisplayed().assertIsDisplayed().assertHasClickAction()
         val safe = node("platform-safe").getUnclippedBoundsInRoot()
         val save = node("package-editor-save").getUnclippedBoundsInRoot()
         assertTrue(save.top >= safe.top)
