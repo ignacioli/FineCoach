@@ -48,7 +48,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 | `28-share-settings-v2`、`29-share-preview` | D7 分享报告设置页（单次训练）与预览页。走查修订 2026-10-22（C15）：预览页卡片之后常驻整宽次按钮「完成」，点了回到今日页（Penpot `D7b-r`） | 取代 12 |
 | `30-training-v2`、`31-add-exercise-sheet` | D8 方案 B：「＋ 新建分区」就地入口；「应用模板」并入添加动作面板；「另存为模板」移到训练结束后的总结页 | 取代 11 |
 | `32-training-history-v2` | D9 训练历史筛选结果列表 | 取代 07 |
-| `33-exercise-filter-sheet`、`34-exercise-options-sheet` | T069c（2026-09-27 产品负责人选定「筛选面板」方案）：动作库搜索框右侧筛选图标 → 筛选面板（器械、显示已隐藏）；点动作行 → 动作选项面板（收藏 / 隐藏 / 辅助器械）。`20-exercise-library` 同步加上筛选图标并重新导出 | 补充 20 |
+| `33-exercise-filter-sheet`、`34-exercise-options-sheet` | T069c（2026-09-27 产品负责人选定「筛选面板」方案）：动作库搜索框右侧筛选图标 → 筛选面板（器械、显示已隐藏）；点动作行 → 动作选项面板（收藏 / 隐藏 / 辅助器械 / 单侧动作；「编辑动作」行只对自定义动作显示）。2026-11-13 回填（S1-D98）：34 补画 P0-D8「单侧动作」开关行（同辅助器械行结构，面板上移 52 pt），并在画板下方加状态说明后重新导出 2 倍图。`20-exercise-library` 同步加上筛选图标并重新导出 | 补充 20 |
 | `35-session-detail` | D12 训练记录（训练历史 → 点日期行；页头 2026-10-23 改为行内 `‹` + 页面内「训练记录」，§10 C18）：复用 `29-share-preview` 的分区（日期 / 标题 / 学员、三项统计、训练部位、动作每行 3 组、课后总结），不带页脚；下方「编辑训练重点 ›」「另存为模板 ›」操作行（另存为模板用底部面板命名）、只读说明，底部固定「生成训练报告」（2026-09-28 产品负责人反馈原页面像表格、字体不齐） | 补充 32 |
 | `36-new-package-stepper`、`37-manual-adjustment-stepper` | D13 数字步进器（2026-09-29 产品负责人批准方案 C「整体胶囊」，T064 发现新建课包「总课时数」与人工调整「课时数」仍为 iOS 系统 `Stepper`）；两页页头同时改为 `‹` + 页面内 `titleLarge`（与 04、训练趋势一致）。新建课包的开始 / 结束日期行与 02 相同：标签-值两栏行，值为 `body`「yyyy年M月d日」（课包有效期可能跨年，保留年份）+ `›`，点行在下方展开日历（2026-09-29 产品负责人审核时要求，快照 `D13a date row as 02 (value + ›) 2026-09-29`）。Penpot 快照 `before-D13-stepper 2026-09-29` → `D13 stepper capsule (option C) 2026-09-29`，画板 D13a、D13b | 新增 |
 | `38-backup-restore-v2` | D14 备份与恢复 v2（T071，2026-09-29）：08 原画稿把「密码 + 再次确认密码」画在「恢复」下，但设置并确认口令属于**导出**，恢复只需「选择备份文件」+ 一次口令；按功能摆放，其余照 08（页面内标题与副标题、导出 / 恢复分区与分割线、失败状态 `status.destructive` 文字 + 22×22「!」徽标 + 说明 + 居中「重试」）。恢复区直接显示，去掉原「从备份恢复」展开按钮与底部整宽「取消」（改用返回）。说明文字 `caption`，口令框为输入框（08）的遮蔽输入。快照 `before-T071-backup-v2 2026-09-29` → `T071 backup-restore v2 (D14) 2026-09-29` | 取代 08 |
@@ -129,6 +129,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 - 阶段 E 集中走查（2026-10-27）：模拟器（iOS 26）上「…」弹出系统胶囊菜单，菜单偏大；真机（iOS 18）的灰色菜单也太大。训练页分区「…」的胶囊外观同源（iOS 26 系统 `Menu` 样式，代码自 2026-10-16 未变，不是回归）。负责人否决底部面板（多一步）和行内文字按钮（页面变乱），选左滑（§10 C27）。分类 B。
 - Penpot（Foundations 页）：快照 `before swipe revision (retire DS-MORE-MENU) 2026-10-27` → `swipe revision drawn: E-a1/E-a2/E-b/B-a/B-b/B-c + E-d 2026-10-27` → `swipe capsules redrawn to iOS 26 look (E-d, B-b) 2026-10-27`。E-a1、E-a2、E-b、B-a 去掉「…」；B-b 顶部改为「分区标题 · 左滑后」红色胶囊；B-c 页头去掉「…」，「管理」加「停用指标」行；新增 E-d（x=14410）：灰色「暂不提醒」胶囊、撤销行、首次轻推。B-b 其余三个左滑示例保持现状，不统一胶囊（负责人 2026-11-03 已裁定）。
 - 2 倍导出：E-a1 已由 `d0163ad` 入库；E-a2、E-b、E-d、B-a、B-b、B-c 已分别入库 `design/insights/screens/E-a2-insights-list.png`、`design/insights/screens/E-b-student-detail-insights.png`、`design/insights/screens/E-d-insights-swipe-snooze.png`、`design/experience-t2/screens/B-a-section-swipe-delete-confirm.png`、`design/experience-t2/screens/B-b-partial-states.png`、`design/experience-t2/screens/B-c-metric-history-manage.png`。本节其余画板的导出状态见 `screens.md`。
+- 2026-11-13 回填（S1-D95）：B-b「分区标题 · 左滑后」去掉标题前的「▾」（iOS 真机与 Android 均无此标识），重新导出 `design/experience-t2/screens/B-b-partial-states.png`。
 
 ### 1.13 阶段 F 系统入口画稿与实现回填（2026-10-28～29）
 
