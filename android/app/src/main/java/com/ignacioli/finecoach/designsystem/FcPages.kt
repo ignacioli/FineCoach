@@ -22,7 +22,9 @@ fun FcPagePrimary(title: String, modifier: Modifier = Modifier, segments: (@Comp
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(FcSpacing.space1)) {
             // S1-D42: header row keeps the 44dp touch row with or without actions
             Row(Modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.touch), verticalAlignment = Alignment.CenterVertically) {
-                FcText(title, Modifier.weight(1f).semantics { heading() }, style = FcTypography.display, color = FcColors.actionPrimary)
+                Box(Modifier.weight(1f)) {
+                    FcText(title, Modifier.semantics { heading() }, style = FcTypography.display, color = FcColors.actionPrimary)
+                }
                 actions()
             }
             subtitle?.let { FcText(it, subtitleModifier, style = FcTypography.style("callout", 400), color = FcColors.textSecondary) }

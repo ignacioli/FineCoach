@@ -1,0 +1,12 @@
+{
+  "toleranceDp": 2,
+  "originOffsetY": -52,
+  "originRule": "S1-D50 measured platform-content origin; top flow only",
+  "elements": [
+    {
+      "path": "6",
+      "tag": "hero-card-title",
+      "source": "CONTENT decision: board says 深蹲训练; real Today title is name · trainingFocus (臀、大腿). Selector observes the true title without replacing expected text."
+    }
+  ]
+}

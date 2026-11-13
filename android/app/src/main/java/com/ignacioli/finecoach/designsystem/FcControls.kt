@@ -163,11 +163,14 @@ fun FcSegmentedSwitch(options: List<String>, selection: Int, onSelect: (Int) -> 
         options.forEachIndexed { index, title ->
             val selected = index == selection
             Box(Modifier.touch().testTag("$tag-$index").selectable(selected = selected, role = Role.Tab, onClick = { onSelect(index) }), contentAlignment = Alignment.Center) {
-                FcText(title, Modifier.clip(FcShapes.capsule)
+                Box(Modifier.clip(FcShapes.capsule)
                     .then(if (selected) Modifier.background(FcColors.actionPrimary) else Modifier)
-                    .padding(horizontal = FcSpacing.space2, vertical = FcSpacing.space1),
+                    .testTag(if (selected) "conformance:DS-SEGMENTED · selected" else "$tag-unselected-$index")
+                    .padding(horizontal = FcSpacing.space2, vertical = FcSpacing.space1)) {
+                FcText(title,
                     style = if (selected) FcTypography.headline else FcTypography.body,
                     color = if (selected) FcColors.actionOn else FcColors.textSecondary)
+                }
             }
         }
     }

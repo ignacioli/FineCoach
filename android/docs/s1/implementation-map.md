@@ -971,3 +971,17 @@ P4 round 2 最终：FAIL；host 952/0、G3 42/0、G4 12/0、训练conformance 1/
 | 添加动作 → 筛选 | `exercise-picker-filter` | 否，筛选条件 | 同一搜索 Row 的 trailing FcTitleIconButton；[ExerciseScreens.kt:108](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L108) |
 | 添加动作 → 全部/部位 chips | `exercise-picker-muscle-all` / `exercise-picker-muscle-$value` | 否 | `exercise-picker-muscles` 满宽横向滚动 Row；[ExerciseScreens.kt:116](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L116) |
 | 添加动作 → 最近/完整列表行 | `exercise-picker-recent-$id` / `exercise-select-$id` | 是，既有 durable add use case | FcListRow / picker 内水平 space.4 容器，358dp；[ExerciseScreens.kt:77](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L77)、[ExerciseScreens.kt:181](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L181) |
+
+## P4 Today S1，round 1（S1-D66/D68）
+
+- 分类与依据：D 类 implementation drift repair；复用 DS-PAGE-PRIMARY / DS-SEGMENTED / DS-HERO-CARD，目标为 `design/m1-b-hifi/screens/01-today-s1.png`。画板与 anatomy 冲突通过 proposal 登记，不在代码贴坐标。
+- 范围与差异：保留既有分段→标题/日期→hero 顺序；DS-PAGE-FLOW 块间 space.4、标题/日期内部 space.1、水平 space.4、滚动末尾 space.6。移除 display 文字的满宽 semantics（外层 Box 继续占剩余宽度），将 segmented 可见胶囊与文字拆分 semantics；hero 的真实 surface 与 badge 提供自动 conformance tags，整卡入口保持原动态 ID。
+- 设计决定：CONTENT 待决：画板「王小明 · 深蹲训练」不能由 name · trainingFocus 产生；A 改板为「王小明 · 臀、大腿」，B 经批准后改 Today 标题逻辑（必须另定真实数据来源），本轮采用真实 fixture。POSITION：板上标题/日期在分段之前，与 DS-PAGE-PRIMARY 冲突；采用现有 anatomy 待 dispatcher 审核 proposal。FONT：板副文字13/400，而 README 已批准 callout15/500；代码保留 token。
+- 实现与检查：`TodayConformanceTests` 验证固定 Sunday、32分钟、真实 title、满宽hero、可见学员/继续入口、路由及16dp flow；ComponentContractTests 增补32dp segmented visual与24dp badge /真实surface几何。两次确定性渲染是稳定性证明，不是截图收敛；未打开 Android capture。L3 派生板批量审查及设备走查 PENDING。
+- 结果：本轮 gates、逐check计数及失败原因以 `.handoff/subagent/2026-11-12-p4-today.md` 为准；proposal 在 `android/build/outputs/conformance/01-today-s1/proposed-board.json`；未提交、未委派，未改 iOS、board、baseline 或 comparator。
+
+| screen → visible control | identifier | mutates data? | width owner / code |
+|---|---|---|---|
+| Today → 今日 / 学员 | `root-0` / `root-1` | 否，选择既有 route | FcPagePrimary / platform-content 满宽；FcSegmentedSwitch 内容宽，44dp minimum touch；`TodayScreen.kt` |
+| Today → 继续训练（整卡可点） | `hero-$sessionID` | 否，进入原 active session | FcHeroCard 满宽358dp，由 today-content / platform-content 所有；`TodayScreen.kt` |
+| Today → 加载失败时重试 | `today-retry` | 否，重新读取 repository | FcButton 填满 today-content；`TodayScreen.kt`，既有 TodayNavigationEntryLayoutTests 覆盖错误恢复 |

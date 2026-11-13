@@ -91,8 +91,9 @@ class ComponentContractTests {
     }
 
     @Test fun segmented() {
-        show { var value by remember { mutableIntStateOf(0) }; FcSegmentedSwitch(listOf("甲", "乙"), value, { value = it }, tag = "seg") }
+        show { var value by remember { mutableIntStateOf(0) }; FcSegmentedSwitch(listOf("今日", "学员"), value, { value = it }, tag = "seg") }
         touch("seg-0"); touch("seg-1")
+        node("conformance:DS-SEGMENTED · selected").assertWidthIsEqualTo(50.dp).assertHeightIsEqualTo(32.dp)
         node("seg-0").assertIsSelected(); node("seg-1").assertIsNotSelected().performClick()
         node("seg-0").assertIsNotSelected(); node("seg-1").assertIsSelected()
     }
@@ -404,6 +405,8 @@ class ComponentContractTests {
                 onClick = { calls++ },
             )
         }
+        node("conformance:DS-HERO-CARD · badge").assertWidthIsAtLeast(56.dp).assertHeightIsEqualTo(24.dp)
+        assertEquals(node("hero").getUnclippedBoundsInRoot(), node("conformance:DS-HERO-CARD · card").getUnclippedBoundsInRoot())
         full("hero")
         node("hero").assertHeightIsAtLeast(100.dp).assertHasClickAction().performClick()
         compose.onNodeWithText("虚构标题").assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading))
