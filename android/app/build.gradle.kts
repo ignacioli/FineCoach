@@ -996,7 +996,7 @@ fun registerVisualGate(taskName: String, suite: String, expectedTests: Int): Tas
 }
 val screenshotGate = registerVisualGate("s0G5", "ComponentScreenshotTests", 1)
 // P7 is capture-only: captureToImage writes sheets without invoking a comparator.
-registerVisualGate("p7SideBySide", "P7SideBySideTests", 5).configure {
+registerVisualGate("p7SideBySide", "P7SideBySideTests", 10).configure {
     outputs.dir(layout.buildDirectory.dir("outputs/p7"))
 }
 val visualBaselineBefore = mutableMapOf<String, String>()

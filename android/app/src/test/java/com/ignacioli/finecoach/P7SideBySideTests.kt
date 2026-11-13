@@ -5,7 +5,20 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.semantics.*
+import com.ignacioli.finecoach.core.domain.training.*
+import com.ignacioli.finecoach.core.domain.template.*
+import com.ignacioli.finecoach.features.exercises.*
+import com.ignacioli.finecoach.features.templates.*
+import com.ignacioli.finecoach.features.session.*
+import com.ignacioli.finecoach.features.history.*
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.File
+import javax.imageio.ImageIO
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.*
@@ -60,7 +73,7 @@ class P7SideBySideTests {
         }
     }
 
-    private fun measure(id: String, composable: String, fixture: String, mismatches: String, render: () -> String) {
+    private fun measure(id: String, composable: String, fixture: String, mismatches: String, sheetTag: String? = null, scrollTag: String? = null, render: () -> String) {
         var reason: String? = null
         val bitmap = try {
             await(render())
@@ -69,7 +82,26 @@ class P7SideBySideTests {
             compose.mainClock.autoAdvance = false
             compose.mainClock.advanceTimeBy(1000)
             compose.waitForIdle()
-            node("conformance-viewport").captureToImage().asAndroidBitmap()
+val first = node("conformance-viewport").captureToImage().asAndroidBitmap()
+when {
+    sheetTag != null -> captureSheet(first, sheetTag)
+    scrollTag != null -> {
+        val scroll = node(scrollTag)
+        val range = scroll.fetchSemanticsNode().config[SemanticsProperties.VerticalScrollAxisRange]
+        val before = range.value()
+        val viewport = scroll.fetchSemanticsNode().boundsInRoot.height
+        scroll.performSemanticsAction(SemanticsActions.ScrollBy) { it(0f, viewport) }
+        compose.waitForIdle()
+        val after = scroll.fetchSemanticsNode().config[SemanticsProperties.VerticalScrollAxisRange].value()
+        val second = node("conformance-viewport").captureToImage().asAndroidBitmap()
+        File(p7Output(), "$id.scroll.txt").writeText("requested=$viewport px; before=$before; after=$after; max=${range.maxValue()}; two complete viewports, including repeated chrome/content if scroll range is shorter")
+        Bitmap.createBitmap(780, 3376, Bitmap.Config.ARGB_8888).also {
+            Canvas(it).apply { drawBitmap(first, 0f, 0f, null); drawBitmap(second, 0f, 1688f, null) }
+            first.recycle(); second.recycle()
+        }
+    }
+    else -> first
+}
         } catch (failure: Exception) {
             reason = "${failure.javaClass.simpleName}: ${failure.message.orEmpty()}"
             P7SheetWriter.placeholder(reason)
@@ -80,6 +112,41 @@ class P7SideBySideTests {
         P7SheetWriter.write(id, bitmap, composable, fixture, mismatches, reason)
         bitmap.recycle()
     }
+
+private fun p7Output() = File(checkNotNull(System.getProperty("finecoach.storageProjectDirectory")), "build/outputs/p7").apply { mkdirs() }
+
+private fun buffered(bitmap: Bitmap) = ByteArrayOutputStream().use { bytes ->
+    check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes))
+    ImageIO.read(ByteArrayInputStream(bytes.toByteArray()))
+}
+
+private fun captureSheet(activity: Bitmap, panelTag: String): Bitmap {
+    fun descendants(n: SemanticsNode): List<SemanticsNode> = listOf(n) + n.children.flatMap(::descendants)
+    val dialogs = compose.onAllNodes(isRoot(), useUnmergedTree = true).fetchSemanticsNodes()
+        .flatMap(::descendants).distinctBy { it.id }.filter { it.config.contains(SemanticsProperties.IsDialog) }
+    check(dialogs.isNotEmpty()) { "No real dialog window for $panelTag" }
+    val windows = dialogs.map { dialog ->
+        val image = compose.onNode(SemanticsMatcher("dialog id") { it.id == dialog.id }, useUnmergedTree = true)
+            .captureToImage().asAndroidBitmap()
+        ConformanceCapture.Window(buffered(image), dialog.boundsInWindow.left.toInt(), dialog.boundsInWindow.top.toInt()).also { image.recycle() }
+    }
+    val base = buffered(activity)
+    val composite = ConformanceCapture.composite(base, windows)
+    val panel = node(panelTag).fetchSemanticsNode().boundsInWindow
+    var contributed = 0
+    val colors = mutableSetOf<Int>()
+    for (y in panel.top.toInt().coerceAtLeast(0) until panel.bottom.toInt().coerceAtMost(1688))
+        for (x in panel.left.toInt().coerceAtLeast(0) until panel.right.toInt().coerceAtMost(780)) {
+            if (base.getRGB(x, y) != composite.getRGB(x, y)) contributed++
+            colors += composite.getRGB(x, y)
+        }
+    check(contributed > 0 && colors.size > 1) { "Sheet pixels absent/uniform: $panelTag; contribution=$contributed; colors=${colors.size}" }
+    File(p7Output(), "$panelTag.capture.txt").writeText("windows=${windows.size}; panel=$panel; windowContributionPixels=$contributed; distinctColors=${colors.size}")
+    activity.recycle()
+    return Bitmap.createBitmap(composite.width, composite.height, Bitmap.Config.ARGB_8888).also {
+        it.setPixels(composite.getRGB(0, 0, composite.width, composite.height, null, 0, composite.width), 0, composite.width, 0, 0, composite.width, composite.height)
+    }
+}
 
     @Test fun emptyState() = measure(
         "16-empty-state", "StudentListScreen",
@@ -170,5 +237,107 @@ class P7SideBySideTests {
         f.test { pkg = f.coursePackage(20) }
         show { ManualCreditAdjustmentScreen(pkg.coursePackageID, f.credits, {}, {}) }
         "package-manual-save"
+    }
+    @Test fun exerciseFilterSheet() = measure(
+        "33-exercise-filter-sheet", "ExerciseLibraryScreen / ExerciseFilterSheet",
+        "ExerciseConformanceFixture；胸 21；器械全部；显示已隐藏 off",
+        "保留现有 Android sheet 高度、器械分类与控件；合成真实 dialog window。", sheetTag = "exercise-library-filter-content",
+    ) {
+        val f = ExerciseConformanceFixture().also { releaseFixture = it::close }
+        show { ExerciseLibraryScreen(f.state) {} }
+        await("exercise-library-muscle-胸")
+        node("exercise-library-muscle-胸").performClick()
+        node("exercise-library-filter").performClick()
+        "exercise-library-filter-content"
+    }
+
+    @Test fun exerciseOptionsSheet() = measure(
+        "34-exercise-options-sheet", "ExerciseLibraryScreen / 动作选项",
+        "ExerciseConformanceFixture；胸 21；杠铃平板卧推 favorite on / hidden off / assisted off",
+        "PNG 为动作名/副标题及 toggles；Android 为动作选项标题、显示名编辑及 action rows，另有单侧记录和取消。",
+        sheetTag = "exercise-options-content",
+    ) {
+        val f = ExerciseConformanceFixture().also { releaseFixture = it::close }
+        f.room.test { f.room.ok(f.state.useCases.updatePreference(UpdateExercisePreferenceCommand(
+            StableExerciseID.parse("fictional-conformance-0"), "杠铃平板卧推", true, false, false, null))) }
+        show { ExerciseLibraryScreen(f.state) {} }
+        await("exercise-options-fictional-conformance-0")
+        compose.waitUntil(15_000) { f.state.preference(StableExerciseID.parse("fictional-conformance-0")).isFavorite }
+        node("exercise-library-muscle-胸").performClick()
+        node("exercise-options-fictional-conformance-0").performClick()
+        "exercise-options-content"
+    }
+
+    @Test fun trainingTemplate() = measure(
+        "05-training-template", "TemplateListScreen",
+        "上肢推/胸/6 动作；下肢力量/大腿/5 动作；全身热身/无重点/4 动作；真实模板 repository",
+        "S1 存在训练模板屏，无需 placeholder；副标题为跨学员使用说明；行不显示动作数，重点用大腿。",
+    ) {
+        val f = TrainingConformanceFixture().also { releaseFixture = it::close }
+        f.room.test {
+            listOf(Triple("上肢推", setOf(BodyPart.chest), 6), Triple("下肢力量", setOf(BodyPart.thighs), 5),
+                Triple("全身热身", emptySet<BodyPart>(), 4)).asReversed().forEachIndexed { i, (name, focus, count) ->
+                f.room.time = f.room.now.plusSeconds(i.toLong())
+                val t = f.room.ok(f.room.templateUseCases.save(SaveTemplateCommand(null, name, focus, null)))
+                val rows = (0 until count).map { n -> TemplateExercise(f.room.ids.newTemplateExerciseID(), t.templateID,
+                    null, n.toUInt(), ExerciseSourceKind.sessionOnly, null, NormalizedName.parse("虚构计划动作 $n"), RecordMode.weightReps, emptyList()).toRecord() }
+                f.room.ok(f.room.templates.saveContent(SaveTemplateContentCommand(t.templateID, t.revision, emptyList(), rows)))
+            }
+        }
+        show { TemplateListScreen(f.templates, {}, {}) }
+        compose.waitUntil(15_000) { f.templates.templates.size == 3 }
+        "template-list-content"
+    }
+
+    @Test fun cardio() = measure(
+        "15-cardio", "ActiveSessionScreen / SetEditor (cardio)",
+        "王小明；跑步机；32:00 / 5.0 / 9.4 / 阻力空；未确认",
+        "Android 使用训练中组合页面，另有学员/时间/添加动作/结束训练；有氧为 inline fields，确认为按钮文案，无 PNG 必填提示。",
+    ) {
+        val f = TrainingConformanceFixture().also { releaseFixture = it::close }
+        f.room.test {
+            val row = SessionExercise(f.room.ids.newSessionExerciseID(), f.content.session.sessionID, 0u,
+                ExerciseSourceKind.sessionOnly, null, NormalizedName.parse("跑步机"), RecordMode.cardio, null, null, emptyList()).toRecord()
+            f.content = f.room.ok(f.room.sessions.saveContent(SaveSessionContentCommand(f.content.session.sessionID,
+                f.content.session.revision, emptyList(), listOf(row))))
+        }
+        show { ActiveSessionScreen(f.state, f.content.session.sessionID, f.exercises, f.templates, {}, {},
+            students = StudentRepository(f.room.db, f.room.clock)) }
+        await("set-duration")
+        listOf("set-duration" to "32:00", "set-distance" to "5.0", "set-speed" to "9.4").forEach { (tag, value) -> node(tag).performTextInput(value) }
+        compose.runOnIdle { compose.activity.currentFocus?.clearFocus() }
+        "set-resistance"
+    }
+
+    @Test fun historyList() = measure(
+        "32-training-history-v2", "HistoryListScreen",
+        "王小明；2025-09-25/18/11/04（周四）；12/10/11/9 组；58/52/55/47 分钟；近30天；大腿、臀筛选",
+        "设计的课程比较/个人最佳不在 S1 HistoryListScreen；保留清除筛选及未扣课说明。右侧为滚动尝试前后两个完整 viewport；4条记录全部适配首屏，scroll range=0，故两屏重复；实际滚动量另记。",
+        scrollTag = "history-list-content",
+    ) {
+        val f = T009Fixture().also { releaseFixture = it::close }
+        val students = StudentUseCases(StudentRepository(f.db, f.clock), f.clock, f.ids)
+        lateinit var state: HistoryUiState
+        f.test {
+            f.ok(students.update(f.studentID, StudentDraft("王小明", StudentSex.male)))
+            listOf(Triple("04", 9, 47), Triple("11", 11, 55), Triple("18", 10, 52), Triple("25", 12, 58)).forEachIndexed { index, (day, count, minutes) ->
+                f.now = Instant.parse("2025-09-${day}T18:00:00Z")
+                val c = f.content()
+                val row = c.exercises.single()
+                val sets = (0 until count).map { n -> row.sets.single().copy(trainingSetID = f.ids.newTrainingSetID(), orderIndex = n.toUInt()) }
+                val updated = f.ok(f.sessions.saveContent(SaveSessionContentCommand(c.session.sessionID, c.session.revision, emptyList(), listOf(row.copy(sets = sets)))))
+                f.now = f.now.plusSeconds(minutes * 60L)
+                f.finish(updated)
+                val done = f.ok(f.sessions.loadContent(c.session.sessionID))!!
+                val focus = when (index) { 0 -> setOf(BodyPart.thighs, BodyPart.calves); 1 -> setOf(BodyPart.thighs); else -> setOf(BodyPart.thighs, BodyPart.glutes) }
+                f.ok(f.historyCases.saveFocusEdit(UpdateHistoryTrainingFocusCommand(done.session.sessionID, done.session.revision, focus)))
+            }
+            f.now = Instant.parse("2025-09-29T19:00:00Z")
+            state = HistoryUiState(f.historyCases, f.studentID, students)
+            state.list(HistoryQuery(f.studentID, HistoryWindowDays.days30, setOf(BodyPart.thighs, BodyPart.glutes)))
+            check(state.records.size == 4 && state.error == null)
+        }
+        show { HistoryListScreen(state, f.zone, {}, {}) }
+        "history-count"
     }
 }
