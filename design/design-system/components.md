@@ -120,7 +120,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 | 关系 | 间距 | 说明 |
 |---|---|---|
 | 页面水平边距 | `space.4` | 列表、输入框、区段都在左右 16 内。横向滚动的 chip 行例外：贯穿屏幕，首尾内容内边距 `space.4`（S1-D50） |
-| 页头 → 第一个内容块 | `space.4` | Android 页头紧贴状态栏下方（S1-D50）；iOS 页头位置见 §4.7 `DS-PAGE-HEADER` |
+| 页头 → 第一个内容块 | `space.4` | 二级页：Android 页头紧贴状态栏下方（S1-D50）；iOS 页头位置见 §4.7 `DS-PAGE-HEADER`。一级页（隐藏系统导航栏）：状态栏 → 标题行上方另留 `space.4`，见 §4.6 `DS-PAGE-PRIMARY`（S1-D72） |
 | 内容块 ↔ 内容块 | `space.4` | 搜索行、筛选 chip 行、区段（分组）、卡片之间；区段与区段之间也是 `space.4` |
 | 区段标签 → 该区段内容 | `space.2` | `DS-SECTION` 标签与其下方的列表或卡片 |
 | 同一行内并排控件 | `space.2` | 如搜索框与筛选按钮、chip 与 chip |
@@ -364,7 +364,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 
 | ID | anatomy | 画板 | 当前实现 |
 |---|---|---|---|
-| `DS-PAGE-PRIMARY` 一级页 | 标题行：`display` 大标题（`action.primary`）+ 右侧 `DS-TITLE-ACTION` →（今日页）日期行 `callout` `text.secondary` → `FCSegmentedSwitch`（今日 / 学员）→ 内容（顺序以画板 01/21/40/41 与 iOS `TodayView` 为准，2026-11-12 S1-D70 更正）；隐藏系统导航栏。**查看模式变体**（M2，2026-10-09 G7 批准）：没有顶部分段切换，标题行只有设置齿轮，其余相同 | 01/21/40/41；M2-11 | Today、StudentList 各自拼装 |
+| `DS-PAGE-PRIMARY` 一级页 | 状态栏下方留 `space.4`（iOS `TodayView`/`StudentListView` 页头 `.padding(.top, space4)`，S1-D72）→ 标题行（最小高 44，标题在行内垂直居中）：`display` 大标题（`action.primary`）+ 右侧 `DS-TITLE-ACTION` → `space.1` →（今日页）日期行 `callout` `text.secondary` → `space.4` → `FCSegmentedSwitch`（今日 / 学员）→ `space.4` → 内容（顺序以画板 01/21/40/41 与 iOS `TodayView` 为准，2026-11-12 S1-D70 更正）；隐藏系统导航栏。**查看模式变体**（M2，2026-10-09 G7 批准）：没有顶部分段切换，标题行只有设置齿轮，其余相同 | 01/21/40/41；M2-11 | Today、StudentList 各自拼装 |
 | `DS-PAGE-SECONDARY` 二级页 | 隐藏系统导航栏（`.fcSecondaryPage()`，同时保持边缘右滑返回可用）→ 由 `fcSecondaryPage()` 提供的顶部零高度 `safeAreaInset` 遮盖（`surface.page`，背景延伸至顶部安全区；feature 不再复制遮盖）→ 紧贴状态栏下方的页头：小号 `‹`（22/400 `text.secondary`）与页面内 `titleLarge` 标题在同一行、紧靠标题左侧（标题起点 x=32），整体由 `FCPageHeader` 绘制（带 header 属性）→ 可选副标题（`callout` 400 `text.secondary`）→ 内容 → 可选底部主按钮 | 23/26/28/36/37/38 | 约 20 个 feature 文件各自拼装；页头部分已有共享组件 `FCPageHeader`（§4.7），StudentDetail 已迁移 |
 | `DS-HUB-ROW` 入口行 | 24pt 图标（`action.primary`）→ 标题（`headline`）/ 副标题（`caption` `text.secondary`）→ `›`；最小高 64，间距 `space.4` | 19/42/43 | 已提升为共享组件 `FCHubRow`（M2 T002/T010，2026-10-10）；ResourceHub、Settings 已迁移，规格见 §4.7 |
 | `DS-INLINE-RESULT` 就地结果 | 22×22 `FCStatusBadge` → 标题（`callout` 600；失败为 `status.destructive`，成功为 `text.primary`）→ 说明（`caption` `text.secondary`）→ 失败时显示居中「重试」`FCLinkButton` | 38/39 | 已提升为共享组件 `FCInlineResult`（M2 T003/T011，2026-10-10）；BackupRestoreFlow 已迁移，规格见 §4.7 |
