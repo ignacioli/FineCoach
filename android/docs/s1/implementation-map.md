@@ -971,3 +971,33 @@ P4 round 2 最终：FAIL；host 952/0、G3 42/0、G4 12/0、训练conformance 1/
 | 添加动作 → 筛选 | `exercise-picker-filter` | 否，筛选条件 | 同一搜索 Row 的 trailing FcTitleIconButton；[ExerciseScreens.kt:108](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L108) |
 | 添加动作 → 全部/部位 chips | `exercise-picker-muscle-all` / `exercise-picker-muscle-$value` | 否 | `exercise-picker-muscles` 满宽横向滚动 Row；[ExerciseScreens.kt:116](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L116) |
 | 添加动作 → 最近/完整列表行 | `exercise-picker-recent-$id` / `exercise-select-$id` | 是，既有 durable add use case | FcListRow / picker 内水平 space.4 容器，358dp；[ExerciseScreens.kt:77](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L77)、[ExerciseScreens.kt:181](../../app/src/main/java/com/ignacioli/finecoach/features/exercises/ExerciseScreens.kt#L181) |
+
+## P4 Today S1，round 1（S1-D66/D68）
+
+- 分类与依据：D 类 implementation drift repair；复用 DS-PAGE-PRIMARY / DS-SEGMENTED / DS-HERO-CARD，目标为 `design/m1-b-hifi/screens/01-today-s1.png`。画板与 anatomy 冲突通过 proposal 登记，不在代码贴坐标。
+- 范围与差异：保留既有分段→标题/日期→hero 顺序；DS-PAGE-FLOW 块间 space.4、标题/日期内部 space.1、水平 space.4、滚动末尾 space.6。移除 display 文字的满宽 semantics（外层 Box 继续占剩余宽度），将 segmented 可见胶囊与文字拆分 semantics；hero 的真实 surface 与 badge 提供自动 conformance tags，整卡入口保持原动态 ID。
+- 设计决定：CONTENT 待决：画板「王小明 · 深蹲训练」不能由 name · trainingFocus 产生；A 改板为「王小明 · 臀、大腿」，B 经批准后改 Today 标题逻辑（必须另定真实数据来源），本轮采用真实 fixture。POSITION：板上标题/日期在分段之前，与 DS-PAGE-PRIMARY 冲突；采用现有 anatomy 待 dispatcher 审核 proposal。FONT：板副文字13/400，而 README 已批准 callout15/500；代码保留 token。
+- 实现与检查：`TodayConformanceTests` 验证固定 Sunday、32分钟、真实 title、满宽hero、可见学员/继续入口、路由及16dp flow；ComponentContractTests 增补32dp segmented visual与24dp badge /真实surface几何。两次确定性渲染是稳定性证明，不是截图收敛；未打开 Android capture。L3 派生板批量审查及设备走查 PENDING。
+- 结果：本轮 gates、逐check计数及失败原因以 `.handoff/subagent/2026-11-12-p4-today.md` 为准；proposal 在 `android/build/outputs/conformance/01-today-s1/proposed-board.json`；未提交、未委派，未改 iOS、board、baseline 或 comparator。
+
+| screen → visible control | identifier | mutates data? | width owner / code |
+|---|---|---|---|
+| Today → 今日 / 学员 | `root-0` / `root-1` | 否，选择既有 route | 标题/日期之后 space.4；FcPagePrimary / platform-content 满宽；FcSegmentedSwitch 内容宽，选项框 50×32 布局、48dp 触控向外扩；[TodayScreen.kt:61](../../app/src/main/java/com/ignacioli/finecoach/features/today/TodayScreen.kt#L61)、[FcPages.kt:31](../../app/src/main/java/com/ignacioli/finecoach/designsystem/FcPages.kt#L31) |
+| Today → 继续训练（整卡可点） | `hero-$sessionID` | 否，进入原 active session | 分段之后 space.4；FcHeroCard 满宽358dp，由 today-content / platform-content 所有；[TodayScreen.kt:72](../../app/src/main/java/com/ignacioli/finecoach/features/today/TodayScreen.kt#L72) |
+| Today → 加载失败时重试 | `today-retry` | 否，重新读取 repository | 分段下内容区；FcButton 填满 today-content；[TodayScreen.kt:66](../../app/src/main/java/com/ignacioli/finecoach/features/today/TodayScreen.kt#L66)，既有 TodayNavigationEntryLayoutTests 覆盖错误恢复 |
+
+## P4 Today S1，round 2（board fix 后 budget round 1，S1-D69/D70/D71）
+
+- 分类与依据：D 类 drift repair；目标设计不变，使用已修正的 01-today-s1 PNG 和 DS-PAGE-PRIMARY anatomy。
+- 范围与差异：复用 DS-PAGE-PRIMARY / DS-SEGMENTED / DS-HERO-CARD；移除分段在标题上方的旧顺序，改为标题/日期→分段→内容，块间仍为 space.4。分段移除占布局高度的44dp触控外框，选项布局按50×32，触控区向外扩展。共享修改同时适用于 StudentList；无分段 viewer 的执行顺序不变。
+- 设计决定：S1-D69/D70/D71 已解决 round 1 的 CONTENT/POSITION/FONT 冲突；fixture 单一 trainingFocus 大腿，保留产品 title/排序逻辑，无新增设计决定。
+- 实现与检查：S1ComponentTests.primaryPage 与 TodayConformanceTests 断言标题/日期→分段→内容及 space.4；ComponentContractTests.segmented 验证50×32布局、8dp间距和50×48触控bounds；入口 map 见上表。未打开 Android capture；L3 负责人派生板审查及设备走查 PENDING。
+- 结果：NOT CONVERGED；最终 host 978/0，G3 42/0、G4 12/0；Training 48/0、D2b 67/0、AddExercise 48/0；Today 0 PASS / 12 FAIL / 0 MISSING，manual 1/12（8.33%）。剩余页头组合与文字框 gap 决策证据、逐check计数和耗时记录于 `.handoff/subagent/2026-11-12-p4-today-r2.md`；未 commit / delegate，未改 iOS、board、baseline 或 comparator。
+
+## P4 Today S1，round 3（budget round 2，S1-D72）
+
+- 分类与依据：D 类 drift repair；复用已批准 DS-PAGE-PRIMARY / DS-PAGE-FLOW，目标为 S1-D72 修正后的 `01-today-s1.png`，不新增设计决定。
+- 范围与差异：`FcPages.kt:21` 移除一级页标题行紧贴状态栏的旧组合，改为共享 header 顶部 `space.4`；保留最小44标题行、标题垂直居中、标题行→日期 `space.1`、header→分段→内容各 `space.4`。Today / StudentList / viewer 共用，不加页面补偿。
+- 设计决定：复用 S1-D72；画板标题→日期及 hero trailing 字框已由 dispatcher 修正，本轮不改设计文件、iOS、baseline 或 comparator。
+- 实现与检查：`S1ComponentTests.primaryPage` / `primaryPageViewerKeepsSharedHeaderSpacing` 和 `TodayConformanceTests` 验证共享顶部、标题居中及日期位置，保留既有顺序、间距、满宽及路由断言；无新增交互，entry/layout map 沿用上表。L3 负责人审查及设备走查 PENDING。
+- 结果：PASS；最终 full host build/lint、unit 979/0，G3 42/0、G4 12/0；Training 48/0、D2b 67/0、AddExercise 48/0；Today gatePassed=true，12 PASS / 0 FAIL / 0 MISSING，manual 1/12（8.33%），双次 fresh render hash 一致。首个有效 host 979/4（2 个既有 editor timeout、2 个新增 mdpi 断言失败）与修正后全绿结果均保留；editor class 独立重跑一次33/0。逐check计数、失败分类、耗时与日志见 `.handoff/subagent/2026-11-12-p4-today-r3.md`；未 commit / delegate，未打开 Android capture；负责人视觉验收及设备走查仍 PENDING。

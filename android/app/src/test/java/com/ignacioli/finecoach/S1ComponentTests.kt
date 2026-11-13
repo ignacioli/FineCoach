@@ -170,10 +170,25 @@ class S1ComponentTests {
     @Test fun primaryPage() {
         show { FcPagePrimary("虚构首页", Modifier.testTag("primary"), segments = {
             FcSegmentedSwitch(listOf("今日", "学员"), 0, {}, Modifier.testTag("segments"))
-        }) { FcListRow("虚构内容", Modifier.testTag("content")) } }
+        }, subtitle = "虚构日期", subtitleModifier = Modifier.testTag("date")) { FcListRow("虚构内容", Modifier.testTag("content")) } }
         full("primary"); full("content")
-        assertTrue(node("segments").getUnclippedBoundsInRoot().bottom <= compose.onNodeWithText("虚构首页").getUnclippedBoundsInRoot().top)
+        val title = compose.onNodeWithText("虚构首页").getUnclippedBoundsInRoot()
+        val rowTop = node("primary").getUnclippedBoundsInRoot().top + FcSpacing.space4
+        compose.onNodeWithText("虚构首页").assertTopPositionInRootIsEqualTo(rowTop + (FcComponentMetrics.touch - (title.bottom - title.top)) / 2)
+        assertEquals(rowTop + FcComponentMetrics.touch + FcSpacing.space1, node("date").getUnclippedBoundsInRoot().top)
+        assertTrue(compose.onNodeWithText("虚构首页").getUnclippedBoundsInRoot().bottom <= node("date").getUnclippedBoundsInRoot().top)
+        assertEquals(FcSpacing.space4, node("segments").getUnclippedBoundsInRoot().top - node("date").getUnclippedBoundsInRoot().bottom)
+        assertEquals(FcSpacing.space4, node("content").getUnclippedBoundsInRoot().top - node("segments").getUnclippedBoundsInRoot().bottom)
         compose.onNodeWithText("虚构首页").assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading))
+    }
+
+    @Test fun primaryPageViewerKeepsSharedHeaderSpacing() {
+        show { FcPagePrimary("虚构档案", Modifier.testTag("primary")) { FcListRow("虚构内容", Modifier.testTag("content")) } }
+        val rowTop = node("primary").getUnclippedBoundsInRoot().top + FcSpacing.space4
+        val title = compose.onNodeWithText("虚构档案").getUnclippedBoundsInRoot()
+        compose.onNodeWithText("虚构档案").assertTopPositionInRootIsEqualTo(rowTop + (FcComponentMetrics.touch - (title.bottom - title.top)) / 2)
+        assertEquals(rowTop + FcComponentMetrics.touch + FcSpacing.space4, node("content").getUnclippedBoundsInRoot().top)
+        full("primary"); full("content")
     }
 
     @Test fun secondaryPage() {

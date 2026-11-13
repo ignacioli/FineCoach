@@ -35,68 +35,67 @@ fun FcHeroCard(
     val minCardHeight = FcComponentMetrics.row + FcComponentMetrics.field
     val badgeMinWidth = FcComponentMetrics.touch + FcSpacing.space3
     val click = onClick
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = minCardHeight)
-            .clip(shape)
-            .background(FcColors.actionPrimary)
-            .then(
-                if (click != null) {
-                    Modifier.clickable(role = Role.Button, onClick = click)
-                } else {
-                    Modifier
-                },
-            )
-            .padding(FcSpacing.space4),
-        verticalArrangement = Arrangement.spacedBy(FcSpacing.space3),
-    ) {
-        Box(
+    Box(modifier.fillMaxWidth().clip(shape).then(
+        if (click != null) Modifier.clickable(role = Role.Button, onClick = click) else Modifier,
+    )) {
+        Column(
             modifier = Modifier
-                .widthIn(min = badgeMinWidth)
-                .height(FcComponentMetrics.icon)
-                .clip(FcShapes.capsule)
-                .background(FcColors.surfaceCanvas)
-                .padding(horizontal = FcSpacing.space2),
-            contentAlignment = Alignment.Center,
+                .fillMaxWidth()
+                .heightIn(min = minCardHeight)
+                .clip(shape)
+                .background(FcColors.actionPrimary)
+                .testTag("conformance:DS-HERO-CARD · card")
+                .padding(FcSpacing.space4),
+            verticalArrangement = Arrangement.spacedBy(FcSpacing.space3),
         ) {
-            FcText(
-                text = badgeText,
-                style = FcTypography.sectionLabel,
-                color = FcColors.actionPrimary,
-            )
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2),
-        ) {
-            Column(
+            Box(
                 modifier = Modifier
-                    .weight(1f)
-                    .alignBy(FirstBaseline),
-                verticalArrangement = Arrangement.spacedBy(FcSpacing.space1),
+                    .widthIn(min = badgeMinWidth)
+                    .height(FcComponentMetrics.icon)
+                    .clip(FcShapes.capsule)
+                    .background(FcColors.surfaceCanvas)
+                    .testTag("conformance:DS-HERO-CARD · badge")
+                    .padding(horizontal = FcSpacing.space2),
+                contentAlignment = Alignment.Center,
             ) {
                 FcText(
-                    text = title,
-                    modifier = Modifier.semantics { heading() },
-                    style = FcTypography.headline,
-                    color = FcColors.actionOn,
+                    text = badgeText,
+                    style = FcTypography.sectionLabel,
+                    color = FcColors.actionPrimary,
                 )
-                if (subtitle.isNotEmpty()) {
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .alignBy(FirstBaseline),
+                    verticalArrangement = Arrangement.spacedBy(FcSpacing.space1),
+                ) {
                     FcText(
-                        text = subtitle,
-                        style = FcTypography.callout,
-                        color = FcColors.textOnActionSecondary,
+                        text = title,
+                        modifier = Modifier.testTag("hero-card-title").semantics { heading() },
+                        style = FcTypography.headline,
+                        color = FcColors.actionOn,
+                    )
+                    if (subtitle.isNotEmpty()) {
+                        FcText(
+                            text = subtitle,
+                            style = FcTypography.callout,
+                            color = FcColors.textOnActionSecondary,
+                        )
+                    }
+                }
+                if (actionTitle != null) {
+                    FcText(
+                        text = actionTitle,
+                        modifier = Modifier.alignBy(FirstBaseline),
+                        style = FcTypography.style("callout", 600),
+                        color = FcColors.actionOn,
                     )
                 }
-            }
-            if (actionTitle != null) {
-                FcText(
-                    text = actionTitle,
-                    modifier = Modifier.alignBy(FirstBaseline),
-                    style = FcTypography.style("callout", 600),
-                    color = FcColors.actionOn,
-                )
             }
         }
     }

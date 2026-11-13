@@ -60,7 +60,7 @@ fun TodayScreen(state: TodayUiState, onNavigate: (String) -> Unit) {
         FcPagePrimary("今日", Modifier.fillMaxSize(),
             segments = { FcSegmentedSwitch(listOf("今日", "学员"), 0, { if (it == 1) onNavigate(S1Routes.STUDENTS) }, tag = "root") },
             subtitleModifier = Modifier.testTag("today-date"), subtitle = state.todayDate.format(DateTimeFormatter.ofPattern("M月d日 · EEE", Locale.SIMPLIFIED_CHINESE))) {
-        Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).testTag("today-content"), verticalArrangement = Arrangement.spacedBy(FcSpacing.space4)) {
+        Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).padding(bottom = FcSpacing.space6).testTag("today-content"), verticalArrangement = Arrangement.spacedBy(FcSpacing.space4)) {
             if (state.error != null) {
                 FcText("加载今日安排失败，再试一次。", Modifier.testTag("today-error"), style = FcTypography.caption, color = FcColors.statusDestructive)
                 FcButton("重试", Modifier.testTag("today-retry")) { scope.launch { state.load() } }
