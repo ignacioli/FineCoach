@@ -1,5 +1,13 @@
 # S1 implementation map
 
+### P4 review fix（2026-11-12）
+
+- 分类与依据：D；DS-SYMBOL 默认装饰性（components.md §3），批准的 `21-student-list-s1.png` 不变。
+- 范围：复用 DS-SYMBOL / DS-LIST-ROW / DS-SECTION；FcSymbol plain semantics 改为 merge boundary，移除 glyph 向祖先 Text 的合并，保留 unmerged Text / GetTextLayoutResult。
+- 设计决定：沿用已有装饰性约束；无新设计、无 Penpot 或 baseline 变更。
+- 实现与检查：ComponentContractTests 新增两个 row 的 merged Text 与 unmerged layout-result 回归；无新增交互，entry/layout map 沿用；L3 未触发（设计不变）。
+- 结果：Component 32/0/0、StudentEntryLayout 19/0/0、conformance 1/0/0（tests/failures/skips，errors 均 0）；student gatePassed 35/0/0（PASS/FAIL/MISSING）；证据 `.handoff/subagent/2026-11-12-p4-students-review-fix.md`，未做设备 TalkBack 人工验证。
+
 本表是 T010～T016 的源码/测试索引总表（基线 c644c56），不改变产品或设计。分类 C（文档回填），共享组件复用，feature 组合沿用原任务 D/C 的说明；既有 B 类平台映射沿用 AD-01～03、D13，不新增审批。画稿编号的完整文件名见下方设计索引，数值仅引用 `design/design-system/README.md`，anatomy 仅引用 `design/design-system/components.md`。
 
 五行执行记录：
@@ -363,12 +371,12 @@
 
 | 页面 | 可见控件 | testTag | 是否改数据 | 宽度 | 代码 | 测试 |
 |---|---|---|---|---|---|---|
-| 学员列表 | 搜索 | `studentList.search` | 否 | `FcSearchField` 撑满内容栏 | `StudentListScreen.kt:372` | `searchMissStaysDistinctFromAnEmptyLibrary` |
-| 学员列表 | 今日分段（可选） | `studentList.segment-0` | 否，发 `today` | 分段控件，不撑满 | `StudentListScreen.kt:345` | 同上 |
-| 学员列表 | 训练中条 | `studentList.inProgress` | 否，发已有 `session/{id}` | `FcHintBar` 撑满内容栏 | `StudentListScreen.kt:386` | `listContinueOpensTheExistingSession` |
-| 学员列表 | 学员行 | `studentList.row.{id}` | 否，发详情 | `StudentActiveRow` 撑满内容栏 | `StudentListScreen.kt:421` | `createPersistsThroughRoomAndAllowsTheSameName` |
-| 学员列表 | 已归档入口 | `studentList.archived` | 否 | `FcGroupEntryRow` 撑满内容栏 | `StudentListScreen.kt:433` | 嵌入列表，见归档恢复测试 |
-| 学员列表 | ＋ 新学员 | `studentList.add` | 否，发 `students/create` | `FcButton` | `StudentListScreen.kt:453` | `listContinueOpensTheExistingSession` |
+| 学员列表 | 搜索 | `studentList.search` | 否 | `FcSearchField` 撑满内容栏 | `StudentListScreen.kt:347` | `searchMissStaysDistinctFromAnEmptyLibrary` |
+| 学员列表 | 今日分段（可选） | `studentList.segment-0` | 否，发 `today` | 分段控件，不撑满 | `StudentListScreen.kt:320` | 同上 |
+| 学员列表 | 训练中条 | `studentList.inProgress` | 否，发已有 `session/{id}` | `FcHintBar` 撑满内容栏 | `StudentListScreen.kt:367` | `listContinueOpensTheExistingSession` |
+| 学员列表 | 学员行 | `studentList.row.{id}` | 否，发详情 | `StudentActiveRow` 撑满内容栏 | `StudentListScreen.kt:401` | `createPersistsThroughRoomAndAllowsTheSameName` |
+| 学员列表 | 已归档入口 | `studentList.archived` | 否 | `FcGroupEntryRow` 撑满内容栏 | `StudentListScreen.kt:412` | 嵌入列表，见归档恢复测试 |
+| 学员列表 | ＋ 新学员 | `studentList.add` | 否，发 `students/create` | `FcButton` | `StudentListScreen.kt:433` | `listContinueOpensTheExistingSession` |
 | 学员列表 | 空库 ＋ 新建学员 | `studentList.emptyAdd` | 否，发新建 | `FcButton` | `StudentListScreen.kt:629` | `emptyLibraryAppearsOnlyAfterASuccessfulLoad` |
 | 学员列表 | 系统返回 | `platform-shell` 的 BackHandler | 否 | — | `StudentListScreen.kt:309` | 与页头返回同一回调 |
 | 已归档 | 返回 | `studentArchived-back` | 否 | 页头返回，触控区由 `FcPageHeader` 补足 | `StudentListScreen.kt:493` | 归档流程中的返回 |
@@ -1001,3 +1009,29 @@ P4 round 2 最终：FAIL；host 952/0、G3 42/0、G4 12/0、训练conformance 1/
 - 设计决定：复用 S1-D72；画板标题→日期及 hero trailing 字框已由 dispatcher 修正，本轮不改设计文件、iOS、baseline 或 comparator。
 - 实现与检查：`S1ComponentTests.primaryPage` / `primaryPageViewerKeepsSharedHeaderSpacing` 和 `TodayConformanceTests` 验证共享顶部、标题居中及日期位置，保留既有顺序、间距、满宽及路由断言；无新增交互，entry/layout map 沿用上表。L3 负责人审查及设备走查 PENDING。
 - 结果：PASS；最终 full host build/lint、unit 979/0，G3 42/0、G4 12/0；Training 48/0、D2b 67/0、AddExercise 48/0；Today gatePassed=true，12 PASS / 0 FAIL / 0 MISSING，manual 1/12（8.33%），双次 fresh render hash 一致。首个有效 host 979/4（2 个既有 editor timeout、2 个新增 mdpi 断言失败）与修正后全绿结果均保留；editor class 独立重跑一次33/0。逐check计数、失败分类、耗时与日志见 `.handoff/subagent/2026-11-12-p4-today-r3.md`；未 commit / delegate，未打开 Android capture；负责人视觉验收及设备走查仍 PENDING。
+
+### P4 学员列表 S1 round 1（2026-11-12，S1-D66/D72/D74）
+
+- 分类与依据：D 类 drift repair；保持批准目标，依据 `21-student-list-s1.png`、DS-PAGE-FLOW / DS-PAGE-PRIMARY anatomy；开工 tracked/staged/untracked 均为 0，分支 `feat/android-p4-students`，HEAD `9fc8a88`。
+- 范围：复用 DS-PAGE-PRIMARY、DS-SEGMENTED、DS-TITLE-ACTION、DS-TEXT-FIELD、DS-HINT-BAR、DS-AVATAR、DS-LIST-ROW、DS-SECTION（FcGroupEntryRow）与 DS-BUTTON；StudentActiveRow 保持既有 feature-owned 行。增加真实可见形状 tag，不改 shared 组件视觉。
+- 设计决定：保留 S1-D74 的无预约语义。移除旧 block space.3，改 search→hint→list→archive 各 space.4；移除行与 divider 之间 space.1；按钮底部 space.2→space.6。标题 / 分段沿用 D72，无重复顶部间距。真实 repository 按 displayName 排序，训练条当前文案与板不同，需负责人裁决；不伪造 presentation。
+- 实现与检查：真实 Room / StudentUseCases / CreditUseCases / SessionRepository fixture；固定 clock，12/8 余额、32 分钟训练、两个归档；StudentListConformanceTests 检查可见、可点与宽度并生成 diagnostic / proposal。L3 负责人查看 PENDING；只查看批准 PNG 一次，不打开 Android capture。
+- 结果：BLOCKED（board avatar 18/600 无 README 行高 token）；host 980 tests / 1 Compose timeout；既有四屏48/0、67/0、48/0、12/0。最终 gate 与逐项诊断见 `.handoff/subagent/2026-11-12-p4-students.md`；提案 `android/build/outputs/conformance/21-student-list-s1/proposed-board.json`，非批准画板。不 commit、不 delegate、不改 iOS / baseline / comparator。
+
+| screen → visible control | identifier | 数据改变 | width owner | evidence |
+|---|---|---|---|---|
+| 学员列表 → 今日 / 学员分段 | `studentList.segment-0` / `studentList.segment-1` | 否，导航 / 选择 | FcSegmentedSwitch 各选项最小 50×32 | StudentEntryLayoutTests.listHeadingUsesSharedTopSpacingOnlyOnce |
+| 学员列表 → 资料库 icon | `student-list-resource-hub` | 否，导航 | FcPagePrimary actions；44 touch | TodayNavigationEntryLayoutTests.resourceRoutesTemplateAndExerciseEditorCancelReturnConsistently |
+| 学员列表 → 搜索学员 | `studentList.search` | 否，过滤 | FcSearchField 填满 platform-content | StudentEntryLayoutTests.searchMissStaysDistinctFromAnEmptyLibrary |
+| 学员列表 → 继续训练 | `studentList.inProgress` | 否，打开已有 Session | FcHintBar 填满内容栏 | StudentListConformanceTests / StudentEntryLayoutTests.listContinueOpensTheExistingSession |
+| 学员列表 → 学员行 | `studentList.row.{id}` | 否，详情导航 | StudentActiveRow 填满内容栏 | StudentEntryLayoutTests.createPersistsThroughRoomAndAllowsTheSameName |
+| 学员列表 → 已归档 · 2 › | `studentList.archived` | 否，打开归档列表 | FcGroupEntryRow 填满内容栏 | StudentListConformanceTests |
+| 学员列表 → ＋ 新学员 | `studentList.add` | 否，新建页导航；保存才写入 | FcButton 填满底部容器 | StudentListConformanceTests |
+
+### P4 学员列表 S1 round 2（S1-D76）
+
+- 分类与依据：D 类 drift repair；复用批准的 DS-HINT-BAR / DS-SECTION / DS-SYMBOL / DS-TITLE-ACTION，目标为修正后的 `21-student-list-s1.png`；不新增设计决定。
+- 范围与差异：标题资料库移除 T020 临时 grid_view，使用 AD-01 list_alt 300；ConformanceMapping 已有 list.bullet.rectangle→list_alt。Hint / group entry 的剩余宽度由外层 Box 保留，内部 Text 自然宽度仍受最大宽度约束，尾部 action / disclosure 位置保持不变。FcSymbol 保留 TextLayoutResult 并 hideFromAccessibility；移除 clearAndSetSemantics。
+- 设计决定：S1-D76 替代 round 1 的文案、排序、头像及图标待决项；保持真实产品排序与字符串。map 重绑 hint path30、保留按钮path24，删除旧文案 exception。移除仅供 round 1 的固定索引 proposal writer，严格 comparator 继续生成逐层报告。
+- 实现与检查：复用上表 entry/layout map，无新交互；共享影响 StudentDetail hint、TemplateEditor group entry 及所有 FcSymbol 调用页（训练、动作库、添加动作、资源库、历史等）。L0/L1/L2 与既有四屏实际 gate 结果见本轮 handoff；本轮未打开 Android capture，L3 负责人验收 PENDING。
+- 结果：NOT CONVERGED；Student gate 25 PASS / 10 FAIL / 0 MISSING，3 AD-01 vector internals，manual 2/38（5.26%）；剩余6项 GAP 为 board 文字框决策点。G3 42/0、G4 12/0，既有四屏48/0、67/0、48/0、12/0；最终 unit 981 tests / 1 PackageEntryLayoutTests 5秒 timeout（原因未确认），ExerciseTemplate class 33/0。完整证据见 `.handoff/subagent/2026-11-12-p4-students-r2.md`；不 commit、不 delegate，不改 iOS / baseline / layers / PNG / tolerance / anchors。

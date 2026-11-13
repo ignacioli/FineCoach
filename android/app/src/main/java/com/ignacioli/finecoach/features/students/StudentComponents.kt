@@ -49,7 +49,7 @@ internal fun StudentActiveRow(
         horizontalArrangement = Arrangement.spacedBy(FcSpacing.space4),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        FcAvatar(name = displayName)
+        FcAvatar(name = displayName, modifier = Modifier.testTag("conformance:DS-AVATAR · circle"))
         Column(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(FcSpacing.space1),

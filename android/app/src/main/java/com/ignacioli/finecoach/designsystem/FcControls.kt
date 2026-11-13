@@ -110,9 +110,9 @@ fun FcSymbol(kind: FcGlyph, modifier: Modifier = Modifier, tint: Color? = null, 
         FcGlyph.Check -> FcTypography.style("callout", 600)
         FcGlyph.CheckOnFill -> FcTypography.sectionLabel
     }
-    // Keep the glyph decorative while allowing a real TextLayoutResult observation.
-    val observation = if (visualTag == null) modifier.clearAndSetSemantics { }
-        else modifier.testTag(visualTag).semantics { hideFromAccessibility() }
+    // A merge boundary keeps decorative text out of ancestors while preserving layout observation.
+    val observation = (if (visualTag == null) modifier else modifier.testTag(visualTag))
+        .semantics(mergeDescendants = true) { hideFromAccessibility() }
     FcText(kind.glyph, observation, style = style,
         color = tint ?: when (kind) {
             FcGlyph.Check -> FcColors.actionPrimary

@@ -38,6 +38,13 @@ class ConformanceGenericTests {
         assertFalse(ConformanceComparison.ad01Unobservable(parent, entry, true, false))
         assertFalse(ConformanceComparison.ad01Unobservable(JSONObject(parent.toString()).put("name", "icon / unknown"), entry, true, true))
     }
+    @Test fun decorativeGlyphTextUsesAutomaticMappingAndListHubUsesAd01() {
+        val entries = ConformanceMapping.entries(listOf(layer("a", "›"), layer("b", "›", y = 50)),
+            emptyList(), listOf(node(1, "›"), node(2, "›", y = 50)), emptyMap())
+        assertEquals(listOf(1, 2), entries.map { it.getInt("nodeID") })
+        assertTrue(entries.all { it.getString("mapping") == "AUTO_TEXT" })
+        assertEquals("list_alt", ConformanceMapping.platformIcon("icon / list.bullet.rectangle"))
+    }
     private fun layer(path: String, text: String = "应用", y: Int = 0) = JSONObject()
         .put("path", path).put("name", "Text").put("type", "text").put("text", text).put("x", 0).put("y", y).put("w", 10).put("h", 10)
     private fun node(id: Int, text: String = "应用", y: Int = 0) = layer("unused", text, y).put("id", id).put("tag", "").put("hex", "#211f1b")

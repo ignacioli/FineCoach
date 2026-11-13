@@ -402,6 +402,7 @@ tasks.withType<Test>().matching { it.name == "testDebugUnitTest" || it.name == "
         excludeTestsMatching("com.ignacioli.finecoach.ExerciseConformanceTests")
         excludeTestsMatching("com.ignacioli.finecoach.AddExerciseConformanceTests")
         excludeTestsMatching("com.ignacioli.finecoach.TodayConformanceTests")
+        excludeTestsMatching("com.ignacioli.finecoach.StudentListConformanceTests")
     }
     inputs.file(privacyDependencyReport)
     inputs.file(rootProject.layout.projectDirectory.file("dependency-allowlist/resolved.txt"))
@@ -847,7 +848,7 @@ val validateComponentGate = tasks.register("validateS0G2Results") {
         val expectedCounts = mapOf(
             "com.ignacioli.finecoach.ComponentCatalogTests" to 6,
             "com.ignacioli.finecoach.ComponentCatalogStateTests" to 66,
-            "com.ignacioli.finecoach.ComponentContractTests" to 31,
+            "com.ignacioli.finecoach.ComponentContractTests" to 32,
             "com.ignacioli.finecoach.PlatformShellTests" to 5,
         )
         check(counts == expectedCounts) { "Unexpected G2 testcase counts: $counts; expected $expectedCounts" }
@@ -1143,3 +1144,5 @@ val validateDesignScanGate = tasks.register("validateS0G3Results") {
     }
 }
 designScanGate.configure { finalizedBy(validateDesignScanGate) }
+
+registerVisualGate("p4StudentListConformance", "StudentListConformanceTests", 1)
