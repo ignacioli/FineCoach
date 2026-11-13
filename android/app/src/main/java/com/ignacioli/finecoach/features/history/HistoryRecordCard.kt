@@ -1,12 +1,18 @@
 package com.ignacioli.finecoach.features.history
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.TextAutoSize
+import androidx.compose.foundation.text.modifiers.TextAutoSizeLayoutScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import com.ignacioli.finecoach.core.application.*
@@ -107,13 +113,30 @@ internal fun HistoryRecordCard(detail: HistoryDetail, zone: ZoneId, studentName:
     }
 }
 
+// Match iOS ShareReportCardView.swift:250 minimumScaleFactor; Android then wraps (AD-09).
+private const val HistorySetMinimumScale = 0.8f
+
 /** Publish the value baseline for the enclosing three-cell row as well as the index/value pair. */
 @Composable
 private fun HistorySetCell(index: String, value: String, modifier: Modifier) {
+    val style = FcTypography.style("callout", 400)
+    val glued = remember(value) { value.replace(Regex("(?<=\\d) (?=[^\\s\\d×])|(?<=×) (?=\\d)"), "\u00a0") }
+    val autoSize = remember(style.fontSize) { object : TextAutoSize {
+        override fun TextAutoSizeLayoutScope.getFontSize(constraints: Constraints, text: AnnotatedString): TextUnit {
+            for (step in 100 downTo (HistorySetMinimumScale * 100).toInt()) {
+                val size = style.fontSize * (step / 100f)
+                val result = performLayout(constraints, text, size)
+                if (result.lineCount == 1 && !result.hasVisualOverflow) return size
+            }
+            return style.fontSize * HistorySetMinimumScale
+        }
+        override fun equals(other: Any?) = this === other
+        override fun hashCode() = System.identityHashCode(this)
+    } }
     Layout(modifier = modifier, content = {
         FcText(index, style = FcTypography.caption, color = FcColors.textDisabled)
-        FcText(value, style = FcTypography.style("callout", 400), color = FcColors.textPrimary,
-            maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis)
+        FcText(glued, style = style, color = FcColors.textPrimary, autoSize = autoSize,
+            softWrap = true, maxLines = Int.MAX_VALUE, overflow = TextOverflow.Visible)
     }) { measurables, constraints ->
         val indexPlaceable = measurables[0].measure(constraints.copy(minWidth = 0, minHeight = 0))
         val gap = FcSpacing.space1.roundToPx()

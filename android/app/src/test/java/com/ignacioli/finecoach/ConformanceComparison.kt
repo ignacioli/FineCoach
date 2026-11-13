@@ -66,7 +66,7 @@ internal object ConformanceComparison {
                 used += n.getInt("id")
                 val geometry = geometry(n, layer, anchor, offset, tolerance, entry)
                 val deltas = geometry.getJSONObject("delta")
-                val textMatches = !layer.has("text") || (entry.optJSONObject("pendingBoardFix")?.optString("text", layer.getString("text")) ?: layer.getString("text")) == n.getString("text")
+                val textMatches = !layer.has("text") || normalizeConformanceText(entry.optJSONObject("pendingBoardFix")?.optString("text", layer.getString("text")) ?: layer.getString("text")) == normalizeConformanceText(n.getString("text"))
                 val ad01 = ConformanceMapping.platformIcon(layer.optString("name")) != null
                 val expectedHex = if (ad01) layers.filter { it.getString("path").startsWith(layer.getString("path") + "/") }
                     .mapNotNull { ConformanceColors.expected(it, layers, tokens) }.distinct().singleOrNull().orEmpty()
@@ -243,7 +243,7 @@ internal object ConformanceComparison {
         return actual.filter { n ->
             (!entry.has("tag") || n.getString("tag") == expand(entry.getString("tag"))) &&
             (!entry.has("scope") || n.getString("tag") == expand(entry.getString("scope")) || expand(entry.getString("scope")) in n.getJSONArray("ancestors").strings()) &&
-            (!entry.has("text") || n.getString("text") == expand(entry.getString("text")))
+            (!entry.has("text") || normalizeConformanceText(n.getString("text")) == normalizeConformanceText(expand(entry.getString("text"))))
         }
     }
 

@@ -1,6 +1,7 @@
 package com.ignacioli.finecoach.designsystem
 
 import androidx.compose.material3.Text
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -56,11 +57,11 @@ internal fun Modifier.fcLineBox(style: TextStyle, lineCount: FcLineCount): Modif
 fun FcText(text: String, modifier: Modifier = Modifier, color: Color = Color.Unspecified,
     textAlign: TextAlign? = null, overflow: TextOverflow = TextOverflow.Clip, softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE, minLines: Int = 1, onTextLayout: ((TextLayoutResult) -> Unit)? = null,
-    style: TextStyle = FcTypography.body) {
+    style: TextStyle = FcTypography.body, autoSize: TextAutoSize? = null) {
     val lineCount = remember { FcLineCount() }
     Text(text, modifier.semantics { }.fcLineBox(style, lineCount), color = color, textAlign = textAlign, overflow = overflow,
         softWrap = softWrap, maxLines = maxLines, minLines = minLines,
-        onTextLayout = { lineCount.lines = it.lineCount; onTextLayout?.invoke(it) }, style = style)
+        onTextLayout = { lineCount.lines = it.lineCount; onTextLayout?.invoke(it) }, style = style, autoSize = autoSize)
 }
 
 @Composable
