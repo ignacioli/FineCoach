@@ -92,3 +92,9 @@ path20/25通过 `commonLayoutParentOfTags` 指向真实minus/plus的最近共同
 ## 遮挡后的颜色观测（P4 C2b-B round 3，dispatcher 批准）
 
 `layers.json` 的后序层绘制在前序层上。通用比较器仅用唯一映射成功的后序层遮挡当前取色 crop：Android 使用其真实节点 bounds，design 使用导出 bounds；同一节点与当前图标的内部 path 不遮挡自身。文字 ink、填充众数与 iconInk 边界背景采样均排除遮挡像素；颜色 token 仍精确比较。两侧任一 crop 完全没有未遮挡像素时，COLOR 为 `UNOBSERVABLE`（`passed=null`），不记 PASS；几何和内容仍独立判定，有偏差仍 FAIL。仅颜色完全遮挡且其余检查通过的层单列 `UNOBSERVABLE_COLOR`，不计 PASS/FAIL，与矢量内部不可观测分开报告。无未遮挡颜色证据但非完全遮挡（例如众数并列或文字没有 ink）仍 FAIL。
+
+## 装饰性文字字形（S1-D76）
+
+`FcSymbol(FcGlyph)` 保留真实 `Text` / `GetTextLayoutResult`，使用 `hideFromAccessibility()` 对 accessibility 隐藏；既有 caller testTag 与可选 visualTag 保留。不再用 `clearAndSetSemantics` 删除观测。通用 auto-mapper 与普通文字一样按精确字形内容、阅读顺序及唯一最近中心匹配（`AUTO_TEXT`），不需要 screen 分支或手动 selector。`ComponentContractTests.symbols` 验证隐藏状态与 layout action，`ConformanceGenericTests.decorativeGlyphTextUsesAutomaticMappingAndListHubUsesAd01` 验证重复字形的自动匹配。
+
+`21-student-list-s1.map.json` 按 S1-D76 新 layers 路径更新：hint surface 为 30，主按钮为 24；旧提示文案 exception 已移除。其余文字与 icon group 使用通用自动映射；origin、anchor、tolerance 不变。

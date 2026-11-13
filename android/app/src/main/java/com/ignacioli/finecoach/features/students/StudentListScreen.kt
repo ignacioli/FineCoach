@@ -323,8 +323,8 @@ fun StudentListScreen(
                         { index -> if (index == 0) onRoute(S1Routes.TODAY) }, tag = StudentTestTags.STUDENT_LIST_SEGMENT)
                 }) else null,
                 actions = {
-                    FcTitleIconButton("资料库", painterResource(R.drawable.ic_ms_grid_view),
-                        Modifier.testTag("student-list-resource-hub")) { onRoute(S1Routes.RESOURCE_HUB) }
+                    FcTitleIconButton("资料库", painterResource(R.drawable.ic_ms_list_alt),
+                        Modifier.testTag("student-list-resource-hub"), visualModifier = Modifier.testTag("conformance:icon / list.bullet.rectangle")) { onRoute(S1Routes.RESOURCE_HUB) }
                 }) { }
 
             if (state.isTrulyEmpty) {
@@ -341,7 +341,7 @@ fun StudentListScreen(
                         .fillMaxWidth()
                         .verticalScroll(rememberScrollState())
                         .padding(bottom = FcSpacing.space6),
-                    verticalArrangement = Arrangement.spacedBy(FcSpacing.space3),
+                    verticalArrangement = Arrangement.spacedBy(FcSpacing.space4),
                 ) {
                     FcSearchField(
                         title = "搜索学员",
@@ -350,6 +350,7 @@ fun StudentListScreen(
                             scope.launch { viewModel.updateQuery(nextQuery) }
                         },
                         modifier = Modifier.testTag(StudentTestTags.STUDENT_LIST_SEARCH),
+                        visualModifier = Modifier.testTag("conformance:DS-TEXT-FIELD · search"),
                     )
 
                     if (state.inProgress.isNotEmpty() && state.query.isEmpty()) {
@@ -391,7 +392,7 @@ fun StudentListScreen(
                     } else if (state.students.isNotEmpty()) {
                         Column(
                             modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(FcSpacing.space1),
+                            verticalArrangement = Arrangement.Top,
                         ) {
                             state.students.forEach { student ->
                                 val info = state.rowInfo[student.studentID] ?: StudentListRowInfo()
@@ -402,7 +403,7 @@ fun StudentListScreen(
                                     modifier = Modifier.testTag(StudentTestTags.studentRow(student.studentID)),
                                     onClick = { onRoute(S1Routes.studentDetail(student.studentID)) },
                                 )
-                                FcListRowDivider()
+                                FcListRowDivider(Modifier.testTag("conformance:DS-LIST-ROW · divider"))
                             }
                         }
                     }
@@ -427,7 +428,7 @@ fun StudentListScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(FcColors.surfacePage)
-                        .padding(vertical = FcSpacing.space2),
+                        .padding(top = FcSpacing.space2, bottom = FcSpacing.space6),
                 ) {
                     FcButton(
                         title = "＋ 新学员",

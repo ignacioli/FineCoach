@@ -108,7 +108,7 @@ fun FcSectionLabel(title: String, modifier: Modifier = Modifier) {
 fun FcGroupEntryRow(title: String, count: Int, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Row(modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.touch).semantics(mergeDescendants = true) { }
         .clickable(role = Role.Button, onClick = onClick), verticalAlignment = Alignment.CenterVertically) {
-        FcText("$title · $count", Modifier.weight(1f), style = FcTypography.sectionLabel, color = FcColors.textSecondary)
+        Box(Modifier.weight(1f)) { FcText("$title · $count", maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, style = FcTypography.sectionLabel, color = FcColors.textSecondary) }
         FcSymbol(FcGlyph.Forward)
     }
 }

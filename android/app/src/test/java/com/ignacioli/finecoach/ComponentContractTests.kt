@@ -375,11 +375,36 @@ class ComponentContractTests {
         show { FcGlyph.entries.forEach { FcSymbol(it, Modifier.testTag(it.name)) }; FcAssetSymbol.entries.forEach { FcSymbol(it, icon, Modifier.testTag(it.name)) } }
         assertEquals(5, FcGlyph.entries.size)
         assertEquals(setOf("‹", "›", "✓"), FcGlyph.entries.map { it.glyph }.toSet())
-        FcGlyph.entries.forEach { node(it.name).assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.ContentDescription)) }
+        FcGlyph.entries.forEach {
+            node(it.name).assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.ContentDescription))
+                .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.HideFromAccessibility))
+                .assertTextEquals(it.glyph)
+                .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.GetTextLayoutResult))
+        }
         assertEquals(3, FcAssetSymbol.entries.size)
         FcAssetSymbol.entries.forEach {
             node(it.name).assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.ContentDescription))
                 .assertWidthIsEqualTo(if (it == FcAssetSymbol.Collapse) 15.dp else 20.dp)
+        }
+    }
+
+    @Test fun decorativeGlyphDoesNotMergeIntoRowText() {
+        show {
+            FcListRow("虚构学员", Modifier.testTag("list"), subtitle = "虚构备注",
+                mode = FcRowMode.Action {})
+            FcGroupEntryRow("虚构分组", 2, Modifier.testTag("group")) {}
+        }
+        compose.onNodeWithTag("list").assertTextEquals("虚构学员", "虚构备注")
+        compose.onNodeWithTag("group").assertTextEquals("虚构分组 · 2")
+        val glyphs = compose.onAllNodesWithText(FcGlyph.Forward.glyph, useUnmergedTree = true)
+        glyphs.assertCountEquals(2)
+        repeat(2) { index ->
+            glyphs[index].assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.HideFromAccessibility))
+                .performSemanticsAction(SemanticsActions.GetTextLayoutResult) { action ->
+                    val results = mutableListOf<androidx.compose.ui.text.TextLayoutResult>()
+                    assertTrue(action(results))
+                    assertEquals(FcGlyph.Forward.glyph, results.single().layoutInput.text.text)
+                }
         }
     }
 
@@ -393,6 +418,10 @@ class ComponentContractTests {
         node("hint").assertHeightIsAtLeast(44.dp).assertContentDescriptionEquals("虚构提示")
         full("active")
         touch("active")
+        val hintText = compose.onNodeWithText("虚构训练中", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        val actionText = compose.onNodeWithText("继续", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        assertTrue(hintText.width < node("active").getUnclippedBoundsInRoot().width / 2)
+        assertEquals(node("active").getUnclippedBoundsInRoot().right - FcSpacing.space4, actionText.right)
         node("active").performClick()
         compose.runOnIdle { assertEquals(1, calls) }
     }

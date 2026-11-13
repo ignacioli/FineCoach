@@ -50,12 +50,15 @@ fun FcHintBar(
             horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            FcText(
-                text = text,
-                modifier = Modifier.weight(1f),
-                style = FcTypography.caption,
-                color = FcColors.actionPrimary,
-            )
+            Box(Modifier.weight(1f)) {
+                FcText(
+                    text = text,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    style = FcTypography.caption,
+                    color = FcColors.actionPrimary,
+                )
+            }
             FcText(
                 text = title,
                 style = FcTypography.style("callout", 600),
