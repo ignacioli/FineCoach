@@ -7,6 +7,8 @@ import java.io.File
 import java.security.MessageDigest
 import javax.imageio.ImageIO
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.round
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -242,9 +244,8 @@ internal object ConformanceComparison {
     }
 
     /**
-     * S1-D40 R2: a design text box is re-expressed in the token line-box model, keeping its center
-     * (glyph position does not move): h = fontSize × the README line-height multiplier of the style
-     * with that size and weight. Layers without font metadata keep their exported box.
+     * S1-D40 R2: one token line is fontSize × the README line-height multiplier of the style with
+     * that size and weight. [designBox] stacks these lines (S1-D84).
      */
     internal fun tokenLineHeight(fontSize: Double, fontWeight: Int): Double {
         val styles = com.ignacioli.finecoach.designsystem.FcTypography.styles
@@ -256,12 +257,16 @@ internal object ConformanceComparison {
     }
 
     /**
-     * Map rules (both explicit per entry, never inferred):
+     * S1-D40 R2 / S1-D84: a design text box keeps its center and becomes
+     * `lines × tokenLineHeight`, with `lines = max(1, round(exported height / tokenLineHeight))`.
+     * Layers without font metadata keep their exported box. Map rules (both explicit per entry, never inferred):
      * - `geometryRule=SYMBOL_CENTER` (S1-D40 R4): a design text glyph that AD-01 maps to a Material
      *   symbol is compared as a `symbolSizeDp` square centered on the glyph box center.
      * - `geometryRule=EDITABLE_TEXT_FIELD` (S1-D42): the platform text field keeps its natural single-line
      *   minimum height outside the caller's modifiers, so the actual editor box is normalized to the design
-     *   token line box around its own center; x, w and the center are judged, the raw height is reported.
+     *   token line box (S1-D84 line count included) around its own center; x, w and the center are judged,
+     *   the raw height is reported. Other actual text keeps its measured bounds; capture reads
+     *   TextLayoutResult for color only and does not store a line count.
      * - `pendingBoardFix` (S1-D42): a registered board drift awaiting a Penpot fix shifts the expected
      *   box by `dx`/`dy`; such a row is reported as BOARD_FIX_PENDING, never as PASS.
      */
@@ -272,7 +277,9 @@ internal object ConformanceComparison {
             box.put("x", layer.getDouble("x") + layer.getDouble("w") / 2 - size / 2).put("y", layer.getDouble("y") + layer.getDouble("h") / 2 - size / 2)
                 .put("w", size).put("h", size)
         } else if (layer.optString("type") == "text" && layer.has("fontSize")) {
-            val h = tokenLineHeight(layer.getDouble("fontSize"), layer.optInt("fontWeight", 400))
+            val line = tokenLineHeight(layer.getDouble("fontSize"), layer.optInt("fontWeight", 400))
+            val lines = max(1, round(layer.getDouble("h") / line).toInt())
+            val h = lines * line
             box.put("y", layer.getDouble("y") + layer.getDouble("h") / 2 - h / 2).put("h", h)
         }
         rule?.optJSONObject("pendingBoardFix")?.let { fix ->
@@ -373,7 +380,7 @@ internal object ConformanceComparison {
             appendLine("\n不可观测（矢量内部）：${result.getInt("unobservableVectorInternal")}，不计入PASS或偏差。仅父图标几何通过且同名资产来源hash验证通过时成立（S1-D37）。")
             appendLine("\noriginOffsetY=${result.getDouble("effectiveOriginOffsetY")}；Android content top=${result.getDouble("measuredContentTop")}；${result.getString("originReason")}")
             result.optJSONObject("stability")?.let { appendLine("\n双次 fresh Room/composition 渲染：$it") }
-            appendLine("\nS1-D40 R2：画稿文字框以中心为准换算为 token 行盒（高 = 字号 × README 行高倍率），尺寸、间距、内边距与对齐的Δ先按S1-D56取最近0.25dp，再采用±2dp含边界；绝对坐标±8dp粗界限，界内仅诊断。ΔcenterY 仅报告。top原点、bottom底距规则不变，无新增偏移。")
+            appendLine("\nS1-D40 R2 / S1-D84：画稿文字框以中心为准换算为 token 行盒（行数 = max(1, round(导出高 / token行高))，高 = 行数 × 字号 × README 行高倍率），尺寸、间距、内边距与对齐的Δ先按S1-D56取最近0.25dp，再采用±2dp含边界；绝对坐标±8dp粗界限，界内仅诊断。ΔcenterY 仅报告。top原点、bottom底距规则不变，无新增偏移。")
             appendLine("\n| path | 元素 | anchor | 容差dp | Δx | Δy | Δw | Δh | ΔcenterY(报告) | text | token | category | 原因 |")
             appendLine("|---|---|---|---:|---:|---:|---:|---:|---:|---|---|---|---|")
             rows.forEach { r ->

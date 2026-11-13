@@ -23,7 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import com.ignacioli.finecoach.R
+import com.ignacioli.finecoach.core.application.toDomain
 import com.ignacioli.finecoach.core.application.AppClock
 import com.ignacioli.finecoach.core.application.ApplicationResult
 import com.ignacioli.finecoach.core.application.CoursePackageRecord
@@ -254,12 +257,20 @@ class StudentDetailViewModel(
             is ApplicationResult.Failure -> RecentRead(summary = null, queried = false, failed = true)
             is ApplicationResult.Success -> {
                 val latest = res.value.maxByOrNull { it.completedAtUTC }
+                val content = if (latest != null) {
+                    when (val loaded = sessionRepository.loadContent(latest.sessionID)) {
+                        is ApplicationResult.Failure -> return RecentRead(null, false, true)
+                        is ApplicationResult.Success -> loaded.value
+                            ?: return RecentRead(null, false, true)
+                    }
+                } else null
                 RecentRead(
                     summary = latest?.let {
                         StudentRecentSessionSummary(
                             sessionID = it.sessionID,
                             completedAtUTC = it.completedAtUTC,
                             trainingFocus = it.trainingFocus,
+                            completedSetCount = content?.toDomain()?.session?.statistics?.completedSetCount,
                         )
                     },
                     queried = true,
@@ -304,7 +315,7 @@ fun StudentDetailScreen(
                     .weight(1f)
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
-                    .padding(top = FcSpacing.space4, bottom = FcSpacing.space6),
+                    .padding(bottom = FcSpacing.space6),
                 verticalArrangement = Arrangement.spacedBy(FcSpacing.space4),
             ) {
                 FcPageHeader(
@@ -330,10 +341,10 @@ fun StudentDetailScreen(
                 if (student != null) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(FcSpacing.space4),
+                        horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        FcAvatar(name = student.displayName)
+                        FcAvatar(name = student.displayName, modifier = Modifier.testTag("conformance:Avatar"))
                         FcText(
                             text = StudentPresentation.goalText(student.trainingGoal),
                             style = FcTypography.callout,
@@ -407,7 +418,7 @@ private fun DetailPrimaryButton(
         modifier = Modifier
             .fillMaxWidth()
             .background(FcColors.surfacePage)
-            .padding(vertical = FcSpacing.space2),
+            .padding(top = FcSpacing.space2, bottom = FcSpacing.space8),
     ) {
         FcButton(
             title = title,
@@ -430,7 +441,7 @@ private fun OverviewSection(
             title = "概览",
             modifier = Modifier.padding(bottom = FcSpacing.space2),
         )
-        FcListRowDivider()
+        FcListRowDivider(Modifier.testTag("conformance:Divider"))
         StudentOverviewRow(
             kicker = "课包",
             modifier = Modifier.testTag(StudentTestTags.DETAIL_COURSE_PACKAGES),
@@ -464,7 +475,7 @@ private fun OverviewSection(
                 }
             }
         }
-        FcListRowDivider()
+        FcListRowDivider(Modifier.testTag("conformance:Divider"))
         StudentOverviewRow(
             kicker = "最近训练",
             modifier = Modifier.testTag(StudentTestTags.DETAIL_RECENT_TRAINING),
@@ -485,7 +496,7 @@ private fun OverviewSection(
                 )
             }
         }
-        FcListRowDivider()
+        FcListRowDivider(Modifier.testTag("conformance:Divider"))
     }
 }
 
@@ -499,13 +510,13 @@ private fun RecordsSection(
             title = "记录",
             modifier = Modifier.padding(bottom = FcSpacing.space2),
         )
-        FcListRowDivider()
+        FcListRowDivider(Modifier.testTag("conformance:Divider"))
         FcActionRow(
             title = "训练历史",
             modifier = Modifier.testTag(StudentTestTags.DETAIL_HISTORY),
             onClick = { onRoute(S1Routes.studentHistory(studentID)) },
         )
-        FcListRowDivider()
+        FcListRowDivider(Modifier.testTag("conformance:Divider"))
     }
 }
 
@@ -521,34 +532,42 @@ private fun ProfileSection(
             title = "资料",
             modifier = Modifier.padding(bottom = FcSpacing.space2),
         )
-        FcListRowDivider()
+        FcListRowDivider(Modifier.testTag("conformance:Divider"))
         FcLabelValueText(
             label = "性别",
             value = StudentSexPresentation.title(student.sex),
             modifier = Modifier.testTag(StudentTestTags.DETAIL_PROFILE_SEX),
         )
-        FcListRowDivider()
-        FcLabelValueText(
+        FcListRowDivider(Modifier.testTag("conformance:Divider"))
+        ProfileValue(
             label = "电话",
             value = StudentPresentation.filledOrUnfilled(student.phone),
             modifier = Modifier.testTag(StudentTestTags.DETAIL_PROFILE_PHONE),
         )
-        FcListRowDivider()
-        FcLabelValueText(
+        FcListRowDivider(Modifier.testTag("conformance:Divider"))
+        ProfileValue(
             label = "微信",
             value = StudentPresentation.filledOrUnfilled(student.wechatID),
             modifier = Modifier.testTag(StudentTestTags.DETAIL_PROFILE_WECHAT),
         )
-        FcListRowDivider()
-        FcLabelValueText(
+        FcListRowDivider(Modifier.testTag("conformance:Divider"))
+        ProfileValue(
             label = "教练备注",
             value = StudentPresentation.filledOrUnfilled(student.privateCoachNote),
             modifier = Modifier.testTag(StudentTestTags.DETAIL_PROFILE_PRIVATE_NOTE),
         )
-        FcListRowDivider()
+        FcListRowDivider(Modifier.testTag("conformance:Divider"))
         FcLabelValueRow(
             label = "注意事项",
-            modifier = Modifier.testTag(StudentTestTags.DETAIL_NOTES_FOLD),
+            modifier = Modifier.testTag(StudentTestTags.DETAIL_NOTES_FOLD).then(
+                if (hasNotes) {
+                    Modifier.semantics {
+                        stateDescription = if (notesExpanded) "已展开" else "已折叠"
+                    }
+                } else {
+                    Modifier
+                },
+            ),
             onClick = if (hasNotes) onToggleNotes else null,
         ) {
             val text = when {
@@ -571,12 +590,20 @@ private fun ProfileSection(
                 color = FcColors.textSecondary,
             )
         }
-        FcListRowDivider()
+        FcListRowDivider(Modifier.testTag("conformance:Divider"))
         FcText(
             text = "电话与微信由教练手输。不读取系统通讯录，不询问联系人权限。",
             modifier = Modifier.padding(top = FcSpacing.space3),
             style = FcTypography.caption,
             color = FcColors.textSecondary,
         )
+    }
+}
+
+@Composable
+private fun ProfileValue(label: String, value: String, modifier: Modifier = Modifier) {
+    FcLabelValueRow(label = label, modifier = modifier.semantics(mergeDescendants = true) { }) {
+        FcText(value, style = FcTypography.body,
+            color = if (value == "未填写") FcColors.textSecondary else FcColors.textPrimary)
     }
 }

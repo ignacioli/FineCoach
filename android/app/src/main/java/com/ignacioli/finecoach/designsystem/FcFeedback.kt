@@ -104,7 +104,7 @@ fun FcInlineResult(variant: FcResultVariant, title: String, description: String,
 
 @Composable
 fun FcAvatar(name: String, modifier: Modifier = Modifier) {
-    Box(modifier.size(FcComponentMetrics.touch).background(FcColors.surfaceSelected, CircleShape).clearAndSetSemantics { },
+    Box(modifier.size(FcComponentMetrics.touch).background(FcColors.surfaceSelected, CircleShape).semantics(mergeDescendants = true) { hideFromAccessibility() },
         contentAlignment = Alignment.Center) {
         FcText(name.take(1), style = FcTypography.headline, color = FcColors.actionPrimary)
     }

@@ -63,6 +63,24 @@ class ConformanceComparisonTests {
         val selector = JSONObject().put("commonLayoutParentOfTags", JSONArray(listOf("minus", "plus"))).put("containsTag", "input")
         assertEquals(2, ConformanceComparison.select(listOf(JSONObject(selector.toString()), JSONObject(selector.toString())), selector).size)
     }
+    @Test fun multiLineDesignTextMatchesATwoLineBoxAndOneLineLayersStayOneTokenLine() {
+        val line = ConformanceComparison.tokenLineHeight(13.0, 400)
+        val design = rect(16.0, 700.0, 220.0, 34.0).put("type", "text").put("fontSize", 13).put("fontWeight", 400)
+        val box = ConformanceComparison.designBox(design)
+        assertEquals(2 * line, box.getDouble("h"), 0.001)
+        assertEquals(717.0, box.getDouble("y") + box.getDouble("h") / 2, 0.001)
+        assertEquals(16.0, box.getDouble("x"), 0.001)
+        assertEquals(220.0, box.getDouble("w"), 0.001)
+        val twoLines = rect(16.0, box.getDouble("y"), 220.0, box.getDouble("h"))
+        assertTrue(ConformanceComparison.geometry(twoLines, design, "top", 0.0).getBoolean("matches"))
+        val oneLineTall = rect(16.0, 717.0 - line / 2, 220.0, line)
+        assertFalse(ConformanceComparison.geometry(oneLineTall, design, "top", 0.0).getBoolean("matches"))
+
+        val single = rect(16.0, 100.0, 86.0, 20.0).put("type", "text").put("fontSize", 17).put("fontWeight", 400)
+        val singleBox = ConformanceComparison.designBox(single)
+        assertEquals(ConformanceComparison.tokenLineHeight(17.0, 400), singleBox.getDouble("h"), 0.001)
+        assertEquals(110.0, singleBox.getDouble("y") + singleBox.getDouble("h") / 2, 0.001)
+    }
     @Test fun designTextBoxIsNormalizedToTokenLineHeightAroundItsCenter() {
         // 17pt/400 = body, README multiplier 1.4 → 23.8; Penpot exported 20 tall at y=100 (center 110).
         val design = rect(16.0, 100.0, 86.0, 20.0).put("type", "text").put("fontSize", 17).put("fontWeight", 400)
