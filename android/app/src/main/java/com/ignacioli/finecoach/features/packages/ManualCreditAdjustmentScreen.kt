@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
@@ -141,6 +142,8 @@ fun ManualCreditAdjustmentScreen(
                         state.reason,
                         { state.reason = it },
                         Modifier.testTag("package-manual-reason"),
+                        visualModifier = Modifier.heightIn(min = FcSpacing.space8 * 2 + FcSpacing.space6),
+                        singleLine = false,
                     )
                 }
                 state.error?.let { message ->

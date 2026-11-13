@@ -63,10 +63,11 @@ fun SetEditor(state: ActiveSessionUiState, exercise: SessionExerciseRecord, targ
                 } else SetNumber(if (sideEntry) "每侧重量 kg" else "重量 kg", weight, { weight = it }, SetValueStepping.Field.weight, "set-weight")
             }
             // S1-D42: the stepping hint is helper text of the last field row, space.1 below it (P0-a2).
-            Column(verticalArrangement = Arrangement.spacedBy(FcSpacing.space1)) {
+            if (exercise.recordModeSnapshot != RecordMode.cardio) Column(verticalArrangement = Arrangement.spacedBy(FcSpacing.space1)) {
                 when (exercise.recordModeSnapshot) {
                     RecordMode.weightReps, RecordMode.reps -> SetNumber("次数", reps, { reps = it }, SetValueStepping.Field.reps, "set-reps")
-                    RecordMode.duration, RecordMode.cardio -> FcTextField("时长（秒或分秒）", duration, { duration = it }, Modifier.testTag("set-duration"), enabled = !state.busy, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), keyboardActions = done)
+                    RecordMode.duration -> FcTextField("时长（秒或分秒）", duration, { duration = it }, Modifier.testTag("set-duration"), enabled = !state.busy, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), keyboardActions = done)
+                    RecordMode.cardio -> Unit
                 }
                 if (exercise.recordModeSnapshot == RecordMode.weightReps) FcText(
                     "每次 ±2.5 kg · 点数字可直接输入", Modifier.padding(start = FcComponentMetrics.label).testTag("set-weight-hint"),
@@ -81,9 +82,13 @@ fun SetEditor(state: ActiveSessionUiState, exercise: SessionExerciseRecord, targ
                 FcTextField("右侧", right, { right = it }, Modifier.testTag("set-right"), keyboardOptions = numberKeyboard, keyboardActions = done)
             }
             if (exercise.recordModeSnapshot == RecordMode.cardio) {
-                FcTextField("距离", distance, { distance = it }, Modifier.testTag("set-distance"), enabled = !state.busy, keyboardOptions = numberKeyboard, keyboardActions = done)
-                FcTextField("速度（可选）", speed, { speed = it }, Modifier.testTag("set-speed"), enabled = !state.busy, keyboardOptions = numberKeyboard, keyboardActions = done)
-                FcTextField("阻力（可选）", resistance, { resistance = it }, Modifier.testTag("set-resistance"), enabled = !state.busy, keyboardOptions = numberKeyboard, keyboardActions = done)
+                Column(Modifier.fillMaxWidth()) {
+                    CardioValue("时长", "时长，如 5 分 30 秒 / 5m30s", duration, { duration = it }, "", true, "set-duration", !state.busy, KeyboardOptions(imeAction = ImeAction.Done), done)
+                    CardioValue("距离", "距离（km）", distance, { distance = it }, "km", true, "set-distance", !state.busy, numberKeyboard, done)
+                    CardioValue("速度", "速度（选填）", speed, { speed = it }, "km/h", false, "set-speed", !state.busy, numberKeyboard, done)
+                    CardioValue("阻力", "阻力（选填）", resistance, { resistance = it }, "", false, "set-resistance", !state.busy, numberKeyboard, done)
+                }
+                FcHintBar("时长与距离均大于 0，才可标记完成", Modifier.testTag("set-cardio-validation-hint"))
             }
             state.error?.let { FcListRow(exerciseErrorTitle(it), Modifier.testTag("set-error")) }
             // S1-D42: actions sit space.4 below the fields (column space.2 + space.2 top inset).
@@ -97,6 +102,21 @@ fun SetEditor(state: ActiveSessionUiState, exercise: SessionExerciseRecord, targ
             }
         }
     }
+}
+
+@Composable
+private fun CardioValue(label: String, title: String, value: String, change: (String) -> Unit,
+    unit: String, required: Boolean, tag: String, enabled: Boolean, options: KeyboardOptions, actions: KeyboardActions) {
+    FcLabelValueRow(label, Modifier.testTag("$tag-row")) {
+        Row(Modifier.fillMaxWidth().testTag("$tag-value-slot"), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2),
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            FcTextField(title, value, change, Modifier.weight(1f).testTag(tag), enabled = enabled,
+                keyboardOptions = options, keyboardActions = actions, inline = true, placeholder = "")
+            if (unit.isNotEmpty()) FcText(unit, style = FcTypography.body, color = FcColors.textPrimary)
+            FcText(if (required) "必填" else "选填", style = FcTypography.caption, color = FcColors.textSecondary)
+        }
+    }
+    FcListRowDivider(Modifier.testTag("$tag-divider"))
 }
 
 @Composable

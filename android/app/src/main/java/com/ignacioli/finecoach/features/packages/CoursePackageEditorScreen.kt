@@ -275,6 +275,8 @@ fun CoursePackageEditorScreen(
                             state.name,
                             { state.name = it },
                             Modifier.testTag("package-editor-name"),
+                            placeholder = "",
+                            inline = true,
                         )
                     }
                 }

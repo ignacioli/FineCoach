@@ -1,5 +1,13 @@
 # S1 implementation map
 
+### P7 15 / 36 / 37 form leftovers（2026-11-13）
+
+- 分类与依据：D；批准的 `15-cardio.png`、`36-new-package-stepper.png`、`37-manual-adjustment-stepper.png` 及 S1-D90，目标设计不变；开工 tracked/staged/untracked 均为 0，HEAD a529e47。
+- 范围与差异：15 无标签/单位/标记 → DS-LABEL-VALUE-ROW + inline DS-TEXT-FIELD + km/km/h + 必填/选填；缺提示 → DS-HINT-BAR；cardio 从 duration 共用分支拆出，weight/reps/duration 原渲染不变。37 单行 → D-b 同款多行 88 token 下限；36 名称填充框 → 共享 inline 值列。默认 inline=false，其他消费者兼容。
+- 设计决定：确认/保存与校验、持久化逻辑不变；15 是 ActiveSessionScreen 内联 editor，保留 inline actions，36/37 继续复用 FcScrollBody / FcPinnedAction。36 的 Android 与 iOS 均无名称 auto-focus；名称空占位与 iOS 一致。iOS 无 cardio 验证提示 key，提示沿用批准 PNG 原文；其他文案按 `session.field.durationFlexible/distance/speed/resistance`、`session.mode.duration`、`session.action.confirmSet`。不新增 unit 给无量纲阻力。
+- 实现与检查：entry/layout map：15 时长/距离/速度/阻力 → set-duration/set-distance/set-speed/set-resistance → 内存 SetEntryValues → FcLabelValueRow 满宽，值 slot 输入占剩余宽度，确认 set-save 沿原 durable save；36 名称 → package-editor-name → 内存 name → 既有 name-slot 满宽，保存沿原 pinned CTA；37 原因 → package-manual-reason → 内存 reason → 既有 reason-slot/FcTextField 满宽，保存沿原 pinned CTA。ActiveSessionEntryLayoutTests 增补四字段可见/编辑/行宽/值 slot/标签/单位/标记/提示；PackageEntryLayoutTests 增补无初始焦点、多行最小高/换行/空原因禁用；ComponentContractTests 增补 inline 编辑与底色、默认底色兼容。L3 未做人类验收。
+- 结果：定向 suites 累计最终 191/0，G3 42/0，P0-a2 48 PASS/0 FAIL、hash d1caec3f70c8 不变，P7 15/0；指定三张各查看一次，15 四项与 37 多行已修复，36 底色已修复且无初始焦点，但 capture 有 fixture 输入后的 caret，保留此限制，无截图迭代；完整证据见 `.handoff/subagent/2026-11-13-p7-forms.md`；未 commit、delegate、改 iOS / baseline / comparator。
+
 ### P7 T1 shared layout F0–F4（2026-11-13）
 
 - 分类与依据：D；沿用 04/05/27/33/36/37、B-a、D-b 批准 PNG 及负责人本轮 F0–F4 指令，目标设计不变。
