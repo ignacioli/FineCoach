@@ -405,6 +405,7 @@ tasks.withType<Test>().matching { it.name == "testDebugUnitTest" || it.name == "
         excludeTestsMatching("com.ignacioli.finecoach.SessionDetailConformanceTests")
         excludeTestsMatching("com.ignacioli.finecoach.StudentListConformanceTests")
         excludeTestsMatching("com.ignacioli.finecoach.StudentDetailConformanceTests")
+        excludeTestsMatching("com.ignacioli.finecoach.P7SideBySideTests")
     }
     inputs.file(privacyDependencyReport)
     inputs.file(rootProject.layout.projectDirectory.file("dependency-allowlist/resolved.txt"))
@@ -994,6 +995,10 @@ fun registerVisualGate(taskName: String, suite: String, expectedTests: Int): Tas
     return gate
 }
 val screenshotGate = registerVisualGate("s0G5", "ComponentScreenshotTests", 1)
+// P7 is capture-only: captureToImage writes sheets without invoking a comparator.
+registerVisualGate("p7SideBySide", "P7SideBySideTests", 15).configure {
+    outputs.dir(layout.buildDirectory.dir("outputs/p7"))
+}
 val visualBaselineBefore = mutableMapOf<String, String>()
 fun visualBaselineManifest(): Map<String, String> = rootProject.fileTree("screenshot-baselines").files.associate {
     it.relativeTo(rootProject.projectDir).path to MessageDigest.getInstance("SHA-256").digest(it.readBytes()).joinToString("") { byte -> "%02x".format(byte) }
