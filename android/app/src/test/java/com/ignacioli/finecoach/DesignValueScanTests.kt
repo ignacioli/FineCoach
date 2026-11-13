@@ -118,7 +118,6 @@ internal object LineBoxScanner {
         Allowed("main/java/com/ignacioli/finecoach/designsystem/FcSetRow.kt", "rawText", 1, "set values use BasicText auto-size with fcLineBox"),
         Allowed("debug/java/com/ignacioli/finecoach/S0DebugApplication.kt", "rawText", 1, "S0 debug sample text, not a design screen"),
         Allowed("main/java/com/ignacioli/finecoach/features/session/SessionChrome.kt", "offset", 1, "back button 44dp hit area extends outward from the visible glyph"),
-        Allowed("main/java/com/ignacioli/finecoach/features/session/SessionSwipeRow.kt", "offset", 1, "swipe drag translation, runtime value"),
     )
     fun scan(path: String, source: String): Map<String, Int> {
         val text = DesignValueScanner.code(source)

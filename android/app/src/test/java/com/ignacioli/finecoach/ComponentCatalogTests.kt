@@ -174,6 +174,9 @@ class ComponentCatalogTests {
                     assertFalse(file.readText().contains("R.drawable.ic_ms_$name"))
                     assertFalse(file.readText().contains("FcSymbol(FcGlyph.Check)"))
                     assertTrue(file.readText().contains("this.selected = selected"))
+                } else if (name == "folder" && owner == "feature:session-swipe-row") {
+                    // P7 F5 follows P0-a2b: the move tile is text-only; retain asset provenance checks.
+                    assertFalse(file.readText().contains("R.drawable.ic_ms_$name"))
                 } else assertTrue("$name must be used by $owner in " + file.path, file.readText().contains("R.drawable.ic_ms_$name"))
             }
         }

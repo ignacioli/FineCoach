@@ -546,6 +546,7 @@ roadmap §4 的其他差异（系统壳分类以 S0 spec D09 批准结论为准�
 - 字体（C 类，S1 核心页走查）：正文与 `‹ › ✓` 都用随包 Noto Sans SC（ADR-001 §7.2，负责人 2026-11-03 确认），token 数值不变，只是渲染引擎不同；由 L3 走查看一次，不画板。
 - 趋势图（D 类，S3）：Swift Charts → Compose Canvas，目标是现有画稿；iOS 位置 `Features/Trends/TrendLineChart.swift`、`Features/Trends/TrendsView.swift`。
 - 左滑操作（D 类，S1）：Compose 没有现成控件，按本文 §4.8 自绘；iOS 位置见 §4.8，不重新设计。
+  - Android SessionSwipeRow：默认字号 tile 宽保持分区删除 112、移入分区 84、删除 76；大字号宽度取默认宽与单行内容 intrinsic width（含图标、间距及水平 padding）的较大值，reveal 距离跟随实测总宽；删除分区视觉 pill 高 36，外层点击区至少 44（自动：`SessionSwipeRowTests`）。
 
 文件选择、分享面板、通知外观是系统界面，不设计，通知文案与 iOS 一致（roadmap §4 末行）。
 
