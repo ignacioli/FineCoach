@@ -1,6 +1,8 @@
 package com.ignacioli.finecoach.features.packages
 
 import com.ignacioli.finecoach.designsystem.FcText
+import com.ignacioli.finecoach.designsystem.FcScrollBody
+import com.ignacioli.finecoach.designsystem.FcPinnedAction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -101,16 +103,10 @@ fun ManualCreditAdjustmentScreen(
     }
     Box(modifier.fillMaxSize().testTag("package-manual-root")) {
         FcPlatformShell(onBack = onBack, insets = windowInsets) {
-            Column(
-                Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .verticalScroll(scroll)
-                    .testTag("package-manual-form"),
-            ) {
+            FcScrollBody(Modifier.testTag("package-manual-form"), scroll) {
                 FcPageHeader("人工调整课时", onBack = onBack, tag = "package-manual")
                 FcListRowDivider()
-                FcLabelValueRow("调整方向", Modifier.padding(top = FcSpacing.space4)) {
+                FcLabelValueRow("调整方向", trailingControl = true) {
                     FcSegmentedSwitch(
                         listOf("扣减", "返还"),
                         if (state.direction == CreditDirection.debit) 0 else 1,
@@ -121,7 +117,7 @@ fun ManualCreditAdjustmentScreen(
                     )
                 }
                 FcListRowDivider()
-                FcLabelValueRow("课时数") {
+                FcLabelValueRow("课时数", trailingControl = true) {
                     FcStepper(
                         "课时数",
                         state.amount,
@@ -155,9 +151,11 @@ fun ManualCreditAdjustmentScreen(
                         color = FcColors.statusDestructive,
                     )
                 }
+            }
+            FcPinnedAction {
                 FcButton(
                     "保存调整",
-                    Modifier.testTag("package-manual-save").padding(top = FcSpacing.space4, bottom = FcSpacing.space6),
+                    Modifier.testTag("package-manual-save"),
                     enabled = reasonReady && !state.busy,
                 ) {
                     if (!reasonReady || !state.tryBegin()) return@FcButton

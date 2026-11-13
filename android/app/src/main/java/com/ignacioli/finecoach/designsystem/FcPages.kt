@@ -2,6 +2,9 @@ package com.ignacioli.finecoach.designsystem
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -12,6 +15,20 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import com.ignacioli.finecoach.R
+
+/** A reserved footer and a scrollable tail keep the last row clear of the primary action. */
+@Composable
+fun ColumnScope.FcScrollBody(modifier: Modifier = Modifier, scroll: ScrollState = rememberScrollState(),
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    content: @Composable ColumnScope.() -> Unit) {
+    Column(modifier.weight(1f).fillMaxWidth().verticalScroll(scroll)
+        .padding(bottom = FcComponentMetrics.row), verticalArrangement = verticalArrangement, content = content)
+}
+
+@Composable
+fun FcPinnedAction(content: @Composable () -> Unit) {
+    Box(Modifier.fillMaxWidth().padding(bottom = FcSpacing.space8)) { content() }
+}
 
 /** §4.6: display title and optional date precede segmented navigation; the caller owns routes/actions. */
 @Composable

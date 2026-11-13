@@ -15,6 +15,9 @@ class TemplateRepository(
 ) : TemplateRepositoryPort {
     private val dao get() = database.s1Dao()
     private val writes get() = database.t008SessionDao()
+    override suspend fun exerciseCounts(): ApplicationResult<Map<TemplateID, Int>> = transaction {
+        dao.templateExerciseCounts().associate { TemplateID.fromUUID(it.templateID) to it.exerciseCount }
+    }
     override suspend fun list(): ApplicationResult<List<TemplateRecord>> = transaction {
         writes.templates().map(::record).sortedWith(compareByDescending<TemplateRecord> { it.updatedAtUTC }.thenBy { it.templateID.value })
     }

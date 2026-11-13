@@ -22,17 +22,19 @@ fun TemplateListScreen(state: TemplateUiState, onNavigate: (String) -> Unit, onB
     LaunchedEffect(state) { state.list() }
     FcPlatformShell(onBack) {
         FcPageHeader("训练模板", onBack = onBack, tag = "templates")
-        Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).testTag("template-list-content")) {
+        FcScrollBody(Modifier.testTag("template-list-content")) {
             FcListRow("跨学员使用；应用后可单独修改")
             state.error?.let { FcListRow(exerciseErrorTitle(it), Modifier.testTag("template-error")) }
             state.templates.forEach { item ->
                 FcListRow(item.name, Modifier.testTag("template-open-${item.templateID.value}"),
-                    subtitle = item.trainingFocus.joinToString("、") { FcBodyParts[BodyPart.entries.indexOf(it)] },
+                    subtitle = templateListMeta(item.trainingFocus, state.exerciseCounts[item.templateID]),
                     mode = FcRowMode.Action { onNavigate(S1Routes.templateDetail(item.templateID)) })
                 FcListRowDivider()
             }
         }
-        FcButton("新建模板", Modifier.testTag("template-new")) { name = ""; create = true }
+        FcPinnedAction {
+            FcButton("新建模板", Modifier.testTag("template-new")) { name = ""; create = true }
+        }
     }
     if (create) FcBottomSheet("新建模板", { if (!state.busy) create = false }) {
         Column(Modifier.fillMaxWidth().imePadding().verticalScroll(rememberScrollState()).testTag("template-create-content"),

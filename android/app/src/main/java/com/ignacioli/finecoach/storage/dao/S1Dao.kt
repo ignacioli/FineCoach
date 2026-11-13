@@ -124,6 +124,9 @@ abstract class S1Dao {
     @Query("SELECT * FROM template_exercises WHERE templateID = :templateID ORDER BY orderIndex")
     abstract fun templateExercises(templateID: UUID): List<TemplateExerciseEntity>
 
+    @Query("SELECT t.id AS templateID, COUNT(e.id) AS exerciseCount FROM training_templates t LEFT JOIN template_exercises e ON e.templateID = t.id GROUP BY t.id")
+    abstract fun templateExerciseCounts(): List<TemplateExerciseCount>
+
     @Query("SELECT * FROM template_planned_sets WHERE templateExerciseID = :exerciseID ORDER BY position")
     abstract fun plannedSets(exerciseID: UUID): List<TemplatePlannedSetEntity>
 
@@ -200,3 +203,5 @@ abstract class S1Dao {
         require(section.ownerKind == kind && section.ownerID == ownerID) { "Section owner mismatch" }
     }
 }
+
+data class TemplateExerciseCount(val templateID: UUID, val exerciseCount: Int)

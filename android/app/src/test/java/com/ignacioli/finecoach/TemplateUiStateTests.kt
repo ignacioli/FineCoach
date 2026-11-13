@@ -68,6 +68,18 @@ class TemplateUiStateTests {
         assertTrue(called); assertEquals("虚构新模板", f.ok(repository.list()).single().name)
         assertNull(state.error); assertFalse(state.busy)
     }
+    @Test fun listLoadsActionCountsFromExistingTemplateContent() = f.test {
+        val template = seed().template
+        val empty = f.ok(repository.save(SaveTemplateCommand(null, "虚构空模板", emptySet(), null)))
+        state.list()
+        assertEquals(2, state.exerciseCounts[template.templateID])
+        assertEquals(0, state.exerciseCounts[empty.templateID])
+        assertEquals("未设重点 · 0 个动作", templateListMeta(empty.trainingFocus, state.exerciseCounts[empty.templateID]))
+        assertEquals("未设重点 · 2 个动作", templateListMeta(emptySet(), state.exerciseCounts[template.templateID]))
+        assertEquals("训练重点 · 胸 · 2 个动作", templateListMeta(setOf(BodyPart.chest), 2))
+        assertNull(templateListMeta(emptySet(), null))
+        assertNull(state.error)
+    }
     @Test fun createInvalidNameDoesNotCallSuccessOrWrite() = f.test {
         state.create(" ") { fail("Invalid create succeeded") }
         assertNotNull(state.error); assertFalse(state.busy); assertTrue(f.ok(repository.list()).isEmpty())

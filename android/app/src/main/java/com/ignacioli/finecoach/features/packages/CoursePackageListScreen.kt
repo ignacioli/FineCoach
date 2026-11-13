@@ -1,6 +1,8 @@
 package com.ignacioli.finecoach.features.packages
 
 import com.ignacioli.finecoach.designsystem.FcText
+import com.ignacioli.finecoach.designsystem.FcScrollBody
+import com.ignacioli.finecoach.designsystem.FcPinnedAction
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -165,13 +167,7 @@ fun CoursePackageListScreen(
     val scroll = rememberScrollState()
     LaunchedEffect(studentID) { state.reload() }
     FcPlatformShell(onBack = onBack, modifier = modifier.testTag("package-list-root")) {
-        Column(
-            Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .verticalScroll(scroll)
-                .testTag("package-list-body"),
-        ) {
+        FcScrollBody(Modifier.testTag("package-list-body"), scroll) {
             FcPageHeader("课包详情", onBack = onBack, tag = "package-list")
             if (state.loadError) {
                 FcInlineResult(
@@ -242,21 +238,23 @@ fun CoursePackageListScreen(
                 )
             }
         }
+        FcPinnedAction {
         if (state.ready && state.active != null) {
             FcButton(
                 "人工调整",
-                Modifier.testTag("package-list-manual").padding(bottom = FcSpacing.space4),
+                Modifier.testTag("package-list-manual"),
             ) {
                 state.active?.coursePackageID?.let(onManual)
             }
         } else if (state.ready) {
             FcButton(
                 "新建课包",
-                Modifier.testTag("package-list-add").padding(bottom = FcSpacing.space4),
+                Modifier.testTag("package-list-add"),
             ) {
                 onCreate()
             }
         }
+    }
     }
     if (state.confirmingEnd) {
         FcConfirmationDialog(

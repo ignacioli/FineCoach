@@ -300,7 +300,12 @@ class ComponentContractTests {
         listOf("normal", "danger", "disabled", "short-detail").forEach { full(it); touch(it) }
         val shortTitle = compose.onNodeWithText("归档学员", useUnmergedTree = true).fetchSemanticsNode().layoutInfo.parentInfo!!
         val shortDetail = compose.onNodeWithText("可恢复", useUnmergedTree = true).fetchSemanticsNode().layoutInfo.parentInfo!!
-        assertTrue("Short detail must not reserve half the row", shortTitle.width > shortDetail.width)
+        val titleBounds = compose.onNodeWithText("归档学员", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        val detailBounds = compose.onNodeWithText("可恢复", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        assertEquals("Title column keeps its natural text width", titleBounds.width.value,
+            shortTitle.width.toFloat(), 1f)
+        assertTrue("Detail receives the remaining width", shortDetail.width > shortTitle.width)
+        assertTrue("Detail follows the complete title", detailBounds.left >= titleBounds.right)
         val title = compose.onNodeWithText("删除样例", useUnmergedTree = true).getUnclippedBoundsInRoot()
         assertTrue("Long trailing detail must reserve title width", title.width >= 64.dp)
         compose.onNodeWithText("删除学员和训练记录；课包与课时流水仍保留，需二次确认", useUnmergedTree = true).assertIsDisplayed()
@@ -309,6 +314,42 @@ class ComponentContractTests {
         compose.runOnIdle { assertEquals(0, calls) }
         node("confirm-cancel").performClick(); node("normal").performClick()
         compose.runOnIdle { assertEquals(1, calls) }
+    }
+
+    @Test fun trailingControlUsesRowHeightAndTrailingEdge() {
+        show {
+            FcLabelValueRow("显示已隐藏", Modifier.testTag("control-row"), trailingControl = true) {
+                FcToggle("显示已隐藏", false, {}, Modifier.testTag("trailing-toggle"))
+            }
+        }
+        node("control-row").assertHeightIsEqualTo(FcComponentMetrics.row)
+        assertEquals(node("control-row").getUnclippedBoundsInRoot().right,
+            node("trailing-toggle").getUnclippedBoundsInRoot().right)
+    }
+
+    @Test fun blankMetaDoesNotReserveSecondLine() {
+        show {
+            FcListRow("无元信息", Modifier.testTag("without-meta"))
+            FcListRow("空元信息", Modifier.testTag("blank-meta"), subtitle = "")
+        }
+        node("without-meta").assertHeightIsEqualTo(FcComponentMetrics.row)
+        node("blank-meta").assertHeightIsEqualTo(FcComponentMetrics.row)
+    }
+
+    @Test fun pinnedActionReservesScrollableTailAndBottomMargin() {
+        show {
+            Column(Modifier.height(FcComponentMetrics.row * 6).testTag("page-body")) {
+                FcScrollBody(Modifier.testTag("scroll-body")) {
+                    repeat(8) { FcListRow("样例 $it", Modifier.testTag("tail-$it")) }
+                }
+                FcPinnedAction { FcButton("保存", Modifier.testTag("pinned-save")) {} }
+            }
+        }
+        val before = node("pinned-save").getUnclippedBoundsInRoot()
+        node("tail-7").performScrollTo().assertIsDisplayed()
+        assertTrue(node("tail-7").getUnclippedBoundsInRoot().bottom <= before.top)
+        assertEquals(before, node("pinned-save").getUnclippedBoundsInRoot())
+        assertEquals(FcSpacing.space8, node("page-body").getUnclippedBoundsInRoot().bottom - before.bottom)
     }
 
     @Test fun undoRow() {
