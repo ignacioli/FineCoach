@@ -23,10 +23,6 @@ internal suspend fun ExerciseUiState.createLibraryExercise(query: String, mode: 
     if (error == null) search(query)
 }
 
-internal suspend fun ExerciseUiState.updateLibraryPreference(command: UpdateExercisePreferenceCommand, onSaved: () -> Unit) {
-    perform({ useCases.updatePreference(command) }) { onSaved() }
-}
-
 internal suspend fun ExerciseUiState.saveCustomExercise(item: ExerciseRecord?, name: String, mode: RecordMode, onSaved: () -> Unit) {
     perform({ item?.let { useCases.updateCustom(it.exerciseID, name, mode) }
         ?: useCases.createCustom(name, mode) }) { onSaved() }
@@ -243,27 +239,48 @@ fun ExerciseLibraryScreen(state: ExerciseUiState, onBack: () -> Unit) {
     }
     if (filters) ExerciseFilterSheet(equipment, { equipment = it }, hidden, { hidden = it }, "exercise-library", { filters = false })
     options?.let { item ->
-
-        val p = state.preference(item.exerciseID)
-        var alias by remember(item.exerciseID) { mutableStateOf(p.alias ?: "") }
-        fun update(command: UpdateExercisePreferenceCommand) {
-            scope.launch { state.updateLibraryPreference(command) { options = null; refresh++ } }
+        DisposableEffect(state, item.exerciseID) {
+            state.openPreferenceID = item.exerciseID
+            onDispose { state.openPreferenceID = null }
         }
-        fun command(aliasValue: String? = p.alias, favorite: Boolean = p.isFavorite, isHidden: Boolean = p.isHidden,
+        val p = state.preference(item.exerciseID)
+        val unilateral = p.isUnilateral ?: (state.metadata[item.exerciseID]?.isUnilateralByDefault ?: false)
+        fun update(command: UpdateExercisePreferenceCommand) {
+            scope.launch {
+                state.updateLibraryPreference(command) {
+                    refresh++
+                }
+            }
+        }
+        fun command(favorite: Boolean = p.isFavorite, isHidden: Boolean = p.isHidden,
             assisted: Boolean = p.isAssisted, unilateral: Boolean? = p.isUnilateral) =
-            UpdateExercisePreferenceCommand(item.exerciseID, aliasValue, favorite, isHidden, assisted, unilateral)
-        FcBottomSheet("动作选项", { if (!state.busy) options = null }, skipPartiallyExpanded = true) {
+            UpdateExercisePreferenceCommand(item.exerciseID, p.alias, favorite, isHidden, assisted, unilateral)
+        FcBottomSheet(p.alias ?: item.canonicalName, { options = null },
+            subtitle = state.subtitle(item), skipPartiallyExpanded = true) {
             Column(Modifier.fillMaxWidth().imePadding().heightIn(max = FcComponentMetrics.row * 7)
                 .verticalScroll(rememberScrollState()).testTag("exercise-options-content")) {
-                FcTextField("显示名", alias, { alias = it }, Modifier.testTag("exercise-alias"))
-                FcButton("保存显示名", Modifier.testTag("exercise-alias-save"), !state.busy) { update(command(aliasValue = alias)) }
-                FcActionRow(if (p.isFavorite) "取消收藏" else "收藏", Modifier.testTag("exercise-favorite"), enabled = !state.busy) { update(command(favorite = !p.isFavorite)) }
-                FcActionRow(if (p.isHidden) "恢复显示" else "隐藏动作", Modifier.testTag("exercise-hide"), enabled = !state.busy) { update(command(isHidden = !p.isHidden)) }
-                FcActionRow(if (p.isAssisted) "取消辅助记录" else "辅助记录", Modifier.testTag("exercise-assisted"), enabled = !state.busy) { update(command(assisted = !p.isAssisted)) }
-                FcActionRow(if (p.isUnilateral == true) "双侧记录" else "单侧记录", Modifier.testTag("exercise-unilateral"), enabled = !state.busy) { update(command(unilateral = p.isUnilateral != true)) }
-                if (item.kind == ExerciseKind.custom) FcActionRow("编辑自定义动作", Modifier.testTag("exercise-edit"), enabled = !state.busy) { options = null; edit = item }
+                FcListRowDivider()
+                FcLabelValueRow("收藏", Modifier.testTag("exercise-favorite-row"), trailingControl = true) {
+                    FcToggle("收藏", p.isFavorite, { update(command(favorite = it)) }, Modifier.testTag("exercise-favorite"), !state.busy)
+                }
+                FcListRowDivider()
+                FcLabelValueRow("隐藏", Modifier.testTag("exercise-hide-row"), trailingControl = true) {
+                    FcToggle("隐藏", p.isHidden, { update(command(isHidden = it)) }, Modifier.testTag("exercise-hide"), !state.busy)
+                }
+                FcListRowDivider()
+                FcLabelValueRow("辅助器械", Modifier.testTag("exercise-assisted-row"), trailingControl = true) {
+                    FcToggle("辅助器械", p.isAssisted, { update(command(assisted = it)) }, Modifier.testTag("exercise-assisted"), !state.busy)
+                }
+                FcListRowDivider()
+                FcLabelValueRow("单侧动作", Modifier.testTag("exercise-unilateral-row"), trailingControl = true) {
+                    FcToggle("单侧动作", unilateral, { update(command(unilateral = it)) }, Modifier.testTag("exercise-unilateral"), !state.busy)
+                }
+                FcListRowDivider()
+                if (item.kind == ExerciseKind.custom) {
+                    FcActionRow("编辑动作", Modifier.testTag("exercise-edit"), enabled = !state.busy) { options = null; edit = item }
+                    FcListRowDivider()
+                }
                 state.error?.let { FcListRow(exerciseErrorTitle(it), Modifier.testTag("exercise-options-error")) }
-                FcSecondaryButton("取消", Modifier.testTag("exercise-options-cancel"), !state.busy) { options = null }
             }
         }
     }
