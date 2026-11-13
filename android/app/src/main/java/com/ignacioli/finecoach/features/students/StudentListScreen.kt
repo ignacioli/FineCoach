@@ -317,7 +317,7 @@ fun StudentListScreen(
                 .testTag(StudentTestTags.STUDENT_LIST_ROOT),
         ) {
             com.ignacioli.finecoach.designsystem.FcPagePrimary("学员",
-                Modifier.fillMaxWidth().padding(top = FcSpacing.space4, bottom = FcSpacing.space4),
+                Modifier.fillMaxWidth().padding(bottom = FcSpacing.space4), // top space.4 is owned by FcPagePrimary (S1-D72)
                 segments = if (showRootSwitch) ({
                     FcSegmentedSwitch(listOf("今日", "学员"), 1,
                         { index -> if (index == 0) onRoute(S1Routes.TODAY) }, tag = StudentTestTags.STUDENT_LIST_SEGMENT)

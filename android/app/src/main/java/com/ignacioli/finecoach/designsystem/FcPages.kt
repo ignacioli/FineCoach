@@ -18,7 +18,7 @@ import com.ignacioli.finecoach.R
 fun FcPagePrimary(title: String, modifier: Modifier = Modifier, segments: (@Composable () -> Unit)? = null,
     subtitle: String? = null, subtitleModifier: Modifier = Modifier, actions: @Composable RowScope.() -> Unit = {}, content: @Composable ColumnScope.() -> Unit) {
     Column(modifier.fillMaxWidth().background(FcColors.surfacePage), verticalArrangement = Arrangement.spacedBy(FcSpacing.space4)) {
-        Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(FcSpacing.space1)) {
+        Column(Modifier.fillMaxWidth().padding(top = FcSpacing.space4), verticalArrangement = Arrangement.spacedBy(FcSpacing.space1)) {
             // S1-D42: header row keeps the 44dp touch row with or without actions
             Row(Modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.touch), verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.weight(1f)) {

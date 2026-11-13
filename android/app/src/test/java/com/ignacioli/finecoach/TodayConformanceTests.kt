@@ -76,7 +76,11 @@ class TodayConformanceTests {
         Assert.assertEquals(node("platform-content").getUnclippedBoundsInRoot().width, hero.getUnclippedBoundsInRoot().width)
         val segments = node("root-0").getUnclippedBoundsInRoot()
         val title = compose.onNode(hasText("今日") and SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading), useUnmergedTree = true).getUnclippedBoundsInRoot()
-        // S1-D70: title/date, segmented navigation, then content, using DS-PAGE-FLOW.
+        // S1-D72: shared top spacing, centered minimum-touch title row, then date/segments/content.
+        val rowTop = node("platform-content").getUnclippedBoundsInRoot().top + com.ignacioli.finecoach.designsystem.FcSpacing.space4
+        Assert.assertEquals(rowTop + com.ignacioli.finecoach.designsystem.FcComponentMetrics.touch / 2, (title.top + title.bottom) / 2)
+        Assert.assertEquals(rowTop + com.ignacioli.finecoach.designsystem.FcComponentMetrics.touch + com.ignacioli.finecoach.designsystem.FcSpacing.space1,
+            node("today-date").getUnclippedBoundsInRoot().top)
         Assert.assertTrue(title.bottom <= node("today-date").getUnclippedBoundsInRoot().top)
         Assert.assertEquals(com.ignacioli.finecoach.designsystem.FcSpacing.space4,
             segments.top - node("today-date").getUnclippedBoundsInRoot().bottom)

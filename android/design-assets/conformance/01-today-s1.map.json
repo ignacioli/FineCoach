@@ -6,7 +6,7 @@
     {
       "path": "6",
       "tag": "hero-card-title",
-      "source": "CONTENT decision: board says 深蹲训练; real Today title is name · trainingFocus (臀、大腿). Selector observes the true title without replacing expected text."
+      "source": "S1-D69: hero title is name · trainingFocus (王小明 · 大腿 in the fixture and on the board). Selector observes the true title without replacing expected text."
     }
   ]
 }

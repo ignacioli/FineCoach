@@ -9,6 +9,9 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
@@ -48,6 +51,8 @@ import com.ignacioli.finecoach.core.domain.common.TemplateID
 import com.ignacioli.finecoach.core.domain.common.TrainingSetID
 import com.ignacioli.finecoach.core.domain.student.StudentDraft
 import com.ignacioli.finecoach.designsystem.FineCoachTheme
+import com.ignacioli.finecoach.designsystem.FcComponentMetrics
+import com.ignacioli.finecoach.designsystem.FcSpacing
 import com.ignacioli.finecoach.features.students.StudentDetailScreen
 import com.ignacioli.finecoach.features.students.StudentEditorMode
 import com.ignacioli.finecoach.features.students.StudentEditorScreen
@@ -127,6 +132,22 @@ class StudentEntryLayoutTests {
             worker.shutdownNow()
             context.deleteDatabase(FineCoachDatabaseFactory.DATABASE_NAME)
         }
+    }
+
+    @Test fun listHeadingUsesSharedTopSpacingOnlyOnce() {
+        val viewModel = StudentFeatureFactory.listViewModel(useCases, clock = clock, zoneId = zoneId)
+        show { StudentListScreen(viewModel, onRoute = {}) }
+        await { viewModel.uiState.isTrulyEmpty }
+        val heading = compose.onNode(
+            hasText("学员") and SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading),
+            useUnmergedTree = true,
+        ).getUnclippedBoundsInRoot()
+        val root = node(StudentTestTags.STUDENT_LIST_ROOT).getUnclippedBoundsInRoot()
+        assertEquals(
+            (FcSpacing.space4 + FcComponentMetrics.touch / 2).value,
+            ((heading.top + heading.bottom) / 2 - root.top).value,
+            0.5f,
+        )
     }
 
     @Test fun emptyLibraryAppearsOnlyAfterASuccessfulLoad() {
