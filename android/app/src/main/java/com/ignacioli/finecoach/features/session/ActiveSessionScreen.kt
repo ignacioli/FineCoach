@@ -154,9 +154,10 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
                 }
             }
         }
-        restSlot()
-        RestTimerView(state.rests, id, state.clock, !WindowInsets.isImeVisible)
-        FcPinnedAction {
+        FcPinnedAction(above = {
+            restSlot()
+            RestTimerView(state.rests, id, state.clock, !WindowInsets.isImeVisible)
+        }) {
         FcButton("结束训练", Modifier.testTag("session-finish"), content != null && !state.busy && state.saveState != FcSaveState.Failed,
             labelModifier = Modifier) {
             if (content?.session?.durationNeedsReview == true) review = true else onFinish()

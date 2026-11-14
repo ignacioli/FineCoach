@@ -10,6 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -69,13 +70,21 @@ fun SetEditor(state: ActiveSessionUiState, exercise: SessionExerciseRecord, targ
                     RecordMode.duration -> FcTextField("时长（秒或分秒）", duration, { duration = it }, Modifier.testTag("set-duration"), enabled = !state.busy, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), keyboardActions = done)
                     RecordMode.cardio -> Unit
                 }
-                if (exercise.recordModeSnapshot == RecordMode.weightReps) FcText(
-                    "每次 ±2.5 kg · 点数字可直接输入", Modifier.padding(start = FcComponentMetrics.label).testTag("set-weight-hint"),
-                    style = FcTypography.caption, color = FcColors.textSecondary)
-            }
-            if (sideEntry) FcLinkButton(if (split) "左右相同" else "左右不同", Modifier.testTag("set-split"), !state.busy) {
-                if (!split) { left = weight; right = weight } else weight = recordedSideWeight(left, right, assisted)
-                split = !split
+                if (exercise.recordModeSnapshot == RecordMode.weightReps) Box(Modifier.fillMaxWidth()) {
+                    FcText("每次 ±2.5 kg · 点数字可直接输入",
+                        Modifier.padding(start = FcComponentMetrics.label).testTag("set-weight-hint"),
+                        style = FcTypography.caption, color = FcColors.textSecondary)
+                    // Overlay the label-column link: its expanded touch area does not size the helper row.
+                    if (sideEntry) Box(Modifier.matchParentSize(), contentAlignment = Alignment.CenterStart) {
+                        Box(Modifier.width(FcComponentMetrics.label).wrapContentHeight(unbounded = true)) {
+                            FcLinkButton(if (split) "左右相同" else "左右不同", Modifier.testTag("set-split"),
+                                !state.busy, contentAlignment = Alignment.CenterStart, compactLayout = true) {
+                                if (!split) { left = weight; right = weight } else weight = recordedSideWeight(left, right, assisted)
+                                split = !split
+                            }
+                        }
+                    }
+                }
             }
             if (initial?.side == SetSide.left || initial?.side == SetSide.right) {
                 FcTextField("左侧", left, { left = it }, Modifier.testTag("set-left"), keyboardOptions = numberKeyboard, keyboardActions = done)

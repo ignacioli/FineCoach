@@ -117,6 +117,60 @@ class ActiveSessionEntryLayoutTests {
     }
     private fun options(set: TrainingSetRecord) = swipe("session-set-${set.trainingSetID.value}-swipe")
     private fun change(action: (SectionedSession) -> SectionedSession) { f.test { ok(state.mutate(action)) }; compose.waitForIdle() }
+    @Test fun unilateralHintLinkSharesLabelColumnWithoutIncreasingActionGap() {
+        val original = content()
+        val exercise = original.exercises.first().copy(recordModeSnapshot = RecordMode.weightReps, sets = emptyList())
+        var unilateral by mutableStateOf(false)
+        compose.setContent {
+            FineCoachTheme { SetEditor(state, exercise, null, unilateral, false) {} }
+        }
+        fun bounds(tag: String) = node(tag).getUnclippedBoundsInRoot()
+        fun actionGap() = bounds("set-editor-actions").top - node("set-reps-minus").onParent().getUnclippedBoundsInRoot().bottom
+        val bilateralGap = actionGap()
+        compose.runOnIdle { unilateral = true }
+        compose.waitForIdle()
+        repeat(2) {
+            compose.onNodeWithTag("set-split").assertTextEquals(if (it == 0) "左右不同" else "左右相同")
+            val link = bounds("set-split")
+            val hint = bounds("set-weight-hint")
+            assertEquals((hint.top + hint.bottom).value / 2, (link.top + link.bottom).value / 2, 1f)
+            val label = compose.onNodeWithText("次数", useUnmergedTree = true).getUnclippedBoundsInRoot()
+            assertEquals(label.left, link.left)
+            val touch = node("set-split").fetchSemanticsNode().touchBoundsInRoot
+            val minimumTouch = with(compose.density) { FcComponentMetrics.touch.toPx() }
+            assertTrue(touch.width >= minimumTouch)
+            assertTrue(touch.height >= minimumTouch)
+            assertTrue(link.width <= FcComponentMetrics.label)
+            assertEquals(bilateralGap, actionGap())
+            node("set-split").assertIsEnabled().performClick()
+            compose.waitForIdle()
+        }
+        node("set-weight-input").assertExists()
+    }
+
+    @Test fun footerGapPrecedesWholeStackWithAndWithoutRestBar() {
+        val original = content()
+        show(original)
+        fun bounds(tag: String) = node(tag).getUnclippedBoundsInRoot()
+        fun gapEndsAt(tag: String) {
+            assertEquals(bounds("active-session-content").bottom + FcSpacing.space4, bounds(tag).top)
+        }
+        node("rest-content").assertDoesNotExist()
+        gapEndsAt("session-finish")
+        val finish = bounds("session-finish")
+        compose.runOnIdle { state.rests.start(original.session.sessionID) }
+        compose.waitForIdle()
+        node("rest-content").assertIsDisplayed()
+        gapEndsAt("rest-content")
+        assertEquals(FcSpacing.space3, bounds("session-finish").top - bounds("rest-content").bottom)
+        assertEquals(finish, bounds("session-finish"))
+        compose.runOnIdle { state.rests.clear(original.session.sessionID) }
+        compose.waitForIdle()
+        node("rest-content").assertDoesNotExist()
+        gapEndsAt("session-finish")
+        assertEquals(finish, bounds("session-finish"))
+    }
+
     @Test fun scrollEndKeepsAddControlsFullyAbovePinnedFinish() {
         show(content())
         val body = node("active-session-content")
