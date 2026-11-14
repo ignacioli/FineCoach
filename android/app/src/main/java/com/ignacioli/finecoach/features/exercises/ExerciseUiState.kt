@@ -96,7 +96,10 @@ class ExerciseUiState(val useCases: ExerciseUseCases, private val repository: Ex
                 val prefs = mutableMapOf<StableExerciseID, ExercisePreferenceRecord>()
                 for (item in result.value) {
                     when (val preference = repository.preference(item.exerciseID)) {
-                        is ApplicationResult.Failure -> { error = preference.error; entries = emptyList(); return }
+                        is ApplicationResult.Failure -> {
+                            if (generation == searchGeneration) { error = preference.error; entries = emptyList() }
+                            return
+                        }
                         is ApplicationResult.Success -> preference.value?.let { prefs[item.exerciseID] = it }
                     }
                 }
