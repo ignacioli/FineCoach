@@ -202,6 +202,7 @@ agent 按上述决定补充的细节（产品负责人在 P0-a2 画稿上确认�
   - 1 倍参考图：`boards/P0-a2-training-simplified@1x.png`、`boards/P0-a2b-partial-states@1x.png`（Penpot MCP 只能导出 1 倍，只作 review 参考，不是正式导出图）。
   - 核对时发现：已批准的 D8 画板本来就把组行画成一行，代码的两行组行和 `components.md` DS-SET-ROW「上下排列」的写法是偏离，Δ5 按 D8 改回一行，并同步 `components.md`。
   - 状态：产品负责人授权 agent 直接推进，看过后有问题再反馈（2026-10-15）。
+- **P0-a2b 回填（2026-11-14，S1-D99，P5+P7 走查 W3/W3b）**：两种单侧状态补画 P0-a2 已有的提示行「每次 ±2.5 kg · 点数字可直接输入」和「确认」。「左右不同 / 左右相同」链接放在提示行同一行的标签列（x=16），提示行仍从步进器左沿 x=112 开始；因此「确认」与最后一个步进器的距离和 P0-a2 相同（步进器 → 6 → 提示行 → 16 → 确认 52），单侧动作不比普通动作多一行。原先提议把链接放在提示行右侧，量得会与提示行重叠 2，负责人改选标签列。画板高 740 → 860，2 倍重新导出 `screens/P0-a2b-partial-states.png`，同时修好旧图里说明文字缺字形显示为方块的问题。
 
 ### Android S1-D56 round-2 执行记录（2026-11-12）
 - Class and basis：D，修复 P0-a2 running rest bar 的实现偏差；依 S1-D58 裁决，running-state link buttons 按文字宽度布局，间距统一为 `space.3`（12dp），末项右对齐 content edge，touch area 向外扩展至 ≥44，不占 layout space；画板已据此更新。
