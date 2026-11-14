@@ -19,7 +19,9 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import javax.imageio.ImageIO
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -49,6 +51,9 @@ import org.robolectric.annotation.GraphicsMode
 class P7SideBySideTests {
     @get:Rule val compose = createAndroidComposeRule<ComponentActivity>()
     private var releaseFixture: (() -> Unit)? = null
+    private var focusManager: FocusManager? = null
+    /** Clears Compose focus (not just the View's), so no text caret is captured. */
+    private fun clearComposeFocus() = compose.runOnIdle { checkNotNull(focusManager).clearFocus(force = true) }
     private fun node(tag: String) = compose.onNodeWithTag(tag, useUnmergedTree = true)
     private fun await(tag: String) = compose.waitUntil(15_000) {
         compose.onAllNodesWithTag(tag, useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty()
@@ -67,6 +72,7 @@ class P7SideBySideTests {
         compose.runOnUiThread {
             compose.activity.setContent {
                 CompositionLocalProvider(LocalDensity provides Density(2f, 1f)) {
+                    focusManager = LocalFocusManager.current
                     FineCoachTheme { ConformanceViewport { content() } }
                 }
             }
@@ -232,7 +238,7 @@ private fun captureSheet(activity: Bitmap, panelTag: String): Bitmap {
         node("package-editor-name").performTextInput("私教20节")
         repeat(10) { node("package-editor-credits-plus").performClick() }
         node("package-editor-has-start").performClick()
-        compose.runOnIdle { compose.activity.currentFocus?.clearFocus() }
+        clearComposeFocus()
         "package-editor-start"
     }
 
@@ -314,7 +320,7 @@ private fun captureSheet(activity: Bitmap, panelTag: String): Bitmap {
             students = StudentRepository(f.room.db, f.room.clock)) }
         await("set-duration")
         listOf("set-duration" to "32:00", "set-distance" to "5.0", "set-speed" to "9.4").forEach { (tag, value) -> node(tag).performTextInput(value) }
-        compose.runOnIdle { compose.activity.currentFocus?.clearFocus() }
+        clearComposeFocus()
         "set-resistance"
     }
 
@@ -444,7 +450,7 @@ private fun captureSheet(activity: Bitmap, panelTag: String): Bitmap {
         compose.mainClock.autoAdvance = true
         node("set-split").performClick()
         node("set-right-input").performTextReplacement("15")
-        compose.runOnIdle { compose.activity.currentFocus?.clearFocus() }
+        clearComposeFocus()
         parts += "单侧动作 · 左右不同（展开后）" to crop(id, "different sides", "set-add-editor-content")
         swipe("session-exercise-${f.squat.sessionExerciseID.value}-swipe")
         parts += "动作行 · 左滑后" to crop(id, "exercise swipe", "session-exercise-${f.squat.sessionExerciseID.value}-swipe")
