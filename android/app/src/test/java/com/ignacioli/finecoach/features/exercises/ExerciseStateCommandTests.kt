@@ -29,10 +29,28 @@ class ExerciseStateCommandTests {
     private lateinit var db: FineCoachDatabase
     private lateinit var repository: ExerciseRepository
     private lateinit var state: ExerciseUiState
+    private val failPreferenceRead = java.util.concurrent.atomic.AtomicBoolean(false)
+    private val failedReads = java.util.concurrent.atomic.AtomicInteger(0)
     private val clock = AppClock { Instant.parse("2026-11-11T00:00:00Z") }
     @Before fun prepare() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        db = Room.inMemoryDatabaseBuilder(context, FineCoachDatabase::class.java).allowMainThreadQueries().build()
+        db = Room.inMemoryDatabaseBuilder(context, FineCoachDatabase::class.java).allowMainThreadQueries()
+            .openHelperFactory { configuration ->
+                val helper = androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory().create(configuration)
+                fun wrap(actual: androidx.sqlite.db.SupportSQLiteDatabase) = object : androidx.sqlite.db.SupportSQLiteDatabase by actual {
+                    override fun query(query: androidx.sqlite.db.SupportSQLiteQuery): android.database.Cursor {
+                        if (query.sql == "SELECT * FROM exercise_preferences WHERE `exerciseID` = ?" && failPreferenceRead.get()) {
+                            failedReads.incrementAndGet()
+                            throw android.database.sqlite.SQLiteException("fictional preference read failure")
+                        }
+                        return actual.query(query)
+                    }
+                }
+                object : androidx.sqlite.db.SupportSQLiteOpenHelper by helper {
+                    override val writableDatabase get() = wrap(helper.writableDatabase)
+                    override val readableDatabase get() = wrap(helper.readableDatabase)
+                }
+            }.build()
         repository = ExerciseRepository(db, ExerciseCatalogLoader(context.assets), clock)
         state = ExerciseUiState(ExerciseUseCases(repository, clock, SequentialIDGenerator()), repository)
     }
@@ -117,6 +135,30 @@ class ExerciseStateCommandTests {
         assertEquals(0, calls); assertNotNull(state.error); assertFalse(state.busy)
         assertTrue(state.preferences.isEmpty())
     }
+    @Test fun stalePreferenceReadFailureCannotClearNewerSearchResults() = runBlocking {
+        custom()
+        val pending = LinkedBlockingQueue<Runnable>()
+        val dispatcher = object : CoroutineDispatcher() {
+            override fun dispatch(context: CoroutineContext, block: Runnable) { pending.add(block) }
+        }
+        fun next(): Runnable = requireNotNull(pending.poll(15, TimeUnit.SECONDS)) { "Search continuation missing" }
+        val oldSearch = launch(dispatcher) { state.search("") }
+        next().run() // Start repository search on IO.
+        failPreferenceRead.set(true)
+        next().run() // Consume search and start the failing per-row preference read.
+        val staleFailure = next()
+        assertEquals(1, failedReads.get())
+        failPreferenceRead.set(false)
+        state.search("虚构")
+        val current = state.entries
+        assertEquals(1, current.size)
+        assertNull(state.error)
+        staleFailure.run()
+        oldSearch.join()
+        assertEquals(current, state.entries)
+        assertNull(state.error)
+    }
+
     @Test fun saveCreatesThenUpdatesSameIdentity() = runBlocking {
         val item = custom()
         var calls = 0
