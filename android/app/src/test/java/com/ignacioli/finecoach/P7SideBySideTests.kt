@@ -244,13 +244,17 @@ private fun captureSheet(activity: Bitmap, panelTag: String): Bitmap {
 
     @Test fun manualAdjustmentStepper() = measure(
         "37-manual-adjustment-stepper", "ManualCreditAdjustmentScreen",
-        "T009Fixture 有效课包；扣减 / 1 / 原因空；未保存",
-        "匹配空原因与默认扣减 1；Android 保存调整为 disabled（原因必填），PNG 按钮绘为深色；保留产品状态。",
+        "T009Fixture 有效课包；扣减 / 1 / 虚构原因补录上周缺勤；未保存",
+        "默认扣减 1；填入虚构原因并清除 Compose 焦点，保存调整 enabled，与 PNG 深色按钮状态一致。",
     ) {
         val f = T009Fixture().also { releaseFixture = it::close }
         lateinit var pkg: CoursePackageRecord
         f.test { pkg = f.coursePackage(20) }
         show { ManualCreditAdjustmentScreen(pkg.coursePackageID, f.credits, {}, {}) }
+        await("package-manual-reason")
+        node("package-manual-reason").performTextInput("补录上周缺勤")
+        clearComposeFocus()
+        node("package-manual-save").assertIsEnabled()
         "package-manual-save"
     }
     @Test fun exerciseFilterSheet() = measure(
@@ -385,8 +389,15 @@ private fun captureSheet(activity: Bitmap, panelTag: String): Bitmap {
         return result
     }
 
-    private fun board(id: String, path: String, composable: String, fixture: String, mismatches: String, capture: () -> List<Pair<String, Bitmap?>>) {
-        File(p7Output(), "$id.crops.txt").writeText("Native-scale state crops in design order; labels are artifact annotations.\n")
+    private fun board(id: String, path: String, composable: String, fixture: String, mismatches: String,
+        designHeight: Int? = null, capture: () -> List<Pair<String, Bitmap?>>) {
+        val design = checkNotNull(ImageIO.read(File(checkNotNull(System.getProperty("finecoach.storageProjectDirectory"))).parentFile.parentFile.resolve(path)))
+        check(design.width == 780 && (designHeight == null || design.height == designHeight)) {
+            "Unexpected board dimensions for $path: ${design.width}×${design.height}"
+        }
+        File(p7Output(), "$id.crops.txt").writeText(
+            "Design board ${design.width}×${design.height}px @2x; Android viewport 780×1688px. " +
+                "Native-scale state crops in design order (not full-board viewport scaling); labels are artifact annotations.\n")
         val bitmap = P7SheetWriter.stack(capture())
         P7SheetWriter.write(id, bitmap, composable, fixture, mismatches, designPath = path, board = true)
         bitmap.recycle()
@@ -433,7 +444,8 @@ private fun captureSheet(activity: Bitmap, panelTag: String): Bitmap {
     @Test fun unilateralPartialStates() = board(
         "P0-a2b-partial-states", "design/experience-p0/screens/P0-a2b-partial-states.png", "ActiveSessionScreen / SetEditor / swipe / recent undo",
         "单侧深蹲：每侧12.5×10；展开后左12.5右15×10；动作左滑；刚确认组4秒内",
-        "四态均有 S1 实现；实际输入带 helper/确认按钮；动作操作顺序为删除/移入分区；刚确认组展示真实撤销；swipe 行高度/裁剪导致动作名及操作文案部分不可见，保留原始像素。",
+        "设计板 390×860pt（780×1720px，2x）；提示行标签列链接与确认遵循 S1-D99；四态按原始像素裁剪拼接，非整屏映射；动作操作顺序为删除/移入分区；刚确认组展示真实撤销；swipe 行高度/裁剪导致动作名及操作文案部分不可见，保留原始像素。",
+        designHeight = 1720,
     ) {
         val id = "P0-a2b-partial-states"
         val f = TrainingConformanceFixture().also { releaseFixture = it::close }

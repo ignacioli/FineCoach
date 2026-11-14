@@ -364,6 +364,7 @@ class ComponentContractTests {
             }
         }
         val before = node("pinned-save").getUnclippedBoundsInRoot()
+        assertEquals(before.top, node("scroll-body").getUnclippedBoundsInRoot().bottom + FcSpacing.space4)
         node("tail-7").performScrollTo().assertIsDisplayed()
         assertTrue(node("tail-7").getUnclippedBoundsInRoot().bottom <= before.top)
         assertEquals(before, node("pinned-save").getUnclippedBoundsInRoot())

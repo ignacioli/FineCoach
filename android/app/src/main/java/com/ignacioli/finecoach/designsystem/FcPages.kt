@@ -26,8 +26,12 @@ fun ColumnScope.FcScrollBody(modifier: Modifier = Modifier, scroll: ScrollState 
 }
 
 @Composable
-fun FcPinnedAction(content: @Composable () -> Unit) {
-    Box(Modifier.fillMaxWidth().padding(bottom = FcSpacing.space8)) { content() }
+fun FcPinnedAction(above: @Composable () -> Unit = {}, content: @Composable () -> Unit) {
+    Column(Modifier.fillMaxWidth().background(FcColors.surfacePage)
+        .padding(top = FcSpacing.space4, bottom = FcSpacing.space8)) {
+        above()
+        content()
+    }
 }
 
 /** §4.6: display title and optional date precede segmented navigation; the caller owns routes/actions. */
