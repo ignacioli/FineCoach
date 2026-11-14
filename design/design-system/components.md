@@ -385,6 +385,8 @@ P7 15/36/37 D 类修复：37 原因复用上述多行最小高；15 cardio 与 3
 
 P7 Android D 类容器修复（2026-11-13）：`FcScrollBody` 复用二级页 weighted scroll 正文，末尾保留一个主按钮行高的滚动 inset；`FcPinnedAction` 独立于滚动正文、底部 `space.8`，应用于 04/05/36/37/B-a。移除 36/37 inline CTA、05 零底距及 36 行间额外 `space.2`。D-b 沿用 StudentEditor 页头的 `space.4` bottom padding，移除正文紧贴页头的组合；页头组件默认行为及 P4 不变。
 
+滚动正文与固定主按钮的间隔（2026-11-14，S1-D99，P5+P7 走查 W2）：`FcPinnedAction` 上方留 `space.4`（16）`surface.page` 间隔，滚动视口在间隔上沿结束，内容不会被切成半截压在按钮后面；按钮下方 `space.8` 不变。适用于所有「`FcScrollBody` + `FcPinnedAction`」页面：04 / 05 / 36 / 37 / B-a / 训练页。Penpot 说明在「04 课包详情」画板下方（画板本身不变）。
+
 状态：**已审定**（2026-10-08 起草，2026-10-09 随 M2 G7 设计载体 review 通过；来源 `design/m2-hifi/implementation-map.md` §2）。已在 M2 tasks Phase 0 实现（2026-10-10），对应行已进入 §3 索引（`ComponentCatalogTests` 要求索引与 `DesignSystem/` 公开类型一一对应）。人工项（标「人工」的不变量）尚未经人工视觉检查。
 
 #### `DS-PAGE-HEADER` 二级页页头（新增共享，CG-8）
