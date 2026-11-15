@@ -331,7 +331,7 @@ androidComponents {
             tasks.withType<MergeResources>().configureEach {
                 if (this.name == mergeTaskName) mergedNotCompiledResourcesOutputDirectory.set(resources)
             }
-            tasks.withType<Test>().matching { it.name == "testDebugUnitTest" || it.name == "testReleaseUnitTest" }.configureEach {
+            tasks.withType<Test>().matching { it.name in setOf("testDebugUnitTest", "testReleaseUnitTest", "s0G8") }.configureEach {
                 inputs.file(manifest)
                 inputs.dir(resources)
                 dependsOn(mergeTaskName)
@@ -379,20 +379,20 @@ val privacyDependencyGraph = tasks.register("writePrivacyDependencyGraph") {
 androidComponents {
     onVariants(selector().withBuildType("debug")) { variant ->
         val apk = variant.artifacts.get(SingleArtifact.APK)
-        tasks.withType<Test>().matching { it.name == "testDebugUnitTest" }.configureEach {
+        tasks.withType<Test>().matching { it.name == "testDebugUnitTest" || it.name == "s0G8" }.configureEach {
             inputs.dir(apk)
             systemProperty("finecoach.debugApk", apk.get().asFile.absolutePath)
         }
     }
     onVariants(selector().withBuildType("release")) { variant ->
         val apk = variant.artifacts.get(SingleArtifact.APK)
-        tasks.withType<Test>().matching { it.name == "testDebugUnitTest" || it.name == "testReleaseUnitTest" }.configureEach {
+        tasks.withType<Test>().matching { it.name in setOf("testDebugUnitTest", "testReleaseUnitTest", "s0G8") }.configureEach {
             inputs.dir(apk)
             systemProperty("finecoach.releaseApk", apk.get().asFile.absolutePath)
         }
     }
 }
-tasks.withType<Test>().matching { it.name == "testDebugUnitTest" || it.name == "testReleaseUnitTest" }.configureEach {
+tasks.withType<Test>().matching { it.name in setOf("testDebugUnitTest", "testReleaseUnitTest", "s0G8") }.configureEach {
     dependsOn(privacyDependencyGraph)
     // T019/S0-14 visual suites run only in s0G5 / s0Conformance, never in the unit gate.
     // The owner's explicit record run (README T019) is the only path that keeps ComponentScreenshotTests.
@@ -419,18 +419,85 @@ tasks.withType<Test>().matching { it.name == "testDebugUnitTest" || it.name == "
     systemProperty("finecoach.dependencyAllowlist", rootProject.layout.projectDirectory.file("dependency-allowlist/resolved.txt").asFile.absolutePath)
 }
 
-// Reserve the approved interfaces. Each is replaced by its owning task only
-// when the full, non-empty test/report contract is implemented (plan section 4).
-val pendingGates = mapOf(
-    "s0G8" to "T004-T010: complete privacy and scope checks",
+// S0 spec section 5 declares all eight G8 suites. StoragePrivacyTests also
+// belongs to s0Room; retain the explicit G8 contract rather than deduplicate it.
+val privacyGateExpectedCounts = mapOf(
+    "com.ignacioli.finecoach.InfrastructureConfigurationTests" to 4,
+    "com.ignacioli.finecoach.CapabilityManifestTests" to 9,
+    "com.ignacioli.finecoach.BackupRulesTests" to 5,
+    "com.ignacioli.finecoach.PrivacySourceScanTests" to 11,
+    "com.ignacioli.finecoach.StoragePrivacyTests" to 3,
+    "com.ignacioli.finecoach.PrivacyCoverTests" to 11,
+    "com.ignacioli.finecoach.FictionalDataPolicyTests" to 16,
+    "com.ignacioli.finecoach.ScopeBoundaryTests" to 19,
 )
-pendingGates.forEach { (gate, owner) ->
-    tasks.register(gate) {
-        group = "verification"
-        description = "未实现 — $owner"
-        doLast { throw GradleException("$gate 未实现：$owner；不能报告 PASS。") }
+val privacyGate = tasks.register<Test>("s0G8") {
+    group = "verification"
+    description = "Merged debug/release artifacts, dependency and privacy/scope checks; not system evidence"
+    val debugTest = tasks.named<Test>("testDebugUnitTest").get()
+    testClassesDirs = debugTest.testClassesDirs
+    classpath = debugTest.classpath
+    javaLauncher.set(debugTest.javaLauncher)
+    setJvmArgs(debugTest.jvmArgs)
+    jvmArgumentProviders.addAll(debugTest.jvmArgumentProviders)
+    systemProperties(debugTest.systemProperties)
+    workingDir = debugTest.workingDir
+    filter {
+        setIncludePatterns(*privacyGateExpectedCounts.keys.toTypedArray())
+        isFailOnNoMatchingTests = true
+    }
+    failOnNoDiscoveredTests.set(true)
+    reports.junitXml.required.set(true)
+    reports.junitXml.outputLocation.set(layout.buildDirectory.dir("test-results/s0G8"))
+    reports.html.outputLocation.set(layout.buildDirectory.dir("reports/tests/s0G8"))
+    binaryResultsDirectory.set(layout.buildDirectory.dir("test-results/s0G8/binary"))
+    outputs.upToDateWhen { false }
+    outputs.doNotCacheIf("G8 evidence must execute on this host") { true }
+}
+val validatePrivacyGate = tasks.register("validateS0G8Results") {
+    doLast {
+        val gate = privacyGate.get()
+        check(!gate.state.skipped && gate.state.failure == null) {
+            "s0G8 did not successfully execute: ${gate.state.skipMessage ?: gate.state.failure}"
+        }
+        val xmlFiles = gate.reports.junitXml.outputLocation.get().asFile
+            .listFiles { file -> file.name.startsWith("TEST-") && file.extension == "xml" }.orEmpty()
+        check(xmlFiles.isNotEmpty()) { "s0G8 has no JUnit XML" }
+        val factory = DocumentBuilderFactory.newInstance().apply {
+            setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
+            setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+            setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "")
+            setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "")
+        }
+        val counts = mutableMapOf<String, Int>()
+        for (xml in xmlFiles) {
+            val suite = factory.newDocumentBuilder().parse(xml).documentElement
+            val name = suite.getAttribute("name")
+            check(name in privacyGateExpectedCounts) { "Unexpected G8 suite: $name" }
+            val cases = suite.getElementsByTagName("testcase")
+            val count = suite.getAttribute("tests").toInt()
+            check(count > 0 && count == cases.length) { "Empty/inconsistent G8 suite: $name" }
+            for (attribute in listOf("failures", "errors", "skipped")) {
+                check(suite.getAttribute(attribute).toInt() == 0) { "$name has $attribute" }
+            }
+            for (index in 0 until cases.length) {
+                val case = cases.item(index) as Element
+                check(listOf("skipped", "failure", "error").all {
+                    case.getElementsByTagName(it).length == 0
+                }) { "Unsuccessful G8 testcase: $name.${case.getAttribute("name")}" }
+            }
+            check(counts.put(name, count) == null) { "Duplicate G8 suite: $name" }
+        }
+        check(counts.keys == privacyGateExpectedCounts.keys) {
+            "Missing G8 suites: ${privacyGateExpectedCounts.keys - counts.keys}"
+        }
+        check(counts == privacyGateExpectedCounts) {
+            "Unexpected G8 testcase counts: $counts; expected $privacyGateExpectedCounts"
+        }
+        logger.lifecycle("s0G8: ${counts.values.sum()} tests, 0 failures/errors/skips; $counts")
     }
 }
+privacyGate.configure { finalizedBy(validatePrivacyGate) }
 
 // T019: the exact S1 suites run independently of the broad JVM gate.
 val s1SeedChecks = tasks.register<Test>("s1SeedChecks") {
