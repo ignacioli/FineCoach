@@ -227,6 +227,27 @@ xcodebuild -project ios/FineCoach.xcodeproj -scheme FineCoachTests -destination 
 - G0 `assembleDebug lint`：退出 0。
 - 未验证：基线像素被改动时 verify 能否失败（受控失败样例属于后续 G5 任务）；本 smoke 不是 DS 组件或 G5 验收。
 
+## G8 聚合门
+
+在 `android/` 运行 `./gradlew :app:s0G8`。按 S0 spec §5 的 G8 映射固定以下 8 个 suite（当前合计 **78 tests**）；不使用此前 targeted 替代集合缩小覆盖。
+
+| Suite（package 均为 `com.ignacioli.finecoach`） | executions |
+|---|---:|
+| InfrastructureConfigurationTests | 4 |
+| CapabilityManifestTests | 9 |
+| BackupRulesTests | 5 |
+| PrivacySourceScanTests | 11 |
+| StoragePrivacyTests | 3 |
+| PrivacyCoverTests | 11 |
+| FictionalDataPolicyTests | 16 |
+| ScopeBoundaryTests | 19 |
+
+条数按当前测试源码的 `@Test` 与 Robolectric SDK 展开声明；`PrivacyCoverTests` 为 8 方法、11 executions（3 方法分别运行 API31/32）。历史 targeted 记录中的条数保留，不作为当前聚合数量。`StoragePrivacyTests` 按 spec 同时归属 G8 与 `s0Room`，此重复归属交 dispatcher 确认，不自行移除；其余 suite 与 G1/G2/G6/Room 无重复。
+
+独立 `Test` task 复用 AGP debug JVM runtime，每次强制执行且不使用结果缓存。保留 debug/release merged manifests、merged resources、APKs 与完整 resolved dependency graph 的现有 provider/input/任务依赖，不回退源 XML。`validateS0G8Results` finalizer 拒绝 task skip/失败、空报告、缺失/重复/意外 suite、条数偏差以及任何 failure/error/skip。JUnit XML：`app/build/test-results/s0G8/`；HTML：`app/build/reports/tests/s0G8/`。
+
+plan §4 warm 建议上限为 5min。此门不替代 T006/T010 系统证据、T028 或 CP1 验收。
+
 ## S0-03 T004 targeted 实施记录（2026-11-04，待宿主验证）
 
 基点 `93c3fe1`，branch `feat/android-s0-infrastructure`；初始 tracked/staged 为空，仅用户已有 untracked `.vscode/`，保留。只读 specs canonical 路径为 `/Users/liyongqiang/gitrepo/ignacioli/.worktree/specs-android-s0/FineCoach/007-android-port/s0-infrastructure/`。本轮禁止 Gradle/模拟器/xcodebuild，不 commit、不改任务勾选；无新 UI 或 entry/layout map 条目。
