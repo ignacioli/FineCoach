@@ -1315,7 +1315,7 @@ adb shell am start -n com.ignacioli.finecoach/.MainActivity --ez finecoachS0Shel
 ./gradlew --offline :app:s0InstallSeededDebug -Pandroid.device="${S1_DEVICE_SERIAL:?required}" -Ps1.seedScenario=multi
 ```
 
-这一条命令 build Debug APK → `adb -s SERIAL install -r -t` → 停止目标进程以串行初始化 → shell-only `am instrument` → 关闭重开数据库验证 complete/version/rows → 校验 instrumentation code/result 和本次 PID/时间的唯一数值日志 → `am start -W` 启动默认 S1。S1-D20 已在基线实现，不需要启动开关。每条 adb 命令都携带 serial；缺设备、冲突 serial、授权失败、安装/seed/日志/启动失败均非零。没有 `pm clear`、uninstall、reset 或自动库切换。相同命令可再执行一次，仍返回初始 inventory，保留教练体验更改。
+这一条命令 build Debug APK → `adb -s SERIAL install -r -t` → 停止目标进程以串行初始化 → shell-only `am instrument` → 关闭重开数据库验证 complete/version/rows → 校验 instrumentation code/result 和本次 PID/时间的唯一数值日志 → `am start -W -a android.intent.action.MAIN -c android.intent.category.LAUNCHER` 启动默认 S1（S0L3-W1：让 task 根 intent 与桌面一致，避免点击桌面图标重复压栈 MainActivity）。S1-D20 已在基线实现，不需要启动开关。每条 adb 命令都携带 serial；缺设备、冲突 serial、授权失败、安装/seed/日志/启动失败均非零。没有 `pm clear`、uninstall、reset 或自动库切换。相同命令可再执行一次，仍返回初始 inventory，保留教练体验更改。
 
 场景参数：`multi`（默认，两位学员各一进行中，初始 `SEED version=3 rows=1149 status=ok`）、`single`（一进行中，rows=1138）、`empty`（无学员/训练，rows=1088）。场景只在首次空数据目录安装时选择；已有 seed 切换参数会拒绝，不能靠参数重建。dataset=`fictional-s1-coach-core-v3`，版本3，clock=`2026-11-09T00:00:00Z`，UUID 以 `72000000-0000-4000-8000-` 为前缀，学员尾号1～7；其余生成ID使用固定顺序1000起，显式分段使用800～900，动作/组使用10000～13053（以 JSON 为准）。只含虚构内容。
 

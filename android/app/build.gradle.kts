@@ -689,7 +689,7 @@ androidComponents.onVariants(androidComponents.selector().withBuildType("debug")
                 it.groupValues[1].toBigDecimal().multiply(1000.toBigDecimal()).toLong() >= loggedAt
             }.map { it.groupValues[2] }.toList()
             check(fresh == listOf(expected)) { "Missing, duplicate or stale SEED logcat event" }
-            val launch = adb("-s", serial, "shell", "am", "start", "-W", "-n", "com.ignacioli.finecoach/.MainActivity")
+            val launch = adb("-s", serial, "shell", "am", "start", "-W", "-a", "android.intent.action.MAIN", "-c", "android.intent.category.LAUNCHER", "-n", "com.ignacioli.finecoach/.MainActivity")
             check(launch.lineSequence().any { it.trim() == "Status: ok" } && !launch.contains("Error:")) { "Debug shell launch failed" }
             val digest = MessageDigest.getInstance("SHA-256").digest(apks.single().readBytes())
                 .joinToString("") { "%02x".format(it) }
