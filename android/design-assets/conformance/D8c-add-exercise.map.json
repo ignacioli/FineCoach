@@ -1,0 +1,19 @@
+{
+  "toleranceDp": 2,
+  "originOffsetY": -52,
+  "originRule": "S1-D30: measured platform-content origin; top flow only; dialog uses its actual window origin",
+  "elements": [
+    {
+      "path": "12",
+      "tag": "template-apply-$template1ID"
+    },
+    {
+      "path": "16",
+      "tag": "template-apply-$template2ID"
+    },
+    {
+      "path": "20",
+      "tag": "template-apply-$template3ID"
+    }
+  ]
+}

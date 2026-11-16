@@ -1,0 +1,7 @@
+Material Symbols by Google
+Source: https://github.com/google/material-design-icons
+Commit: 10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7
+Licensed under the Apache License, Version 2.0.
+See material-symbols-LICENSE.txt for the full license.
+Modified for Android: SVG paths retained verbatim; converted to vector drawable,
+Y translated by 960; white placeholder fill colored by Compose tint.

@@ -1,0 +1,175 @@
+{
+  "owner": "FineCoach",
+  "provenance": "design/design-system/README.md §7.1; product-owned artwork; no third-party Material license applies",
+  "conversion": "Path data retained verbatim; inherited group attributes expanded; white template tint; 24dp viewport; 2px round strokes; kettlebell body is the only fill",
+  "icons": [
+    {
+      "name": "barbell",
+      "source": "design/m1-b-hifi/icons/barbell.svg",
+      "sourceSha256": "b2f902b2b0277bc27b49acc2c9e7cfaf1f2a432a4c22533437ba2f8fab15b644",
+      "drawable": "app/src/main/res/drawable/ic_equipment_barbell.xml",
+      "drawableSha256": "d166b9f933a30d83de13fe236a5da75525b55765f04bb865ad2c372a88359093",
+      "paths": 1
+    },
+    {
+      "name": "bike",
+      "source": "design/m1-b-hifi/icons/bike.svg",
+      "sourceSha256": "6b9e163e46421274cbe5f7a75fc1aaebc9dffdd08ca5706717f4ab613b162975",
+      "drawable": "app/src/main/res/drawable/ic_equipment_bike.xml",
+      "drawableSha256": "db464d9a164e8d8cb29b5a69df754700e7c29b465ecd8025e99a817b2175d3b6",
+      "paths": 1
+    },
+    {
+      "name": "bodyweight",
+      "source": "design/m1-b-hifi/icons/bodyweight.svg",
+      "sourceSha256": "817a9fabc8112fc8714abc3cecca7aaaaae05125b0ca31437fc3a55efbeedbeb",
+      "drawable": "app/src/main/res/drawable/ic_equipment_bodyweight.xml",
+      "drawableSha256": "c60efec504e6f5063a4768516b7b72642ed77a78a9e7e6349c496dad1c40ff61",
+      "paths": 1
+    },
+    {
+      "name": "cable-crossover",
+      "source": "design/m1-b-hifi/icons/cable-crossover.svg",
+      "sourceSha256": "f37c56e6d42ef3e28490746f070188b112dccebdd2da0f1efe8425e4cb70ab6e",
+      "drawable": "app/src/main/res/drawable/ic_equipment_cable_crossover.xml",
+      "drawableSha256": "c922a662be11fb47c70a3fcee7e15f22ffc76bcaf15bf64983517beaeccd0316",
+      "paths": 1
+    },
+    {
+      "name": "cable-machine",
+      "source": "design/m1-b-hifi/icons/cable-machine.svg",
+      "sourceSha256": "d533f439706b218b4de9f56c0c5beb26df94b9c965d409df4c80a8906be75054",
+      "drawable": "app/src/main/res/drawable/ic_equipment_cable_machine.xml",
+      "drawableSha256": "69f022f6ebfe88609c8c190893ce2ac5ac3946ba67fa0f5c1c2be4a49ca555dc",
+      "paths": 1
+    },
+    {
+      "name": "dumbbell",
+      "source": "design/m1-b-hifi/icons/dumbbell.svg",
+      "sourceSha256": "ff0055cda24401bf33d7ba110bbf979235f1dc113212d8c7063760a841187208",
+      "drawable": "app/src/main/res/drawable/ic_equipment_dumbbell.xml",
+      "drawableSha256": "68d69355d4b4be22fb35cf177f34fef80233a607915fe8229c392f21a6449efc",
+      "paths": 1
+    },
+    {
+      "name": "hack-squat",
+      "source": "design/m1-b-hifi/icons/hack-squat.svg",
+      "sourceSha256": "8dd1c21a8df945c1e841fa964101b21fb51432cd2ed2be1c8d79813e1888a716",
+      "drawable": "app/src/main/res/drawable/ic_equipment_hack_squat.xml",
+      "drawableSha256": "67c73aad85df9c53c05f7e5c6edada207eb7d7a701041c4474ab84d70b88b1ac",
+      "paths": 1
+    },
+    {
+      "name": "hip-adduction",
+      "source": "design/m1-b-hifi/icons/hip-adduction.svg",
+      "sourceSha256": "9d3341fab206a9f9a62440ab85b42c90a87357fb292d4c64f9aa8739288bf733",
+      "drawable": "app/src/main/res/drawable/ic_equipment_hip_adduction.xml",
+      "drawableSha256": "195e7fe9639ebdc51c276f01aaa79b976140bca41dad71adcc9ab23f8e139e83",
+      "paths": 1
+    },
+    {
+      "name": "jump-rope",
+      "source": "design/m1-b-hifi/icons/jump-rope.svg",
+      "sourceSha256": "58fb1ba6898fb53b17d380481d3415902d5b108899d527c06207ac7681867ade",
+      "drawable": "app/src/main/res/drawable/ic_equipment_jump_rope.xml",
+      "drawableSha256": "273819021705ba114d735eb2f15ccbe88b9652b87eb87ca5e2981af8042d3038",
+      "paths": 2
+    },
+    {
+      "name": "kettlebell",
+      "source": "design/m1-b-hifi/icons/kettlebell.svg",
+      "sourceSha256": "0748c92278655d0591a6f6720063315fb0ac364b9ea2625b7b67b47953778591",
+      "drawable": "app/src/main/res/drawable/ic_equipment_kettlebell.xml",
+      "drawableSha256": "10e5c6cd79de3df12810fe285d2987f48c913091eecdd4dab9967ec29f5656ba",
+      "paths": 2
+    },
+    {
+      "name": "leg-extension",
+      "source": "design/m1-b-hifi/icons/leg-extension.svg",
+      "sourceSha256": "f7d360a3fe55382468a4c79018fddc5b7bf0d3d007452955824ce7c3b993a8c2",
+      "drawable": "app/src/main/res/drawable/ic_equipment_leg_extension.xml",
+      "drawableSha256": "ad5c3c8dcb89b34616dd66938e4eec4c7bd7282307a5261b299a0711da7a1cde",
+      "paths": 1
+    },
+    {
+      "name": "pec-deck",
+      "source": "design/m1-b-hifi/icons/pec-deck.svg",
+      "sourceSha256": "60f7c901c5349a921c224c07e767affc8d3354e451fc1a0dedb7d59bfa1f2a32",
+      "drawable": "app/src/main/res/drawable/ic_equipment_pec_deck.xml",
+      "drawableSha256": "25c0f04f1fbc7afbbde0712dec5a8b27cc15529167b419cd03360b242d7cc289",
+      "paths": 1
+    },
+    {
+      "name": "plate-loaded",
+      "source": "design/m1-b-hifi/icons/plate-loaded.svg",
+      "sourceSha256": "b23b514e7681f3c8740c9cd223340e2cc4022a477d826a01f2e375fbc6a67c23",
+      "drawable": "app/src/main/res/drawable/ic_equipment_plate_loaded.xml",
+      "drawableSha256": "c1982cbb30f93e11f9111356eb071fe8a129a9d026008fd0901050b0295e8e9b",
+      "paths": 1
+    },
+    {
+      "name": "pull-up-bar",
+      "source": "design/m1-b-hifi/icons/pull-up-bar.svg",
+      "sourceSha256": "820d2c916ff33a0fe0d3fe6f41f61a082c9d5bf3058bb4f4b0bc4dbe7227f50c",
+      "drawable": "app/src/main/res/drawable/ic_equipment_pull_up_bar.xml",
+      "drawableSha256": "13ad37e3deb706ab2c24b83e3a565866cfcb85a713416a3f66668a54b491ed9b",
+      "paths": 1
+    },
+    {
+      "name": "resistance-band",
+      "source": "design/m1-b-hifi/icons/resistance-band.svg",
+      "sourceSha256": "6cb4daf7e5070d8d3b5db62add41e8449c359dbaedca6124e609399c3921b6b5",
+      "drawable": "app/src/main/res/drawable/ic_equipment_resistance_band.xml",
+      "drawableSha256": "9e7d118c240d23c46e8bb8c777a2e069511d59fbc4ca35d5d6af50e2a5108074",
+      "paths": 1
+    },
+    {
+      "name": "rowing-machine",
+      "source": "design/m1-b-hifi/icons/rowing-machine.svg",
+      "sourceSha256": "daa133650eb34481e1e7453d0ae18764ef29916fc410a1269cb02832a1c176db",
+      "drawable": "app/src/main/res/drawable/ic_equipment_rowing_machine.xml",
+      "drawableSha256": "adc720d2b87d107866c32c72f639f32e358266a30e5a185a2a9370247d93c4f7",
+      "paths": 1
+    },
+    {
+      "name": "shoulder-press",
+      "source": "design/m1-b-hifi/icons/shoulder-press.svg",
+      "sourceSha256": "12b02564584f59b29826c817de409005ef61a17e8d94028b68e8280fbaf46f9e",
+      "drawable": "app/src/main/res/drawable/ic_equipment_shoulder_press.xml",
+      "drawableSha256": "5777d7f96d39cb19f9cfce6aba6ce9ae6c37682a7bc11b97c01e2c640af1666c",
+      "paths": 1
+    },
+    {
+      "name": "smith-machine",
+      "source": "design/m1-b-hifi/icons/smith-machine.svg",
+      "sourceSha256": "e3f4f38eb7daa15b766eef91f540638f08ba0d5897f26e43f203268bf3c30087",
+      "drawable": "app/src/main/res/drawable/ic_equipment_smith_machine.xml",
+      "drawableSha256": "b2428a7af9dd1b83188a94ed2e8f2c0b7f67f058e0ec8df104af7e570669de4f",
+      "paths": 1
+    },
+    {
+      "name": "suspension-trainer",
+      "source": "design/m1-b-hifi/icons/suspension-trainer.svg",
+      "sourceSha256": "bc786c082e997d52661b9c9fde46ac36df3eff8268ae12df7e2cd47419141cd0",
+      "drawable": "app/src/main/res/drawable/ic_equipment_suspension_trainer.xml",
+      "drawableSha256": "07b91db27845bd16ebbef42bac29ba168644990311b14edf2eb4612433a95543",
+      "paths": 1
+    },
+    {
+      "name": "tbar-row",
+      "source": "design/m1-b-hifi/icons/tbar-row.svg",
+      "sourceSha256": "4d85bc3a5366165a39364e53120eac4f6c2028457b917fa1de287cb4a35bbc12",
+      "drawable": "app/src/main/res/drawable/ic_equipment_tbar_row.xml",
+      "drawableSha256": "ca371c8fe35002ebcaba5c9c30a918ccc0629ebbb5a10952ee9fa53eb12e3501",
+      "paths": 1
+    },
+    {
+      "name": "treadmill",
+      "source": "design/m1-b-hifi/icons/treadmill.svg",
+      "sourceSha256": "c031d845019435aba9ca82adc4dd4932ba7fbc8a367e7355dd370233522feadb",
+      "drawable": "app/src/main/res/drawable/ic_equipment_treadmill.xml",
+      "drawableSha256": "a015e0bd44b99c437ef09654cabfc1e9752a794fd123f022ea076c185cfa9550",
+      "paths": 2
+    }
+  ]
+}

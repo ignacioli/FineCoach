@@ -1,0 +1,191 @@
+{
+  "source": {
+    "file": "M1-B G5 Design",
+    "page": "Foundations",
+    "boardId": "8724aff1-68d0-802a-8008-ef10b1785bcb",
+    "boardName": "S1 · 01 今日（派生 S1-D68：去掉预约、日历、新建预约、设置）",
+    "derivedFrom": {
+      "boardId": "b48ddf15-5062-8001-8008-b669285db34a",
+      "boardName": "D15a 今日 · 页头（新建预约 · 日历 · 设置）"
+    },
+    "png": "design/m1-b-hifi/screens/01-today-s1.png",
+    "pngPixels": [
+      780,
+      1688
+    ],
+    "exportedAt": "2026-11-12",
+    "exporter": "penpot-mcp execute_code (host)",
+    "units": "pt relative to board origin; PNG is 2x",
+    "status": "S1-scope derived board (S1-D68); positions pending the implementation's proposed-board pass; hero title follows DS-HERO-CARD 学员名 · 部位 (S1-D69)"
+  },
+  "board": {
+    "w": 390,
+    "h": 844,
+    "fill": "#ffffff"
+  },
+  "layers": [
+    {
+      "name": "Rectangle",
+      "type": "rectangle",
+      "path": "0",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "fill": "#ffffff"
+    },
+    {
+      "name": "Text",
+      "type": "text",
+      "path": "1",
+      "x": 16,
+      "y": 116,
+      "w": 108,
+      "h": 21,
+      "fill": "#5c5a52",
+      "text": "8月31日 · 周日",
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 15,
+      "fontWeight": 400,
+      "lineHeight": 1.4
+    },
+    {
+      "name": "Text",
+      "type": "text",
+      "path": "2",
+      "x": 81.5,
+      "y": 157,
+      "w": 35,
+      "h": 24,
+      "fill": "#5c5a52",
+      "text": "学员",
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 17,
+      "fontWeight": 400,
+      "lineHeight": 1.4
+    },
+    {
+      "name": "DS-HERO-CARD · card",
+      "type": "rectangle",
+      "path": "3",
+      "x": 16,
+      "y": 201,
+      "w": 358,
+      "h": 117,
+      "fill": "#2a2822",
+      "radius": 16
+    },
+    {
+      "name": "DS-HERO-CARD · badge",
+      "type": "rectangle",
+      "path": "4",
+      "x": 32,
+      "y": 217,
+      "w": 56,
+      "h": 24,
+      "fill": "#f7f4ee",
+      "radius": 12
+    },
+    {
+      "name": "Text",
+      "type": "text",
+      "path": "5",
+      "x": 39.5,
+      "y": 221,
+      "w": 41,
+      "h": 16,
+      "fill": "#2a2822",
+      "text": "进行中",
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 13,
+      "fontWeight": 600,
+      "lineHeight": 1.2
+    },
+    {
+      "name": "Text",
+      "type": "text",
+      "path": "6",
+      "x": 32,
+      "y": 253,
+      "w": 111,
+      "h": 24,
+      "fill": "#ffffff",
+      "text": "王小明 · 大腿",
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 17,
+      "fontWeight": 600,
+      "lineHeight": 1.4
+    },
+    {
+      "name": "Text",
+      "type": "text",
+      "path": "7",
+      "x": 32,
+      "y": 281.5,
+      "w": 100,
+      "h": 20,
+      "fill": "#b0aba2",
+      "text": "已训练 32 分钟",
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 15,
+      "fontWeight": 500,
+      "lineHeight": 1.3
+    },
+    {
+      "name": "Text",
+      "type": "text",
+      "path": "8",
+      "x": 298,
+      "y": 255.5,
+      "w": 60,
+      "h": 21,
+      "fill": "#ffffff",
+      "text": "继续训练",
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "lineHeight": 1.4
+    },
+    {
+      "name": "Text",
+      "type": "text",
+      "path": "9",
+      "x": 16,
+      "y": 69.5,
+      "w": 69,
+      "h": 41,
+      "fill": "#2a2822",
+      "text": "今日",
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 34,
+      "fontWeight": 700,
+      "lineHeight": 1.2
+    },
+    {
+      "name": "DS-SEGMENTED · selected",
+      "type": "rectangle",
+      "path": "10",
+      "x": 16,
+      "y": 153,
+      "w": 50,
+      "h": 32,
+      "fill": "#2a2822",
+      "radius": 16
+    },
+    {
+      "name": "Text",
+      "type": "text",
+      "path": "11",
+      "x": 23.5,
+      "y": 157,
+      "w": 35,
+      "h": 24,
+      "fill": "#ffffff",
+      "text": "今日",
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 17,
+      "fontWeight": 600,
+      "lineHeight": 1.4
+    }
+  ]
+}

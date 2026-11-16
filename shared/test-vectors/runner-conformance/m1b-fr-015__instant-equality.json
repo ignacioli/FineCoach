@@ -1,0 +1,32 @@
+{
+  "id": "instant-equality",
+  "rule": "M1B-FR-015",
+  "meta": {
+    "tags": [
+      "fictional-data"
+    ],
+    "conformance": {
+      "outcome": "pass",
+      "path": "/"
+    }
+  },
+  "given": {
+    "clock": {
+      "now": "2031-04-05T18:30:00Z"
+    },
+    "state": {}
+  },
+  "when": {
+    "op": "fixture.value",
+    "args": {
+      "value": {
+        "createdAtUTC": "2031-04-05T19:30:00+01:00"
+      }
+    }
+  },
+  "then": {
+    "state": {
+      "createdAtUTC": "2031-04-05T18:30:00Z"
+    }
+  }
+}

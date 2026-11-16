@@ -129,6 +129,7 @@ agent 按上述决定补充的细节（产品负责人在 P0-a2 画稿上确认�
 代码是 `RestTimerBar`，只在训练页、结束训练按钮上方。画板 2 倍导出：`boards/P0-b-component-states.png`（Penpot P0-b，2026-10-24 导出，含 C25 的「刚结束 / 已超时」两态）。
 
 - **部件（进行中）**：说明「组间休息」（`caption`、`text.secondary`）→ 倒计时（`numeralLarge`）→ 链接按钮「−15 秒」「+15 秒」「跳过」。
+- **Android S1-D56 drift repair**：依 S1-D58 裁决，running-state link buttons 按文字宽度布局，间距统一为 `space.3`（12dp），末项右对齐 content edge；复用 `FcLinkButton(compactLayout = true)`，touch area 向外扩展至 ≥44，不占 layout space；画板已据此更新。
 - **部件（结束）**：✓ → 「休息结束，可以开始下一组」（`headline`）→ 「关闭」。
 - **部件（已超时）**：同「结束」，超时满 1 秒起主文字下多一行「已超时 m:ss」（`caption`、`text.secondary`、等宽数字），每秒加一；两行合并读屏。
 - **容器**：`surface.canvas`、`radius.lg`、最小高 64、水平内边距 `space.4`、宽度填满。
@@ -201,3 +202,25 @@ agent 按上述决定补充的细节（产品负责人在 P0-a2 画稿上确认�
   - 1 倍参考图：`boards/P0-a2-training-simplified@1x.png`、`boards/P0-a2b-partial-states@1x.png`（Penpot MCP 只能导出 1 倍，只作 review 参考，不是正式导出图）。
   - 核对时发现：已批准的 D8 画板本来就把组行画成一行，代码的两行组行和 `components.md` DS-SET-ROW「上下排列」的写法是偏离，Δ5 按 D8 改回一行，并同步 `components.md`。
   - 状态：产品负责人授权 agent 直接推进，看过后有问题再反馈（2026-10-15）。
+- **P0-a2b 回填（2026-11-14，S1-D99，P5+P7 走查 W3/W3b）**：两种单侧状态补画 P0-a2 已有的提示行「每次 ±2.5 kg · 点数字可直接输入」和「确认」。「左右不同 / 左右相同」链接放在提示行同一行的标签列（x=16），提示行仍从步进器左沿 x=112 开始；因此「确认」与最后一个步进器的距离和 P0-a2 相同（步进器 → 6 → 提示行 → 16 → 确认 52），单侧动作不比普通动作多一行。原先提议把链接放在提示行右侧，量得会与提示行重叠 2，负责人改选标签列。画板高 740 → 860，2 倍重新导出 `screens/P0-a2b-partial-states.png`，同时修好旧图里说明文字缺字形显示为方块的问题。
+
+### Android S1-D99 W1/W2/W3 执行记录（2026-11-14）
+- Class and basis：D；依据上面的 P0-a2b 回填、`components.md`「滚动正文与固定主按钮的间隔」及 S1-D99 已批准裁决修复实现偏差，无新设计决定。
+- Scope：复用 FcPinnedAction / DS-PAGE-SECONDARY 与 FcLinkButton；移除单侧录入独立链接行，改为提示行标签列 overlay；共享 footer 增 space.4，04/05/36/37/B-a/训练页生效；37 仅 fixture 填原因。
+- Design decisions：保留 row 滚动 tail inset、footer 底部 space.8、既有 testTags 与 busy 规则；FcPageSecondary.bottom 无现用 caller，未改；P0-a2b 为 780×1720 状态板，Android 780×1688 viewport 原比例裁剪，不缩放。
+- Implementation and checks：训练页→左右不同/左右相同→set-split→仅修改录入内存，确认后持久化→提示行 overlay 的 FcComponentMetrics.label 列；两态中心差≤1dp、左沿对齐次数标签、touch≥44dp、actions 间距等于双侧均通过。ComponentContract 36、PackageEntryLayout 17、ActiveSessionEntryLayout 23、G3 42、P7 15 均 0 failures/skips；P7 全 rendered；未进行本轮人工视觉验收。
+- Result：FAIL（核心屏门禁）；s0Conformance 1 test failed，38/48 applicable layers passed，10 UI deviations，4 vector internal unobservable。新增 footer gap 使 rest-content 上移16dp、到结束训练的间隔12→28dp，与核心图冲突；保留失败，不改 comparator/baseline。双次 hash 稳定；详情及前后 hash 见 `.handoff/subagent/2026-11-14-p5-walkthrough-fixes.md`，待负责人处理该冲突与 hash 重审；未 commit。
+
+### Android S1-D99 Round 2 执行记录（2026-11-14）
+- Class and basis：D；S1-D99 负责人裁决为固定主按钮上方留 `space.4`；调度者根据第 1 轮核心屏门禁失败的诊断：间隔属于滚动正文与整个 footer 的边界，P0-a2 既有休息条到结束训练的 `space.3` 不变，据此修正上轮实现位置错误。
+- Scope：FcPinnedAction 增可选 `above` slot，训练页将 restSlot 与 RestTimerView 纳入该 slot；纯按钮 caller 保持上轮布局；同步 components.md 边界说明。
+- Design decisions：只有 footer 外层 top space.4 / bottom space.8；stack 内无新增 spacing，空 slot / 隐藏休息条无额外间隔；row tail inset、原有交互和 tokens 保留。
+- Implementation and checks：训练页→结束训练→session-finish→进入结束流程→FcPinnedAction fillMaxWidth；训练页→休息操作→rest-minus/rest-plus/rest-skip→内存计时→above 内 RestTimerView fillMaxWidth；新增 footerGapPrecedesWholeStackWithAndWithoutRestBar 覆盖未显示/显示/清除，证明 viewport.bottom+space.4=首元素.top、rest→finish=space.3、finish bounds 不变；class list 77、G3 42、P7 15 全通过且无 skip，P7 15项全 rendered。
+- Result：PASS（本轮指定自测）；s0Conformance 1 test、48/48 applicable、0 failed，4 vector internal unobservable；双次 hash 恢复 d1caec3f70c8ef69b7d8f7f38b7bccdee1e8f0dad50549bd466566936be0978a，与改动前一致；上轮核心屏失败已消除。未改 baseline/hash 文件/comparator，未 commit，未做本轮人工视觉验收；详情见同一 handoff 报告 Round 2。
+
+### Android S1-D56 round-2 执行记录（2026-11-12）
+- Class and basis：D，修复 P0-a2 running rest bar 的实现偏差；依 S1-D58 裁决，running-state link buttons 按文字宽度布局，间距统一为 `space.3`（12dp），末项右对齐 content edge，touch area 向外扩展至 ≥44，不占 layout space；画板已据此更新。
+- Scope：DS-REST-TIMER reuse；仅 running 的 rest-minus/rest-plus/rest-skip opt in 既有 compactLayout；rest-close、其他 FcLinkButton consumers 不变。
+- Design decisions：复用 S1-D56 的0.25dp测量精度、首段 space.3、touch/layout分离；不改 tolerance、absolute、color、mapping、baseline。
+- Implementation and checks：训练中→可见 −15/+15/跳过→rest-minus/rest-plus/rest-skip→调整/清除内存计时→rest-content fillMaxWidth；48dp touch、12dp layout断言与行为测试通过；G3 42、G4 12、全量964通过。无新设计审批或人工视觉验收。
+- Result：FAIL，training 6 failed layers / 8 failed checks，D2b failed 0；证据见 `.handoff/subagent/2026-11-12-conformance-relative-r2.md`；不宣称 checkpoint 完成。

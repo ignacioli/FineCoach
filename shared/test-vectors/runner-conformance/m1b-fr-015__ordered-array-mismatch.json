@@ -1,0 +1,38 @@
+{
+  "id": "ordered-array-mismatch",
+  "rule": "M1B-FR-015",
+  "meta": {
+    "tags": [
+      "fictional-data"
+    ],
+    "conformance": {
+      "outcome": "compare",
+      "path": "/then/state/items/0"
+    }
+  },
+  "given": {
+    "clock": {
+      "now": "2031-04-05T18:30:00Z"
+    },
+    "state": {}
+  },
+  "when": {
+    "op": "fixture.value",
+    "args": {
+      "value": {
+        "items": [
+          1,
+          2
+        ]
+      }
+    }
+  },
+  "then": {
+    "state": {
+      "items": [
+        2,
+        1
+      ]
+    }
+  }
+}

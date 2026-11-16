@@ -70,7 +70,27 @@ Ask the product owner one targeted question only for a real authority conflict, 
 
 When code is introduced, document the canonical setup, build, test, lint, and formatting commands here. Do not invent commands before the toolchain exists.
 
-Android Gradle build and test commands will be added to this file when S0-02 creates the project.
+Android 命令从 `android/` 运行；先按 `android/README.md` 配置批准的 JDK21、SDK 与缓存，在宿主机运行：
+
+```sh
+./gradlew assembleDebug lint
+./gradlew :app:testDebugUnitTest --tests '*InfrastructureConfigurationTests'
+./gradlew :app:testDebugUnitTest --tests '*EnvironmentSmokeTests' --tests '*PlatformCryptoAvailabilityTests' --tests '*PlatformCryptoParityTests'
+./gradlew :app:s0EnvironmentSmoke
+```
+
+`s0EnvironmentSmoke` 仅 verify；缺负责人 environment 基线、record=true、0 tests 或 skip 均失败。报告在 `app/build/test-results/s0EnvironmentSmoke/`。负责人专用 record 命令见 `android/README.md`，agent 禁止运行。
+
+设备测试一律用 `am instrument`，不用 `connectedDebugAndroidTest`（负责人 2026-11-04 裁决，避免 UTP 未批准 alpha 依赖）。仅连接一个指定设备，记录 serial/API/build、APK digest 与 provider；当前 KDF 流程：
+
+```sh
+./gradlew assembleDebug assembleDebugAndroidTest
+adb install -r -t app/build/outputs/apk/debug/app-debug.apk
+adb install -r -t app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+adb shell am instrument -w -r -e class com.ignacioli.finecoach.PlatformCryptoParityInstrumentedTests com.ignacioli.finecoach.test/androidx.test.runner.AndroidJUnitRunner
+```
+
+检查 instrumentation 文字结果非空、0 failures/errors/skips（当前预期 `OK (2 tests)`），不能只看 adb 退出码。JVM host smoke 不替代设备/provider 证明。
 
 ## Operational constraints
 
@@ -80,8 +100,8 @@ These apply to every coding tool and are not stated in the sections above.
 - Do not discard uncommitted changes without explicit confirmation.
 - Green unit and integration tests are not checkpoint completion without the entry and layout map in `design/design-system/components.md` §1.4. `VisionHarnessTests` asserts design-token hex values and WCAG contrast ratios only. Do not describe Feature UI as visually verified unless a human looked; say so when that has not happened.
 - Do not add a forced red/green test-order gate, a full UI automation matrix, a fault-injection matrix, a 20-restart matrix, or a new performance-stress matrix unless the product owner asks. Do not add ViewInspector structural assertions on Feature screens unless explicitly requested.
-- Do not accept UX or UI work with a screenshot-compare-fix loop unless the product owner asks for that instance.
-- Android has the explicitly approved exceptions in ADR-001 Q11/Q12, detailed in `CLAUDE.md`: product-owner-approved screenshot baselines with automated pixel comparison, and Compose UI tests (Robolectric) for the entry and layout map. Only the product owner approves and updates baselines; agents must not modify them and read text results only, not images. Deterministic pixel comparison is not the prohibited screenshot-judge-fix loop. The Feature-screen structural-assertion restriction does not apply to these Android entry and layout tests; the map remains in the execution record. iOS rules are unchanged.
+- Do not accept UX or UI work with a repeated screenshot-compare-fix loop. A one-shot, checklist-based model review of a screenshot is allowed; repeated screenshotting means stop and run a retrospective (product owner, 2026-11-10, S1-D25). Visual conformance against the approved design (`design/`) is never deferred; details in `CLAUDE.md`.
+- Android has the explicitly approved exceptions in ADR-001 Q11/Q12, detailed in `CLAUDE.md`: product-owner-approved screenshot baselines with automated pixel comparison, and Compose UI tests (Robolectric) for the entry and layout map. Only the product owner approves and updates baselines; agents must not modify them. Deterministic pixel comparison is not the prohibited screenshot-judge-fix loop. The Feature-screen structural-assertion restriction does not apply to these Android entry and layout tests; the map remains in the execution record. iOS rules are unchanged.
 - A data-changing action must be reachable from a visible control (a button, a swipe action, or a visible menu). A long-press `.contextMenu` alone is not a UI path.
 - When a required behavior is ambiguous between an automatic side effect and an explicit coach confirmation, and the effect is hard to reverse (ending a course package's credits, deleting something, or changing billing-adjacent state), ask the product owner. Creating a new course package must not silently end the current package.
 - A design-system change goes into `design/` and is backfilled into the Penpot file「M1-B G5 Design」in the same round.
@@ -99,13 +119,29 @@ These apply to every coding tool and are not stated in the sections above.
 - Use `mobile-privacy-security-reviewer` as an independent read-only gate for architecture and implementation milestones involving sensitive data or platform privacy controls.
 - Android implementation follows the approved ADR-001 D1/D2 stack and interoperability contract, with an approved spec → plan → tasks for each slice. Do not create the `android/` project before the S0 spec is approved. Agent runs follow the slice run-list approval in `CLAUDE.md` (ADR-001 Q13); commit, merge, and push still require approval each time.
 
+## Dispatcher (any agent)
+
+- S1-D101 hybrid: Codex `gpt-6.1-sol` medium dispatches day to day as PM, chief engineer, and designer; Claude handles Penpot/design backfill, milestone review, and diagnosis after a subtask stalls for 2+ rounds. During shadowing, Claude reviews Codex decisions.
+- Shared memory: live, writable copy `/Users/liyongqiang/gitrepo/ignacioli/specs-memory/FineCoach/agent-memory/` in the long-lived specs worktree `/Users/liyongqiang/gitrepo/ignacioli/specs-memory` (branch `memory/live`); read `MEMORY.md` first each session, then relevant entries. Write there, commit on `memory/live`, and merge into specs `main` with `--no-ff` at checkpoints; never edit specs `main` directly (see the memory `README.md`). Untagged entries apply to both; honor `metadata.applies_to` for tool-specific mechanics.
+- Read and record decisions in the primary checkout's `.handoff/decisions/android-port.md`; prompts go in `.handoff/prompt/`, reports in `.handoff/subagent/`, logs and last messages in `.handoff/logs/`; current dispatcher state is `.handoff/dispatcher/HANDOFF.md`.
+- Use `.handoff/bin/codex-run.sh <cwd> <prompt> <logbase>` and `codex-resume.sh <cwd> <session-id> <prompt> <logbase>`; use `cursor-run.sh <cwd> <prompt> <logbase> --mode ask` for Cursor review. Resume the existing run instead of creating a duplicate writer; independently check `git status --short` and `git log --oneline` before and after resuming.
+- One writer owns a phase/worktree. Codex writes + Cursor reviews; when Codex quota is exhausted, Cursor writes + dsh reviews. Author and reviewer must differ; the dispatcher must not review its own implementation. Parallel writers need disjoint files AND no semantic dependency; send fixes to the owning writer.
+- The owner approves each slice's run list (task, agent, model, worktree, branch); listed runs need no repeated approval, off-list runs do. Choose reasoning effort by risk; keep prompts bounded and name allowed files, approved screens PNGs, anatomy entries, and `design/` assets.
+- Writers self-test through `.handoff/bin/agent-test.sh`; dispatcher host acceptance uses `.handoff/bin/host-locked.sh` with the shared host lock. Read fresh reports, counts, skips, hashes, and diffs independently; an agent summary or wrapper exit alone is insufficient. Check sandbox capability before assuming host/device access.
+- Long runs use `~/.local/bin/agent-watchdog` with `WATCHDOG_REPEAT_LIMIT=0`; launch `.handoff/bin/idle-check.sh <watchdog.log> <process-pattern> 300` alongside every launch. Set limits per task (normally max 1800 s, stall 600 s), inspect alarms instead of periodic model patrols; launcher defaults are not the policy.
+- At 20 minutes check direction and scope; after two unclear/repeating failed rounds, stop before a third attempt, print the retrospective and falsifiable hypotheses, and escalate stalled diagnosis to Claude. Clear-cause progress is reported separately; never blindly raise timeouts or tune screenshots to pass.
+- Android visuals target approved `design/`, with registered AD-xx platform deltas. Before core-screen owner review, provide matching fixtures/viewport, layer-to-rendered geometry evidence and a design/Android/difference sheet; do not defer conformance. See `CLAUDE.md` for the full visual and checkpoint procedures and tool-specific mechanics.
+- Under Git checkpoint pre-authorization, green gates plus independent review allow topic commits and `git merge --no-ff` into clean local `main`; remove a merged clean worktree afterward. Push/PR/remote merge, new design/baselines, dependency/version exceptions, privacy boundaries, and ambiguous consequential behavior still require the owner. Explicit task restrictions override this permission.
+
 ## Git
 
-- Do not commit unless explicitly requested.
+- Do not commit unless explicitly requested, except under the checkpoint pre-authorization below.
 - Keep commits and pull requests scoped to one concern and reference the relevant decision recorded in this repository.
 - Preserve unrelated and untracked work.
 
 **Protected primary branch.** Do not modify tracked files, stage, or commit on `main` or `master`. The remote `origin` is the public GitHub repository. Do not push, merge into `main`, delete specs files, or rewrite history without product-owner approval. Use the local `main` tip, then create a topic branch (prefer a dedicated git worktree) before changing tracked files. Direct commits to the primary branch are forbidden. Gitignored local state on the primary checkout is allowed.
+
+**Checkpoint pre-authorization (product owner, 2026-11-04).** After a checkpoint's gates are green and an independent review has passed, an agent may commit to its topic branch and merge that branch into the local `main` without asking again. Merging must use `git merge` (no rebase or history rewrite), and the primary checkout must be clean first. Push, pull requests, and merges into the remote stay subject to product-owner approval, batched per milestone. Design decisions, screenshot baselines, dependency or version exceptions, privacy boundaries, and ambiguous consequential behavior still need the product owner.
 
 **Local toolchain bootstrap.** After `git worktree add`, and before using project skills, `.handoff`, or subagents in that worktree, run `scripts/bootstrap-local-worktree.sh` with the worktree as `cwd`. The script links ignored runtime subtrees from the primary checkout and skips missing sources. Do not symlink entire ignored toolchain directories; the script chooses the subtrees. Agents: run `ig-worktree-gate` before tracked-file edits.
 

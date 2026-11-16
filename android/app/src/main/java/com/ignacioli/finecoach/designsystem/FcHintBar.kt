@@ -1,0 +1,69 @@
+package com.ignacioli.finecoach.designsystem
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+
+@Composable
+fun FcHintBar(
+    text: String,
+    modifier: Modifier = Modifier,
+    actionTitle: String? = null,
+    onClick: (() -> Unit)? = null,
+) {
+    val shape = RoundedCornerShape(FcShapes.md)
+    val title = actionTitle
+    val click = onClick
+    val bar = modifier
+        .fillMaxWidth()
+        .heightIn(min = FcComponentMetrics.touch)
+        .clip(shape)
+        .background(FcColors.surfaceSelected)
+    if (title == null || click == null) {
+        Box(
+            modifier = bar
+                .semantics(mergeDescendants = true) { contentDescription = text }
+                .padding(horizontal = FcSpacing.space4),
+            contentAlignment = Alignment.CenterStart,
+        ) {
+            FcText(text = text, style = FcTypography.caption, color = FcColors.actionPrimary)
+        }
+    } else {
+        Row(
+            modifier = bar
+                .semantics(mergeDescendants = true) { }
+                .clickable(role = Role.Button, onClick = click)
+                .padding(horizontal = FcSpacing.space4),
+            horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(Modifier.weight(1f)) {
+                FcText(
+                    text = text,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    style = FcTypography.caption,
+                    color = FcColors.actionPrimary,
+                )
+            }
+            FcText(
+                text = title,
+                style = FcTypography.style("callout", 600),
+                color = FcColors.actionPrimary,
+            )
+        }
+    }
+}

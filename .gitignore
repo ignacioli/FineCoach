@@ -6,6 +6,8 @@
 DerivedData/
 *.swiftpm/
 Packages/
+# Android feature package (case-insensitive FS would otherwise match Packages/)
+!android/app/src/**/features/packages/
 xcuserdata/
 *.xcuserstate
 

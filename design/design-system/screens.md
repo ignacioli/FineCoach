@@ -31,7 +31,7 @@
 | SCR-RESOURCE-HUB | 资料库 | `design/m1-b-hifi/screens/19-resource-hub.png` | — | — | `ios/FineCoachApp/Features/ResourceHub/ResourceHubView.swift` | — | 已入库 2 倍 | README §1.2 |
 | SCR-EXERCISE-LIBRARY | 动作库 | `design/m1-b-hifi/screens/20-exercise-library.png` | `C2b-recent-group` 最近练过分组（`design/experience-t2/screens/C2b-recent-group.png`） | — | `ios/FineCoachApp/Features/ExerciseLibrary/ExerciseLibraryView.swift` | — | 已入库 2 倍 | README §1.2；experience-t2「Penpot 绘制」「第二轮」；components §4.3；`d0163ad` |
 | SCR-EXERCISE-FILTER | 动作筛选面板 | `design/m1-b-hifi/screens/33-exercise-filter-sheet.png` | — | — | `ios/FineCoachApp/Features/ExerciseLibrary/ExerciseLibraryView.swift` | — | 已入库 2 倍 | README §1.2 |
-| SCR-EXERCISE-OPTIONS | 动作选项面板 | `design/m1-b-hifi/screens/34-exercise-options-sheet.png` | P0-D8 单侧标记（文字批准来源；独立更新图未确认） | — | `ios/FineCoachApp/Features/ExerciseLibrary/ExerciseLibraryView.swift` | — | 基础已入库 2 倍；单侧选项图待确认 | README §1.2；P0「产品负责人决定（2026-10-15，训练页精简）」P0-D8 |
+| SCR-EXERCISE-OPTIONS | 动作选项面板 | `design/m1-b-hifi/screens/34-exercise-options-sheet.png` | P0-D8 单侧标记（2026-11-13 已补画进 34，S1-D98） | — | `ios/FineCoachApp/Features/ExerciseLibrary/ExerciseLibraryView.swift` | — | 基础与单侧动作行均已入库 2 倍 | README §1.2；P0「产品负责人决定（2026-10-15，训练页精简）」P0-D8 |
 | SCR-EXERCISE-CREATE | 新建自定义动作 | iOS 现有实现 + 组件规格（负责人 2026-11-03） | — | — | `ios/FineCoachApp/Features/ExerciseLibrary/CustomExerciseEditorView.swift` | — | —（不补画稿；已裁定 2026-11-03） | README §10 C20；`design/experience-t2/implementation-map.md` 「入口与布局清单」 |
 | SCR-TEMPLATE-LIST | 训练模板列表 | `design/m1-b-hifi/screens/05-training-template.png` | — | — | `ios/FineCoachApp/Features/Templates/TemplateListView.swift` | — | 已入库 2 倍 | README §1.1；`ios/FineCoachApp/Features/Templates/TemplateListView.swift:64` 明记 05 画稿 |
 | SCR-TEMPLATE-EDIT | 编辑训练模板 | iOS 现有实现 + 组件规格（负责人 2026-11-03） | `design/experience-t2/screens/B-b-partial-states.png` / C27 左滑交互修订 | `design/experience-t2/boards/B-b-partial-states@1x.png` 已被 B-b 2 倍图取代 | `ios/FineCoachApp/Features/Templates/TemplateEditorView.swift` | — | —（不补画稿；已裁定 2026-11-03） | README §1.1、§1.12；`design/experience-t2/decisions.md`；`design/experience-t2/implementation-map.md` |
@@ -215,3 +215,14 @@
 - **C24 / C25 历史规则冲突**：README §10 C24 保留「看着结束则 3 秒后收起」，C25 取消「休息结束 3 秒后自动收起」。本轮仅在 C24 标注取代关系；历史原文如何统一待负责人，不改规则或数值。
 - **学员详情底稿编号冲突**：已更正（2026-11-03）：insights 分类表 E-b 底稿改为学员详情（26-student-detail；M2-01 导出入口），依据 README §1.2、SCR-STUDENT-DETAIL；M2-03 是导出预览。
 - **删除分区确认来源分歧**：已更正（2026-11-03）：experience-t2 入口表 M06、M16「连同动作删除」标为已移除（B-D1），M05、M15 保留；`FCAccessibilityID.swift` 已无 `DeleteSectionDeleteExercises`。
+
+## Android 已批准差异画板的导出登记（AD-07）
+
+批准来源见 `components.md` §5；负责人已在 Penpot「M1-B G5 Design」→「Android 差异」页导出三块 2 倍 PNG，宿主已放入以下路径（2026-11-10）。已核验 SHA-256；不取代既有 iOS 页面目标。
+
+| 画板名 | 入库路径 | 状态 | SHA-256 |
+|---|---|---|---|
+| AD-01 图标映射 | `design/android-differences/screens/AD-01-icon-mapping.png` | 已入库（2026-11-10，负责人导出） | `769ad7d20c3de8bee10f0f0b48c4ed9203b8c0e55d2cf8900e619a9847177f71` |
+| AD-02 日期和时间选择 | `design/android-differences/screens/AD-02-date-time-picker.png` | 已入库（2026-11-10，负责人导出） | `4eb76ec7f3bcf1f49a92b671ef66ac1c6356e41e444bf2bf759bea96ecccfb2f` |
+| AD-03 操作面板 | `design/android-differences/screens/AD-03-action-sheet.png` | 已入库（2026-11-10，负责人导出） | `a05bd35362ce27c6e9a2f8e04f04e0f1a61b366eebfcea7b328c8b30ef946d35` |
+| AD-04 自适应图标 | `design/android-differences/screens/AD-04-adaptive-icon.png` | 已入库（2026-11-10，负责人导出） | `5457264f78d0cc02ecf1a042a3a9774c0ab86ab0f9ef972a4e0b8ed38be698ea` |

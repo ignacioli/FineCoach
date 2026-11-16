@@ -1,0 +1,17 @@
+{
+  "toleranceDp": 2,
+  "originOffsetY": -52,
+  "originRule": "S1-D50 measured platform-content origin; top flow only",
+  "elements": [
+    {
+      "path": "30",
+      "tag": "studentList.inProgress",
+      "source": "Existing visible training bar interaction tag; S1-D76 refreshed layer path"
+    },
+    {
+      "path": "24",
+      "tag": "studentList.add",
+      "source": "Existing primary button interaction tag observes the visible button surface"
+    }
+  ]
+}

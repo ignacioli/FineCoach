@@ -1,0 +1,8 @@
+{
+  "toleranceDp": 2,
+  "originOffsetY": -52,
+  "originRule": "S1-D30: measured platform-content origin; top flow only; dialog uses its actual window origin",
+  "elements": [
+
+  ]
+}

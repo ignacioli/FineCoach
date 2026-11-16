@@ -1,0 +1,48 @@
+{
+  "id": "ordered-results-and-escaped-pointer",
+  "rule": "M1B-FR-015",
+  "meta": {
+    "tags": [
+      "fictional-data"
+    ],
+    "conformance": {
+      "outcome": "pass",
+      "path": "/"
+    }
+  },
+  "given": {
+    "clock": {
+      "now": "2031-04-05T18:30:00Z"
+    },
+    "state": {
+      "a/b": {
+        "~value": {
+          "balance": 8
+        }
+      }
+    }
+  },
+  "when": [
+    {
+      "op": "fixture.value",
+      "args": {
+        "value": {
+          "$ref": "/given/state/a~1b/~0value"
+        }
+      }
+    },
+    {
+      "op": "fixture.value",
+      "args": {
+        "value": {
+          "$ref": "/results/0"
+        }
+      }
+    }
+  ],
+  "then": {
+    "state": {
+      "balance": 8
+    }
+  }
+}

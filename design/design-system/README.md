@@ -48,7 +48,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 | `28-share-settings-v2`、`29-share-preview` | D7 分享报告设置页（单次训练）与预览页。走查修订 2026-10-22（C15）：预览页卡片之后常驻整宽次按钮「完成」，点了回到今日页（Penpot `D7b-r`） | 取代 12 |
 | `30-training-v2`、`31-add-exercise-sheet` | D8 方案 B：「＋ 新建分区」就地入口；「应用模板」并入添加动作面板；「另存为模板」移到训练结束后的总结页 | 取代 11 |
 | `32-training-history-v2` | D9 训练历史筛选结果列表 | 取代 07 |
-| `33-exercise-filter-sheet`、`34-exercise-options-sheet` | T069c（2026-09-27 产品负责人选定「筛选面板」方案）：动作库搜索框右侧筛选图标 → 筛选面板（器械、显示已隐藏）；点动作行 → 动作选项面板（收藏 / 隐藏 / 辅助器械）。`20-exercise-library` 同步加上筛选图标并重新导出 | 补充 20 |
+| `33-exercise-filter-sheet`、`34-exercise-options-sheet` | T069c（2026-09-27 产品负责人选定「筛选面板」方案）：动作库搜索框右侧筛选图标 → 筛选面板（器械、显示已隐藏）；点动作行 → 动作选项面板（收藏 / 隐藏 / 辅助器械 / 单侧动作；「编辑动作」行只对自定义动作显示）。2026-11-13 回填（S1-D98）：34 补画 P0-D8「单侧动作」开关行（同辅助器械行结构，面板上移 52 pt），并在画板下方加状态说明后重新导出 2 倍图。`20-exercise-library` 同步加上筛选图标并重新导出 | 补充 20 |
 | `35-session-detail` | D12 训练记录（训练历史 → 点日期行；页头 2026-10-23 改为行内 `‹` + 页面内「训练记录」，§10 C18）：复用 `29-share-preview` 的分区（日期 / 标题 / 学员、三项统计、训练部位、动作每行 3 组、课后总结），不带页脚；下方「编辑训练重点 ›」「另存为模板 ›」操作行（另存为模板用底部面板命名）、只读说明，底部固定「生成训练报告」（2026-09-28 产品负责人反馈原页面像表格、字体不齐） | 补充 32 |
 | `36-new-package-stepper`、`37-manual-adjustment-stepper` | D13 数字步进器（2026-09-29 产品负责人批准方案 C「整体胶囊」，T064 发现新建课包「总课时数」与人工调整「课时数」仍为 iOS 系统 `Stepper`）；两页页头同时改为 `‹` + 页面内 `titleLarge`（与 04、训练趋势一致）。新建课包的开始 / 结束日期行与 02 相同：标签-值两栏行，值为 `body`「yyyy年M月d日」（课包有效期可能跨年，保留年份）+ `›`，点行在下方展开日历（2026-09-29 产品负责人审核时要求，快照 `D13a date row as 02 (value + ›) 2026-09-29`）。Penpot 快照 `before-D13-stepper 2026-09-29` → `D13 stepper capsule (option C) 2026-09-29`，画板 D13a、D13b | 新增 |
 | `38-backup-restore-v2` | D14 备份与恢复 v2（T071，2026-09-29）：08 原画稿把「密码 + 再次确认密码」画在「恢复」下，但设置并确认口令属于**导出**，恢复只需「选择备份文件」+ 一次口令；按功能摆放，其余照 08（页面内标题与副标题、导出 / 恢复分区与分割线、失败状态 `status.destructive` 文字 + 22×22「!」徽标 + 说明 + 居中「重试」）。恢复区直接显示，去掉原「从备份恢复」展开按钮与底部整宽「取消」（改用返回）。说明文字 `caption`，口令框为输入框（08）的遮蔽输入。快照 `before-T071-backup-v2 2026-09-29` → `T071 backup-restore v2 (D14) 2026-09-29` | 取代 08 |
@@ -129,6 +129,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 - 阶段 E 集中走查（2026-10-27）：模拟器（iOS 26）上「…」弹出系统胶囊菜单，菜单偏大；真机（iOS 18）的灰色菜单也太大。训练页分区「…」的胶囊外观同源（iOS 26 系统 `Menu` 样式，代码自 2026-10-16 未变，不是回归）。负责人否决底部面板（多一步）和行内文字按钮（页面变乱），选左滑（§10 C27）。分类 B。
 - Penpot（Foundations 页）：快照 `before swipe revision (retire DS-MORE-MENU) 2026-10-27` → `swipe revision drawn: E-a1/E-a2/E-b/B-a/B-b/B-c + E-d 2026-10-27` → `swipe capsules redrawn to iOS 26 look (E-d, B-b) 2026-10-27`。E-a1、E-a2、E-b、B-a 去掉「…」；B-b 顶部改为「分区标题 · 左滑后」红色胶囊；B-c 页头去掉「…」，「管理」加「停用指标」行；新增 E-d（x=14410）：灰色「暂不提醒」胶囊、撤销行、首次轻推。B-b 其余三个左滑示例保持现状，不统一胶囊（负责人 2026-11-03 已裁定）。
 - 2 倍导出：E-a1 已由 `d0163ad` 入库；E-a2、E-b、E-d、B-a、B-b、B-c 已分别入库 `design/insights/screens/E-a2-insights-list.png`、`design/insights/screens/E-b-student-detail-insights.png`、`design/insights/screens/E-d-insights-swipe-snooze.png`、`design/experience-t2/screens/B-a-section-swipe-delete-confirm.png`、`design/experience-t2/screens/B-b-partial-states.png`、`design/experience-t2/screens/B-c-metric-history-manage.png`。本节其余画板的导出状态见 `screens.md`。
+- 2026-11-13 回填（S1-D95）：B-b「分区标题 · 左滑后」去掉标题前的「▾」（iOS 真机与 Android 均无此标识），重新导出 `design/experience-t2/screens/B-b-partial-states.png`。
 
 ### 1.13 阶段 F 系统入口画稿与实现回填（2026-10-28～29）
 
@@ -361,7 +362,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 | 主按钮（页面底部） | 358×52，`radius.md`，底色 `action.primary`，按下 `action.pressed`；文字 `headline` 白色 |
 | 次按钮（样张） | 白底，1.5pt `action.primary` 描边，`radius.md`；文字 `headline` `action.primary` |
 | 链接式按钮 | 无底色，文字 `callout` 600 `action.primary`（例：「＋ 添加动作」「＋ 自定义指标」「重试」） |
-| 顶部分段切换（今日 / 学员） | 选中项 50×32 胶囊，`action.primary` 底 + `headline` 白字；未选中项为纯文字 `body` `text.secondary`。同一外观也用于页内 2–4 段（C26）的互斥短选项（37「扣减 / 返还」；趋势指标、身体数据录入单位），选项更多或文字较长时改用筛选胶囊（2026-10-05，§10 C11） |
+| 顶部分段切换（今日 / 学员） | 每个选项框最小 50×32、间距 `space.2`，文字在框内水平垂直居中；选中项的框即胶囊，`action.primary` 底 + `headline` 白字；未选中项为纯文字 `body` `text.secondary`。一级页顶部时第一个选项框左缘对齐页边距 `space.4`（S1-D70）。同一外观也用于页内 2–4 段（C26）的互斥短选项（37「扣减 / 返还」；趋势指标、身体数据录入单位），选项更多或文字较长时改用筛选胶囊（2026-10-05，§10 C11） |
 | 筛选胶囊（07） | 高 30 胶囊；未选中 `surface.selected` 底 + `chipLabel` `text.primary`；选中 `action.primary` 底 + 白字 |
 | 开关 | 44×26 胶囊，滑块 18×18 白色圆，**左关右开**（iOS 惯例，与画稿 02/12 一致）。开启：轨道 `action.primary`。关闭：轨道 `surface.divider` 底 + 1.5pt `border.control` 内描边（O7）。实现为系统原生 `Toggle` + 自定义外观样式，保留系统开关的无障碍语义；可点击区域不小于 44×44 |
 | 深色 hero 卡（01） | 358×100，`radius.lg`，`action.primary` 底；内含徽标（高 24 胶囊，最小宽 56、随文字增长，`surface.canvas` 底，`sectionLabel` `action.primary` 字）、`headline` 白字标题、`text.onActionSecondary` 副文字、`callout` 600 白字操作。每屏最多一个。**多行变体（W08-a，2026-10-22）**：多名学员同时训练时仍是一张卡，徽标「进行中 · N」，每人一行（学员名 · 部位 / 已训练 N 分钟 / 「继续 ›」），行最小高 44，行间 `surface.dividerOnAction` 分割线，按开始时间升序；每行单独可点。1 人时与 01 相同 |
@@ -439,6 +440,24 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 - dark / tinted 只是 iOS 18 主屏图标外观，随用户在主屏「自定」中的选择切换；App 界面本身仍未适配深色模式，不因此引入界面深色主题。
 - Penpot：「M1-B G5 Design」Foundations 页画板「AppIcon options (2026-10-11) — REJECTED A / B / C」底部的 `AppIcon / approved / {light,dark,tinted}` 已于 2026-10-14 回填为新三张图（快照 `before-app-icon-v2 2026-10-14` → `app-icon v2 backfill 2026-10-14 (mascot original, light/dark/tinted)`，`File.validate()` 0 个错误），并更新了画板内的「已批准」说明；上方几何兔头 / 「练」字标 / 哑铃片三案为 2026-10-11 否决方案，保留作记录。
 - 验收：2026-10-14 产品负责人在真机体验，反馈审核通过（light / dark / tinted 三个外观）。
+
+**Android 自适应图标（AD-04，2026-11-10 产品负责人讨论决定；未实施）**
+
+平台事实（已对照 Android 官方文档「Adaptive icons」与 `AdaptiveIconDrawable` 参考核对）：自适应图标由背景层与前景层组成，各 108×108dp；启动器只显示中间 72×72dp，四边各 18dp 留给遮罩与动效；遮罩形状（圆形、圆角方、squircle 等）由设备厂商决定；只有中心 66×66dp 不会被任何遮罩裁切，标志应在 48–66dp 之间。iOS 的满版方图内容铺到四角，不能直接使用。
+
+- 构图分两个阶段（负责人原话：「D，R-03 前先用 B」）：
+  - 阶段 B（R-03 侧载前实施）：背景层为纯色，前景层为 `app-icon-light.png` 缩到画布的 72/108 居中、四周透明。已知并接受的限制：圆角方与 squircle 遮罩下完整；圆形遮罩下记事本与笔被裁掉一部分，夹克左下角被裁；吉祥物比常见图标显小。不能再缩小：原图夹克在底边平切，小于 72dp 会露出悬空的平边。
+  - 阶段 D（目标）：Android 专用构图。透明底前景，吉祥物胸像放大居中、身体延伸到画布底边，六边形徽章与记事本、笔收进中心 66dp 圆内；背景层同为纯色。由产品负责人用 ChatGPT image 出图（提示词与安全区模板由 Claude 准备）。出图后在 Penpot「Android 差异」页新建画板（各遮罩下的效果，B 类，负责人审），通过后替换阶段 B。时点（负责人原话：「同意设在上架 Google Play 之前。」）：侧载期间可一直用 B，公开上架前必须换成 D。
+- 背景色：取 light 版底色。本节上文记为「约 `#F8F0E3`」，原图底色不一定均匀；实施时从原图边缘取样定值，使阶段 B 的前景与背景之间看不出接缝，并把取到的值写回本节。
+- 单色层（Android 13+ 主题图标）：R-03 前不提供，推后到 D 出图时决定是否另绘剪影（负责人原话：「同意「R-03 前不提供单色层，推后到 D 出图时决定」。」）。不提供时的表现：Android 16 QPR2 之前，用户开启主题图标后仍显示彩色图标；Android 16 QPR2 起系统用颜色滤镜自动生成单色版，效果未在真机验证。`app-icon-tinted.png` 是满版灰度图、无透明通道，不能当单色层用。
+- 外观：Android 只用 light 版；`app-icon-dark.png` 与 `app-icon-tinted.png` 不进入 Android 工程（负责人原话：「同意「Android 只用 light 版，dark 与 tinted 不用」」）。Android 自适应图标没有官方的深色外观机制；App 界面本身也未适配深色。
+- 资产与分工（负责人：「同意」）：
+  - 母版放在 `assets/`（阶段 B 的前景母版由脚本从 `app-icon-light.png` 生成；阶段 D 的母版为负责人出的透明底图）。Android 工程内的图是母版的副本，用测试保证一致。
+  - 前景层为 PNG 位图（插画不转矢量），由脚本从母版缩放出五档密度：108 / 162 / 216 / 324 / 432 px（mdpi～xxxhdpi）。背景层写成颜色值，不出图。
+  - 一个 `<adaptive-icon>` 定义文件引用背景与前景；阶段 D 只换前景图，不改该文件（若届时提供单色层则加一项）。
+  - `minSdk` 为 31，自适应图标自 API 26 起支持：不做旧版启动器回退图，不做 `android:roundIcon`。
+  - Google Play 商店 512px 图标不在范围内，决定上架时与阶段 D 一并处理。
+- 画板：`design/android-differences/screens/AD-04-adaptive-icon.png` 是讨论材料，其中方案 B 的说明「圆形遮罩只裁掉四角的米色底」不准确（圆形遮罩下记事本与笔也被裁到），以本节为准；该画板不改。
 
 ### 9.3 开屏页（2026-10-29 过渡版，Penpot G-b）
 
@@ -647,3 +666,71 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 | 启动进入首页（§9.3 ② 历史记录；C31 已由 `654e1b8` 删除，不再生效） | 开屏叠层保持约 0.3 s 后淡出，`fast` + `standard`；只在冷启动播一次 | 不叠这一层，直接显示首页 |
 
 迁移范围：本轮只有训练页（ActiveSession 与 `FCSetRow`、`FCSetStateCircle`）改用 `FCMotion`；其他页面的现有数值与 token 相同，改到哪页再迁哪页（`components.md` §1.3）。
+
+## 15. Android 映射规则
+
+T012 文档回填（2026-11-05）。本节解释既有 token 的跨端单位与字体映射，不修改 §2～§14 的值、色值、样式名或组件 anatomy。来源规格为 `007-android-port/s0-infrastructure/spec.md`（下称 S0 spec）、`plan.md` §3.3、`tasks.md` T012/T013 及上级 ADR-001 §7.2；本轮读取的是独立 `specs-android-s0` worktree，路径见 [Android 执行记录](../../android/README.md#s0-05-t012android-映射文档)。负责人 2026-11-03 批准 S0 spec/plan/tasks 及 D02/D05/D14；下文明确标为待核实的实现细节不因此视为已批准。
+
+### 15.1 单位与 fontScale
+
+| 规则 | 映射与边界 | 来源（iOS 路径均相对产品根；行号以 `c381853` 为基点） |
+|---|---|---|
+| 字号 pt → sp | §3.2/§3.3 的字号数值 `s` 生成 `s.sp`，基准 `fontScale=1` 时数值 1pt→1sp；不承诺跨端 px、字形墨迹或物理尺寸相等。 | `ios/FineCoachApp/DesignSystem/Typography.swift:116–160`；S0-FR-052；负责人 2026-11-03 批准 S0 规则基准。 |
+| 几何 pt → dp | §4 间距、§5 固定圆角及已批准组件尺寸/描边数值 `g` 对应 `g.dp`（1pt→1dp），保留小数，不乘 fontScale。§6 的 1pt 分割线、1.5pt 描边同理，不改成按设备像素的 hairline。dp 会随 density 换算成 px，但不随字体设置缩放。 | `ios/FineCoachApp/DesignSystem/Tokens.swift:68–90`；本 README §6；S0-FR-052；负责人 2026-11-03。尺寸/描边没有统一 iOS token 常量，不虚构常量来源。 |
+| 正文与字形缩放 | 14 个文本样式及随包 `‹ › ✓` 都使用 sp，交由平台/Compose 响应系统字体设置，不另乘 `fontScale` 或硬编码 sp→px 公式。iOS 使用各样式的 `UIFontMetrics` 基准，字形用 body 基准；Android 不把这些 UIKit 基准名当作另一组字号或相同缩放曲线。 | 本 README §3.1/§7.2；`ios/FineCoachApp/DesignSystem/Typography.swift:178–226`、`ios/FineCoachApp/DesignSystem/Components/FCSymbol.swift:102–108`；S0-FR-051/052、D05/D14；负责人 2026-11-03（随包字形原决定 2026-10-10）。 |
+| 缩放限制 | token 层不锁 `fontScale=1`，不设置全局上限、不把文字改为 dp；S0-FR-052 没有批准任何样式级 fontScale clamp。G5 固定 fontScale 是测试环境约束，不是产品限制。组件既有换行、最小触控尺寸或局部文字适配约束仍按 components 执行，不推广为全局缩放限制；新增例外见 §15.5。 | `ios/FineCoachApp/DesignSystem/Typography.swift:209–226`（无上限）；components §2 `DS-BASE` 及 §4 的 `DS-PAGE-HEADER`、§3 的 `DS-SET-ROW`；S0-FR-052/090；负责人 2026-11-03。 |
+
+Android 14+ 字体缩放可以是非线性的，不能把 px 定义成 `sp × density × fontScale`。这里的 1:1 是未缩放设计数值的映射，沿用平台 sp 转换；见 [Android 字体缩放说明](https://developer.android.com/about/versions/14/features#non-linear-font-scaling)（2026-11-05 核对）。
+
+### 15.2 lineHeight 与 letterSpacing
+
+- **输入语义**：§3 两张表的「行高」是无量纲倍率 `m`，不是 pt/sp。Android 的名义目标为 `lineHeight=(s × m).sp`，保留乘积精度，不四舍五入到整数，不把 `m` 直接当 sp。字号与行高均使用 sp，由平台分别换算；不承诺所有系统字体设置下换算后的 px 比率恒定。来源：`ios/FineCoachApp/DesignSystem/Typography.swift:108–160`、`:218–226`；S0-FR-051/052；负责人 2026-11-03。
+- **iOS 实际实现**：`View.fcFont` 先通过 `UIFontMetrics` 得到 `scaledFont`，令 `desiredLineHeight=scaledFont.pointSize × m`，再应用 `.lineSpacing(max(0, desiredLineHeight-scaledFont.lineHeight))`。自然行高超过目标时不压缩，且 lineSpacing 不等于强设首尾行盒高度。`Text.fcFont` 只缩放字体，不加行间距，也不响应局部 Dynamic Type override。来源：`ios/FineCoachApp/DesignSystem/Typography.swift:211–226`、`:244–257`；S0-FR-051/052；负责人 2026-11-03 要求对齐既有实现，精确行盒差异见 §15.5。
+- **Compose 处理边界**：`TextStyle.lineHeight` 表达总行高；`PlatformTextStyle(includeFontPadding=false)` 可去除平台额外字体 padding，`LineHeightStyle.Alignment` 控制剩余空间分配，`LineHeightStyle.Trim` 控制首尾额外空间，Trim 需配合 `includeFontPadding=false`。这些 API 已由 [官方段落排版文档](https://developer.android.com/develop/ui/compose/text/style-paragraph)核对（2026-11-05）；不能仅套 `(s × m).sp` 就宣称重现 iOS 的自然行高下限和首尾行盒。本轮未指定 Alignment/Trim 组合，亦未将 includeFontPadding 策略标为已完成 parity；见 §15.5。对齐依据同上 iOS `:218–226`、`:244–257`，S0-FR-051/052、负责人 2026-11-03；API 机制不是额外的负责人设计决定。
+- **Android 单行行盒（S1-D40 R1，负责人 2026-11-10）**：实测本技术栈（Compose BOM 2026.09 / ui-text 1.12.1，随包 Noto Sans SC VF）单行 Text 的布局高度固定为字体自然行盒 ≈1.45em，`lineHeight`、`LineHeightStyle`、`includeFontPadding=false` 都压不到 token 值。因此由设计系统 `FcText`（`android/.../designsystem/FcText.kt`）统一处理：单行文字的布局高度 = 字号 × §3 倍率，自然行盒在其中垂直居中，上下等量溢出、不裁剪；多行文字保持自然布局。页面只用 `FcText`，不自行用 `offset` 或改小间距补偿；G3 `rawText` / `offset` 白名单扫描守住（R5）。平台输入框（`BasicTextField`）在调用方修饰符之外保持自然单行最小高度，编辑框按中心对齐、比对按中心判定（S1-D42）。比对器把画稿文字框以中心换算到 token 行高后判 x/y/w/h（R2）。
+  下伸部和大号数字的墨迹可以超出 token 行盒，与 CSS 模型一致，最多为（自然 − token）/2；会裁剪的容器（`clipToBounds`、滚动视口边缘）要给文字留出这部分空间，不能把它当作可裁掉的区域（S1-D42）。
+- **letterSpacing**：全部文本样式显式对应 `letterSpacing=0.sp`，不继承 Material typography 的非零默认字距，不把倍率或字重当字距。iOS 没有额外 tracking/kerning，使用默认 0。来源：本 README §3.1；`ios/FineCoachApp/DesignSystem/Typography.swift:230–234`；S0-FR-051/052；负责人 2026-11-03 沿用既有排版。
+
+### 15.3 随包字体与 weight
+
+复用 [NotoSansSC-VF.otf](../../ios/FineCoachApp/Resources/Fonts/NotoSansSC-VF.otf) 和 [OFL.txt](../../ios/FineCoachApp/Resources/Fonts/OFL.txt)，完整字表、不裁剪、不下载字体。所有字重都来自同一个 variable font 文件，不存在四份静态字重文件；字体与许可的 Android 落地由 T013 核实，不在 T012 复制资产。来源：本 README §3.1/§7.2；`ios/FineCoachApp/DesignSystem/Typography.swift:8–25`、`:35–54`；ADR-001 §7.2、S0-FR-052、D05/D14（负责人 2026-11-03；原完整可变字体决定 2026-09-22）。
+
+| 表中 weight | 字体文件与轴值 | Compose 匹配含义 |
+|---|---|---|
+| 400 Regular | `NotoSansSC-VF.otf`，`wght=400` | `FontWeight.Normal`；字体实例显式配置相同轴值 |
+| 500 Medium | 同文件，`wght=500` | `FontWeight.Medium`；同上 |
+| 600 SemiBold | 同文件，`wght=600` | `FontWeight.SemiBold`；600 没有 named instance，仍使用 variable axis 插值 |
+| 700 Bold | 同文件，`wght=700` | `FontWeight.Bold`；字体实例显式配置相同轴值 |
+
+上表逐行来源：`ios/FineCoachApp/DesignSystem/Typography.swift:8–17`、`:35–54`、`:116–151`；`ios/FineCoachTests/DesignSystem/TypographyHarnessTests.swift:29–50` 明确检查四档轴值；S0-FR-051/052、D05/D14，负责人 2026-11-03。Compose 可用 `FontVariation.Settings(FontVariation.weight(w))` 配置同一资源的各个 weight 实例，见 [官方字体文档](https://developer.android.com/develop/ui/compose/text/fonts)（2026-11-05 核对）；不能只声明 `fontWeight` 后假定已命中轴值。
+
+缺少静态 600 不是缺失字重，不能以 500/700 或合成粗体替代；缺资产、加载失败、缺字或不能得到要求轴值时，记录验证失败/待核实，不改用系统字体、不偷偷取最近字重。iOS 的注册失败 fallback 与本规则有差异，见 §15.5。默认字重和允许变体仅取 §3 表：`callout` 400/600、`compact` 选中/今天 600；`title` 的 700 和 `caption` 的 600 分别复用已具名 `titleEmphasis`、`sectionLabel`，不另增样式。来源：`Typography.swift:67–81`、`:164–174`、`TypographyHarnessTests.swift:67–99`（完整路径同上）；S0-FR-051、D05/D14，负责人 2026-11-03。正文与 `‹ › ✓` 都遵循此随包规则；本节不决定其他符号的 Android 资产。
+
+### 15.4 capsule
+
+`radius.capsule` 是随实际尺寸计算的 shape，不生成固定 dp 常量或巨大半径。Android 可用 `RoundedCornerShape(percent=50)`：半径取较短边的 50%，水平胶囊宽≥高时即高度/2；随内容增高后重新按实际尺寸计算。其余 §5 数值圆角照 §15.1 生成 dp。来源：`ios/FineCoachApp/DesignSystem/Tokens.swift:79–90`（iOS 使用 `Capsule()`）；本 README §5；S0-FR-051/052；负责人 2026-11-03；[Compose shape API](https://developer.android.com/reference/kotlin/androidx/compose/foundation/shape/package-summary)（2026-11-05 核对）。不以 `VisionHarnessTests.testRadiusTokenValues` 当作 capsule 运行验证，该方法只断言五个固定半径（`ios/FineCoachTests/DesignSystem/VisionHarnessTests.swift:111–119`）。
+
+### 15.5 待核实
+
+| 项目 | 已知证据与边界 | 后续处理 |
+|---|---|---|
+| 精确行盒、自然行高下限与首尾留白 | iOS `View.fcFont` 用非负 lineSpacing，`Text.fcFont` 不加行间距；S0-FR-051 要求行高 parity，但 `TypographyHarnessTests.swift:93–99` 只验证倍率等元数据，没有渲染行盒证据。当前没有获批的 Compose Alignment/Trim/includeFontPadding 组合；名义 sp 乘积不证明同样结果。 | T013 对所用字体/Compose 版本核实单行、多行及 fontScale 下的自然 metrics 和首尾行为；记录 G1 的可证明范围。需要偏离 iOS/批准设计的策略由负责人裁决，不改 iOS 或降低断言。未核实前不宣称精确行高 parity。 |
+| 行盒两端差异（iOS 延后） | Android 已按 §15.2「Android 单行行盒」统一（S1-D40）；iOS 仍按字体自然行高排版、间距手工调过，没有采用同一规则。两端可能剩 2～4dp 纵向差距，属已知两端差异。 | 负责人 2026-11-10：先做 Android，iOS 记录在案；Android 移植完成后择机在 iOS 文字组件内统一行盒（如 `NSParagraphStyle` 最小/最大行高 + `baselineOffset`）。在此之前不改 iOS 产品代码。 |
+| 字体失败路径不一致 | iOS `Typography.swift:40–43` 在注册失败时使用系统字体，但 iOS harness `:20–50` 将注册/轴值失败判失败；D05/D14 已定 Android 随包字体，系统字体不是候选。 | 不照搬 fallback、不修改 iOS；T013 验证实际资源加载、四档轴值和 `‹ › ✓` 覆盖，失败明确报告；若要改变故障行为，交负责人单独裁决。 |
+| 局部缩放适配边界 | S0 没有统一 clamp 清单；components 的 `DS-SET-ROW` 单行数值最小缩放 0.8 等是组件规则，不等于全局 fontScale 上限。UIKit scalingBase 与 Android 非线性 sp 不存在已批准逐档等价表。 | 按后续获批组件逐项映射；不为 T013 发明上限或重建 UIKit 曲线。 |
+| 来源文件旧措辞 | ADR-001 §7.2 仍写中间格式待定，plan §3.3 仍保留「若 D02 选 JSON」分支；S0 spec D02/D05/D14 已于 2026-11-03 定案。 | 本轮遵循直接 README→Kotlin 与随包字体；来源 owner 跟踪历史文字同步，不重开决定，不修改只读规格。 |
+| 独立复核 | T012 要求 cursor-agent 对照 iOS token 测试复核；本轮仅 Codex 文档与静态来源核对。 | 待 cursor-agent 独立复核，不把本轮 readback 当作该复核或 G1/G5 通过。 |
+
+### 15.6 Android 平台设计结论回写（AD-07，2026-11-10）
+
+本节为 C 类文档回填，目标设计不变、不修改任何 token 数值。AD-01、AD-02、AD-03 的负责人批准记录、画板名称及日期以 `components.md` §5 为唯一记录；本节引用已批准结论，不重复记批准。三块画板的 2 倍 PNG 已入库（2026-11-10，负责人导出），路径/摘要、35 项逐行对照与未接入项见 [T031](../../android/docs/s0/T031.md)。
+
+| 来源 | 当前适用规则 | 替代的旧表述 / 保留边界 |
+|---|---|---|
+| AD-01 / D12 | SF Symbols → 按需 Material Symbols vector drawable，附 Apache 2.0 LICENSE/NOTICE；标题栏 weight 300、状态/保存 400–600、± ▾ 600。实际 drawable 与 provenance、35 项逐行状态见 `components.md` §5 AD-07 引用 | 不再待选图标引入方式；不引图标库。`‹ › ✓` 保留随包 Noto Sans SC，来源不变 |
+| AD-02 | 日期点值行后在行下页内展开、再点收起，不用日期弹窗；时间用 M3 时间弹窗，24h 表盘，左下键盘图标切换直接输入；重复截止日早于开始日期的日子灰显 `text.disabled`；选中 `action.primary` 底白字，今天 1pt 圆环，`radius.lg`，星期从「日」开始 | 替代快进阶段的通用 M3 DatePickerDialog 目标；不以旧 catalog 样例反向定义设计。日期值行复用 DS-LABEL-VALUE-ROW，不新增 DS ID |
+| AD-03 | 复用 DS-BOTTOM-SHEET 和 DS-ACTION-ROW；当前分区行尾 ✓（15/600、action.primary）；选项纯文字、不加 folder 图标；点遮罩或下拉取消 | 不再待定选项样式；folder 仍可用于训练页「移入分区」左滑入口，面板选项内不用 |
+| D07 | 负责人批准基础子集；当前 31 个已实现 ID 的真实类型/状态/不变量及 S2/S4 两项延期以 `components.md` §8.1–8.2 为准 | 初始 22 个基础 ID 与 11 项延期是历史范围；恢复第 3 步已将 S1 项提升，不继续作为当前延期 |
+| D09 | 负责人批准按 ADR A/B 处理、经 Penpot 审；系统壳使用安全 Insets、系统返回与 DS-PAGE-HEADER 的 ‹ 共用 callback，详见 `components.md` §8.4 | 不把 roadmap 旧 C 分类写成已批准；真实系统栏与手势效果仍需核实，不新增自动结束/删除行为 |
+
+三块批准画板导出已按摘要核验入库；文档回写、导出核验与自动测试不等于 Android 运行时视觉验收。

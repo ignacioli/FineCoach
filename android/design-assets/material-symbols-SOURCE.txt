@@ -1,0 +1,3 @@
+source: https://github.com/google/material-design-icons @ 10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7
+S0 step3: outlined variable font; _filled filenames use FILL=1; source paths recorded per icon in provenance.
+Review cleanup: current inventory is 19 SVG/vector pairs. Superseded filter_list.svg/ic_ms_filter_list.xml and info.svg/ic_ms_info.xml removed after confirming zero code references; their hashes are excluded from current SHA256SUMS/provenance.

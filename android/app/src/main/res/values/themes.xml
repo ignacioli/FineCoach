@@ -1,0 +1,9 @@
+<resources>
+    <!-- DS-LAUNCH C31 / S1-D: white system launch and no icon, text or animation. -->
+    <style name="Theme.FineCoach" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowSplashScreenBackground">@android:color/white</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/launch_blank</item>
+        <item name="android:windowSplashScreenAnimationDuration">0</item>
+    </style>
+</resources>

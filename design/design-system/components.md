@@ -113,6 +113,24 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 - 修改数据的操作必须有可见的入口，不能只能通过 `.contextMenu` 或长按触发（`CLAUDE.md`）。
 - 装饰性部件（图标、头像、徽标）对无障碍隐藏，由旁边的文字或所在行承担可访问名称。
 
+### 2.1 页面纵向组合间距 `DS-PAGE-FLOW`（2026-11-12，S1-D53）
+
+组件 anatomy 只规定组件内部；页面上组件**之间**的距离由本条规定。设计稿和两端实现都按它摆放，不手工估距离。依据：iOS 现有页面的写法（`ios/FineCoachApp/Features` 中块间 `space.4` 47 处、标签→内容 `space.2` 42 处、水平 `space.4` 70 处、底部 `space.6` 34 处），以及 D2b 动作库首屏实测（S1-D51、S1-D52）。
+
+| 关系 | 间距 | 说明 |
+|---|---|---|
+| 页面水平边距 | `space.4` | 列表、输入框、区段都在左右 16 内。横向滚动的 chip 行例外：贯穿屏幕，首尾内容内边距 `space.4`（S1-D50） |
+| 页头 → 第一个内容块 | `space.4` | 二级页：Android 页头紧贴状态栏下方（S1-D50）；iOS 页头位置见 §4.7 `DS-PAGE-HEADER`。一级页（隐藏系统导航栏）：状态栏 → 标题行上方另留 `space.4`，见 §4.6 `DS-PAGE-PRIMARY`（S1-D72） |
+| 内容块 ↔ 内容块 | `space.4` | 搜索行、筛选 chip 行、区段（分组）、卡片之间；区段与区段之间也是 `space.4` |
+| 区段标签 → 该区段内容 | `space.2` | `DS-SECTION` 标签与其下方的列表或卡片 |
+| 同一行内并排控件 | `space.2` | 如搜索框与筛选按钮、chip 与 chip |
+| 内容末尾 → 可滚动页面底边 | `space.6` | 底部留白 |
+
+- **范围**：列表行内部的上下内边距和分割线属于 `DS-LIST-ROW` 等组件 anatomy，不在本条。
+- **例外**：某页需要别的值时，写进该页的组合说明或对应组件 anatomy 并登记决策，不在设计稿或实现里单独改。已知例外：动作库筛选面板里标签→选项用 `space.3`（iOS `ExerciseLibraryView` 筛选 sheet）。
+- **设计稿冲突**：画板与本条不一致时，按 S1-D49 先改画板，再比对实现；实现不去贴合画板上手工摆的距离。
+- **检查**：Android 由各屏 conformance gate 的几何比对覆盖（±2dp）；iOS 不另加检查。
+
 ## 3. 组件索引
 
 「消费者」由 `grep` 统计（2026-10-05，`ios/FineCoachApp/Features` 与 `App`），只用于评估影响范围，不代表这些页面已经通过视觉验收。`ComponentCatalogTests` 校验：本表「代码」列与 `DesignSystem/` 中的公开类型逐一对应。
@@ -185,7 +203,8 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 
 #### `DS-SEGMENTED` 顶部分段切换
 
-- **部件**：横向排列的选项，间距 `space.2`。选中项：50×32 胶囊、`action.primary` 底、`headline` 白字；未选中项：纯文字 `body` `text.secondary`，无底色。
+- **部件**：横向排列的选项框，框与框间距 `space.2`。每个选项框最小 50×32，选中与未选中同尺寸；文字在自己的框内水平、垂直居中（按 token 行盒，README §15.5）。选中项：框即胶囊，`action.primary` 底、`headline` 白字；未选中项：纯文字 `body` `text.secondary`，无底色。
+- **位置**：作为一级页顶部切换时，第一个选项框左缘对齐页边距 `space.4`，胶囊不得越出页边距（2026-11-12 S1-D70：画板曾把胶囊放在 x=8、文字偏下 3pt，已按本条改正；iOS `FCSegmentedSwitch` 本就如此）。
 - **状态**：选中项带 `.isSelected` 无障碍属性。
 - **不变量**：点击区 ≥ 44（自动）；同时只有一个选中项（类型保证：`selection` 是单个 ID）。
 - **用途**：一级页顶部「今日 / 学员」；页内 2–4 段（C26）的互斥短选项（37「扣减 / 返还」、趋势指标、身体数据录入单位），通常放在 `DS-LABEL-VALUE-ROW` 的值 slot（README §10 C11）。
@@ -199,6 +218,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
   - `FCBodyPartChip`：高 28、最小宽 48、水平内边距 `space.4`；`FCBodyPartPicker` 按 `BodyPart.allCases` 的 spec 顺序排出 8 个，通过 `FCFlowLayout` 自动换行。
 - **状态**：未选中 `surface.selected` 底 + `text.primary` 字；选中 `action.primary` 底 + `action.on` 字，并带 `.isSelected` 属性。
 - **不变量**：视觉高度保持 28/30，点击区补足到 ≥ 44（自动）；`FCBodyPartPicker` 胶囊之间的视觉行距为 8，通过负的布局行距抵消 44pt 点击区（`space.2 - (44 - 28)`，可自动）；部位顺序与 spec 一致（可自动）。
+- **Android（S1-D50）**：非 body `FcFilterChip` 的 layout 与 visual 均为文字宽 + 2×`space.3`、高30；删除44dp最小布局约束，Compose minimum touch-target 向外扩展，点击目标≥44且不占布局空间。横向部位筛选 row 贯穿屏幕，首尾 content padding 为 `space.4`；body variant 保留既有布局。
 - **可访问性标识扩展**：`FCBodyPartPicker` 可选接收 `BodyPart -> String` identifier factory，默认 `nil`；非 `nil` 时将结果赋给对应的真实 `FCBodyPartChip` Button，`nil` 时不设置 identifier。该扩展只增加自动化定位能力，不改变视觉、布局或默认消费者行为。
 - **复用边界**：多选与单选共用同一套外观；是单选还是多选由调用方的绑定决定。不要新造第三种胶囊尺寸；确实需要时按「扩展」流程处理。
 
@@ -226,6 +246,10 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 - **不变量**：不在白底上使用无边界的输入框（O3，人工）；可访问名称等于占位标题（可自动）。
 - **复用边界**：输入框外面没有单独的标签行。需要「标签 + 值」两栏时，使用 `DS-LABEL-VALUE-ROW`，并在值 slot 放一个无底色的 `TextField`（例如 02 / 27 画板），而不是嵌入 `FCTextField`。
 
+Android P7 总结页 D 类修复例外：按 `progress-milestones/screens/D-b-session-gains.png`，备注使用框外可见标签 → 多行输入区，标签与框间距 `space.2`。`FcTextField` 可关闭单行和占位文字，输入区顶部对齐，调用方以 `space.8 × 2 + space.6` 指定最小高（88）；保留原有底色、圆角、水平内边距及可访问名称。既有消费者默认单行和占位行为不变；不修改批准的设计。
+
+P7 15/36/37 D 类修复：37 原因复用上述多行最小高；15 cardio 与 36 名称复用标签-值行，值 slot 的 `FcTextField(inline = true)` 去除填充底色和内边距，保留可编辑、最小触控高与可访问名称。默认 `inline = false`，不改变 P4 或其他消费者。15 值列依次为可编辑值、单位（距离 km、速度 km/h）、必填/选填；行宽由 `FcLabelValueRow` 持有，输入填满值列剩余宽度，时长可访问名沿用 iOS 灵活格式文案。15 属训练页内联 editor，继续使用既有确认/保存操作，不新增独立页面。
+
 ### 4.3 列表类
 
 #### `DS-LIST-ROW` 列表行与分割线
@@ -247,12 +271,16 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 
 #### `DS-LABEL-VALUE-ROW` 标签-值两栏行
 
+- **P7 D 类修复（2026-11-13）**：Android 显式 `trailingControl` 变体用于 33/36/37 的 Stepper、Toggle、Segmented：标签使用 `text.primary`，保留自然宽度，控件右对齐，行最小高沿用 52；普通值列仍为 96 宽标签、左对齐，不改变 P4。
+
 - **部件**：标签列（`callout` 400 `text.secondary`，宽 96，因此值从 x=112 开始）→ 值 slot（左对齐，任意视图）→ 可选 `›`。最小高 52；行与行之间由调用方插入 `FCListRowDivider`。
 - **变体**：纯文字值（`FCLabelValueText`，`body` `text.primary`，整行合并为一个无障碍元素）；视图值（开关、日期、文字 + 尾部元素，子元素各自保持可访问）；带 `action` 时整行可点并显示 `›`；放在 `Menu` 的 label 里时可以只显示 `›`。
 - **不变量**：标签列宽固定，值列对齐（人工，23/27）；带 action 的行显示 `›`（可自动）。
 - **复用边界**：见 CG-5。CoursePackageEditor、ManualCreditAdjustment 还有各自私有的 `editorRow`。
 
 #### `DS-ACTION-ROW` 操作行
+
+- **P7 D 类修复（2026-11-13）**：无副标题且有说明时，标题保留自然宽度、不截断，说明占剩余宽度、右对齐、最多两行；移除 Android 说明固定最大 96 宽的限制。
 
 - **部件**：标题（无副标题时为 `body`，有副标题时为 `headline`）→ 可选副标题（`caption` `text.secondary`）→ 弹性空白 → 可选说明（`caption` `text.secondary`）→ `›`（仅普通操作行）。最小高 52；有副标题时上下内边距 `space.3`。
 - **变体**：`normal`；`destructive`（`status.destructive` 字、**没有** `›`）；禁用（文字和 `›` 都改为 `text.disabled`）。destructive 行暂不可用时用禁用变体，并在说明 slot 写原因，整行不可点（B-c「删除指标」，2026-10-16 已批准）。
@@ -288,6 +316,8 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 - **部件**：拖动条（36×5 `surface.divider` 胶囊，居中，距顶 `space.2`，对无障碍隐藏）→ 可选标题区：标题（`headline` 或 `title`，带 header 属性）+ 副标题（`callout` 400 `text.secondary`）+ 可选尾部 accessory（如 18 画板的状态文字）→ 内容（通常是 `FCActionRow` 与分割线）。白底、顶部两角 `radius.lg`、水平内边距 `space.4`、底部 `space.6`。
 - **呈现**：必须用 `View.fcBottomSheet(isPresented:)`，由它绘制 `overlay.scrim`；不要用系统 `.sheet`，因为它的遮罩颜色不在色板内。点击遮罩、向下拖超过 80pt 或无障碍 escape 都会关闭面板。
 - **不变量**：遮罩颜色为 `text.primary` 40%（自动：Vision）；面板带 `.isModal` 属性（可自动）。
+
+- **添加动作面板组合（S1-D60，DS-PAGE-FLOW panel exception）**：grabber 顶 `space.2`；grabber→title→content 各 `space.4`；tabs→list `space.3`；search→chips→最近练过各 `space.2`；最近练过 block 底 `space.2`，另由外层 flow 提供 `space.2`；sections 间 `space.4`；水平 `space.4`，chips edge-to-edge 且首尾 content padding `space.4`；底部 `space.6`。tabs 复用非 body `FcFilterChip`，动作行复用 C′2b（70dp pitch）。移除 picker 普通动作行和内缩 chips 的旧组合；不新增样式或排序规则。来源：批准 C2b-B、iOS addExerciseSheet / QuickCreateExerciseFlow / FCBottomSheet；Android 按 S1-D63 使用 `min(FcComponentMetrics.addExerciseSheetHeight = 544dp, available height)`，内容在面板内滚动；移除不固定面板高度的旧规则，以匹配批准画板并将完整列表置于 fold 下；其他面板高度规则不变。
 
 #### `DS-CONFIRM-DIALOG` 确认弹窗
 
@@ -342,7 +372,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 
 | ID | anatomy | 画板 | 当前实现 |
 |---|---|---|---|
-| `DS-PAGE-PRIMARY` 一级页 | 顶部 `FCSegmentedSwitch`（今日 / 学员）→ 标题行：`display` 大标题（`action.primary`）+ 右侧 `DS-TITLE-ACTION` → 内容；隐藏系统导航栏。**查看模式变体**（M2，2026-10-09 G7 批准）：没有顶部分段切换，标题行只有设置齿轮，其余相同 | 01/21/40/41；M2-11 | Today、StudentList 各自拼装 |
+| `DS-PAGE-PRIMARY` 一级页 | 状态栏下方留 `space.4`（iOS `TodayView`/`StudentListView` 页头 `.padding(.top, space4)`，S1-D72）→ 标题行（最小高 44，标题在行内垂直居中）：`display` 大标题（`action.primary`）+ 右侧 `DS-TITLE-ACTION` → `space.1` →（今日页）日期行 `callout` `text.secondary` → `space.4` → `FCSegmentedSwitch`（今日 / 学员）→ `space.4` → 内容（顺序以画板 01/21/40/41 与 iOS `TodayView` 为准，2026-11-12 S1-D70 更正）；隐藏系统导航栏。**查看模式变体**（M2，2026-10-09 G7 批准）：没有顶部分段切换，标题行只有设置齿轮，其余相同 | 01/21/40/41；M2-11 | Today、StudentList 各自拼装 |
 | `DS-PAGE-SECONDARY` 二级页 | 隐藏系统导航栏（`.fcSecondaryPage()`，同时保持边缘右滑返回可用）→ 由 `fcSecondaryPage()` 提供的顶部零高度 `safeAreaInset` 遮盖（`surface.page`，背景延伸至顶部安全区；feature 不再复制遮盖）→ 紧贴状态栏下方的页头：小号 `‹`（22/400 `text.secondary`）与页面内 `titleLarge` 标题在同一行、紧靠标题左侧（标题起点 x=32），整体由 `FCPageHeader` 绘制（带 header 属性）→ 可选副标题（`callout` 400 `text.secondary`）→ 内容 → 可选底部主按钮 | 23/26/28/36/37/38 | 约 20 个 feature 文件各自拼装；页头部分已有共享组件 `FCPageHeader`（§4.7），StudentDetail 已迁移 |
 | `DS-HUB-ROW` 入口行 | 24pt 图标（`action.primary`）→ 标题（`headline`）/ 副标题（`caption` `text.secondary`）→ `›`；最小高 64，间距 `space.4` | 19/42/43 | 已提升为共享组件 `FCHubRow`（M2 T002/T010，2026-10-10）；ResourceHub、Settings 已迁移，规格见 §4.7 |
 | `DS-INLINE-RESULT` 就地结果 | 22×22 `FCStatusBadge` → 标题（`callout` 600；失败为 `status.destructive`，成功为 `text.primary`）→ 说明（`caption` `text.secondary`）→ 失败时显示居中「重试」`FCLinkButton` | 38/39 | 已提升为共享组件 `FCInlineResult`（M2 T003/T011，2026-10-10）；BackupRestoreFlow 已迁移，规格见 §4.7 |
@@ -353,6 +383,10 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 
 ### 4.7 已定稿规格（M2 Phase 0，T001–T012 已实现）
 
+P7 Android D 类容器修复（2026-11-13）：`FcScrollBody` 复用二级页 weighted scroll 正文，末尾保留一个主按钮行高的滚动 inset；`FcPinnedAction` 独立于滚动正文、底部 `space.8`，应用于 04/05/36/37/B-a。移除 36/37 inline CTA、05 零底距及 36 行间额外 `space.2`。D-b 沿用 StudentEditor 页头的 `space.4` bottom padding，移除正文紧贴页头的组合；页头组件默认行为及 P4 不变。
+
+滚动正文与固定主按钮的间隔（2026-11-14，S1-D99，P5+P7 走查 W2）：`FcPinnedAction` 上方留 `space.4`（16）`surface.page` 间隔，滚动视口在间隔上沿结束，内容不会被切成半截压在按钮后面；按钮下方 `space.8` 不变。调度者根据第 1 轮核心屏门禁失败的诊断：间隔属于滚动正文与整个固定 footer 的边界，P0-a2 既有休息条到结束训练的 `space.3` 不变。训练页通过 `above` slot 将 `restSlot`、`RestTimerView` 放在同一 footer 内，间隔在首个可见 footer 元素上方，休息条到结束训练仍为 `space.3`（12）；休息条隐藏或 slot 为空不增加额外间隔。适用于所有「`FcScrollBody` + `FcPinnedAction`」页面：04 / 05 / 36 / 37 / B-a / 训练页。Penpot 说明在「04 课包详情」画板下方（画板本身不变）。
+
 状态：**已审定**（2026-10-08 起草，2026-10-09 随 M2 G7 设计载体 review 通过；来源 `design/m2-hifi/implementation-map.md` §2）。已在 M2 tasks Phase 0 实现（2026-10-10），对应行已进入 §3 索引（`ComponentCatalogTests` 要求索引与 `DesignSystem/` 公开类型一一对应）。人工项（标「人工」的不变量）尚未经人工视觉检查。
 
 #### `DS-PAGE-HEADER` 二级页页头（新增共享，CG-8）
@@ -362,6 +396,7 @@ Agent 负责分类、影响分析和整理证据；人类主要负责审阅新�
 - **部件**：可选内联返回 `‹`（`back:`，22/400 `text.secondary`，Noto Sans SC 字形 `FCSymbol(.pageBack)`；与标题首行基线对齐，布局宽 16，所以标题从 x=32 开始，实测 M2-02a/02b/03、M1 26/36 的 PNG：`‹` 墨迹 x 17–21.5、y 74–82.5，标题墨迹 x 32.5–33、y 58；点击区 44×44 以 overlay 方式覆盖在字形周围，不占布局；无障碍名称「返回」（`common.back`），标识由调用方传入；`handler` 为空时执行 `dismiss`，流程内的「上一步」传自己的 handler）。调用页用 `.fcSecondaryPage(swipeBackEnabled:)` 隐藏系统导航栏并保持（或在流程步骤页关闭）边缘右滑返回——系统导航栏隐藏后 `interactivePopGestureRecognizer` 会拒绝开始，所以该修饰符换上自己的 delegate（有上一页即允许），页面消失时恢复。无标题（`title: ""`）时只画返回与尾部操作（29 分享预览）→ 页面内标题（默认 `titleLarge`，训练中页用 `titleEmphasis`；`text.primary`，带 `.isHeader`）→ 可选副标题（`callout` 400 `text.secondary`，与标题间距 `space.2`）→ 可选尾部操作（与标题首行同一行右侧，`callout` 600 `action.primary` 文字按钮，例如 26「编辑资料」）。
 - **状态**：只有静态内容；尾部操作可禁用（`text.disabled`）。
 - **不变量**：标题带 header 无障碍属性（可自动）；尾部操作点击区 ≥ 44（可自动：`TouchTargetComponentTests` 扩展）；标题与副标题随动态字体换行，不截断（人工，组件引入时看一次）；尾部操作存在时标题宽度让出操作文字，标题换行而不是与操作重叠（人工）。
+- **Android 页头位置（S1-D50）**：`FcPageHeader` 直接位于状态栏下方，无顶部 `space.2` padding；Insets 由 shell 消费一次。以下 iOS 历史位置决定不变。
 - **页头位置**：页头行盒顶 = 安全区顶 + `space.2`（8pt，`FCPageHeader` 自带上边距），不伸进状态栏。画稿标题墨迹顶 y=58（行盒顶约 y=52，落在状态栏安全区内），这是画稿绘制时状态栏占位不准，不是设计意图；以实现为准（产品负责人 2026-10-10 授权由实施方定）。理由：①iOS 惯例，状态栏下方留白，不与状态栏争视觉；②44×44 返回点击区以 22pt 字形为中心向上延伸约 11pt，留白后不与状态栏触控区（点按回到顶部）重叠；③全部二级页统一一个值，灵动岛 / 非灵动岛机型都相对安全区计算。
 - **复用边界**：所有二级页页头都用它；一级页（今日、学员、查看模式首页）不用，见 `DS-PAGE-PRIMARY`。35 训练记录详情与 M2-13 原先把「训练记录」放在导航栏 inline 标题，2026-10-23 起同样使用本组件（README §10 C18），页面内日期与训练标题在页头之下。
 - **迁移范围**：M2 新页面全部使用；2026-10-10 产品负责人走查发现系统导航栏的返回按钮（iOS 26 液态玻璃大圆钮）单独占一行、标题被挤到下一行，与画稿不符，所有 `titleLarge` 二级页（动作库、设置、资料库、日历、课包、课时调整、预约编辑、学员编辑 / 详情 / 已归档、趋势、训练历史、模板、备份、身体数据、分享报告 2 页、M2 导出流程）统一迁移到 `FCPageHeader` + `.fcSecondaryPage()`。训练中（`ActiveSessionView`，11/30）同样改为内联返回，标题保持 22/700（`titleStyle: .titleEmphasis`，产品负责人 2026-10-10：返回方式全 App 一致，以后发现不一致直接改）。仍使用系统导航栏的只有标题放在导航栏的页面（返回与居中标题同一行）。35 与 M2-13 原属此类，2026-10-23 起也迁移到本组件（README §10 C18）；2026-10-23 导航排查后第一批迁移：编辑训练重点、编辑模板、自定义动作（返回标识 `customExercise.back`）、记录指标（原有自定义指标的「…」与页头并排，2026-10-27 起移到页面底部操作行，见 §4.8 左滑操作扩展）。第二批（README §10 C20）：训练总结改为页内页头、无返回；全屏确认流程（结束训练、复核时长、删除动作、归档 / 永久删除学员）不用本组件，统一为页内标题 + 页内「取消」，不挂系统导航栏；无入口的应用模板页删除。此后全 App 不再使用系统导航栏标题。
@@ -489,6 +524,50 @@ C 类，只补规则，默认字号下外观不变：
 
 两条路都会落在 CG-1 / CG-8 的手工拼装代码上；第二条路的跑偏风险最高，因为它会产生「看起来一样、实际各写一份」的第三、第四份行结构。所以在 Phase 0 先把行和页头收进共享组件，M2 页面只做拼装。M2 不涉及的 M1 页面（课包、日历、模板、备份等）不在本轮迁移，以免改动已验收界面却没有收益。
 
+### Android 设计差异登记（AD-01～AD-06，roadmap §4）
+
+编号 AD-01–AD-06 来自 specs 仓 `007-android-port/roadmap.md` §4「Android 设计差异」，登记的是 iOS 画稿表达不了的 Android 平台差异。它与上表 CG 编号、路线图评审门 G1–G7、Android 验收门禁 G0–G8 都不是一回事。功能页面不重画：iOS 已批准画稿直接作为 Android 目标，按 D 类执行（ADR-001 §7.4）。本节保留 roadmap 任务 AD-00 的 delta 登记，并承载 AD-01～03 已批准结论；AD-07 文档回写与资产定位见下文，三块导出已入库，路径/摘要见 screens.md。编号跳过 AD-07：roadmap §6 里 AD-07 已是「同步与导出」任务，所以 App Intents 快捷指令这条新差异（2026-11-03 负责人确认补充）从 AD-08 开始，roadmap §4 现已登记 AD-08。
+
+通用约定：
+
+- 类别按 roadmap §4 抄录，未按 §1.2 重判。AD-01、AD-03 保持 B 类；负责人已于 2026-11-10 批准画板，批准记录见各行，不重复发起设计审批。
+- 画板都画在 Penpot「M1-B G5 Design」的「Android 差异」页，一个 AD 一块；负责人审过后，结论同一轮同步到 README、本文和 Penpot（§1.4、ADR-001 §7.4）。
+- 「新增」只是候选。待画板审过后，在 §4 新增条目；在此之前不分配 `DS-*` ID，也不写代码。
+- 行号为 2026-11-03 核对的 `ios/FineCoachApp` 与 `ios/FineCoachWidgets`，代码移动后以 grep 为准。
+
+| ID | 差异（iOS 现状 → Android 目标） | 设计 delta 类别 | 受影响组件（复用 / 扩展 / 新增） | iOS 证据 | 受影响页面 | 需要的 Penpot 画板 | 状态 |
+|---|---|---|---|---|---|---|---|
+| AD-01 | 图标映射：SF Symbol → Material Symbols。负责人 2026-11-03 定：各平台用自己的系统图标，能找到对应的就用，风格有少量差异可以接受；`‹ › ✓` 仍是随包 Noto Sans SC 字形，两端一致，不在映射内 | B | `DS-SYMBOL`：扩展（`− + ▾` 已按 D12 接入 Material vector drawable，定位见 AD-07 表）；`DS-TITLE-ACTION`、`DS-HUB-ROW`、`DS-STATUS`、`DS-SAVE-STATUS`、`DS-LIST-ROW`、`DS-SET-ROW`、`DS-BOTTOM-SHEET`、`DS-ACTION-ROW`（destructive 图标）：复用，只换字形来源 | `DesignSystem/Components/FCSymbol.swift:40–47, 94`；`FCButton.swift:171, 199`；`FCHubRow.swift:123`；`FCStatusLabel.swift:117`；`FCSaveStatusView.swift:30`；`FCListRow.swift:294`（`star.fill`）；`FCSetRow.swift:255`（`pencil`）；`FCBottomSheet.swift:200`（`trash`）；`Features/ShareReport/ShareReportFlowView.swift:409`、`Features/ArchiveExport/ArchiveExclusionNote.swift:13`（`lock.fill`）；`Features/Insights/InsightRowView.swift:71, 135`（`bell.slash`）；`Features/ActiveSession/ActiveSessionView.swift:92, 506, 520, 527, 596`；`FineCoachWidgets/SessionLiveActivity.swift:28, 32`（`timer`）；`App/SystemEntryIntents.swift:46, 49, 52`（快捷指令图标 `calendar`、`figure.strengthtraining.traditional`、`play.circle`，由 AD-08 处理，不在 AD-01 对照板内）。画板 35 项已按宿主逐行转录核对，含 gearshape→settings、calendar→calendar_month；未筛选 SF 名为 line.3.horizontal.decrease.circle→filter_alt；详情与未接入项见 T031，不以源码推测补造映射 | 使用上述组件的全部页面（待核实：未逐页列出） | 是，一块图标对照板（SF Symbol 名 → Material Symbol 名，含尺寸；找不到对应的单独列出） | 已批准（负责人 2026-11-10；Penpot「M1-B G5 Design」→「Android 差异」页「AD-01 图标映射」画板，35 项映射以画板为准；Android 字重沿用已接入实现：标题栏 300，状态与保存 400–600，DS-SYMBOL 的 − + ▾ 600；实现回写 S1-D28：filter_alt（outlined/300，筛选后 FILL=1）、info_i（600）、list_alt（300）、edit/folder/check_circle FILL=1/star FILL=1（400）；± ▾ 600。实现回写见 android/docs/s1/S0-step3-components.md） |
+| AD-02 | 日期和时间选择：iOS `DatePicker`（图形式日历、时分滚轮）→ Material 3 选择器，用设计系统 token 着色 | B | 无现有组件：选择器本身是系统控件，`DS-*` 索引里没有对应项；展开行复用 `DS-LABEL-VALUE-ROW`（见 CG-5 的 `editorRow`），颜色用 `DS-BASE` token。批准选择器规则见本行及 README §15.6；不新建 DS ID | `Features/CoursePackages/CoursePackageEditorView.swift:161, 183`（`displayedComponents: .date`，图形式）；`Features/Appointments/AppointmentEditorView.swift:472, 485, 681`（日期、时间、重复截止日） | `SCR-PACKAGE-EDIT`、`SCR-APPOINTMENT-NEW`（`SCR-APPOINTMENT-EDIT-SCOPE` 同一视图文件，待核实是否含选择器） | 是 | 已批准（负责人 2026-11-10；「AD-02 日期和时间选择」画板：日期在行下页内展开、再点收起，不用 M3 弹窗；时间用 M3 时间选择弹窗，24 小时表盘，左下键盘图标切换直接输入；重复截止日早于开始日期的日子灰显 text.disabled；选中 action.primary 底白字，今天 1pt 圆环，圆角 radius.lg 16，星期从「日」开始） |
+| AD-03 | 操作面板：iOS `.confirmationDialog`（动作移入分区选择）→ 现有 `DS-BOTTOM-SHEET` | B | `DS-BOTTOM-SHEET`：复用（批准选项为纯文字与行尾 ✓，不加 folder 图标）；`DS-ACTION-ROW`：复用；`DS-CONFIRM-DIALOG` 不受影响（已是自绘组件，不用系统 `.confirmationDialog`） | `Features/ActiveSession/ActiveSessionView.swift:249`；`Features/Templates/TemplateEditorView.swift:272`（两处都是「移入分区」选择） | `SCR-SESSION-SECTION`、`SCR-TEMPLATE-SECTION`（均为「iOS 现有实现 + 组件规格」，无画稿） | 是 | 已批准（负责人 2026-11-10；「AD-03 操作面板」画板：当前所在分区行尾显示 ✓（15/600 action.primary）；选项行纯文字，不加 folder 图标；点遮罩或下拉即取消） |
+| AD-04 | 应用图标：iOS 单张 1024 方图（light / dark / tinted）→ Android 自适应图标的前景、背景、单色层 | B | 无现有组件：应用图标是资产（README §9.2），不是 `DS-*` 组件；前景、背景、单色层的拆法属于新增资产规格，已写入 README §9.2 | `design/design-system/assets/app-icon-{light,dark,tinted}.png`；`ios/FineCoachApp/Resources/Assets.xcassets/AppIcon.appiconset/Contents.json` | 无 `screens.md` 行（图标不属于页面）；README §9.2 | 是（阶段 D 另需一块新画板；现有画板不改） | 已定，未实施（负责人 2026-11-10 讨论后逐项决定，规格见 README §9.2「Android 自适应图标」）。① 构图：「D，R-03 前先用 B」——阶段 B 为背景层纯色、原图缩到 72dp 放前景层；阶段 D 为 Android 专用构图（透明底前景，道具收进中心 66dp 圆内），由负责人出图，新画板审过后替换 B，时点为「上架 Google Play 之前」。② 单色层：「R-03 前不提供单色层，推后到 D 出图时决定」。③ 「Android 只用 light 版，dark 与 tinted 不用」。④ 资产清单与分工：「同意」（五档密度 PNG 由脚本从 `design/` 母版生成；minSdk 31，不做旧版回退图与 `roundIcon`）。此前记录：负责人同日先对画板答复「通过」后撤回，原因是方形图标转自适应图标需要慎重考虑。现有画板方案 B 的说明「圆形遮罩只裁掉四角的米色底」不准确，以 README §9.2 为准。R-03 侧载前须完成阶段 B 的实施） |
+| AD-05 | 小组件：Android 小组件尺寸与 iOS 不同，F-a 画稿按 Android 尺寸重排；隐私规则不变（README §10 C28） | B | 无现有组件：小组件是 feature 专有 `SE-*`（anatomy 见 `design/system-entry/implementation-map.md` §2，README §1.13），不在 §3 索引。是否提升为共享组件：不在此判断 | `FineCoachWidgets/TodayWidget.swift`；`FineCoachWidgets/FineCoachWidgetsBundle.swift` | `SCR-WIDGET-LOCK-RECT`、`SCR-WIDGET-LOCK-INLINE`、`SCR-WIDGET-STANDBY`、`SCR-WIDGET-HOME-SMALL`、`SCR-WIDGET-HOME-MEDIUM`、`SCR-WIDGET-STATE-EMPTY`、`SCR-WIDGET-STATE-FINISHED`、`SCR-WIDGET-STATE-PLACEHOLDER`（iOS 形态；Android 形态待画板确认哪些适用） | 是 | 待画板（S5 前） |
+| AD-06 | Live Activity 对应物：Android 持续通知或 Android 16 Live Updates（ADR-001 Q5，S5 再定） | A | 无现有组件：Live Activity 是 feature 专有 `SE-ACTIVITY`（`design/system-entry/implementation-map.md` §2），不在 §3 索引。Android 形态未决，不替负责人选 | `FineCoachWidgets/SessionLiveActivity.swift`（含 `timer` 图标 :28, :32） | `SCR-LIVE-ACTIVITY-LOCK`、`SCR-LIVE-ACTIVITY-ISLAND-MINIMAL`、`SCR-LIVE-ACTIVITY-ISLAND-EXPANDED`、`SCR-LIVE-ACTIVITY-ISLAND-COMPACT`、`SCR-LIVE-ACTIVITY-STATE-UNCONFIRMED`、`SCR-LIVE-ACTIVITY-STATE-TRAINING`、`SCR-LIVE-ACTIVITY-STATE-REST`、`SCR-LIVE-ACTIVITY-STATE-OVERDUE`（iOS 形态，Android 不一定一一对应） | 是 | 待画板（S5 前） |
+| AD-08 | App Intents 快捷指令：iOS App Shortcuts（Siri 与快捷指令 App 里的「今日」「开始训练」「继续训练」三项）→ Android 启动器 App Shortcuts（长按应用图标出现的静态或动态快捷方式）。Google Assistant App Actions 依赖 Assistant 和网络，不在范围内 | B | 无现有组件：快捷方式图标和文案是系统入口资产，不在 §3 索引，`design/system-entry/implementation-map.md` §2 也没有对应 `SE-*`。图标与 AD-01（图标映射）有关联：三个图标在 AD-01 里不含，由本条画板单独定；与 AD-04（自适应图标）有关联：快捷方式图标与应用图标同在启动器出现，两者关系待画板确认。是否登记新的 `SE-*`：待画板审过后决定 | `ios/FineCoachApp/App/SystemEntryIntents.swift:4–55`（`TodayIntent`、`StartTrainingIntent`、`ContinueTrainingIntent`，均 `openAppWhenRun`、`requiresAuthentication`）；`:46, 49, 52`（`AppShortcutsProvider` 中三项及图标）；文案资源 `ios/FineCoachApp/Resources/AppShortcuts.xcstrings` | `SCR-SHORTCUT-TODAY`、`SCR-SHORTCUT-START`、`SCR-SHORTCUT-CONTINUE`（`screens.md` 记为系统界面，未记录独立画板，需求待确认） | 是，一块：长按菜单的三项、图标和文案 | 待画板（S5 前；属于系统入口 S5） |
+| AD-09 | 训练记录组值：iOS lineLimit(1) + minimumScaleFactor(0.8)，缩到 0.8 仍放不下就截断 → Android 先缩到 token 字号的 0.8，再换行；数字与单位、× 与次数各自不拆开，任何字号都不省略、不裁切。负责人 2026-11-12，S1-D86 | D | 会话详情组值格（feature-owned，不新增 DS ID）：复用 callout / caption | ios/FineCoachApp/Features/ShareReport/ShareReportCardView.swift:246–250 | SCR-SESSION-DETAIL | 否（规则差异，无画板） | 已批准（负责人 2026-11-12，S1-D86） |
+
+分类备注：
+
+- AD-04：不是 `DS-*` 组件，§1.3 的复用 / 扩展 / 新增不适用；产物是 README §9.2 的 Android 资产规格。
+
+roadmap §4 的其他差异（系统壳分类以 S0 spec D09 批准结论为准，不沿用旧 C 类表述）：
+
+- 系统栏、全面屏、手势返回：D09 已批准按 ADR A/B，在 Penpot 经负责人审；不能直接当作已批准 C 类。安全 Insets、系统返回与 `DS-PAGE-HEADER` 的 `‹` 共用 callback 的实现合同见 §8.4；真实系统栏/手势效果仍待负责人核实。
+- 字体（C 类，S1 核心页走查）：正文与 `‹ › ✓` 都用随包 Noto Sans SC（ADR-001 §7.2，负责人 2026-11-03 确认），token 数值不变，只是渲染引擎不同；由 L3 走查看一次，不画板。
+- 趋势图（D 类，S3）：Swift Charts → Compose Canvas，目标是现有画稿；iOS 位置 `Features/Trends/TrendLineChart.swift`、`Features/Trends/TrendsView.swift`。
+- 左滑操作（D 类，S1）：Compose 没有现成控件，按本文 §4.8 自绘；iOS 位置见 §4.8，不重新设计。
+  - Android SessionSwipeRow：默认字号 tile 宽保持分区删除 112、移入分区 84、删除 76；大字号宽度取默认宽与单行内容 intrinsic width（含图标、间距及水平 padding）的较大值，reveal 距离跟随实测总宽；删除分区视觉 pill 高 36，外层点击区至少 44（自动：`SessionSwipeRowTests`）。
+
+文件选择、分享面板、通知外观是系统界面，不设计，通知文案与 iOS 一致（roadmap §4 末行）。
+
+### AD-07 资产定位（T031，2026-11-10）
+
+AD-01 的 35 项完整逐行对照、三类状态与名称差异清单见 [T031](../../android/docs/s0/T031.md#AD-01-画板-35-项逐行对照)。权威输入为宿主 `.handoff/design/AD-01-board-rows.md`，来自负责人导出的批准 PNG；此前 19 资产 + 17 源码观察项不是画板范围，已由该 35 行表取代。35 个唯一 SF Symbol 中 18 项已接入且 Material 名称/填充一致，0 项 Material 名称不一致，17 项尚未接入且所属页面不在 S1；18 个独立 drawable 覆盖已接入项（plus 两处用途共用 add）。现有额外资产 grid_view 不在本板，未混入计数。
+
+画板未筛选图标的 SF 名为 `line.3.horizontal.decrease.circle → filter_alt`；现有 provenance.iosSymbol 登记为 `line.3.horizontal.decrease`，这是 SF 别名登记差异，实际 Material 名称/填充一致。`gearshape → settings`、`calendar → calendar_month` 已核对，`chart.xyaxis.line → show_chart` 未接入留 S3。未修改 provenance 或资产，不补造缺失项。D12 继续为按需 SVG→vector drawable + Apache 2.0 署名；来源和许可见 [资产说明](../../android/design-assets/README.md)。
+
+画板「不在本板」四条照录见 T031；`‹ › ✓` 随包 Noto Sans SC 字形来源不变，timer 属 AD-06，三个快捷指令图标属 AD-08，equipment-* 为自有共用 SVG。三张 2 倍 PNG 已入库（2026-11-10，负责人导出），路径/摘要见 screens.md 与 T031。
+
 ## 6. Feature 实施映射（每个里程碑一份）
 
 从 M2 开始，每个里程碑在它的高保真目录中维护一份 `implementation-map.md`（例如 `design/m2-hifi/implementation-map.md`），只写该 feature 自己的内容：
@@ -518,3 +597,120 @@ C 类，只补规则，默认字号下外观不变：
 关于 → CC BY-SA 4.0 → about.ccBySA4 → 否 → FCHubRow（Features/Settings/CoachAboutView.swift）
 关于 → CC BY-SA 3.0 → about.ccBySA3 → 否 → FCHubRow（Features/Settings/CoachAboutView.swift）
 ```
+
+## 8. Android S0 roster（T015/T016，2026-11-05）
+
+本节只增加 Android 映射，不改 §1～§7/iOS anatomy。依据 S0 spec D07（负责人 2026-11-03 按建议批准）、D09、D12。2026-11-05 快进时曾推迟 AD-07/G3/G4/截图；该执行范围已由 2026-11-10 S0 恢复清单取代。AD-01～03 已批准，T031 文档本轮同步，三块 PNG 已入库（2026-11-10，负责人导出）；G3/G4 工具结果见 android/docs/s0/T018.md、T017.md。以下是实现合同，不是视觉验收记录。
+
+### 8.1 范围、来源与变化
+
+| 位置 | 当前 | 目标 | 理由 | 处理 |
+|---|---|---|---|---|
+| §3 共享组件 | iOS anatomy 与源码 | D07 22 个 ID 的 Compose 映射 | 复用既有设计 | 保留 iOS，新增 Android 实现；一般组件 C 类移植/复用，差异如下 |
+| DS-SYMBOL / AD-01 | SF Symbols 与随包字形 | 按需 Material Symbols SVG→vector drawable；Painter 注入 | D12 | B 类平台映射，资产已接入并登记 provenance；不新增图标库 |
+| DS-BOTTOM-SHEET / AD-03 | 自绘 iOS 面板 | Material3 ModalBottomSheet | 本轮授权的平台对应物 | B 类；保留 token 遮罩、标题/内容层级，拖拽/关闭采用平台实现 |
+| 日期选择 / AD-02 | 系统 DatePicker | 日期页内展开/收起；时间 M3 24h 表盘弹窗、键盘切换；重复截止日灰显早于开始日期的日期 | 2026-11-10 批准画板 | B 类；复用 LABEL-VALUE-ROW，不新增 DS ID；旧 DatePickerDialog 样例不代表批准目标 |
+| 系统栏、edge-to-edge、返回 | ADR §7.2 A/B；roadmap 旧 C 分类冲突 | 安全 Insets 与统一 back callback | D09 | A/B，未登记为已批准 C 类；延后负责人走查 |
+| T014/T031、截图/G3/G4 | 快进时推迟 | 恢复执行 | S1-D25 / S1-D32 | T014 已批准；T031 文档与 35 项对照已同步、三块负责人导出已入库；G3/G4 自测结果见任务报告；截图基线仅负责人维护 |
+
+代码列均相对 `android/app/src/main/java/com/ignacioli/finecoach/designsystem/`；iOS 列均相对 `ios/FineCoachApp/DesignSystem/`。原 S0 状态 key 用于 G2（66 例保持）；新增 S1 key 用于独立 `S1CatalogEntries`。不变量 ID 对应 `ComponentContractTests` 或 `S1ComponentTests` 同名 test method（BASE 由 catalog source/token 检查补充）。L3 为尚待负责人统一走查的项目。
+
+<!-- android-roster-start -->
+| ID | Kotlin 类型 | 文件 | 代表状态 key | iOS 源码 | G2 不变量 ID | L3 / Material 差异 |
+|---|---|---|---|---|---|---|
+| DS-BASE | FineCoachTheme | FineCoachTheme.kt | tokens | Tokens.swift;Typography.swift | tokenUsage | 字体行盒/缩放，沿用 G1 限制 |
+| DS-BUTTON | FcButton;FcSecondaryButton;FcLinkButton | FcControls.kt | default;disabled;secondary;link | Components/FCButton.swift | buttons | 按下 token、长文/大字；无 opacity 压暗 |
+| DS-TITLE-ACTION | FcTitleIconButton;FcTitleAddButton | FcControls.kt | icon;add | Components/FCButton.swift | titleActions | Painter 注入，图标已接入，待负责人走查 |
+| DS-SEGMENTED | FcSegmentedSwitch | FcControls.kt | first;last | Components/FCSegmentedSwitch.swift | segmented | 单选布局/大字 |
+| DS-CHIP | FcFilterChip;FcBodyPartChip;FcBodyPartPicker | FcControls.kt | off;on;body | Components/FCChip.swift;Components/FCBodyPartChip.swift | chips | FlowRow 换行与视觉行距 |
+| DS-TOGGLE | FcToggle | FcControls.kt | off;on;disabled | Components/FCToggleStyle.swift | toggle | Compose toggleable Switch 语义；保留 iOS 轨道尺寸 |
+| DS-STEPPER | FcStepper;FcStepperField | FcControls.kt | lower;upper;field | Components/FCStepper.swift | steppers | 字号放大/键盘；图标 Painter 注入 |
+| DS-TEXT-FIELD | FcTextField;FcSearchField | FcControls.kt | empty;secure;search | Components/FCTextField.swift | fields | 焦点/软键盘/长文 |
+| DS-LIST-ROW | FcListRow;FcListGroupRow;FcListRowDivider | FcRows.kt | plain;action;selected;unavailable;group | Components/FCListRow.swift | listRows | 子行缩进/大字；组状态由子项推导 |
+| DS-SECTION | FcSectionLabel;FcGroupEntryRow | FcRows.kt | label;entry | Components/FCListRow.swift | sections | 区块阅读层级 |
+| DS-LABEL-VALUE-ROW | FcLabelValueRow;FcLabelValueText | FcRows.kt | text;slot;action | Components/FCListRow.swift | labelValue | 标签列/大字；AD-02 日期在行下页内展开/收起；时间用 M3 24h 表盘弹窗及键盘切换（§5、README §15.6） |
+| DS-PAGE-HEADER | FcPageHeader | FcRows.kt | back;trailing | Components/FCPageHeader.swift | pageHeader | 基线/标题折行；返回 A/B 见 §8.4 |
+| DS-HUB-ROW | FcHubRow | FcRows.kt | action;info;unavailable | Components/FCHubRow.swift | hubRows | Painter 注入；标题与原因合并读取 |
+| DS-INLINE-RESULT | FcInlineResult | FcFeedback.kt | failure;success;info | Components/FCInlineResult.swift | inlineResult | 重试独立可访问/大字 |
+| DS-ACTION-ROW | FcActionRow | FcRows.kt | normal;destructive;disabled | Components/FCListRow.swift | actionRows | 危险文案+可选 Painter，不靠颜色；确认由调用方发起 |
+| DS-UNDO-ROW | FcUndoRow | FcRows.kt | visible | Components/FCUndoRow.swift | undoRow | 原位置恢复/窗口由未来业务 owner 实现，不在 DS 创建计时器 |
+| DS-BOTTOM-SHEET | FcBottomSheet | FcFeedback.kt | open | Components/FCBottomSheet.swift | bottomSheet | M3 ModalBottomSheet；拖拽/返回关闭/隐私遮罩待设备走查；Android 可选 skipPartiallyExpanded，长内容面板使用；iOS 面板本来无半展开态 |
+| DS-CONFIRM-DIALOG | FcConfirmationDialog | FcFeedback.kt | open;long | Components/FCConfirmationDialog.swift | confirmation | 自绘 Dialog；大字堆叠、滚动、取消/确认位置 |
+| DS-STATUS | FcStatus;FcStatusLabel;FcStatusBadge | FcFeedback.kt | overdue;conflict;coursePackageInvalid;notComparable;permissionDenied | Components/FCStatusLabel.swift | status | 五态文字+徽标，装饰字形隐藏 |
+| DS-SAVE-STATUS | FcSaveState;FcSaveStatusView | FcFeedback.kt | saving;saved;failed | Components/FCSaveStatusView.swift | saveStatus | Painter 注入；真实 Painter 注入，待负责人走查 |
+| DS-AVATAR | FcAvatar | FcFeedback.kt | initial | Components/FCAvatar.swift | avatar | 首字与圆形裁切，装饰性 |
+| DS-SYMBOL | FcSymbol;FcGlyph;FcAssetSymbol | FcControls.kt | pageBack;back;forward;check;checkOnFill;minus;plus;collapse | Components/FCSymbol.swift | symbols | 字形仅 ‹ › ✓；其余 Painter，19 个 Material Symbols drawable 已接入（§8.3），待 L3 走查 |
+| DS-HINT-BAR | FcHintBar | FcHintBar.kt | info;continue | Components/FCHintBar.swift | hintBar | 提示与训练中条同一组件；整条可点。单行，不改其他 DS |
+| DS-HERO-CARD | FcHeroCard | FcHeroCard.kt | single | Components/FCHeroCard.swift | heroCard | 单行默认不变；多行 `FcMultiHeroCard` 是已实现的变体，见 651-655 |
+| DS-AMBIENT-SCENE | FcAmbientScene | FcAmbientScene.kt | today;calendar | Components/FCAmbientEmptyScene.swift | ambientScene | C 类迁移；四层与暂停逻辑复用，未做人工视觉验收 |
+| DS-SET-ROW | FcSetRow | FcSetRow.kt | draft;pending;completed;disabled;undo | Components/FCSetRow.swift | setRow | C 类正式登记；G2 计数保持，新增检查在 S1ComponentTests。Android 可见步距 38dp（P0-a2），44dp 点击区以各自可见图形为中心向外扩展（编辑按钮上下各 3dp；圆圈比行中心低 3dp，点击区为行顶至向下 44dp，伸进下一行 6dp），相邻行重叠带内归下一行，依据 S1-D38（2026-11-10 更正表述）；iOS 行高 ≥44 为已知两端差异 |
+| DS-EQUIPMENT-ICON | FcEquipmentIcon;FcEquipmentIconView;FcEquipmentIconForExercise | FcEquipmentIcon.kt | barbell;bike;bodyweight;cable_crossover;cable_machine;dumbbell;hack_squat;hip_adduction;jump_rope;kettlebell;leg_extension;pec_deck;plate_loaded;pull_up_bar;resistance_band;rowing_machine;shoulder_press;smith_machine;suspension_trainer;tbar_row;treadmill | Components/FCEquipmentIcon.swift | equipmentIcons | C 类产品自有 21 SVG，路径/圆头描边保留；未人工视觉验收 |
+| DS-PAGE-PRIMARY | FcPagePrimary | FcPages.kt | coach;viewer | Components/FCPageHeader.swift | primaryPage | C 类组合；display 标题（+日期）→分段，调用方提供入口 |
+| DS-PAGE-SECONDARY | FcPageSecondary | FcPages.kt | back;bottom | Components/FCPageHeader.swift | secondaryPage | C 类组合；FcPlatformShell 唯一 Insets 与返回 owner |
+| DS-EMPTY-STATE | FcEmptyState | FcPages.kt | static;ambient | Components/FCAmbientEmptyScene.swift | emptyState | C 类组合；静态与 C30 动画空态，底部主按钮 |
+| DS-LAUNCH | FcLaunch | FcPages.kt | white | ../Resources/LaunchScreen.storyboard | launch | D 类 C31：纯白系统启动与 Compose 加载面，无图无字无过场；iOS 实际依据 LaunchScreen.storyboard |
+<!-- android-roster-end -->
+
+### 8.2 D07 延期表
+
+S0 恢复第 3 步已将 S1 目标移至 §8.1；HERO/HINT 已有映射，本轮补正式合同。以下仅保留实际存在的 S2+ 两项，不补造第三项；均不实施、不计 S0 G2 完成。
+
+<!-- android-deferred-start -->
+| ID | 目标切片 | 批准来源 / 原因 |
+|---|---|---|
+| DS-CALENDAR-DAY | S2 | D07 2026-11-03；预约日历 |
+| DS-BODY-DIAGRAM | S4 | D07 2026-11-03；分享报告 |
+<!-- android-deferred-end -->
+
+### 8.3 Android anatomy 与 G2 边界
+
+沿用 §4 部件顺序、颜色、字号、disabled/selection/accessibility 合同。`FcComponentMetrics` 仅将 §4 与 README §6/§8 已有几何表示为生成 spacing token 的算式（44=32+12、52=32+16+4、48=32+16、1.5=12/8 等）；不是新设计值或新的 token 源。禁止裸 Color/sp/dp（零 dp 除外）；G2 扫描 main designsystem 与 debug catalog，实际 pressed 配色由交互测试核验。
+
+- touch：所有交互目标至少 44×44；视觉 chip 28/30、toggle 44×26、搜索视觉 40 保留，外层点击区补足。满宽按钮、输入框、rows 与父内容容器等宽。
+- state：disabled 不触发 callback；segmented 单选；组选择状态只能由 children 推导；Stepper 整数 ±1 并 clamp，FIELD 将步长/解析交回调用方；自定义 accessibility action 提供调节。撤销不自带业务计时、持久化或假造完成状态。
+- semantics：heading、selected、Switch、密码遮蔽、强制非空 icon label；无交互行合并读取；徽标/头像/图标默认装饰性；重试单独可访问。每个新入口有 testTag 和可见控件，见 android/README 的 entry/layout map。
+- overlays：Dialog 采用既有 300 宽/80% 可滚动说明、大字纵排，token scrim；ModalBottomSheet 接管平台 drag/back/dismiss，token scrim/圆角/内容 padding；独立窗口注册 T009 privacyCover，不以壳窗口覆盖等同已保护弹层。
+- AD-02：日期在值行下页内展开、再次点击收起；时间采用 M3 时间弹窗、24h 表盘及键盘切换；重复截止日早于开始日期的日子灰显。具体 token 规则见 §5 批准行、README §15.6。既有 catalog 的 DatePickerDialog 是快进时样例，不能作为批准目标；本轮只同步文档，不改 Kotlin。
+- icon：`android/design-assets/material-symbols-manifest.txt` 的 19 项已接入（源码/输出 digest、权重、commit 见 provenance JSON）；完整 Apache-2.0 LICENSE/NOTICE 已归档并随 APK 打包。catalog 通过 painterResource 注入真实 vector，不含占位 Painter。无图标库依赖；视觉验收仍待负责人走查。
+
+### 8.4 平台壳（D09：A/B，待负责人走查）
+
+`FcPlatformShell` 在 Activity 已启用 edge-to-edge 的前提下，以 surface.page 绘制全屏背景，仅内容消费 safeDrawing Insets；不写死状态栏/导航栏高度，不吞系统手势。`BackHandler` 与 DS-PAGE-HEADER 的 `‹` 调用同一 onBack；catalog 只维护样例导航，不新增产品路由。系统栏图标明暗沿用 Activity `enableEdgeToEdge` 默认平台策略，尚待负责人核实。PlatformShellTests 注入确定 Insets，验证内容边界与返回 dispatcher/header 一致；JVM 不能证明真实系统手势动画、OEM 系统栏或缩略图。
+
+### 8.5 2026-11-05 历史执行记录（范围已由 S0 恢复清单取代）
+
+分类与依据：一般组件 C 类映射/复用 §4 iOS anatomy；AD-01/02/03 B 类平台差异、系统壳 ADR A/B；2026-11-05 授权先实现并统一走查。
+范围：D07 22 个 ID + debug catalog；11 个 ID 延期；不改 iOS，不建功能页，不回写 Penpot。
+设计决定：复用生成 token 与随包字体；Material Sheet/DatePicker 按本轮指令；Material Symbols 资产已接入，视觉验收仍未取证。
+实现与检查：G2 对应本节 roster 与测试方法，entry/layout map 在 android/README；按指令不运行 Gradle/模拟器/xcodebuild；不做 G3/G4/截图。
+结果：实现待宿主编译/G1/G2 验证与 cursor-agent 复核；L3 统一走查未取证；不得据此勾选只读 tasks 或宣布 T016 验收通过。
+
+2026-11-06 接入差异：移除 catalog 空 Painter/「图标待接入」占位与边框，目标为 D12 的 13 个宿主提供 SVG→vector；保留所有原 testTag，追加三个标题图标样例入口（android/README map）。LICENSE/NOTICE 精确路径+digest 纳入隐私策略；未新增产品许可页面、依赖或设计值。未运行 Gradle；宿主 toggleable 编译失败仍保留为历史 FAIL，修复后运行证据待取。
+
+### S1 T013a Android DS-SET-ROW 对照（C 类，iOS anatomy 不变）
+
+| ID | Compose | 部件与状态 | 合同 |
+|---|---|---|---|
+| DS-SET-ROW | FcSetRow / FcSetRow.kt | 44 触控区的状态入口 → 第 N 组 → 数值 → 状态 → 编辑；draft/pending/completed；操作菜单承载复制/删除 | 满宽、确认/编辑可见可点、禁用时不写入；ComponentContractTests.setRow |
+
+### S1 T016 Android 多人 hero 对照（C 类，复用 W08-a anatomy）
+
+| ID | Compose | 部件与状态 | 合同 |
+|---|---|---|---|
+| DS-HERO-CARD | FcMultiHeroCard / FcHeroCard.kt | 一个进行中 N 徽标，每名学员一行44触控区，姓名/重点→时长→继续，行间divider；0条不展示 | 满宽、每行独立点击且稳定ID、开始时间排序由Today提供；ComponentContractTests.multiHeroCard。原 FcHeroCard 默认不变；S0截图目录不变 |
+
+### S0 恢复第 3 步（2026-11-10）
+
+S1 的九项按 §4 anatomy 正式落地：HERO/HINT 既有实现保留，SET 正式登记，AMBIENT 迁移，其余见 §8.1。G2 固定计数 27/66/6/5 不变，新不变量在 `S1ComponentTests`、`S1ComponentAssetTests`、`S1CatalogStateTests`。差异与五行执行记录见 `android/docs/s1/S0-step3-components.md`。
+
+### P4 D2b Android drift repair（2026-11-12）
+
+D 类，复用 DS-PAGE-HEADER / DS-TEXT-FIELD / DS-CHIP / DS-SECTION / DS-LIST-ROW。
+FcListRow 增加显式 exerciseLibrary 变体，对应本文件 C′2b 的 space.4 横向、space.3 上下间距；默认普通行不变。既有组件增加可选的 visual modifier / tag，挂在真实图形上，点击区 tag 保留。只动作库开启，picker 保留当前组合。
+差异：FcListRow 动作库间距 12/8 → 16/12，修复 anatomy 偏差；不可观测的 glyph / chip / field / icon → 可选视觉 tag，不改变交互；其余消费者默认值保留。S1-D46 的行高及绳索 caption 由 map 登记；其余画板冲突仍待决定。
+
+P4 round 2 drift repair：Search 可见框固定 40dp，由外层 ≥44dp editor 在上下向外扩展 hit area；动作库 search-row 的 gap 使用 space.1，使可见框为 310dp，filter 保留 44dp 点击区。FcSectionLabel 保留满宽外层，调用方 tag 和 heading 移到实际文字；删除文字自身 fillMaxWidth。目标仍是批准的 D2b，不修改 token、Penpot 或 baseline。
+
+P4 round 3（S1-D50）：Android FcPageHeader 删除顶部 space.2，直接位于 status inset 下；非 body FcFilterChip 删除44dp最小布局，visual/layout均为文字+2×space.3、高30，触区由Compose向外补到48dp。动作库横向chip row从358dp裁剪容器→390dp edge-to-edge，首尾space.4，搜索与列表仍space.4内边距。body chip与iOS不变；无新视觉决定。ComponentContractTests验证框外tap和layout/touch分离；P4ExerciseLibraryTests验证390dp row与358dp列表；完整结果与未解决的页面组合差异见r3执行记录/报告。
+
+P4 round 4（S1-D51）：动作库 header→search→chips→section 使用 space.4；section label→rows 与 search HStack 使用 space.2，水平 space.4、chips edge-to-edge。Android DS-PAGE-HEADER Back layout 宽 space.4、字形 leading 对齐并与标题首行 baseline 对齐，Compose 扩展点击区≥44，不占 layout；trailing 以 token line box 与标题首行 centerY 对齐，点击区向外扩展。移除 Back/trailing 44dp 布局占位，不新增 offset；行 › 的 glyph advance 右缘等于内容右缘，board 文字框应跟随真实 advance。Penpot 由 dispatcher 根据 proposed-board.json 更新，本轮不改板。

@@ -1,0 +1,37 @@
+{
+  "version": 2,
+  "toleranceDp": 2,
+  "originOffsetY": -52,
+  "originRule": "仅 anchor=top：expectedAndroidY=designY+originOffsetY+measuredContentTop，originOffsetY=-52 对齐画稿首内容与Android content顶；bottom比较视口底距，不应用此偏移；viewport按390×844视口比较。S1-D30，不吸收页面内部偏差。",
+  "viewport": {
+    "widthDp": 390,
+    "heightDp": 844,
+    "density": 2,
+    "fontScale": 1,
+    "locale": "zh-CN"
+  },
+  "elements": [
+    {
+      "path": "0",
+      "anchor": "viewport"
+    },
+    {
+      "path": "7",
+      "tag": "session-icon-$squatID",
+      "source": "S1-D86: runtime tag stays session-icon-$id. conformance:icon / barbell would also tag the training rows behind other screens' sheets."
+    },
+    {
+      "path": "45",
+      "tag": "$set1-edit-icon"
+    },
+    {
+      "path": "46",
+      "tag": "$set2-edit-icon"
+    },
+    {
+      "path": "33",
+      "tag": "session-icon-$benchID",
+      "source": "S1-D86: runtime tag stays session-icon-$id. conformance:icon / barbell would also tag the training rows behind other screens' sheets."
+    }
+  ]
+}

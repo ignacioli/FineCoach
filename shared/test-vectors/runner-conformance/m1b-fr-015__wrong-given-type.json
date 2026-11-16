@@ -1,0 +1,27 @@
+{
+  "id": "wrong-given-type",
+  "rule": "M1B-FR-015",
+  "meta": {
+    "tags": [
+      "fictional-data"
+    ],
+    "conformance": {
+      "outcome": "format",
+      "path": "/given"
+    }
+  },
+  "given": [],
+  "when": {
+    "op": "fixture.value",
+    "args": {
+      "value": {
+        "balance": 8
+      }
+    }
+  },
+  "then": {
+    "state": {
+      "balance": 8
+    }
+  }
+}
