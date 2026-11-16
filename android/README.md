@@ -1450,6 +1450,8 @@ T010三个历史环境均为指定serial `emulator-5554`，APK SHA-256均为 `c7
 
 **剩余与责任。** T001～T010/T032不是全部依赖关闭：T006仍未勾；T010人工判定按恢复记录仍DEFERRED。L3从未发生，明确未取/PENDING。OWNER? D10的bundleId/teamId/contentVersion与cross-platform后续验证、集中走查及系统证据最终认可；没有批准不得代负责人关闭。CP1只归档现有自动与历史证据，不宣称全量FR已满足。
 
+D10 经负责人 2026-11-16 确认暂定 BLOCKED（Apple Developer Program 开通中），T006 跨平台段开通后补验（S1-D114）。
+
 ## T021 / CP2：设计门禁 checkpoint evidence（2026-11-16）
 
 **自动设计门禁可运行的证据已归档；L3 未取 / PENDING，未完成人工视觉验收。** 依据 canonical S0 `tasks.md` T021（依赖T012～T020、T031）、Phase2 Done when / Proven by、`plan.md` §6 CP2。H/E/D及完整产品HEAD沿用上一节的定位约定；本节每个host结果均为2026-11-16 T028 dispatcher同HEAD复跑，非本轮运行。Codex整理，Cursor独立复核，负责人批准设计与基线；无新实现/测试。
@@ -1544,3 +1546,11 @@ S1-D111纠正口径：旧summary的`Android-subtotal ran=19 excludes=G8`未计G8
 本轮初始tracked/staged/untracked均空，branch=`docs/s0-checkpoint-evidence`，HEAD同上；修改摘要仅README末尾三个checkpoint section及一处`s0G8`旧说明指向现行聚合门。文档验证限定readback和`git diff --check`，具体rc及最终status由writer最终报告提供；没有新host/device执行。本节不将文档完成当作T030/CP3验收，不tick tasks、不stage/commit。
 
 剩余：T006/D10 **BLOCKED**；T010人工判定 **DEFERRED/PENDING**（历史自动文字记录已定位）；当前同HEAD seed安装 **未取得/BLOCKED separate host check**；本轮独立README review **PENDING**；集中L3/最终运行清单认可/S0-SC-003 **PENDING，OWNER?**；G7 **DEFERRED S4**。没有明确批准的事项不代owner决定。
+
+### CP3 补充（2026-11-16）
+
+L3 集中走查已于 2026-11-16 进行，逐项结果见 [walkthrough §0.4](docs/s1/walkthrough.md#04-走查结果2026-11-16)：API 31 的 A1/A2/A4 通过，负责人选择在 Pixel 8a（Android 16 / API 36）走查的 B1～B8 全部通过；A3 修复后待负责人复核。此前本节的 L3 未取及当前 seed 安装缺口为历史状态，以本补充及 S1-D113/D114 为当前记录；T030 仍待 A3 复核与运行清单认可。
+
+当前 seed 的设备安装证据已取得（均为 `SEED version=3 rows=1149 status=ok`）：API 36 模拟器连跑两次 rc 0，日志 `.handoff/logs/2026-11-16-walkthrough-api36-install{1,2}.log`；API 31 模拟器首次因非 seed 库拒绝，负责人同意清空该虚构模拟器 App 数据后两次 rc 0，日志 `.handoff/logs/2026-11-16-walkthrough-api31-install{1,2,3}.log`；Pixel 8a 全新数据目录连跑两次 rc 0，日志 `.handoff/logs/2026-11-16-walkthrough-pixel8a-install{1,2}.log`，W1 修复后用修复版脚本再安装一次 rc 0，日志 `.handoff/logs/2026-11-16-w1-pixel8a-install.log`。仅引用本地日志路径，不复制含设备 serial 的内容；详情见 [walkthrough](docs/s1/walkthrough.md) §0.1（S1-D113/D114）。
+
+S0L3-W1 修复与门禁见 S1-D114：修复已合入 local main `47f56c3`；API 31 与 Pixel 8a 机器验证重复桌面启动后均只有 1 个 MainActivity 实例；主机门禁 unit 1023/0、7 核心屏 hash 不变、P7 15/0，日志 `.handoff/logs/2026-11-16-w1-gate{A,B}.log`。机器验证不替代负责人 A3 复核，本次仅整理既有证据，未重跑构建或设备验证。
