@@ -51,6 +51,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (shouldFinishDuplicateLauncher(isTaskRoot, intent?.action, intent?.categories)) {
+            finish()
+            return
+        }
         applyLaunchIntent(intent)
         privacyCover = PrivacyCoverPolicy(this)
         privacyCover.onCreate()
@@ -73,20 +77,23 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onPause() {
-        privacyCover.onPause()
+        if (::privacyCover.isInitialized) privacyCover.onPause()
         super.onPause()
     }
 
     override fun onResume() {
         super.onResume()
-        privacyCover.onResume()
+        if (::privacyCover.isInitialized) privacyCover.onResume()
     }
 
     override fun onDestroy() {
-        privacyCover.onDestroy()
+        if (::privacyCover.isInitialized) privacyCover.onDestroy()
         super.onDestroy()
     }
 }
+
+internal fun shouldFinishDuplicateLauncher(isTaskRoot: Boolean, action: String?, categories: Set<String>?): Boolean =
+    !isTaskRoot && action == Intent.ACTION_MAIN && categories?.contains(Intent.CATEGORY_LAUNCHER) == true
 
 // Only explicit debug harness intents select S0; normal launches open S1 in both variants.
 internal interface ShellContentProvider {
