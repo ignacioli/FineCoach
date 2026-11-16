@@ -1549,8 +1549,10 @@ S1-D111纠正口径：旧summary的`Android-subtotal ran=19 excludes=G8`未计G8
 
 ### CP3 补充（2026-11-16）
 
-L3 集中走查已于 2026-11-16 进行，逐项结果见 [walkthrough §0.4](docs/s1/walkthrough.md#04-走查结果2026-11-16)：API 31 的 A1/A2/A4 通过，负责人选择在 Pixel 8a（Android 16 / API 36）走查的 B1～B8 全部通过；A3 修复后待负责人复核。此前本节的 L3 未取及当前 seed 安装缺口为历史状态，以本补充及 S1-D113/D114 为当前记录；T030 仍待 A3 复核与运行清单认可。
+L3 集中走查已于 2026-11-16 进行，逐项结果见 [walkthrough §0.4](docs/s1/walkthrough.md#04-走查结果2026-11-16)：API 31 的 A1/A2/A4 通过，负责人选择在 Pixel 8a（Android 16 / API 36）走查的 B1～B8 全部通过；A3 已由负责人复核通过（S1-D115）。此前本节的 L3 未取及当前 seed 安装缺口为历史状态，以本补充及 S1-D113～S1-D115 为当前记录；T030 已完成（S1-D115）。
 
 当前 seed 的设备安装证据已取得（均为 `SEED version=3 rows=1149 status=ok`）：API 36 模拟器连跑两次 rc 0，日志 `.handoff/logs/2026-11-16-walkthrough-api36-install{1,2}.log`；API 31 模拟器首次因非 seed 库拒绝，负责人同意清空该虚构模拟器 App 数据后两次 rc 0，日志 `.handoff/logs/2026-11-16-walkthrough-api31-install{1,2,3}.log`；Pixel 8a 全新数据目录连跑两次 rc 0，日志 `.handoff/logs/2026-11-16-walkthrough-pixel8a-install{1,2}.log`，W1 修复后用修复版脚本再安装一次 rc 0，日志 `.handoff/logs/2026-11-16-w1-pixel8a-install.log`。仅引用本地日志路径，不复制含设备 serial 的内容；详情见 [walkthrough](docs/s1/walkthrough.md) §0.1（S1-D113/D114）。
 
 S0L3-W1 修复与门禁见 S1-D114：修复已合入 local main `47f56c3`；API 31 与 Pixel 8a 机器验证重复桌面启动后均只有 1 个 MainActivity 实例；主机门禁 unit 1023/0、7 核心屏 hash 不变、P7 15/0，日志 `.handoff/logs/2026-11-16-w1-gate{A,B}.log`。机器验证不替代负责人 A3 复核，本次仅整理既有证据，未重跑构建或设备验证。
+
+负责人 2026-11-16 认可 S0 运行清单与验收（S0-SC-003），S0 关闭，T011/T006 跨平台段带 D10 BLOCKED，G7 DEFERRED 到 S4，S0-FR-130 按 S1-D111 原样接受。
