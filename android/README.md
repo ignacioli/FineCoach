@@ -1218,7 +1218,7 @@ S1 数据由独立的 debug-only `S1DebugSeed` 经真实 Repository 写入一份
 
 - 已实现：`s0G1`、`s0G2`、`s0G6`、`s0Room`、`s0SeedIsolation`、`s0InstallSeededDebug`
 - 已接入独立非空 Test gate：`s0G3`（DesignValueScanTests）、`s0G4`（EntryLayoutHarnessTests）；用法与独立报告目录见本文末尾 S0 G3/G4。
-- `s0G5` 已接入 verify-only 截图门禁（T019）；`s0G8` 仍是占位（执行即失败）。
+- `s0G5` 已接入 verify-only 截图门禁（T019）；`s0G8` 现行契约见本文「G8 聚合门」，已按 S1-D107 接入聚合测试。
 - 向量 runner 与余额运算：
   - `app/src/test/java/com/ignacioli/finecoach/SharedVectorRunner.kt`
   - `app/src/main/java/com/ignacioli/finecoach/domain/CreditLedger.kt`
@@ -1394,3 +1394,153 @@ agent 运行上述任务一律从产品根调用共享宿主锁 wrapper：
 从 worktree 根运行 `.handoff/bin/agent-test.sh --task s0G3`，只运行 `DesignValueScanTests`。
 扫描 main Kotlin（含壳、features、navigation）及 debug Kotlin；main `designsystem/` 定义处排除，测试 fixture 不进入源码扫描目录。仅间距位置允许原始零值。
 通过 `finecoach.sourceRoot` 指定 `app/src`；报告位于 `app/build/test-results/s0G3/`、`app/build/reports/tests/s0G3/`，打印实际文件数、分目录违规数及文件:行。空测试、skip、失败均拒绝。
+
+## T011 / CP1：安全骨架 checkpoint evidence（2026-11-16）
+
+**证据已归档；CP1 BLOCKED，L3 未取 / PENDING，不称安全基础设施完全就绪。** 本节只收证据，不修改 T011 复选框。依据 canonical specs `/Users/liyongqiang/gitrepo/ignacioli/specs/FineCoach/007-android-port/s0-infrastructure/` 的 `tasks.md` T011、Phase 1 Done when / Proven by 与依赖表、`plan.md` §6、`spec.md` FR-020～042/070～072；完成口径遵循 `CLAUDE.md`「Checkpoint completion」及 `design/design-system/components.md` §1.4。
+
+本节及下两节的定位约定（均可直接在本机读取）：
+
+- `H=/Users/liyongqiang/gitrepo/ignacioli/FineCoach`；所有 `.handoff/...` 都相对 H，不能把已移除的测试 worktree 当日志根。
+- `E=H/.handoff/logs/t028-s0-android-20261116-090232-90127/`；`D=H/.handoff/decisions/android-port.md`，使用其中具名 S1-D100～111；本轮范围裁决见 `H/.handoff/dispatcher/step7-decisions.md`。
+- 产品证据基点完整 HEAD/base 均为 `48a98e4da048c55d0b3f602ae419b0ca76d41a82`，来自 `E/summary.txt` 首行及 `E/runlist.tsv`；T028 当时 branch=`test/s0-t028-host-gate`。本轮 writer 在 `docs/s0-checkpoint-evidence`、同一 HEAD，仅编辑 README；不是本轮新跑，也不是本轮设备重测。
+- T028 host 执行/核验责任人为 hybrid dispatcher（S1-D101 角色迁移、S1-D108）；本轮整理责任人为 Codex。该既有 host 复跑满足 T011 的「跑」及 T021 的「Claude 复跑」角色要求，本轮不再运行。独立复核责任人为 Cursor（T029）；负责人承担参数、基线及人工批准。
+
+**T011 必跑 host 证据。** 以下历史命令 cwd 为 T028 worktree 的 `android/`。每行在 `E/summary.txt` 有完整 command/rc/count/duration/report/log；已读取相应 log 和归档报告。共同命令前缀原文为 `./gradlew --offline --no-daemon --no-build-cache --rerun-tasks -Proborazzi.test.record=false -Proborazzi.test.verify=true`，表中任务接在此前缀之后。所有 JUnit 行的 failures/errors/skips 均为 0；G0 按构建/lint 口径，不能写成 0 tests 的测试 PASS。
+
+| 门 / command 任务 | rc / 实际数量 / 耗时 | report 与原始 log（相对 E） | 结论 |
+|---|---|---|---|
+| G0：`assembleDebug assembleRelease assembleDebugAndroidTest lint` | 0；lintErrors=0、APK=3；49s | `reports/G0/lint-results-debug.xml`、`reports/G0/apk.sha256`；`G0.log` | PASS，构建证据，不是安装证据 |
+| G8：`:app:s0G8` | 0；78；50s | `reports/G8/TEST-*.xml`（8 suites）；`G8.log` | PASS，不替代系统隐私验证 |
+| Room：`:app:s0Room` | 0；18；22s | `reports/Room/TEST-*.xml`；`Room.log` | PASS，骨架/值/存储隐私；不外推业务库迁移 |
+| environment smoke：`:app:s0EnvironmentSmoke` | 0；7；27s | `reports/smoke/TEST-*.xml`；`smoke.log` | PASS；KDF 在此仅为 JVM host smoke |
+
+**依赖与非 host 证据逐项归档。** 未留存的字段明确记缺证据；不以 task 已勾选替代运行原文。
+
+| 要求 / 依赖 | 来源、command / rc / count / HEAD / 责任人 | 状态与边界 |
+|---|---|---|
+| T001：路径、P0-07、环境及版本批准 | 本文 Environment 的「路径与基线」「当前批准状态」及版本批准表；历史基点 `b3980c8d409d791997b80b9c0718a154131cc267`。负责人 2026-11-03 批准版本，JDK Temurin 21.0.13+9 arm64；2026-11-04 接受 Jetifier beta10 例外，非 UTP alpha 例外 | 版本逐项来源保留在原表；不是本轮重新批准或安装 toolchain |
+| T002/T003：工程、crypto、环境基线 | 本文「构建」「T003 验证结果（2026-11-04）」：`assembleDebug lint` rc0；smoke 冷12s/暖5s各7例，record=true拒绝rc1；负责人亲录并批准 environment 基线；当前构建/smoke 以上表同 HEAD T028 为准 | PASS（各自范围）；historical record 不在本轮执行 |
+| T004/T005：merged manifest、规则/依赖/源码守卫 | 本文 S0-03 targeted 与修复轮保留过程；当前 `E/G8.log`：InfrastructureConfiguration 4、CapabilityManifest 9、BackupRules 5、PrivacySourceScan 11、StoragePrivacy 3、PrivacyCover 11、FictionalDataPolicy 16、ScopeBoundary 19，共78；对应8份XML，rc0 | 自动 PASS；历史 FR-034 固定事件实现 PENDING 的记录不改写。后续 seed 固定事件边界见本文 S0-12「显式触发与权限边界」；本节不由 G8 推定任意 logger 或系统行为已获证明 |
+| T006：QPR2 三段九域系统解析 | D/S1-D100（2026-11-14），`H/.handoff/evidence/t006/2026-11-14-d2d-parser.txt` 原始系统文字。`emulator-5554`、AVD FineCoach_QPR2_API36_1、Android16/BE4B.251210.005、sdk_full36.1；`bmgr backupnow` + LocalTransport / GMS D2dTransport，D2D test mode；原文有 valid data-extraction-rules、九域 excludes、无 includes、无 backup data | device-transfer parser PASS；cloud 因 allowBackup=false 拒绝，**不是 cloud parser 证明**；cross-platform 无可观察入口且需 platform-specific-params，**BLOCKED→D10**。D100只给APK digest前缀 `f43209cfb514…`，该摘录无完整 shell 命令/逐命令rc/产品HEAD，缺证据，不补造 |
+| T007/T008：Room 骨架与 synthetic migration | 本文 S0-04 字段策略、T008 修复轮；specs tasks T007/T008 的负责人批准注释：唯一 store_metadata、synthetic V1/V2；JVM s0Room18，历史设备迁移 `am instrument` 为2例 | 当前18例见上表；设备2例属2026-11-05历史，不是本次同HEAD重测。不可用JVM18例替代设备迁移 |
+| T009：后台遮罩实现及实际入口 | 本文「样例 anatomy、testTag 与 entry/layout map」及下述代码 map；当前 G8 的 PrivacyCoverTests11（含API31/32展开） | 自动 PASS 仅证明调用/生命周期等测试合同，不证明系统快照 |
+| T010：API31/32/33+ 系统遮挡、恢复、前台截屏 | 本文「T010：宿主 API 31 / 32 / 33+ 操作与文字证据」和「T010 宿主自动验证结果（2026-11-05）」；实际日志 `H/.handoff/evidence/2026-11-05-t010/api31/t010-api31.log`、`api32/t010-api32.log`、`api36_1/t010-api36_1.log`（后两项同一t010根）；脚本 `t010.sh`、`t010auto.sh`、`transitions.py`、`snapstat.py` 可读，执行责任人为Claude宿主 | 历史HEAD c381853，各记录安装/启动命令及exit=0、APK digest和build见下表；普通/弹层最终文字行0、阳性对照23～279；probe0→1、关闭后壳为1、前台PNG签名及内容。原partialRows误报FAIL及refined detector修正均保留（api31 与 api36_1 为 02:18:01、api32 为 02:18:04）；本轮不看图/不重算。tasks恢复状态仍将API31/32及弹层人工判定列DEFERRED，归集中L3，不能自行关闭 |
+| T032 / D13：非ASCII双端KDF字节 | specs spec §7 D13：负责人2026-11-03选契约字节证明；本文「KDF 一致性证明」「T032 验证结果（2026-11-04）」；`H/.handoff/logs/2026-11-04-host-s0-02-t032-{jvm,device-am,ios}.log` | 历史 JVM4例；Android API36/BE2A.250530.026.D1、emulator-5554、BC，`am instrument -w -r -e class com.ignacioli.finecoach.PlatformCryptoParityInstrumentedTests com.ignacioli.finecoach.test/androidx.test.runner.AndroidJUnitRunner` 输出 `OK (2 tests)`；iOS iPhone17/iOS26.5(23F77)、CommonCrypto，定向 PlatformCryptoParityTests 2例/0 failures/TEST SUCCEEDED。历史日志未逐项记独立shell rc/HEAD，缺字段；不伪称48a98e4设备重测 |
+| cursor-agent 复核 | 本文2026-11-06 T012/T013/T010复核通过历史记录；`H/.handoff/subagent/2026-11-16-t029-review.md` 对 `99c0cc5..48a98e4` 的独立一致性/入口/隐私复核通过；major/minor按D110/D111处置 | T029不是对所有历史系统场景的新实测；本轮README的独立review尚未取得/PENDING，由dispatcher另行收取 |
+
+KDF 对照保留可直接核对的完整值：NFC/NFD 两端 key 均为 `02171f9cb0decb1812ab132a927109f42dfff580ff96bacb0acc3b25adab2fdb`；NFC UTF-8 输入 SHA-256 均为 `54a7a451447f7eb29db39828e92309c98034dd167261c476c396634f50473b95`。来源是上述历史结果表、iOS日志的 passwordNFC/passwordNFD 两行及共享 fixture；不把 G6 的77向量或本次JVM smoke充作这次设备/provider证明。iOS历史实跑命令见 `t032-ios.log` 开头（destination=`EFE2D5A0-4877-4682-BE79-7460C0C1E8C8`，derivedData=`/Users/liyongqiang/.cache/finecoach-android/ios-derived-t032`）。
+
+T010三个历史环境均为指定serial `emulator-5554`，APK SHA-256均为 `c71d9e0ccb16a078f9f749af6b9c8501a9c176f9cf9596171abc36fbbe21d5be`；完整fingerprint和逐命令exit见各日志开头。它们只绑定c381853历史产物，不是48a98e4新系统验证：
+
+| API / 日志目录 | fingerprint | 结果与人工边界 |
+|---|---|---|
+| 31 / api31 | `google/sdk_gphone64_arm64/emulator64_arm64:12/SE1A.220630.001.A1/9056438:userdebug/dev-keys` | refined textRows普通/弹层0；前台截屏正常；人工判定DEFERRED |
+| 32 / api32 | `google/sdk_gphone64_arm64/emulator64_arm64:12/SE1B.240122.005/11418786:userdebug/dev-keys` | refined textRows普通/弹层0；前台截屏正常；人工判定DEFERRED |
+| 36.1 / api36_1 | `google/sdk_gphone64_arm64/emu64a:16/BE4B.251210.005/14574095:userdebug/dev-keys` | 普通/弹层textRows0；前台截屏正常；日志02:04:16有负责人「QPR2 最近任务卡片看不到 sentinel」，不外推弹层或其他API人工批准 |
+
+**CP1 entry/layout。** 本轮文档无新交互；历史 T009 的四个入口仍必须保留证据，不写成「CP1从未有交互」。完整逐行 map 见本文「样例 anatomy、testTag 与 entry/layout map」；实际代码为 `app/src/debug/java/com/ignacioli/finecoach/S0DebugApplication.kt` 的 `PrivacySample` / `SampleButton`：
+
+| screen → visible control → identifier | 数据变化 | width owner / code |
+|---|---|---|
+| debug壳 → 打开虚构弹层 → `s0-open-dialog` | 内存dialogOpen | 壳Column安全区；SampleButton.fillMaxWidth |
+| debug壳 → 交互探针+1 → `s0-probe` | 内存count，无持久化 | 同上 |
+| debug弹层 → 交互探针+1 → `s0-dialog-probe` | 共享内存count，无持久化 | Dialog内Column.fillMaxWidth；SampleButton.fillMaxWidth |
+| debug弹层 → 关闭弹层 → `s0-close-dialog` | 内存dialogOpen | 同上 |
+
+**剩余与责任。** T001～T010/T032不是全部依赖关闭：T006仍未勾；T010人工判定按恢复记录仍DEFERRED。L3从未发生，明确未取/PENDING。OWNER? D10的bundleId/teamId/contentVersion与cross-platform后续验证、集中走查及系统证据最终认可；没有批准不得代负责人关闭。CP1只归档现有自动与历史证据，不宣称全量FR已满足。
+
+## T021 / CP2：设计门禁 checkpoint evidence（2026-11-16）
+
+**自动设计门禁可运行的证据已归档；L3 未取 / PENDING，未完成人工视觉验收。** 依据 canonical S0 `tasks.md` T021（依赖T012～T020、T031）、Phase2 Done when / Proven by、`plan.md` §6 CP2。H/E/D及完整产品HEAD沿用上一节的定位约定；本节每个host结果均为2026-11-16 T028 dispatcher同HEAD复跑，非本轮运行。Codex整理，Cursor独立复核，负责人批准设计与基线；无新实现/测试。
+
+**T021 必跑 host 证据。** cwd、共同Gradle前缀与CP1相同；`E/summary.txt`逐行给command/rc/report，原始log和归档XML均可定位。各JUnit数量后的failures/errors/skips均为0。
+
+| 门 / command 任务 | rc / 数量 / 耗时 | report / log（相对 E） |
+|---|---|---|
+| G0：`assembleDebug assembleRelease assembleDebugAndroidTest lint` | 0；lintErrors0、APK3；49s | `reports/G0/{lint-results-debug.xml,apk.sha256}` / `G0.log` |
+| G1：`:app:s0G1` | 0；39；24s | `reports/G1/TEST-*.xml` / `G1.log` |
+| G2：`:app:s0G2` | 0；113；26s | `reports/G2/TEST-*.xml` / `G2.log` |
+| G3：`:app:s0G3` | 0；42；30s | `reports/G3/TEST-*.xml` / `G3.log` |
+| G4：`:app:s0G4` | 0；12；23s | `reports/G4/TEST-*.xml` / `G4.log` |
+| G5：`:app:s0G5` | 0；1；22s | `reports/G5/TEST-*.xml` / `G5.log` |
+| G8：`:app:s0G8` | 0；78；50s | `reports/G8/TEST-*.xml` / `G8.log` |
+
+| T021 要求 / 依赖 | 原文来源与实际证据 | 结论 / 边界 / 责任 |
+|---|---|---|
+| T012/T013，D02/D05 | S0 spec §7批准表：负责人2026-11-03批准直接从README生成Kotlin、沿用Noto Sans SC/OFL；本文S0-05 T012/T013与 `design/design-system/README.md` 为映射/值源。G1实跑分解TokenParity6+Generator9+Contrast17+Typography7=39 | 自动PASS；两项对比度豁免按既有记录锁比值、不skip；本轮无字体/token决定 |
+| T014/T031，AD-01～03及D07/D09 | canonical tasks T014/T031完成注释；`design/design-system/components.md` §5、§8.1～8.4；负责人2026-11-10批准并导出 `design/android-differences/screens/AD-01-icon-mapping.png`、`AD-02-date-time-picker.png`、`AD-03-action-sheet.png`，T031记录main ab44d0d（ae28a96）、35项对照18已接/17后续、Cursor PASS | 已有画板批准和文档同步记录；D09系统壳仍按ADR A/B，不能改称C。画板批准不等于本轮界面L3 |
+| D12适用裁决/资产来源 | S0 spec §7 D12负责人2026-11-03决定按需SVG→vector drawable并附Apache2.0；`design-assets/material-symbols-manifest.txt`、`design-assets/material-symbols-provenance.json` 逐项源/输出digest，upstream commit `10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7`；components §8.3登记19项及随包LICENSE/NOTICE | 沿用已登记资产和许可；不新增资产、不推定后续未接入图标已批准；`‹ › ✓`仍随包字形 |
+| T015/T016 roster/不变量 | components §8的逐ID代码/iOS源/状态/test method/L3列；本文S0-08 roster及map。`E/reports/G2/`：ComponentContract36、CatalogState66、Catalog6、PlatformShell5=113 | 113为当前实跑；旧96为历史预期，旧延期清单不覆盖components现行§8.2（仅CALENDAR-DAY→S2、BODY-DIAGRAM→S4）。S1新增组件合同有独立来源，不把旧22-ID数字当现行全部实现 |
+| T017/T018入口/组合工具 | 本文「S0 G4」「S0 G3」、`docs/s0/T017.md`、`docs/s0/T018.md`；当前G4 XML12例、G3 XML42例。具体map见下文 | 自动PASS；G4工具不替代每一Feature入口map，alpha(0f)/不拦触摸遮罩的既有检测限制不抹去 |
+| T019/T020，组件基线批准/digest | D/S1-D102：负责人2026-11-14亲录并查看DS-BUTTON-default（780×320），批准「看起来没问题」；正向1/0、临时「计数→次数」负例1failure，基线不变；T020完成注释main702f8f6。当前G5 XML记录pixelDifferences=0 | G5自动PASS；S1-D109决定保持现状、不扩展，不新增baseline。不是全组件或Feature视觉验收 |
+| Claude复跑 / Cursor复核 | T028 host角色迁移与复跑见CP1、D101/D108；`H/.handoff/subagent/2026-11-16-t029-review.md`：范围99c0cc5..48a98e4，结论通过、无blocker；major由D110补归档，minor由D111处置 | 满足既有host/独立复核来源；本轮README独立review仍PENDING，不冒称已经通过 |
+| L3状态与checkpoint边界 | components §1.4及本文S0-08「L3 与图标接入」；T021原文要求标明已取/未取 | **未取/PENDING**；系统手势、字体/大字、弹层等人工项未完成。是否将证据任务T021视为可勾，留dispatcher/负责人最终核验；本轮不勾、不称CP2已人工完成 |
+
+DS-BUTTON完整SHA-256为 `0cdcc5e879daa5b2d6e0e712f9939263657059a242645fa92c536b9aa1c5ef82`，同时出现在D102、`E/baseline-before.txt`、`E/baseline-final.txt`。两份快照还包括environment PNG/README及当时产品README；它们描述T028前后不变，本轮README文档改动不冒充该快照的新批准。基线批准责任人为负责人；本轮未写任何baseline。
+
+**CP2 entry/layout。** 本轮无新交互；历史组件交互的完整逐行map在本文S0-08「entry / layout map」及「宿主编译失败修复与 D12 资源接入」新增3行，不用本轮无新交互声明取代。代码入口为 `app/src/debug/java/com/ignacioli/finecoach/S0ComponentCatalog.kt` 的 `S0ComponentCatalog` / `S0ComponentState`：catalog内容列→`catalog-{ID}`可见分组→组件状态；后者构造`{ID}-{state}`及各子tag、内存callback。width owner实际位于 `app/src/main/java/com/ignacioli/finecoach/designsystem/{FcControls,FcRows,FcFeedback}.kt`：
+
+| map中的实际交互示例（其余逐行沿用原map） | 数据变化 | 代码 / width owner |
+|---|---|---|
+| catalog索引→DS-BUTTON→`catalog-DS-BUTTON` | 内存样例导航 | Catalog→FcRows.FcGroupEntryRow.fillMaxWidth |
+| DS-BUTTON/default→主按钮样例→`DS-BUTTON-default` | 内存count，无持久化 | Catalog→FcControls.FcButton.fillMaxWidth；父`$tag-parent`列 |
+| DS-STEPPER/field→输入→`DS-STEPPER-field-input` | 内存text | Catalog→FcControls.FcStepperField；input.weight(1f)，胶囊满宽 |
+| DS-CONFIRM-DIALOG/open→确认/取消→`DS-CONFIRM-DIALOG-open-accept` / `-cancel` | 确认仅内存count，取消关闭 | Catalog→FcFeedback.FcConfirmationDialog；横排weight/大字纵排满宽 |
+| DS-TITLE-ACTION/icon→日历/资料库/筛选→`DS-TITLE-ACTION-icon-calendar` / `-library` / `-filter` | 内存count | Catalog→FcControls.FcTitleIconButton；≥44点击区，不要求满宽 |
+
+结果限定为上述自动门与归档证据。OWNER? 集中L3及最终人工认可仍由负责人决定；无本轮新A/B设计，也无Penpot/baseline改动。
+
+## T030 / CP3：向量与交付 checkpoint evidence（2026-11-16）
+
+**CP3尚不可申请S0验收；L3 未取 / PENDING，S0-SC-003未满足。** 依据canonical S0 `tasks.md` T030（依赖T022～T029）、Phase3 Done when / Proven by、`plan.md` §5/§6及`spec.md` S0-SC-001～003。H/E/D及完整HEAD采用CP1定位约定；以下host归档均绑定产品基点 `48a98e4da048c55d0b3f602ae419b0ca76d41a82`。责任人：T028执行/核验为dispatcher，T029独立复核为Cursor，本轮仅Codex整理，集中L3与最终认可为负责人。
+
+**最终host gate。** T028原始入口由D108记录为 `gate.sh --android`，完整授权输入在 `E/runlist.tsv`、`E/manifest.sha256`；各门的确切展开命令在 `E/summary.txt`。该包未独立保存带全部参数的顶层shell命令/exit行，不补造。G0/G1～G5/G8、Room、smoke的逐门command/rc/count/report见CP1/CP2。其余门如下；Gradle共同前缀及cwd同CP1，JUnit均0 failures/errors/skips：
+
+| 门 / command 任务 | rc / 数量 / 耗时 | report / log（相对 E） |
+|---|---|---|
+| unit：`:app:testDebugUnitTest` | 0；1014；99s | `reports/unit/TEST-*.xml` / `unit.log` |
+| G6 Android：`:app:s0G6` | 0；77；18s | `reports/G6-Android/TEST-*.xml` / `G6-Android.log` |
+| seed：`:app:s0SeedIsolation` | 0；16；30s | `reports/seed/TEST-*.xml` / `seed.log` |
+| training：`:app:s0Conformance` | 0；1；28s | `reports/training/TEST-*.xml` / `training.log` |
+| library：`:app:p4ExerciseLibraryConformance` | 0；1；27s | `reports/library/TEST-*.xml` / `library.log` |
+| today：`:app:p4TodayConformance` | 0；1；25s | `reports/today/TEST-*.xml` / `today.log` |
+| detail：`:app:p4SessionDetailConformance` | 0；1；24s | `reports/detail/TEST-*.xml` / `detail.log` |
+| students：`:app:p4StudentListConformance` | 0；1；27s | `reports/students/TEST-*.xml` / `students.log` |
+| student：`:app:p4StudentDetailConformance` | 0；1；25s | `reports/student/TEST-*.xml` / `student.log` |
+| P7：`:app:p7SideBySide` | 0；15；29s | `reports/P7/TEST-*.xml` / `P7.log` |
+| add-exercise：`:app:p4AddExerciseConformance` | 0；1；27s | `reports/add-exercise/TEST-*.xml` / `add-exercise.log` |
+
+S1-D111纠正口径：旧summary的`Android-subtotal ran=19 excludes=G8`未计G8，实际 **19+G8=20门**（含七个core、P7、unit等；不是20个互不重叠测试集合，测试数不能相加当独立覆盖）。`overall status=BLOCKED rc=2`为设计结果：G7 DEFERRED S4、L3 PENDING、安装/系统另检，且summary未接入后来G6对账；不称自动门失败，**不称FR-130「一条命令退出0」已由脚本满足**。D111接受现状及小计修正，不等于S0验收。
+
+| T030要求 / 依赖 | 原文与可定位证据 | 结论 / 剩余 |
+|---|---|---|
+| T022～T024：最小真实运算/双端同集 | 本文S0-06「清单与证明边界」「双端op映射」「FR-018 / FR-012 登记」：72 conformance +5 course-packages正常样例，D06/D11批准最小credit-ledger.balance及日历timeZone；`E/G6-reconciliation.txt`、`G6-iOS.log`、`G6-Android.log`、`G6-iOS-vectors.txt`、`G6-Android-vectors.txt` | G6 **PASS，77=77**，id/path/sha256一致；iOS2个XCTest不等于2条向量，Android为72+5。S1首批13向量另属S1；历史FR-018已有iOS非纯Domain断言、未接余额runner；FR-012确认门槛共享adapter映射当时未确认，留S1核实，本节不由77项自动宣称该历史缺口已关闭 |
+| G6 iOS确切历史command/环境 | `G6-iOS.log`开头：`xcodebuild -project ios/FineCoach.xcodeproj -scheme FineCoachTests -destination id=4DD81BE1-C2EA-4B71-90B0-2A7247934A60 -derivedDataPath /tmp/fc-t028-ios -resultBundlePath /tmp/fc-t028-ios.xcresult -only-testing:FineCoachTests/VectorFormatTests -only-testing:FineCoachTests/SharedVectorTests test`；对账记iPhone17/iOS27.0、已重启、09:13:59～09:15:05、rc0 | 2 tests/0 failures/TEST SUCCEEDED；以对账及双端原日志为最终G6，旧summary的BLOCKED不覆盖后续对账；未新跑 |
+| T025：seed与Release隔离 | `E/seed.log`及2份XML：S1DebugSeedTests12+S1SeedIsolationTests4=16；Release APK SHA-256 `46fcd1d1086d18e55a49b8692ca640e6b7d17925d810802eff9cb54cac6927bb`，dex2/manifest1/resources1 | 同HEAD host隔离PASS，**不是设备安装PASS**；当前S1 seed由既有S0 task承载，不能外推S0历史metadata合同仍适用 |
+| T026：S0历史安装/幂等 | `H/.handoff/logs/2026-11-06-host-s0-12-t026.log`：`RUN1 exit=0`/`RUN2 exit=0`，均`SEED version=1 rows=5 status=ok`；serial emulator-5554/API36/build BE2A.250530.026.D1，APK SHA-256 `68f66edc9fecf7bee22bbaed938437d594dbb93ee4531d2ceae0934047722bf6` | 历史2次安装PASS；原日志未给产品HEAD/完整命令，缺字段；对应已停用S0 metadata安装合同，不当成当前安装验收 |
+| S1历史安装及当前安装缺口 | 本文「S1 T019」「S1 T020」与 `docs/s1/T019.md`、`docs/s1/T020.md`；`H/.handoff/logs/2026-11-09-s1-seed-api36-install1.log` / `install2.log` 均BUILD SUCCESSFUL、version1/rows66，同API36/BE4B.251210.005，APK SHA-256 `24465907c3e44193384d5fa15e047cbae5be9f4836ddca506dd7a062ecf7b01a`；T020记录两次rc0、tree同05a5cad | 当前合同是version3/multi rows1149（single1138/empty1088），命令见本文S1 T019；不是上述66或S0的5。**T028同HEAD当前seed的设备安装未取得**，summary的s0InstallSeededDebug为BLOCKED/separate-host-check；OWNER? 后续指定设备安装与认可 |
+| 系统隐私/QPR2/API31/32/33+、KDF | CP1逐项来源：D100及t006 parser；2026-11-05 T010三份原始log/执行结果；2026-11-04 T032平台/provider及字节 | 沿用历史日期/环境，不称同HEAD设备重测；cross-platform仍BLOCKED→D10；cloud拒绝不算parser；T010人工DEFERRED如CP1保留 |
+| T027/T028：host gate/基线变化/状态 | D104/D106的fixture66/0×2、bash-n/zsh-n rc0，D107接入G8，D108授权runlist；`E/status-before.txt`、`status-final.txt`为空；`baseline-before.txt`/`baseline-final.txt`相同，G0另存3个APK digest | T028当时产品干净；不是本轮README仍无diff。DS-BUTTON按D102/D109只引用digest、不加baseline；FR-130边界如上 |
+| T029：独立一致性/入口布局/隐私复核 | `H/.handoff/subagent/2026-11-16-t029-review.md`（Cursor只读、未跑构建/设备），D110补六屏，D111逐条处置 | 复核通过、无blocker；T029勾选只代表复核处置，不代表L3发生；本轮README独立review PENDING |
+| 集中L3、运行清单、SC-003 | `E/summary.txt`的L3 PENDING、D111、canonical spec S0-SC-003原文要求隐私系统证据和最终集中L3/运行清单负责人认可 | **L3从未发生，未取/PENDING**；D108批准T028 runlist不是最终S0集中走查/运行清单验收。OWNER? 集中走查、系统证据认可、最终S0验收；现阶段不能申请 |
+
+**七个core hash的证据分层（S1-D110）。** 批准对照索引为 `H/.handoff/dispatcher/HANDOFF.md` 的七hash表；下列完整值均来自归档原文。训练页来自T028主跑XML；其余六屏来自同HEAD补跑 `E/core-hash-supplement/` 中各具名report.json的`sha256`（均`gatePassed=true`）及对应report.md。不能合称七屏都在T028主跑报告中留存。
+
+| core / 归档来源（相对 E） | SHA-256 |
+|---|---|
+| P0-a2训练中 / `reports/training/TEST-com.ignacioli.finecoach.TrainingConformanceTests.xml`，S0_CONFORMANCE hashes | `d1caec3f70c8ef69b7d8f7f38b7bccdee1e8f0dad50549bd466566936be0978a` |
+| 今日 / `core-hash-supplement/01-today-s1.report.json` | `06e5ce4d145aafff78dcac174f8fd49a57d9e459bd5bff14c026f153d0c0da1a` |
+| 动作库 / `core-hash-supplement/D2b-exercise-library.report.json` | `9ded179ce418e332ae866ac07d41a61df8959a3f6899399e47839c089c915e5b` |
+| 学员列表 / `core-hash-supplement/21-student-list-s1.report.json` | `9df8e951ea9883e9efe486022de4261c2467ede5c0e0b3bfc670a3c18359772c` |
+| 学员详情 / `core-hash-supplement/26-student-detail-s1.report.json` | `2e48c2607cc36aa4c6fe17eb4fc2a07573ff0aa8b425ad57a01046120a1d3bd2` |
+| 历史详情 / `core-hash-supplement/35-session-detail-s1.report.json` | `6ff3c85d892252e47ff3da3f594289bc4d0d63436ba03b2af61a5c4a980d1d65` |
+| 添加动作 / `core-hash-supplement/C2b-B-add-exercise.report.json` | `143ba9c0445844326ca0b91c8dfe3989fd9dde365f6f56720b7d55f5a6fba786` |
+
+补跑责任人为dispatcher；`E/core-hash-supplement.log` 保留C2b-B首次`AddExerciseConformanceTests:89`/ComposeTimeoutException失败，后在空闲主机单独重跑一次通过，见 `core-hash-supplement-c2bb-rerun.log`，按D110记为已知flake，不删除失败历史、不另起本轮重测。其余五屏一次通过；基线未改。自动几何/稳定hash证明不等于L3。
+
+**CP3 entry/layout与本轮diff。** 本文S0-06 runner原执行记录明确「没有新增用户交互，entry/layout map不适用」；S0-12/S1 seed为debug infrastructure及adb instrumentation入口，不新增用户控件。已有catalog/弹层交互沿用本文S0-08完整map和D12三行及CP1 probe map。S1已实现的Feature入口另见 `docs/s1/implementation-map.md`（其中控件、identifier、mutation及width owner指向真实代码），作为S1范围引用，不混称S0新增交互。本轮仅文档，无新交互，无design delta；不修改Penpot/产品/测试/规格或baseline。
+
+本轮初始tracked/staged/untracked均空，branch=`docs/s0-checkpoint-evidence`，HEAD同上；修改摘要仅README末尾三个checkpoint section及一处`s0G8`旧说明指向现行聚合门。文档验证限定readback和`git diff --check`，具体rc及最终status由writer最终报告提供；没有新host/device执行。本节不将文档完成当作T030/CP3验收，不tick tasks、不stage/commit。
+
+剩余：T006/D10 **BLOCKED**；T010人工判定 **DEFERRED/PENDING**（历史自动文字记录已定位）；当前同HEAD seed安装 **未取得/BLOCKED separate host check**；本轮独立README review **PENDING**；集中L3/最终运行清单认可/S0-SC-003 **PENDING，OWNER?**；G7 **DEFERRED S4**。没有明确批准的事项不代owner决定。
