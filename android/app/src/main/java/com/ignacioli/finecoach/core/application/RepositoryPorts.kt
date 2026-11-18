@@ -420,6 +420,7 @@ interface ExerciseRepositoryPort {
 }
 
 interface SessionRepositoryPort {
+    suspend fun linkedAppointmentID(sessionID: SessionID): ApplicationResult<String?> = ApplicationResult.Success(null)
     suspend fun startOrOpen(command: StartOrOpenSessionCommand): ApplicationResult<SessionRecord>
     suspend fun listActiveSessions(): ApplicationResult<List<ActiveSessionSnapshot>>
     suspend fun active(studentID: StudentID): ApplicationResult<SessionRecord?>

@@ -23,9 +23,11 @@ class SessionRepository(
     private val dao get() = database.s1Dao()
     private val writes get() = database.t008SessionDao()
 
-    override suspend fun startOrOpen(command: StartOrOpenSessionCommand): ApplicationResult<SessionRecord> = transaction {
+    override suspend fun startOrOpen(command: StartOrOpenSessionCommand): ApplicationResult<SessionRecord> = transaction { startOrOpenInTransaction(command) }
+
+    internal fun startOrOpenInTransaction(command: StartOrOpenSessionCommand): SessionRecord {
         val student = dao.findStudent(command.studentID.t008UUID()) ?: trainingFailure(ApplicationErrorCode.notFound)
-        activeRow(command.studentID)?.let { return@transaction record(it) }
+        activeRow(command.studentID)?.let { return record(it) }
         if (student.lifecycle != StudentLifecycle.active) trainingFailure(ApplicationErrorCode.invalidState)
         val started = Session.start(ids.newSessionID(), command.studentID, command.initialTrainingFocus, command.nowUTC).toRecord()
         dao.insert(started.toEntity())
@@ -33,7 +35,7 @@ class SessionRepository(
         // Only the stale scalar pointer is replaced; its terminal Session and children are preserved.
         writes.deletePointer(command.studentID.value)
         dao.insert(ActiveSessionPointerEntity(command.studentID.value, started.sessionID.t008UUID()))
-        record(requireNotNull(dao.findSession(started.sessionID.t008UUID())))
+        return record(requireNotNull(dao.findSession(started.sessionID.t008UUID())))
     }
 
     override suspend fun active(studentID: StudentID): ApplicationResult<SessionRecord?> = transaction {
@@ -46,6 +48,9 @@ class SessionRepository(
         rows.map(::record).sortedWith(compareBy<SessionRecord> { it.startedAtUTC }.thenBy { it.sessionID.value }).map {
             ActiveSessionSnapshot(it.sessionID, it.studentID, it.startedAtUTC, it.lastCheckpointUTC, it.durationNeedsReview)
         }
+    }
+    override suspend fun linkedAppointmentID(sessionID: SessionID): ApplicationResult<String?> = transaction {
+        dao.findSession(sessionID.t008UUID())?.appointmentID?.toString()
     }
     override suspend fun find(sessionID: SessionID): ApplicationResult<SessionRecord?> = transaction {
         dao.findSession(sessionID.t008UUID())?.let(::record)
@@ -91,6 +96,7 @@ class SessionRepository(
         if (command.settleCredits) trainingFailure(ApplicationErrorCode.incompatibleInput)
         requireSession(command.sessionID, command.expectedRevision, SessionState.inProgress)
         val finished = requireNotNull(loadSessionContent(database, command.sessionID)).toDomain().session.finished(command.completedAtUTC)
+        completeLinkedAppointment(database, command.sessionID, command.completedAtUTC)
         updateSession(database, finished.toRecord())
         writes.deletePointer(finished.studentID.value)
         exerciseRepository.releaseSessionClaimsInTransaction(sessionClaimOwners(command.sessionID.t008UUID()))
@@ -99,6 +105,7 @@ class SessionRepository(
     override suspend fun abandon(command: AbandonEmptySessionCommand): ApplicationResult<SessionRecord> = transaction {
         requireSession(command.sessionID, command.expectedRevision, SessionState.inProgress)
         val abandoned = requireNotNull(loadSessionContent(database, command.sessionID)).toDomain().session.abandoned(command.abandonedAtUTC)
+        abandonLinkedAppointment(database, command.sessionID, command.abandonedAtUTC)
         updateSession(database, abandoned.toRecord())
         writes.deletePointer(abandoned.studentID.value)
         exerciseRepository.releaseSessionClaimsInTransaction(sessionClaimOwners(command.sessionID.t008UUID()))

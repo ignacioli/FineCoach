@@ -95,7 +95,11 @@ class FinishSessionUseCases(
             is ApplicationResult.Failure -> return@settlementValidation result
             is ApplicationResult.Success -> result.value
         }
-        val key = CreditLedgerSourceEventKeyFactory.adhocSession(sessionID)
+        val linked = when (val result = sessions.linkedAppointmentID(sessionID)) {
+            is ApplicationResult.Failure -> return@settlementValidation result
+            is ApplicationResult.Success -> result.value != null
+        }
+        val key = if (linked) CreditLedgerSourceEventKeyFactory.sessionComplete(sessionID) else CreditLedgerSourceEventKeyFactory.adhocSession(sessionID)
         ledger.firstOrNull { it.sourceEventKey == key }?.let {
             return@settlementValidation ApplicationResult.Success(SessionCreditOutcome.Debited(it))
         }
@@ -113,6 +117,12 @@ class FinishSessionUseCases(
             coursePackage.endDate?.let { it < clock.today(zoneID) } == true -> SessionCreditUnusableReason.expired
             coursePackage.remainingCreditsCache <= 0 -> SessionCreditUnusableReason.insufficientBalance
             else -> null
+        }
+        if (linked && reason == null) {
+            return@settlementValidation when (val debit = credits.debitOnSessionComplete(coursePackage.coursePackageID, sessionID)) {
+                is ApplicationResult.Failure -> debit
+                is ApplicationResult.Success -> ApplicationResult.Success(SessionCreditOutcome.Debited(debit.value))
+            }
         }
         ApplicationResult.Success(if (reason == null) SessionCreditOutcome.AdhocChoiceRequired(coursePackage)
             else SessionCreditOutcome.PackageUnusable(coursePackage, reason))
@@ -139,6 +149,10 @@ class FinishSessionUseCases(
     }
 
     suspend fun skipDebit(sessionID: SessionID): ApplicationResult<SessionCreditOutcome> = settlementValidation {
+        when (val linked = sessions.linkedAppointmentID(sessionID)) {
+            is ApplicationResult.Failure -> return@settlementValidation linked
+            is ApplicationResult.Success -> if (linked.value != null) trainingFailure(ApplicationErrorCode.invalidState)
+        }
         when (val result = completed(sessionID)) {
             is ApplicationResult.Failure -> result
             is ApplicationResult.Success -> ApplicationResult.Success(SessionCreditOutcome.Skipped)
