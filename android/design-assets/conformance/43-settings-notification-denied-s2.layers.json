@@ -1,0 +1,194 @@
+{
+  "source": {
+    "file": "M1-B G5 Design",
+    "page": "Foundations",
+    "boardId": "fdf3c3ea-1297-80d1-8008-f6737036c06a",
+    "boardName": "S2 · 43 设置 · 通知权限已拒绝（派生 S2 T002：只留通知行，S2-D01）",
+    "exportedAt": "2026-11-17",
+    "exporter": "penpot-mcp execute_code (host)",
+    "units": "pt relative to board origin; PNG is 2x",
+    "png": "design/m1-b-hifi/screens/43-settings-notification-denied-s2.png",
+    "pngPixels": [
+      780,
+      1688
+    ],
+    "status": "S2 T002 derived board; pending owner review",
+    "derivedFrom": {
+      "boardId": "b48ddf15-5062-8001-8008-b669431b9ba9",
+      "boardName": "D15d 设置 · 通知权限已拒绝"
+    },
+    "scope": "S2-D01 notification row only"
+  },
+  "board": {
+    "w": 390,
+    "h": 844,
+    "fill": "#ffffff"
+  },
+  "layers": [
+    {
+      "name": "Back",
+      "type": "text",
+      "path": "0",
+      "x": 16,
+      "y": 62,
+      "w": 8,
+      "h": 26,
+      "fill": "#5c5a52",
+      "text": "‹",
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 22,
+      "fontWeight": 400,
+      "lineHeight": 1.2
+    },
+    {
+      "name": "设置",
+      "type": "text",
+      "path": "1",
+      "x": 32,
+      "y": 52,
+      "w": 58,
+      "h": 34,
+      "fill": "#211f1b",
+      "text": "设置",
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 28,
+      "fontWeight": 700,
+      "lineHeight": 1.2
+    },
+    {
+      "name": "Divider",
+      "type": "rectangle",
+      "path": "2",
+      "x": 16,
+      "y": 112,
+      "w": 358,
+      "h": 1,
+      "fill": "#ece9e2"
+    },
+    {
+      "name": "Divider",
+      "type": "rectangle",
+      "path": "3",
+      "x": 16,
+      "y": 176,
+      "w": 358,
+      "h": 1,
+      "fill": "#ece9e2"
+    },
+    {
+      "name": "icon / bell",
+      "type": "group",
+      "path": "4",
+      "x": 17,
+      "y": 125,
+      "w": 24,
+      "h": 24,
+      "fill": null
+    },
+    {
+      "name": "svg-path",
+      "type": "path",
+      "path": "4/1",
+      "x": 20,
+      "y": 127,
+      "w": 18,
+      "h": 15,
+      "fill": "#2a2822"
+    },
+    {
+      "name": "svg-path",
+      "type": "path",
+      "path": "4/2",
+      "x": 27.3,
+      "y": 146,
+      "w": 3.5,
+      "h": 1,
+      "fill": "#2a2822"
+    },
+    {
+      "name": "通知",
+      "type": "text",
+      "path": "5",
+      "x": 56,
+      "y": 124,
+      "w": 35,
+      "h": 20,
+      "fill": "#211f1b",
+      "text": "通知",
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 17,
+      "fontWeight": 600,
+      "lineHeight": 1.2
+    },
+    {
+      "name": "Status badge",
+      "type": "ellipse",
+      "path": "6",
+      "x": 56,
+      "y": 145,
+      "w": 22,
+      "h": 22,
+      "fill": "#2a2822"
+    },
+    {
+      "name": "Badge i",
+      "type": "text",
+      "path": "7",
+      "x": 64,
+      "y": 147,
+      "w": 5,
+      "h": 16,
+      "fill": "#ffffff",
+      "text": "i",
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 13,
+      "fontWeight": 700,
+      "lineHeight": 1.2
+    },
+    {
+      "name": "权限拒绝",
+      "type": "text",
+      "path": "8",
+      "x": 84,
+      "y": 148,
+      "w": 67,
+      "h": 16,
+      "fill": "#5c5a52",
+      "text": "权限已拒绝",
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "lineHeight": 1.2
+    },
+    {
+      "name": "前往设置",
+      "type": "text",
+      "path": "9",
+      "x": 282,
+      "y": 128,
+      "w": 62,
+      "h": 18,
+      "fill": "#2a2822",
+      "text": "前往设置",
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "lineHeight": 1.2
+    },
+    {
+      "name": "›",
+      "type": "text",
+      "path": "10",
+      "x": 360,
+      "y": 132,
+      "w": 8,
+      "h": 24,
+      "fill": "#5c5a52",
+      "text": "›",
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 20,
+      "fontWeight": 400,
+      "lineHeight": 1.2
+    }
+  ]
+}
