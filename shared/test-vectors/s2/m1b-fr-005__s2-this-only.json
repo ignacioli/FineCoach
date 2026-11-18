@@ -1,0 +1,32 @@
+{
+  "id": "s2-this-only",
+  "rule": "M1B-FR-005",
+  "meta": {
+    "description": "fictional-data: fixed S2 parity scenario",
+    "tags": [
+      "fictional-data"
+    ]
+  },
+  "given": {
+    "clock": {
+      "now": "2026-03-08T10:00:00Z"
+    },
+    "timeZone": "America/Los_Angeles",
+    "state": {}
+  },
+  "when": {
+    "op": "appointment.detached",
+    "args": {
+      "$ref": "/given/state"
+    }
+  },
+  "then": {
+    "state": {
+      "detached": true,
+      "sameSeries": true,
+      "time": "11:30",
+      "lead": 60,
+      "enabled": false
+    }
+  }
+}

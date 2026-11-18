@@ -1,0 +1,29 @@
+{
+  "id": "s2-notification-content",
+  "rule": "M1B-FR-011",
+  "meta": {
+    "description": "fictional-data: fixed S2 parity scenario",
+    "tags": [
+      "fictional-data"
+    ]
+  },
+  "given": {
+    "clock": {
+      "now": "2026-03-08T10:00:00Z"
+    },
+    "timeZone": "America/Los_Angeles",
+    "state": {}
+  },
+  "when": {
+    "op": "appointment.notification",
+    "args": {
+      "$ref": "/given/state"
+    }
+  },
+  "then": {
+    "state": {
+      "title": "训练提醒",
+      "body": "01:00 有一节训练安排。"
+    }
+  }
+}

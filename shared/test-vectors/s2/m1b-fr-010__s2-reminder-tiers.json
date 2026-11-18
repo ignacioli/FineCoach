@@ -1,0 +1,35 @@
+{
+  "id": "s2-reminder-tiers",
+  "rule": "M1B-FR-010",
+  "meta": {
+    "description": "fictional-data: fixed S2 parity scenario",
+    "tags": [
+      "fictional-data"
+    ]
+  },
+  "given": {
+    "clock": {
+      "now": "2026-03-08T10:00:00Z"
+    },
+    "timeZone": "America/Los_Angeles",
+    "state": {}
+  },
+  "when": {
+    "op": "appointment.reminders",
+    "args": {
+      "$ref": "/given/state"
+    }
+  },
+  "then": {
+    "state": {
+      "minutes": [
+        15,
+        30,
+        60,
+        120
+      ],
+      "default": 60,
+      "disabledLead": null
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "s2-overdue-persists",
+  "rule": "M1B-FR-002",
+  "meta": {
+    "description": "fictional-data: fixed S2 parity scenario",
+    "tags": [
+      "fictional-data"
+    ]
+  },
+  "given": {
+    "clock": {
+      "now": "2026-03-08T10:00:00Z"
+    },
+    "timeZone": "America/Los_Angeles",
+    "state": {}
+  },
+  "when": {
+    "op": "appointment.overdue",
+    "args": {
+      "$ref": "/given/state"
+    }
+  },
+  "then": {
+    "state": {
+      "beforeEnd": false,
+      "atEnd": true,
+      "nextDay": true,
+      "status": "scheduled"
+    }
+  }
+}
