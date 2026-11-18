@@ -5,6 +5,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.ignacioli.finecoach.storage.migration.MIGRATION_1_2
+import com.ignacioli.finecoach.storage.migration.MIGRATION_2_3
+import com.ignacioli.finecoach.storage.migration.installAppointmentIntegrity
 import com.ignacioli.finecoach.storage.value.StorageValueConverters
 import java.time.Instant
 import java.util.UUID
@@ -29,9 +31,10 @@ object FineCoachDatabaseFactory {
         require(!application.isDeviceProtectedStorage) { "Credential-protected storage required" }
         val path = application.getDatabasePath(DATABASE_NAME)
         return Room.databaseBuilder(application, FineCoachDatabase::class.java, path.absolutePath)
-            .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
+                    installAppointmentIntegrity(db)
                     db.execSQL(
                         "INSERT INTO store_metadata (`key`, value) VALUES (?, ?)",
                         arrayOf(CREATED_AT_KEY, StorageValueConverters().instantToString(Instant.now())),

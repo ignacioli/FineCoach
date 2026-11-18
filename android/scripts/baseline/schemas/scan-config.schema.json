@@ -1,0 +1,290 @@
+{
+  "$comment": "Source: /Users/liyongqiang/.agents/skills/ig-design-system/schemas/scan-config.schema.json; copied 2026-11-17.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "scan-config.schema.json",
+  "title": "Board scan config (scripts/board-scan)",
+  "description": "Project-specific names and values for the board scan. Prefer *From sources so values stay in the project's documents.",
+  "type": "object",
+  "required": [
+    "extract",
+    "rules"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "root": {
+      "type": "string",
+      "description": "base for *From file paths, relative to this config file"
+    },
+    "extract": {
+      "type": "object",
+      "required": [
+        "page"
+      ],
+      "properties": {
+        "fileName": {
+          "type": "string",
+          "description": "expected penpot.currentFile.name; the script refuses another file"
+        },
+        "page": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string",
+          "description": "shared plugin data namespace of the layer tags"
+        },
+        "statusKey": {
+          "type": "string"
+        },
+        "statusValue": {
+          "type": "string"
+        },
+        "screenKey": {
+          "type": "string"
+        }
+      }
+    },
+    "rules": {
+      "type": "object",
+      "required": [
+        "lineHeights"
+      ],
+      "properties": {
+        "componentPrefixes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "assetPrefixes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "icons": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "prefix"
+            ],
+            "properties": {
+              "prefix": {
+                "type": "string"
+              },
+              "sizes": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              },
+              "min": {
+                "type": "number"
+              },
+              "max": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "decorPattern": {
+          "type": "string"
+        },
+        "framePattern": {
+          "type": "string"
+        },
+        "scrimPrefixes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "colors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "colorsFrom": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "file",
+              "pattern"
+            ],
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "pattern": {
+                "type": "string"
+              },
+              "flags": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "colorExempt": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "lineHeights": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "minSize",
+              "value"
+            ],
+            "properties": {
+              "minSize": {
+                "type": "number"
+              },
+              "value": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "toolDefaultLineHeight": {
+          "type": "number"
+        },
+        "fonts": {
+          "type": "object"
+        },
+        "screenFonts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "screen",
+              "fonts"
+            ],
+            "properties": {
+              "screen": {
+                "type": "string"
+              },
+              "fonts": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "grid": {
+          "type": "number"
+        },
+        "touchMin": {
+          "type": "number"
+        },
+        "roles": {
+          "type": "object",
+          "properties": {
+            "header": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "sectionTitle": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "listRow": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "fixedBottom": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "floating": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "sheet": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "tile": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "flow": {
+          "type": "object"
+        },
+        "flowFrom": {
+          "type": "object",
+          "required": [
+            "file",
+            "heading"
+          ],
+          "properties": {
+            "file": {
+              "type": "string"
+            },
+            "heading": {
+              "type": "string"
+            },
+            "idColumn": {
+              "type": "integer"
+            },
+            "pxColumn": {
+              "type": "integer"
+            }
+          }
+        },
+        "exceptions": {
+          "type": "array"
+        },
+        "exceptionsFrom": {
+          "type": "object",
+          "required": [
+            "file",
+            "heading"
+          ],
+          "properties": {
+            "file": {
+              "type": "string"
+            },
+            "heading": {
+              "type": "string"
+            }
+          }
+        },
+        "flowTolerance": {
+          "type": "number"
+        },
+        "inlineMaxHeight": {
+          "type": "number"
+        },
+        "pushApartMin": {
+          "type": "number"
+        },
+        "forbidFixedTextBox": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

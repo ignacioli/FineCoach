@@ -1,3 +1,4 @@
+// fictional-data: synthetic storage rows; no real student data.
 package com.ignacioli.finecoach
 
 import android.content.Context
@@ -44,6 +45,11 @@ class S1EntityRoundtripTests {
         LocalDate.of(2026, 12, 1), LocalDate.of(2026, 1, 1), CoursePackageStatus.active, now, now)
     private fun exercise(n: Int = 5, order: Long = 1) = SessionExerciseEntity(id(n), id(2), order,
         ExerciseSourceKind.sessionOnly, null, "虚构动作快照", RecordMode.cardio, "虚构动作备注", null)
+    private fun insertAppointmentReference() {
+        if (dao.findStudent(id(1)) == null) dao.insert(student())
+        database.appointmentDao().insert(AppointmentEntity(id(99).toString(), id(1).toString(), null, "2026-11-07", "09:00", 60,
+            "scheduled", null, null, false, true, 60, null, "", now.toString(), now.toString()))
+    }
     private fun <T> offMain(action: () -> T): T = worker.submit(Callable { action() }).get(30, TimeUnit.SECONDS)
 
     @Before fun prepare() {
@@ -79,6 +85,7 @@ class S1EntityRoundtripTests {
         dao.insert(pkg)
         val claim = ActivePackageClaimEntity(id(1), pkg.id)
         dao.insert(claim)
+        insertAppointmentReference()
         val ledger = CreditAdjustmentEntity(id(4), pkg.id, CreditDirection.credit, 2,
             CreditReasonKind.manualCorrection, "虚构修正原因", id(2), id(99), "fictional-event", now)
         dao.insert(ledger)
@@ -108,6 +115,7 @@ class S1EntityRoundtripTests {
         val empty = full.copy(id = id(20), state = SessionState.completed, interruptionStartedAtUTC = null,
             durationNeedsReview = false, coachAdjustedDurationSeconds = null, studentFacingSummary = null,
             privateCoachNote = null, revision = "1", completedAtUTC = now, appointmentID = id(99), creditSettlementNote = null)
+        insertAppointmentReference()
         dao.insert(empty)
         assertEquals(empty, dao.findSession(empty.id))
     }

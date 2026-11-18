@@ -1,0 +1,129 @@
+{
+  "$comment": "Source: /Users/liyongqiang/.agents/skills/ig-design-system/examples/board-scan/scan.config.json; copied 2026-11-17.",
+  "$schema": "../../schemas/scan-config.schema.json",
+  "root": ".",
+  "extract": {
+    "fileName": "Example Design",
+    "page": "Screens",
+    "namespace": "example",
+    "statusKey": "status",
+    "statusValue": "approved",
+    "screenKey": "screen"
+  },
+  "rules": {
+    "componentPrefixes": [
+      "DS-",
+      "FO-"
+    ],
+    "assetPrefixes": [
+      "asset / "
+    ],
+    "icons": [
+      {
+        "prefix": "asset / icon / ",
+        "sizes": [
+          16,
+          20,
+          24
+        ]
+      },
+      {
+        "prefix": "asset / icon / large / ",
+        "min": 32,
+        "max": 48
+      }
+    ],
+    "decorPattern": "^(frame-|mark( /|$))",
+    "framePattern": "^frame-",
+    "scrimPrefixes": [
+      "scrim"
+    ],
+    "colorsFrom": [
+      {
+        "file": "tokens.css",
+        "pattern": "--color-[a-z-]+:\\s*(#[0-9a-f]{6})"
+      }
+    ],
+    "colorExempt": [
+      "asset / illustration"
+    ],
+    "lineHeights": [
+      {
+        "minSize": 20,
+        "value": 1.3
+      },
+      {
+        "minSize": 0,
+        "value": 1.6
+      }
+    ],
+    "toolDefaultLineHeight": 1.2,
+    "fonts": {
+      "Example Sans": {
+        "sizes": [
+          13,
+          15,
+          17,
+          20,
+          24
+        ],
+        "weights": [
+          "400",
+          "600"
+        ]
+      }
+    },
+    "screenFonts": [
+      {
+        "screen": "Focus mode",
+        "fonts": {
+          "Example Sans": {
+            "sizes": [
+              32
+            ]
+          }
+        }
+      }
+    ],
+    "grid": 4,
+    "touchMin": 48,
+    "roles": {
+      "header": [
+        "DS-TopBar"
+      ],
+      "sectionTitle": [
+        "DS-SectionTitle"
+      ],
+      "listRow": [
+        "DS-ListRow"
+      ],
+      "fixedBottom": [
+        "DS-TabBar",
+        "DS-PrimaryRow"
+      ],
+      "floating": [
+        "DS-Fab"
+      ],
+      "sheet": [
+        "DS-Sheet"
+      ],
+      "tile": [
+        "DS-Tile"
+      ]
+    },
+    "flowFrom": {
+      "file": "components.md",
+      "heading": "#### Relations",
+      "idColumn": 1,
+      "pxColumn": 3
+    },
+    "exceptionsFrom": {
+      "file": "components.md",
+      "heading": "#### Registered exceptions"
+    },
+    "flowTolerance": 0.5,
+    "inlineMaxHeight": 32,
+    "pushApartMin": 48,
+    "forbidFixedTextBox": false
+  }
+}

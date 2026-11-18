@@ -1,0 +1,44 @@
+{
+  "id": "s2-recurrence-end-date",
+  "rule": "M1B-FR-004",
+  "meta": {
+    "description": "fictional-data: fixed S2 parity scenario",
+    "tags": [
+      "fictional-data"
+    ]
+  },
+  "given": {
+    "clock": {
+      "now": "2026-03-08T10:00:00Z"
+    },
+    "timeZone": "America/Los_Angeles",
+    "state": {
+      "interval": 7,
+      "first": {
+        "year": 2026,
+        "month": 3,
+        "day": 7
+      },
+      "end": {
+        "year": 2026,
+        "month": 3,
+        "day": 21
+      }
+    }
+  },
+  "when": {
+    "op": "appointment.recurrence",
+    "args": {
+      "$ref": "/given/state"
+    }
+  },
+  "then": {
+    "state": {
+      "dates": [
+        "2026-03-07",
+        "2026-03-14",
+        "2026-03-21"
+      ]
+    }
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "count": 10,
+  "vectors": [
+    {
+      "id": "s2-recurrence-count",
+      "path": "s2/m1b-fr-004__s2-recurrence-count.json",
+      "sha256": "64438d05bf0647d9334623b622888a5f6a79d5cc9227f87fba6ea77e78168ece",
+      "androidAdapter": "appointment.recurrence",
+      "iosAdapter": "appointment.recurrence"
+    },
+    {
+      "id": "s2-recurrence-end-date",
+      "path": "s2/m1b-fr-004__s2-recurrence-end-date.json",
+      "sha256": "ca2ae4cd31121d557171152f3b53bc923f03352a3121c083dcd1c2127b98031d",
+      "androidAdapter": "appointment.recurrence",
+      "iosAdapter": "appointment.recurrence"
+    },
+    {
+      "id": "s2-recurrence-limit",
+      "path": "s2/m1b-fr-004__s2-recurrence-limit.json",
+      "sha256": "9ddde0cf2dac509350752b1da146e3ee1c4ee101d54e2c15eb86bcbb8b3384cd",
+      "androidAdapter": "appointment.limit",
+      "iosAdapter": "appointment.limit"
+    },
+    {
+      "id": "s2-this-only",
+      "path": "s2/m1b-fr-005__s2-this-only.json",
+      "sha256": "763964c9723f823caec4a0ba749a896d581444a69db16d23192d6c913718ea42",
+      "androidAdapter": "appointment.detached",
+      "iosAdapter": "appointment.detached"
+    },
+    {
+      "id": "s2-this-and-future",
+      "path": "s2/m1b-fr-005__s2-this-and-future.json",
+      "sha256": "92915a07f54255446ba4f193bbee4e13ddbd1f7b9c36a84d16fb6eb93cd8c592",
+      "androidAdapter": "appointment.future",
+      "iosAdapter": "appointment.future"
+    },
+    {
+      "id": "s2-overdue-persists",
+      "path": "s2/m1b-fr-002__s2-overdue-persists.json",
+      "sha256": "e5851a3da43f202ab48408174ea9361d9398a04aa98b18eed42b18edb951057e",
+      "androidAdapter": "appointment.overdue",
+      "iosAdapter": "appointment.overdue"
+    },
+    {
+      "id": "s1-empty-session-abandon-restores-appointment",
+      "path": "s2/m1b-fr-007__s1-empty-session-abandon-restores-appointment.json",
+      "sha256": "9f5a536e9e3be75f7d0aa3eb8894dbf058d8836aac4a50a6d63a6fc419d5be28",
+      "androidAdapter": "appointment.abandon",
+      "iosAdapter": "appointment.abandon"
+    },
+    {
+      "id": "s2-absent-credit-idempotent",
+      "path": "s2/m1b-fr-013__s2-absent-credit-idempotent.json",
+      "sha256": "4b7d99385c3097aa4156ad00addbc1a8fc495faa8292e4b51f07ec1427f5f6b2",
+      "androidAdapter": "appointment.absent",
+      "iosAdapter": "appointment.absent"
+    },
+    {
+      "id": "s2-reminder-tiers",
+      "path": "s2/m1b-fr-010__s2-reminder-tiers.json",
+      "sha256": "195e00698dfaf8cec3972676026e1ced6e694e95681c75ed3dc880abe91d7924",
+      "androidAdapter": "appointment.reminders",
+      "iosAdapter": "appointment.reminders"
+    },
+    {
+      "id": "s2-notification-content",
+      "path": "s2/m1b-fr-011__s2-notification-content.json",
+      "sha256": "dd4ae5de98f338dd7a0d3d81327c84cd1510f8b6238e44f11c7b4e1f7d944b3b",
+      "androidAdapter": "appointment.notification",
+      "iosAdapter": "appointment.notification"
+    }
+  ],
+  "meta": {
+    "tags": [
+      "fictional-data"
+    ]
+  }
+}

@@ -238,6 +238,7 @@ val validateEnvironmentSmoke = tasks.register("validateS0EnvironmentSmokeResults
 environmentSmoke.configure { finalizedBy(validateEnvironmentSmoke) }
 
 val roomClasses = listOf(
+    "com.ignacioli.finecoach.RoomMigrationV3Tests",
     "com.ignacioli.finecoach.RoomSkeletonTests",
     "com.ignacioli.finecoach.StorageValueTests",
     "com.ignacioli.finecoach.StoragePrivacyTests",
@@ -935,6 +936,7 @@ tasks.withType<Test>().configureEach {
     systemProperty("finecoach.sharedVectorRoot", sharedVectorRoot.asFile.absolutePath)
 }
 val sharedVectorClasses = listOf(
+    "com.ignacioli.finecoach.S2VectorRunnerTests",
     "com.ignacioli.finecoach.VectorFormatTests",
     "com.ignacioli.finecoach.SharedVectorTests",
 )
@@ -998,6 +1000,7 @@ val validateSharedVectorGate = tasks.register("validateS0G6Results") {
         check(counts.keys == sharedVectorClasses.toSet()) { "Missing G6 suites: ${sharedVectorClasses - counts.keys}" }
         val expectedCounts = mapOf(
             "com.ignacioli.finecoach.VectorFormatTests" to 72,
+            "com.ignacioli.finecoach.S2VectorRunnerTests" to 10,
             "com.ignacioli.finecoach.SharedVectorTests" to 5,
         )
         check(counts == expectedCounts) { "Unexpected G6 testcase counts: $counts; expected $expectedCounts" }
@@ -1008,6 +1011,22 @@ sharedVectorGate.configure { finalizedBy(validateSharedVectorGate) }
 
 // T019/S0-14: isolated tasks reuse T003's resource-aware JVM without plugin
 // restore/finalizers. No gate ever accepts a record request.
+// S2: immutable S1 core hashes. Render suites already provide dual-render stability evidence.
+val coreBaselineScreens = mapOf(
+    "s0Conformance" to ("p0-a2-training" to "P0-a2-training"),
+    "p4ExerciseLibraryConformance" to ("d2b-exercise-library" to "D2b-exercise-library/D2b-exercise-library"),
+    "p4AddExerciseConformance" to ("c2b-b-add-exercise" to "C2b-B-add-exercise/C2b-B-add-exercise"),
+    "p4TodayConformance" to ("01-today-s1" to "01-today-s1/01-today-s1"),
+    "p4SessionDetailConformance" to ("35-session-detail-s1" to "35-session-detail-s1/35-session-detail-s1"),
+    "p4StudentListConformance" to ("21-student-list-s1" to "21-student-list-s1/21-student-list-s1"),
+    "p4StudentDetailConformance" to ("26-student-detail-s1" to "26-student-detail-s1/26-student-detail-s1"),
+)
+val baselineManifestGate = tasks.register<Exec>("s2BaselineManifest") {
+    group = "verification"
+    workingDir(rootProject.projectDir)
+    commandLine("node", "scripts/baseline/baseline-check.mjs", "--manifest", "screenshot-baselines/screens/baselines.json",
+        "--decisions", "screenshot-baselines/screens/APPROVALS.md")
+}
 fun registerVisualGate(taskName: String, suite: String, expectedTests: Int): TaskProvider<Test> {
     val gate = tasks.register<Test>(taskName) {
         group = "verification"
@@ -1055,6 +1074,17 @@ fun registerVisualGate(taskName: String, suite: String, expectedTests: Int): Tas
             check(suiteXml.getAttribute("tests").toInt() == expectedTests && suiteXml.getElementsByTagName("testcase").length == expectedTests)
             for (attr in listOf("failures", "errors", "skipped")) check(suiteXml.getAttribute(attr).toInt() == 0)
             check(listOf("failure", "error", "skipped").all { suiteXml.getElementsByTagName(it).length == 0 })
+            coreBaselineScreens[taskName]?.let { (screen, output) ->
+                val conformance = layout.buildDirectory.dir("outputs/conformance").get().asFile
+                val evidence = layout.buildDirectory.dir("outputs/baseline/$screen").get().asFile.apply { mkdirs() }
+                val builder = ProcessBuilder("node", rootProject.file("scripts/baseline/verify-conformance.mjs").absolutePath,
+                    rootProject.file("screenshot-baselines/screens/baselines.json").absolutePath,
+                    rootProject.file("screenshot-baselines/screens/APPROVALS.md").absolutePath,
+                    File(conformance, "$output.report.json").absolutePath, File(conformance, "$output.android.png").absolutePath,
+                    screen, evidence.absolutePath)
+                    .directory(rootProject.projectDir).redirectErrorStream(true).redirectOutput(File(evidence, "check.log")).start()
+                check(builder.waitFor() == 0) { "$taskName baseline manifest check failed; see ${File(evidence, "check.log")}" }
+            }
             logger.lifecycle("$taskName: $expectedTests tests, 0 failures/errors/skips")
         }
     }

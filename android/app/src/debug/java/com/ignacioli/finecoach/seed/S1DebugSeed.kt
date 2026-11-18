@@ -84,7 +84,7 @@ internal object S1DebugSeed {
             context.getDatabasePath(FineCoachDatabaseFactory.DATABASE_NAME).absolutePath, null,
             android.database.sqlite.SQLiteDatabase.OPEN_READONLY,
         ).use { raw ->
-            check(raw.version == 2) { "Non-seed schema rejected" }
+            check(raw.version == 2 || raw.version == 3) { "Non-seed schema rejected" }
             val expected = mapOf(DATASET_KEY to fixture.dataset, VERSION_KEY to fixture.version.toString(),
                 STATUS_KEY to "complete", "${PREFIX}scenario" to scenario)
             for ((key, value) in expected) {

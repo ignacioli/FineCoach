@@ -1,0 +1,30 @@
+{
+  "id": "s2-absent-credit-idempotent",
+  "rule": "M1B-FR-013",
+  "meta": {
+    "description": "fictional-data: fixed S2 parity scenario",
+    "tags": [
+      "fictional-data"
+    ]
+  },
+  "given": {
+    "clock": {
+      "now": "2026-03-08T10:00:00Z"
+    },
+    "timeZone": "America/Los_Angeles",
+    "state": {}
+  },
+  "when": {
+    "op": "appointment.absent",
+    "args": {
+      "$ref": "/given/state"
+    }
+  },
+  "then": {
+    "state": {
+      "balance": 4,
+      "ledgerCount": 1,
+      "sameID": true
+    }
+  }
+}

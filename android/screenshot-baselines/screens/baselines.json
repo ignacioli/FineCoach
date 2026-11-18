@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "algorithm": "sha256",
+  "screens": [
+    {
+      "id": "p0-a2-training",
+      "png": "p0-a2-training.png",
+      "sha256": "d1caec3f70c8ef69b7d8f7f38b7bccdee1e8f0dad50549bd466566936be0978a",
+      "approvedAt": "2026-11-14",
+      "decision": "S1-D99"
+    },
+    {
+      "id": "01-today-s1",
+      "png": "01-today-s1.png",
+      "sha256": "06e5ce4d145aafff78dcac174f8fd49a57d9e459bd5bff14c026f153d0c0da1a",
+      "approvedAt": "2026-11-14",
+      "decision": "S1-D99"
+    },
+    {
+      "id": "d2b-exercise-library",
+      "png": "d2b-exercise-library.png",
+      "sha256": "9ded179ce418e332ae866ac07d41a61df8959a3f6899399e47839c089c915e5b",
+      "approvedAt": "2026-11-14",
+      "decision": "S1-D99"
+    },
+    {
+      "id": "c2b-b-add-exercise",
+      "png": "c2b-b-add-exercise.png",
+      "sha256": "143ba9c0445844326ca0b91c8dfe3989fd9dde365f6f56720b7d55f5a6fba786",
+      "approvedAt": "2026-11-14",
+      "decision": "S1-D99"
+    },
+    {
+      "id": "35-session-detail-s1",
+      "png": "35-session-detail-s1.png",
+      "sha256": "6ff3c85d892252e47ff3da3f594289bc4d0d63436ba03b2af61a5c4a980d1d65",
+      "approvedAt": "2026-11-14",
+      "decision": "S1-D99"
+    },
+    {
+      "id": "21-student-list-s1",
+      "png": "21-student-list-s1.png",
+      "sha256": "9df8e951ea9883e9efe486022de4261c2467ede5c0e0b3bfc670a3c18359772c",
+      "approvedAt": "2026-11-14",
+      "decision": "S1-D99"
+    },
+    {
+      "id": "26-student-detail-s1",
+      "png": "26-student-detail-s1.png",
+      "sha256": "2e48c2607cc36aa4c6fe17eb4fc2a07573ff0aa8b425ad57a01046120a1d3bd2",
+      "approvedAt": "2026-11-14",
+      "decision": "S1-D99"
+    }
+  ]
+}
