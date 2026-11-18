@@ -17,6 +17,12 @@ interface T006aStudentDao {
     @Query("SELECT EXISTS(SELECT 1 FROM sessions WHERE studentID = :id AND state = 'inProgress')")
     fun hasInProgressSession(id: UUID): Boolean
 
+    @Query("DELETE FROM appointments WHERE studentID = :id")
+    fun deleteAppointments(id: UUID)
+
+    @Query("DELETE FROM recurrence_series WHERE studentID = :id")
+    fun deleteRecurrenceSeries(id: UUID)
+
     @Query("DELETE FROM training_sets WHERE sessionExerciseID IN (SELECT id FROM session_exercises WHERE sessionID IN (SELECT id FROM sessions WHERE studentID = :id))")
     fun deleteSets(id: UUID)
 
