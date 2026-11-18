@@ -1563,7 +1563,15 @@ S0L3-W1 修复与门禁见 S1-D114：修复已合入 local main `47f56c3`；API 
 
 ### T015 / Phase 2 checkpoint：领域、存储与基线门禁
 
-（待 Phase 2 完成后填写）
+**续跑 1 / 2 指定范围 PASS；Phase 2 checkpoint PENDING（2026-11-17）**。seed v3 与余下 4 张核心屏的阻塞已解除，完整记录、文件清单和日志见 [T015](docs/s2/T015.md)；iOS 行号对齐表见 [T010](docs/s2/T010.md)、[T013](docs/s2/T013.md)。无新 UI，不新增 entry/layout map 行。
+
+最终 schema 下：S1DebugSeedTests 12/0/0/0、DebugSeedTests 10/0/0/0、s0Room 21/0/0/0、s0G6 87/0/0/0（tests/failures/errors/skips），全部 exit 0。seed 只改一行，显式接受 schema 2 或 3；保留 ownership/generation/完整性和原测试断言。详见 [T012](docs/s2/T012.md)。
+
+7 张 S1 锁定 PNG 已齐，实际完整 SHA-256 全部匹配既有批准值；补齐后 7 个 conformance task（含 Gradle manifest finalizer）各 1/0/0/0、exit 0。canonical 全 7 图正例 exit 0、临时副本改单 hash 负例 exit 1；生产 gate.sh 的 baseline-manifest 门无 stub 返回 PASS。未改 manifest hash 或新增视觉批准。哈希表与原始日志见 [T014](docs/s2/T014.md)。
+
+S2-D06 / FR-007a 已落地：第二安排遇到已关联其他安排的 active Session，返回携带 A/session id 的 PreviousTrainingNeedsHandling，全部行不变；正常完成/放弃旧训练后 B 可新建，未关联安排的临时训练仍复用并关联。续跑 2 定向 AppointmentUseCaseTests10 + S2VectorRunnerTests10 + ActiveSessionRepositoryTests28 + SessionSettlementTests23 = 71/0/0/0，日志和差异见 [T013](docs/s2/T013.md)。Phase 5 可见入口待该 phase 实现。S2 iOS runner/双端对账、宿主全量门禁及独立复核仍 PENDING；不宣称整个 Phase 2 checkpoint 完成。未 commit、merge、push 或修改 specs。
+
+续跑 4 修正 focus-only 编辑误脱离（移除 DAO 绕路）、补全迁移回滚及 fresh/migrated trigger 断言，定向 Domain10 + UseCase11 + Migration3 + S2Vector10 = 34/0/0/0。训练屏完整批准 digest 在 S1 README / T028 历史 XML 中找到，核对锁图一致后补为 64 位；宿主 .handoff 脚本不列入本分支文件清单。详见 T013/T014/T015。宿主已告知 gate A/B 全绿、G6 两端一致；删除学员/训练外键 blocker 在续跑 4 保留，续跑 5 已按 S2-D07 落地：删学员同事务清空安排/系列，保留课包/ledger 历史，实际删 Session 时 SET NULL；deleteFuture 引用保护保留。定向 59/0/0/0，证据与 Phase 3 撤销闹钟交接见 T012/T015；当前改动后的宿主复跑/复核仍 PENDING。
 
 ### T023 / Phase 3 checkpoint：提醒
 
