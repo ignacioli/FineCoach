@@ -1,3 +1,4 @@
+// fictional-data: capability fixtures contain no personal data.
 package com.ignacioli.finecoach
 
 import org.junit.Assert.assertThrows
@@ -10,8 +11,8 @@ internal object CapabilityPolicy {
         require(variant in MergedPrivacyInputs.variants)
         fun Element.attr(name: String) = getAttributeNS(MergedPrivacyInputs.ANDROID, name)
         val requested = MergedPrivacyInputs.children(manifest).filter { it.tagName.startsWith("uses-permission") }
-        require(requested.size == 2 && requested.all { it.tagName == "uses-permission" } &&
-            requested.map { it.attr("name") }.toSet() == setOf(permission, "android.permission.POST_NOTIFICATIONS"))
+        require(requested.size == 4 && requested.all { it.tagName == "uses-permission" } &&
+            requested.map { it.attr("name") }.toSet() == setOf(permission, "android.permission.POST_NOTIFICATIONS", "android.permission.SCHEDULE_EXACT_ALARM", "android.permission.RECEIVE_BOOT_COMPLETED"))
         require(requested.none { it.hasAttributeNS(MergedPrivacyInputs.ANDROID, "maxSdkVersion") })
         val declared = MergedPrivacyInputs.children(manifest).filter { it.tagName == "permission" }
         require(declared.size == 1 && declared.single().attr("name") == permission && declared.single().attr("protectionLevel") == "signature")
@@ -28,6 +29,7 @@ internal object CapabilityPolicy {
             "activity" to "com.ignacioli.finecoach.MainActivity",
             "receiver" to "androidx.profileinstaller.ProfileInstallReceiver",
             "receiver" to "com.ignacioli.finecoach.notifications.RestNotificationReceiver",
+            "receiver" to "com.ignacioli.finecoach.notifications.ReminderRescheduleReceiver",
             "provider" to "androidx.startup.InitializationProvider",
             // Library entry contributed by room-runtime 2.8.5 in both variants.
             "service" to "androidx.room.MultiInstanceInvalidationService",
