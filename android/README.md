@@ -1556,3 +1556,27 @@ L3 集中走查已于 2026-11-16 进行，逐项结果见 [walkthrough §0.4](do
 S0L3-W1 修复与门禁见 S1-D114：修复已合入 local main `47f56c3`；API 31 与 Pixel 8a 机器验证重复桌面启动后均只有 1 个 MainActivity 实例；主机门禁 unit 1023/0、7 核心屏 hash 不变、P7 15/0，日志 `.handoff/logs/2026-11-16-w1-gate{A,B}.log`。机器验证不替代负责人 A3 复核，本次仅整理既有证据，未重跑构建或设备验证。
 
 负责人 2026-11-16 认可 S0 运行清单与验收（S0-SC-003），S0 关闭，T011/T006 跨平台段带 D10 BLOCKED，G7 DEFERRED 到 S4，S0-FR-130 按 S1-D111 原样接受。
+
+## S2：预约和提醒
+
+需求与验收见 specs `FineCoach/007-android-port/s2-appointments/spec.md`（S2-D01）；执行记录见 [`docs/s2/`](docs/s2/README.md)。
+
+### T015 / Phase 2 checkpoint：领域、存储与基线门禁
+
+（待 Phase 2 完成后填写）
+
+### T023 / Phase 3 checkpoint：提醒
+
+（待填写）
+
+### T034 / Phase 4 checkpoint：核心屏
+
+（待填写）
+
+### T045 / Phase 5 checkpoint：课程处理与非核心屏
+
+（待填写）
+
+### T054 / Phase 6 checkpoint：设备证据、复核与走查
+
+（待填写）
