@@ -460,3 +460,9 @@ interface SessionSettlementNotePort {
     suspend fun save(command: SaveSessionSettlementNoteCommand): ApplicationResult<SessionSettlementNoteRecord>
     suspend fun clear(sessionID: SessionID, expectedRevision: Revision): ApplicationResult<Unit>
 }
+
+/** Persisted appointment state is authoritative; notification denial never rolls back a save. */
+fun interface AppointmentReminderPort {
+    suspend fun reconcile()
+    suspend fun appointmentSaved() = reconcile()
+}

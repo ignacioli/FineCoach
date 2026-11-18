@@ -1,3 +1,4 @@
+// fictional-data: source policy fixtures are invented code snippets.
 package com.ignacioli.finecoach
 
 import java.io.File
@@ -304,10 +305,14 @@ internal object ScopeBoundaryPolicy {
         val sourceWithoutComments = stripCommentsPreservingStrings(source)
         require(!path.substringAfterLast('/').equals("shortcuts.xml", ignoreCase = true)) { "Static shortcuts resource: $path" }
         val notificationOwner = path.contains("/notifications/") || path.endsWith("MainActivity.kt") || path.endsWith("AndroidManifest.xml")
+        // S2-D01: exact alarms belong only to the appointment adapter and manifest.
+        val appointmentAlarmOwner = path.endsWith("/notifications/AppointmentReminders.kt") || path.endsWith("AndroidManifest.xml")
         forbidden.forEach { (kind, pattern) ->
             val inspected = if (kind == "notifications" && notificationOwner)
                 sourceWithoutComments.replace(Regex("\\b(?:NotificationManager|NotificationChannel|AlarmManager|POST_NOTIFICATIONS)\\b"), "") else sourceWithoutComments
-            require(!pattern.containsMatchIn(inspected)) { "$kind: $path" }
+            val approved = if (appointmentAlarmOwner && kind in setOf("exact-alarms", "notifications"))
+                inspected.replace(Regex("\\b(?:SCHEDULE_EXACT_ALARM|setExactAndAllowWhileIdle)\\b"), "") else inspected
+            require(!pattern.containsMatchIn(approved)) { "$kind: $path" }
         }
         ensureComposableRoutesUseS1Contracts(path, sourceWithoutComments)
         ensureNavigationRoutesUseS1Contracts(path, sourceWithoutComments)
@@ -335,7 +340,11 @@ internal object ScopeBoundaryPolicy {
                         pairs.single().first == "action" && pairs.single().second in setOf(
                             "androidx.profileinstaller.action.INSTALL_PROFILE", "androidx.profileinstaller.action.SKIP_FILE",
                             "androidx.profileinstaller.action.SAVE_PROFILE", "androidx.profileinstaller.action.BENCHMARK_OPERATION"))
+                    "com.ignacioli.finecoach.notifications.ReminderRescheduleReceiver" -> require(pairs.size == 4 && pairs.toSet() == setOf(
+                        "action" to "android.intent.action.BOOT_COMPLETED", "action" to "android.intent.action.TIME_SET",
+                        "action" to "android.intent.action.TIMEZONE_CHANGED", "action" to "android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED"))
                     else -> require(false) { "Unapproved system intent-filter" }
+
                 }
             }
         }

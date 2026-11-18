@@ -26,6 +26,9 @@ import com.ignacioli.finecoach.features.resources.*
 import com.ignacioli.finecoach.navigation.*
 import com.ignacioli.finecoach.notifications.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.conflate
 
 @Composable
 fun S1Root(activity: MainActivity) {
@@ -40,7 +43,8 @@ fun S1Root(activity: MainActivity) {
         }
     }
     graph?.let { value ->
-        S1App(value, activity.restNotificationSessionID, activity::consumeRestNotificationRoute, activity.notificationPermissionRevision)
+        LaunchedEffect(value) { value.reminders.permissionRequest.collect { if (it) { activity.requestRestNotificationPermission(); value.reminders.permissionRequest.value = false } } }
+        S1App(value, activity.restNotificationSessionID, activity::consumeRestNotificationRoute, activity.notificationPermissionRevision, activity.appointmentNotificationRevision)
     } ?: if (!failed) FcLaunch(Modifier.testTag("s1-loading")) else FcPlatformShell({}, Modifier.testTag("s1-loading")) {
         if (failed) {
             FcText("没有完成，再试一次。", Modifier.testTag("s1-load-error"),
@@ -82,7 +86,7 @@ private fun AfterStopResume(action: suspend () -> Unit) {
 }
 
 @Composable
-fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNotification: () -> Unit = {}, permissionRevision: Int = 0) {
+fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNotification: () -> Unit = {}, permissionRevision: Int = 0, appointmentNotificationRevision: Int = 0) {
     val nav = rememberNavController()
     val navigator = remember(nav) { S1Navigator(nav) }
     var recovered by remember(graph) { mutableStateOf(false) }
@@ -90,6 +94,8 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
     var recoveryAttempt by remember { mutableIntStateOf(0) }
     var notificationMissing by remember { mutableStateOf(false) }
     var adjustmentRequested by remember { mutableStateOf<CoursePackageID?>(null) }
+    val reminderRequests = remember(graph) { Channel<Unit>(Channel.CONFLATED) }
+    var lastReminderPermissionRevision by remember(graph) { mutableIntStateOf(permissionRevision) }
     val adapter = remember(graph) { RestNotifications(graph.context) }
     LaunchedEffect(graph, recoveryAttempt) {
         graph.prepareExerciseCatalog()
@@ -99,7 +105,24 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
             is ApplicationResult.Success -> { recovered = true; recoveryError = false }
         }
     }
-    LaunchedEffect(permissionRevision) { graph.rests.rescheduleAll() }
+    // Recovery publishes the S1 UI before reminder work starts on the IO dispatcher.
+    LaunchedEffect(graph, recovered) {
+        if (recovered) launch(Dispatchers.IO) {
+            reminderRequests.trySend(Unit)
+            launch {
+                graph.database.invalidationTracker.createFlow("appointments", emitInitialState = false)
+                    .conflate().collect { reminderRequests.trySend(Unit) }
+            }
+            for (request in reminderRequests) graph.reminders.reconcile(force = true)
+        }
+    }
+    LaunchedEffect(permissionRevision) {
+        graph.rests.rescheduleAll()
+        if (permissionRevision != lastReminderPermissionRevision) {
+            lastReminderPermissionRevision = permissionRevision
+            reminderRequests.trySend(Unit)
+        }
+    }
     LaunchedEffect(recovered, notificationSession) {
         if (recovered && notificationSession != null) {
             when (val result = graph.sessions.find(notificationSession)) {
@@ -117,6 +140,10 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
                 FcButton("重试", Modifier.testTag("s1-recovery-retry")) { recoveryError = false; recoveryAttempt++ }
             }
         }; return
+    }
+    AfterStopResume { reminderRequests.trySend(Unit) }
+    LaunchedEffect(appointmentNotificationRevision) {
+        if (appointmentNotificationRevision > 0) nav.navigate(S1Routes.TODAY) { popUpTo(S1Routes.TODAY) { inclusive = true }; launchSingleTop = true }
     }
     val back = { navigator.back() }
     NavHost(nav, startDestination = S1Routes.TODAY, modifier = Modifier.fillMaxSize().testTag("s1-navigation").semantics { testTagsAsResourceId = true }) {
