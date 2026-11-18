@@ -1,0 +1,30 @@
+{
+  "$comment": "Source: /Users/liyongqiang/.agents/skills/ig-design-system/examples/conformance/baselines.json; copied 2026-11-17.",
+  "version": 1,
+  "algorithm": "sha256",
+  "screens": [
+    {
+      "id": "home",
+      "png": "baselines/home.png",
+      "sha256": "0123456789ab",
+      "design": "design/home.png",
+      "fixture": "home-default",
+      "viewport": {
+        "w": 360,
+        "h": 800,
+        "scale": 2
+      },
+      "approvedAt": "2026-01-03",
+      "decision": "D-7"
+    }
+  ],
+  "environment": [
+    {
+      "id": "ds-button-canary",
+      "png": "baselines/ds-button.png",
+      "sha256": "abcdef012345",
+      "approvedAt": "2026-01-03",
+      "decision": "D-7"
+    }
+  ]
+}

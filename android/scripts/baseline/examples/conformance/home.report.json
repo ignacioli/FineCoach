@@ -1,0 +1,50 @@
+{
+  "$comment": "Source: /Users/liyongqiang/.agents/skills/ig-design-system/examples/conformance/home.report.json; copied 2026-11-17.",
+  "screen": "home",
+  "layers": "home.layers.json (home approved 2026-01-02)",
+  "capture": "home.capture.json",
+  "summary": {
+    "mapped": 3,
+    "missing": 0,
+    "ambiguous": 0,
+    "failed": 0,
+    "exceptions": 0,
+    "exceptionRatio": 0
+  },
+  "checks": [
+    {
+      "path": "1",
+      "id": "top-bar",
+      "kind": "size",
+      "expected": [
+        360,
+        56
+      ],
+      "actual": [
+        360,
+        56
+      ],
+      "delta": 0,
+      "tolerance": 2,
+      "status": "pass"
+    },
+    {
+      "path": "1/0",
+      "kind": "text",
+      "expected": "Today",
+      "actual": "Today",
+      "status": "pass"
+    },
+    {
+      "path": "2",
+      "id": "primary-action",
+      "kind": "gap",
+      "expected": 24,
+      "actual": 24,
+      "delta": 0,
+      "tolerance": 2,
+      "status": "pass"
+    }
+  ],
+  "result": "PASS"
+}

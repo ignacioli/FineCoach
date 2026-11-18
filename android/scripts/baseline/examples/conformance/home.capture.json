@@ -1,0 +1,44 @@
+{
+  "$comment": "Source: /Users/liyongqiang/.agents/skills/ig-design-system/examples/conformance/home.capture.json; copied 2026-11-17.",
+  "screen": "home",
+  "fixture": "home-default",
+  "platform": "web",
+  "viewport": {
+    "w": 360,
+    "h": 800,
+    "scale": 2
+  },
+  "renderer": {
+    "name": "playwright-chromium",
+    "version": "example",
+    "fontScale": 1
+  },
+  "png": "out/home.png",
+  "elements": [
+    {
+      "id": "top-bar",
+      "x": 0,
+      "y": 0,
+      "w": 360,
+      "h": 56,
+      "visible": true
+    },
+    {
+      "text": "Today",
+      "x": 20,
+      "y": 15,
+      "w": 58,
+      "h": 26,
+      "visible": true
+    },
+    {
+      "id": "primary-action",
+      "x": 20,
+      "y": 720,
+      "w": 320,
+      "h": 56,
+      "color": "#3355aa",
+      "visible": true
+    }
+  ]
+}

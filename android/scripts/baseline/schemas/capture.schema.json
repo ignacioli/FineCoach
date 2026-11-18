@@ -1,0 +1,115 @@
+{
+  "$comment": "Source: /Users/liyongqiang/.agents/skills/ig-design-system/schemas/capture.schema.json; copied 2026-11-17.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "capture.schema.json",
+  "title": "Platform adapter output for one fixture render",
+  "description": "The only thing a platform adapter produces besides the PNG: element bounds and text for every element carrying an accessibility identifier, plus visible text nodes. Units and origin match layers.json (design units, viewport top-left).",
+  "type": "object",
+  "required": [
+    "screen",
+    "fixture",
+    "platform",
+    "viewport",
+    "png",
+    "elements"
+  ],
+  "properties": {
+    "screen": {
+      "type": "string"
+    },
+    "fixture": {
+      "type": "string"
+    },
+    "platform": {
+      "type": "string",
+      "description": "android-compose, ios-swiftui, web, …"
+    },
+    "viewport": {
+      "type": "object",
+      "required": [
+        "w",
+        "h",
+        "scale"
+      ],
+      "properties": {
+        "w": {
+          "type": "number",
+          "minimum": 1
+        },
+        "h": {
+          "type": "number",
+          "minimum": 1
+        },
+        "scale": {
+          "type": "number",
+          "minimum": 1
+        }
+      }
+    },
+    "renderer": {
+      "type": "object",
+      "description": "what produced the pixels; a change here is a renderer change, not a UI change",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "fontScale": {
+          "type": "number"
+        },
+        "fonts": {
+          "type": "string"
+        }
+      }
+    },
+    "png": {
+      "type": "string"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "elements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "x",
+          "y",
+          "w",
+          "h"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          },
+          "w": {
+            "type": "number",
+            "minimum": 0
+          },
+          "h": {
+            "type": "number",
+            "minimum": 0
+          },
+          "color": {
+            "type": "string"
+          },
+          "visible": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,171 @@
+{
+  "$comment": "Source: /Users/liyongqiang/.agents/skills/ig-design-system/schemas/layers.schema.json; copied 2026-11-17.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "layers.schema.json",
+  "title": "Design geometry of one core screen board",
+  "description": "Exported once per approved board version. Coordinates are board-relative, in design units (dp / pt / CSS px), origin top-left. Text boxes are the drawn boxes; the comparer applies the geometry contract (token line box, centre comparison).",
+  "type": "object",
+  "required": [
+    "source",
+    "viewport",
+    "layers"
+  ],
+  "properties": {
+    "source": {
+      "type": "object",
+      "required": [
+        "tool",
+        "file",
+        "board",
+        "version"
+      ],
+      "properties": {
+        "tool": {
+          "type": "string",
+          "description": "penpot, figma, …"
+        },
+        "file": {
+          "type": "string"
+        },
+        "page": {
+          "type": "string"
+        },
+        "board": {
+          "type": "string"
+        },
+        "boardId": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string",
+          "description": "design-file version label the extract came from"
+        },
+        "png": {
+          "type": "string",
+          "description": "repo path of the exported board PNG"
+        },
+        "extractedAt": {
+          "type": "string"
+        }
+      }
+    },
+    "viewport": {
+      "$ref": "#/$defs/viewport"
+    },
+    "layers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/layer"
+      }
+    }
+  },
+  "$defs": {
+    "viewport": {
+      "type": "object",
+      "required": [
+        "w",
+        "h"
+      ],
+      "properties": {
+        "w": {
+          "type": "number",
+          "minimum": 1
+        },
+        "h": {
+          "type": "number",
+          "minimum": 1
+        },
+        "scale": {
+          "type": "number",
+          "minimum": 1
+        }
+      }
+    },
+    "layer": {
+      "type": "object",
+      "required": [
+        "path",
+        "name",
+        "type",
+        "x",
+        "y",
+        "w",
+        "h"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^[0-9]+(/[0-9]+)*$",
+          "description": "stable child-index path inside the board"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "text",
+            "rectangle",
+            "ellipse",
+            "path",
+            "icon",
+            "image",
+            "group",
+            "board",
+            "component"
+          ]
+        },
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "w": {
+          "type": "number",
+          "minimum": 0
+        },
+        "h": {
+          "type": "number",
+          "minimum": 0
+        },
+        "fill": {
+          "type": "string",
+          "pattern": "^#[0-9a-f]{6}(@[0-9.]+)?$"
+        },
+        "text": {
+          "type": "string"
+        },
+        "font": {
+          "type": "object",
+          "required": [
+            "family",
+            "size"
+          ],
+          "properties": {
+            "family": {
+              "type": "string"
+            },
+            "size": {
+              "type": "number"
+            },
+            "weight": {
+              "type": "string"
+            },
+            "lineHeight": {
+              "type": "number"
+            }
+          }
+        },
+        "component": {
+          "type": "string",
+          "description": "DS-* id from layer tags, if any"
+        },
+        "part": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

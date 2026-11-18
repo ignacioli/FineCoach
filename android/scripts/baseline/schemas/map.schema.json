@@ -1,0 +1,148 @@
+{
+  "$comment": "Source: /Users/liyongqiang/.agents/skills/ig-design-system/schemas/map.schema.json; copied 2026-11-17.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "map.schema.json",
+  "title": "Design layer → implementation element mapping for one core screen",
+  "description": "Selectors are accessibility identifiers (Compose testTag, SwiftUI accessibilityIdentifier, web data-testid), never view-tree indexes or CSS classes. Text layers without an id match by exact text in reading order. Every visible layer is mapped, ignored with a reason, or an exception; anything else is MISSING.",
+  "type": "object",
+  "required": [
+    "screen",
+    "fixture",
+    "tolerance",
+    "elements"
+  ],
+  "properties": {
+    "screen": {
+      "type": "string"
+    },
+    "fixture": {
+      "type": "string",
+      "description": "fixture id the adapter renders; same content as the design board"
+    },
+    "layers": {
+      "type": "string",
+      "description": "path of the layers.json this map applies to"
+    },
+    "tolerance": {
+      "type": "object",
+      "required": [
+        "size",
+        "gap"
+      ],
+      "properties": {
+        "size": {
+          "type": "number",
+          "minimum": 0,
+          "description": "box size, design units"
+        },
+        "gap": {
+          "type": "number",
+          "minimum": 0,
+          "description": "neighbour gap, padding and alignment, design units"
+        },
+        "absolute": {
+          "type": "number",
+          "minimum": 0,
+          "description": "coarse upper bound on absolute position"
+        },
+        "round": {
+          "type": "number",
+          "minimum": 0,
+          "description": "delta rounding step"
+        }
+      }
+    },
+    "originOffsetY": {
+      "type": "number",
+      "description": "measured offset between board origin and platform content origin"
+    },
+    "elements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "id"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "description": "accessibility identifier in the implementation"
+          },
+          "compare": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "size",
+                "gap",
+                "padding",
+                "align",
+                "absolute",
+                "color",
+                "text"
+              ]
+            }
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ignore": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "reason"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "exceptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "rule",
+          "reason",
+          "decision"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "rule": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "decision": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "bindings": {
+      "type": "object",
+      "description": "fixture values substituted into $name placeholders in ids and texts"
+    }
+  }
+}

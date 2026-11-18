@@ -1,0 +1,35 @@
+{
+  "$comment": "Source: /Users/liyongqiang/.agents/skills/ig-design-system/examples/conformance/home.map.json; copied 2026-11-17.",
+  "screen": "home",
+  "fixture": "home-default",
+  "layers": "home.layers.json",
+  "tolerance": {
+    "size": 2,
+    "gap": 2,
+    "absolute": 8,
+    "round": 0.25
+  },
+  "originOffsetY": 0,
+  "elements": [
+    {
+      "path": "1",
+      "id": "top-bar"
+    },
+    {
+      "path": "2",
+      "id": "primary-action",
+      "compare": [
+        "size",
+        "gap",
+        "color"
+      ]
+    }
+  ],
+  "ignore": [
+    {
+      "path": "0",
+      "reason": "board background is the window background"
+    }
+  ],
+  "exceptions": []
+}
