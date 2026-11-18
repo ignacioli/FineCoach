@@ -1575,7 +1575,13 @@ S2-D06 / FR-007a 已落地：第二安排遇到已关联其他安排的 active S
 
 ### T023 / Phase 3 checkpoint：提醒
 
-（待填写）
+**续跑 1 Agent 自测 PASS；续跑 2 指定 UI 回归 FAIL，整体 checkpoint PENDING（2026-11-18）**。T020/T021 的登记、调度、撤销、替换、重排与 T022 的权限/通用文案接线已实现；FR-010 拒绝后可见设置入口仍待 Phase 5（本 phase 白名单不允许新增设置 Feature）。宿主 plan §5 复跑、独立复核和 SC-004 设备部分尚未取得，不将 JVM 自测当作 milestone 验收。
+
+续跑 1 `agent-test.sh`：AppointmentReminderTests 10、CapabilityManifestTests 9、AppointmentUseCaseTests 13、StudentRepositoryTests 12、RestNotificationTests 4、RestNotificationEntryLayoutTests 1、RestTimerTests 2、ScopeBoundaryTests 19，共 **70/0/0/0**；`s0G8` **78/0/0/0**；`s0G6` **87/0/0/0**（tests/failures/errors/skips）。日志、JUnit XML 路径、保留失败及文件清单见 [T023](docs/s2/T023.md)。所有命令经批准 wrapper，仅设独立可写 JVM home，无新依赖；`git diff --check` 通过。
+
+续跑 2 已移除启动 recovery 前的提醒阻塞，并合并启动重复触发；登记改为 OS set 成功后写入。新增异常恢复和真实 TIME_SET receiver 测试，均通过。ExerciseTemplateEntryLayoutTests 同一节点等待连续两次 15 秒超时，按约定停止，未改 S1 断言/超时。当前逐类结果与日志见 [T023 续跑 2](docs/s2/T023.md)。下方 70/78/87 为续跑 1 历史证据。
+
+登记表复用 Room `store_metadata`，无需 migration；S2-D07 删除学员撤销全部已删安排闹钟已有测试。精确访问可用时 setExactAndAllowWhileIdle，否则 setWindow；系统四类广播、启动/恢复与 Room invalidation 都复用 reconcile。独立通知渠道、仅 UUID extras、PUBLIC 通用锁屏文案；未改 S1 休息通知源码。iOS 对齐清单及五行执行记录见 [T020](docs/s2/T020.md)，系统重排见 [T021](docs/s2/T021.md)，权限与既有测试同步原因见 [T022](docs/s2/T022.md)。ScopeBoundaryTests 仅纳入 S2-D01 明确批准的 API/receiver，其他禁止项保留。无新 UI、无 entry/layout map 新行；未提交、切分支、push 或修改 specs。
 
 ### T034 / Phase 4 checkpoint：核心屏
 
