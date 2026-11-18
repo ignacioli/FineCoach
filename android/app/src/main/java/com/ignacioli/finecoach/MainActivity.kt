@@ -27,6 +27,8 @@ import com.ignacioli.finecoach.designsystem.LocalFcWindowRegistry
 class MainActivity : ComponentActivity() {
     companion object { const val EXTRA_S0_SHELL = "finecoachS0Shell" }
     private var showS0Shell by mutableStateOf(false)
+    var appointmentNotificationRevision by mutableIntStateOf(0)
+        private set
     var restNotificationSessionID by mutableStateOf<SessionID?>(null)
         private set
     var notificationPermissionRevision by mutableIntStateOf(0)
@@ -44,6 +46,7 @@ class MainActivity : ComponentActivity() {
     }
     private fun applyLaunchIntent(intent: Intent?) {
         showS0Shell = intent?.getBooleanExtra(EXTRA_S0_SHELL, false) == true
+        if (com.ignacioli.finecoach.notifications.AppointmentReminders.parse(intent) != null) { appointmentNotificationRevision++; restNotificationSessionID = null }
         RestNotificationRoute.deliver(intent) { restNotificationSessionID = it; showS0Shell = false }
     }
     internal lateinit var privacyCover: PrivacyCoverPolicy

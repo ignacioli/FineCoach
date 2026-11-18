@@ -26,7 +26,7 @@ class S1AppGraph(val database: FineCoachDatabase, val clock: AppClock, val ids: 
         }
     }
     val studentRepository = StudentRepository(database, clock)
-    val students = StudentUseCases(studentRepository, clock, ids)
+    val students by lazy { StudentUseCases(studentRepository, clock, ids, reminders) }
     val exerciseRepository = ExerciseRepository(database, ExerciseCatalogLoader(context.assets), clock)
     val exercises = ExerciseUseCases(exerciseRepository, clock, ids)
     val sessions = SessionRepository(database, clock, ids, generation, exerciseRepository)
@@ -39,6 +39,9 @@ class S1AppGraph(val database: FineCoachDatabase, val clock: AppClock, val ids: 
     val rests = RestTimerStore(clock)
     val active = ActiveSessionUseCases(sessions, clock, ids)
     val recovery = RecoveryCoordinator(sessions, clock)
+    val appointmentRepository by lazy { AppointmentRepository(database, clock, ids, generation, sessions, zone) }
+    val reminders by lazy { com.ignacioli.finecoach.notifications.AppointmentReminders(context, database, appointmentRepository, clock) }
+    val appointments by lazy { AppointmentUseCases(appointmentRepository, reminders) }
     val finisher = FinishSessionUseCases(sessions, active, credits, historyRepository, clock, zone)
 }
 
