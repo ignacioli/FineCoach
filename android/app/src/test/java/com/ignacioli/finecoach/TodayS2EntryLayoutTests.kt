@@ -14,6 +14,11 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.time.LocalDate
+import androidx.compose.runtime.rememberCoroutineScope
+import com.ignacioli.finecoach.core.application.*
+import com.ignacioli.finecoach.core.domain.appointment.Appointment
+import com.ignacioli.finecoach.features.appointments.AppointmentListState
+import kotlinx.coroutines.*
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [36], qualifiers = "zh-rCN-w390dp-h844dp-notnight-xhdpi")
@@ -87,5 +92,38 @@ class TodayS2EntryLayoutTests {
         compose.onNodeWithTag("today-retry").assertIsDisplayed().performClick()
         compose.waitUntil(15_000) { compose.waitForIdle(); state.loaded }
         assertNull(state.error); assertEquals(2,attempts)
+    }
+    @Test fun sameRangeReloadKeepsDisplayedRowsUntilReplacementArrives() {
+        val f = S2ScreenFixture().also { fixture = it }
+        val entered = CompletableDeferred<Unit>(); val release = CompletableDeferred<Unit>()
+        var attempts = 0
+        val repository = object : AppointmentRepositoryPort by f.repository {
+            override suspend fun inDateRange(first: LocalDate, last: LocalDate): ApplicationResult<List<Appointment>> {
+                if (++attempts > 1) { entered.complete(Unit); release.await() }
+                val result = f.repository.inDateRange(first, last)
+                return if (attempts > 1 && result is ApplicationResult.Success) {
+                    ApplicationResult.Success(result.value.map { if (it.startTime.hour == 15) it.copy(durationMinutes = 90) else it })
+                } else result
+            }
+        }
+        val state = AppointmentListState(AppointmentUseCases(repository), f.students, f.room.clock, f.zone)
+        lateinit var scope: CoroutineScope
+        compose.setContent {
+            scope = rememberCoroutineScope()
+            FineCoachTheme { TodayS2Screen(f.training, state, {}, {}, {}, {}) }
+        }
+        compose.waitUntil(15_000) { compose.waitForIdle(); state.loaded }
+        val rows = state.rows; val names = state.names
+        val old = rows.single { it.startTime.hour == 15 }
+        compose.runOnIdle { scope.launch { state.load() } }
+        compose.waitUntil(15_000) { compose.waitForIdle(); entered.isCompleted }
+        assertTrue(state.loaded); assertEquals(rows, state.rows); assertEquals(names, state.names)
+        compose.onNodeWithTag("today-appointment-${old.id}").assertIsDisplayed()
+        compose.onNodeWithText("60 分钟 · 大腿").assertIsDisplayed()
+        release.complete(Unit)
+        compose.waitUntil(15_000) { compose.waitForIdle(); state.rows.any { it.id == old.id && it.durationMinutes == 90 } }
+        compose.onNodeWithTag("today-appointment-${old.id}").assertIsDisplayed()
+        compose.onNodeWithText("90 分钟 · 大腿").assertIsDisplayed()
+        assertTrue(state.loaded); assertEquals(names, state.names)
     }
 }
