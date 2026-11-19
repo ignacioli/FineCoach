@@ -8,8 +8,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.test.*
 import androidx.compose.ui.unit.width
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.getOrNull
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.test.core.app.ApplicationProvider
 import com.ignacioli.finecoach.core.application.*
 import com.ignacioli.finecoach.core.domain.common.*
@@ -57,6 +58,31 @@ class TodayNavigationEntryLayoutTests {
         } finally { S1Runtime.resetForTest() }
     }
     private fun show() { compose.setContent { FineCoachTheme { S1App(graph, notification, { notification = null }) } } }
+    @Test fun todayToStudentsArrivesWithinSixFramesWithoutOutgoingPage() {
+        show(); await("today-empty")
+        node("today-content").assertIsDisplayed()
+        compose.mainClock.autoAdvance = false
+        try {
+            // Invoke the visible control's real action without advancing time for touch injection.
+            node("root-1").assertIsDisplayed().assertIsEnabled().performSemanticsAction(SemanticsActions.OnClick) { it() }
+            var arrivalFrame: Int? = null
+            // S2-D14: no navigation transition. 6 frames (~100 ms) is the instant-response bound; the shortest
+            // motion token (instant, 0.15 s ≈ 9 frames) and the old 700 ms default fade (~42 frames) both fail it.
+            for (frame in 1..6) {
+                compose.mainClock.advanceTimeByFrame()
+                if (node(StudentTestTags.STUDENT_LIST_ROOT).isDisplayed() && !exists("today-content")) {
+                    arrivalFrame = frame
+                    break
+                }
+            }
+            println("NAVIGATION_ARRIVAL frames=$arrivalFrame maxFrames=6")
+            assertNotNull("Students must be displayed and Today removed within 6 frames (~100 ms)", arrivalFrame)
+            node(StudentTestTags.STUDENT_LIST_ROOT).assertIsDisplayed()
+            node("today-content").assertDoesNotExist()
+        } finally {
+            compose.mainClock.autoAdvance = true
+        }
+    }
     @Test fun emptyTodaySwitchesToStudentCreateAndReturnsToSameDurableStudent() {
         // Fixed Sunday: an expected literal catches Android CLDR differences from the approved iOS label.
         val sunday = java.time.LocalDate.of(2026, 11, 8)

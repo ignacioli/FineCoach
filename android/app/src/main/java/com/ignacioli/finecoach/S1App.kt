@@ -1,5 +1,7 @@
 package com.ignacioli.finecoach
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -146,7 +148,18 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
         if (appointmentNotificationRevision > 0) nav.navigate(S1Routes.TODAY) { popUpTo(S1Routes.TODAY) { inclusive = true }; launchSingleTop = true }
     }
     val back = { navigator.back() }
-    NavHost(nav, startDestination = S1Routes.TODAY, modifier = Modifier.fillMaxSize().testTag("s1-navigation").semantics { testTagsAsResourceId = true }) {
+    NavHost(
+        nav, startDestination = S1Routes.TODAY,
+        modifier = Modifier.fillMaxSize().testTag("s1-navigation").semantics { testTagsAsResourceId = true },
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None },
+        // Navigation 2.10 has separate predictive-back defaults (S2-D14).
+        predictivePopEnterTransition = { EnterTransition.None },
+        predictivePopExitTransition = { ExitTransition.None },
+        sizeTransform = null,
+    ) {
         composable(S1Routes.TODAY) {
             val today = remember { TodayUiState(graph.sessions, graph.students, graph.clock) }
             OnResume { today.load() }
