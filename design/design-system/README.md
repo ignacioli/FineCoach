@@ -355,6 +355,8 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 
 规则：需要教练处理的状态用 `status.warning` 加「!」；只是信息提示的状态用 `action.primary` 加「i」。09 屏新增的两行已回填 Penpot（快照 `before-status-mapping-09 2026-09-23` → `status-mapping-09 2026-09-23 (课包异常 !, 不可比较 i)`），并重新导出 `09-accessibility.png`（尺寸不变）。
 
+2026-11-19（产品负责人，S2-D23）：09、D15d、S2·43 三块画板上的状态文字由「权限已拒绝」统一为本表的「权限拒绝」，与 iOS `status.permissionDenied` 一致；Penpot 快照 `before 权限拒绝 status copy fix (09 / D15d / S2·43) 2026-11-19` → `权限拒绝 status copy fix (09 / D15d / S2·43) 2026-11-19`，重新导出 `09-accessibility.png`、`43-settings-notification-denied.png`、`43-settings-notification-denied-s2.png`（尺寸不变）。
+
 ## 8. 组件规格（来自 17 屏实测）
 
 | 组件 | 规格 |

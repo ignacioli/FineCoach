@@ -17,7 +17,8 @@
       "boardId": "b48ddf15-5062-8001-8008-b669431b9ba9",
       "boardName": "D15d 设置 · 通知权限已拒绝"
     },
-    "scope": "S2-D01 notification row only"
+    "scope": "S2-D01 notification row only",
+    "copyFix": "2026-11-19: path 8 text 权限已拒绝→权限拒绝 (README §7.2 / iOS status.permissionDenied; owner), w 67→54 measured in Penpot"
   },
   "board": {
     "w": 390,
@@ -151,10 +152,10 @@
       "path": "8",
       "x": 84,
       "y": 148,
-      "w": 67,
+      "w": 54,
       "h": 16,
       "fill": "#5c5a52",
-      "text": "权限已拒绝",
+      "text": "权限拒绝",
       "fontFamily": "Noto Sans SC",
       "fontSize": 13,
       "fontWeight": 400,
