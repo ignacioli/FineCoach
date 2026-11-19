@@ -67,15 +67,21 @@ class AppointmentRepository(
         val focus = superseded.associate { it.date to it.trainingFocus }.toMutableMap()
         edit.boundaryTrainingFocus?.let { focus[boundary] = it }
         RecurrenceSeries.validateBound(boundary, series.termination)
-        val replacement = series.copy(id = makeID(), defaultStartTime = edit.startTime ?: series.defaultStartTime,
+        // S2-D22: reissue superseded dates only. Rematerializing the original termination
+        // recounts RepeatCount from the boundary and revives resolved or detached dates.
+        val termination = when (val current = series.termination) {
+            is RecurrenceTermination.EndDate -> current
+            is RecurrenceTermination.RepeatCount -> RecurrenceTermination.RepeatCount(superseded.size)
+        }
+        val replacement = series.copy(id = makeID(), termination = termination, defaultStartTime = edit.startTime ?: series.defaultStartTime,
             defaultDurationMinutes = edit.durationMinutes ?: series.defaultDurationMinutes,
             defaultReminderEnabled = edit.reminderEnabled ?: series.defaultReminderEnabled,
             defaultReminderLeadMinutes = edit.reminderLeadMinutes ?: series.defaultReminderLeadMinutes,
             createdAtUTC = clock.now(), updatedAtUTC = clock.now())
-        val appointments = RecurrenceSeries.materializedDates(series.intervalDays, boundary, series.termination).map {
-            Appointment(makeID(), series.studentID, replacement.id, it, replacement.defaultStartTime, replacement.defaultDurationMinutes,
+        val appointments = superseded.map {
+            Appointment(makeID(), series.studentID, replacement.id, it.date, replacement.defaultStartTime, replacement.defaultDurationMinutes,
                 reminderEnabled = replacement.defaultReminderEnabled, reminderLeadMinutes = replacement.defaultReminderLeadMinutes,
-                trainingFocus = focus[it].orEmpty(), createdAtUTC = clock.now(), updatedAtUTC = clock.now())
+                trainingFocus = focus[it.date].orEmpty(), createdAtUTC = clock.now(), updatedAtUTC = clock.now())
         }
         checkConflicts(appointments, superseded.map { it.id }.toSet(), overrideConflict)
         check(dao.update(series.ended(clock.now()).toEntity()) == 1)
