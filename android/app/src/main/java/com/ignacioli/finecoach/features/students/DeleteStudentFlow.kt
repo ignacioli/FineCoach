@@ -530,6 +530,12 @@ fun DeleteStudentScreen(
                                 style = FcTypography.caption,
                                 color = FcColors.statusDestructive,
                             )
+                            FcButton(
+                                title = "重试",
+                                modifier = Modifier.testTag(StudentTestTags.DELETE_RETRY),
+                                enabled = !state.isLoading,
+                                onClick = { scope.launch { viewModel.load() } },
+                            )
                         }
                     }
                     FcLinkButton(

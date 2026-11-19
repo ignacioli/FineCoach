@@ -187,4 +187,26 @@ class AppointmentEditorEntryLayoutTests {
         node("appointment-retry").performScrollTo().assertIsDisplayed().performClick(); await { state.loaded }
         assertNull(state.error); assertEquals(2,attempts)
     }
+    @Test fun longRepeatCountScopeCountMatchesReissuedInstances() {
+        val f = fixture(); var rows: List<Appointment> = emptyList()
+        f.room.test {
+            rows = f.room.ok(f.appointments.createRecurring(RecurrenceSeries(UUID.randomUUID(), f.room.studentID(2), RecurrenceInterval.everyWeek,
+                RecurrenceTermination.RepeatCount(60), LocalTime.of(19, 0), defaultReminderEnabled = false,
+                createdAtUTC = f.room.time, updatedAtUTC = f.room.time), f.date.plusDays(1)))
+        }
+        assertTrue(java.time.temporal.ChronoUnit.DAYS.between(rows.first().date, rows.last().date) > 366)
+        val state = AppointmentEditorState(f.appointments, f.students, f.room.clock, f.zone, f.date, rows.first().id)
+        var saved = false
+        compose.setContent { FineCoachTheme { AppointmentEditorScreen(state, {}, { saved = true }) } }; await { state.loaded }
+        assertEquals(60, state.affectedCount)
+        compose.runOnIdle { state.time = LocalTime.of(20, 0) }
+        node("appointment-save").performClick(); await { state.scopeRequested }
+        compose.onNodeWithText("${rows.first().date.monthValue}月${rows.first().date.dayOfMonth}日起的 60 节一起改", substring = true).assertExists()
+        node("appointment-scope-future").assertIsDisplayed().performClick(); await { saved }
+        f.room.test {
+            val reissued = f.room.ok(f.appointments.all()).filter { it.studentID == f.room.studentID(2) && it.startTime == LocalTime.of(20, 0) }
+            assertEquals(60, reissued.size)
+            assertEquals(state.affectedCount, reissued.size)
+        }
+    }
 }

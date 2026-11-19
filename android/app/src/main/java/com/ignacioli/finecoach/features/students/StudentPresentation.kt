@@ -87,6 +87,7 @@ object StudentTestTags {
     const val DELETE_BACK_TO_DETAIL = "deleteStudent.backToDetail"
     const val DELETE_NAME = "deleteStudent.confirmName"
     const val DELETE_ERROR = "deleteStudent.error"
+    const val DELETE_RETRY = "deleteStudent.retry"
     const val DELETE_CONFIRM = "deleteStudent.confirm"
     const val DELETE_CANCEL = "student.delete.cancel"
     const val DELETE_DONE = "deleteStudent.done"

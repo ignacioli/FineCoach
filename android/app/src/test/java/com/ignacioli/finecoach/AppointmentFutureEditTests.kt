@@ -101,6 +101,16 @@ class AppointmentFutureEditTests {
         val seriesDates = cases.all().requireSuccess().filter { it.seriesID != null }.map { it.date }.sorted()
         assertEquals(initial.map { it.date }, seriesDates)
     }
+
+    @Test fun detachedBoundaryFailsAndLeavesBothTablesUnchanged() = s2Run {
+        val initial = series(student(), 3)
+        val boundary = cases.editSingle(initial.last().id, AppointmentEdit(startTime = LocalTime.of(15, 0))).requireSuccess()
+        assertTrue(boundary.isDetachedException)
+        val before = scheduleRows(db)
+        assertEquals(ApplicationErrorCode.incompatibleInput, cases.editFuture(boundary.seriesID!!, boundary.date,
+            FutureAppointmentEdit(startTime = LocalTime.of(11, 30))).requireFailure().code)
+        assertEquals(before, scheduleRows(db))
+    }
 }
 
 private fun scheduleRows(db: FineCoachDatabase): List<String> {

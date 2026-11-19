@@ -17,7 +17,7 @@
 | 今日 | 日历 | today-calendar | 否 | FcPagePrimary title row / FcTitleIconButton | S2NavigationEntryLayoutTests.realNavHostOpensEditorAndCalendarAndReturnsToS2Today |
 | 今日 | 学员分段 | root-1 | 否 | FcSegmentedSwitch | TodayNavigationEntryLayoutTests.todayToStudentsArrivesWithinSixFramesWithoutOutgoingPage |
 | 今日 | 继续训练 | hero-<sessionID> | 否，打开已有训练 | FcHeroCard fillMaxWidth | TodayNavigationEntryLayoutTests.singleAndMultipleHeroesOpenExactExistingSessionAndBackNeverStartsAnother |
-| 今日 | 下一节课／逾期／其余安排整行 | today-appointment-<UUID> | 否，进入安排详情/编辑 | FcAppointmentRow fillMaxWidth | TodayS2EntryLayoutTests.visibleEntriesAndCollapsedResolvedRowsUseRealAppointmentData / overdueAndOtherTodayRowsAreVisibleClickableAndUseSharedStatus；真实 next-up 导航 S2NavigationEntryLayoutTests |
+| 今日 | 下一节课／逾期／其余安排整行 | today-appointment-<UUID> | 否，先打开课程面板，再从面板内编辑进入安排编辑 | FcAppointmentRow fillMaxWidth | TodayS2EntryLayoutTests.visibleEntriesAndCollapsedResolvedRowsUseRealAppointmentData / overdueAndOtherTodayRowsAreVisibleClickableAndUseSharedStatus；真实 next-up 先开面板再点 course-edit：S2NavigationEntryLayoutTests.realNavHostOpensEditorAndCalendarAndReturnsToS2Today |
 | 今日 | 已处理 · N | today-resolved | 否，只切换展开 | FcGroupEntryRow fillMaxWidth | TodayS2EntryLayoutTests.visibleEntriesAndCollapsedResolvedRowsUseRealAppointmentData |
 | 今日 | 重试 | today-retry | 否，只重读 | FcButton fillMaxWidth | TodayS2EntryLayoutTests.retryReadsTodayRangeAfterVisibleFailure |
 | 今日 | 设置齿轮 | today-settings | 否，打开提醒页 | FcTitleIconButton | S2NavigationEntryLayoutTests.realNavHostOpensEditorAndCalendarAndReturnsToS2Today（真实点击） |
@@ -25,7 +25,7 @@
 | 课程日历 | 返回 | calendar-back | 否 | FcPageHeader / header Row fillMaxWidth | S2NavigationEntryLayoutTests.realNavHostOpensEditorAndCalendarAndReturnsToS2Today |
 | 课程日历 | 上月／下月 | calendar-previous / calendar-next | 否 | FcCalendarMonthButton / header Row | CalendarEntryLayoutTests.monthSwitchSelectionAndCreatePassSelectedDateWithoutMutation |
 | 课程日历 | 日期格 | calendar-day-<day> | 否，选中日期 | 7 个等宽 Box / FcCalendarDayCell | CalendarEntryLayoutTests.calendarDays / monthSwitchSelectionAndCreatePassSelectedDateWithoutMutation |
-| 课程日历 | 安排整行 | calendar-appointment-<UUID> | 否，进入安排页 | FcAppointmentRow fillMaxWidth | S2NavigationEntryLayoutTests.realNavHostOpensEditorAndCalendarAndReturnsToS2Today（真实 calendar row → edit） |
+| 课程日历 | 安排整行 | calendar-appointment-<UUID> | 否，先打开课程面板，再从面板内编辑进入安排编辑 | FcAppointmentRow fillMaxWidth | S2NavigationEntryLayoutTests.realNavHostOpensEditorAndCalendarAndReturnsToS2Today（真实 calendar row → 课程面板 → course-edit） |
 | 课程日历 | 添加课程安排 | calendar-add | 否，进入编辑页并携带 selectedDate | FcButton fillMaxWidth / FcPinnedAction | CalendarEntryLayoutTests.monthSwitchSelectionAndCreatePassSelectedDateWithoutMutation |
 | 课程日历 | 重试 | calendar-retry | 否，只重读 | FcButton fillMaxWidth | CalendarEntryLayoutTests.retryReloadsDisplayedMonthAfterVisibleFailure |
 

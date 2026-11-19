@@ -4,6 +4,7 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -34,6 +35,7 @@ import com.ignacioli.finecoach.navigation.*
 import com.ignacioli.finecoach.notifications.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.conflate
 
@@ -153,9 +155,40 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
         if (appointmentNotificationRevision > 0) nav.navigate(S1Routes.TODAY) { popUpTo(S1Routes.TODAY) { inclusive = true }; launchSingleTop = true }
     }
     val back = { navigator.back() }
+    val scope = rememberCoroutineScope()
     var selectedAppointment by remember { mutableStateOf<UUID?>(null) }
     var appointmentRevision by remember { mutableIntStateOf(0) }
-    var savedReminderDenied by remember { mutableStateOf(false) }
+    var savedReminderDenied by rememberSaveable { mutableStateOf(false) }
+    var awaitingNotificationGrant by rememberSaveable { mutableStateOf(false) }
+    var grantBaseline by rememberSaveable { mutableIntStateOf(permissionRevision) }
+    SideEffect { graph.reminders.observedPermissionRevision = permissionRevision }
+    suspend fun reminderDenied() = withContext(Dispatchers.IO) {
+        readReminderSettingsStatus(graph.reminders::enabled) {
+            graph.database.storeMetadataDao().find(AppointmentReminders.PERMISSION_REQUESTED) != null
+        }
+    } == ReminderSettingsState.Status.denied
+    LaunchedEffect(permissionRevision) {
+        if (awaitingNotificationGrant && permissionRevision != grantBaseline) {
+            awaitingNotificationGrant = false
+            savedReminderDenied = reminderDenied()
+        }
+    }
+    val onAppointmentSaved: (AppointmentEditorState) -> Unit = { editor ->
+        val baseline = graph.reminders.takePendingPermissionBaseline()
+        if (baseline != null) {
+            grantBaseline = baseline
+            awaitingNotificationGrant = true
+            savedReminderDenied = false
+            if (permissionRevision != baseline) {
+                awaitingNotificationGrant = false
+                scope.launch { savedReminderDenied = reminderDenied() }
+            }
+        } else if (editor.reminderEnabled) {
+            scope.launch { savedReminderDenied = reminderDenied() }
+        } else savedReminderDenied = false
+        appointmentRevision++
+        back()
+    }
 
     NavHost(
         nav, startDestination = S1Routes.TODAY,
@@ -183,10 +216,8 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
         composable(S2Routes.SETTINGS) {
             val state=remember(graph) { ReminderSettingsState {
                 kotlinx.coroutines.withContext(Dispatchers.IO) {
-                    when {
-                        graph.reminders.enabled() -> ReminderSettingsState.Status.enabled
-                        android.os.Build.VERSION.SDK_INT < 33 || graph.database.storeMetadataDao().find("appointment-permission-requested") != null -> ReminderSettingsState.Status.denied
-                        else -> ReminderSettingsState.Status.notRequested
+                    readReminderSettingsStatus(graph.reminders::enabled) {
+                        graph.database.storeMetadataDao().find(AppointmentReminders.PERMISSION_REQUESTED) != null
                     }
                 }
             } }
@@ -205,18 +236,12 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
         composable(S2Routes.APPOINTMENT_CREATE) { entry ->
             val date = LocalDate.parse(requireNotNull(entry.arguments?.getString(S2Routes.ARG_DATE)))
             val editor = remember(date) { AppointmentEditorState(graph.appointments, graph.students, graph.clock, graph.zone, date) }
-AppointmentEditorScreen(editor, back) {
-                savedReminderDenied = editor.reminderEnabled && !graph.reminders.enabled() && !graph.reminders.permissionRequest.value
-                appointmentRevision++; back()
-            }
+AppointmentEditorScreen(editor, back) { onAppointmentSaved(editor) }
         }
         composable(S2Routes.APPOINTMENT_EDIT) { entry ->
             val id = UUID.fromString(requireNotNull(entry.arguments?.getString(S2Routes.ARG_APPOINTMENT)))
             val editor = remember(id) { AppointmentEditorState(graph.appointments, graph.students, graph.clock, graph.zone, graph.clock.today(graph.zone), id) }
-AppointmentEditorScreen(editor, back) {
-                savedReminderDenied = editor.reminderEnabled && !graph.reminders.enabled() && !graph.reminders.permissionRequest.value
-                appointmentRevision++; back()
-            }
+AppointmentEditorScreen(editor, back) { onAppointmentSaved(editor) }
         }
         composable(S1Routes.STUDENTS) {
             val state = remember { StudentListViewModel(graph.students, sessionRepository = graph.sessions, creditUseCases = graph.credits, clock = graph.clock, zoneId = graph.zone) }
@@ -224,8 +249,9 @@ AppointmentEditorScreen(editor, back) {
             StudentListScreen(state, navigator::open, { navigator.open(S1Routes.TODAY) }, showRootSwitch = true, autoLoad = false)
         }
         composable(S1Routes.STUDENT_CREATE) {
-            val state = remember { StudentEditorViewModel(StudentEditorMode.Add, graph.students) }
-            StudentEditorScreen(state, back, { record -> if (record != null) { navigator.back(); navigator.open(S1Routes.studentDetail(record.studentID)) } }, sessionRepository = graph.sessions, historyRepository = graph.historyRepository, appointments = graph.appointments)
+            val state = remember { StudentFeatureFactory.editorViewModel(StudentEditorMode.Add, graph.students) }
+            StudentEditorScreen(state, back, { record -> if (record != null) { navigator.back(); navigator.open(S1Routes.studentDetail(record.studentID)) } }, sessionRepository = graph.sessions, historyRepository = graph.historyRepository, appointments = graph.appointments,
+                makeDeleteViewModel = { studentID -> StudentFeatureFactory.deleteViewModel(studentID, graph.students, graph.sessions, graph.historyRepository, graph.appointments) })
         }
         composable(S1Routes.STUDENT_DETAIL) { entry ->
             val id = StudentID.parse(requireNotNull(entry.arguments?.getString(S1Routes.ARG_STUDENT_ID)))
@@ -235,9 +261,10 @@ AppointmentEditorScreen(editor, back) {
         }
         composable(S1Routes.STUDENT_EDIT) { entry ->
             val id = StudentID.parse(requireNotNull(entry.arguments?.getString(S1Routes.ARG_STUDENT_ID)))
-            val state = remember(id) { StudentEditorViewModel(StudentEditorMode.Edit(id), graph.students) }
+            val state = remember(id) { StudentFeatureFactory.editorViewModel(StudentEditorMode.Edit(id), graph.students) }
             StudentEditorScreen(state, back, { back() }, onArchived = back, onDeleted = { navigator.open(S1Routes.STUDENTS) },
-                onRoute = navigator::open, sessionRepository = graph.sessions, historyRepository = graph.historyRepository, appointments = graph.appointments)
+                onRoute = navigator::open, sessionRepository = graph.sessions, historyRepository = graph.historyRepository, appointments = graph.appointments,
+                makeDeleteViewModel = { studentID -> StudentFeatureFactory.deleteViewModel(studentID, graph.students, graph.sessions, graph.historyRepository, graph.appointments) })
         }
         composable(S1Routes.STUDENT_PACKAGES) { entry ->
             val id = StudentID.parse(requireNotNull(entry.arguments?.getString(S1Routes.ARG_STUDENT_ID)))

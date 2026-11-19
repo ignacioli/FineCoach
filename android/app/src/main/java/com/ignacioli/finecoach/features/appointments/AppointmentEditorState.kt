@@ -75,10 +75,10 @@ class AppointmentEditorState(private val appointments: AppointmentUseCases, priv
             }
         }
         original?.let { row -> if (series != null) {
-            when (val found = appointments.inDateRange(row.date, row.date.plusDays(RecurrenceSeries.MAXIMUM_INSTANCES.toLong()))) {
+            when (val found = appointments.all()) {
                 is ApplicationResult.Failure -> { error = "读取受影响课程失败，再试一次。"; return }
                 is ApplicationResult.Success -> affectedCount = found.value.count {
-                    it.seriesID == row.seriesID && it.status == AppointmentStatus.scheduled && !it.isDetachedException
+                    it.seriesID == row.seriesID && it.date >= row.date && it.status == AppointmentStatus.scheduled && !it.isDetachedException
                 }
             }
         } }

@@ -280,6 +280,7 @@ fun StudentEditorScreen(
     sessionRepository: SessionRepositoryPort? = null,
     historyRepository: HistoryRepositoryPort? = null,
     appointments: com.ignacioli.finecoach.core.application.AppointmentUseCases? = null,
+    makeDeleteViewModel: ((StudentID) -> DeleteStudentViewModel)? = null,
     autoLoad: Boolean = true,
     insets: WindowInsets = WindowInsets.safeDrawing,
 ) {
@@ -310,8 +311,8 @@ fun StudentEditorScreen(
                 )
             }
             StudentManagementOverlay.Delete -> {
-                val deleteViewModel = remember(editingStudentID, viewModel.useCases, sessionRepository, historyRepository, appointments) {
-                    DeleteStudentViewModel(
+                val deleteViewModel = remember(editingStudentID, viewModel.useCases, sessionRepository, historyRepository, appointments, makeDeleteViewModel) {
+                    makeDeleteViewModel?.invoke(editingStudentID) ?: StudentFeatureFactory.deleteViewModel(
                         studentID = editingStudentID,
                         useCases = viewModel.useCases,
                         sessionRepository = sessionRepository,

@@ -135,5 +135,24 @@ class CourseActionEntryLayoutTests {
         await { dismissed==1 }
         f.room.test { assertEquals(expected,f.room.ok(f.appointments.all()).count { it.studentID==row.studentID }) }
     }
+    @Test fun studentDeleteReadFailureShowsRetryAndKeepsRoom() {
+        val port = object : AppointmentRepositoryPort by f.repository {
+            override suspend fun all() = ApplicationResult.Failure(ApplicationError(ApplicationErrorCode.persistenceFailed))
+        }
+        lateinit var state: com.ignacioli.finecoach.features.students.DeleteStudentViewModel
+        var students = 0L; var appointments = 0L
+        f.room.test {
+            students = f.room.count("students"); appointments = f.room.count("appointments")
+            state = com.ignacioli.finecoach.features.students.DeleteStudentViewModel(row.studentID, f.students, f.room.sessions, appointments = AppointmentUseCases(port))
+        }
+        compose.setContent { FineCoachTheme { com.ignacioli.finecoach.features.students.DeleteStudentScreen(state, {}) } }
+        await { state.uiState.errorMessage != null }
+        node(com.ignacioli.finecoach.features.students.StudentTestTags.DELETE_CONFIRM).assertDoesNotExist()
+        node(com.ignacioli.finecoach.features.students.StudentTestTags.DELETE_ERROR).assertIsDisplayed()
+        node(com.ignacioli.finecoach.features.students.StudentTestTags.DELETE_RETRY).assertIsDisplayed().assertHasClickAction().performClick()
+        await { state.uiState.errorMessage != null && !state.uiState.isLoading }
+        node(com.ignacioli.finecoach.features.students.StudentTestTags.DELETE_CONFIRM).assertDoesNotExist()
+        f.room.test { assertEquals(students, f.room.count("students")); assertEquals(appointments, f.room.count("appointments")) }
+    }
 
 }

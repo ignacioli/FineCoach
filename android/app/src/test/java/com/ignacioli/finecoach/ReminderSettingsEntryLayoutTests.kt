@@ -43,7 +43,8 @@ class ReminderSettingsEntryLayoutTests {
         val state=ReminderSettingsState { ReminderSettingsState.Status.enabled }; var opens=0
         compose.setContent { FineCoachTheme { ReminderSettingsScreen(state,{}) { opens++; true } } }; await { state.status!=null }
         node("settings-notifications").assertIsDisplayed().assertTextContains("提醒已开启").performClick(); assertEquals(1,opens)
-        f.room.test { assertNull(f.room.db.storeMetadataDao().find("appointment-permission-requested")) }
+        assertNull(shadowOf(compose.activity).lastRequestedPermission)
+        f.room.test { assertNull(f.room.db.storeMetadataDao().find(com.ignacioli.finecoach.notifications.AppointmentReminders.PERMISSION_REQUESTED)) }
     }
     @Test fun failureRetryAndOpenFailureAreVisibleAndDoNotChangeRoom() {
         var reads=0; val state=ReminderSettingsState { reads++; if(reads==1) error("synthetic failure") else ReminderSettingsState.Status.notRequested }

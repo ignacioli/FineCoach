@@ -314,7 +314,7 @@ P7 15/36/37 D 类修复：37 原因复用上述多行最小高；15 cardio 与 3
 #### `DS-BOTTOM-SHEET` 底部面板
 
 - **部件**：拖动条（36×5 `surface.divider` 胶囊，居中，距顶 `space.2`，对无障碍隐藏）→ 可选标题区：标题（`headline` 或 `title`，带 header 属性）+ 副标题（`callout` 400 `text.secondary`）+ 可选尾部 accessory（如 18 画板的状态文字）→ 内容（通常是 `FCActionRow` 与分割线）。白底、顶部两角 `radius.lg`、水平内边距 `space.4`、底部 `space.6`。
-- **Android S2 C 类映射**：`FcBottomSheet` 补齐既有 title/headline 样式与尾部 accessory slot（18-s2 的待上课）；默认 headline 和旧消费者保持不变。
+- **Android S2 C 类映射**：`FcBottomSheet` 补齐既有 title/headline 样式与尾部 accessory slot（18-s2 的待上课）；默认 headline 和旧消费者保持不变。受影响的现有消费者（§1.3）：使用新 slot 的是 `CourseActionSheet`（`titleStyle` title + accessory 状态文字）。仍走默认 headline、不传 accessory 的是 `AppointmentEditorScreen`（范围 sheet）、`TemplateScreens`、`PlannedSetsSheet`、`ActiveSessionScreen`、`HistoryTemplateSheet`、`HistoryListScreen`、`ExerciseScreens`。
 - **呈现**：必须用 `View.fcBottomSheet(isPresented:)`，由它绘制 `overlay.scrim`；不要用系统 `.sheet`，因为它的遮罩颜色不在色板内。点击遮罩、向下拖超过 80pt 或无障碍 escape 都会关闭面板。
 - **不变量**：遮罩颜色为 `text.primary` 40%（自动：Vision）；面板带 `.isModal` 属性（可自动）。
 
@@ -410,7 +410,7 @@ P7 Android D 类容器修复（2026-11-13）：`FcScrollBody` 复用二级页 we
 - **变体 / 状态**：可点（带 `›`）；不可点（无 `›`，用于纯信息行）；42「关于」自 C33 起改用可点态；打开外部链接的行同样用可点态（如 42「源代码」，README §10 C21）；**不可用**（新）：图标与标题改为 `text.disabled`，尾部说明写原因（如「档案未包含」），无 `›`，整行不可点，读作「标题，原因」。
 - **不变量**：带 action 时整行可点（可自动）；不可用态没有点击动作（可自动）；整行合并为一个无障碍元素，读出标题、副标题与尾部说明（可自动）；点击区 ≥ 44（自动）。
 - **复用边界**：用于入口列表页（资料库 19、设置 42、首次启动二选一 M2-07、查看模式首页 M2-11）。操作区里的单行操作用 `DS-ACTION-ROW`，普通内容列表用 `DS-LIST-ROW`。
-- **Android S2 C 类映射**：`FcHubRow` 补齐 subtitleContent / trailingContent slot，对应上述已批准的 status 与 actionText；默认字符串和 disclosure 不变；42/43 使用真实通知设置 Intent。
+- **Android S2 C 类映射**：`FcHubRow` 补齐 subtitleContent / trailingContent slot，对应上述已批准的 status 与 actionText；默认字符串和 disclosure 不变；42/43 使用真实通知设置 Intent。受影响的现有消费者（§1.3）：`ReminderSettingsScreen` 使用这两个 slot（权限拒绝状态与「前往设置」）。`ResourceHubScreen` 两行仍只传字符串 subtitle 和默认 disclosure，表现不变。
 - **迁移范围（Phase 0）**：ResourceHub `hubRow`、Settings `row` 改用本组件，外观不得改变。
 
 #### `DS-INLINE-RESULT` 就地结果（由组合模式提升为共享组件）

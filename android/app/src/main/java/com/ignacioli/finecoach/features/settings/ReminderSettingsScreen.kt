@@ -26,6 +26,15 @@ class ReminderSettingsState(private val readStatus: suspend () -> Status) {
     fun openSettings(open: () -> Boolean) { if (!open()) error = "无法打开系统设置，请稍后重试。" }
 }
 
+internal suspend fun readReminderSettingsStatus(
+    enabled: () -> Boolean,
+    permissionRequested: suspend () -> Boolean,
+): ReminderSettingsState.Status = when {
+    enabled() -> ReminderSettingsState.Status.enabled
+    android.os.Build.VERSION.SDK_INT < 33 || permissionRequested() -> ReminderSettingsState.Status.denied
+    else -> ReminderSettingsState.Status.notRequested
+}
+
 fun openNotificationSettings(context: Context): Boolean = try {
     context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     true

@@ -79,4 +79,48 @@ class LinkedFinishEntryLayoutTests {
         f.test { assertEquals(AppointmentStatus.inProgress,f.ok(cases.find(row.id))!!.status); assertEquals(0L,f.count("credit_adjustments")) }
         assertFalse(finish.completed)
     }
+    @Test fun linkedUsablePackageHasNoSkipAndDebitsOnce() {
+        show(); node("finish-skip").assertDoesNotExist()
+        node("finish-discard").assertIsDisplayed().performClick(); await { summary!=null }
+        node("finish-skip").assertDoesNotExist()
+        f.test {
+            assertEquals(AppointmentStatus.completed,f.ok(cases.find(row.id))!!.status)
+            assertEquals(1L,f.count("credit_adjustments"))
+            assertEquals(CreditLedgerSourceEventKeyFactory.sessionComplete(content.session.sessionID),f.ok(f.credits.ledger(f.studentID)).single().sourceEventKey)
+        }
+    }
+    @Test fun linkedExpiredPackageSkipCompletesWithoutLedger() {
+        f.test { f.db.openHelper.writableDatabase.execSQL("UPDATE course_packages SET endDate = ?", arrayOf<Any>(f.today.minusDays(1).toString())) }
+        show(); node("finish-discard").assertIsDisplayed().performClick()
+        await { finish.outcome is SessionCreditOutcome.PackageUnusable }
+        node("finish-skip").assertIsDisplayed().performClick(); await { summary!=null }
+        f.test {
+            assertEquals(AppointmentStatus.completed,f.ok(cases.find(row.id))!!.status)
+            assertEquals(0L,f.count("credit_adjustments"))
+        }
+    }
+    @Test fun linkedInsufficientBalanceShowsClickableManualAdjustment() {
+        var adjusted=false
+        f.test {
+            val pack=f.ok(f.credits.activePackage(f.studentID,f.today))!!
+            f.ok(f.credits.recordManualCorrection(pack.coursePackageID,CreditDirection.debit,pack.remainingCreditsCache,"虚构调整"))
+        }
+        compose.setContent { FineCoachTheme { FinishSessionScreen(finish,{},{},{summary=it},{adjusted=true}) } }
+        await { finish.gate!=null }
+        node("finish-discard").assertIsDisplayed().performClick()
+        await { finish.outcome is SessionCreditOutcome.PackageUnusable }
+        node("finish-adjust").assertIsDisplayed().assertHasClickAction().performClick()
+        await { adjusted }
+    }
+    @Test fun linkedSessionCompleteRejectsSkipAndLeavesLedger() {
+        show(); node("finish-discard").assertIsDisplayed().performClick(); await { summary!=null }
+        f.test {
+            val before=f.ok(f.credits.ledger(f.studentID))
+            assertEquals(1, before.size)
+            assertEquals(CreditLedgerSourceEventKeyFactory.sessionComplete(content.session.sessionID), before.single().sourceEventKey)
+            f.error(ApplicationErrorCode.invalidState, f.finisher.skipDebit(content.session.sessionID))
+            assertEquals(before, f.ok(f.credits.ledger(f.studentID)))
+            assertEquals(1L, f.count("credit_adjustments"))
+        }
+    }
 }

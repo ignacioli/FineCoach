@@ -145,12 +145,12 @@ fun FinishSessionScreen(state: FinishSessionUiState, onContinue: () -> Unit, onA
             else if (state.error != null || state.outcome is SessionCreditOutcome.PackageUnusable) {
                 (state.outcome as? SessionCreditOutcome.PackageUnusable)?.let { notice ->
                     FcListRow(if (notice.reason == SessionCreditUnusableReason.expired) "课包已到期，本次未扣课" else "课包余额不足，本次未扣课")
-                    if (!state.linked) FcButton("手工调整", Modifier.testTag("finish-adjust"), !state.busy) {
+                    FcButton("手工调整", Modifier.testTag("finish-adjust"), !state.busy) {
                         state.adjustmentTarget = notice.coursePackage.coursePackageID
                         scope.launch { state.skip() }
                     }
                 }
-                if (!state.linked) FcSecondaryButton("不扣课", Modifier.testTag("finish-skip"), !state.busy) { scope.launch { state.skip() } }
+                if (state.outcome is SessionCreditOutcome.PackageUnusable || !state.linked) FcSecondaryButton("不扣课", Modifier.testTag("finish-skip"), !state.busy) { scope.launch { state.skip() } }
             }
         }
     }
