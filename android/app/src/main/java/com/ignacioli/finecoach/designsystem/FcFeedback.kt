@@ -114,6 +114,7 @@ fun FcAvatar(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun FcBottomSheet(title: String, onDismiss: () -> Unit, modifier: Modifier = Modifier, subtitle: String? = null,
     skipPartiallyExpanded: Boolean = false, panelFlow: Boolean = false,
+    titleStyle: androidx.compose.ui.text.TextStyle = FcTypography.headline, accessory: (@Composable () -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
     ModalBottomSheet(onDismissRequest = onDismiss, containerColor = FcColors.surfacePage,
@@ -132,8 +133,11 @@ fun FcBottomSheet(title: String, onDismiss: () -> Unit, modifier: Modifier = Mod
                 FcSpacing.space2 - FcSpacing.space1 - FcComponentMetrics.hairline) else Modifier)
                 .then(if (panelFlow) Modifier.padding(top = FcSpacing.space4) else Modifier.padding(horizontal = FcSpacing.space4)).padding(bottom = FcSpacing.space6)
                 .testTag("sheet-content"), verticalArrangement = Arrangement.spacedBy(if (panelFlow) FcSpacing.space4 else FcSpacing.space2)) {
-                Box(Modifier.then(if (panelFlow) Modifier.padding(horizontal = FcSpacing.space4) else Modifier)) {
-                    FcText(title, Modifier.semantics { heading() }, style = FcTypography.headline, color = FcColors.textPrimary)
+                Row(Modifier.fillMaxWidth().then(if (panelFlow) Modifier.padding(horizontal = FcSpacing.space4) else Modifier), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                    FcText(title, Modifier.semantics { heading() }, style = titleStyle, color = FcColors.textPrimary)
+                    }
+                    accessory?.invoke()
                 }
                 subtitle?.let { FcText(it, style = FcTypography.style("callout", 400), color = FcColors.textSecondary) }
                 content()

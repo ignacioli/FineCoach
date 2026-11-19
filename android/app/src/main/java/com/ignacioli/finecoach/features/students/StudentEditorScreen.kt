@@ -279,6 +279,7 @@ fun StudentEditorScreen(
     onRoute: (String) -> Unit = {},
     sessionRepository: SessionRepositoryPort? = null,
     historyRepository: HistoryRepositoryPort? = null,
+    appointments: com.ignacioli.finecoach.core.application.AppointmentUseCases? = null,
     autoLoad: Boolean = true,
     insets: WindowInsets = WindowInsets.safeDrawing,
 ) {
@@ -309,12 +310,13 @@ fun StudentEditorScreen(
                 )
             }
             StudentManagementOverlay.Delete -> {
-                val deleteViewModel = remember(editingStudentID, viewModel.useCases, sessionRepository, historyRepository) {
+                val deleteViewModel = remember(editingStudentID, viewModel.useCases, sessionRepository, historyRepository, appointments) {
                     DeleteStudentViewModel(
                         studentID = editingStudentID,
                         useCases = viewModel.useCases,
                         sessionRepository = sessionRepository,
                         historyRepository = historyRepository,
+                        appointments = appointments,
                     )
                 }
                 DeleteStudentScreen(

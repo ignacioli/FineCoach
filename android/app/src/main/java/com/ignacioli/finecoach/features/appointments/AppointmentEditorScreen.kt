@@ -117,9 +117,21 @@ fun AppointmentEditorScreen(state: AppointmentEditorState, onBack: () -> Unit, o
         FcPinnedAction { FcButton("保存", Modifier.testTag("appointment-save"), enabled = state.loaded && !state.busy) { scope.launch { state.save() } } }
     }
     if (field == "time") FcAppointmentTimePicker(state.time, { state.time = it; field = null }, { field = null })
-    if (state.scopeRequested) FcBottomSheet("编辑范围", state::dismissScope) {
-        FcActionRow("仅本次", Modifier.testTag("appointment-scope-single")) { scope.launch { state.save(AppointmentEditorState.Scope.single) } }
-        FcActionRow("本次及以后", Modifier.testTag("appointment-scope-future"), enabled = state.original?.date == state.date) { scope.launch { state.save(AppointmentEditorState.Scope.future) } }
+    if (state.scopeRequested) FcBottomSheet("这节课属于重复安排", state::dismissScope,
+        modifier = Modifier.testTag("appointment-scope"), subtitle = "改动只影响开始时间、预计时长和提醒。") {
+        val day = state.original?.date?.let { "${it.monthValue}月${it.dayOfMonth}日" }.orEmpty()
+        Column(Modifier.fillMaxWidth()) {
+            FcListRowDivider()
+            FcActionRow("仅本次", Modifier.testTag("appointment-scope-single"), subtitle = "只改 $day 这一节") {
+                scope.launch { state.save(AppointmentEditorState.Scope.single) }
+            }
+            FcListRowDivider()
+            FcActionRow("本次及以后", Modifier.testTag("appointment-scope-future"),
+                subtitle = if (state.original?.date == state.date) "${day}起的 ${state.affectedCount} 节一起改" else "改了日期只能选「仅本次」",
+                enabled = state.original?.date == state.date) { scope.launch { state.save(AppointmentEditorState.Scope.future) } }
+            FcListRowDivider()
+            FcLinkButton("取消", Modifier.fillMaxWidth().padding(top = FcSpacing.space2).testTag("appointment-scope-cancel"), onClick = state::dismissScope)
+        }
     }
     state.conflict?.let { message -> FcConfirmationDialog("时间冲突", message, "覆盖并保存", { scope.launch { state.overrideConflict() } },
         state::dismissConflict, tag = "appointment-conflict") }

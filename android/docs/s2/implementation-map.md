@@ -20,7 +20,7 @@
 | 今日 | 下一节课／逾期／其余安排整行 | today-appointment-<UUID> | 否，进入安排详情/编辑 | FcAppointmentRow fillMaxWidth | TodayS2EntryLayoutTests.visibleEntriesAndCollapsedResolvedRowsUseRealAppointmentData / overdueAndOtherTodayRowsAreVisibleClickableAndUseSharedStatus；真实 next-up 导航 S2NavigationEntryLayoutTests |
 | 今日 | 已处理 · N | today-resolved | 否，只切换展开 | FcGroupEntryRow fillMaxWidth | TodayS2EntryLayoutTests.visibleEntriesAndCollapsedResolvedRowsUseRealAppointmentData |
 | 今日 | 重试 | today-retry | 否，只重读 | FcButton fillMaxWidth | TodayS2EntryLayoutTests.retryReadsTodayRangeAfterVisibleFailure |
-| 今日 | 设置齿轮（Phase 5 未接入，禁用） | today-settings | 否 | FcTitleIconButton | S2NavigationEntryLayoutTests（只断言 disabled，Phase 5 无 click 路径） |
+| 今日 | 设置齿轮 | today-settings | 否，打开提醒页 | FcTitleIconButton | S2NavigationEntryLayoutTests.realNavHostOpensEditorAndCalendarAndReturnsToS2Today（真实点击） |
 
 | 课程日历 | 返回 | calendar-back | 否 | FcPageHeader / header Row fillMaxWidth | S2NavigationEntryLayoutTests.realNavHostOpensEditorAndCalendarAndReturnsToS2Today |
 | 课程日历 | 上月／下月 | calendar-previous / calendar-next | 否 | FcCalendarMonthButton / header Row | CalendarEntryLayoutTests.monthSwitchSelectionAndCreatePassSelectedDateWithoutMutation |
@@ -78,3 +78,30 @@ S2Routes 独立定义 Calendar / create(date) / edit(UUID)；S1Routes 的冻结�
 设计决策：无新增；图层与容差均有负责人裁决，不改渲染坐标、PNG 或 baseline。
 实现与检查：三屏 33/0/0、64/0/0、66/0/0；S1 七屏及 baseline 均绿；G3 42/0、G4 12/0、P7 15/0、comparator+scope 100/0、Entry/Nav 23/0，含真实 row 的导航补充单跑 1/0。
 结果：agent 自测 PASS；T034 仍 PENDING 宿主完整门禁与 owner L3，候选 hash 仅在 T033。
+
+## Phase 5 anatomy（实现前）
+
+分类 C/D；复用批准的 24 scope、18-s2 action sheet、42/43-s2 settings 与 AD-02。删除误建是 T002 已批准 B delta；不新增设计决定。
+范围：复用 DS-BOTTOM-SHEET（标题、副标题、grabber）、DS-ACTION-ROW（subtitle/destructive/disabled）、DS-LIST-ROW、DS-STATUS、DS-PAGE-FLOW、DS-BUTTON；scope 的取消占满 sheet-content；课程操作由 Today/Calendar 安排行打开，编辑作为面板内可见入口；settings 仅提醒。
+组合：页面水平 space.4、块间 space.4、标签至内容 space.2、底部 space.6；sheet 内使用共享组件现有间距，不以坐标贴板。
+
+| 编辑范围 | 取消 | appointment-scope-cancel | 否，保留草稿和 Room 原数据 | FcLinkButton fillMaxWidth / sheet-content | AppointmentEditorEntryLayoutTests.seriesEditingRequiresScopeAndFutureKeepsPriorInstance |
+| Today / Calendar | 安排行 → 课程面板 → 编辑安排 | course-edit | 否，进入 editor | FcActionRow / course-actions fillMaxWidth | S2NavigationEntryLayoutTests.realNavHostOpensEditorAndCalendarAndReturnsToS2Today |
+| 课程面板 | 开始训练 | course-start | 是，创建/关联训练后导航 | FcButton / course-actions fillMaxWidth | CourseActionEntryLayoutTests.startPersistsAndNavigatesOnlyAfterSuccess / failedStartShowsErrorAndKeepsRoomUnchanged |
+| 课程面板 | 进入上次训练 | course-previous | 否，FR-007a 新安排不变 | FcButton fillMaxWidth | CourseActionEntryLayoutTests.startCreatesLinkedTrainingWithFocusAndVisiblePreviousTrainingEntryLeavesNewAppointmentUnchanged |
+| 课程面板 | 标记缺席 / 返回 | course-absent / course-absent-back | 否，选择页 | FcActionRow / FcLinkButton fillMaxWidth | CourseActionEntryLayoutTests.absentBackThenExplicitDebitPersistsOneIdempotentAppointmentEvent |
+| 缺席选择 | 不扣课 / 扣1课时 | course-absent-free / course-absent-debit | 是，前者仅缺席，后者一次 appointmentAbsent 扣课 | FcActionRow fillMaxWidth | CourseActionEntryLayoutTests.absentWithoutDebitNeverWritesLedger / absentBackThenExplicitDebitPersistsOneIdempotentAppointmentEvent |
+| 课程面板 | 取消本次 / 确认与返回 | course-cancel / course-confirm-accept / course-confirm-cancel | 仅确认保留取消记录、不扣课 | FcActionRow / FcConfirmationDialog | CourseActionEntryLayoutTests.cancelConfirmationAndDismissKeepRecordWithoutDebit |
+| 课程面板 | 删除误建 / 确认与返回 | course-delete / course-confirm-accept / course-confirm-cancel | 仅确认永久删除可删除安排 | FcActionRow fillMaxWidth / FcConfirmationDialog | CourseActionEntryLayoutTests.deleteRequiresConfirmationAndHasFullWidthVisibleControl |
+| 课程面板 | 取消（关闭面板） | course-dismiss | 否 | FcLinkButton fillMaxWidth | CourseActionEntryLayoutTests.overdueNeverOffersPermanentDeleteAndEditDismissDoNotWrite |
+
+| 课程面板 | 继续训练 | course-continue | 否，打开已关联训练 | FcButton fillMaxWidth | CourseActionEntryLayoutTests.linkedAppointmentHasVisibleContinueAndNeverDelete |
+| 删除学员 | 受影响安排数 / 取消 | delete-student-appointments / StudentTestTags.DELETE_CANCEL | 否，取消不删除 | 既有 DeleteStudentScreen 列与按钮 | CourseActionEntryLayoutTests.studentDeleteConfirmationCountsAppointmentsAndCancelKeepsRoom |
+| 今日 | 设置齿轮 | today-settings | 否，打开提醒页 | FcTitleIconButton / title row | S2NavigationEntryLayoutTests.realNavHostOpensEditorAndCalendarAndReturnsToS2Today |
+| 设置 | 通知 / 前往设置 | settings-notifications | 否，系统 Intent | FcHubRow / settings-content fillMaxWidth | ReminderSettingsEntryLayoutTests.deniedRowUsesStatusAndVisibleSystemSettingsActionWithoutRoomMutation / enabledRowStillOpensSystemSettingsAndNeverRequestsRuntimePermission |
+| 设置 | 返回 | settings-back | 否 | FcPageHeader | ReminderSettingsEntryLayoutTests.deniedRowUsesStatusAndVisibleSystemSettingsActionWithoutRoomMutation |
+| 设置 | 重试 | settings-retry | 否，重读权限 | FcButton fillMaxWidth | ReminderSettingsEntryLayoutTests.failureRetryAndOpenFailureAreVisibleAndDoNotChangeRoom |
+| 保存已启用提醒且权限已拒绝 | 前往设置 / 完成 | saved-reminder-denied-accept / saved-reminder-denied-cancel | 否，安排已落盘；前往设置只打开提醒页 | FcConfirmationDialog | S2NavigationEntryLayoutTests.deniedReminderSaveKeepsRowAndCompleteDismisses / deniedReminderSaveOpensSettingsFromVisibleAction |
+| 结束关联训练 | 丢弃未完成组并结束 | finish-discard | 是，完成并按关联安排扣一次；不出现扣/不扣 | FcButton / finish-content fillMaxWidth | LinkedFinishEntryLayoutTests.linkedCompletionUsesVisibleDiscardAndDeductsOnceWithoutAdhocChoice |
+| 结束关联训练 | 扣课失败后重试 | finish-retry | 是，重试后仍只一笔；无「不扣课」 | FcButton fillMaxWidth | LinkedFinishEntryLayoutTests.linkedDebitFailureHasExplicitRetryAndNoInvalidSkip |
+| 结束关联训练 | 返回继续 | finish-return | 否 | FcSecondaryButton | LinkedFinishEntryLayoutTests.linkedReturnKeepsTrainingAndAppointmentWithoutDebit |

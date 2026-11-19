@@ -67,6 +67,38 @@ internal object P7SheetWriter {
         sheet.recycle()
     }
 
+    /** Wide approved board kept at native pixels beside a 780px Android column. */
+    @Synchronized
+    fun writeUnscaled(id: String, android: Bitmap, composable: String, fixture: String, mismatches: String, designPath: String) {
+        val design = checkNotNull(BitmapFactory.decodeFile(File(app.parentFile.parentFile, designPath).path)) {
+            "Cannot read design PNG: $designPath"
+        }
+        check(android.width == 780 && android.height > 0 && design.width > 780 && design.height > 0) {
+            "AD-02 board stays native width; Android column stays 780px"
+        }
+        save(android, File(output, "$id.android.png"))
+        val sheet = Bitmap.createBitmap(design.width + android.width, maxOf(design.height, android.height) + 40, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(sheet)
+        canvas.drawColor(Color.WHITE)
+        canvas.drawBitmap(design, 0f, 40f, null)
+        canvas.drawBitmap(android, design.width.toFloat(), 40f, null)
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.BLACK; textSize = 22f }
+        canvas.drawText("$id | design | Android", 12f, 28f, paint)
+        save(sheet, File(output, "$id.sheet.png"))
+        fun cell(value: String) = value.replace("|", " / ").replace('\n', ' ')
+        rows[id] = "| $id | $designPath | $composable | ${cell("rendered")}; ${cell(fixture)} | ${cell(mismatches)} |"
+        File(output, "index.md").writeText(
+            "# P7 design / Android 测量\n\n" +
+                "仅测量，未进行 OK/minor/rework 判定；无 comparator、baseline 或视觉验收。fictional data。\n" +
+                "sdk 36; zh-rCN-w390dp-h844dp-notnight-xhdpi; NATIVE; Density(2f, 1f); status inset 52dp。\n" +
+                "左右均为原始像素 1:1，40px 标签行；Android 为真实 viewport 或按状态标签排列的原始裁剪；滚动信息见各行及 .scroll.txt；保留产品布局和文案。\n\n" +
+                "| id | design path | Android composable | status / fixture notes | unmatched content |\n" +
+                "|---|---|---|---|---|\n" + rows.values.joinToString("\n") + "\n",
+        )
+        design.recycle()
+        sheet.recycle()
+    }
+
     fun stack(parts: List<Pair<String, Bitmap?>>): Bitmap {
         val result = Bitmap.createBitmap(780, parts.sumOf { 76 + (it.second?.height ?: 100) }, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(result)

@@ -20,9 +20,14 @@ class FinishSessionUiState(val active: ActiveSessionUiState, val useCases: Finis
     var completed by mutableStateOf(false); private set
     var busy by mutableStateOf(false); private set
     var ready by mutableStateOf(false); private set
+    var linked by mutableStateOf(false); private set
     var adjustmentTarget: CoursePackageID? = null
     suspend fun prepare() {
         val current = active.content ?: return
+when (val found = sessions.linkedAppointmentID(current.session.sessionID)) {
+            is ApplicationResult.Failure -> { error = found.error; return }
+            is ApplicationResult.Success -> linked = found.value != null
+        }
         if (current.session.state == SessionState.completed) { completed = true; settle(); return }
         when (val result = useCases.gate(current.session.sessionID)) {
             is ApplicationResult.Failure -> error = result.error
@@ -111,7 +116,7 @@ fun FinishSessionScreen(state: FinishSessionUiState, onContinue: () -> Unit, onA
         state.adjustmentTarget?.let(onAdjust) ?: state.active.content?.session?.sessionID?.let(onSummary)
     } }
     val current = state.active.content
-    val back = { if (!state.busy) { if (state.completed) scope.launch { state.skip() } else onContinue() }; Unit }
+    val back = { if (!state.busy) { if (state.completed) scope.launch { if (state.linked) state.settle() else state.skip() } else onContinue() }; Unit }
     if (!state.completed && current?.session?.durationNeedsReview == true) {
         DurationReviewScreen(state.active, onContinue) { scope.launch { state.prepare() } }
         return
@@ -120,7 +125,7 @@ fun FinishSessionScreen(state: FinishSessionUiState, onContinue: () -> Unit, onA
         FcPageHeader(if (state.completed) "训练已完成" else "结束训练", onBack = back, tag = "finish")
         Column(Modifier.fillMaxWidth().weight(1f).imePadding().verticalScroll(rememberScrollState()).testTag("finish-content")) {
             state.error?.let {
-                FcListRow(if (state.completed) "训练已完成，扣课未成功，请重试或不扣课" else "结束失败，请重试", Modifier.testTag("finish-error"))
+                FcListRow(if (state.completed) (if (state.linked) "训练已完成，扣课未成功，请重试" else "训练已完成，扣课未成功，请重试或不扣课") else "结束失败，请重试", Modifier.testTag("finish-error"))
                 FcButton("重试", Modifier.testTag("finish-retry"), !state.busy) {
                     scope.launch { if (state.completed) state.settle() else state.retryFinish() }
                 }
@@ -140,12 +145,12 @@ fun FinishSessionScreen(state: FinishSessionUiState, onContinue: () -> Unit, onA
             else if (state.error != null || state.outcome is SessionCreditOutcome.PackageUnusable) {
                 (state.outcome as? SessionCreditOutcome.PackageUnusable)?.let { notice ->
                     FcListRow(if (notice.reason == SessionCreditUnusableReason.expired) "课包已到期，本次未扣课" else "课包余额不足，本次未扣课")
-                    FcButton("手工调整", Modifier.testTag("finish-adjust"), !state.busy) {
+                    if (!state.linked) FcButton("手工调整", Modifier.testTag("finish-adjust"), !state.busy) {
                         state.adjustmentTarget = notice.coursePackage.coursePackageID
                         scope.launch { state.skip() }
                     }
                 }
-                FcSecondaryButton("不扣课", Modifier.testTag("finish-skip"), !state.busy) { scope.launch { state.skip() } }
+                if (!state.linked) FcSecondaryButton("不扣课", Modifier.testTag("finish-skip"), !state.busy) { scope.launch { state.skip() } }
             }
         }
     }

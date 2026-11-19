@@ -19,7 +19,7 @@ import java.util.UUID
 
 @Composable
 fun TodayS2Screen(training: TodayUiState, state: AppointmentListState, onNavigate: (String) -> Unit,
-    onCalendar: () -> Unit, onCreate: (LocalDate) -> Unit, onAppointment: (UUID) -> Unit) {
+    onCalendar: () -> Unit, onCreate: (LocalDate) -> Unit, onAppointment: (UUID) -> Unit, onSettings: () -> Unit = {}) {
     val scope = rememberCoroutineScope()
     var expanded by remember { mutableStateOf(false) }
     LaunchedEffect(state, training) { training.load(); state.load() }
@@ -31,9 +31,8 @@ fun TodayS2Screen(training: TodayUiState, state: AppointmentListState, onNavigat
                 FcTitleAddButton("新建课程安排", painterResource(R.drawable.ic_ms_add), Modifier.testTag("today-add"), Modifier.testTag("conformance:icon / plus")) { onCreate(state.today) }
                 FcTitleIconButton("课程日历", painterResource(R.drawable.ic_ms_calendar_month), Modifier.testTag("today-calendar"),
                     Modifier.testTag("conformance:icon / calendar"), onClick = onCalendar)
-                // The settings destination belongs to Phase 5; keep an explicit unavailable affordance.
                 FcTitleIconButton("设置", painterResource(R.drawable.ic_ms_settings), Modifier.testTag("today-settings"),
-                    Modifier.testTag("conformance:icon / gearshape"), enabled = false) {}
+                    Modifier.testTag("conformance:icon / gearshape"), onClick = onSettings)
             }, segments = { FcSegmentedSwitch(listOf("今日", "学员"), 0, { if (it == 1) onNavigate(S1Routes.STUDENTS) }, tag = "root") }) {
             Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).padding(bottom = FcSpacing.space6)
                 .testTag("today-content"), verticalArrangement = Arrangement.spacedBy(FcSpacing.space4)) {

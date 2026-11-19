@@ -7,6 +7,7 @@ import java.util.UUID
 object S2Routes {
     const val ARG_DATE = "date"
     const val ARG_APPOINTMENT = "appointmentID"
+    const val SETTINGS = "settings/reminders"
     const val CALENDAR = "calendar"
     const val APPOINTMENT_CREATE = "appointments/create/{$ARG_DATE}"
     const val APPOINTMENT_EDIT = "appointments/{$ARG_APPOINTMENT}/edit"

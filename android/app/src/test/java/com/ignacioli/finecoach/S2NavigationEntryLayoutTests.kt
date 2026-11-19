@@ -9,6 +9,7 @@ import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.test.core.app.ApplicationProvider
 import com.ignacioli.finecoach.designsystem.FineCoachTheme
 import com.ignacioli.finecoach.core.domain.appointment.Appointment
+import com.ignacioli.finecoach.storage.StoreMetadata
 import java.time.LocalTime
 import java.util.UUID
 import org.junit.*
@@ -52,12 +53,15 @@ class S2NavigationEntryLayoutTests {
         node("today-content").assertDoesNotExist()
         node("appointment-editor-back").assertIsDisplayed().performClick()
         await("today-add"); node("today-content").assertIsDisplayed()
-        node("today-settings").assertIsNotEnabled()
+        node("today-settings").assertIsDisplayed().performClick(); await("settings-content")
+        node("settings-notifications").assertIsDisplayed()
+        node("settings-back").performClick(); await("today-add")
         node("today-calendar").assertIsDisplayed().assertHasClickAction().performClick()
         await("calendar-content"); node("calendar-add").assertIsDisplayed()
         node("today-content").assertDoesNotExist()
         await("calendar-appointment-${appointment.id}")
         node("calendar-appointment-${appointment.id}").assertIsDisplayed().performClick()
+        await("course-edit"); node("course-edit").assertIsDisplayed().performClick()
         await("appointment-editor-content")
         compose.onNodeWithText("编辑课程安排",useUnmergedTree=true).assertIsDisplayed()
         node("appointment-editor-back").performClick(); await("calendar-content")
@@ -65,12 +69,47 @@ class S2NavigationEntryLayoutTests {
         await("today-add"); node("today-content").assertIsDisplayed()
         await("today-appointment-${appointment.id}")
         node("today-appointment-${appointment.id}").assertIsDisplayed().assertHasClickAction().performClick()
+        await("course-edit"); node("course-edit").assertIsDisplayed().performClick()
         await("appointment-editor-content")
         compose.onNodeWithText("编辑课程安排", useUnmergedTree = true).assertIsDisplayed()
         node("appointment-editor-back").performClick(); await("today-add")
         fixture.test {
             assertEquals(appointment, fixture.ok(graph.appointments.find(appointment.id)))
             assertEquals(1L, fixture.count("appointments")); assertEquals(1L, fixture.count("students"))
+        }
+    }
+    private fun showDeniedReminderSave(): S1AppGraph {
+        lateinit var graph: S1AppGraph
+        fixture.test {
+            fixture.student(1)
+            fixture.db.storeMetadataDao().insert(StoreMetadata("appointment-permission-requested", "true"))
+            graph = S1AppGraph(fixture.db, fixture.clock, fixture.ids, fixture.generation,
+                ApplicationProvider.getApplicationContext<Context>(), ZoneId.of("Asia/Shanghai"))
+        }
+        compose.setContent { FineCoachTheme { S1App(graph) } }
+        await("today-add"); node("today-add").performClick(); await("appointment-editor-content")
+        node("appointment-student").performClick()
+        node("appointment-student-${fixture.studentID(1).value}").performClick()
+        node("appointment-save").performClick()
+        await("saved-reminder-denied-card")
+        return graph
+    }
+    @Test fun deniedReminderSaveKeepsRowAndCompleteDismisses() {
+        val graph = showDeniedReminderSave()
+        node("saved-reminder-denied-cancel").assertIsDisplayed().assertHasClickAction().performClick()
+        await("today-add"); node("saved-reminder-denied-card").assertDoesNotExist()
+        fixture.test {
+            val saved = fixture.ok(graph.appointments.all()).single()
+            assertTrue(saved.reminderEnabled); assertEquals(1L, fixture.count("appointments"))
+        }
+    }
+    @Test fun deniedReminderSaveOpensSettingsFromVisibleAction() {
+        val graph = showDeniedReminderSave()
+        node("saved-reminder-denied-accept").assertIsDisplayed().assertHasClickAction().performClick()
+        await("settings-content")
+        fixture.test {
+            val saved = fixture.ok(graph.appointments.all()).single()
+            assertTrue(saved.reminderEnabled); assertEquals(1L, fixture.count("appointments"))
         }
     }
 }

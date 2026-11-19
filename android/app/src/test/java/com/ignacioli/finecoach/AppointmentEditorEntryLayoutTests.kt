@@ -105,7 +105,13 @@ class AppointmentEditorEntryLayoutTests {
         compose.runOnIdle { state.time = LocalTime.of(20,0) }
         node("appointment-save").performClick(); await { state.scopeRequested }
         assertFalse(state.saved)
+        compose.onNodeWithText("9月9日起的 2 节一起改", substring = true).assertExists()
+        assertEquals(node("sheet-content").getUnclippedBoundsInRoot().width, node("appointment-scope-cancel").getUnclippedBoundsInRoot().width)
+        node("appointment-scope-cancel").assertIsDisplayed().performClick(); await { !state.scopeRequested }
+        f.room.test { assertEquals(rows[1], f.room.ok(f.appointments.find(rows[1].id))) }
+        node("appointment-save").performClick(); await { state.scopeRequested }
         node("appointment-scope-future").assertIsDisplayed().performClick(); await { saved }
+
         f.room.test {
             assertEquals(rows.first(), f.room.ok(f.appointments.find(rows.first().id)))
             val future = f.room.ok(f.appointments.all()).filter { it.studentID == f.room.studentID(2) && it.date >= rows[1].date && it.seriesID != null }
