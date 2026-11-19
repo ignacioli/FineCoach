@@ -24,7 +24,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.*
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.unit.Density
 import com.ignacioli.finecoach.core.application.*
 import com.ignacioli.finecoach.core.domain.common.*
@@ -49,6 +49,7 @@ import org.robolectric.annotation.GraphicsMode
 @Config(sdk = [36], qualifiers = "zh-rCN-w390dp-h844dp-notnight-xhdpi")
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class P7SideBySideTests {
+    // Queue IO resumptions on the test UI scheduler instead of resuming on IO workers.
     @get:Rule val compose = createAndroidComposeRule<ComponentActivity>()
     private var releaseFixture: (() -> Unit)? = null
     private var focusManager: FocusManager? = null
