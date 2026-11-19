@@ -85,6 +85,40 @@ class ExerciseRepositoryTests {
         assertFalse(repository.browseMetadataUnavailable)
     }
 
+    @Test fun consecutiveSearchesParseCatalogOnceAndKeepCallerTimestamps() = runBlocking {
+        val cache = ExerciseCatalogCache()
+        var parses = 0
+        var time = now
+        val countingLoader = ExerciseCatalogLoader(context.assets, cache) {
+            parses++
+            context.assets.open(ExerciseCatalogLoader.CATALOG_PATH).bufferedReader().use { it.readText() }
+        }
+        repository = ExerciseRepository(database, countingLoader, AppClock { time })
+        ok(repository.saveCustom(custom()))
+        val first = ok(repository.search(""))
+        val metadata = repository.browseMetadata
+        time = now.plusSeconds(60)
+        assertEquals(first, ok(repository.search("")))
+        assertEquals(metadata, repository.browseMetadata)
+        assertEquals(1, parses)
+        val reused = cache.load(context.assets, time) { error("Catalog must already be cached") }
+        assertTrue(reused.records.all { it.createdAtUTC == time && it.updatedAtUTC == time })
+    }
+
+    @Test fun catalogCacheRetriesAfterFailureAndKeepsTestInstancesIsolated() {
+        val cache = ExerciseCatalogCache()
+        var reads = 0
+        assertThrows(java.io.IOException::class.java) {
+            cache.load(context.assets, now) { reads++; throw java.io.IOException("fictional catalog read failure") }
+        }
+        assertTrue(cache.metadata(context.assets).isEmpty())
+        val loaded = cache.load(context.assets, now) { reads++; loader.load(now) }
+        assertEquals(2, reads)
+        assertEquals(loaded.metadata, cache.metadata(context.assets))
+        val isolated = ExerciseCatalogCache()
+        assertTrue(isolated.metadata(context.assets).isEmpty())
+    }
+
     @Test fun browseCombinesSearchMuscleEquipmentAndPreservesCanonicalOrderingAndCounts() = runBlocking {
         ok(repository.synchronizeCatalog())
         val all = ok(repository.search(""))
