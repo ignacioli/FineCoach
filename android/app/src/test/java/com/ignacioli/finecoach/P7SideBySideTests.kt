@@ -558,4 +558,112 @@ private fun captureSheet(activity: Bitmap, panelTag: String): Bitmap {
         await("summary-save")
         "summary-content"
     }
+
+    @Test fun editOccurrenceScope() = measure(
+        "24-edit-occurrence-scope", "AppointmentEditorScreen / FcBottomSheet",
+        "张伟；2025-09-27 周六 15:00；60 分钟；大腿、臀；每隔两天直到 2025-10-30；打开提醒后保存，范围面板未落盘",
+        "画板高 900pt，Android viewport 844pt。受影响节数是真实 series 的 scheduled 非例外数，不改成画板上的 12。",
+        sheetTag = "appointment-scope", designPath = "design/m1-b-hifi/screens/24-edit-occurrence-scope.png",
+    ) {
+        val day = java.time.LocalDate.of(2025, 9, 27)
+        val f = S2ScreenFixture(day, todayHero = false).also { releaseFixture = it::close }
+        lateinit var first: com.ignacioli.finecoach.core.domain.appointment.Appointment
+        f.room.test {
+            val existing = f.room.ok(f.appointments.all()).first { it.startTime == java.time.LocalTime.of(15, 0) && it.date == day }
+            f.room.ok(f.appointments.deleteFuture(existing.id, true))
+            first = f.room.ok(f.appointments.createRecurring(com.ignacioli.finecoach.core.domain.appointment.RecurrenceSeries(
+                UUID.randomUUID(), f.room.studentID(2), com.ignacioli.finecoach.core.domain.appointment.RecurrenceInterval.everyTwoDays,
+                com.ignacioli.finecoach.core.domain.appointment.RecurrenceTermination.EndDate(java.time.LocalDate.of(2025, 10, 30)),
+                java.time.LocalTime.of(15, 0), defaultReminderEnabled = false, createdAtUTC = f.room.time, updatedAtUTC = f.room.time),
+                day, setOf(BodyPart.thighs, BodyPart.glutes))).first()
+        }
+        val state = com.ignacioli.finecoach.features.appointments.AppointmentEditorState(f.appointments, f.students, f.room.clock, f.zone, day, first.id)
+        show { com.ignacioli.finecoach.features.appointments.AppointmentEditorScreen(state, {}, {}) }
+        compose.waitUntil(15_000) { state.loaded }
+        compose.runOnIdle { state.reminderEnabled = true }
+        node("appointment-save").performClick()
+        compose.waitUntil(15_000) { state.scopeRequested }
+        "appointment-scope"
+    }
+
+    @Test fun courseActionSheet() = measure(
+        "18-course-action-sheet-s2", "TodayS2Screen / CourseActionSheet",
+        "2025-08-31 周日；王小明进行中 32 分钟大腿；张伟 15:00 60 分钟大腿、臀；未来误建可删",
+        "删除误建是 T002 已批准的 B 行；面板盖在今日上。",
+        sheetTag = "course-sheet", designPath = "design/m1-b-hifi/screens/18-course-action-sheet-s2.png",
+    ) {
+        val f = S2ScreenFixture().also { releaseFixture = it::close }
+        val credits = com.ignacioli.finecoach.core.application.CreditUseCases(
+            com.ignacioli.finecoach.storage.repository.CoursePackageRepository(f.room.db, f.room.clock, f.room.ids, f.zone), f.room.clock, f.room.ids, f.zone)
+        lateinit var row: com.ignacioli.finecoach.core.domain.appointment.Appointment
+        f.room.test {
+            row = f.room.ok(f.appointments.all()).first { it.startTime == java.time.LocalTime.of(15, 0) }
+            f.room.ok(f.appointments.updateTrainingFocus(row.id, setOf(BodyPart.thighs, BodyPart.glutes)))
+            f.room.ok(credits.createActivePackage(row.studentID, null, 5))
+        }
+        val actions = com.ignacioli.finecoach.features.appointments.CourseActionState(row.id, f.appointments, credits, f.students, f.room.clock, f.zone)
+        show {
+            com.ignacioli.finecoach.features.today.TodayS2Screen(f.training, f.list, {}, {}, {}, {})
+            com.ignacioli.finecoach.features.appointments.CourseActionSheet(actions, {}, {}, {}, {})
+        }
+        compose.waitUntil(15_000) { actions.row != null && actions.deletable && actions.name.isNotBlank() }
+        "course-sheet"
+    }
+
+    @Test fun settingsReminders() = measure(
+        "42-settings-s2", "ReminderSettingsScreen",
+        "通知权限已允许；副标题「提醒已开启」；不写 Room",
+        "S2-D01 只留通知行；没有备份、关于或其他设置项。",
+        designPath = "design/m1-b-hifi/screens/42-settings-s2.png",
+    ) {
+        val state = com.ignacioli.finecoach.features.settings.ReminderSettingsState { com.ignacioli.finecoach.features.settings.ReminderSettingsState.Status.enabled }
+        show { com.ignacioli.finecoach.features.settings.ReminderSettingsScreen(state, {}) { false } }
+        compose.waitUntil(15_000) { state.status != null }
+        "settings-content"
+    }
+
+    @Test fun settingsNotificationDenied() = measure(
+        "43-settings-notification-denied-s2", "ReminderSettingsScreen",
+        "通知权限已拒绝；FcStatus.PermissionDenied 与「前往设置」；不写 Room",
+        "README §7.2 状态文字是「权限拒绝」；42/43 画板写「权限已拒绝」。不改共享状态文案。",
+        designPath = "design/m1-b-hifi/screens/43-settings-notification-denied-s2.png",
+    ) {
+        val state = com.ignacioli.finecoach.features.settings.ReminderSettingsState { com.ignacioli.finecoach.features.settings.ReminderSettingsState.Status.denied }
+        show { com.ignacioli.finecoach.features.settings.ReminderSettingsScreen(state, {}) { false } }
+        compose.waitUntil(15_000) { state.status != null }
+        "settings-notifications"
+    }
+
+    @Test fun ad02DateAndTimePickers() {
+        val day = java.time.LocalDate.of(2025, 9, 27)
+        val f = S2ScreenFixture(day, todayHero = false).also { releaseFixture = it::close }
+        val state = com.ignacioli.finecoach.features.appointments.AppointmentEditorState(f.appointments, f.students, f.room.clock, f.zone, day).apply {
+            studentID = f.room.studentID(2); time = java.time.LocalTime.of(16, 0)
+            focus = setOf(BodyPart.thighs, BodyPart.glutes)
+        }
+        show { com.ignacioli.finecoach.features.appointments.AppointmentEditorScreen(state, {}, {}) }
+        compose.waitUntil(15_000) { state.loaded }
+        node("appointment-date").performScrollTo().performClick()
+        await("appointment-date-picker")
+        compose.runOnIdle { simulateConformanceStatusBar(compose.activity) }
+        compose.mainClock.autoAdvance = false
+        compose.mainClock.advanceTimeBy(1000)
+        compose.waitForIdle()
+        val date = node("conformance-viewport").captureToImage().asAndroidBitmap()
+        compose.mainClock.autoAdvance = true
+        node("appointment-time").performScrollTo().performClick()
+        await("appointment-time-clock")
+        compose.runOnIdle { simulateConformanceStatusBar(compose.activity) }
+        compose.mainClock.autoAdvance = false
+        compose.mainClock.advanceTimeBy(1000)
+        compose.waitForIdle()
+        val base = node("conformance-viewport").captureToImage().asAndroidBitmap()
+        val time = captureSheet(base, "appointment-time-clock")
+        val stacked = P7SheetWriter.stack(listOf("日期：行内展开" to date, "时间：24 小时表盘" to time))
+        P7SheetWriter.writeUnscaled("AD-02-date-time-picker", stacked, "AppointmentEditorScreen / FcAppointmentDatePicker / FcAppointmentTimePicker",
+            "张伟；2025-09-27；开始时间 16:00；日期在行下展开，时间是 M3 24 小时弹窗",
+            "批准画板宽 2753px，含课包日期与说明；Android 只拼安排页的日期展开和时间弹窗，原始像素并排，不缩放画板。",
+            "design/android-differences/screens/AD-02-date-time-picker.png")
+        stacked.recycle()
+    }
 }

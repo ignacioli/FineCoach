@@ -64,6 +64,7 @@ class AppointmentRepository(
         val existing = rows().filter { it.seriesID == seriesID }
         require(existing.any { it.date == boundary && it.status == AppointmentStatus.scheduled })
         val superseded = existing.filter { it.date >= boundary && it.status == AppointmentStatus.scheduled && !it.isDetachedException }
+        require(superseded.isNotEmpty())
         val focus = superseded.associate { it.date to it.trainingFocus }.toMutableMap()
         edit.boundaryTrainingFocus?.let { focus[boundary] = it }
         RecurrenceSeries.validateBound(boundary, series.termination)

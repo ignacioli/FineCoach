@@ -164,16 +164,17 @@ fun FcPageHeader(title: String, modifier: Modifier = Modifier, subtitle: String?
 
 @Composable
 fun FcHubRow(title: String, icon: Painter?, modifier: Modifier = Modifier, subtitle: String? = null,
-    detail: String? = null, mode: FcRowMode = FcRowMode.Informational) {
+    detail: String? = null, mode: FcRowMode = FcRowMode.Informational,
+    subtitleContent: (@Composable () -> Unit)? = null, trailingContent: (@Composable () -> Unit)? = null) {
     require(mode !is FcRowMode.Selection)
     Row(modifier.fillMaxWidth().heightIn(min = FcComponentMetrics.hub).semantics(mergeDescendants = true) { }.rowInteraction(mode),
         horizontalArrangement = Arrangement.spacedBy(FcSpacing.space4), verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.size(FcComponentMetrics.icon)) { icon?.let { FcSymbol(it, tint = if (mode is FcRowMode.Unavailable) FcColors.textDisabled else FcColors.actionPrimary) } }
         Column(Modifier.weight(1f)) {
             FcText(title, style = FcTypography.headline, color = if (mode is FcRowMode.Unavailable) FcColors.textDisabled else FcColors.textPrimary)
-            subtitle?.let { FcText(it, style = FcTypography.caption, color = FcColors.textSecondary) }
+            if (subtitleContent != null) subtitleContent() else subtitle?.let { FcText(it, style = FcTypography.caption, color = FcColors.textSecondary) }
         }
-        (if (mode is FcRowMode.Unavailable) mode.reason else detail)?.let { FcText(it, style = FcTypography.caption, color = FcColors.textSecondary) }
+        if (trailingContent != null) trailingContent() else (if (mode is FcRowMode.Unavailable) mode.reason else detail)?.let { FcText(it, style = FcTypography.caption, color = FcColors.textSecondary) }
         if (mode is FcRowMode.Action) FcSymbol(FcGlyph.Forward)
     }
 }

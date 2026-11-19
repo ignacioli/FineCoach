@@ -51,6 +51,7 @@ data class StudentDeletionImpact(
     val completedSessionCount: Int?,
     val hasInProgressSession: Boolean,
     val inProgressSessionID: SessionID? = null,
+    val appointmentCount: Int? = null,
 )
 
 data class DeleteStudentUiState(
@@ -74,6 +75,7 @@ class DeleteStudentViewModel(
     val useCases: StudentUseCases,
     val sessionRepository: SessionRepositoryPort? = null,
     val historyRepository: HistoryRepositoryPort? = null,
+    val appointments: com.ignacioli.finecoach.core.application.AppointmentUseCases? = null,
 ) {
     var uiState by mutableStateOf(DeleteStudentUiState())
         private set
@@ -107,10 +109,20 @@ class DeleteStudentViewModel(
                 (history.list(HistoryQuery(studentID = studentID)) as? ApplicationResult.Success)?.value?.size
             }
 
+            val appointmentCount = appointments?.let { cases ->
+                when (val result = cases.all()) {
+                    is ApplicationResult.Failure -> {
+                        uiState = uiState.copy(isLoading = false, impact = null, errorMessage = "读取受影响课程失败，请重试。")
+                        return
+                    }
+                    is ApplicationResult.Success -> result.value.count { it.studentID == studentID }
+                }
+            }
             uiState = uiState.copy(
                 impact = StudentDeletionImpact(
                     displayName = student.displayName,
                     completedSessionCount = completedCount,
+                    appointmentCount = appointmentCount,
                     hasInProgressSession = activeSession != null,
                     inProgressSessionID = activeSession?.sessionID,
                 ),
@@ -442,7 +454,11 @@ fun DeleteStudentScreen(
                             style = FcTypography.body,
                             color = FcColors.textPrimary,
                         )
-                        impact.completedSessionCount?.let { count ->
+                        impact.appointmentCount?.let { count ->
+                            FcText("• $count 个课程安排（所属周期系列和对应提醒一并删除）", Modifier.testTag("delete-student-appointments"),
+                                style = FcTypography.body, color = FcColors.textPrimary)
+                        }
+                        impact.completedSessionCount?.let  { count ->
                             FcText(
                                 text = "• $count 条已完成训练记录",
                                 style = FcTypography.body,
@@ -513,6 +529,12 @@ fun DeleteStudentScreen(
                                 modifier = Modifier.testTag(StudentTestTags.DELETE_ERROR),
                                 style = FcTypography.caption,
                                 color = FcColors.statusDestructive,
+                            )
+                            FcButton(
+                                title = "重试",
+                                modifier = Modifier.testTag(StudentTestTags.DELETE_RETRY),
+                                enabled = !state.isLoading,
+                                onClick = { scope.launch { viewModel.load() } },
                             )
                         }
                     }

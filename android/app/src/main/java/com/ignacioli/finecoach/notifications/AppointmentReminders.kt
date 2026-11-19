@@ -30,6 +30,7 @@ class AppointmentReminders(
         const val CHANNEL = "appointment-reminders"
         const val ACTION = "com.ignacioli.finecoach.APPOINTMENT_REMINDER"
         const val ID = "appointmentID"
+        const val PERMISSION_REQUESTED = "appointment-permission-requested"
         private const val REGISTRY = "appointment-reminders-v1"
         private val gate = Mutex()
         fun parse(intent: Intent?): UUID? = try {
@@ -60,12 +61,18 @@ class AppointmentReminders(
         catch (_: Exception) { lastFailure.value = ApplicationError(ApplicationErrorCode.persistenceFailed) }
     }
     val permissionRequest = kotlinx.coroutines.flow.MutableStateFlow(false)
+    @Volatile var observedPermissionRevision: Int = 0
+    private val pendingPermissionBaseline = java.util.concurrent.atomic.AtomicReference<Int?>(null)
+    /** Baseline captured before [permissionRequest] is raised, so a fast grant result is not compared with itself. */
+    fun takePendingPermissionBaseline(): Int? = pendingPermissionBaseline.getAndSet(null)
     override suspend fun appointmentSaved() = safely {
         withContext(Dispatchers.IO) { gate.withLock {
             val rows = (repository.all() as? ApplicationResult.Success)?.value.orEmpty()
-            if (rows.any { it.reminderEnabled } && database.storeMetadataDao().find("appointment-permission-requested") == null) {
-                database.storeMetadataDao().insert(StoreMetadata("appointment-permission-requested", "true"))
-                permissionRequest.value = Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+            if (rows.any { it.reminderEnabled } && database.storeMetadataDao().find(PERMISSION_REQUESTED) == null) {
+                database.storeMetadataDao().insert(StoreMetadata(PERMISSION_REQUESTED, "true"))
+                val issue = Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+                if (issue) pendingPermissionBaseline.set(observedPermissionRevision)
+                permissionRequest.value = issue
             }
         } }
         reconcile()

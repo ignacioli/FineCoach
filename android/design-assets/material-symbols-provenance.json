@@ -316,6 +316,22 @@
       "upstreamPath": "symbols/web/star/materialsymbolsoutlined/star_fill1_24px.svg",
       "drawable": "app/src/main/res/drawable/ic_ms_star_filled.xml",
       "drawableSha256": "440f0cffa8c7f3db89f7ee3872d801e3d1458a836c32ad4a2366512c867fb92d"
+    },
+    {
+      "symbol": "notifications",
+      "style": "outlined",
+      "weight": 300,
+      "fill": 0,
+      "iosSymbol": "bell",
+      "components": [
+        "DS-HUB-ROW"
+      ],
+      "sourceSvg": "material-symbols-svg/notifications.svg",
+      "sourceSha256": "75a0fa8d9f9ecd6f198dff84b9f5ef9c74415eb7165ff99a91d5f8ffb75f44aa",
+      "upstreamCommit": "10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7",
+      "upstreamPath": "symbols/web/notifications/materialsymbolsoutlined/notifications_wght300_24px.svg",
+      "drawable": "app/src/main/res/drawable/ic_ms_notifications.xml",
+      "drawableSha256": "ad2927c96e4135804317f4abe93056054119777d70d265a3acb706561fdedff5"
     }
   ]
 }

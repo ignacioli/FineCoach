@@ -1589,7 +1589,7 @@ S2-D06 / FR-007a 已落地：第二安排遇到已关联其他安排的 active S
 
 ### T045 / Phase 5 checkpoint：课程处理与非核心屏
 
-（待填写）
+**PENDING。** 实现和 agent 自测见 [T045](docs/s2/T045.md)。宿主完整门禁、独立复核和负责人看图尚未完成。
 
 ### T054 / Phase 6 checkpoint：设备证据、复核与走查
 

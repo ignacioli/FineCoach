@@ -1,3 +1,4 @@
+// fictional-data: source asset inventory and synthetic component contracts only.
 package com.ignacioli.finecoach
 
 import java.io.File
@@ -77,10 +78,10 @@ class ComponentCatalogTests {
         val assets = File(root, "android/design-assets")
         val manifest = File(assets, "material-symbols-manifest.txt").readLines()
             .filter { it.isNotBlank() && !it.startsWith('#') }
-        assertEquals(19, manifest.size)
+        assertEquals(20, manifest.size)
         val provenance = File(assets, "material-symbols-provenance.json").readText()
         val records = Regex("\\{[^{}]*\\\"symbol\\\"[^{}]*}").findAll(provenance).map { it.value }.toList()
-        assertEquals(19, records.size)
+        assertEquals(20, records.size)
         val sums = File(assets, "material-symbols-SHA256SUMS").readLines().associate {
             val parts = it.trim().split(Regex("\\s+"), limit = 2); parts[1] to parts[0]
         }
@@ -107,7 +108,8 @@ class ComponentCatalogTests {
             "DS-LIST-ROW" to mapOf("remove" to catalogFile, "expand_more" to catalogFile,
                 "star_filled" to sourcePrefix + "designsystem/FcRows.kt"),
             "DS-HUB-ROW" to mapOf("settings" to catalogFile, "grid_view" to catalogFile,
-                "list_alt" to sourcePrefix + "features/resources/ResourceHubScreen.kt"),
+                "list_alt" to sourcePrefix + "features/resources/ResourceHubScreen.kt",
+                "notifications" to sourcePrefix + "features/settings/ReminderSettingsScreen.kt"),
             "DS-ACTION-ROW" to mapOf("delete" to catalogFile),
             "DS-SAVE-STATUS" to mapOf("sync" to catalogFile, "check_circle" to catalogFile, "warning" to catalogFile),
             "DS-STATUS" to mapOf("priority_high" to catalogFile, "info_i" to catalogFile),
@@ -183,8 +185,8 @@ class ComponentCatalogTests {
                 } else assertTrue("$name must be used by $owner in " + file.path, file.readText().contains("R.drawable.ic_ms_$name"))
             }
         }
-        assertEquals(19, File(assets, "material-symbols-svg").listFiles()!!.count { it.extension == "svg" })
-        assertEquals(19, File(app, "src/main/res/drawable").listFiles()!!.count { it.name.startsWith("ic_ms_") && it.extension == "xml" })
+        assertEquals(20, File(assets, "material-symbols-svg").listFiles()!!.count { it.extension == "svg" })
+        assertEquals(20, File(app, "src/main/res/drawable").listFiles()!!.count { it.name.startsWith("ic_ms_") && it.extension == "xml" })
         val edit = records.single { field(it, "symbol") == "edit" }
         assertEquals("symbols/web/edit/materialsymbolsoutlined/edit_24px.svg", field(edit, "upstreamPath"))
         assertEquals("pencil", field(edit, "iosSymbol"))
