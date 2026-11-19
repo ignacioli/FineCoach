@@ -87,22 +87,13 @@ class ExerciseUiState(val useCases: ExerciseUseCases, private val repository: Ex
 
     suspend fun search(query: String, includeHidden: Boolean = false) {
         val generation = ++searchGeneration
-        val result = repository.search(query, includeHidden)
+        val result = repository.searchWithPreferences(query, includeHidden)
         if (generation == searchGeneration) metadataUnavailable = repository.browseMetadataUnavailable
         if (generation != searchGeneration) return
         when (result) {
             is ApplicationResult.Failure -> { error = result.error; entries = emptyList() }
             is ApplicationResult.Success -> {
-                val prefs = mutableMapOf<StableExerciseID, ExercisePreferenceRecord>()
-                for (item in result.value) {
-                    when (val preference = repository.preference(item.exerciseID)) {
-                        is ApplicationResult.Failure -> {
-                            if (generation == searchGeneration) { error = preference.error; entries = emptyList() }
-                            return
-                        }
-                        is ApplicationResult.Success -> preference.value?.let { prefs[item.exerciseID] = it }
-                    }
-                }
+                val prefs = result.value.preferences.toMutableMap()
                 if (generation != searchGeneration) return
                 // Only the open sheet may retain a filtered-out exercise's saved preference.
                 openPreferenceID?.takeIf { it !in prefs }?.let { id ->
@@ -110,7 +101,7 @@ class ExerciseUiState(val useCases: ExerciseUseCases, private val repository: Ex
                 }
                 preferences = prefs
                 metadata = repository.browseMetadata
-                entries = result.value
+                entries = result.value.entries
                 error = null
             }
         }

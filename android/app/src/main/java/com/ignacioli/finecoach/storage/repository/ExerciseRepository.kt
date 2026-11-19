@@ -60,7 +60,18 @@ class ExerciseRepository(
 
     override suspend fun search(query: String) = search(query, includeHidden = false)
 
-    suspend fun search(query: String, includeHidden: Boolean): ApplicationResult<List<ExerciseRecord>> = transaction {
+    suspend fun search(query: String, includeHidden: Boolean): ApplicationResult<List<ExerciseRecord>> =
+        when (val result = searchWithPreferences(query, includeHidden)) {
+            is ApplicationResult.Failure -> result
+            is ApplicationResult.Success -> ApplicationResult.Success(result.value.entries)
+        }
+
+    data class SearchSnapshot(
+        val entries: List<ExerciseRecord>,
+        val preferences: Map<StableExerciseID, ExercisePreferenceRecord>,
+    )
+
+    suspend fun searchWithPreferences(query: String, includeHidden: Boolean): ApplicationResult<SearchSnapshot> = transaction {
         val metadata = try { loadCatalog().metadata }
         catch (cancelled: CancellationException) { throw cancelled }
         catch (failure: Exception) {
@@ -72,7 +83,7 @@ class ExerciseRepository(
         val occupied = dao.claims().filter { it.ownerKind != ExerciseSourceKind.builtIn }.map { it.normalizedName }.toSet()
         val normalizedQuery = fold(query.trim())
         val pinyinQuery = compact(normalizedQuery)
-        dao.catalog().filter { item ->
+        val entries = dao.catalog().filter { item ->
             val preference = preferences[item.id]
             val facet = metadata[StableExerciseID.parse(item.id)]
             // Keep the existing library path to restore archived custom exercises.
@@ -84,6 +95,9 @@ class ExerciseRepository(
                     facet?.primaryMuscleGroup, facet?.equipmentClass).any { fold(it).contains(normalizedQuery) } ||
                     listOfNotNull(item.canonicalName, preference?.alias).any { pinyinMatches(it, pinyinQuery) })
         }.map { it.record() }
+        SearchSnapshot(entries, entries.mapNotNull { item ->
+            preferences[item.exerciseID.value]?.record()?.let { item.exerciseID to it }
+        }.toMap())
     }
 
     suspend fun synchronizeCatalog(): ApplicationResult<Unit> = transaction {

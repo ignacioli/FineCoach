@@ -171,8 +171,7 @@ private fun historyGrouped(value: BigDecimal): String = java.text.NumberFormat.g
 
 @Composable
 private fun historyEquipmentName(id: StableExerciseID?): String {
-    val assets = androidx.compose.ui.platform.LocalContext.current.applicationContext.assets
-    val metadata = androidx.compose.runtime.remember(assets) { ExerciseCatalogLoader(assets).load(Instant.EPOCH).metadata }
+    val metadata = rememberExerciseCatalogMetadata()
     val facet = metadata[id]
     return FcEquipmentIcon.icon(facet?.equipmentClass, facet?.primaryMuscleGroup)?.name?.replace('_', '-') ?: "unmapped"
 }

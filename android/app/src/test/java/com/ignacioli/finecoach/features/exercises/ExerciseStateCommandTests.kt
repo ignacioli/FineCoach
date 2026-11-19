@@ -31,6 +31,8 @@ class ExerciseStateCommandTests {
     private lateinit var state: ExerciseUiState
     private val failPreferenceRead = java.util.concurrent.atomic.AtomicBoolean(false)
     private val failedReads = java.util.concurrent.atomic.AtomicInteger(0)
+    private val batchPreferenceReads = java.util.concurrent.atomic.AtomicInteger(0)
+    private val singlePreferenceReads = java.util.concurrent.atomic.AtomicInteger(0)
     private val clock = AppClock { Instant.parse("2026-11-11T00:00:00Z") }
     @Before fun prepare() {
         val context = ApplicationProvider.getApplicationContext<Context>()
@@ -39,7 +41,9 @@ class ExerciseStateCommandTests {
                 val helper = androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory().create(configuration)
                 fun wrap(actual: androidx.sqlite.db.SupportSQLiteDatabase) = object : androidx.sqlite.db.SupportSQLiteDatabase by actual {
                     override fun query(query: androidx.sqlite.db.SupportSQLiteQuery): android.database.Cursor {
-                        if (query.sql == "SELECT * FROM exercise_preferences WHERE `exerciseID` = ?" && failPreferenceRead.get()) {
+                        if (query.sql == "SELECT * FROM exercise_preferences WHERE `exerciseID` = ?") singlePreferenceReads.incrementAndGet()
+                        if (query.sql == "SELECT * FROM exercise_preferences") batchPreferenceReads.incrementAndGet()
+                        if (query.sql == "SELECT * FROM exercise_preferences" && failPreferenceRead.get()) {
                             failedReads.incrementAndGet()
                             throw android.database.sqlite.SQLiteException("fictional preference read failure")
                         }
@@ -65,6 +69,22 @@ class ExerciseStateCommandTests {
         assertEquals("虚构动作", state.entries.single().canonicalName)
         assertEquals(RecordMode.reps, repository.listCatalog().requireSuccess().single().recordMode)
         assertFalse(state.busy)
+    }
+    @Test fun searchReadsPreferencesOnceAndNeverPerResult() = runBlocking {
+        val first = custom()
+        state.createLibraryExercise("虚构第二动作", RecordMode.duration)
+        val command = UpdateExercisePreferenceCommand(first.exerciseID, "虚构别名", true, false, true, false)
+        state.updateLibraryPreference(command) {}
+        batchPreferenceReads.set(0)
+        singlePreferenceReads.set(0)
+        state.search("")
+        assertNull(state.error)
+        assertEquals(2, state.entries.size)
+        assertEquals("虚构别名", state.preference(first.exerciseID).alias)
+        assertTrue(state.preference(first.exerciseID).isFavorite)
+        assertEquals(false, state.preference(first.exerciseID).isUnilateral)
+        assertEquals(1, batchPreferenceReads.get())
+        assertEquals(0, singlePreferenceReads.get())
     }
     @Test fun createLibraryExerciseRejectsBlankAndRetainsResults() = runBlocking {
         custom(); state.search("虚构")
@@ -114,8 +134,7 @@ class ExerciseStateCommandTests {
         fun next(): Runnable = requireNotNull(pending.poll(15, TimeUnit.SECONDS)) { "Search continuation missing" }
         val search = launch(dispatcher) { state.search("") }
         next().run() // Start search; repository work runs on IO.
-        next().run() // Consume results and start reading the old preference.
-        val stalePreference = next() // The old row was read, but has not reached state yet.
+        val stalePreference = next() // The atomic search snapshot has not reached state yet.
         state.updateLibraryPreference(UpdateExercisePreferenceCommand(item.exerciseID, "虚构别名", false, true, true, false)) {}
         val saved = state.preference(item.exerciseID)
         stalePreference.run()
@@ -142,10 +161,9 @@ class ExerciseStateCommandTests {
             override fun dispatch(context: CoroutineContext, block: Runnable) { pending.add(block) }
         }
         fun next(): Runnable = requireNotNull(pending.poll(15, TimeUnit.SECONDS)) { "Search continuation missing" }
-        val oldSearch = launch(dispatcher) { state.search("") }
-        next().run() // Start repository search on IO.
         failPreferenceRead.set(true)
-        next().run() // Consume search and start the failing per-row preference read.
+        val oldSearch = launch(dispatcher) { state.search("") }
+        next().run() // Start the failing batched preference read on IO.
         val staleFailure = next()
         assertEquals(1, failedReads.get())
         failPreferenceRead.set(false)

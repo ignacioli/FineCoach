@@ -5,6 +5,7 @@ import com.ignacioli.finecoach.core.domain.common.*
 import com.ignacioli.finecoach.core.domain.training.parseDomainName
 import org.json.JSONObject
 import java.time.Instant
+import java.util.WeakHashMap
 
 /** All attribution and license text is bundled; these identifiers are never fetched. */
 data class ExerciseProvenance(
@@ -32,13 +33,24 @@ data class LoadedExerciseCatalog internal constructor(
     val metadata: Map<StableExerciseID, ExerciseCatalogMetadata>,
 )
 
-class ExerciseCatalogLoader(private val assets: AssetManager) {
-    fun load(now: Instant): LoadedExerciseCatalog =
-        decode(assets.open(CATALOG_PATH).bufferedReader().use { it.readText() }, now).also {
+class ExerciseCatalogLoader internal constructor(
+    private val assets: AssetManager,
+    private val cache: ExerciseCatalogCache,
+    private val readText: () -> String,
+) {
+    constructor(assets: AssetManager) : this(assets, processCache,
+        { assets.open(CATALOG_PATH).bufferedReader().use { it.readText() } })
+
+    fun load(now: Instant): LoadedExerciseCatalog = cache.load(assets, now) {
+        decode(readText(), now).also {
             require(assets.open(LICENSE_PATH).use { stream -> stream.read() } != -1)
         }
+    }
+
+    fun cachedMetadata(): Map<StableExerciseID, ExerciseCatalogMetadata> = cache.metadata(assets)
 
     companion object {
+        private val processCache = ExerciseCatalogCache()
         const val CATALOG_PATH = "exercises/provenance.json"
         const val LICENSE_PATH = "exercises/licenses/SOURCES.md"
         private val muscles = setOf("胸", "肩", "背", "大腿", "小腿", "臂", "臀", "核心")
@@ -89,4 +101,20 @@ class ExerciseCatalogLoader(private val assets: AssetManager) {
             return LoadedExerciseCatalog(records, provenance.toMap(), metadata.toMap())
         }
     }
+}
+
+/** AssetManager identifies an immutable packaged asset set; failed reads never populate the cache. */
+internal class ExerciseCatalogCache {
+    private val catalogs = WeakHashMap<AssetManager, LoadedExerciseCatalog>()
+
+    @Synchronized
+    fun load(assets: AssetManager, now: Instant, read: () -> LoadedExerciseCatalog): LoadedExerciseCatalog {
+        val catalog = synchronized(catalogs) { catalogs[assets] }
+            ?: read().also { synchronized(catalogs) { catalogs[assets] = it } }
+        // Timestamps belong to the caller's synchronization, not the first process cache fill.
+        return catalog.copy(records = catalog.records.map { it.copy(createdAtUTC = now, updatedAtUTC = now) })
+    }
+
+    fun metadata(assets: AssetManager): Map<StableExerciseID, ExerciseCatalogMetadata> =
+        synchronized(catalogs) { catalogs[assets]?.metadata ?: emptyMap() }
 }
