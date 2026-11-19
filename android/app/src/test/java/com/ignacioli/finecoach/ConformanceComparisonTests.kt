@@ -1,3 +1,4 @@
+// fictional-data: synthetic geometry only
 package com.ignacioli.finecoach
 
 import org.json.JSONArray
@@ -107,7 +108,7 @@ class ConformanceComparisonTests {
         val g = ConformanceComparison.geometry(tall, design, "top", 0.0)
         assertFalse(g.getBoolean("matches")); assertFalse(g.getJSONObject("withinTolerance").getBoolean("h"))
         assertEquals(0.0, g.getJSONObject("delta").getDouble("centerY"), 0.001)
-        for ((axis, value) in listOf("x" to 24.001, "w" to 88.001)) {
+        for ((axis, value) in listOf("x" to 24.001, "w" to 93.741)) {
             val off = rect(16.0, 98.1, 86.0, 23.8).put(axis, value)
             assertFalse(axis, ConformanceComparison.geometry(off, design, "top", 0.0).getBoolean("matches"))
         }
@@ -218,5 +219,16 @@ class ConformanceComparisonTests {
         val reps = JSONObject(weight.toString()).put("commonLayoutParentOfTags", JSONArray(listOf("set-reps-minus", "set-reps-plus"))).put("containsTag", "set-reps-input").put("y", 318.0).put("id", 8)
         assertEquals(2, ConformanceComparison.select(listOf(weight, reps), capsuleEntry).size)
         assertFalse(ConformanceMapping.matchesStepperCapsule(JSONObject().put("commonLayoutParentOfTags", JSONArray(listOf("rest-minus", "rest-plus"))).put("containsTag", "rest-skip")))
+    }
+
+    @Test fun proportionalTextGeometryAndAlignmentKeepAnchorStrict() {
+        val design = rect(0.0,0.0,100.0,20.0).put("type", "text")
+        for ((alignment, x) in listOf("left" to 0.0, "center" to 3.0, "right" to 6.0)) {
+            val rule = JSONObject(design.toString()).put("textAlign", alignment)
+            assertTrue(ConformanceComparison.geometry(rect(x,0.0,94.0,20.0), rule, "top", 0.0).getBoolean("matches"))
+            assertFalse(ConformanceComparison.geometry(rect(x+2.5,0.0,94.0,20.0), rule, "top", 0.0).getBoolean("matches"))
+        }
+        assertFalse(ConformanceComparison.geometry(rect(0.0,0.0,91.0,20.0), design,"top",0.0).getBoolean("matches"))
+        assertFalse(ConformanceComparison.geometry(rect(0.0,0.0,102.5,20.0), rect(0.0,0.0,100.0,20.0),"top",0.0).getBoolean("matches"))
     }
 }

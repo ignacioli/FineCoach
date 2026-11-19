@@ -1585,7 +1585,7 @@ S2-D06 / FR-007a 已落地：第二安排遇到已关联其他安排的 active S
 
 ### T034 / Phase 4 checkpoint：核心屏
 
-（待填写）
+**Round 5，checkpoint PENDING（2026-11-19）。** r4 宿主全量 unit 1109/3（仅 DS-CALENDAR-DAY catalog geometry contract）；r5 补齐契约并修复月份加载竞态，agent 完整 unit 1111/0/0/0。三屏 strict 保持 33/0/0、64/0/0、66/0/0。完整 Editor Entry 9/0，前一天唯一且禁用、开始日唯一且启用均已验证；r5 运行日志见 `.handoff/subagent/2026-11-19-s2-phase4-r5.md`，宿主/独立复核与负责人看图仍待完成。见 [T034](docs/s2/T034.md)。
 
 ### T045 / Phase 5 checkpoint：课程处理与非核心屏
 

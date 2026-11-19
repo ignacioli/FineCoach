@@ -81,8 +81,31 @@ class AppointmentDomainTests {
         }
     }
     @Test fun todaySections() {
-        val rows = listOf(row("05:00"), row("04:00"), row(), row("00:00").startingTraining(UUID(0, 5), now), row("06:00").cancelling(null, now), row().copy(date = row().date.minusDays(1)))
-        assertEquals(TodayOrderingSection.entries, TodayOrderingPolicy.order(rows, row().date, now, zone).map { it.section })
+        val date = LocalDate.of(2026,9,1)
+        val boundary = date.atTime(12,0).atZone(zone).toInstant()
+        fun example(id: Long, time: String, status: AppointmentStatus = AppointmentStatus.scheduled) =
+            row(time).copy(id=UUID(0,id),date=date,status=status)
+        val ongoingEarly=example(1,"08:00",AppointmentStatus.inProgress)
+        val ongoingLate=example(2,"09:00",AppointmentStatus.inProgress)
+        val overdueEarly=example(3,"10:00")
+        val endEqualsNow=example(4,"11:00")
+        val next=example(5,"12:00")
+        val remainingEarly=example(6,"13:00")
+        val remainingLate=example(7,"14:00")
+        val resolvedEarly=example(8,"06:00",AppointmentStatus.cancelled)
+        val resolvedLate=example(9,"07:00",AppointmentStatus.completed)
+        val otherDay=example(10,"01:00").copy(date=date.minusDays(1))
+        val input=listOf(remainingLate,resolvedLate,ongoingLate,endEqualsNow,next,otherDay,overdueEarly,remainingEarly,ongoingEarly,resolvedEarly)
+        val ordered=TodayOrderingPolicy.order(input,date,boundary,zone)
+        assertEquals(TodayOrderingSection.entries,ordered.map { it.section }.distinct())
+        assertEquals(listOf(ongoingEarly,ongoingLate,overdueEarly,endEqualsNow,next,remainingEarly,remainingLate,resolvedEarly,resolvedLate).map { it.id },ordered.map { it.appointment.id })
+        for (group in ordered.groupBy { it.section }.values) {
+            val times=group.map { it.appointment.startTime }; assertEquals(times.sorted(),times)
+        }
+        assertEquals(next.id,ordered.single { it.section==TodayOrderingSection.nextUp }.appointment.id)
+        assertEquals(input.filter { it.date==date && it.status==AppointmentStatus.scheduled && !it.isOverdue(boundary,zone) }.minBy { it.startTime }.id,next.id)
+        assertEquals(boundary,endEqualsNow.endInstant(zone)); assertTrue(endEqualsNow.isOverdue(boundary,zone))
+        assertEquals(listOf(overdueEarly.id,endEqualsNow.id),ordered.filter { it.section==TodayOrderingSection.overdue }.map { it.appointment.id })
     }
     @Test fun remindersAreGeneric() {
         assertEquals(listOf(15, 30, 60, 120), ReminderLeadMinutes.entries.map { it.minutes })

@@ -626,7 +626,7 @@ AD-01 的 35 项完整逐行对照、三类状态与名称差异清单见 [T031]
 | DS-TOGGLE | FcToggle | FcControls.kt | off;on;disabled | Components/FCToggleStyle.swift | toggle | Compose toggleable Switch 语义；保留 iOS 轨道尺寸 |
 | DS-STEPPER | FcStepper;FcStepperField | FcControls.kt | lower;upper;field | Components/FCStepper.swift | steppers | 字号放大/键盘；图标 Painter 注入 |
 | DS-TEXT-FIELD | FcTextField;FcSearchField | FcControls.kt | empty;secure;search | Components/FCTextField.swift | fields | 焦点/软键盘/长文 |
-| DS-LIST-ROW | FcListRow;FcListGroupRow;FcListRowDivider | FcRows.kt | plain;action;selected;unavailable;group | Components/FCListRow.swift | listRows | 子行缩进/大字；组状态由子项推导 |
+| DS-LIST-ROW | FcListRow;FcListGroupRow;FcListRowDivider;FcAppointmentRow | FcRows.kt;FcAppointmentRow.kt | plain;action;selected;unavailable;group | Components/FCListRow.swift | listRows | 子行缩进/大字；组状态由子项推导；FcAppointmentRow 为 Today/Calendar 的组合变体 |
 | DS-SECTION | FcSectionLabel;FcGroupEntryRow | FcRows.kt | label;entry | Components/FCListRow.swift | sections | 区块阅读层级 |
 | DS-LABEL-VALUE-ROW | FcLabelValueRow;FcLabelValueText | FcRows.kt | text;slot;action | Components/FCListRow.swift | labelValue | 标签列/大字；AD-02 日期在行下页内展开/收起；时间用 M3 24h 表盘弹窗及键盘切换（§5、README §15.6） |
 | DS-PAGE-HEADER | FcPageHeader | FcRows.kt | back;trailing | Components/FCPageHeader.swift | pageHeader | 基线/标题折行；返回 A/B 见 §8.4 |
@@ -649,6 +649,7 @@ AD-01 的 35 项完整逐行对照、三类状态与名称差异清单见 [T031]
 | DS-PAGE-SECONDARY | FcPageSecondary | FcPages.kt | back;bottom | Components/FCPageHeader.swift | secondaryPage | C 类组合；FcPlatformShell 唯一 Insets 与返回 owner |
 | DS-EMPTY-STATE | FcEmptyState | FcPages.kt | static;ambient | Components/FCAmbientEmptyScene.swift | emptyState | C 类组合；静态与 C30 动画空态，底部主按钮 |
 | DS-LAUNCH | FcLaunch | FcPages.kt | white | ../Resources/LaunchScreen.storyboard | launch | D 类 C31：纯白系统启动与 Compose 加载面，无图无字无过场；iOS 实际依据 LaunchScreen.storyboard |
+| DS-CALENDAR-DAY | FcCalendarDayCell | FcCalendarDayCell.kt | plain;selected;scheduled | Components/FCCalendarDayCell.swift | calendarDays | S2 已实现；日期格最小 touch、状态说明、选中日隐藏有课点 |
 <!-- android-roster-end -->
 
 ### 8.2 D07 延期表
@@ -658,7 +659,6 @@ S0 恢复第 3 步已将 S1 目标移至 §8.1；HERO/HINT 已有映射，本轮
 <!-- android-deferred-start -->
 | ID | 目标切片 | 批准来源 / 原因 |
 |---|---|---|
-| DS-CALENDAR-DAY | S2 | D07 2026-11-03；预约日历 |
 | DS-BODY-DIAGRAM | S4 | D07 2026-11-03；分享报告 |
 <!-- android-deferred-end -->
 

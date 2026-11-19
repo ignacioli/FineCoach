@@ -6,6 +6,8 @@ import com.ignacioli.finecoach.storage.entity.*
 @Dao
 interface AppointmentDao {
     @Query("SELECT * FROM appointments ORDER BY date, startTime, id") fun all(): List<AppointmentEntity>
+    @Query("SELECT * FROM appointments WHERE date >= :first AND date <= :last ORDER BY date, startTime, id")
+    fun inDateRange(first: String, last: String): List<AppointmentEntity>
     @Query("SELECT * FROM appointments WHERE id = :id") fun find(id: String): AppointmentEntity?
     @Query("SELECT * FROM recurrence_series WHERE id = :id") fun series(id: String): RecurrenceSeriesEntity?
     @Insert fun insert(row: AppointmentEntity)

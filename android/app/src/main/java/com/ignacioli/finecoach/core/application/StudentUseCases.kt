@@ -12,6 +12,7 @@ class StudentUseCases(
     private val reminders: AppointmentReminderPort = AppointmentReminderPort {},
 ) {
     suspend fun list(query: StudentQuery = StudentQuery()) = repository.list(query)
+    suspend fun displayNames(ids: Set<StudentID>) = repository.displayNames(ids)
     suspend fun find(studentID: StudentID) = repository.find(studentID)
 
     suspend fun create(draft: StudentDraft): ApplicationResult<StudentRecord> = studentValidation {

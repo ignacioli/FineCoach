@@ -59,3 +59,7 @@
 - 为了让比对通过，去改容差、改锚点或扩大白名单；遇到这种情况登记决策点。
 - 改 iOS 产品代码、改截图基线、在 fixture 里用真实个人数据。
 - 单个子任务跑了 20 分钟还没收敛：停下来检查方向，不要原地重试。
+
+## S2-D18 通用文字几何容差（负责人 2026-11-19）
+
+文字宽度与以文字左右缘为端点的SIZE.width 与横向 GAP/ALIGN 使用 `max(toleranceDp, expectedTextWidth × 0.07)`；GAP 涉及多个文字端点时取端点容差最大值；ALIGN 按成员计算，只有 left-aligned 文字的右缘、right-aligned 文字的左缘、center-aligned 文字的左右缘可使用比例容差，锚点缘与非文字成员仍为 2dp，不取全组最大值。INSET 各轴始终为 2dp。文字的 left/center/right 对齐锚点单独以 2dp 验证；高度、纵向关系、非文字尺寸仍为 2dp，ABSOLUTE_GROSS 保持 8dp，COLOR 与 ICON_PIXELS 不变。继续采用最近 0.25dp 的 S1-D56 取整。每项 JSON/Markdown 报告列明实际 toleranceDp，SIZE 按轴、ALIGN 按成员列出，保留本次新增且已获接受的 TEXT_ANCHOR 收紧检查。实际 TextLayoutResult 对齐方式随观测导出，未提供时按 start/left；没有屏幕分支。`verify-conformance.mjs` 只消费稳定 hash，不作几何判断，无须重复实现容差。

@@ -393,6 +393,7 @@ sealed interface SaveCoursePackageResult {
 }
 
 interface StudentRepositoryPort {
+    suspend fun displayNames(ids: Set<StudentID>): ApplicationResult<Map<StudentID,String>>
     suspend fun list(query: StudentQuery): ApplicationResult<List<StudentRecord>>
     suspend fun find(studentID: StudentID): ApplicationResult<StudentRecord?>
     suspend fun save(record: StudentRecord): ApplicationResult<StudentRecord>

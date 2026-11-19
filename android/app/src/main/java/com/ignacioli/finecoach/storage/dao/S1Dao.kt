@@ -11,8 +11,13 @@ import java.util.UUID
 
 // Blocking storage primitives. Repository callers supply the encompassing transaction
 // for multi-row operations, disposition, revision CAS, and user-facing behavior.
+data class StudentDisplayNameRow(val id: UUID, val displayName: String)
+
 @Dao
 abstract class S1Dao {
+    @Query("SELECT id, displayName FROM students WHERE id IN (:ids)")
+    abstract fun displayNames(ids: List<UUID>): List<StudentDisplayNameRow>
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     abstract fun insert(row: StudentEntity)
 

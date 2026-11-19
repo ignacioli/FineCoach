@@ -7,6 +7,7 @@ import java.util.UUID
 /** Atomic persistence boundary; implementations re-read state and conflicts inside the write transaction. */
 interface AppointmentRepositoryPort {
     suspend fun all(): ApplicationResult<List<Appointment>>
+    suspend fun inDateRange(first: LocalDate, last: LocalDate): ApplicationResult<List<Appointment>>
     suspend fun find(id: UUID): ApplicationResult<Appointment?>
     suspend fun series(id: UUID): ApplicationResult<RecurrenceSeries?>
     suspend fun create(appointments: List<Appointment>, series: RecurrenceSeries?, overrideConflict: Boolean): ApplicationResult<List<Appointment>>
@@ -45,6 +46,7 @@ class AppointmentUseCases(private val repository: AppointmentRepositoryPort, pri
     }
 
     suspend fun all() = repository.all()
+    suspend fun inDateRange(first: LocalDate, last: LocalDate) = repository.inDateRange(first,last)
     suspend fun find(id: UUID) = repository.find(id)
     suspend fun series(id: UUID) = repository.series(id)
     suspend fun createSingle(appointment: Appointment, overrideConflict: Boolean = false) = repository.create(listOf(appointment), null, overrideConflict).afterReminderChange()

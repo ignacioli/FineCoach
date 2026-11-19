@@ -136,23 +136,27 @@ fun FcSymbol(painter: Painter, modifier: Modifier = Modifier, tint: Color = FcCo
 
 @Composable
 fun FcTitleIconButton(label: String, painter: Painter, modifier: Modifier = Modifier, onClick: () -> Unit) =
-    FcTitleIconButton(label, painter, modifier, Modifier, onClick)
+    FcTitleIconButton(label, painter, modifier, Modifier, onClick = onClick)
 
 @Composable
-fun FcTitleIconButton(label: String, painter: Painter, modifier: Modifier = Modifier, visualModifier: Modifier, onClick: () -> Unit) {
+fun FcTitleIconButton(label: String, painter: Painter, modifier: Modifier = Modifier, visualModifier: Modifier, enabled: Boolean = true, onClick: () -> Unit) {
     require(label.isNotBlank())
     Box(modifier.touch().semantics { contentDescription = label }
-        .clickable(role = Role.Button, onClick = onClick), contentAlignment = Alignment.Center) {
+        .clickable(enabled = enabled, role = Role.Button, onClick = onClick), contentAlignment = Alignment.Center) {
         Icon(painter, null, visualModifier.size(FcComponentMetrics.badge, FcShapes.xl), tint = FcColors.textSecondary)
     }
 }
 
 @Composable
-fun FcTitleAddButton(label: String, painter: Painter, modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun FcTitleAddButton(label: String, painter: Painter, modifier: Modifier = Modifier, onClick: () -> Unit) =
+    FcTitleAddButton(label, painter, modifier, Modifier, onClick)
+
+@Composable
+fun FcTitleAddButton(label: String, painter: Painter, modifier: Modifier = Modifier, visualModifier: Modifier, onClick: () -> Unit) {
     require(label.isNotBlank())
     Box(modifier.touch().semantics { contentDescription = label }
         .clickable(role = Role.Button, onClick = onClick), contentAlignment = Alignment.Center) {
-        Icon(painter, null, Modifier.size(FcComponentMetrics.badge), tint = FcColors.actionPrimary)
+        Icon(painter, null, visualModifier.size(FcComponentMetrics.badge), tint = FcColors.actionPrimary)
     }
 }
 
@@ -184,8 +188,8 @@ fun FcFilterChip(title: String, selected: Boolean, modifier: Modifier = Modifier
     FcChip(title, selected, false, modifier, onClick, visualModifier)
 
 @Composable
-fun FcBodyPartChip(title: String, selected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) =
-    FcChip(title, selected, true, modifier, onClick)
+fun FcBodyPartChip(title: String, selected: Boolean, modifier: Modifier = Modifier, visualModifier: Modifier = Modifier, onClick: () -> Unit) =
+    FcChip(title, selected, true, modifier, onClick, visualModifier)
 
 @Composable
 private fun FcChip(title: String, selected: Boolean, body: Boolean, modifier: Modifier, onClick: () -> Unit, visualModifier: Modifier = Modifier) {
@@ -203,25 +207,25 @@ private fun FcChip(title: String, selected: Boolean, body: Boolean, modifier: Mo
 val FcBodyParts = listOf("胸", "肩", "背", "大腿", "小腿", "臂", "臀", "核心")
 
 @Composable
-fun FcBodyPartPicker(selected: Set<Int>, onToggle: (Int) -> Unit, modifier: Modifier = Modifier, tag: String = "body") {
+fun FcBodyPartPicker(selected: Set<Int>, onToggle: (Int) -> Unit, modifier: Modifier = Modifier, tag: String = "body", conformanceTags: Boolean = false) {
     FlowRow(modifier, horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2),
         verticalArrangement = Arrangement.spacedBy(-FcSpacing.space2)) {
         FcBodyParts.forEachIndexed { index, title ->
-            FcBodyPartChip(title, index in selected, Modifier.testTag("$tag-$index")) { onToggle(index) }
+            FcBodyPartChip(title, index in selected, Modifier.testTag("$tag-$index"), if (conformanceTags) Modifier.testTag("conformance:Chip") else Modifier) { onToggle(index) }
         }
     }
 }
 
 @Composable
-fun FcToggle(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
+fun FcToggle(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true, trackModifier: Modifier = Modifier, knobModifier: Modifier = Modifier) {
     require(label.isNotBlank())
     Box(modifier.touch().semantics { contentDescription = label }
         .toggleable(value = checked, enabled = enabled, role = Role.Switch, onValueChange = onCheckedChange), contentAlignment = Alignment.Center) {
-        Box(Modifier.size(FcComponentMetrics.touch, FcSpacing.space6 + FcSpacing.space1 / 2)
+        Box(trackModifier.size(FcComponentMetrics.touch, FcSpacing.space6 + FcSpacing.space1 / 2)
             .clip(FcShapes.capsule).background(if (checked) FcColors.actionPrimary else FcColors.surfaceDivider)
             .then(if (!checked) Modifier.border(FcComponentMetrics.stroke, FcColors.borderControl, FcShapes.capsule) else Modifier)
             .padding(FcSpacing.space1), contentAlignment = if (checked) Alignment.CenterEnd else Alignment.CenterStart) {
-            Box(Modifier.size(FcSpacing.space4 + FcSpacing.space1 / 2).background(FcColors.actionOn, CircleShape))
+            Box(knobModifier.size(FcSpacing.space4 + FcSpacing.space1 / 2).background(FcColors.actionOn, CircleShape))
         }
     }
 }

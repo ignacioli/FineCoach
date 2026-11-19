@@ -10,11 +10,12 @@ class ComponentCatalogTests {
     private val doc = File(root, "design/design-system/components.md").readText()
     private val main = File(app, "src/main/java/com/ignacioli/finecoach/designsystem")
     private val test = File(app, "src/test/java/com/ignacioli/finecoach/ComponentContractTests.kt").readText() +
-        File(app, "src/test/java/com/ignacioli/finecoach/S1ComponentTests.kt").readText()
+        File(app, "src/test/java/com/ignacioli/finecoach/S1ComponentTests.kt").readText() +
+        File(app, "src/test/java/com/ignacioli/finecoach/CalendarEntryLayoutTests.kt").readText()
     private val approved = setOf("BASE", "BUTTON", "TITLE-ACTION", "SEGMENTED", "CHIP", "TOGGLE", "STEPPER", "TEXT-FIELD",
         "LIST-ROW", "SECTION", "LABEL-VALUE-ROW", "PAGE-HEADER", "HUB-ROW", "INLINE-RESULT", "ACTION-ROW", "UNDO-ROW",
-        "BOTTOM-SHEET", "CONFIRM-DIALOG", "STATUS", "SAVE-STATUS", "AVATAR", "SYMBOL", "HINT-BAR", "HERO-CARD", "AMBIENT-SCENE", "SET-ROW", "EQUIPMENT-ICON", "PAGE-PRIMARY", "PAGE-SECONDARY", "EMPTY-STATE", "LAUNCH").map { "DS-$it" }.toSet()
-    private val deferred = setOf("CALENDAR-DAY", "BODY-DIAGRAM").map { "DS-$it" }.toSet()
+        "BOTTOM-SHEET", "CONFIRM-DIALOG", "STATUS", "SAVE-STATUS", "AVATAR", "SYMBOL", "HINT-BAR", "HERO-CARD", "AMBIENT-SCENE", "SET-ROW", "EQUIPMENT-ICON", "PAGE-PRIMARY", "PAGE-SECONDARY", "EMPTY-STATE", "LAUNCH", "CALENDAR-DAY").map { "DS-$it" }.toSet()
+    private val deferred = setOf("BODY-DIAGRAM").map { "DS-$it" }.toSet()
 
     private fun rows(start: String, end: String): List<List<String>> = doc.substringAfter("<!-- $start -->", "")
         .substringBefore("<!-- $end -->").lineSequence().filter { it.startsWith("| DS-") }
@@ -22,17 +23,19 @@ class ComponentCatalogTests {
 
     @Test fun approvedRosterIsExactAndUnique() {
         val rows = rows("android-roster-start", "android-roster-end")
-        assertEquals(31, rows.size)
+        assertEquals(32, rows.size)
         assertEquals(approved, rows.map { it[0] }.toSet())
         assertEquals(approved, (S0CatalogEntries + S1CatalogEntries).map { it.id }.toSet())
-        assertEquals(31, (S0CatalogEntries + S1CatalogEntries).size)
+        assertEquals(32, (S0CatalogEntries + S1CatalogEntries).size)
     }
 
     @Test fun everyTypeFileAndIosSourceExists() {
         rows("android-roster-start", "android-roster-end").forEach { row ->
-            val source = File(main, row[2]); assertTrue(source.path, source.isFile)
+            val files = row[2].split(';').map { File(main,it) }
+            files.forEach { assertTrue(it.path,it.isFile) }
+            val sources = files.joinToString("\n") { it.readText() }
             row[1].split(';').forEach { type ->
-                assertTrue("${row[0]} missing $type", Regex("(?:fun|class|enum class|object)\\s+${Regex.escape(type)}\\b").containsMatchIn(source.readText()))
+                assertTrue("${row[0]} missing $type", Regex("(?:fun|class|enum class|object)\\s+${Regex.escape(type)}\\b").containsMatchIn(sources))
             }
             row[4].split(';').forEach { assertTrue(it, File(root, "ios/FineCoachApp/DesignSystem/$it").isFile) }
         }
@@ -49,7 +52,7 @@ class ComponentCatalogTests {
 
     @Test fun deferredTableIsExactAndUnionCoversAuthorityIndexWithoutUnknownIds() {
         val rows = rows("android-deferred-start", "android-deferred-end")
-        assertEquals(2, rows.size)
+        assertEquals(1, rows.size)
         assertEquals(deferred, rows.map { it[0] }.toSet())
         rows.forEach { assertTrue(it[1].startsWith("S")); assertTrue(it[2].contains("D07 2026-11-03")) }
         assertTrue(approved.intersect(deferred).isEmpty())

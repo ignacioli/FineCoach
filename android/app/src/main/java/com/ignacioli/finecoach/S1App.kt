@@ -24,6 +24,10 @@ import com.ignacioli.finecoach.features.templates.*
 import com.ignacioli.finecoach.features.session.*
 import com.ignacioli.finecoach.features.history.*
 import com.ignacioli.finecoach.features.today.*
+import com.ignacioli.finecoach.features.calendar.*
+import com.ignacioli.finecoach.features.appointments.*
+import java.time.LocalDate
+import java.util.UUID
 import com.ignacioli.finecoach.features.resources.*
 import com.ignacioli.finecoach.navigation.*
 import com.ignacioli.finecoach.notifications.*
@@ -161,9 +165,31 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
         sizeTransform = null,
     ) {
         composable(S1Routes.TODAY) {
-            val today = remember { TodayUiState(graph.sessions, graph.students, graph.clock) }
-            OnResume { today.load() }
-            TodayScreen(today, navigator::open)
+            val today = remember { TodayUiState(graph.sessions, graph.students, graph.clock, graph.zone) }
+            val appointments = remember { AppointmentListState(graph.appointments, graph.students, graph.clock, graph.zone) }
+            OnResume { today.load(); appointments.load() }
+            TodayS2Screen(today, appointments, navigator::open,
+                onCalendar = { nav.navigate(S2Routes.CALENDAR) },
+                onCreate = { date -> nav.navigate(S2Routes.createAppointment(date)) },
+                onAppointment = { id -> nav.navigate(S2Routes.editAppointment(id)) })
+        }
+        composable(S2Routes.CALENDAR) {
+            val appointments = remember { AppointmentListState(graph.appointments, graph.students, graph.clock, graph.zone) }
+            val calendar = remember { CalendarUiState(appointments) }
+            OnResume { calendar.load() }
+            CalendarScreen(calendar, back,
+                onCreate = { date -> nav.navigate(S2Routes.createAppointment(date)) },
+                onAppointment = { id -> nav.navigate(S2Routes.editAppointment(id)) })
+        }
+        composable(S2Routes.APPOINTMENT_CREATE) { entry ->
+            val date = LocalDate.parse(requireNotNull(entry.arguments?.getString(S2Routes.ARG_DATE)))
+            val editor = remember(date) { AppointmentEditorState(graph.appointments, graph.students, graph.clock, graph.zone, date) }
+            AppointmentEditorScreen(editor, back, back)
+        }
+        composable(S2Routes.APPOINTMENT_EDIT) { entry ->
+            val id = UUID.fromString(requireNotNull(entry.arguments?.getString(S2Routes.ARG_APPOINTMENT)))
+            val editor = remember(id) { AppointmentEditorState(graph.appointments, graph.students, graph.clock, graph.zone, graph.clock.today(graph.zone), id) }
+            AppointmentEditorScreen(editor, back, back)
         }
         composable(S1Routes.STUDENTS) {
             val state = remember { StudentListViewModel(graph.students, sessionRepository = graph.sessions, creditUseCases = graph.credits, clock = graph.clock, zoneId = graph.zone) }

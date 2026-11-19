@@ -254,6 +254,7 @@ internal object ScopeBoundaryPolicy {
 
     private fun isApprovedRouteExpression(path: String, expression: String): Boolean {
         val candidate = expression.trim()
+        if (candidate in setOf("S2Routes.CALENDAR", "S2Routes.APPOINTMENT_CREATE", "S2Routes.APPOINTMENT_EDIT")) return true
         if (Regex("S1Routes\\.[A-Z][A-Z0-9_]*").matches(candidate)) return true
         if (isMainActivity(path) && candidate == "\"placeholder\"") return true
         return false
@@ -261,6 +262,8 @@ internal object ScopeBoundaryPolicy {
 
     private fun isApprovedNavigateExpression(expression: String): Boolean {
         val candidate = expression.trim()
+        if (candidate in setOf("S2Routes.CALENDAR", "S2Routes.APPOINTMENT_CREATE", "S2Routes.APPOINTMENT_EDIT")) return true
+        if (Regex("^S2Routes\\.(?:createAppointment|editAppointment)\\s*\\(.*\\)$").matches(candidate)) return true
         if (Regex("^S1Routes\\.[A-Z][A-Z0-9_]*$").matches(candidate)) return true
         if (Regex("^S1Routes\\.[a-z][A-Za-z0-9_]*\\s*\\(.*\\)$").matches(candidate)) return true
         return false
@@ -397,6 +400,11 @@ class ScopeBoundaryTests {
     }
     @Test fun allowsApprovedS1RouteConstantsOnly() {
         ScopeBoundaryPolicy.validateSource("FictionalNav.kt", "composable(S1Routes.TODAY) {}")
+        listOf("CALENDAR", "APPOINTMENT_CREATE", "APPOINTMENT_EDIT").forEach {
+            ScopeBoundaryPolicy.validateSource("FictionalNav.kt", "composable(S2Routes.$it) {}")
+        }
+        reject("composable(S2Routes.BACKUP) {}")
+        reject("navigate(S2Routes.backup())")
         ScopeBoundaryPolicy.validateSource(
             "FictionalNav.kt",
             "composable(route = S1Routes.STUDENT_DETAIL, arguments = fictionalArguments) {}",
