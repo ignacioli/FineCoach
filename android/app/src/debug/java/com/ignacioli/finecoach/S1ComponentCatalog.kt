@@ -10,6 +10,7 @@ import com.ignacioli.finecoach.designsystem.*
 
 // fictional-data: S1 additions stay separate so the frozen S0/G2 66-state matrix does not change.
 val S1CatalogEntries = listOf(
+    S0CatalogEntry("DS-CALENDAR-DAY", listOf("plain", "selected", "scheduled")),
     S0CatalogEntry("DS-AMBIENT-SCENE", listOf("today", "calendar")),
     S0CatalogEntry("DS-SET-ROW", listOf("draft", "pending", "completed", "disabled", "undo")),
     S0CatalogEntry("DS-EQUIPMENT-ICON", FcEquipmentIcon.entries.map { it.name }),
@@ -23,6 +24,7 @@ val S1CatalogEntries = listOf(
 internal fun S1ComponentState(id: String, state: String) {
     val modifier = Modifier.testTag("$id-$state")
     when (id) {
+        "DS-CALENDAR-DAY" -> FcCalendarDayCell(8,state == "selected",state == "scheduled",modifier) {}
         "DS-AMBIENT-SCENE" -> Box(modifier) { FcAmbientScene(size = if (state == "calendar") FcComponentMetrics.calendarIllustration else FcComponentMetrics.illustration) }
         "DS-SET-ROW" -> FcSetRow(1, "20 kg × 8", state == "completed" || state == "undo", state == "pending", {}, {}, modifier,
             enabled = state != "disabled", tag = "$id-$state", onUndo = if (state == "undo") ({}) else null)

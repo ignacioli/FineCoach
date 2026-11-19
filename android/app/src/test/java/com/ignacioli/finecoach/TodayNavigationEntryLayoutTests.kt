@@ -86,7 +86,7 @@ class TodayNavigationEntryLayoutTests {
     @Test fun emptyTodaySwitchesToStudentCreateAndReturnsToSameDurableStudent() {
         // Fixed Sunday: an expected literal catches Android CLDR differences from the approved iOS label.
         val sunday = java.time.LocalDate.of(2026, 11, 8)
-        f.test { f.time = sunday.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant() }
+        f.test { f.time = sunday.atStartOfDay(graph.zone).toInstant() }
         show(); await("today-empty")
         node("today-date").assertIsDisplayed().assertTextEquals("11月8日 · 周日")
         node("today-empty-scene").assertIsDisplayed()

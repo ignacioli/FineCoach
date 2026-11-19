@@ -20,14 +20,14 @@ import com.ignacioli.finecoach.navigation.S1Routes
 import kotlinx.coroutines.launch
 import java.time.Duration
 
-class TodayUiState(private val sessions: SessionRepositoryPort, private val students: StudentUseCases, private val clock: AppClock) {
-    var todayDate by mutableStateOf(clock.now().atZone(ZoneId.systemDefault()).toLocalDate()); private set
+class TodayUiState(private val sessions: SessionRepositoryPort, private val students: StudentUseCases, private val clock: AppClock, private val zone: ZoneId = ZoneId.systemDefault()) {
+    var todayDate by mutableStateOf(clock.now().atZone(zone).toLocalDate()); private set
     var hasCompletedInitialLoad by mutableStateOf(false); private set
     var items by mutableStateOf<List<FcHeroEntry>>(emptyList()); private set
     var loading by mutableStateOf(true); private set
     var error by mutableStateOf<ApplicationError?>(null); private set
     suspend fun load() {
-        todayDate = clock.now().atZone(ZoneId.systemDefault()).toLocalDate()
+        todayDate = clock.now().atZone(zone).toLocalDate()
         loading = true
         val result = sessions.listActiveSessions()
         if (result is ApplicationResult.Failure) { error = result.error; loading = false; return }

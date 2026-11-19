@@ -18,6 +18,10 @@ class AppointmentRepository(
     private fun rows() = dao.all().map { it.toDomain() }
     private fun persist(row: Appointment): Appointment { check(dao.update(row.toEntity()) == 1); return row }
     override suspend fun all() = tx { rows() }
+    override suspend fun inDateRange(first: LocalDate, last: LocalDate) = tx {
+        require(!last.isBefore(first))
+        dao.inDateRange(first.toString(),last.toString()).map { it.toDomain() }
+    }
     override suspend fun find(id: UUID) = tx { dao.find(id.toString())?.toDomain() }
     override suspend fun series(id: UUID) = tx { dao.series(id.toString())?.toDomain() }
     private fun conflictsWith(candidate: Appointment, exclude: Set<UUID>) = rows().filter {

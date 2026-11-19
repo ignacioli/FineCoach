@@ -30,6 +30,11 @@ class StudentRepository(
             .map { it.toRecord() }
     }
 
+    override suspend fun displayNames(ids: Set<StudentID>): ApplicationResult<Map<StudentID,String>> = operation {
+        if (ids.isEmpty()) emptyMap() else database.s1Dao().displayNames(ids.map { it.uuid() })
+            .associate { StudentID.fromUUID(it.id) to it.displayName }
+    }
+
     override suspend fun find(studentID: StudentID): ApplicationResult<StudentRecord?> = operation {
         database.s1Dao().findStudent(studentID.uuid())?.toRecord()
     }

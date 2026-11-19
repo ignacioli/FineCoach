@@ -403,6 +403,9 @@ tasks.withType<Test>().matching { it.name in setOf("testDebugUnitTest", "testRel
         excludeTestsMatching("com.ignacioli.finecoach.ExerciseConformanceTests")
         excludeTestsMatching("com.ignacioli.finecoach.AddExerciseConformanceTests")
         excludeTestsMatching("com.ignacioli.finecoach.TodayConformanceTests")
+        excludeTestsMatching("com.ignacioli.finecoach.TodayS2ConformanceTests")
+        excludeTestsMatching("com.ignacioli.finecoach.CalendarConformanceTests")
+        excludeTestsMatching("com.ignacioli.finecoach.AppointmentEditorConformanceTests")
         excludeTestsMatching("com.ignacioli.finecoach.SessionDetailConformanceTests")
         excludeTestsMatching("com.ignacioli.finecoach.StudentListConformanceTests")
         excludeTestsMatching("com.ignacioli.finecoach.StudentDetailConformanceTests")
@@ -1117,6 +1120,9 @@ registerVisualGate("p4ExerciseLibraryConformance", "ExerciseConformanceTests", 1
 
 registerVisualGate("p4AddExerciseConformance", "AddExerciseConformanceTests", 1)
 registerVisualGate("p4TodayConformance", "TodayConformanceTests", 1)
+registerVisualGate("p4TodayS2Conformance", "TodayS2ConformanceTests", 1)
+registerVisualGate("p4CalendarConformance", "CalendarConformanceTests", 1)
+registerVisualGate("p4AppointmentEditorConformance", "AppointmentEditorConformanceTests", 1)
 registerVisualGate("p4SessionDetailConformance", "SessionDetailConformanceTests", 1)
 
 val entryLayoutClasses = listOf("com.ignacioli.finecoach.EntryLayoutHarnessTests")

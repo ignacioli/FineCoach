@@ -8,10 +8,10 @@ import org.json.JSONObject
 
 /** S1-D55: relations are selected exclusively from design geometry, never from observed drift. */
 internal object ConformanceRelativeGeometry {
-    private val names = listOf("SIZE", "GAP", "INSET", "ALIGN", "ABSOLUTE_GROSS", "COLOR")
+    private val names = listOf("SIZE", "GAP", "INSET", "ALIGN", "ABSOLUTE_GROSS", "COLOR", "TEXT_ANCHOR")
     private fun rounded(delta: Double) = sign(delta) * floor(abs(delta) * 4 + 0.5) / 4
-    private fun within(delta: Double) = abs(rounded(delta)) <= 2
-    private fun measurement(delta: Double) = JSONObject().put("delta", delta).put("roundedDelta", rounded(delta))
+    private fun within(delta: Double, tolerance: Double = 2.0) = abs(rounded(delta)) <= tolerance
+    private fun measurement(delta: Double, tolerance: Double = 2.0) = JSONObject().put("delta", delta).put("roundedDelta", rounded(delta)).put("toleranceDp", tolerance)
     fun evaluate(rows: List<JSONObject>): JSONObject {
         val counts = JSONObject().apply { names.forEach { put(it, 0) } }
         val checks = JSONArray()
@@ -29,6 +29,7 @@ internal object ConformanceRelativeGeometry {
             v(c,"x")+v(c,"w") <= v(p,"x")+v(p,"w") && v(c,"y")+v(c,"h") <= v(p,"y")+v(p,"h") &&
             v(p,"w")*v(p,"h") > v(c,"w")*v(c,"h")
         fun record(kind: String, members: List<JSONObject>, pass: Boolean, detail: JSONObject = JSONObject()) {
+            if (!detail.has("toleranceDp")) detail.put("toleranceDp", if (kind == "ABSOLUTE_GROSS") 8.0 else if (kind == "COLOR") JSONObject.NULL else 2.0)
             detail.put("check", kind).put("members", JSONArray(members.map { it.getString("path") })).put("passed", pass)
             checks.put(detail)
             if (!pass) {
@@ -44,10 +45,17 @@ internal object ConformanceRelativeGeometry {
             val sizeDetail = JSONObject()
             val sizePass = listOf("w","h").map { axis ->
                 val delta = d.getDouble(axis)
-                sizeDetail.put(axis, measurement(delta))
-                within(delta)
+                val tolerance = if (axis == "w") ConformanceTextTolerance.width(a, v(a,"w")) else 2.0
+                sizeDetail.put(axis, measurement(delta, tolerance))
+                within(delta, tolerance)
             }.all { it }
             record("SIZE", listOf(a), sizePass, sizeDetail)
+            if (ConformanceTextTolerance.isText(a)) {
+                val alignment = a.getJSONObject("geometry").optString("textAlignment", "left")
+                val axis = when (alignment) { "right" -> "right"; "center" -> "centerX"; else -> "left" }
+                val delta = edge(a, axis, true) - edge(a, axis)
+                record("TEXT_ANCHOR", listOf(a), within(delta), measurement(delta).put("edge", axis))
+            }
             record("ABSOLUTE_GROSS", listOf(a), listOf("x","y").all { abs(d.getDouble(it)) <= 8 })
             if (a.optBoolean("colorFullyOccluded"))
                 checks.put(JSONObject().put("check", "COLOR").put("members", JSONArray(listOf(a.getString("path"))))
@@ -59,8 +67,9 @@ internal object ConformanceRelativeGeometry {
                 val pass = listOf("x","y").map { axis ->
                     val design = v(a,axis)-v(parent,axis)
                     val actual = v(a,axis,true)-v(parent,axis,true)
-                    detail.put(axis, measurement(actual-design).put("design",design).put("actual",actual))
-                    within(actual-design)
+                    val tolerance = 2.0
+                    detail.put(axis, measurement(actual-design, tolerance).put("design",design).put("actual",actual))
+                    within(actual-design, tolerance)
                 }.all { it }
                 record("INSET", listOf(parent,a), pass, detail)
             }
@@ -72,9 +81,10 @@ internal object ConformanceRelativeGeometry {
                     .sortedWith(compareBy<JSONObject> { v(it,axis)-v(a,axis)-v(a,size) }.thenBy { it.getString("path") }).firstOrNull() ?: continue
                 val design = v(b,axis)-v(a,axis)-v(a,size)
                 val actual = v(b,axis,true)-v(a,axis,true)-v(a,size,true)
-                val detail = JSONObject().put("a",a.getString("path")).put("b",b.getString("path"))
+                val tolerance = if (axis == "x") maxOf(ConformanceTextTolerance.width(a,v(a,"w")), ConformanceTextTolerance.width(b,v(b,"w"))) else 2.0
+                val detail = JSONObject().put("toleranceDp",tolerance).put("a",a.getString("path")).put("b",b.getString("path"))
                     .put("direction",direction).put("design",design).put("actual",actual).put("delta",actual-design).put("roundedDelta",rounded(actual-design))
-                record("GAP",listOf(a,b),within(actual-design),detail)
+                record("GAP",listOf(a,b),within(actual-design,tolerance),detail)
                 gaps.put(detail)
             }
         }
@@ -89,7 +99,16 @@ internal object ConformanceRelativeGeometry {
                 remaining.removeAll(group.toSet())
                 if (group.size < 2) continue
                 val spread = group.maxOf { edge(it,axis,true) }-group.minOf { edge(it,axis,true) }
-                record("ALIGN",group,within(spread),measurement(spread).put("edge",axis).put("actualSpread",spread))
+                val tolerances = group.associateWith { ConformanceTextTolerance.edge(it, axis, v(it,"w")) }
+                val anchors = group.filter { tolerances.getValue(it) == 2.0 }
+                val references = anchors.ifEmpty { group }
+                val memberChecks = group.map { member ->
+                    val deviation = references.maxOf { abs(edge(member,axis,true)-edge(it,axis,true)) }
+                    val tolerance = tolerances.getValue(member)
+                    measurement(deviation,tolerance).put("path",member.getString("path")).put("passed",within(deviation,tolerance))
+                }
+                record("ALIGN",group,memberChecks.all { it.getBoolean("passed") },JSONObject()
+                    .put("toleranceDp",JSONObject.NULL).put("memberChecks",JSONArray(memberChecks)).put("edge",axis).put("actualSpread",spread))
             }
         }
         observable.forEach { r ->
@@ -108,4 +127,18 @@ internal object ConformanceRelativeGeometry {
         }
         return JSONObject().put("counts",counts).put("checks",checks).put("gaps",gaps)
     }
+}
+
+/** S2-D18: only real text width-derived edges receive proportional tolerance. */
+internal object ConformanceTextTolerance {
+    fun isText(row: JSONObject) = row.optString("layerType") == "text" || row.optJSONObject("geometry")?.optString("textLineBox", "") == "TOKEN_LINE_HEIGHT_CENTERED"
+    fun width(row: JSONObject, expectedWidth: Double, base: Double = 2.0) = width(isText(row), expectedWidth, base)
+    fun width(text: Boolean, expectedWidth: Double, base: Double = 2.0) = if (text) maxOf(base, expectedWidth * 7.0 / 100.0) else base
+    fun edge(row: JSONObject, axis: String, expectedWidth: Double): Double {
+        if (!isText(row) || axis == "centerX") return 2.0
+        val anchor = row.optJSONObject("geometry")?.optString("textAlignment", "left") ?: "left"
+        val nonAnchor = anchor == "center" || (anchor == "left" && axis == "right") || (anchor == "right" && axis == "left")
+        return if (nonAnchor) width(row,expectedWidth) else 2.0
+    }
+    fun alignment(value: String) = when (value.lowercase()) { "center", "centre" -> "center"; "right", "end" -> "right"; else -> "left" }
 }
