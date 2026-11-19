@@ -1,6 +1,7 @@
 package com.ignacioli.finecoach.features.appointments
 
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.Snapshot
 import com.ignacioli.finecoach.core.application.*
 import com.ignacioli.finecoach.core.domain.appointment.*
 import com.ignacioli.finecoach.core.domain.common.*
@@ -16,13 +17,17 @@ class AppointmentListState(val appointments: AppointmentUseCases, private val st
     var loaded by mutableStateOf(false); private set
     var error by mutableStateOf<ApplicationError?>(null); private set
     private var generation = 0L
+    private var range: Pair<LocalDate, LocalDate>? = null
     fun invalidate() {
         generation++
+        range = null
         rows = emptyList(); names = emptyMap(); loaded = false; error = null
     }
     val today get() = clock.today(zone)
     suspend fun load(first: LocalDate = today, last: LocalDate = first) {
-        invalidate()
+        val requestedRange = first to last
+        if (range != requestedRange) invalidate() else { generation++; error = null }
+        range = requestedRange
         val request = generation
         val result = appointments.inDateRange(first,last)
         if (request != generation) return
@@ -34,8 +39,10 @@ class AppointmentListState(val appointments: AppointmentUseCases, private val st
                 when (labels) {
                     is ApplicationResult.Failure -> { error = labels.error; return }
                     is ApplicationResult.Success -> {
-                        rows = result.value; names = result.value.associate { it.studentID to labels.value[it.studentID].orEmpty() }
-                        loaded = true; error = null
+                        Snapshot.withMutableSnapshot {
+                            rows = result.value; names = result.value.associate { it.studentID to labels.value[it.studentID].orEmpty() }
+                            loaded = true; error = null
+                        }
                     }
                 }
             }
