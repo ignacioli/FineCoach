@@ -1615,7 +1615,7 @@ seed v4 的 multi 增加 15 条预约、两系列（RepeatCount / EndDate）及�
 
 ### T034 / Phase 4 checkpoint：训练趋势与身体数据
 
-待办。
+**PENDING（2026-11-20，宿主复跑和负责人看对照页之前）。** T030 训练趋势页已接上。S3-D12 之后趋势门禁 46 层：PASS 44，OWNER_EXCEPTION 2（日期 12、13 的字宽 GAP，上限 4dp），FAIL 0，`gatePassed`。本轮交付全量单测 **1247/0**（日志 `.handoff/logs/agent-test-android-s3-p4-20261120-064850.log`）。`26-student-detail-s1` 锁定哈希 `2e48c260…1d3bd2`，加入口后捕获 `1386ae98…3baf8e`，未改基线；Phase 5 T042 替换该基线。学员详情一致性测试已恢复为 main 原样。详见 [T030](docs/s3/T030.md)–[T034](docs/s3/T034.md)。
 
 ### T045 / Phase 5 checkpoint：需要留意与核心屏
 
