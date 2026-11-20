@@ -1,6 +1,10 @@
 // fictional-data: isolated Room, one invented student and a fixed Asia/Shanghai clock.
 package com.ignacioli.finecoach
 
+import android.os.Bundle
+import com.ignacioli.finecoach.features.settings.*
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicBoolean
 import android.Manifest
 import android.app.Application
 import android.app.NotificationManager
@@ -123,7 +127,8 @@ class S2NavigationEntryLayoutTests {
             assertTrue(saved.reminderEnabled); assertEquals(1L, fixture.count("appointments"))
         }
     }
-    private fun showFirstReminderSave(): androidx.compose.runtime.MutableState<Int> {
+    private lateinit var permissionGraph: S1AppGraph
+    private fun showFirstReminderSave(restoration: androidx.compose.ui.test.junit4.StateRestorationTester? = null, progress: androidx.compose.runtime.MutableState<NotificationPermissionProgress>? = null, initialRevision: Int = 0, readStatus: (suspend () -> ReminderSettingsState.Status)? = null): androidx.compose.runtime.MutableState<Int> {
         lateinit var graph: S1AppGraph
         fixture.test {
             fixture.student(1)
@@ -133,12 +138,91 @@ class S2NavigationEntryLayoutTests {
         val app = ApplicationProvider.getApplicationContext<Application>()
         shadowOf(app).denyPermissions(Manifest.permission.POST_NOTIFICATIONS)
         shadowOf(app.getSystemService(NotificationManager::class.java)).setNotificationsEnabled(true)
-        val revision = mutableStateOf(0)
-        compose.setContent { FineCoachTheme { S1App(graph, permissionRevision = revision.value) } }
+        permissionGraph = graph
+        val revision = mutableStateOf(initialRevision)
+        val content: @androidx.compose.runtime.Composable () -> Unit = {
+            FineCoachTheme { S1App(graph, permissionRevision = progress?.value?.revision ?: revision.value, permissionInFlight = progress?.value?.inFlight ?: false, readSavedReminderStatus = readStatus) }
+        }
+        if (restoration == null) compose.setContent(content) else restoration.setContent(content)
+
         await("today-add"); node("today-add").performClick(); await("appointment-editor-content")
         node("appointment-student").performClick()
         node("appointment-student-${fixture.studentID(1).value}").performClick()
         return revision
+    }
+    private val statusReads = AtomicInteger()
+    private val lastReadStatus = java.util.concurrent.atomic.AtomicReference<ReminderSettingsState.Status?>()
+    private suspend fun countedStatus(): ReminderSettingsState.Status {
+        statusReads.incrementAndGet()
+        val status = readReminderSettingsStatus(permissionGraph.reminders::enabled) {
+            permissionGraph.database.storeMetadataDao().find(AppointmentReminders.PERMISSION_REQUESTED) != null
+        }
+        lastReadStatus.set(status)
+        return status
+    }
+    private fun recreateLaunchedRequest(): Pair<androidx.compose.runtime.MutableState<NotificationPermissionProgress>, Bundle> {
+        val restoration = androidx.compose.ui.test.junit4.StateRestorationTester(compose)
+        val original = NotificationPermissionProgress("fictional-process").also { repeat(3) { _ -> it.complete() }; it.begin() }
+        val progress = mutableStateOf(original)
+        showFirstReminderSave(restoration, progress, readStatus = ::countedStatus)
+        node("appointment-save").performClick(); await("today-add")
+        // Model S1Root's launch handshake: queue consumed, system result still outstanding.
+        compose.runOnIdle { permissionGraph.reminders.permissionRequest.value = false }
+        val saved = Bundle().also(original::save)
+        compose.runOnIdle { progress.value = NotificationPermissionProgress("fictional-process").also { it.restore(saved) } }
+        restoration.emulateSavedInstanceStateRestore()
+        await("today-add"); compose.waitForIdle()
+        compose.runOnIdle { assertFalse(permissionGraph.reminders.permissionRequest.value); assertEquals(0, statusReads.get()) }
+        node("saved-reminder-denied-card").assertDoesNotExist()
+        return progress to saved
+    }
+    @Test fun rotationDuringRequestWaitsForLateResultRatherThanShowingDenial() {
+        val (progress, _) = recreateLaunchedRequest()
+        compose.runOnIdle { progress.value.complete() }
+        await("saved-reminder-denied-card")
+        assertEquals(1, statusReads.get())
+    }
+    @Test fun lateGrantAfterRecreationFinishesWaitWithoutDeniedCard() {
+        val (progress, _) = recreateLaunchedRequest()
+        shadowOf(ApplicationProvider.getApplicationContext<Application>()).grantPermissions(Manifest.permission.POST_NOTIFICATIONS)
+        compose.runOnIdle { progress.value.complete() }
+        compose.waitUntil(15_000) {
+            // The v2 rule must settle the permission-result recomposition before reading an external atomic.
+            compose.waitForIdle()
+            lastReadStatus.get() == ReminderSettingsState.Status.enabled
+        }
+        compose.waitForIdle()
+        node("saved-reminder-denied-card").assertDoesNotExist()
+        assertEquals(1, statusReads.get())
+        // A later revision must not read again once the saved-request wait has ended.
+        compose.runOnIdle { progress.value.complete() }
+        compose.waitForIdle()
+        assertEquals(1, statusReads.get())
+        node("saved-reminder-denied-card").assertDoesNotExist()
+    }
+    @Test fun lostRequestAfterProcessRecreationFallsBackToCurrentPermission() {
+        val (progress, saved) = recreateLaunchedRequest()
+        // UI wait has survived recreation; a new process cannot keep the old launch in flight.
+        compose.runOnIdle { progress.value = NotificationPermissionProgress("fictional-new-process").also { it.restore(saved) } }
+        await("saved-reminder-denied-card")
+        assertEquals(1, statusReads.get())
+    }
+    @Test fun saveCallbackReadFailurePreservesAppointmentAndVisibleRetryRecovers() {
+        val fail = AtomicBoolean(true)
+        showFirstReminderSave(readStatus = {
+            if (fail.get()) throw IllegalStateException("fictional post-save read failure")
+            countedStatus()
+        })
+        fixture.test { fixture.db.storeMetadataDao().insert(StoreMetadata(AppointmentReminders.PERMISSION_REQUESTED, "true")) }
+        node("appointment-save").performClick()
+        await("saved-reminder-error-card")
+        compose.onNodeWithText("读取通知设置失败，请重试。", useUnmergedTree = true).assertIsDisplayed()
+        fixture.test { assertEquals(1L, fixture.count("appointments")); assertTrue(fixture.ok(permissionGraph.appointments.all()).single().reminderEnabled) }
+        fail.set(false)
+        node("saved-reminder-error-accept").assertIsDisplayed().performClick()
+        await("saved-reminder-denied-card")
+        node("saved-reminder-error-card").assertDoesNotExist()
+        fixture.test { assertEquals(1L, fixture.count("appointments")) }
     }
     @Test fun firstReminderGrantDoesNotShowDeniedPrompt() {
         val revision = showFirstReminderSave()

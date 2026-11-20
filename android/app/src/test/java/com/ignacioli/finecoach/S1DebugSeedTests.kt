@@ -6,6 +6,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.ignacioli.finecoach.seed.S1SeedFixture
 import com.ignacioli.finecoach.seed.objects
 import com.ignacioli.finecoach.seed.strings
+import com.ignacioli.finecoach.core.domain.common.CreditLedgerSourceEventKeyFactory
 import com.ignacioli.finecoach.core.domain.common.StudentID
 import org.json.JSONObject
 import org.json.JSONArray
@@ -57,8 +58,8 @@ class S1DebugSeedTests {
         assertEquals(setOf("completed", "pending", "draft"), f.records("sessions").flatMap { it.objects("exercises") }.flatMap { it.objects("sets") }.map { it.getString("state") }.toSet())
     }
 
-    @Test fun fixtureContainsNoBodyDataAppointmentOrShareFields() {
-        val forbidden = setOf("bodyData", "bodyMeasurements", "bodyWeight", "height", "waist", "bodyFat", "appointments", "shareReport", "shareReports")
+    @Test fun fixtureContainsNoBodyDataOrShareFields() {
+        val forbidden = setOf("bodyData", "bodyMeasurements", "bodyWeight", "height", "waist", "bodyFat", "shareReport", "shareReports")
         fun inspect(value: Any) {
             when (value) {
                 is JSONObject -> value.keys().forEach { key -> assertFalse("Forbidden fixture field", key in forbidden); inspect(value.get(key)) }
@@ -130,7 +131,8 @@ class S1DebugSeedTests {
     @Test fun existingNonSeedEvenEmptyIsRejectedWithoutMutation() = off {
         val db=FineCoachDatabaseFactory.create(context)
         // Force creation of an ordinary user database.
-        db.storeMetadataDao().find(FineCoachDatabaseFactory.GENERATION_KEY); db.close()
+        db.storeMetadataDao().find(FineCoachDatabaseFactory.GENERATION_KEY)
+        db.storeMetadataDao().insert(com.ignacioli.finecoach.storage.StoreMetadata("fictional-user-metadata", "retained")); db.close()
         var failed=false
         try { S1DebugSeed.load(context) } catch (_: IllegalStateException) { failed=true }
         assertTrue(failed)
@@ -138,6 +140,59 @@ class S1DebugSeedTests {
         try { assertNull(reopened.storeMetadataDao().find(S1DebugSeed.DATASET_KEY)); assertEquals(0,S1DebugSeed.businessRows(reopened)) }
         finally { reopened.close() }
     }
+    @Test fun reminderOnlyStartupStoreCanBeSeededWithoutReplacingGeneration() = off {
+        val db = FineCoachDatabaseFactory.create(context)
+        val generation = db.storeMetadataDao().find(FineCoachDatabaseFactory.GENERATION_KEY)!!.value
+        db.storeMetadataDao().insert(com.ignacioli.finecoach.storage.StoreMetadata("appointment-reminders-v1", "{}"))
+        db.close()
+        S1DebugSeed.load(context)
+        val reopened = FineCoachDatabaseFactory.create(context)
+        try {
+            assertEquals(generation, reopened.storeMetadataDao().find(FineCoachDatabaseFactory.GENERATION_KEY)!!.value)
+            val g = S1DebugSeed.graph(reopened, context)
+            val rows = g.appointments.all().requireSuccess()
+            val today = java.time.LocalDate.now(java.time.ZoneId.systemDefault())
+            assertEquals(15, rows.size)
+            assertTrue(rows.count { it.date == today } >= 7)
+            val series = rows.mapNotNull { it.seriesID }.distinct().map { g.appointments.series(it).requireSuccess()!! }
+            assertEquals(2, series.size)
+            assertTrue(series.any { it.termination is com.ignacioli.finecoach.core.domain.appointment.RecurrenceTermination.RepeatCount })
+            assertTrue(series.any { it.termination is com.ignacioli.finecoach.core.domain.appointment.RecurrenceTermination.EndDate })
+            for (row in fixture.selected("appointments", "multi")) {
+                val actual = rows.single { it.id.toString() == fixture.uuid(row.getInt("id")) }
+                assertEquals(today.plusDays(row.getLong("dayOffset")), actual.date)
+                assertEquals(row.getString("state"), actual.status.name)
+            }
+            assertTrue(rows.any { it.status.name == "inProgress" && it.linkedSessionID != null })
+            assertEquals(setOf("charged", "notCharged"), rows.mapNotNull { it.absentCreditChoice?.name }.toSet())
+            assertEquals(1, g.credits.ledger(student(1)).requireSuccess().count { it.sourceEventKey?.value == CreditLedgerSourceEventKeyFactory.appointmentAbsent(rows.single { it.absentCreditChoice?.name == "charged" }.id.toString()).value })
+        } finally { reopened.close() }
+    }
+
+    @Test fun startupKeyRemovedAfterPreflightIsNotAdopted() = off {
+        val db = FineCoachDatabaseFactory.create(context)
+        db.storeMetadataDao().insert(com.ignacioli.finecoach.storage.StoreMetadata("appointment-reminders-v1", "{}"))
+        val generation = db.storeMetadataDao().find(FineCoachDatabaseFactory.GENERATION_KEY)!!.value
+        db.close()
+        var boundaryReached = false
+        var rejected = false
+        try {
+            S1DebugSeed.load(context, beforeOwnershipTransaction = { opened ->
+                boundaryReached = true
+                opened.openHelper.writableDatabase.execSQL("DELETE FROM store_metadata WHERE `key`='appointment-reminders-v1'")
+            })
+        } catch (_: IllegalStateException) { rejected = true }
+        assertTrue(boundaryReached); assertTrue(rejected)
+        val reopened = FineCoachDatabaseFactory.create(context)
+        try {
+            assertEquals(generation, reopened.storeMetadataDao().find(FineCoachDatabaseFactory.GENERATION_KEY)!!.value)
+            assertNull(reopened.storeMetadataDao().find(S1DebugSeed.DATASET_KEY))
+            assertNull(reopened.storeMetadataDao().find("appointment-reminders-v1"))
+            assertEquals(0, S1DebugSeed.businessRows(reopened))
+            reopened.openHelper.readableDatabase.query("SELECT COUNT(*) FROM store_metadata").use { it.moveToFirst(); assertEquals(2, it.getInt(0)) }
+        } finally { reopened.close() }
+    }
+
     @Test fun existingLegacyNonSeedIsRejectedBeforeAnyRoomMigration() = off {
         val path=context.getDatabasePath(FineCoachDatabaseFactory.DATABASE_NAME)
         path.parentFile!!.mkdirs()
@@ -163,6 +218,7 @@ class S1DebugSeedTests {
         try {
             val graph=S1DebugSeed.graph(db,context)
             graph.students.create(StudentDraft("虚构非seed资料",com.ignacioli.finecoach.core.domain.common.StudentSex.other)).requireSuccess()
+            db.storeMetadataDao().insert(com.ignacioli.finecoach.storage.StoreMetadata("appointment-reminders-v1", "{}"))
             count=S1DebugSeed.businessRows(db)
         } finally { db.close() }
         var failed=false

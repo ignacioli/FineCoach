@@ -33,11 +33,12 @@ class MainActivity : ComponentActivity() {
         private set
     var notificationPermissionRevision by mutableIntStateOf(0)
         private set
+    internal val permissionProgress = NotificationPermissionProgress()
     private val notificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-        notificationPermissionRevision++
+        permissionProgress.complete(); notificationPermissionRevision = permissionProgress.revision
     }
     fun requestRestNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= 33) notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        if (Build.VERSION.SDK_INT >= 33) { permissionProgress.begin(); notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS) }
     }
     fun consumeRestNotificationRoute() { restNotificationSessionID = null }
     override fun onNewIntent(intent: Intent) {
@@ -54,6 +55,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        permissionProgress.restore(savedInstanceState)
+        notificationPermissionRevision = permissionProgress.revision
         if (shouldFinishDuplicateLauncher(isTaskRoot, intent?.action, intent?.categories)) {
             finish()
             return
@@ -77,6 +80,11 @@ class MainActivity : ComponentActivity() {
               }
             }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        permissionProgress.save(outState)
+        super.onSaveInstanceState(outState)
     }
 
     override fun onPause() {

@@ -148,6 +148,7 @@ class AppointmentReminderTests {
         assertEquals(Notification.VISIBILITY_PUBLIC, notification.visibility)
         assertEquals(AppointmentNotificationContentBuilder.title(), notification.extras.getString(Notification.EXTRA_TITLE))
         assertEquals(AppointmentNotificationContentBuilder.body(a.startInstant(zone), zone), notification.extras.getString(Notification.EXTRA_TEXT))
+        assertFalse(notification.extras.getString(Notification.EXTRA_TEXT).orEmpty().contains("虚构排课"))
         use.cancel(a.id).requireSuccess()
         context.getSystemService(NotificationManager::class.java).cancelAll()
         reminders.receive(intent)

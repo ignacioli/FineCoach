@@ -23,6 +23,7 @@ class ReminderSettingsState(private val readStatus: suspend () -> Status) {
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (_: Exception) { error = "读取通知设置失败，请重试。" }
     }
+    fun dismissError() { error = null }
     fun openSettings(open: () -> Boolean) { if (!open()) error = "无法打开系统设置，请稍后重试。" }
 }
 
@@ -59,5 +60,13 @@ fun ReminderSettingsScreen(state: ReminderSettingsState, onBack: () -> Unit, onO
             state.error?.let { FcText(it,Modifier.testTag("settings-error"),style=FcTypography.caption,color=FcColors.statusDestructive)
                 FcButton("重试",Modifier.testTag("settings-retry")) { scope.launch { state.refresh() } } }
         }
+    }
+}
+
+@Composable
+internal fun SavedReminderReadError(state: ReminderSettingsState, onRetry: () -> Unit) {
+    state.error?.let { error ->
+        FcConfirmationDialog("课程安排已保存", error, "重试", onRetry, state::dismissError,
+            cancelTitle = "完成", tag = "saved-reminder-error")
     }
 }

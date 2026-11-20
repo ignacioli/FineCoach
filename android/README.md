@@ -1188,7 +1188,7 @@ contributor 失败整笔 rollback；降级、固定值冲突、同版本缺行/�
 
 S1 数据由独立的 debug-only `S1DebugSeed` 经真实 Repository 写入一份全新、显式标记所有权的 `finecoach.db`，这正是冻结 S1Runtime 默认读取的库；不替换产品 factory，不通过 S0 contributor 的同步事务调用会切 dispatcher 的 Repository。S0 contributor 接口仍为 S0 测试保留，未改其版本/UUID/clock/inventory。这个接线取代原先“给 S0 contributor 加业务行、把业务页面改读另一个库”的预案：后者需修改已冻结的 graph/factory 且会让默认 S1 读不到 seed。
 
-只接受全新 app 数据目录，或完全匹配 dataset/version/scenario/complete 的既有 S1 seed。任何已有非 seed 数据库（包括空库）拒绝；重复执行只验证持久标记，不修改体验中编辑、删除、完成过的数据。初始化中断保留 installing 并非零，不自动 reset/repair。需要清理/更换场景由负责人另行决定，本工具不提供清库命令。Appointment 仍属于 S2，不造假数据。
+只接受全新 app 数据目录，或完全匹配 dataset/version/scenario/complete 的既有 S1 seed。除仅有提醒 startup metadata 且全部业务表为空的 store 外，任何已有非 seed 数据库（包括带其他 metadata 的空库）拒绝；重复执行只验证持久标记，不修改体验中编辑、删除、完成过的数据。初始化中断保留 installing 并非零，不自动 reset/repair。需要清理/更换场景由负责人另行决定，本工具不提供清库命令。S2 Phase 6 的 multi 预约扩展和本地日期偏移规则见 T051。
 
 本轮 execution record：变更为非 UI debug 基础设施；复用既有 catalog，无视觉设计 delta；
 新增入口为 adb instrumentation，不新增用户交互，entry/layout map 沿用本 README 的 S0-08 map；
@@ -1593,4 +1593,10 @@ S2-D06 / FR-007a 已落地：第二安排遇到已关联其他安排的 active S
 
 ### T054 / Phase 6 checkpoint：设备证据、复核与走查
 
-（待填写）
+**PENDING（2026-11-20），仅剩 T053 与合并后的最终 `.handoff/gate.sh --android` 摘要。** dispatcher 宿主证据：T050 PASS，API 31 emulator r7 与 API 36 emulator r6 各五方法均 `OK (1 test)`，测试前 package alarms 均为0；API31 Settings 总开关由 uiautomator 确认 true→false→true。完整 fingerprints、APK SHA-256、无serial的日志索引与实际fresh-install/重启流程见 [T050](docs/s2/T050.md)；日志为 `.handoff/logs/2026-11-20-s2-t050-r7-*` / `2026-11-20-s2-t050-r6-*`，宿主脚本 `.handoff/bin/s2-device-run.sh`。本 writer 未执行设备。
+
+T052：cursor grok-4.7-medium 只读首轮 FAIL（seed事务复查/rotation测试两项P2）→ fix3修复 → 2026-11-20限定范围复核 PASS；后续 fix4～fix6 修正 Compose测试同步、ICU裸`}`与dumpsys正时长window解析。host gate r5 PASS：BUILD 0、UNIT 0、total 1168、BAD 0，含 assembleDebugAndroidTest、s0G8、s0G3、s0G4、s0Room、s0Conformance、全部p4 conformance、p7SideBySide、s1SeedChecks，见 [T054](docs/s2/T054.md)。
+
+T053仍待负责人集中走查并批准三核心屏/P7 baseline、写manifest与APPROVALS.md；fresh install上的真实API36 grant dialog、锁屏外观、通知点击→Today、channel-off仍需人眼证据。设备自动化与gate通过不等于owner批准；S2尚未关闭。
+
+seed v4 的 multi 增加 15 条预约、两系列（RepeatCount / EndDate）及一笔缺席扣课。dayOffset/endDayOffset 基于首次 seed 时设备本地日期；其余数据确定，重复 seed 不重算日期/覆盖人工编辑。仅 startup metadata 且无任何业务行的 store 可 seed；含用户数据或其他 metadata 仍拒绝。通知锁屏 visibility 保持 Phase 3 的 PUBLIC 决定；正文仍是时间句，不含学员信息。详见 [T050](docs/s2/T050.md)、[T051](docs/s2/T051.md)、[walkthrough](docs/s2/walkthrough.md)、[T054](docs/s2/T054.md)。
