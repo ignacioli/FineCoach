@@ -55,5 +55,5 @@ Viewer mode only opens an archive exported in §3 step 6, so it needs a second i
 
 - Student profiles may include body measurements and injury notes entered by the coach. These stay in the app's local storage on the device. They are excluded from device backups, and HealthKit is not used.
 - Data leaves the device only when the user explicitly shares a password-encrypted backup or archive file, or a training report image, through the iOS share sheet or Files.
-- Privacy policy: 〔URL，待 D4〕
+- Privacy policy: https://ignacioli.github.io/FineCoach/privacy/ (Simplified Chinese, the default; the app is not localized). English version: https://ignacioli.github.io/FineCoach/privacy/en/
 - Source code: https://github.com/ignacioli/FineCoach
