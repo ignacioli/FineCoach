@@ -8,7 +8,7 @@ final class SystemEntryConfigurationTests: XCTestCase {
         ] {
             let entitlements = try dictionary(at: path)
             let groups = try XCTUnwrap(entitlements["com.apple.security.application-groups"] as? [String], path)
-            XCTAssertEqual(groups, ["group.com.finecoach.app"], path)
+            XCTAssertEqual(groups, ["group.com.ignacioli.finecoach"], path)
         }
     }
 
