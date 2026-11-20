@@ -85,9 +85,9 @@ class RoomSkeletonTests {
         assertEquals("original", dao.find("fictional_key")?.value)
     }
 
-    @Test fun runtimeV3SchemaRetainsMetadataShapeAlongsideS1AndS2Tables() = offMain {
+    @Test fun runtimeV4SchemaRetainsMetadataShapeAlongsideS1S2AndBodyTables() = offMain {
         val sqlite = open().openHelper.writableDatabase
-        assertEquals(3, sqlite.version)
+        assertEquals(4, sqlite.version)
         val tables = mutableSetOf<String>()
         sqlite.query("SELECT name FROM sqlite_master WHERE type = 'table'").use { cursor ->
             while (cursor.moveToNext()) tables += cursor.getString(0)
@@ -98,7 +98,7 @@ class RoomSkeletonTests {
             "credit_adjustments", "sessions", "active_session_pointers", "session_training_focus",
             "session_exercises", "training_sets", "training_templates", "template_training_focus",
             "template_exercises", "template_planned_sets", "session_sections", "exercise_catalog",
-            "exercise_preferences", "exercise_name_claims", "appointments", "recurrence_series")
+            "exercise_preferences", "exercise_name_claims", "appointments", "recurrence_series", "body_metric_definitions", "body_measurements")
         assertEquals(expected, tables - setOf("room_master_table", "android_metadata", "sqlite_sequence"))
         val columns = mutableListOf<List<String>>()
         sqlite.query("PRAGMA table_info(`store_metadata`)").use { cursor ->

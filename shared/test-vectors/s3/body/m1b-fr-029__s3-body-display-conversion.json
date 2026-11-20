@@ -1,0 +1,57 @@
+{
+  "id": "s3-body-display-conversion",
+  "rule": "M1B-FR-029",
+  "meta": {
+    "requirements": [
+      "S3-FR-010",
+      "M1B-FR-024",
+      "M1B-FR-025"
+    ],
+    "description": "fictional-data: S3 deterministic parity case",
+    "tags": [
+      "fictional-data",
+      "s3",
+      "body"
+    ]
+  },
+  "given": {
+    "clock": {
+      "now": "2026-03-15T20:00:00Z"
+    },
+    "timeZone": "America/Los_Angeles",
+    "state": {
+      "context": {
+        "studentName": "虚构学员",
+        "exerciseName": "虚构动作",
+        "sourceKind": "builtIn",
+        "exerciseOrder": 0,
+        "revision": 1,
+        "displayedDurationSeconds": "600",
+        "ordinaryTrainingVolume": null,
+        "privateCoachNote": null,
+        "studentFacingSummary": null,
+        "actionPrivateNote": null,
+        "actionPrivateNotes": {
+        },
+        "latestReport": null
+      },
+      "value": "70",
+      "centimeters": "180",
+      "weightUnit": "lb",
+      "lengthUnit": "in"
+    }
+  },
+  "when": {
+    "op": "s3.body-display",
+    "args": {
+      "$ref": "/given/state"
+    }
+  },
+  "then": {
+    "state": {
+      "weight": "154.32",
+      "length": "70.87",
+      "original": "70"
+    }
+  }
+}

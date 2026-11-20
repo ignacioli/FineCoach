@@ -1607,7 +1607,7 @@ seed v4 的 multi 增加 15 条预约、两系列（RepeatCount / EndDate）及�
 
 ### T016 / Phase 2 checkpoint：领域、存储与向量
 
-待办。
+**PENDING（2026-11-20）**。T010～T014 已实现并通过定向测试；Room v4 显式迁移与完整身体字段往返通过。S3 77 条向量在 Android 与 macOS Foundation 纯 Domain 对照通过，iOS XCTest 仍待宿主定向 runner。s0G6 92/0、s0Room 26/0；续跑 1 按 S3-D04 仅扩展 seed 三处版本判断后，完整单测 **1207/0/0/0**（tests/failures/errors/skips），原 4 项 seed 失败全部消除；未修改测试断言。当前不是 checkpoint 完成；最终结果、日志和逐项文件清单见 [T016](docs/s3/T016.md) 及 T010～T015。未提交或修改 specs 勾选。
 
 ### T023 / Phase 3 checkpoint：训练页新纪录与本节收获
 
