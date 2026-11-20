@@ -43,7 +43,7 @@ class LastExercisePerformanceLookup(
         val newestFirst = sessions
             .asSequence()
             .filter { it.state == SessionState.completed && it.completedAtUTC != null }
-            .sortedByDescending { it.completedAtUTC }
+            .sortedWith(compareByDescending<Session> { it.completedAtUTC }.thenByDescending { it.sessionID.value })
             .toList()
 
         val map = linkedMapOf<LookupKey, LastExercisePerformance>()
