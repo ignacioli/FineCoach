@@ -180,18 +180,18 @@
       "type": "group",
       "path": "11",
       "x": 16,
-      "y": 230,
+      "y": 246,
       "w": 358,
-      "h": 140
+      "h": 104
     },
     {
       "name": "base-background",
       "type": "rectangle",
       "path": "11/0",
       "x": 16,
-      "y": 230,
+      "y": 246,
       "w": 358,
-      "h": 140
+      "h": 104
     },
     {
       "name": "svg-line",
