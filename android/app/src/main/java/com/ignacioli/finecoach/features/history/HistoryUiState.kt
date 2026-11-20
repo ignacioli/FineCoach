@@ -3,8 +3,12 @@ package com.ignacioli.finecoach.features.history
 import androidx.compose.runtime.*
 import com.ignacioli.finecoach.core.application.*
 import com.ignacioli.finecoach.core.domain.common.*
+import com.ignacioli.finecoach.core.domain.progress.SessionGains
+import java.time.ZoneId
 
-class HistoryUiState(val useCases: HistoryUseCases, val studentID: StudentID?, private val students: StudentUseCases? = null) {
+class HistoryUiState(val useCases: HistoryUseCases, val studentID: StudentID?, private val students: StudentUseCases? = null,
+    private val progress: ProgressUseCases? = null, private val zone: ZoneId = ZoneId.systemDefault()) {
+    var gains by mutableStateOf(SessionGains()); private set
     var studentName by mutableStateOf(""); private set
     var query by mutableStateOf(HistoryQuery(studentID = studentID)); private set
     var records by mutableStateOf<List<SessionHistoryRecord>>(emptyList()); private set
@@ -44,9 +48,17 @@ class HistoryUiState(val useCases: HistoryUseCases, val studentID: StudentID?, p
     suspend fun load(id: SessionID) {
         if (busy) return
         busy = true
+        gains = SessionGains()
         when (val result = useCases.detail(id)) {
             is ApplicationResult.Failure -> error = result.error
-            is ApplicationResult.Success -> { detail = result.value; focus = result.value.content.session.trainingFocus; error = null; loadStudentName(result.value.content.session.studentID) }
+            is ApplicationResult.Success -> {
+                detail = result.value; focus = result.value.content.session.trainingFocus; error = null
+                loadStudentName(result.value.content.session.studentID)
+                when (val loaded = loadSessionGains(result.value, progress, zone)) {
+                    is ApplicationResult.Failure -> error = loaded.error
+                    is ApplicationResult.Success -> gains = loaded.value
+                }
+            }
         }; busy = false
     }
     private suspend fun loadStudentName(id: StudentID) {

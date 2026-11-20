@@ -1611,7 +1611,7 @@ seed v4 的 multi 增加 15 条预约、两系列（RepeatCount / EndDate）及�
 
 ### T023 / Phase 3 checkpoint：训练页新纪录与本节收获
 
-待办。
+**PENDING（2026-11-20，宿主合并前）**。T020 训练页新纪录与确认反馈、T021 总结/历史只读收获已实现；浮起测试时钟与训练入口发布时序问题已修复。负责人本轮提供的最终宿主结果：build/lint 通过，完整单测 **1217/0**；s0G1 **39**、s0G3 **42**、s0G4 **12**、p7SideBySide **24**、s0Conformance **1**、p4SessionDetailConformance **1**，全部 0 失败；cursor 独立复核 **PASS**。checkpoint 在宿主合并前保持 PENDING。本轮 P3 收尾的 P7 唯一 id、备注滚动/点击断言及作者自测见 [T023](docs/s3/T023.md)，入口与布局见 [implementation-map](docs/s3/implementation-map.md)。未 commit、委派或修改 specs。
 
 ### T034 / Phase 4 checkpoint：训练趋势与身体数据
 

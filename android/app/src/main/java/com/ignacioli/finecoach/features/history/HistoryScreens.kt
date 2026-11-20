@@ -23,7 +23,7 @@ fun HistoryDetailScreen(state: HistoryUiState, id: SessionID, zone: ZoneId, onBa
             state.error?.let { FcListRow("加载失败，请返回重试", Modifier.testTag("history-detail-error")) }
             state.detail?.let { detail ->
                 val session = detail.content.session
-                HistoryRecordCard(detail, zone, state.studentName)
+                HistoryRecordCard(detail, zone, state.studentName, state.gains)
                 if (detail.creditNote?.note == SessionCreditSettlementNote.noActivePackage) HistoryCaption("未扣课 · 无有效课包", Modifier.testTag("history-credit-note"))
                 Column(Modifier.fillMaxWidth().testTag("history-actions")) {
                     FcListRowDivider(Modifier.testTag("conformance:Divider"))

@@ -16,12 +16,31 @@ import kotlinx.coroutines.launch
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalView
+import android.provider.Settings
+import android.view.HapticFeedbackConstants
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: ExerciseUiState, templates: TemplateUiState,
-    onBack: () -> Unit, onFinish: () -> Unit, recoverySlot: @Composable () -> Unit = {}, restSlot: @Composable () -> Unit = {}, students: StudentRepositoryPort? = null) {
+    onBack: () -> Unit, onFinish: () -> Unit, recoverySlot: @Composable () -> Unit = {}, restSlot: @Composable () -> Unit = {}, students: StudentRepositoryPort? = null,
+    confirmationHaptic: (() -> Unit)? = null) {
     val scope = rememberCoroutineScope()
+    val view = LocalView.current
+    var recordPlayback by remember(id) { mutableStateOf<ActiveSessionUiState.Confirmation?>(null) }
+    LaunchedEffect(state.confirmations.toList()) {
+        state.consumeConfirmations().forEach { event ->
+            if (confirmationHaptic != null) confirmationHaptic() else view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+            if (event.isRecordImprovement && Settings.Global.getFloat(view.context.contentResolver,
+                    Settings.Global.ANIMATOR_DURATION_SCALE, 1f) != 0f) recordPlayback = event
+        }
+    }
+    LaunchedEffect(recordPlayback) {
+        if (recordPlayback != null) {
+            kotlinx.coroutines.delay(FcMotion.durationEmphasisMillis.toLong()) // Expire even for an off-screen row.
+            recordPlayback = null
+        }
+    }
     var addSheet by remember { mutableStateOf(false) }
     var picker by remember { mutableStateOf(false) }
     var revealed by remember { mutableStateOf<String?>(null) }
@@ -110,7 +129,9 @@ fun ActiveSessionScreen(state: ActiveSessionUiState, id: SessionID, exercises: E
                             set.state == SetRecordingState.pending,
                             { change({ state.confirmSet(set.trainingSetID) }) },
                             { openEditor(row, set) }, Modifier.testTag("session-set-${set.trainingSetID.value}"), !state.busy, "session-set-${set.trainingSetID.value}",
-                            onUndo = if (state.undoableSetID == set.trainingSetID) ({ scope.launch { state.undoRecentSet(); if (state.error == null) { editor = row; editing = null } }; Unit }) else null)
+                            onUndo = if (state.undoableSetID == set.trainingSetID) ({ scope.launch { state.undoRecentSet(); if (state.error == null) { editor = row; editing = null } }; Unit }) else null,
+                            isNewRecord = set.trainingSetID in state.gains.recordHolderSetIDs,
+                            recordFloatSequence = recordPlayback?.takeIf { it.setID == set.trainingSetID }?.sequence)
                         }
                         if (editor?.sessionExerciseID == row.sessionExerciseID && editing?.trainingSetID == set.trainingSetID) {
                             Spacer(Modifier.height(FcSpacing.space3))
