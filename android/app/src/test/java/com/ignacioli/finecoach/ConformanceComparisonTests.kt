@@ -231,4 +231,91 @@ class ConformanceComparisonTests {
         assertFalse(ConformanceComparison.geometry(rect(0.0,0.0,91.0,20.0), design,"top",0.0).getBoolean("matches"))
         assertFalse(ConformanceComparison.geometry(rect(0.0,0.0,102.5,20.0), rect(0.0,0.0,100.0,20.0),"top",0.0).getBoolean("matches"))
     }
+
+    private fun placed(path: String, x: Double, y: Double, w: Double, h: Double, dx: Double = 0.0, dy: Double = 0.0, dw: Double = 0.0): JSONObject {
+        fun box(x: Double, y: Double, w: Double, h: Double) = JSONObject().put("x", x).put("y", y).put("w", w).put("h", h)
+        return JSONObject().put("path", path).put("selector", JSONObject()).put("category", "PASS").put("textMatches", true).put("tokenMatches", true)
+            .put("delta", box(dx, dy, dw, 0.0)).put("geometry", JSONObject().put("expectedBounds", box(x, y, w, h)).put("actualBounds", box(x + dx, y + dy, w + dw, h)))
+    }
+
+    private fun grant(row: JSONObject, checks: List<String>, maxDeltaDp: Double) {
+        row.getJSONObject("selector").put("ownerException", JSONObject()
+            .put("decision", "S3-D12").put("reason", "fictional raster width")
+            .put("checks", JSONArray(checks)).put("maxDeltaDp", maxDeltaDp))
+    }
+
+    private fun apply(rows: List<JSONObject>) {
+        val checks = ConformanceRelativeGeometry.evaluate(rows).getJSONArray("checks")
+        ConformanceComparison.applyOwnerExceptions(rows, checks)
+    }
+
+    @Test fun ownerExceptionCoversAListedCheckInsideTheDeltaCap() {
+        val row = placed("12", 0.0, 0.0, 40.0, 10.0, dw = 3.0)
+        grant(row, listOf("SIZE"), 4.0)
+        apply(listOf(row))
+        assertEquals("OWNER_EXCEPTION", row.getString("status"))
+        assertEquals("S3-D12", row.getJSONObject("ownerException").getString("decision"))
+        assertFalse(row.optBoolean("ownerExceptionUnused"))
+    }
+
+    @Test fun ownerExceptionStaysFailWhenAnotherCheckFails() {
+        val left = placed("12", 0.0, 0.0, 40.0, 10.0, dw = -2.0)
+        val right = placed("13", 50.0, 0.0, 10.0, 10.0, dx = 2.0)
+        grant(left, listOf("GAP"), 4.0)
+        grant(right, listOf("GAP"), 4.0)
+        val checks = ConformanceRelativeGeometry.evaluate(listOf(left, right)).getJSONArray("checks")
+        left.getJSONArray("failedChecks").put("ICON_PIXELS")
+        ConformanceComparison.applyOwnerExceptions(listOf(left, right), checks)
+        assertEquals("FAIL", left.getString("status"))
+        assertEquals("OWNER_EXCEPTION", right.getString("status"))
+    }
+
+    @Test fun ownerExceptionStaysFailWhenTheDeltaExceedsTheCap() {
+        val left = placed("12", 0.0, 0.0, 40.0, 10.0, dw = -2.0)
+        val right = placed("13", 50.0, 0.0, 10.0, 10.0, dx = 2.0)
+        grant(left, listOf("GAP"), 3.0)
+        grant(right, listOf("GAP"), 3.0)
+        apply(listOf(left, right))
+        assertEquals("FAIL", left.getString("status"))
+        assertEquals("FAIL", right.getString("status"))
+    }
+
+    @Test fun ownerExceptionNotesAnUnusedRegistrationWhenTheRowPasses() {
+        val row = placed("12", 0.0, 0.0, 40.0, 10.0)
+        grant(row, listOf("GAP"), 4.0)
+        apply(listOf(row))
+        assertEquals("PASS", row.getString("status"))
+        assertTrue(row.getBoolean("ownerExceptionUnused"))
+        assertTrue(row.getString("reason").contains("例外登记未被使用"))
+    }
+
+    @Test fun ownerExceptionRejectsAnIncompleteRegistration() {
+        val row = placed("12", 0.0, 0.0, 40.0, 10.0, dw = 3.0)
+        val cases = listOf(
+            JSONObject().put("decision", "board").put("reason", "because").put("checks", JSONArray(listOf("SIZE"))).put("maxDeltaDp", 4),
+            JSONObject().put("decision", "S3-D12").put("reason", " ").put("checks", JSONArray(listOf("SIZE"))).put("maxDeltaDp", 4),
+            JSONObject().put("decision", "S3-D12").put("reason", "because").put("checks", JSONArray()).put("maxDeltaDp", 4),
+            JSONObject().put("decision", "S3-D12").put("reason", "because").put("checks", JSONArray(listOf("SIZE"))),
+            JSONObject().put("decision", "S3-D12").put("reason", "because").put("checks", JSONArray(listOf("SIZE"))).put("maxDeltaDp", 0),
+        )
+        for (spec in cases) {
+            row.getJSONObject("selector").put("ownerException", spec)
+            val error = runCatching { ConformanceComparison.applyOwnerExceptions(listOf(row), JSONArray()) }.exceptionOrNull()
+            assertTrue(spec.toString(), error is IllegalStateException)
+            assertTrue(error?.message, error?.message?.contains("12") == true)
+        }
+    }
+
+    @Test fun ownerExceptionNeedsBothSidesOfAGap() {
+        val left = placed("12", 0.0, 0.0, 40.0, 10.0, dw = -2.0)
+        val right = placed("13", 50.0, 0.0, 10.0, 10.0, dx = 2.0)
+        grant(left, listOf("GAP"), 4.0)
+        apply(listOf(left, right))
+        assertEquals("FAIL", left.getString("status"))
+        assertEquals("FAIL", right.getString("status"))
+        grant(right, listOf("GAP"), 4.0)
+        apply(listOf(left, right))
+        assertEquals("OWNER_EXCEPTION", left.getString("status"))
+        assertEquals("OWNER_EXCEPTION", right.getString("status"))
+    }
 }
