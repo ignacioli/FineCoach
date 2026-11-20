@@ -4,6 +4,10 @@ Notable changes to FineCoach are recorded here. The format follows [Keep a Chang
 
 ## [Unreleased]
 
+### Added
+
+- About page in Settings now lists the exercise catalog's sources and licenses (counted from `provenance.json`) and the Noto Sans SC font license, with links to the licenses. The student archive viewer no longer shows the same license twice.
+
 ### Changed
 
 - Build configuration: version set to 0.3.0 (1) and the signing team switched to the paid Apple Developer Program team, in preparation for the first TestFlight upload. No product behavior changes.
