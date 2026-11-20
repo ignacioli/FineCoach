@@ -16,7 +16,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.*
 import androidx.compose.ui.test.*
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
@@ -40,6 +40,7 @@ import com.ignacioli.finecoach.features.exercises.*
 @Config(sdk = [36], qualifiers = "zh-rCN-w390dp-h844dp-notnight-xhdpi")
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class AddExerciseConformanceTests {
+    // Queue IO resumptions on the test UI scheduler instead of resuming on IO workers.
     @get:Rule val compose = createAndroidComposeRule<ComponentActivity>()
     private var fixture: TrainingConformanceFixture? = null
     private var fixtureBindings = emptyMap<String, String>()
@@ -126,7 +127,7 @@ class AddExerciseConformanceTests {
                 .put("ancestors", JSONArray(ancestors)).put("contentDescriptions", JSONArray(n.config.getOrNull(SemanticsProperties.ContentDescription).orEmpty())).put("clickable", n.config.contains(SemanticsActions.OnClick)).put("text", editable ?: texts.joinToString("\n"))
                 .put("placed", n.layoutInfo.isPlaced).put("attached", n.layoutInfo.isAttached)
                 .put("unclipped", unclipped).put("scrollAncestors", scrollAncestors)
-                .put("hex", argb ?: JSONObject.NULL).put("alpha", if (color != null && color != androidx.compose.ui.graphics.Color.Unspecified) color.alpha.toDouble() else 1.0)
+                .put("textAlign", layouts.firstOrNull()?.layoutInput?.style?.textAlign?.toString() ?: "Start").put("hex", argb ?: JSONObject.NULL).put("alpha", if (color != null && color != androidx.compose.ui.graphics.Color.Unspecified) color.alpha.toDouble() else 1.0)
                 .put("x", bounds.left / 2).put("y", bounds.top / 2).put("w", bounds.width / 2).put("h", bounds.height / 2))
         }
 

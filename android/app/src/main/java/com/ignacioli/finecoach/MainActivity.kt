@@ -27,15 +27,18 @@ import com.ignacioli.finecoach.designsystem.LocalFcWindowRegistry
 class MainActivity : ComponentActivity() {
     companion object { const val EXTRA_S0_SHELL = "finecoachS0Shell" }
     private var showS0Shell by mutableStateOf(false)
+    var appointmentNotificationRevision by mutableIntStateOf(0)
+        private set
     var restNotificationSessionID by mutableStateOf<SessionID?>(null)
         private set
     var notificationPermissionRevision by mutableIntStateOf(0)
         private set
+    internal val permissionProgress = NotificationPermissionProgress()
     private val notificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-        notificationPermissionRevision++
+        permissionProgress.complete(); notificationPermissionRevision = permissionProgress.revision
     }
     fun requestRestNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= 33) notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        if (Build.VERSION.SDK_INT >= 33) { permissionProgress.begin(); notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS) }
     }
     fun consumeRestNotificationRoute() { restNotificationSessionID = null }
     override fun onNewIntent(intent: Intent) {
@@ -44,6 +47,7 @@ class MainActivity : ComponentActivity() {
     }
     private fun applyLaunchIntent(intent: Intent?) {
         showS0Shell = intent?.getBooleanExtra(EXTRA_S0_SHELL, false) == true
+        if (com.ignacioli.finecoach.notifications.AppointmentReminders.parse(intent) != null) { appointmentNotificationRevision++; restNotificationSessionID = null }
         RestNotificationRoute.deliver(intent) { restNotificationSessionID = it; showS0Shell = false }
     }
     internal lateinit var privacyCover: PrivacyCoverPolicy
@@ -51,6 +55,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        permissionProgress.restore(savedInstanceState)
+        notificationPermissionRevision = permissionProgress.revision
         if (shouldFinishDuplicateLauncher(isTaskRoot, intent?.action, intent?.categories)) {
             finish()
             return
@@ -74,6 +80,11 @@ class MainActivity : ComponentActivity() {
               }
             }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        permissionProgress.save(outState)
+        super.onSaveInstanceState(outState)
     }
 
     override fun onPause() {

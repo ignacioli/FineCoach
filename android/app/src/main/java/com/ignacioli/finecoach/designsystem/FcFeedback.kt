@@ -114,6 +114,7 @@ fun FcAvatar(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun FcBottomSheet(title: String, onDismiss: () -> Unit, modifier: Modifier = Modifier, subtitle: String? = null,
     skipPartiallyExpanded: Boolean = false, panelFlow: Boolean = false,
+    titleStyle: androidx.compose.ui.text.TextStyle = FcTypography.headline, accessory: (@Composable () -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
     ModalBottomSheet(onDismissRequest = onDismiss, containerColor = FcColors.surfacePage,
@@ -132,8 +133,11 @@ fun FcBottomSheet(title: String, onDismiss: () -> Unit, modifier: Modifier = Mod
                 FcSpacing.space2 - FcSpacing.space1 - FcComponentMetrics.hairline) else Modifier)
                 .then(if (panelFlow) Modifier.padding(top = FcSpacing.space4) else Modifier.padding(horizontal = FcSpacing.space4)).padding(bottom = FcSpacing.space6)
                 .testTag("sheet-content"), verticalArrangement = Arrangement.spacedBy(if (panelFlow) FcSpacing.space4 else FcSpacing.space2)) {
-                Box(Modifier.then(if (panelFlow) Modifier.padding(horizontal = FcSpacing.space4) else Modifier)) {
-                    FcText(title, Modifier.semantics { heading() }, style = FcTypography.headline, color = FcColors.textPrimary)
+                Row(Modifier.fillMaxWidth().then(if (panelFlow) Modifier.padding(horizontal = FcSpacing.space4) else Modifier), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                    FcText(title, Modifier.semantics { heading() }, style = titleStyle, color = FcColors.textPrimary)
+                    }
+                    accessory?.invoke()
                 }
                 subtitle?.let { FcText(it, style = FcTypography.style("callout", 400), color = FcColors.textSecondary) }
                 content()
@@ -208,5 +212,58 @@ fun FcDatePickerDialog(initialMillis: Long?, onSelect: (Long?) -> Unit, onDismis
             disabledSelectedDayContainerColor = FcColors.surfaceDivider,
             selectedDayContainerColor = FcColors.actionPrimary, selectedDayContentColor = FcColors.actionOn,
             todayContentColor = FcColors.actionPrimary, todayDateBorderColor = FcColors.actionPrimary))
+    }
+}
+
+/** AD-02 appointment date selector expands inline, not in a dialog. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FcAppointmentDatePicker(date: java.time.LocalDate, minimum: java.time.LocalDate? = null, onSelect: (java.time.LocalDate) -> Unit) {
+    val initial = date.atStartOfDay(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+    val selectable = remember(minimum) { object : SelectableDates {
+        override fun isSelectableDate(utcTimeMillis: Long): Boolean = minimum == null ||
+            java.time.Instant.ofEpochMilli(utcTimeMillis).atZone(java.time.ZoneOffset.UTC).toLocalDate() >= minimum
+    } }
+    val state = rememberDatePickerState(initialSelectedDateMillis = initial, selectableDates = selectable)
+    LaunchedEffect(state.selectedDateMillis) {
+        state.selectedDateMillis?.let { onSelect(java.time.Instant.ofEpochMilli(it).atZone(java.time.ZoneOffset.UTC).toLocalDate()) }
+    }
+    DatePicker(state, Modifier.fillMaxWidth().testTag("appointment-date-picker"), showModeToggle = false,
+        colors = DatePickerDefaults.colors(containerColor = FcColors.surfacePage,
+            titleContentColor = FcColors.textSecondary, headlineContentColor = FcColors.textPrimary,
+            weekdayContentColor = FcColors.textSecondary, subheadContentColor = FcColors.textPrimary,
+            yearContentColor = FcColors.textPrimary, currentYearContentColor = FcColors.actionPrimary,
+            selectedYearContentColor = FcColors.actionOn, selectedYearContainerColor = FcColors.actionPrimary,
+            disabledYearContentColor = FcColors.textDisabled, dayContentColor = FcColors.textPrimary,
+            disabledDayContentColor = FcColors.textDisabled, disabledSelectedDayContentColor = FcColors.textSecondary,
+            disabledSelectedDayContainerColor = FcColors.surfaceDivider,
+            selectedDayContainerColor = FcColors.actionPrimary, selectedDayContentColor = FcColors.actionOn,
+            todayContentColor = FcColors.actionPrimary, todayDateBorderColor = FcColors.actionPrimary))
+}
+
+/** AD-02 24-hour clock with an explicit direct-entry mode. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FcAppointmentTimePicker(initial: java.time.LocalTime, onSelect: (java.time.LocalTime) -> Unit, onDismiss: () -> Unit) {
+    val state = rememberTimePickerState(initial.hour, initial.minute, is24Hour = true)
+    var input by remember { mutableStateOf(false) }
+    TimePickerDialog(onDismissRequest = onDismiss, containerColor = FcColors.surfaceElevated,
+        shape = RoundedCornerShape(FcShapes.lg), title = {},
+        confirmButton = { FcLinkButton("确定", Modifier.testTag("appointment-time-accept")) { onSelect(java.time.LocalTime.of(state.hour, state.minute)) } },
+        dismissButton = { FcLinkButton("取消", Modifier.testTag("appointment-time-cancel"), onClick = onDismiss) },
+        modeToggleButton = {
+            TimePickerDialogDefaults.DisplayModeToggle(
+                onDisplayModeChange = { input = !input },
+                displayMode = if (input) TimePickerDisplayMode.Input else TimePickerDisplayMode.Picker,
+                modifier = Modifier.testTag("appointment-time-mode"))
+        }) {
+        RegisterOverlayWindow()
+        val colors = TimePickerDefaults.colors(clockDialColor = FcColors.surfaceCanvas,
+            selectorColor = FcColors.actionPrimary, containerColor = FcColors.surfaceElevated,
+            clockDialSelectedContentColor = FcColors.actionOn, clockDialUnselectedContentColor = FcColors.textPrimary,
+            timeSelectorSelectedContainerColor = FcColors.actionPrimary, timeSelectorUnselectedContainerColor = FcColors.surfaceCanvas,
+            timeSelectorSelectedContentColor = FcColors.actionOn, timeSelectorUnselectedContentColor = FcColors.textPrimary)
+        if (input) TimeInput(state, Modifier.testTag("appointment-time-input"), colors = colors)
+        else TimePicker(state, Modifier.testTag("appointment-time-clock"), colors = colors)
     }
 }

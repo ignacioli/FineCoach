@@ -1,6 +1,7 @@
 package com.ignacioli.finecoach.features.students
 
 import com.ignacioli.finecoach.core.application.AppClock
+import com.ignacioli.finecoach.core.application.AppointmentUseCases
 import com.ignacioli.finecoach.core.application.CreditUseCases
 import com.ignacioli.finecoach.core.application.HistoryRepositoryPort
 import com.ignacioli.finecoach.core.application.SessionRepositoryPort
@@ -60,10 +61,12 @@ object StudentFeatureFactory {
         useCases: StudentUseCases,
         sessionRepository: SessionRepositoryPort? = null,
         historyRepository: HistoryRepositoryPort? = null,
+        appointments: AppointmentUseCases? = null,
     ) = DeleteStudentViewModel(
         studentID = studentID,
         useCases = useCases,
         sessionRepository = sessionRepository,
         historyRepository = historyRepository,
+        appointments = appointments,
     )
 }

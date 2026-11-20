@@ -238,6 +238,7 @@ val validateEnvironmentSmoke = tasks.register("validateS0EnvironmentSmokeResults
 environmentSmoke.configure { finalizedBy(validateEnvironmentSmoke) }
 
 val roomClasses = listOf(
+    "com.ignacioli.finecoach.RoomMigrationV3Tests",
     "com.ignacioli.finecoach.RoomSkeletonTests",
     "com.ignacioli.finecoach.StorageValueTests",
     "com.ignacioli.finecoach.StoragePrivacyTests",
@@ -402,6 +403,9 @@ tasks.withType<Test>().matching { it.name in setOf("testDebugUnitTest", "testRel
         excludeTestsMatching("com.ignacioli.finecoach.ExerciseConformanceTests")
         excludeTestsMatching("com.ignacioli.finecoach.AddExerciseConformanceTests")
         excludeTestsMatching("com.ignacioli.finecoach.TodayConformanceTests")
+        excludeTestsMatching("com.ignacioli.finecoach.TodayS2ConformanceTests")
+        excludeTestsMatching("com.ignacioli.finecoach.CalendarConformanceTests")
+        excludeTestsMatching("com.ignacioli.finecoach.AppointmentEditorConformanceTests")
         excludeTestsMatching("com.ignacioli.finecoach.SessionDetailConformanceTests")
         excludeTestsMatching("com.ignacioli.finecoach.StudentListConformanceTests")
         excludeTestsMatching("com.ignacioli.finecoach.StudentDetailConformanceTests")
@@ -522,7 +526,7 @@ val s1SeedChecks = tasks.register<Test>("s1SeedChecks") {
     outputs.upToDateWhen { false }
     outputs.doNotCacheIf("Seed checks must execute") { true }
     doLast {
-        val expected = mapOf("com.ignacioli.finecoach.S1DebugSeedTests" to 12, "com.ignacioli.finecoach.S1SeedIsolationTests" to 4)
+        val expected = mapOf("com.ignacioli.finecoach.S1DebugSeedTests" to 14, "com.ignacioli.finecoach.S1SeedIsolationTests" to 4)
         val files = reports.junitXml.outputLocation.get().asFile.listFiles { file -> file.name.startsWith("TEST-") && file.extension == "xml" }.orEmpty()
         check(files.size == expected.size) { "S1 seed checks must run nonzero tests without failures or skips" }
         val factory = DocumentBuilderFactory.newInstance().apply {
@@ -935,6 +939,7 @@ tasks.withType<Test>().configureEach {
     systemProperty("finecoach.sharedVectorRoot", sharedVectorRoot.asFile.absolutePath)
 }
 val sharedVectorClasses = listOf(
+    "com.ignacioli.finecoach.S2VectorRunnerTests",
     "com.ignacioli.finecoach.VectorFormatTests",
     "com.ignacioli.finecoach.SharedVectorTests",
 )
@@ -998,6 +1003,7 @@ val validateSharedVectorGate = tasks.register("validateS0G6Results") {
         check(counts.keys == sharedVectorClasses.toSet()) { "Missing G6 suites: ${sharedVectorClasses - counts.keys}" }
         val expectedCounts = mapOf(
             "com.ignacioli.finecoach.VectorFormatTests" to 72,
+            "com.ignacioli.finecoach.S2VectorRunnerTests" to 10,
             "com.ignacioli.finecoach.SharedVectorTests" to 5,
         )
         check(counts == expectedCounts) { "Unexpected G6 testcase counts: $counts; expected $expectedCounts" }
@@ -1008,6 +1014,26 @@ sharedVectorGate.configure { finalizedBy(validateSharedVectorGate) }
 
 // T019/S0-14: isolated tasks reuse T003's resource-aware JVM without plugin
 // restore/finalizers. No gate ever accepts a record request.
+// S2: immutable S1 core hashes. Render suites already provide dual-render stability evidence.
+val coreBaselineScreens = mapOf(
+    "s0Conformance" to ("p0-a2-training" to "P0-a2-training"),
+    "p4ExerciseLibraryConformance" to ("d2b-exercise-library" to "D2b-exercise-library/D2b-exercise-library"),
+    "p4AddExerciseConformance" to ("c2b-b-add-exercise" to "C2b-B-add-exercise/C2b-B-add-exercise"),
+    "p4TodayConformance" to ("01-today-s1" to "01-today-s1/01-today-s1"),
+    "p4SessionDetailConformance" to ("35-session-detail-s1" to "35-session-detail-s1/35-session-detail-s1"),
+    "p4StudentListConformance" to ("21-student-list-s1" to "21-student-list-s1/21-student-list-s1"),
+    "p4StudentDetailConformance" to ("26-student-detail-s1" to "26-student-detail-s1/26-student-detail-s1"),
+    // S2-D24 (owner, 2026-11-19): S2 core screens locked after the T053 walkthrough.
+    "p4TodayS2Conformance" to ("01-today-s2" to "01-today-s2/01-today-s2"),
+    "p4CalendarConformance" to ("25-calendar-v2" to "25-calendar-v2/25-calendar-v2"),
+    "p4AppointmentEditorConformance" to ("23-new-appointment-v2" to "23-new-appointment-v2/23-new-appointment-v2"),
+)
+val baselineManifestGate = tasks.register<Exec>("s2BaselineManifest") {
+    group = "verification"
+    workingDir(rootProject.projectDir)
+    commandLine("node", "scripts/baseline/baseline-check.mjs", "--manifest", "screenshot-baselines/screens/baselines.json",
+        "--decisions", "screenshot-baselines/screens/APPROVALS.md")
+}
 fun registerVisualGate(taskName: String, suite: String, expectedTests: Int): TaskProvider<Test> {
     val gate = tasks.register<Test>(taskName) {
         group = "verification"
@@ -1055,6 +1081,17 @@ fun registerVisualGate(taskName: String, suite: String, expectedTests: Int): Tas
             check(suiteXml.getAttribute("tests").toInt() == expectedTests && suiteXml.getElementsByTagName("testcase").length == expectedTests)
             for (attr in listOf("failures", "errors", "skipped")) check(suiteXml.getAttribute(attr).toInt() == 0)
             check(listOf("failure", "error", "skipped").all { suiteXml.getElementsByTagName(it).length == 0 })
+            coreBaselineScreens[taskName]?.let { (screen, output) ->
+                val conformance = layout.buildDirectory.dir("outputs/conformance").get().asFile
+                val evidence = layout.buildDirectory.dir("outputs/baseline/$screen").get().asFile.apply { mkdirs() }
+                val builder = ProcessBuilder("node", rootProject.file("scripts/baseline/verify-conformance.mjs").absolutePath,
+                    rootProject.file("screenshot-baselines/screens/baselines.json").absolutePath,
+                    rootProject.file("screenshot-baselines/screens/APPROVALS.md").absolutePath,
+                    File(conformance, "$output.report.json").absolutePath, File(conformance, "$output.android.png").absolutePath,
+                    screen, evidence.absolutePath)
+                    .directory(rootProject.projectDir).redirectErrorStream(true).redirectOutput(File(evidence, "check.log")).start()
+                check(builder.waitFor() == 0) { "$taskName baseline manifest check failed; see ${File(evidence, "check.log")}" }
+            }
             logger.lifecycle("$taskName: $expectedTests tests, 0 failures/errors/skips")
         }
     }
@@ -1063,7 +1100,7 @@ fun registerVisualGate(taskName: String, suite: String, expectedTests: Int): Tas
 }
 val screenshotGate = registerVisualGate("s0G5", "ComponentScreenshotTests", 1)
 // P7 is capture-only: captureToImage writes sheets without invoking a comparator.
-registerVisualGate("p7SideBySide", "P7SideBySideTests", 15).configure {
+registerVisualGate("p7SideBySide", "P7SideBySideTests", 20).configure {
     outputs.dir(layout.buildDirectory.dir("outputs/p7"))
 }
 val visualBaselineBefore = mutableMapOf<String, String>()
@@ -1087,6 +1124,9 @@ registerVisualGate("p4ExerciseLibraryConformance", "ExerciseConformanceTests", 1
 
 registerVisualGate("p4AddExerciseConformance", "AddExerciseConformanceTests", 1)
 registerVisualGate("p4TodayConformance", "TodayConformanceTests", 1)
+registerVisualGate("p4TodayS2Conformance", "TodayS2ConformanceTests", 1)
+registerVisualGate("p4CalendarConformance", "CalendarConformanceTests", 1)
+registerVisualGate("p4AppointmentEditorConformance", "AppointmentEditorConformanceTests", 1)
 registerVisualGate("p4SessionDetailConformance", "SessionDetailConformanceTests", 1)
 
 val entryLayoutClasses = listOf("com.ignacioli.finecoach.EntryLayoutHarnessTests")

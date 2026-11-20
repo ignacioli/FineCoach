@@ -18,3 +18,4 @@ list_alt | outlined/300 | list.bullet.rectangle | DS-HUB-ROW | integrated
 folder | outlined/400 | folder | feature:session-swipe-row | integrated
 check_circle_filled | outlined/400 | checkmark.circle.fill | feature:session-exercise-header | integrated
 star_filled | outlined/400 | star.fill | DS-LIST-ROW | integrated
+notifications | outlined/300 | bell | DS-HUB-ROW | integrated

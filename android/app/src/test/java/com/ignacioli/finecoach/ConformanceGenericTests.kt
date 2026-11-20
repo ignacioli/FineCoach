@@ -1,3 +1,4 @@
+// fictional-data: synthetic geometry only
 package com.ignacioli.finecoach
 
 import java.awt.image.BufferedImage
@@ -21,10 +22,11 @@ class ConformanceGenericTests {
             listOf(node(1), node(2, y = 900)), emptyMap())
         assertEquals(1, entries.size)
         assertEquals(1, entries.single().getInt("nodeID"))
+        // S2-D18: this is the independent 2dp text-anchor boundary, using full unclipped geometry.
         val clipped = JSONObject(partial.toString()).put("w", 3).put("unclipped", partial)
         assertTrue(ConformanceComparison.geometry(clipped, partial, "top", 0.0).getBoolean("matches"))
-        assertTrue(ConformanceComparison.geometry(clipped, JSONObject(partial.toString()).put("x", 380), "top", 0.0).getBoolean("matches"))
-        assertFalse(ConformanceComparison.geometry(clipped, JSONObject(partial.toString()).put("x", 378), "top", 0.0).getBoolean("matches"))
+        assertTrue(ConformanceComparison.geometry(clipped, JSONObject(partial.toString()).put("x", 385), "top", 0.0).getBoolean("matches"))
+        assertFalse(ConformanceComparison.geometry(clipped, JSONObject(partial.toString()).put("x", 384.5), "top", 0.0).getBoolean("matches"))
     }
     @Test fun ad01MappingUsesParentGeometryAndVerifiedMaterialSourceOnly() {
         val parent = layer("1").put("type", "group").put("name", "icon / filter")
@@ -206,4 +208,18 @@ class ConformanceGenericTests {
         assertEquals(listOf(1, 2), entries.map { it.getInt("nodeID") })
     }
 
+
+    @Test fun independentAbsoluteGrossTextBoundaryRemainsEightDp() {
+        for ((shift, failures) in listOf(8.0 to 0, 8.001 to 1)) {
+            val bounds = JSONObject().put("x",10).put("y",10).put("w",40).put("h",20)
+            val observed = JSONObject(bounds.toString()).put("x",10+shift)
+            val row = JSONObject().put("path","synthetic").put("layerType","text").put("selector",JSONObject())
+                .put("textMatches",true).put("tokenMatches",true).put("category","PASS")
+                .put("delta",JSONObject().put("x",shift).put("y",0).put("w",0).put("h",0))
+                .put("geometry",JSONObject().put("expectedBounds",bounds).put("actualBounds",observed))
+            val checks = ConformanceRelativeGeometry.evaluate(listOf(row)).getJSONObject("counts")
+            assertEquals(failures,checks.getInt("ABSOLUTE_GROSS"))
+            assertEquals(1,checks.getInt("TEXT_ANCHOR"))
+        }
+    }
 }

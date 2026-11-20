@@ -3,6 +3,7 @@ package com.ignacioli.finecoach.core.application
 import com.ignacioli.finecoach.core.domain.common.*
 import com.ignacioli.finecoach.core.domain.training.SessionFinishGate
 import com.ignacioli.finecoach.core.domain.training.SessionTimingCoordinator
+import java.time.LocalDate
 import java.time.ZoneId
 import kotlinx.coroutines.CancellationException
 
@@ -95,7 +96,11 @@ class FinishSessionUseCases(
             is ApplicationResult.Failure -> return@settlementValidation result
             is ApplicationResult.Success -> result.value
         }
-        val key = CreditLedgerSourceEventKeyFactory.adhocSession(sessionID)
+        val linked = when (val result = sessions.linkedAppointmentID(sessionID)) {
+            is ApplicationResult.Failure -> return@settlementValidation result
+            is ApplicationResult.Success -> result.value != null
+        }
+        val key = if (linked) CreditLedgerSourceEventKeyFactory.sessionComplete(sessionID) else CreditLedgerSourceEventKeyFactory.adhocSession(sessionID)
         ledger.firstOrNull { it.sourceEventKey == key }?.let {
             return@settlementValidation ApplicationResult.Success(SessionCreditOutcome.Debited(it))
         }
@@ -109,10 +114,12 @@ class FinishSessionUseCases(
                 is ApplicationResult.Success -> return@settlementValidation ApplicationResult.Success(SessionCreditOutcome.NoActivePackage)
             }
         }
-        val reason = when {
-            coursePackage.endDate?.let { it < clock.today(zoneID) } == true -> SessionCreditUnusableReason.expired
-            coursePackage.remainingCreditsCache <= 0 -> SessionCreditUnusableReason.insufficientBalance
-            else -> null
+        val reason = unusableReason(coursePackage, clock.today(zoneID))
+        if (linked && reason == null) {
+            return@settlementValidation when (val debit = credits.debitOnSessionComplete(coursePackage.coursePackageID, sessionID)) {
+                is ApplicationResult.Failure -> debit
+                is ApplicationResult.Success -> ApplicationResult.Success(SessionCreditOutcome.Debited(debit.value))
+            }
         }
         ApplicationResult.Success(if (reason == null) SessionCreditOutcome.AdhocChoiceRequired(coursePackage)
             else SessionCreditOutcome.PackageUnusable(coursePackage, reason))
@@ -139,10 +146,38 @@ class FinishSessionUseCases(
     }
 
     suspend fun skipDebit(sessionID: SessionID): ApplicationResult<SessionCreditOutcome> = settlementValidation {
+        when (val linked = sessions.linkedAppointmentID(sessionID)) {
+            is ApplicationResult.Failure -> return@settlementValidation linked
+            is ApplicationResult.Success -> if (linked.value != null) {
+                when (val unusable = linkedPackageUnusable(sessionID)) {
+                    is ApplicationResult.Failure -> return@settlementValidation unusable
+                    is ApplicationResult.Success -> if (!unusable.value) trainingFailure(ApplicationErrorCode.invalidState)
+                }
+            }
+        }
         when (val result = completed(sessionID)) {
             is ApplicationResult.Failure -> result
             is ApplicationResult.Success -> ApplicationResult.Success(SessionCreditOutcome.Skipped)
         }
+    }
+
+    /** Read-only PackageUnusable check. Does not call settlement, which debits a usable linked package. */
+    private suspend fun linkedPackageUnusable(sessionID: SessionID): ApplicationResult<Boolean> {
+        val session = completed(sessionID)
+        if (session is ApplicationResult.Failure) return session
+        val record = (session as ApplicationResult.Success).value
+        val ledger = when (val result = credits.ledger(record.studentID)) {
+            is ApplicationResult.Failure -> return result
+            is ApplicationResult.Success -> result.value
+        }
+        if (ledger.any { it.sourceEventKey == CreditLedgerSourceEventKeyFactory.sessionComplete(sessionID) }) {
+            return ApplicationResult.Success(false)
+        }
+        val coursePackage = when (val result = credits.activePackage(record.studentID, clock.today(zoneID))) {
+            is ApplicationResult.Failure -> return result
+            is ApplicationResult.Success -> result.value
+        } ?: return ApplicationResult.Success(false)
+        return ApplicationResult.Success(unusableReason(coursePackage, clock.today(zoneID)) != null)
     }
 
     private suspend fun completed(id: SessionID): ApplicationResult<SessionRecord> = when (val loaded = sessions.find(id)) {
@@ -153,6 +188,12 @@ class FinishSessionUseCases(
             ApplicationResult.Success(record)
         }
     }
+}
+
+internal fun unusableReason(coursePackage: CoursePackageRecord, today: LocalDate): SessionCreditUnusableReason? = when {
+    coursePackage.endDate?.let { it < today } == true -> SessionCreditUnusableReason.expired
+    coursePackage.remainingCreditsCache <= 0 -> SessionCreditUnusableReason.insufficientBalance
+    else -> null
 }
 
 internal suspend fun <T> settlementValidation(action: suspend () -> ApplicationResult<T>): ApplicationResult<T> = try {

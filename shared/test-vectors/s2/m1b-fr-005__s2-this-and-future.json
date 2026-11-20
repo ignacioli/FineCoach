@@ -1,0 +1,43 @@
+{
+  "id": "s2-this-and-future",
+  "rule": "M1B-FR-005",
+  "meta": {
+    "description": "fictional-data: fixed S2 parity scenario",
+    "tags": [
+      "fictional-data"
+    ]
+  },
+  "given": {
+    "clock": {
+      "now": "2026-03-08T10:00:00Z"
+    },
+    "timeZone": "America/Los_Angeles",
+    "state": {}
+  },
+  "when": {
+    "op": "appointment.future",
+    "args": {
+      "$ref": "/given/state"
+    }
+  },
+  "then": {
+    "state": {
+      "pastUnchanged": true,
+      "detachedUnchanged": true,
+      "resolvedUnchanged": true,
+      "oldEnded": true,
+      "times": [
+        "11:30",
+        "11:30"
+      ],
+      "focus": [
+        [
+          "thighs"
+        ],
+        [
+          "back"
+        ]
+      ]
+    }
+  }
+}

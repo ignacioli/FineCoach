@@ -1,3 +1,4 @@
+// fictional-data: source asset inventory and synthetic component contracts only.
 package com.ignacioli.finecoach
 
 import java.io.File
@@ -10,11 +11,12 @@ class ComponentCatalogTests {
     private val doc = File(root, "design/design-system/components.md").readText()
     private val main = File(app, "src/main/java/com/ignacioli/finecoach/designsystem")
     private val test = File(app, "src/test/java/com/ignacioli/finecoach/ComponentContractTests.kt").readText() +
-        File(app, "src/test/java/com/ignacioli/finecoach/S1ComponentTests.kt").readText()
+        File(app, "src/test/java/com/ignacioli/finecoach/S1ComponentTests.kt").readText() +
+        File(app, "src/test/java/com/ignacioli/finecoach/CalendarEntryLayoutTests.kt").readText()
     private val approved = setOf("BASE", "BUTTON", "TITLE-ACTION", "SEGMENTED", "CHIP", "TOGGLE", "STEPPER", "TEXT-FIELD",
         "LIST-ROW", "SECTION", "LABEL-VALUE-ROW", "PAGE-HEADER", "HUB-ROW", "INLINE-RESULT", "ACTION-ROW", "UNDO-ROW",
-        "BOTTOM-SHEET", "CONFIRM-DIALOG", "STATUS", "SAVE-STATUS", "AVATAR", "SYMBOL", "HINT-BAR", "HERO-CARD", "AMBIENT-SCENE", "SET-ROW", "EQUIPMENT-ICON", "PAGE-PRIMARY", "PAGE-SECONDARY", "EMPTY-STATE", "LAUNCH").map { "DS-$it" }.toSet()
-    private val deferred = setOf("CALENDAR-DAY", "BODY-DIAGRAM").map { "DS-$it" }.toSet()
+        "BOTTOM-SHEET", "CONFIRM-DIALOG", "STATUS", "SAVE-STATUS", "AVATAR", "SYMBOL", "HINT-BAR", "HERO-CARD", "AMBIENT-SCENE", "SET-ROW", "EQUIPMENT-ICON", "PAGE-PRIMARY", "PAGE-SECONDARY", "EMPTY-STATE", "LAUNCH", "CALENDAR-DAY").map { "DS-$it" }.toSet()
+    private val deferred = setOf("BODY-DIAGRAM").map { "DS-$it" }.toSet()
 
     private fun rows(start: String, end: String): List<List<String>> = doc.substringAfter("<!-- $start -->", "")
         .substringBefore("<!-- $end -->").lineSequence().filter { it.startsWith("| DS-") }
@@ -22,17 +24,19 @@ class ComponentCatalogTests {
 
     @Test fun approvedRosterIsExactAndUnique() {
         val rows = rows("android-roster-start", "android-roster-end")
-        assertEquals(31, rows.size)
+        assertEquals(32, rows.size)
         assertEquals(approved, rows.map { it[0] }.toSet())
         assertEquals(approved, (S0CatalogEntries + S1CatalogEntries).map { it.id }.toSet())
-        assertEquals(31, (S0CatalogEntries + S1CatalogEntries).size)
+        assertEquals(32, (S0CatalogEntries + S1CatalogEntries).size)
     }
 
     @Test fun everyTypeFileAndIosSourceExists() {
         rows("android-roster-start", "android-roster-end").forEach { row ->
-            val source = File(main, row[2]); assertTrue(source.path, source.isFile)
+            val files = row[2].split(';').map { File(main,it) }
+            files.forEach { assertTrue(it.path,it.isFile) }
+            val sources = files.joinToString("\n") { it.readText() }
             row[1].split(';').forEach { type ->
-                assertTrue("${row[0]} missing $type", Regex("(?:fun|class|enum class|object)\\s+${Regex.escape(type)}\\b").containsMatchIn(source.readText()))
+                assertTrue("${row[0]} missing $type", Regex("(?:fun|class|enum class|object)\\s+${Regex.escape(type)}\\b").containsMatchIn(sources))
             }
             row[4].split(';').forEach { assertTrue(it, File(root, "ios/FineCoachApp/DesignSystem/$it").isFile) }
         }
@@ -49,7 +53,7 @@ class ComponentCatalogTests {
 
     @Test fun deferredTableIsExactAndUnionCoversAuthorityIndexWithoutUnknownIds() {
         val rows = rows("android-deferred-start", "android-deferred-end")
-        assertEquals(2, rows.size)
+        assertEquals(1, rows.size)
         assertEquals(deferred, rows.map { it[0] }.toSet())
         rows.forEach { assertTrue(it[1].startsWith("S")); assertTrue(it[2].contains("D07 2026-11-03")) }
         assertTrue(approved.intersect(deferred).isEmpty())
@@ -74,10 +78,10 @@ class ComponentCatalogTests {
         val assets = File(root, "android/design-assets")
         val manifest = File(assets, "material-symbols-manifest.txt").readLines()
             .filter { it.isNotBlank() && !it.startsWith('#') }
-        assertEquals(19, manifest.size)
+        assertEquals(20, manifest.size)
         val provenance = File(assets, "material-symbols-provenance.json").readText()
         val records = Regex("\\{[^{}]*\\\"symbol\\\"[^{}]*}").findAll(provenance).map { it.value }.toList()
-        assertEquals(19, records.size)
+        assertEquals(20, records.size)
         val sums = File(assets, "material-symbols-SHA256SUMS").readLines().associate {
             val parts = it.trim().split(Regex("\\s+"), limit = 2); parts[1] to parts[0]
         }
@@ -104,7 +108,8 @@ class ComponentCatalogTests {
             "DS-LIST-ROW" to mapOf("remove" to catalogFile, "expand_more" to catalogFile,
                 "star_filled" to sourcePrefix + "designsystem/FcRows.kt"),
             "DS-HUB-ROW" to mapOf("settings" to catalogFile, "grid_view" to catalogFile,
-                "list_alt" to sourcePrefix + "features/resources/ResourceHubScreen.kt"),
+                "list_alt" to sourcePrefix + "features/resources/ResourceHubScreen.kt",
+                "notifications" to sourcePrefix + "features/settings/ReminderSettingsScreen.kt"),
             "DS-ACTION-ROW" to mapOf("delete" to catalogFile),
             "DS-SAVE-STATUS" to mapOf("sync" to catalogFile, "check_circle" to catalogFile, "warning" to catalogFile),
             "DS-STATUS" to mapOf("priority_high" to catalogFile, "info_i" to catalogFile),
@@ -180,8 +185,8 @@ class ComponentCatalogTests {
                 } else assertTrue("$name must be used by $owner in " + file.path, file.readText().contains("R.drawable.ic_ms_$name"))
             }
         }
-        assertEquals(19, File(assets, "material-symbols-svg").listFiles()!!.count { it.extension == "svg" })
-        assertEquals(19, File(app, "src/main/res/drawable").listFiles()!!.count { it.name.startsWith("ic_ms_") && it.extension == "xml" })
+        assertEquals(20, File(assets, "material-symbols-svg").listFiles()!!.count { it.extension == "svg" })
+        assertEquals(20, File(app, "src/main/res/drawable").listFiles()!!.count { it.name.startsWith("ic_ms_") && it.extension == "xml" })
         val edit = records.single { field(it, "symbol") == "edit" }
         assertEquals("symbols/web/edit/materialsymbolsoutlined/edit_24px.svg", field(edit, "upstreamPath"))
         assertEquals("pencil", field(edit, "iosSymbol"))

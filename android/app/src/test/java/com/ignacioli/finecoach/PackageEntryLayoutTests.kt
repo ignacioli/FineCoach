@@ -544,6 +544,10 @@ class PackageEntryLayoutTests {
         node("package-editor-save").assertIsDisplayed()
         assertSameWidth("package-editor-form", "package-editor-save")
         assertSameWidth("package-editor-name-slot", "package-editor-name")
+        compose.waitUntil(timeoutMillis = 5_000) {
+            node("package-editor-save").fetchSemanticsNode().config
+                .contains(androidx.compose.ui.semantics.SemanticsProperties.Disabled).not()
+        }
         node("package-editor-save").assertIsEnabled().performClick()
         awaitTag("package-list-manual")
         assertEquals("虚构宽度课包", packages().single().name)
@@ -579,7 +583,11 @@ class PackageEntryLayoutTests {
         }
         awaitTag("package-editor-name")
         node("package-editor-name").performTextInput("虚构键盘课包")
-        node("package-editor-save").assertIsDisplayed().assertIsDisplayed().assertHasClickAction()
+        compose.waitUntil(timeoutMillis = 5_000) {
+            node("package-editor-save").fetchSemanticsNode().config
+                .contains(androidx.compose.ui.semantics.SemanticsProperties.Disabled).not()
+        }
+        node("package-editor-save").assertIsDisplayed().assertIsEnabled().assertHasClickAction()
         val safe = node("platform-safe").getUnclippedBoundsInRoot()
         val save = node("package-editor-save").getUnclippedBoundsInRoot()
         assertTrue(save.top >= safe.top)

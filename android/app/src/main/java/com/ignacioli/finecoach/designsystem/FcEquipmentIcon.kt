@@ -8,8 +8,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import com.ignacioli.finecoach.R
 import com.ignacioli.finecoach.core.application.ExerciseCatalogLoader
+import com.ignacioli.finecoach.core.application.ExerciseCatalogMetadata
 import com.ignacioli.finecoach.core.domain.common.StableExerciseID
 import java.time.Instant
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /** Product-owned §7.1 artwork. No fallback for custom/unmapped equipment. */
 enum class FcEquipmentIcon(val drawable: Int) {
@@ -67,8 +71,24 @@ fun FcEquipmentIconView(icon: FcEquipmentIcon, modifier: Modifier = Modifier) {
 @Composable
 fun FcEquipmentIconForExercise(id: StableExerciseID?, modifier: Modifier = Modifier) {
     if (id == null) return
-    val assets = LocalContext.current.applicationContext.assets
-    val metadata = remember(assets) { ExerciseCatalogLoader(assets).load(Instant.EPOCH).metadata }
+    val metadata = rememberExerciseCatalogMetadata()
     val facet = metadata[id] ?: return
     FcEquipmentIcon.icon(facet.equipmentClass, facet.primaryMuscleGroup)?.let { FcEquipmentIconView(it, modifier) }
+}
+
+/** Composition only reads cached facets; a cold cache is filled off the main thread. */
+@Composable
+internal fun rememberExerciseCatalogMetadata(): Map<StableExerciseID, ExerciseCatalogMetadata> {
+    val assets = LocalContext.current.applicationContext.assets
+    val loader = remember(assets) { ExerciseCatalogLoader(assets) }
+    val metadata by produceState(loader.cachedMetadata(), assets) {
+        if (value.isEmpty()) {
+            value = withContext(Dispatchers.IO) {
+                try { loader.load(Instant.EPOCH).metadata }
+                catch (cancelled: CancellationException) { throw cancelled }
+                catch (_: Exception) { loader.cachedMetadata() }
+            }
+        }
+    }
+    return metadata
 }

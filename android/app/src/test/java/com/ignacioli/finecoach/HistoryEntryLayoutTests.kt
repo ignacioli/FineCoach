@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.ui.test.*
 import androidx.compose.ui.layout.FirstBaseline
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.unit.width
 import com.ignacioli.finecoach.core.application.*
 import com.ignacioli.finecoach.core.domain.common.*
@@ -22,6 +22,7 @@ import org.robolectric.annotation.GraphicsMode
 @Config(sdk = [36], qualifiers = "zh-rCN-w320dp-h640dp-notnight-mdpi")
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class HistoryEntryLayoutTests {
+    // Queue IO resumptions on the test UI scheduler instead of resuming on IO workers.
     @get:Rule val compose = createAndroidComposeRule<ComponentActivity>()
     private lateinit var f: T009Fixture
     private lateinit var state: HistoryUiState

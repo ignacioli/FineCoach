@@ -1,0 +1,12 @@
+{
+  "toleranceDp": 2,
+  "originOffsetY": -52,
+  "originRule": "S1-D50 measured platform-content origin; top flow only; S2-D17 board revision (automatic text/tag mapping, including new icon internals and Back)",
+  "elements": [
+    {
+      "path": "64",
+      "tag": "appointment-save",
+      "source": "The pinned primary button node owns its real background."
+    }
+  ]
+}

@@ -246,6 +246,12 @@ class CreditRepositoryTests {
         assertEquals(3L, useCases.balance(studentA, pkg.coursePackageID).requireSuccess("balanceAfterAdhoc"))
         assertEquals(3L, rawPersistedRemainingCreditsCache(pkg.coursePackageID))
 
+        // Schema v3 requires the existing linkedAppointmentID scalar to reference a real row.
+        database.s1Dao().insert(com.ignacioli.finecoach.storage.entity.StudentEntity(UUID.fromString(studentA.value), "虚构排课",
+            com.ignacioli.finecoach.core.domain.common.StudentSex.female, null, null, null, null, null,
+            com.ignacioli.finecoach.core.domain.common.StudentLifecycle.active, clock.now(), clock.now()))
+        database.appointmentDao().insert(com.ignacioli.finecoach.storage.entity.AppointmentEntity(appointment1, studentA.value, null,
+            "2026-11-07", "09:00", 60, "scheduled", null, null, false, true, 60, null, "", clock.now().toString(), clock.now().toString()))
         val firstAbsent = useCases.debitOnAppointmentAbsent(pkg.coursePackageID, appointment1).requireSuccess("firstAbsent")
         val repeatAbsent = useCases.debitOnAppointmentAbsent(pkg.coursePackageID, appointment1).requireSuccess("repeatAbsent")
         assertEquals(firstAbsent, repeatAbsent)

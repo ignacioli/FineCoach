@@ -21,7 +21,7 @@ internal class S1SeedFixture private constructor(val json: JSONObject) {
         fun read(context: Context) = decode(context.assets.open(PATH).bufferedReader().use { it.readText() })
         fun decode(text: String): S1SeedFixture {
             val root = JSONObject(text)
-            root.keysOnly("declaration source seedVersion dataset clockUTC uuidPrefix generatedIDStart catalogCount expectedRows scenarios students packages sessions ledger templates")
+            root.keysOnly("declaration source seedVersion dataset clockUTC uuidPrefix generatedIDStart catalogCount expectedRows scenarios students packages sessions ledger templates appointments")
             require(root.getString("declaration").contains("fictional-data"))
             val fixture = S1SeedFixture(root)
             require(fixture.version > 0 && fixture.dataset == "fictional-s1-coach-core-v${fixture.version}")
@@ -32,15 +32,16 @@ internal class S1SeedFixture private constructor(val json: JSONObject) {
             root.getJSONObject("expectedRows").keysOnly("empty single multi")
             for (variant in listOf("empty", "single", "multi")) require(root.getJSONObject("expectedRows").getInt(variant) > 0)
             fixture.records("scenarios").forEach { it.recordKeys("key") }
-            for (group in listOf("students", "packages", "sessions", "ledger", "templates")) {
+            for (group in listOf("students", "packages", "sessions", "ledger", "templates", "appointments")) {
                 val rows = fixture.records(group)
-                val identity = if (group == "students") "id" else "key"
+                val identity = if (group in setOf("students", "appointments")) "id" else "key"
                 require(rows.map { it.get(identity).toString() }.distinct().size == rows.size)
                 rows.forEach { row ->
                     require(row.strings("variants").isNotEmpty() && row.strings("variants").all { it in setOf("single", "multi") })
                     when (group) {
                         "students" -> row.recordKeys("variants id name sex trainingGoal injuryNotes privateCoachNote phone wechatID lifecycle offsetSeconds")
                         "packages" -> row.recordKeys("variants key studentID name totalCredits startDate endDate state confirmedReplacement offsetSeconds")
+                        "appointments" -> row.recordKeys("variants id studentID dayOffset startTime state absentCreditChoice termination count endDayOffset seriesID")
                         "ledger" -> row.recordKeys("variants key kind packageKey sessionKey direction amount note offsetSeconds")
                         else -> {
                             row.recordKeys(if (group == "sessions") "variants key studentID state startOffsetSeconds finishOffsetSeconds trainingFocus sections exercises summary" else "variants key name trainingFocus offsetSeconds sections exercises")

@@ -1,7 +1,10 @@
 package com.ignacioli.finecoach
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -22,10 +25,19 @@ import com.ignacioli.finecoach.features.templates.*
 import com.ignacioli.finecoach.features.session.*
 import com.ignacioli.finecoach.features.history.*
 import com.ignacioli.finecoach.features.today.*
+import com.ignacioli.finecoach.features.calendar.*
+import com.ignacioli.finecoach.features.settings.*
+import com.ignacioli.finecoach.features.appointments.*
+import java.time.LocalDate
+import java.util.UUID
 import com.ignacioli.finecoach.features.resources.*
 import com.ignacioli.finecoach.navigation.*
 import com.ignacioli.finecoach.notifications.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.conflate
 
 @Composable
 fun S1Root(activity: MainActivity) {
@@ -40,7 +52,8 @@ fun S1Root(activity: MainActivity) {
         }
     }
     graph?.let { value ->
-        S1App(value, activity.restNotificationSessionID, activity::consumeRestNotificationRoute, activity.notificationPermissionRevision)
+        LaunchedEffect(value) { value.reminders.permissionRequest.collect { if (it) { activity.requestRestNotificationPermission(); value.reminders.permissionRequest.value = false } } }
+        S1App(value, activity.restNotificationSessionID, activity::consumeRestNotificationRoute, activity.notificationPermissionRevision, activity.appointmentNotificationRevision, activity.permissionProgress.inFlight)
     } ?: if (!failed) FcLaunch(Modifier.testTag("s1-loading")) else FcPlatformShell({}, Modifier.testTag("s1-loading")) {
         if (failed) {
             FcText("没有完成，再试一次。", Modifier.testTag("s1-load-error"),
@@ -82,7 +95,7 @@ private fun AfterStopResume(action: suspend () -> Unit) {
 }
 
 @Composable
-fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNotification: () -> Unit = {}, permissionRevision: Int = 0) {
+fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNotification: () -> Unit = {}, permissionRevision: Int = 0, appointmentNotificationRevision: Int = 0, permissionInFlight: Boolean = false, readSavedReminderStatus: (suspend () -> ReminderSettingsState.Status)? = null) {
     val nav = rememberNavController()
     val navigator = remember(nav) { S1Navigator(nav) }
     var recovered by remember(graph) { mutableStateOf(false) }
@@ -90,6 +103,8 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
     var recoveryAttempt by remember { mutableIntStateOf(0) }
     var notificationMissing by remember { mutableStateOf(false) }
     var adjustmentRequested by remember { mutableStateOf<CoursePackageID?>(null) }
+    val reminderRequests = remember(graph) { Channel<Unit>(Channel.CONFLATED) }
+    var lastReminderPermissionRevision by remember(graph) { mutableIntStateOf(permissionRevision) }
     val adapter = remember(graph) { RestNotifications(graph.context) }
     LaunchedEffect(graph, recoveryAttempt) {
         graph.prepareExerciseCatalog()
@@ -99,7 +114,24 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
             is ApplicationResult.Success -> { recovered = true; recoveryError = false }
         }
     }
-    LaunchedEffect(permissionRevision) { graph.rests.rescheduleAll() }
+    // Recovery publishes the S1 UI before reminder work starts on the IO dispatcher.
+    LaunchedEffect(graph, recovered) {
+        if (recovered) launch(Dispatchers.IO) {
+            reminderRequests.trySend(Unit)
+            launch {
+                graph.database.invalidationTracker.createFlow("appointments", emitInitialState = false)
+                    .conflate().collect { reminderRequests.trySend(Unit) }
+            }
+            for (request in reminderRequests) graph.reminders.reconcile(force = true)
+        }
+    }
+    LaunchedEffect(permissionRevision) {
+        graph.rests.rescheduleAll()
+        if (permissionRevision != lastReminderPermissionRevision) {
+            lastReminderPermissionRevision = permissionRevision
+            reminderRequests.trySend(Unit)
+        }
+    }
     LaunchedEffect(recovered, notificationSession) {
         if (recovered && notificationSession != null) {
             when (val result = graph.sessions.find(notificationSession)) {
@@ -118,12 +150,105 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
             }
         }; return
     }
+    AfterStopResume { reminderRequests.trySend(Unit) }
+    LaunchedEffect(appointmentNotificationRevision) {
+        if (appointmentNotificationRevision > 0) nav.navigate(S1Routes.TODAY) { popUpTo(S1Routes.TODAY) { inclusive = true }; launchSingleTop = true }
+    }
     val back = { navigator.back() }
-    NavHost(nav, startDestination = S1Routes.TODAY, modifier = Modifier.fillMaxSize().testTag("s1-navigation").semantics { testTagsAsResourceId = true }) {
+    val scope = rememberCoroutineScope()
+    var selectedAppointment by remember { mutableStateOf<UUID?>(null) }
+    var appointmentRevision by remember { mutableIntStateOf(0) }
+    var savedReminderDenied by rememberSaveable { mutableStateOf(false) }
+    var awaitingNotificationGrant by rememberSaveable { mutableStateOf(false) }
+    var grantBaseline by rememberSaveable { mutableIntStateOf(permissionRevision) }
+    SideEffect { graph.reminders.observedPermissionRevision = permissionRevision }
+    val savedReminderStatus = remember(graph, readSavedReminderStatus) { ReminderSettingsState {
+        withContext(Dispatchers.IO) {
+            readSavedReminderStatus?.invoke() ?: readReminderSettingsStatus(graph.reminders::enabled) {
+                graph.database.storeMetadataDao().find(AppointmentReminders.PERMISSION_REQUESTED) != null
+            }
+        }
+    } }
+    suspend fun refreshSavedReminder() {
+        savedReminderStatus.refresh()
+        savedReminderDenied = savedReminderStatus.error == null && savedReminderStatus.status == ReminderSettingsState.Status.denied
+    }
+    val queuedPermission by graph.reminders.permissionRequest.collectAsState()
+    LaunchedEffect(awaitingNotificationGrant, permissionRevision, permissionInFlight, queuedPermission) {
+        if (awaitingNotificationGrant && (permissionRevision != grantBaseline || (!permissionInFlight && !queuedPermission))) {
+            refreshSavedReminder()
+            awaitingNotificationGrant = false
+        }
+    }
+    val onAppointmentSaved: (AppointmentEditorState) -> Unit = { editor ->
+        val baseline = graph.reminders.takePendingPermissionBaseline()
+        if (baseline != null) {
+            grantBaseline = baseline
+            awaitingNotificationGrant = true
+            savedReminderDenied = false
+            if (permissionRevision != baseline) {
+                awaitingNotificationGrant = false
+                scope.launch { refreshSavedReminder() }
+            }
+        } else if (editor.reminderEnabled) {
+            scope.launch { refreshSavedReminder() }
+        } else savedReminderDenied = false
+        appointmentRevision++
+        back()
+    }
+
+    NavHost(
+        nav, startDestination = S1Routes.TODAY,
+        modifier = Modifier.fillMaxSize().testTag("s1-navigation").semantics { testTagsAsResourceId = true },
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None },
+        // Navigation 2.10 has separate predictive-back defaults (S2-D14).
+        predictivePopEnterTransition = { EnterTransition.None },
+        predictivePopExitTransition = { ExitTransition.None },
+        sizeTransform = null,
+    ) {
         composable(S1Routes.TODAY) {
-            val today = remember { TodayUiState(graph.sessions, graph.students, graph.clock) }
-            OnResume { today.load() }
-            TodayScreen(today, navigator::open)
+            val today = remember { TodayUiState(graph.sessions, graph.students, graph.clock, graph.zone) }
+            val appointments = remember { AppointmentListState(graph.appointments, graph.students, graph.clock, graph.zone) }
+            OnResume { today.load(); appointments.load() }
+            LaunchedEffect(appointmentRevision) { today.load(); appointments.load() }
+            TodayS2Screen(today, appointments, navigator::open,
+                onSettings = { nav.navigate(S2Routes.SETTINGS) },
+                onCalendar = { nav.navigate(S2Routes.CALENDAR) },
+                onCreate = { date -> nav.navigate(S2Routes.createAppointment(date)) },
+                onAppointment = { id -> selectedAppointment = id })
+        }
+        composable(S2Routes.SETTINGS) {
+            val state=remember(graph) { ReminderSettingsState {
+                kotlinx.coroutines.withContext(Dispatchers.IO) {
+                    readReminderSettingsStatus(graph.reminders::enabled) {
+                        graph.database.storeMetadataDao().find(AppointmentReminders.PERMISSION_REQUESTED) != null
+                    }
+                }
+            } }
+            OnResume { state.refresh() }
+            ReminderSettingsScreen(state,back) { openNotificationSettings(graph.context) }
+        }
+        composable(S2Routes.CALENDAR) {
+            val appointments = remember { AppointmentListState(graph.appointments, graph.students, graph.clock, graph.zone) }
+            val calendar = remember { CalendarUiState(appointments) }
+            OnResume { calendar.load() }
+            LaunchedEffect(appointmentRevision) { calendar.load() }
+            CalendarScreen(calendar, back,
+                onCreate = { date -> nav.navigate(S2Routes.createAppointment(date)) },
+                onAppointment = { id -> selectedAppointment = id })
+        }
+        composable(S2Routes.APPOINTMENT_CREATE) { entry ->
+            val date = LocalDate.parse(requireNotNull(entry.arguments?.getString(S2Routes.ARG_DATE)))
+            val editor = remember(date) { AppointmentEditorState(graph.appointments, graph.students, graph.clock, graph.zone, date) }
+AppointmentEditorScreen(editor, back) { onAppointmentSaved(editor) }
+        }
+        composable(S2Routes.APPOINTMENT_EDIT) { entry ->
+            val id = UUID.fromString(requireNotNull(entry.arguments?.getString(S2Routes.ARG_APPOINTMENT)))
+            val editor = remember(id) { AppointmentEditorState(graph.appointments, graph.students, graph.clock, graph.zone, graph.clock.today(graph.zone), id) }
+AppointmentEditorScreen(editor, back) { onAppointmentSaved(editor) }
         }
         composable(S1Routes.STUDENTS) {
             val state = remember { StudentListViewModel(graph.students, sessionRepository = graph.sessions, creditUseCases = graph.credits, clock = graph.clock, zoneId = graph.zone) }
@@ -131,8 +256,9 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
             StudentListScreen(state, navigator::open, { navigator.open(S1Routes.TODAY) }, showRootSwitch = true, autoLoad = false)
         }
         composable(S1Routes.STUDENT_CREATE) {
-            val state = remember { StudentEditorViewModel(StudentEditorMode.Add, graph.students) }
-            StudentEditorScreen(state, back, { record -> if (record != null) { navigator.back(); navigator.open(S1Routes.studentDetail(record.studentID)) } }, sessionRepository = graph.sessions, historyRepository = graph.historyRepository)
+            val state = remember { StudentFeatureFactory.editorViewModel(StudentEditorMode.Add, graph.students) }
+            StudentEditorScreen(state, back, { record -> if (record != null) { navigator.back(); navigator.open(S1Routes.studentDetail(record.studentID)) } }, sessionRepository = graph.sessions, historyRepository = graph.historyRepository, appointments = graph.appointments,
+                makeDeleteViewModel = { studentID -> StudentFeatureFactory.deleteViewModel(studentID, graph.students, graph.sessions, graph.historyRepository, graph.appointments) })
         }
         composable(S1Routes.STUDENT_DETAIL) { entry ->
             val id = StudentID.parse(requireNotNull(entry.arguments?.getString(S1Routes.ARG_STUDENT_ID)))
@@ -142,9 +268,10 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
         }
         composable(S1Routes.STUDENT_EDIT) { entry ->
             val id = StudentID.parse(requireNotNull(entry.arguments?.getString(S1Routes.ARG_STUDENT_ID)))
-            val state = remember(id) { StudentEditorViewModel(StudentEditorMode.Edit(id), graph.students) }
+            val state = remember(id) { StudentFeatureFactory.editorViewModel(StudentEditorMode.Edit(id), graph.students) }
             StudentEditorScreen(state, back, { back() }, onArchived = back, onDeleted = { navigator.open(S1Routes.STUDENTS) },
-                onRoute = navigator::open, sessionRepository = graph.sessions, historyRepository = graph.historyRepository)
+                onRoute = navigator::open, sessionRepository = graph.sessions, historyRepository = graph.historyRepository, appointments = graph.appointments,
+                makeDeleteViewModel = { studentID -> StudentFeatureFactory.deleteViewModel(studentID, graph.students, graph.sessions, graph.historyRepository, graph.appointments) })
         }
         composable(S1Routes.STUDENT_PACKAGES) { entry ->
             val id = StudentID.parse(requireNotNull(entry.arguments?.getString(S1Routes.ARG_STUDENT_ID)))
@@ -197,6 +324,17 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
             S1ActiveDestination(graph, id, back, { navigator.open(S1Routes.TODAY) }, { adjustmentRequested = it; navigator.open(S1Routes.packageDetail(it)) })
         }
     }
+    selectedAppointment?.let { id ->
+        val actions = remember(id) { CourseActionState(id, graph.appointments, graph.credits, graph.students, graph.clock, graph.zone) }
+        CourseActionSheet(actions, { selectedAppointment = null }, {
+            selectedAppointment = null
+            appointmentRevision++
+        }, { editID -> selectedAppointment = null; nav.navigate(S2Routes.editAppointment(editID)) },
+            { sessionID -> selectedAppointment = null; navigator.open(S1Routes.activeSession(sessionID)) })
+    }
+    SavedReminderReadError(savedReminderStatus) { scope.launch { refreshSavedReminder() } }
+    if (savedReminderDenied) FcConfirmationDialog("课程安排已保存", "通知权限已拒绝，提醒未开启。可前往系统设置开启。", "前往设置",
+        { savedReminderDenied=false; nav.navigate(S2Routes.SETTINGS) }, { savedReminderDenied=false }, cancelTitle="完成",tag="saved-reminder-denied")
     if (notificationMissing) FcConfirmationDialog("训练无法打开", "该训练已结束或不存在。", "知道了", { notificationMissing = false }, { notificationMissing = false }, tag = "notification-unavailable")
 }
 

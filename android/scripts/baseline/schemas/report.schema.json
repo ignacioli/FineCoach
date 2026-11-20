@@ -1,0 +1,125 @@
+{
+  "$comment": "Source: /Users/liyongqiang/.agents/skills/ig-design-system/schemas/report.schema.json; copied 2026-11-17.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "report.schema.json",
+  "title": "Comparer result for one core screen",
+  "type": "object",
+  "required": [
+    "screen",
+    "layers",
+    "capture",
+    "summary",
+    "checks",
+    "result"
+  ],
+  "properties": {
+    "screen": {
+      "type": "string"
+    },
+    "layers": {
+      "type": "string",
+      "description": "layers.json path and design version"
+    },
+    "capture": {
+      "type": "string",
+      "description": "capture.json path"
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "mapped",
+        "missing",
+        "failed",
+        "exceptions"
+      ],
+      "properties": {
+        "mapped": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "missing": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ambiguous": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "exceptions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "exceptionRatio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "kind",
+          "status"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "size",
+              "gap",
+              "padding",
+              "align",
+              "absolute",
+              "color",
+              "text",
+              "mapping"
+            ]
+          },
+          "expected": {},
+          "actual": {},
+          "delta": {
+            "type": "number"
+          },
+          "tolerance": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "fail",
+              "exception",
+              "missing",
+              "ambiguous"
+            ]
+          }
+        }
+      }
+    },
+    "diffPng": {
+      "type": "string",
+      "description": "difference map written by the comparer, if any"
+    },
+    "result": {
+      "type": "string",
+      "enum": [
+        "PASS",
+        "FAIL"
+      ]
+    }
+  }
+}

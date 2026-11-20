@@ -9,7 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.*
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.width
 import androidx.core.view.ViewCompat
@@ -35,6 +35,7 @@ import org.robolectric.annotation.GraphicsMode
 @Config(sdk = [36], qualifiers = "zh-rCN-w320dp-h640dp-notnight-mdpi")
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class ExerciseTemplateEntryLayoutTests {
+    // Queue IO resumptions on the test UI scheduler instead of resuming on IO workers.
     @get:Rule val compose = createAndroidComposeRule<ComponentActivity>()
     private lateinit var f: T008Fixture
     private lateinit var exerciseRepository: com.ignacioli.finecoach.storage.repository.ExerciseRepository

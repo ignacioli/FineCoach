@@ -393,6 +393,7 @@ sealed interface SaveCoursePackageResult {
 }
 
 interface StudentRepositoryPort {
+    suspend fun displayNames(ids: Set<StudentID>): ApplicationResult<Map<StudentID,String>>
     suspend fun list(query: StudentQuery): ApplicationResult<List<StudentRecord>>
     suspend fun find(studentID: StudentID): ApplicationResult<StudentRecord?>
     suspend fun save(record: StudentRecord): ApplicationResult<StudentRecord>
@@ -420,6 +421,7 @@ interface ExerciseRepositoryPort {
 }
 
 interface SessionRepositoryPort {
+    suspend fun linkedAppointmentID(sessionID: SessionID): ApplicationResult<String?> = ApplicationResult.Success(null)
     suspend fun startOrOpen(command: StartOrOpenSessionCommand): ApplicationResult<SessionRecord>
     suspend fun listActiveSessions(): ApplicationResult<List<ActiveSessionSnapshot>>
     suspend fun active(studentID: StudentID): ApplicationResult<SessionRecord?>
@@ -458,4 +460,10 @@ interface SessionSettlementNotePort {
     suspend fun find(sessionID: SessionID): ApplicationResult<SessionSettlementNoteRecord?>
     suspend fun save(command: SaveSessionSettlementNoteCommand): ApplicationResult<SessionSettlementNoteRecord>
     suspend fun clear(sessionID: SessionID, expectedRevision: Revision): ApplicationResult<Unit>
+}
+
+/** Persisted appointment state is authoritative; notification denial never rolls back a save. */
+fun interface AppointmentReminderPort {
+    suspend fun reconcile()
+    suspend fun appointmentSaved() = reconcile()
 }

@@ -49,7 +49,7 @@ internal object ConformanceComparison {
                 check(fix.optString("decision").startsWith("S1-D") && fix.optString("reason").isNotBlank()) { "pendingBoardFix needs a decision and reason at ${layer.getString("path")}" }
             }
             val expected = expectedBounds(layer, anchor, offset, entry)
-            val row = JSONObject().put("path", layer.getString("path")).put("name", layer.getString("name"))
+            val row = JSONObject().put("path", layer.getString("path")).put("name", layer.getString("name")).put("layerType", layer.optString("type"))
                 .put("mapping", entry.getString("mapping")).put("anchor", anchor).put("toleranceDp", tolerance).put("topOriginApplied", anchor == "top")
                 .put("expectedText", layer.optString("text", "")).put("selector", entry)
                 .put("expected", expected)
@@ -307,22 +307,31 @@ internal object ConformanceComparison {
         val layoutActual = actual.optJSONObject("unclipped") ?: actual
         @Suppress("NAME_SHADOWING") val actual = if (rule?.optString("geometryRule") == "EDITABLE_TEXT_FIELD") JSONObject(layoutActual.toString())
             .put("y", actual.getDouble("y") + actual.getDouble("h") / 2 - expected.getDouble("h") / 2).put("h", expected.getDouble("h")) else layoutActual
+        val text = layer.optString("type") == "text"
+        val alignment = ConformanceTextTolerance.alignment(layer.optString("textAlign", actual.optString("textAlign", "left")))
+        val widthTolerance = ConformanceTextTolerance.width(text, expected.getDouble("w"), tolerance)
+        val tolerances = JSONObject()
         val delta = JSONObject()
         val within = JSONObject()
         for (axis in listOf("x", "y", "w", "h")) {
             val value = if (axis == "y" && anchor == "bottom")
                 (844.0 - actual.getDouble("y") - actual.getDouble("h")) - (844.0 - design.getDouble("y") - design.getDouble("h"))
             else actual.getDouble(axis) - expected.getDouble(axis)
-            delta.put(axis, value); within.put(axis, abs(value) <= if (axis in listOf("x", "y")) 8.0 else tolerance)
+            val used = if (axis in listOf("x", "y")) 8.0 else if (axis == "w") widthTolerance else tolerance
+            tolerances.put(axis, used)
+            delta.put(axis, value); within.put(axis, abs(value) <= used)
         }
-        val text = layer.optString("type") == "text"
         if (text) {
             val center = actual.getDouble("y") + actual.getDouble("h") / 2 - expected.getDouble("y") - expected.getDouble("h") / 2
             delta.put("centerY", center); within.put("centerY", abs(center) <= tolerance)
+            val fraction = when (alignment) { "right" -> 1.0; "center" -> 0.5; else -> 0.0 }
+            val anchorDelta = actual.getDouble("x") + fraction * actual.getDouble("w") - expected.getDouble("x") - fraction * expected.getDouble("w")
+            delta.put("textAnchor", anchorDelta); tolerances.put("textAnchor", tolerance)
+            within.put("textAnchor", abs(anchorDelta) <= tolerance)
         }
-        return JSONObject().put("delta", delta).put("withinTolerance", within)
+        return JSONObject().put("delta", delta).put("withinTolerance", within).put("tolerancesDp", tolerances).put("textAlignment", alignment)
             .put("actualBounds", actual).put("expectedBounds", expected)
-            .put("matches", listOf("x", "y", "w", "h").all { within.getBoolean(it) })
+            .put("matches", listOf("x", "y", "w", "h").all { within.getBoolean(it) } && (!text || within.getBoolean("textAnchor")))
             .put("comparisonAxes", JSONArray(listOf("x", "y", "w", "h")))
             .put("textLineBox", if (text) "TOKEN_LINE_HEIGHT_CENTERED" else JSONObject.NULL)
             .put("rawYDelta", actual.getDouble("y") - layer.getDouble("y"))
@@ -384,13 +393,14 @@ internal object ConformanceComparison {
             appendLine("\n不可观测（矢量内部）：${result.getInt("unobservableVectorInternal")}，不计入PASS或偏差。仅父图标几何通过且同名资产来源hash验证通过时成立（S1-D37）。")
             appendLine("\noriginOffsetY=${result.getDouble("effectiveOriginOffsetY")}；Android content top=${result.getDouble("measuredContentTop")}；${result.getString("originReason")}")
             result.optJSONObject("stability")?.let { appendLine("\n双次 fresh Room/composition 渲染：$it") }
-            appendLine("\nS1-D40 R2 / S1-D84：画稿文字框以中心为准换算为 token 行盒（行数 = max(1, round(导出高 / token行高))，高 = 行数 × 字号 × README 行高倍率），尺寸、间距、内边距与对齐的Δ先按S1-D56取最近0.25dp，再采用±2dp含边界；绝对坐标±8dp粗界限，界内仅诊断。ΔcenterY 仅报告。top原点、bottom底距规则不变，无新增偏移。")
-            appendLine("\n| path | 元素 | anchor | 容差dp | Δx | Δy | Δw | Δh | ΔcenterY(报告) | text | token | category | 原因 |")
-            appendLine("|---|---|---|---:|---:|---:|---:|---:|---:|---|---|---|---|")
+            appendLine("\nS1-D40 R2 / S1-D84：画稿文字框以中心为准换算为 token 行盒（行数 = max(1, round(导出高 / token行高))，高 = 行数 × 字号 × README 行高倍率），尺寸、间距、内边距与对齐的Δ先按S1-D56取最近0.25dp，再采用±2dp含边界（S2-D18：文字宽度及横向文字边缘关系使用 max(2,0.07×设计字宽)，文字对齐锚点仍为2dp）；绝对坐标±8dp粗界限，界内仅诊断。ΔcenterY 仅报告。top原点、bottom底距规则不变，无新增偏移。")
+            appendLine("\n| path | 元素 | anchor | base ±dp | tol.w | tol.h | tol.anchor | Δx | Δy | Δw | Δh | ΔcenterY(报告) | text | token | category | 原因 |")
+            appendLine("|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|---|")
             rows.forEach { r ->
                 val d = r.optJSONObject("delta")
-                appendLine("| ${r.getString("path")} | ${r.getString("name")} | ${r.getString("anchor")} | ±${r.getDouble("toleranceDp")} | ${d?.optDouble("x")} | ${d?.optDouble("y")} | ${d?.optDouble("w")} | ${d?.optDouble("h")} | ${if (d?.has("centerY") == true) d.getDouble("centerY") else "N/A"} | ${r.getBoolean("textMatches")} | ${r.optString("tokenComparison", "MISSING")} | ${r.getString("category")} ${r.optJSONArray("failedChecks")} | ${r.optString("reason").ifEmpty { r.optJSONObject("visibility")?.optString("reason") ?: "" }} |")
+                appendLine("| ${r.getString("path")} | ${r.getString("name")} | ${r.getString("anchor")} | ±${r.getDouble("toleranceDp")} | ${r.optJSONObject("geometry")?.optJSONObject("tolerancesDp")?.opt("w") ?: "N/A"} | ${r.optJSONObject("geometry")?.optJSONObject("tolerancesDp")?.opt("h") ?: "N/A"} | ${r.optJSONObject("geometry")?.optJSONObject("tolerancesDp")?.opt("textAnchor") ?: "N/A"} | ${d?.optDouble("x")} | ${d?.optDouble("y")} | ${d?.optDouble("w")} | ${d?.optDouble("h")} | ${if (d?.has("centerY") == true) d.getDouble("centerY") else "N/A"} | ${r.getBoolean("textMatches")} | ${r.optString("tokenComparison", "MISSING")} | ${r.getString("category")} ${r.optJSONArray("failedChecks")} | ${r.optString("reason").ifEmpty { r.optJSONObject("visibility")?.optString("reason") ?: "" }} |")
             }
+            appendLine("\n## 每项实用容差（S2-D18）\n\n```json\n${result.getJSONObject("relativeGeometry").getJSONArray("checks")}\n```")
             appendLine("\n## ICON_PIXELS\n\n每个父图标中心对齐，ink IoU ≥ ${ConformanceIconPixels.minimumIou}，背景 RGB 最大通道差 > ${ConformanceIconPixels.inkThreshold}。AD-01 不适用。")
             result.getJSONObject("ICON_PIXELS").getJSONArray("checks").objects().forEach { appendLine("- ${it.getString("path")} ${it.getString("name")}: ${it.getString("status")}; IoU=${it.opt("iou")}; scale1.4=${it.opt("scale1_4Iou")}") }
             appendLine("\n## relative-spacing diagnostics\n\n${result.optJSONObject("relativeGeometry")?.optJSONObject("counts")}")

@@ -1,8 +1,8 @@
 {
-  "declaration": "fictional-data: all people, identifiers, notes and values are invented walkthrough fixtures.",
+  "declaration": "fictional-data: all people, identifiers, notes and values are invented walkthrough fixtures. Appointment dayOffset/endDayOffset are relative to the device local date at seed time; all other fields remain deterministic.",
   "source": "ios/FineCoachApp/Core/Platform/ArchiveExportDebugSeed.swift（仅借鉴虚构姓名与训练文案风格）",
-  "seedVersion": 3,
-  "dataset": "fictional-s1-coach-core-v3",
+  "seedVersion": 4,
+  "dataset": "fictional-s1-coach-core-v4",
   "clockUTC": "2026-11-09T00:00:00Z",
   "uuidPrefix": "72000000-0000-4000-8000-",
   "generatedIDStart": 1000,
@@ -10,7 +10,7 @@
   "expectedRows": {
     "empty": 1088,
     "single": 1138,
-    "multi": 1149
+    "multi": 1167
   },
   "scenarios": [
     {
@@ -250,7 +250,9 @@
       "state": "completed",
       "startOffsetSeconds": 0,
       "finishOffsetSeconds": 0,
-      "trainingFocus": [],
+      "trainingFocus": [
+
+      ],
       "sections": [
         {
           "scenario": "T019 历史训练分段",
@@ -362,7 +364,9 @@
       "studentID": 1,
       "state": "inProgress",
       "startOffsetSeconds": 0,
-      "trainingFocus": [],
+      "trainingFocus": [
+
+      ],
       "sections": [
         {
           "scenario": "T019 进行中分段",
@@ -467,7 +471,9 @@
       "studentID": 2,
       "state": "inProgress",
       "startOffsetSeconds": 0,
-      "trainingFocus": [],
+      "trainingFocus": [
+
+      ],
       "sections": [
         {
           "scenario": "T019 第二位学员的进行中分段",
@@ -601,7 +607,9 @@
         "multi"
       ],
       "name": "全身基础·力量与体能",
-      "trainingFocus": [],
+      "trainingFocus": [
+
+      ],
       "offsetSeconds": 0,
       "sections": [
         {
@@ -697,6 +705,137 @@
           ]
         }
       ]
+    }
+  ],
+  "appointments": [
+    {
+      "scenario": "T051 fictional S2 scheduled",
+      "variants": [
+        "multi"
+      ],
+      "id": 20000,
+      "studentID": 3,
+      "dayOffset": -1,
+      "startTime": "08:00",
+      "state": "scheduled"
+    },
+    {
+      "scenario": "T051 fictional S2 scheduled",
+      "variants": [
+        "multi"
+      ],
+      "id": 20010,
+      "studentID": 3,
+      "dayOffset": 0,
+      "startTime": "08:00",
+      "state": "scheduled"
+    },
+    {
+      "scenario": "T051 fictional S2 scheduled",
+      "variants": [
+        "multi"
+      ],
+      "id": 20020,
+      "studentID": 4,
+      "dayOffset": 0,
+      "startTime": "10:00",
+      "state": "scheduled"
+    },
+    {
+      "scenario": "T051 fictional S2 scheduled",
+      "variants": [
+        "multi"
+      ],
+      "id": 20030,
+      "studentID": 5,
+      "dayOffset": 0,
+      "startTime": "14:00",
+      "state": "scheduled"
+    },
+    {
+      "scenario": "T051 fictional S2 cancelled",
+      "variants": [
+        "multi"
+      ],
+      "id": 20040,
+      "studentID": 6,
+      "dayOffset": 0,
+      "startTime": "16:00",
+      "state": "cancelled"
+    },
+    {
+      "scenario": "T051 fictional S2 absent",
+      "variants": [
+        "multi"
+      ],
+      "id": 20050,
+      "studentID": 2,
+      "dayOffset": 0,
+      "startTime": "17:00",
+      "state": "absent",
+      "absentCreditChoice": "charged"
+    },
+    {
+      "scenario": "T051 fictional S2 absent",
+      "variants": [
+        "multi"
+      ],
+      "id": 20060,
+      "studentID": 3,
+      "dayOffset": 0,
+      "startTime": "18:00",
+      "state": "absent",
+      "absentCreditChoice": "notCharged"
+    },
+    {
+      "scenario": "T051 fictional S2 scheduled",
+      "variants": [
+        "multi"
+      ],
+      "id": 20070,
+      "studentID": 6,
+      "dayOffset": 1,
+      "startTime": "10:00",
+      "state": "scheduled"
+    },
+    {
+      "scenario": "T051 fictional S2 inProgress",
+      "variants": [
+        "multi"
+      ],
+      "id": 20080,
+      "studentID": 1,
+      "dayOffset": 0,
+      "startTime": "09:00",
+      "state": "inProgress"
+    },
+    {
+      "scenario": "T051 fictional S2 scheduled",
+      "variants": [
+        "multi"
+      ],
+      "id": 20090,
+      "studentID": 3,
+      "dayOffset": 1,
+      "startTime": "14:00",
+      "state": "scheduled",
+      "termination": "RepeatCount",
+      "count": 3,
+      "seriesID": 21000
+    },
+    {
+      "scenario": "T051 fictional S2 scheduled",
+      "variants": [
+        "multi"
+      ],
+      "id": 20100,
+      "studentID": 4,
+      "dayOffset": 2,
+      "startTime": "16:00",
+      "state": "scheduled",
+      "termination": "EndDate",
+      "endDayOffset": 6,
+      "seriesID": 21001
     }
   ]
 }

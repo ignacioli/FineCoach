@@ -1188,7 +1188,7 @@ contributor 失败整笔 rollback；降级、固定值冲突、同版本缺行/�
 
 S1 数据由独立的 debug-only `S1DebugSeed` 经真实 Repository 写入一份全新、显式标记所有权的 `finecoach.db`，这正是冻结 S1Runtime 默认读取的库；不替换产品 factory，不通过 S0 contributor 的同步事务调用会切 dispatcher 的 Repository。S0 contributor 接口仍为 S0 测试保留，未改其版本/UUID/clock/inventory。这个接线取代原先“给 S0 contributor 加业务行、把业务页面改读另一个库”的预案：后者需修改已冻结的 graph/factory 且会让默认 S1 读不到 seed。
 
-只接受全新 app 数据目录，或完全匹配 dataset/version/scenario/complete 的既有 S1 seed。任何已有非 seed 数据库（包括空库）拒绝；重复执行只验证持久标记，不修改体验中编辑、删除、完成过的数据。初始化中断保留 installing 并非零，不自动 reset/repair。需要清理/更换场景由负责人另行决定，本工具不提供清库命令。Appointment 仍属于 S2，不造假数据。
+只接受全新 app 数据目录，或完全匹配 dataset/version/scenario/complete 的既有 S1 seed。除仅有提醒 startup metadata 且全部业务表为空的 store 外，任何已有非 seed 数据库（包括带其他 metadata 的空库）拒绝；重复执行只验证持久标记，不修改体验中编辑、删除、完成过的数据。初始化中断保留 installing 并非零，不自动 reset/repair。需要清理/更换场景由负责人另行决定，本工具不提供清库命令。S2 Phase 6 的 multi 预约扩展和本地日期偏移规则见 T051。
 
 本轮 execution record：变更为非 UI debug 基础设施；复用既有 catalog，无视觉设计 delta；
 新增入口为 adb instrumentation，不新增用户交互，entry/layout map 沿用本 README 的 S0-08 map；
@@ -1556,3 +1556,47 @@ L3 集中走查已于 2026-11-16 进行，逐项结果见 [walkthrough §0.4](do
 S0L3-W1 修复与门禁见 S1-D114：修复已合入 local main `47f56c3`；API 31 与 Pixel 8a 机器验证重复桌面启动后均只有 1 个 MainActivity 实例；主机门禁 unit 1023/0、7 核心屏 hash 不变、P7 15/0，日志 `.handoff/logs/2026-11-16-w1-gate{A,B}.log`。机器验证不替代负责人 A3 复核，本次仅整理既有证据，未重跑构建或设备验证。
 
 负责人 2026-11-16 认可 S0 运行清单与验收（S0-SC-003），S0 关闭，T011/T006 跨平台段带 D10 BLOCKED，G7 DEFERRED 到 S4，S0-FR-130 按 S1-D111 原样接受。
+
+## S2：预约和提醒
+
+需求与验收见 specs `FineCoach/007-android-port/s2-appointments/spec.md`（S2-D01）；执行记录见 [`docs/s2/`](docs/s2/README.md)。
+
+### T015 / Phase 2 checkpoint：领域、存储与基线门禁
+
+**续跑 1 / 2 指定范围 PASS；Phase 2 checkpoint PENDING（2026-11-17）**。seed v3 与余下 4 张核心屏的阻塞已解除，完整记录、文件清单和日志见 [T015](docs/s2/T015.md)；iOS 行号对齐表见 [T010](docs/s2/T010.md)、[T013](docs/s2/T013.md)。无新 UI，不新增 entry/layout map 行。
+
+最终 schema 下：S1DebugSeedTests 12/0/0/0、DebugSeedTests 10/0/0/0、s0Room 21/0/0/0、s0G6 87/0/0/0（tests/failures/errors/skips），全部 exit 0。seed 只改一行，显式接受 schema 2 或 3；保留 ownership/generation/完整性和原测试断言。详见 [T012](docs/s2/T012.md)。
+
+7 张 S1 锁定 PNG 已齐，实际完整 SHA-256 全部匹配既有批准值；补齐后 7 个 conformance task（含 Gradle manifest finalizer）各 1/0/0/0、exit 0。canonical 全 7 图正例 exit 0、临时副本改单 hash 负例 exit 1；生产 gate.sh 的 baseline-manifest 门无 stub 返回 PASS。未改 manifest hash 或新增视觉批准。哈希表与原始日志见 [T014](docs/s2/T014.md)。
+
+S2-D06 / FR-007a 已落地：第二安排遇到已关联其他安排的 active Session，返回携带 A/session id 的 PreviousTrainingNeedsHandling，全部行不变；正常完成/放弃旧训练后 B 可新建，未关联安排的临时训练仍复用并关联。续跑 2 定向 AppointmentUseCaseTests10 + S2VectorRunnerTests10 + ActiveSessionRepositoryTests28 + SessionSettlementTests23 = 71/0/0/0，日志和差异见 [T013](docs/s2/T013.md)。Phase 5 可见入口待该 phase 实现。S2 iOS runner/双端对账、宿主全量门禁及独立复核仍 PENDING；不宣称整个 Phase 2 checkpoint 完成。未 commit、merge、push 或修改 specs。
+
+续跑 4 修正 focus-only 编辑误脱离（移除 DAO 绕路）、补全迁移回滚及 fresh/migrated trigger 断言，定向 Domain10 + UseCase11 + Migration3 + S2Vector10 = 34/0/0/0。训练屏完整批准 digest 在 S1 README / T028 历史 XML 中找到，核对锁图一致后补为 64 位；宿主 .handoff 脚本不列入本分支文件清单。详见 T013/T014/T015。宿主已告知 gate A/B 全绿、G6 两端一致；删除学员/训练外键 blocker 在续跑 4 保留，续跑 5 已按 S2-D07 落地：删学员同事务清空安排/系列，保留课包/ledger 历史，实际删 Session 时 SET NULL；deleteFuture 引用保护保留。定向 59/0/0/0，证据与 Phase 3 撤销闹钟交接见 T012/T015；当前改动后的宿主复跑/复核仍 PENDING。
+
+### T023 / Phase 3 checkpoint：提醒
+
+**续跑 1 Agent 自测 PASS；续跑 2 指定 UI 回归 FAIL，整体 checkpoint PENDING（2026-11-18）**。T020/T021 的登记、调度、撤销、替换、重排与 T022 的权限/通用文案接线已实现；FR-010 拒绝后可见设置入口仍待 Phase 5（本 phase 白名单不允许新增设置 Feature）。宿主 plan §5 复跑、独立复核和 SC-004 设备部分尚未取得，不将 JVM 自测当作 milestone 验收。
+
+续跑 1 `agent-test.sh`：AppointmentReminderTests 10、CapabilityManifestTests 9、AppointmentUseCaseTests 13、StudentRepositoryTests 12、RestNotificationTests 4、RestNotificationEntryLayoutTests 1、RestTimerTests 2、ScopeBoundaryTests 19，共 **70/0/0/0**；`s0G8` **78/0/0/0**；`s0G6` **87/0/0/0**（tests/failures/errors/skips）。日志、JUnit XML 路径、保留失败及文件清单见 [T023](docs/s2/T023.md)。所有命令经批准 wrapper，仅设独立可写 JVM home，无新依赖；`git diff --check` 通过。
+
+续跑 2 已移除启动 recovery 前的提醒阻塞，并合并启动重复触发；登记改为 OS set 成功后写入。新增异常恢复和真实 TIME_SET receiver 测试，均通过。ExerciseTemplateEntryLayoutTests 同一节点等待连续两次 15 秒超时，按约定停止，未改 S1 断言/超时。当前逐类结果与日志见 [T023 续跑 2](docs/s2/T023.md)。下方 70/78/87 为续跑 1 历史证据。
+
+登记表复用 Room `store_metadata`，无需 migration；S2-D07 删除学员撤销全部已删安排闹钟已有测试。精确访问可用时 setExactAndAllowWhileIdle，否则 setWindow；系统四类广播、启动/恢复与 Room invalidation 都复用 reconcile。独立通知渠道、仅 UUID extras、PUBLIC 通用锁屏文案；未改 S1 休息通知源码。iOS 对齐清单及五行执行记录见 [T020](docs/s2/T020.md)，系统重排见 [T021](docs/s2/T021.md)，权限与既有测试同步原因见 [T022](docs/s2/T022.md)。ScopeBoundaryTests 仅纳入 S2-D01 明确批准的 API/receiver，其他禁止项保留。无新 UI、无 entry/layout map 新行；未提交、切分支、push 或修改 specs。
+
+### T034 / Phase 4 checkpoint：核心屏
+
+**DONE（2026-11-19）。** 宿主 gate 1111/0，三屏 strict 33/0/0、64/0/0、66/0/0，人工例外 ≤1.6%，dsh 复核 PASS；合并 main `0fb16ce`。基线审批移到 Phase 6 走查。见 [T034](docs/s2/T034.md)。
+
+### T045 / Phase 5 checkpoint：课程处理与非核心屏
+
+**DONE（2026-11-19）。** 宿主 gate 1152/0（BUILD 0、BAD 0），dsh 复核两轮修复后 PASS，`p7SideBySide` 20/0；合并 main `b658a8f`。三条 P3 与设备证据、负责人看图带到 Phase 6。见 [T045](docs/s2/T045.md)。
+
+### T054 / Phase 6 checkpoint：设备证据、复核与走查
+
+**DONE（2026-11-19），S2 关闭。** dispatcher 宿主证据：T050 PASS，API 31 emulator r7 与 API 36 emulator r6 各五方法均 `OK (1 test)`，测试前 package alarms 均为0；API31 Settings 总开关由 uiautomator 确认 true→false→true。完整 fingerprints、APK SHA-256、无serial的日志索引与实际fresh-install/重启流程见 [T050](docs/s2/T050.md)；日志为 `.handoff/logs/2026-11-20-s2-t050-r7-*` / `2026-11-20-s2-t050-r6-*`，宿主脚本 `.handoff/bin/s2-device-run.sh`。本 writer 未执行设备。
+
+T052：cursor grok-4.7-medium 只读首轮 FAIL（seed事务复查/rotation测试两项P2）→ fix3修复 → 2026-11-20限定范围复核 PASS；后续 fix4～fix6 修正 Compose测试同步、ICU裸`}`与dumpsys正时长window解析。host gate r5 PASS：BUILD 0、UNIT 0、total 1168、BAD 0，含 assembleDebugAndroidTest、s0G8、s0G3、s0G4、s0Room、s0Conformance、全部p4 conformance、p7SideBySide、s1SeedChecks，见 [T054](docs/s2/T054.md)。
+
+T053 PASS（S2-D24）：负责人走查 1～14 步通过并批准 01 今日 S2、25 日历、23 新建安排三张 baseline，已写入 manifest、APPROVALS.md 与 coreBaselineScreens hash 锁，见 [T053](docs/s2/T053.md)。收尾宿主 gate PASS：BUILD 0、UNIT 0、total 1168、BAD 0，s2BaselineManifest 与 10 张核心屏 baseline-check 全部 PASS；`gate.sh --android` 因无负责人提供的 runlist/manifest 未运行。锁屏外观、API 36 真实授权框、通知点击→Today、channel-off 延后到下一次真机验收。
+
+seed v4 的 multi 增加 15 条预约、两系列（RepeatCount / EndDate）及一笔缺席扣课。dayOffset/endDayOffset 基于首次 seed 时设备本地日期；其余数据确定，重复 seed 不重算日期/覆盖人工编辑。仅 startup metadata 且无任何业务行的 store 可 seed；含用户数据或其他 metadata 仍拒绝。通知锁屏 visibility 保持 Phase 3 的 PUBLIC 决定；正文仍是时间句，不含学员信息。详见 [T050](docs/s2/T050.md)、[T051](docs/s2/T051.md)、[walkthrough](docs/s2/walkthrough.md)、[T054](docs/s2/T054.md)。

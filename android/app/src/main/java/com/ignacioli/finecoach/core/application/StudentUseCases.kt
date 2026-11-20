@@ -9,8 +9,10 @@ class StudentUseCases(
     private val repository: StudentRepositoryPort,
     private val clock: AppClock,
     private val ids: StableIDGenerator,
+    private val reminders: AppointmentReminderPort = AppointmentReminderPort {},
 ) {
     suspend fun list(query: StudentQuery = StudentQuery()) = repository.list(query)
+    suspend fun displayNames(ids: Set<StudentID>) = repository.displayNames(ids)
     suspend fun find(studentID: StudentID) = repository.find(studentID)
 
     suspend fun create(draft: StudentDraft): ApplicationResult<StudentRecord> = studentValidation {
@@ -33,7 +35,7 @@ class StudentUseCases(
     suspend fun archive(studentID: StudentID) = repository.archive(studentID)
     suspend fun restore(studentID: StudentID) = repository.restore(studentID)
     suspend fun delete(studentID: StudentID, confirmedDisplayName: String) =
-        repository.delete(studentID, confirmedDisplayName)
+        repository.delete(studentID, confirmedDisplayName).also { if (it is ApplicationResult.Success) reminders.reconcile() }
 }
 
 internal fun StudentRecord.toStudent(): Student = Student.fromDraft(
