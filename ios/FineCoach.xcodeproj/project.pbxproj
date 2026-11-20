@@ -435,6 +435,7 @@
 		FC0060000000000000000006 /* SharedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0060000000000000000005 /* SharedVectorTests.swift */; };
 		FC0170000000000000000002 /* S1SharedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0170000000000000000001 /* S1SharedVectorTests.swift */; };
 		FC0270000000000000000002 /* S2SharedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0270000000000000000001 /* S2SharedVectorTests.swift */; };
+		FC0370000000000000000002 /* S3SharedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0370000000000000000001 /* S3SharedVectorTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -897,6 +898,7 @@
 		FC0060000000000000000005 /* SharedVectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../SharedVectors/SharedVectorTests.swift; sourceTree = "<group>"; };
 		FC0170000000000000000001 /* S1SharedVectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../SharedVectors/S1SharedVectorTests.swift; sourceTree = "<group>"; };
 		FC0270000000000000000001 /* S2SharedVectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../SharedVectors/S2SharedVectorTests.swift; sourceTree = "<group>"; };
+		FC0370000000000000000001 /* S3SharedVectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../SharedVectors/S3SharedVectorTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1829,6 +1831,7 @@
 				FC0060000000000000000005 /* SharedVectorTests.swift */,
 				FC0170000000000000000001 /* S1SharedVectorTests.swift */,
 				FC0270000000000000000001 /* S2SharedVectorTests.swift */,
+				FC0370000000000000000001 /* S3SharedVectorTests.swift */,
 				FC0320000000000000000001 /* PlatformCryptoParityTests.swift */,
 			);
 			path = Backup;
@@ -2620,6 +2623,7 @@
 				FC0060000000000000000006 /* SharedVectorTests.swift in Sources */,
 				FC0170000000000000000002 /* S1SharedVectorTests.swift in Sources */,
 				FC0270000000000000000002 /* S2SharedVectorTests.swift in Sources */,
+				FC0370000000000000000002 /* S3SharedVectorTests.swift in Sources */,
 				FC0320000000000000000002 /* PlatformCryptoParityTests.swift in Sources */,
 				B252 /* ScenePrivacyCoordinatorTests.swift in Sources */,
 				B201 /* FictitiousFixtures.swift in Sources */,
@@ -2787,7 +2791,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9Z7427RG9X;
+				DEVELOPMENT_TEAM = L5VL8A64P3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FineCoachApp/FineCoach-Info.plist;
 				INFOPLIST_KEY_CFBundleDevelopmentRegion = "zh-Hans";
@@ -2795,7 +2799,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app;
 				PRODUCT_NAME = FineCoach;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -2811,7 +2815,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9Z7427RG9X;
+				DEVELOPMENT_TEAM = L5VL8A64P3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FineCoachApp/FineCoach-Info.plist;
 				INFOPLIST_KEY_CFBundleDevelopmentRegion = "zh-Hans";
@@ -2819,7 +2823,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app;
 				PRODUCT_NAME = FineCoach;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -2830,7 +2834,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				DEVELOPMENT_TEAM = 9Z7427RG9X;
+				DEVELOPMENT_TEAM = L5VL8A64P3;
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app.tests;
 				PRODUCT_NAME = FineCoachTests;
@@ -2843,7 +2847,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				DEVELOPMENT_TEAM = 9Z7427RG9X;
+				DEVELOPMENT_TEAM = L5VL8A64P3;
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app.tests;
 				PRODUCT_NAME = FineCoachTests;
@@ -2855,7 +2859,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				DEVELOPMENT_TEAM = 9Z7427RG9X;
+				DEVELOPMENT_TEAM = L5VL8A64P3;
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.finecoach.app.integration-tests";
 				PRODUCT_NAME = FineCoachIntegrationTests;
@@ -2868,7 +2872,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				DEVELOPMENT_TEAM = 9Z7427RG9X;
+				DEVELOPMENT_TEAM = L5VL8A64P3;
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.finecoach.app.integration-tests";
 				PRODUCT_NAME = FineCoachIntegrationTests;
@@ -2880,7 +2884,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 9Z7427RG9X;
+				DEVELOPMENT_TEAM = L5VL8A64P3;
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.finecoach.app.ui-tests";
 				PRODUCT_NAME = FineCoachUITests;
@@ -2893,7 +2897,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 9Z7427RG9X;
+				DEVELOPMENT_TEAM = L5VL8A64P3;
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.finecoach.app.ui-tests";
 				PRODUCT_NAME = FineCoachUITests;
@@ -2909,13 +2913,13 @@
 				CODE_SIGN_ENTITLEMENTS = FineCoachWidgets/FineCoachWidgets.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9Z7427RG9X;
+				DEVELOPMENT_TEAM = L5VL8A64P3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FineCoachWidgets/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "精练教练";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", "@executable_path/../../Frameworks", );
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app.widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -2931,13 +2935,13 @@
 				CODE_SIGN_ENTITLEMENTS = FineCoachWidgets/FineCoachWidgets.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9Z7427RG9X;
+				DEVELOPMENT_TEAM = L5VL8A64P3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FineCoachWidgets/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "精练教练";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", "@executable_path/../../Frameworks", );
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app.widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

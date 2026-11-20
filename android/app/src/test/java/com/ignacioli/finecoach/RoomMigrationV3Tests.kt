@@ -58,7 +58,7 @@ class RoomMigrationV3Tests {
         legacy(context)
         val db = FineCoachDatabaseFactory.create(context)
         try {
-            assertEquals(3, db.openHelper.writableDatabase.version)
+            assertEquals(4, db.openHelper.writableDatabase.version)
             assertEquals("fictional-v2", db.storeMetadataDao().find("retained")?.value)
             assertNotNull(db.s1Dao().findSession(UUID(0, 3)))
             val s = RecurrenceSeries(UUID(0, 4), StudentID.fromUUID(UUID(0, 2)), RecurrenceInterval.everyTwoDays,
@@ -101,7 +101,7 @@ class RoomMigrationV3Tests {
             db.rawQuery("SELECT count(*) FROM sqlite_master WHERE name = 'appointments'", null).use { assertTrue(it.moveToFirst()); assertEquals(0, it.getInt(0)) }
         }
         val valid = FineCoachDatabaseFactory.create(context)
-        try { assertEquals(3, valid.openHelper.writableDatabase.version) } finally { valid.close() }
+        try { assertEquals(4, valid.openHelper.writableDatabase.version) } finally { valid.close() }
     }
     @Test fun migratedStudentDeletionClearsScheduleAndSessionDeletionNullsLinks() = run { context ->
         legacy(context)

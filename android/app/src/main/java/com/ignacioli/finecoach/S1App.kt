@@ -298,7 +298,7 @@ AppointmentEditorScreen(editor, back) { onAppointmentSaved(editor) }
         }
         composable(S1Routes.HISTORY_DETAIL) { entry ->
             val id = SessionID.parse(requireNotNull(entry.arguments?.getString(S1Routes.ARG_SESSION_ID)))
-            val state = remember(id) { HistoryUiState(graph.history, null, graph.students) }
+            val state = remember(id) { HistoryUiState(graph.history, null, graph.students, sessionProgress(graph), graph.zone) }
             val templates = remember(id) { HistoryTemplateState(graph.templates, graph.clock, graph.ids) }
             HistoryDetailScreen(state, id, graph.zone, back, templates)
         }
@@ -340,10 +340,10 @@ AppointmentEditorScreen(editor, back) { onAppointmentSaved(editor) }
 
 @Composable
 private fun S1ActiveDestination(graph: S1AppGraph, id: SessionID, onBack: () -> Unit, onToday: () -> Unit, onAdjust: (CoursePackageID) -> Unit) {
-    val active = remember(id) { ActiveSessionUiState(graph.active, graph.clock, graph.ids, graph.sessions, graph.historyRepository, graph.exercises, graph.rests) }
+    val active = remember(id) { ActiveSessionUiState(graph.active, graph.clock, graph.ids, graph.sessions, graph.historyRepository, graph.exercises, graph.rests, sessionProgress(graph), graph.zone) }
     val exercises = remember { ExerciseUiState(graph.exercises, graph.exerciseRepository, graph.historyRepository, graph.sessions) }
     val templates = remember { TemplateUiState(graph.templates, graph.clock, graph.ids) }
-    val summary = remember(id) { SessionSummaryUiState(graph.history, graph.clock) }
+    val summary = remember(id) { SessionSummaryUiState(graph.history, graph.clock, sessionProgress(graph), graph.zone) }
     val summaryTemplates = remember(id) { HistoryTemplateState(graph.templates, graph.clock, graph.ids) }
     var finishing by remember { mutableStateOf(false) }
     var summarizing by remember { mutableStateOf(false) }
@@ -380,5 +380,12 @@ private fun S1PackageTrail(graph: S1AppGraph, id: CoursePackageID, onBack: () ->
     owner?.let { CreditAdjustmentTrailScreen(it, id, graph.credits, graph.zone, onBack) } ?: FcPlatformShell(onBack) {
         FcPageHeader("课时流水", onBack = onBack, tag = "package-trail-loading")
         FcListRow(if (failed) "课包无法打开，请返回重试" else "正在加载")
+    }
+}
+
+private fun sessionProgress(graph: S1AppGraph) = ProgressUseCases(graph.historyRepository, graph.sessions) {
+    when (val result = graph.exerciseRepository.searchWithPreferences("", includeHidden = true)) {
+        is ApplicationResult.Failure -> result
+        is ApplicationResult.Success -> ApplicationResult.Success(result.value.preferences.values.filter { it.isAssisted }.map { it.exerciseID }.toSet())
     }
 }

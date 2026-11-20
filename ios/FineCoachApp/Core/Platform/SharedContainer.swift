@@ -2,7 +2,7 @@ import Foundation
 
 /// Shared by the host and its extension; an unavailable group has no fallback.
 enum SharedContainer {
-    static let appGroupIdentifier = "group.com.finecoach.app"
+    static let appGroupIdentifier = "group.com.ignacioli.finecoach"
     static let widgetSnapshotFilename = "widget-today.json"
 
     static var widgetSnapshotURL: URL? {

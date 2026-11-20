@@ -52,7 +52,8 @@ internal fun HistoryEmpty(title: String, body: String, tag: String) {
 
 /** Page-only allowlist: completed sets, focus, date, statistics and nonempty student summary. */
 @Composable
-internal fun HistoryRecordCard(detail: HistoryDetail, zone: ZoneId, studentName: String = "") {
+internal fun HistoryRecordCard(detail: HistoryDetail, zone: ZoneId, studentName: String = "",
+    gains: com.ignacioli.finecoach.core.domain.progress.SessionGains = com.ignacioli.finecoach.core.domain.progress.SessionGains()) {
     val session = detail.content.session
     val exercises = detail.content.exercises.sortedBy { it.orderIndex }
     val sets = exercises.flatMap { it.sets }.filter { it.state == SetRecordingState.completed }
@@ -105,6 +106,7 @@ internal fun HistoryRecordCard(detail: HistoryDetail, zone: ZoneId, studentName:
                 }
             }
         }
+        SessionGainsSection(gains, "history-gains")
         session.studentFacingSummary?.takeIf { it.isNotEmpty() }?.let { summary ->
             HistoryRecordSection("课后总结", "history-record-summary") {
                 FcText(summary, style = FcTypography.body, color = FcColors.textPrimary)

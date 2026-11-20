@@ -17,7 +17,7 @@ final class SystemEntryInfrastructureTests: XCTestCase {
     func testSharedSnapshotUsesFixedFilenameWithoutIdentifiers() throws {
         let container = URL(fileURLWithPath: "/shared-container", isDirectory: true)
         let url = try XCTUnwrap(SharedContainer.snapshotURL(in: container))
-        XCTAssertEqual(SharedContainer.appGroupIdentifier, "group.com.finecoach.app")
+        XCTAssertEqual(SharedContainer.appGroupIdentifier, "group.com.ignacioli.finecoach")
         XCTAssertEqual(url, container.appendingPathComponent("widget-today.json"))
         XCTAssertEqual(url.lastPathComponent, "widget-today.json")
         XCTAssertNil(UUID(uuidString: url.deletingPathExtension().lastPathComponent))

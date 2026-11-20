@@ -1,6 +1,7 @@
 package com.ignacioli.finecoach.storage
 
 import android.content.Context
+import com.ignacioli.finecoach.storage.migration.MIGRATION_3_4
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -31,7 +32,7 @@ object FineCoachDatabaseFactory {
         require(!application.isDeviceProtectedStorage) { "Credential-protected storage required" }
         val path = application.getDatabasePath(DATABASE_NAME)
         return Room.databaseBuilder(application, FineCoachDatabase::class.java, path.absolutePath)
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     installAppointmentIntegrity(db)

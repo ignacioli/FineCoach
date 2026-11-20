@@ -9,6 +9,10 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.text.modifiers.TextAutoSizeLayoutScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.animation.core.*
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.PathEffect
@@ -20,6 +24,7 @@ import androidx.compose.ui.semantics.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -43,6 +48,13 @@ private object SetValueAutoSize : TextAutoSize {
     }
 }
 
+@Composable
+private fun SetValues(values: String, modifier: Modifier) {
+    BasicText(values, modifier.fcLineBox(FcTypography.body, FcLineCount()),
+        style = FcTypography.body.copy(color = FcColors.textPrimary, textAlign = TextAlign.Start),
+        maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis, autoSize = SetValueAutoSize)
+}
+
 private fun Modifier.setHitLayout(visualWidth: Dp? = null, circle: Boolean = false) = layout { measurable, constraints ->
     val placeable = measurable.measure(constraints)
     val width = visualWidth?.roundToPx() ?: placeable.width
@@ -57,9 +69,18 @@ private fun Modifier.setHitLayout(visualWidth: Dp? = null, circle: Boolean = fal
 @Composable
 fun FcSetRow(ordinal: Int, values: String, completed: Boolean, pending: Boolean,
     onConfirm: () -> Unit, onEdit: () -> Unit, modifier: Modifier = Modifier,
-    enabled: Boolean = true, tag: String = "set-row", onUndo: (() -> Unit)? = null) {
+    enabled: Boolean = true, tag: String = "set-row", onUndo: (() -> Unit)? = null,
+    isNewRecord: Boolean = false, recordFloatSequence: Int? = null) {
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+    val measurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    val valueMinimum = with(density) { measurer.measure(values,
+        FcTypography.body.copy(fontSize = FcTypography.body.fontSize * 0.8f), maxLines = 1).size.width.toDp() }
+    val titleMinimum = with(density) { measurer.measure("第 $ordinal 组", FcTypography.body, maxLines = 1).size.width.toDp() }
+    val titleMaximum = (maxWidth - FcComponentMetrics.badge - FcSpacing.space3 * 3 -
+        FcComponentMetrics.field - FcSpacing.space1 * 2 - (FcSpacing.space4 + FcSpacing.space1) - valueMinimum).coerceAtLeast(titleMinimum)
     Row(modifier.fillMaxWidth().heightIn(min = setVisualRhythm).semantics(mergeDescendants = true) {
-        stateDescription = if (completed) "已完成" else if (pending) "待完成" else "草稿"
+        stateDescription = (if (completed && isNewRecord) "新纪录，" else "") + if (completed) "已完成" else if (pending) "待完成" else "草稿"
         customActions = buildList {
             if (enabled && !completed) add(CustomAccessibilityAction("确认") { onConfirm(); true })
             if (enabled) add(CustomAccessibilityAction("编辑") { onEdit(); true })
@@ -80,12 +101,31 @@ fun FcSetRow(ordinal: Int, values: String, completed: Boolean, pending: Boolean,
                             (FcSpacing.space1 - FcComponentMetrics.hairline).toPx(), (FcSpacing.space1 / 2).toPx()))))
             }
         }
-        FcText("第 $ordinal 组", style = FcTypography.body, color = if (completed) FcColors.textPrimary else FcColors.textSecondary)
+        if (completed && isNewRecord) {
+            @OptIn(ExperimentalLayoutApi::class)
+            FlowRow(Modifier.widthIn(max = titleMaximum),
+                horizontalArrangement = Arrangement.spacedBy(FcSpacing.space2), itemVerticalAlignment = Alignment.CenterVertically) {
+                FcText("第 $ordinal 组", style = FcTypography.body, color = FcColors.textPrimary)
+                FcSetRowRecordBadge(Modifier.testTag("$tag-record"))
+            }
+        } else FcText("第 $ordinal 组", style = FcTypography.body, color = if (completed) FcColors.textPrimary else FcColors.textSecondary)
         Box(Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
-            BasicText(values, Modifier.testTag("$tag-values").fcLineBox(FcTypography.body, FcLineCount()),
-                style = FcTypography.body.copy(color = FcColors.textPrimary, textAlign = TextAlign.Start),
-                maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis,
-                autoSize = SetValueAutoSize)
+            SetValues(values, Modifier.testTag("$tag-values"))
+            val float = remember { Animatable(1f) }
+            var floating by remember { mutableStateOf(false) }
+            val distance = with(LocalDensity.current) { FcSpacing.space6.toPx() }
+            LaunchedEffect(recordFloatSequence) {
+                floating = false
+                if (recordFloatSequence != null && completed && isNewRecord) {
+                    float.snapTo(0f); floating = true
+                    // motion.duration.emphasis + motion.curve.standard (easeOut), README §14.2.
+                    float.animateTo(1f, tween(FcMotion.durationEmphasisMillis, easing = FcMotion.curveStandard))
+                    floating = false
+                }
+            }
+            if (floating) SetValues(values, Modifier.testTag("$tag-record-float").graphicsLayer {
+                translationY = -distance * float.value; alpha = 1f - float.value
+            }.clearAndSetSemantics { hideFromAccessibility() })
         }
         // S1-D42: P0-a2 trailing cluster on token gaps — values → space.3 + space.1 → status column
         // (field width) → space.1 → edit; keeps the 38dp rhythm and each 44dp hit box.
@@ -101,4 +141,14 @@ fun FcSetRow(ordinal: Int, values: String, completed: Boolean, pending: Boolean,
             }
         }
     }
+    }
+}
+
+/** DS-SET-ROW's informational part, also used in the session-gains action slot. */
+@Composable
+fun FcSetRowRecordBadge(modifier: Modifier = Modifier) {
+    FcText("新纪录", modifier.background(FcColors.surfaceSelected, FcShapes.capsule)
+        .padding(horizontal = FcSpacing.space2, vertical = FcSpacing.space1)
+        .clearAndSetSemantics { hideFromAccessibility() },
+        style = FcTypography.sectionLabel, color = FcColors.actionPrimary)
 }

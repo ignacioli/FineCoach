@@ -1600,3 +1600,27 @@ T052：cursor grok-4.7-medium 只读首轮 FAIL（seed事务复查/rotation测�
 T053 PASS（S2-D24）：负责人走查 1～14 步通过并批准 01 今日 S2、25 日历、23 新建安排三张 baseline，已写入 manifest、APPROVALS.md 与 coreBaselineScreens hash 锁，见 [T053](docs/s2/T053.md)。收尾宿主 gate PASS：BUILD 0、UNIT 0、total 1168、BAD 0，s2BaselineManifest 与 10 张核心屏 baseline-check 全部 PASS；`gate.sh --android` 因无负责人提供的 runlist/manifest 未运行。锁屏外观、API 36 真实授权框、通知点击→Today、channel-off 延后到下一次真机验收。
 
 seed v4 的 multi 增加 15 条预约、两系列（RepeatCount / EndDate）及一笔缺席扣课。dayOffset/endDayOffset 基于首次 seed 时设备本地日期；其余数据确定，重复 seed 不重算日期/覆盖人工编辑。仅 startup metadata 且无任何业务行的 store 可 seed；含用户数据或其他 metadata 仍拒绝。通知锁屏 visibility 保持 Phase 3 的 PUBLIC 决定；正文仍是时间句，不含学员信息。详见 [T050](docs/s2/T050.md)、[T051](docs/s2/T051.md)、[walkthrough](docs/s2/walkthrough.md)、[T054](docs/s2/T054.md)。
+
+## S3：进步与洞察
+
+需求与验收见 specs `FineCoach/007-android-port/s3-progress-insights/spec.md`（S3-D01）；执行记录见 [`docs/s3/`](docs/s3/README.md)。
+
+### T016 / Phase 2 checkpoint：领域、存储与向量
+
+**PENDING（2026-11-20）**。T010～T014 已实现并通过定向测试；Room v4 显式迁移与完整身体字段往返通过。S3 77 条向量在 Android 与 macOS Foundation 纯 Domain 对照通过，iOS XCTest 仍待宿主定向 runner。s0G6 92/0、s0Room 26/0；续跑 1 按 S3-D04 仅扩展 seed 三处版本判断后，完整单测 **1207/0/0/0**（tests/failures/errors/skips），原 4 项 seed 失败全部消除；未修改测试断言。当前不是 checkpoint 完成；最终结果、日志和逐项文件清单见 [T016](docs/s3/T016.md) 及 T010～T015。未提交或修改 specs 勾选。
+
+### T023 / Phase 3 checkpoint：训练页新纪录与本节收获
+
+**PENDING（2026-11-20，宿主合并前）**。T020 训练页新纪录与确认反馈、T021 总结/历史只读收获已实现；浮起测试时钟与训练入口发布时序问题已修复。负责人本轮提供的最终宿主结果：build/lint 通过，完整单测 **1217/0**；s0G1 **39**、s0G3 **42**、s0G4 **12**、p7SideBySide **24**、s0Conformance **1**、p4SessionDetailConformance **1**，全部 0 失败；cursor 独立复核 **PASS**。checkpoint 在宿主合并前保持 PENDING。本轮 P3 收尾的 P7 唯一 id、备注滚动/点击断言及作者自测见 [T023](docs/s3/T023.md)，入口与布局见 [implementation-map](docs/s3/implementation-map.md)。未 commit、委派或修改 specs。
+
+### T034 / Phase 4 checkpoint：训练趋势与身体数据
+
+待办。
+
+### T045 / Phase 5 checkpoint：需要留意与核心屏
+
+待办。
+
+### T053 / Phase 6 checkpoint：seed、复核与走查
+
+待办。

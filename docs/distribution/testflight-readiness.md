@@ -31,16 +31,16 @@
 
 ### Team
 
-`DEVELOPMENT_TEAM = 9Z7427RG9X`，所有 target 都是自动签名（`project.pbxproj:2747,2750` 等）。
+`DEVELOPMENT_TEAM = L5VL8A64P3`（付费 Apple Developer Program，S2-D04，2026-11-20 起），所有 target 都是自动签名。此前为 `9Z7427RG9X`（Personal Team）。
 
-本机 Xcode 偏好 `com.apple.dt.Xcode` → `IDEProvisioningTeamByIdentifier` 里，这个 Team 记录为 `teamType = "Personal Team"`、`isFreeProvisioningTeam = 1`。**结论：`9Z7427RG9X` 是免费的 Personal Team，不能上传 TestFlight。** 这次核实只读本机配置文件，没有登录 Apple 账号。
+本机 Xcode 偏好 `com.apple.dt.Xcode` → `IDEProvisioningTeamByIdentifier` 里，这个 Team 记录为 `teamType = "Personal Team"`、`isFreeProvisioningTeam = 1`。**结论：`9Z7427RG9X` 是免费的 Personal Team，不能上传 TestFlight，已换为 `L5VL8A64P3`。** 这次核实只读本机配置文件，没有登录 Apple 账号。
 
 ### Bundle ID 与 App Group
 
 | Target | Bundle ID | App Group | MARKETING_VERSION | CURRENT_PROJECT_VERSION | 依据 |
 |---|---|---|---|---|---|
-| FineCoach（App） | `com.finecoach.app` | `group.com.finecoach.app` | 0.2.0 | 1 | `project.pbxproj:2748,2758,2759`（Debug）、`2772,2782,2783`（Release）；`FineCoachApp/FineCoach.entitlements` |
-| FineCoachWidgets（小组件 + Live Activity） | `com.finecoach.app.widgets` | `group.com.finecoach.app` | 0.2.0 | 1 | `project.pbxproj:2871,2878,2879`（Debug）、`2893,2900,2901`（Release）；`FineCoachWidgets/FineCoachWidgets.entitlements` |
+| FineCoach（App） | `com.finecoach.app` | `group.com.ignacioli.finecoach` | 0.3.0 | 1 | `project.pbxproj:2748,2758,2759`（Debug）、`2772,2782,2783`（Release）；`FineCoachApp/FineCoach.entitlements` |
+| FineCoachWidgets（小组件 + Live Activity） | `com.finecoach.app.widgets` | `group.com.ignacioli.finecoach` | 0.3.0 | 1 | `project.pbxproj:2871,2878,2879`（Debug）、`2893,2900,2901`（Release）；`FineCoachWidgets/FineCoachWidgets.entitlements` |
 | FineCoachTests | `com.finecoach.app.tests` | — | — | — | `project.pbxproj:2795,2808`（不上传） |
 | FineCoachIntegrationTests | `com.finecoach.app.integration-tests` | — | — | — | `project.pbxproj:2820,2833`（不上传） |
 | FineCoachUITests | `com.finecoach.app.ui-tests` | — | — | — | `project.pbxproj:2845,2858`（不上传） |
@@ -106,6 +106,7 @@
 
 > **负责人决定（2026-11-02）**：先尝试注册原 ID（`com.finecoach.app`、`com.finecoach.app.widgets`、`group.com.finecoach.app`）。只有被占用时，才整套改成 `com.ignacioli.finecoach`、`com.ignacioli.finecoach.widgets`、`group.com.ignacioli.finecoach`。
 
+- 结果（2026-11-20）：`com.finecoach.app` 在付费 Team `L5VL8A64P3` 下注册成功；`group.com.finecoach.app` 在 Xcode 和网页上都提示 not available（已被其他 Team 占用）。负责人决定只改 Group 为 `group.com.ignacioli.finecoach`，Bundle ID 不变（`com.finecoach.app`、`com.finecoach.app.widgets`）。
 - 事实：`com.finecoach.app`、`com.finecoach.app.widgets`、`group.com.finecoach.app` 还没在任何付费 Team 下注册。Bundle ID 全局唯一，Personal Team 下的自动签名记录可能也占着这个 ID（待核实：加入付费计划后能否在新 Team 下注册同名 ID）。
 - 如果被占用，要改的地方：
   1. 两个 target 的 `PRODUCT_BUNDLE_IDENTIFIER`，小组件必须以 App 的 ID 为前缀。
@@ -130,7 +131,7 @@
 
 > **负责人决定（2026-11-02）**：用 GitHub Pages（选项 B），先发布中文版。开启 Pages 属于仓库设置改动，由负责人操作或另行授权。
 
-- 草稿：`docs/distribution/privacy-policy.zh.md`。
+- 正文：`docs/privacy/index.md`；事实依据：`docs/distribution/privacy-policy-evidence.md`。站点配置 `docs/_config.yml` 只发布隐私政策，`distribution/` 被排除。
 - 选项 A：仓库内 Markdown，用 GitHub 文件页链接当 URL。最省事。
   - 后果：URL 依赖仓库保持公开，改路径或分支会让链接失效。
 - 选项 B：GitHub Pages（例如 `ignacioli.github.io/FineCoach/privacy`）。URL 更稳定，看起来更正式。
@@ -187,7 +188,7 @@
 ## 6. 本轮产出
 
 - `docs/distribution/testflight-readiness.md`（本文件）
-- `docs/distribution/privacy-policy.zh.md`（隐私政策草稿）
+- `docs/privacy/index.md`（隐私政策正文）、`docs/distribution/privacy-policy-evidence.md`（事实依据）
 - `docs/distribution/app-review-notes.md`（审核备注草稿）
 
 三份草稿已由负责人审阅通过（2026-11-02）。隐私政策的生效日期和联系方式，以及审核备注第 4 节（演示档案的链接和密码），等 D4 的 GitHub Pages 开通后再补。

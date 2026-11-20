@@ -1,0 +1,121 @@
+{
+  "id": "s3-insight-ranking",
+  "rule": "M1B-FR-029",
+  "meta": {
+    "requirements": [
+      "S3-FR-005",
+      "E-FR-001",
+      "E-FR-006",
+      "E-FR-007"
+    ],
+    "description": "fictional-data: S3 deterministic parity case",
+    "tags": [
+      "fictional-data",
+      "s3",
+      "insights"
+    ]
+  },
+  "given": {
+    "clock": {
+      "now": "2026-03-15T20:00:00Z"
+    },
+    "timeZone": "America/Los_Angeles",
+    "state": {
+      "context": {
+        "studentName": "虚构学员",
+        "exerciseName": "虚构动作",
+        "sourceKind": "builtIn",
+        "exerciseOrder": 0,
+        "revision": 1,
+        "displayedDurationSeconds": "600",
+        "ordinaryTrainingVolume": null,
+        "privateCoachNote": null,
+        "studentFacingSummary": null,
+        "actionPrivateNote": null,
+        "actionPrivateNotes": {
+        },
+        "latestReport": null
+      },
+      "students": [
+        {
+          "id": "73000000-0000-4000-8000-000000000004",
+          "createdAtUTC": "2026-02-23T20:00:00Z",
+          "archived": false,
+          "sex": "female",
+          "name": "虚构学员"
+        },
+        {
+          "id": "73000000-0000-4000-8000-000000000001",
+          "createdAtUTC": "2026-02-03T20:00:00Z",
+          "archived": false,
+          "sex": "female",
+          "name": "虚构学员"
+        }
+      ],
+      "packages": [
+        {
+          "id": "73000000-0000-4000-8000-00000000000a",
+          "studentID": "73000000-0000-4000-8000-000000000004",
+          "balance": 2,
+          "totalCredits": 10,
+          "endDate": null
+        },
+        {
+          "id": "73000000-0000-4000-8000-00000000000b",
+          "studentID": "73000000-0000-4000-8000-000000000001",
+          "balance": 0,
+          "totalCredits": 10,
+          "endDate": null
+        }
+      ],
+      "appointments": [
+
+      ],
+      "history": [
+
+      ],
+      "assisted": [
+
+      ],
+      "snoozed": [
+
+      ]
+    }
+  },
+  "when": {
+    "op": "s3.insights",
+    "args": {
+      "$ref": "/given/state"
+    }
+  },
+  "then": {
+    "state": {
+      "items": [
+        {
+          "kind": "packageExhausted",
+          "studentID": "73000000-0000-4000-8000-000000000001",
+          "exerciseID": null,
+          "metric": null
+        },
+        {
+          "kind": "packageLow",
+          "studentID": "73000000-0000-4000-8000-000000000004",
+          "exerciseID": null,
+          "metric": null
+        },
+        {
+          "kind": "inactive",
+          "studentID": "73000000-0000-4000-8000-000000000001",
+          "exerciseID": null,
+          "metric": null
+        },
+        {
+          "kind": "inactive",
+          "studentID": "73000000-0000-4000-8000-000000000004",
+          "exerciseID": null,
+          "metric": null
+        }
+      ]
+    }
+  }
+}

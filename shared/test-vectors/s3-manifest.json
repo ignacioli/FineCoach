@@ -1,0 +1,550 @@
+{
+  "version": 1,
+  "count": 77,
+  "meta": {
+    "tags": [
+      "fictional-data"
+    ]
+  },
+  "vectors": [
+    {
+      "id": "s3-gains-first",
+      "path": "s3/gains/m1b-fr-029__s3-gains-first.json",
+      "sha256": "076298145b826ff0e2788454671a229768dfb28ad0b928de8492ed4dba89d284",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-gains-tie",
+      "path": "s3/gains/m1b-fr-029__s3-gains-tie.json",
+      "sha256": "7b2ab389bfbc1a546f37d9a1f1f6bb6e1fd4649b706a6f9cb170edb5c40464c5",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-gains-assistance",
+      "path": "s3/gains/m1b-fr-029__s3-gains-assistance.json",
+      "sha256": "77253f274bd84983487058649611293c2424584dfd6d0b49e7be99a1812dd186",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-gains-duration",
+      "path": "s3/gains/m1b-fr-029__s3-gains-duration.json",
+      "sha256": "1a31281bd9a9a6951d8b0f4244a7a0265be72bceb0a12e6e8bc2644c2466bb43",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-gains-cardio",
+      "path": "s3/gains/m1b-fr-029__s3-gains-cardio.json",
+      "sha256": "84a2ef6b50e2e9e1d7b7c22a33b11786a2b85a1bae053aec3bfb1bba1bab0bc5",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-gains-reps",
+      "path": "s3/gains/m1b-fr-029__s3-gains-reps.json",
+      "sha256": "4756c5a2cf3a8b541b6756244a66e9a98b5fa3c96dbaa8e62502df39455751ad",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-gains-holder-transfer",
+      "path": "s3/gains/m1b-fr-029__s3-gains-holder-transfer.json",
+      "sha256": "af5edaa2e82c11872589c47169d01a422d5c78b73a32981560cf0fb19d7d7399",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-gains-holder-equal-earlier",
+      "path": "s3/gains/m1b-fr-029__s3-gains-holder-equal-earlier.json",
+      "sha256": "b4d4a9c9d24ae430f53f107b383281a7a852d40faf39fbac5ad22876e82625b6",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-gains-delete-recompute",
+      "path": "s3/gains/m1b-fr-029__s3-gains-delete-recompute.json",
+      "sha256": "bd11791ba60c9ad26ab32d85f11ab85383a7904ea92a880b10f54d3f591c0517",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-gains-edit-recompute",
+      "path": "s3/gains/m1b-fr-029__s3-gains-edit-recompute.json",
+      "sha256": "6ff0d18c24c123ba731c35b636c13619b2ac31195a4f83c401cbb79a802eb0f3",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-gains-undo-recompute",
+      "path": "s3/gains/m1b-fr-029__s3-gains-undo-recompute.json",
+      "sha256": "7e6083adfba0860eb1adce5b140f323999c9f26e3ed3d87f3c533218d5edb8c0",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-progress-one-better-one-worse",
+      "path": "s3/gains/m1b-fr-029__s3-progress-one-better-one-worse.json",
+      "sha256": "ec735831c544a2cce6bf2d98a2493d75574c4504dbc529ae1491d0d0c71209c5",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-progress-tie",
+      "path": "s3/gains/m1b-fr-029__s3-progress-tie.json",
+      "sha256": "f490fb174e36eefcf06e58b825cbdcfa88c754fa97a7b310a4a3ad60fc78fbe1",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-progress-both-better-not-record",
+      "path": "s3/gains/m1b-fr-029__s3-progress-both-better-not-record.json",
+      "sha256": "ecdd5a1af140127d0562a463f6e165ae550fcd136b5a09a0c88fab668d0a99d4",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-progress-more-reps-only",
+      "path": "s3/gains/m1b-fr-029__s3-progress-more-reps-only.json",
+      "sha256": "b99d9c1c815ad9c4256d03829c5087dfbd8e00a6ed73b45d0236851a2cf0f2e9",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-record-even-if-progress-tradeoff",
+      "path": "s3/gains/m1b-fr-029__s3-record-even-if-progress-tradeoff.json",
+      "sha256": "325b2c5ee56cfd35ab45efe1d448648f6ad17e8a0ac44736ee9be34b6a1a7d91",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-gains-ignore-future-other-student",
+      "path": "s3/gains/m1b-fr-029__s3-gains-ignore-future-other-student.json",
+      "sha256": "e324df09d22a780f9c97489137823a0c12485ac0997e89dbc90f352d5420dfcb",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-gains-same-time-id-order",
+      "path": "s3/gains/m1b-fr-029__s3-gains-same-time-id-order.json",
+      "sha256": "3752391859a22803bf422bf9a3e11e2251e93ac52083fad575dbb0106d2c1dab",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-milestone-9",
+      "path": "s3/gains/m1b-fr-029__s3-milestone-9.json",
+      "sha256": "f85ea495f629a8141287a23cba0d4ac5e8602078a8b1f2011e40085b2aecfeed",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-milestone-10",
+      "path": "s3/gains/m1b-fr-029__s3-milestone-10.json",
+      "sha256": "f4338a3ee1391236ea95f6170480e81f10387918e408c51daa7a845cfa755fc6",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-milestone-11",
+      "path": "s3/gains/m1b-fr-029__s3-milestone-11.json",
+      "sha256": "302f9603286ed437985ca366a566bbff79d1fecd05e6d713fc1e283feaefe046",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-milestone-149",
+      "path": "s3/gains/m1b-fr-029__s3-milestone-149.json",
+      "sha256": "c2af5f83a8077140c6b1105e5120740048123d07c7954c00018182c193d22a1b",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-milestone-150",
+      "path": "s3/gains/m1b-fr-029__s3-milestone-150.json",
+      "sha256": "4b113a3cd6d2777fcf9d4dc85965bb1be27d22e9e54fbb0a14055dae4a994569",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-streak-3",
+      "path": "s3/gains/m1b-fr-029__s3-streak-3.json",
+      "sha256": "d4da8e735650cd264d3f66ae3b8581e39253e8b8a5c6be9ad9e624603544e790",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-streak-4",
+      "path": "s3/gains/m1b-fr-029__s3-streak-4.json",
+      "sha256": "976ec812a1a55c021b1f39ee0a4be7e836e4e2036bc5cd7b3b6707678a82dabb",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-streak-5",
+      "path": "s3/gains/m1b-fr-029__s3-streak-5.json",
+      "sha256": "a348c4ba49e2cd7f96be301b12ac4bda2dfe2b61ee748bb4c79b9492876fd1c4",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-streak-26",
+      "path": "s3/gains/m1b-fr-029__s3-streak-26.json",
+      "sha256": "dc28eb71c0b170f9b98bf66b39a3d247286d54599c8a45ab7ee5f8e147fd9a11",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-streak-52",
+      "path": "s3/gains/m1b-fr-029__s3-streak-52.json",
+      "sha256": "e27317f45b61273c583bad223cddaca3be4bbc7537d73dce00fd18aab60c9d46",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-streak-78",
+      "path": "s3/gains/m1b-fr-029__s3-streak-78.json",
+      "sha256": "4b2fdee7bc9ca891c325dcbbeabd2946165a489cbba7d9af305e8e96e02db9bf",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-streak-first-only",
+      "path": "s3/gains/m1b-fr-029__s3-streak-first-only.json",
+      "sha256": "1d609455a5f7eb31fb651d7a2dbbcc2b6116c170523407d1fd822fbcf9c393a7",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-streak-third-only",
+      "path": "s3/gains/m1b-fr-029__s3-streak-third-only.json",
+      "sha256": "db4eecacf5d2b25813c065f23d1a24f30b2be621e203c1c466569b9976843c58",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-streak-gap",
+      "path": "s3/gains/m1b-fr-029__s3-streak-gap.json",
+      "sha256": "d5bab02cddc15661c24bc309adfbbaa48e323ae89cd7f89f96ea1d7a6869e8b8",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-streak-sunday-2359",
+      "path": "s3/gains/m1b-fr-029__s3-streak-sunday-2359.json",
+      "sha256": "4299863232a1d130efb58d2c94d5c477fbc2aa9b3447ff8d94f8ca170376cc2b",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-streak-monday-0000",
+      "path": "s3/gains/m1b-fr-029__s3-streak-monday-0000.json",
+      "sha256": "5445cc61d77c10b04aa317ca9bea6a83247ae3b148bc3aef2d19fe8f40ba2a29",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-streak-and-tenth",
+      "path": "s3/gains/m1b-fr-029__s3-streak-and-tenth.json",
+      "sha256": "94871a9f274eb687b89ba115921fd4b4764479350a2c6faa584321fb9b97ef24",
+      "androidAdapter": "s3.gains",
+      "iosAdapter": "s3.gains"
+    },
+    {
+      "id": "s3-e1rm-1",
+      "path": "s3/e1rm/m1b-fr-029__s3-e1rm-1.json",
+      "sha256": "3afb9744010f8844d68f99ac77654b131d9bb19a58f26d37c5a748b256d17135",
+      "androidAdapter": "s3.e1rm",
+      "iosAdapter": "s3.e1rm"
+    },
+    {
+      "id": "s3-e1rm-2",
+      "path": "s3/e1rm/m1b-fr-029__s3-e1rm-2.json",
+      "sha256": "cf52b024f3e254a6bbd4db76afccb0b6c7a13cef9569a2b75145eb7f258f635d",
+      "androidAdapter": "s3.e1rm",
+      "iosAdapter": "s3.e1rm"
+    },
+    {
+      "id": "s3-e1rm-3",
+      "path": "s3/e1rm/m1b-fr-029__s3-e1rm-3.json",
+      "sha256": "74785add5b23ae92e941af3ffffc46eb11ce68e35a806fa4f652d0130f773280",
+      "androidAdapter": "s3.e1rm",
+      "iosAdapter": "s3.e1rm"
+    },
+    {
+      "id": "s3-e1rm-4",
+      "path": "s3/e1rm/m1b-fr-029__s3-e1rm-4.json",
+      "sha256": "0a748f3ac329a4c80c8ba3ec12badcb235368b7af19fa566a0271db39eb6927a",
+      "androidAdapter": "s3.e1rm",
+      "iosAdapter": "s3.e1rm"
+    },
+    {
+      "id": "s3-e1rm-5",
+      "path": "s3/e1rm/m1b-fr-029__s3-e1rm-5.json",
+      "sha256": "b6b1a6d2bdf187ba9cf867345ec91a1a1c7ac30016cd507fb89738438c2b457b",
+      "androidAdapter": "s3.e1rm",
+      "iosAdapter": "s3.e1rm"
+    },
+    {
+      "id": "s3-e1rm-6",
+      "path": "s3/e1rm/m1b-fr-029__s3-e1rm-6.json",
+      "sha256": "2cdddc6bfe22693fa50033abe48e1e5ab696998096f94491c02ed1dbb01071d8",
+      "androidAdapter": "s3.e1rm",
+      "iosAdapter": "s3.e1rm"
+    },
+    {
+      "id": "s3-e1rm-7",
+      "path": "s3/e1rm/m1b-fr-029__s3-e1rm-7.json",
+      "sha256": "bb8578414b5c074d9d8c0c4006872451bb4b06d97622b1e036a739a872c11884",
+      "androidAdapter": "s3.e1rm",
+      "iosAdapter": "s3.e1rm"
+    },
+    {
+      "id": "s3-e1rm-8",
+      "path": "s3/e1rm/m1b-fr-029__s3-e1rm-8.json",
+      "sha256": "8c663b02c101cdf1abe205c2c94db051c7fefcb8aeaac8c84fdb8292dfbe7d6d",
+      "androidAdapter": "s3.e1rm",
+      "iosAdapter": "s3.e1rm"
+    },
+    {
+      "id": "s3-e1rm-unlisted",
+      "path": "s3/e1rm/m1b-fr-029__s3-e1rm-unlisted.json",
+      "sha256": "4a64ed805ddf065e969a1d8f76e072884c5fbe8aafc2f4312c9fcedb20cb304b",
+      "androidAdapter": "s3.e1rm",
+      "iosAdapter": "s3.e1rm"
+    },
+    {
+      "id": "s3-package-3-8",
+      "path": "s3/insights/m1b-fr-029__s3-package-3-8.json",
+      "sha256": "e53eacc52cf157383db5497d1124b82f25e5f56c9a4cdf7be6b798f48a597d1f",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-package-3-7",
+      "path": "s3/insights/m1b-fr-029__s3-package-3-7.json",
+      "sha256": "a2117570635c076ac2f7c4f1bb11864b0a586b0961f8c99eb3e43d7f7397afa2",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-package-3-expired",
+      "path": "s3/insights/m1b-fr-029__s3-package-3-expired.json",
+      "sha256": "2423c6349e376c87015073278dd8112f1bb41ea2354a6998a6e8ba9989775779",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-package-2-8",
+      "path": "s3/insights/m1b-fr-029__s3-package-2-8.json",
+      "sha256": "916b087dd19952f53355d587995f40880eb00fea66918e5f7ee4cbb2d316374d",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-package-2-7",
+      "path": "s3/insights/m1b-fr-029__s3-package-2-7.json",
+      "sha256": "45cafb0e19de0736b3a3254f8fd0a731b4623b091c63ce3ac3c214bde1866eed",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-package-2-expired",
+      "path": "s3/insights/m1b-fr-029__s3-package-2-expired.json",
+      "sha256": "b841204b5eacbe16bf3b11e1d5303ae1dad09308f850326cd572fbbf475e643a",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-package-0-8",
+      "path": "s3/insights/m1b-fr-029__s3-package-0-8.json",
+      "sha256": "c6d004c90e499621f41aef3c1b4a65fe7fde1cdcafcd599a91f165af8172496b",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-package-0-7",
+      "path": "s3/insights/m1b-fr-029__s3-package-0-7.json",
+      "sha256": "709d98cb9bc9d8347c7b0395d8e8009d29db1e5d035798b22a1409517a85c6f2",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-package-0-expired",
+      "path": "s3/insights/m1b-fr-029__s3-package-0-expired.json",
+      "sha256": "5477b163e0f37565fb7413ff98618ad757c54acc29b2187db73e0fb0f13f2921",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-inactive-13",
+      "path": "s3/insights/m1b-fr-029__s3-inactive-13.json",
+      "sha256": "a812909efd2b644311448a4db3f16ea4e5c70546b272adaf921008e30e7fa190",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-inactive-14",
+      "path": "s3/insights/m1b-fr-029__s3-inactive-14.json",
+      "sha256": "d1222c66e101972972c2c21e17315ef1a7f7d860acb334f2033ab3919bab5505",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-inactive-archived",
+      "path": "s3/insights/m1b-fr-029__s3-inactive-archived.json",
+      "sha256": "52063912356fc8423173fafb3eaa7b6397d7d15223b47914a48587ca47208ee0",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-inactive-cancelled",
+      "path": "s3/insights/m1b-fr-029__s3-inactive-cancelled.json",
+      "sha256": "508f75a93bdf5637db49105283f3976435bb6b3558915fd3bea467b8b9ad9b5e",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-inactive-scheduled",
+      "path": "s3/insights/m1b-fr-029__s3-inactive-scheduled.json",
+      "sha256": "ee63243141faf24363efd87c9008d3e3dcff90ddd8f23f9a65b391b620cf2c2c",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-inactive-snoozed",
+      "path": "s3/insights/m1b-fr-029__s3-inactive-snoozed.json",
+      "sha256": "70e9df9e8f7f416d4d593ffa0b051ea60e22ab4a20046a5f6ae449272d5a6b0b",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-stagnant-2-points",
+      "path": "s3/insights/m1b-fr-029__s3-stagnant-2-points.json",
+      "sha256": "43974825c224048080d4e6ea9467c6375bc11b7e5faedaba6ae9e153941553a0",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-stagnant-3-points",
+      "path": "s3/insights/m1b-fr-029__s3-stagnant-3-points.json",
+      "sha256": "74d56160ebce5ef1ad44219eff18309f5396334633446a70735c9cdef2356cef",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-stagnant-4-points",
+      "path": "s3/insights/m1b-fr-029__s3-stagnant-4-points.json",
+      "sha256": "f7eada2eddfcfcc9d603280e46062223c961a82d6063b9ca281a4543cabdd2c3",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-stagnant-assistance-tie",
+      "path": "s3/insights/m1b-fr-029__s3-stagnant-assistance-tie.json",
+      "sha256": "03ac0cf69634f4969ccd64ede52c134f70c1377666918ead7122131db9cdfae6",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-stagnant-e1rm-tie",
+      "path": "s3/insights/m1b-fr-029__s3-stagnant-e1rm-tie.json",
+      "sha256": "4f3a5dceb5b41017e363c6259b91e1a66f6a7fc9cdb85fda48f09c5c4b3c116c",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-stagnant-more-reps-improves-e1rm",
+      "path": "s3/insights/m1b-fr-029__s3-stagnant-more-reps-improves-e1rm.json",
+      "sha256": "6ed56d35ec72faf44dd7c7a0abd6943e94e4680521a308c41b0e91167e82d643",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-stagnant-lower-assistance-improves",
+      "path": "s3/insights/m1b-fr-029__s3-stagnant-lower-assistance-improves.json",
+      "sha256": "7bad639ee242a2eea89d47ed55b046697d491335542d6c50761ee85cacd4ca8e",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-stagnant-outside-window",
+      "path": "s3/insights/m1b-fr-029__s3-stagnant-outside-window.json",
+      "sha256": "82fb331318266e1729dc89d185165fa2d89f29629f3a2fcc468705c3fe9dbf90",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-insight-ranking",
+      "path": "s3/insights/m1b-fr-029__s3-insight-ranking.json",
+      "sha256": "e3190240c2b7fbfdb11cf678be3f2cfdaceb4715e4ecb119c15abdd83157c06d",
+      "androidAdapter": "s3.insights",
+      "iosAdapter": "s3.insights"
+    },
+    {
+      "id": "s3-comparison-compatible",
+      "path": "s3/comparison/m1b-fr-029__s3-comparison-compatible.json",
+      "sha256": "229045bc2a477d84b970b962fd5c229398880fda2668d7a9408585f48c3e6f66",
+      "androidAdapter": "s3.compare",
+      "iosAdapter": "s3.compare"
+    },
+    {
+      "id": "s3-comparison-incompatible",
+      "path": "s3/comparison/m1b-fr-029__s3-comparison-incompatible.json",
+      "sha256": "8676553f086d8cefc776217c381c16b5f46bf8df8cb77a32800c637566e4efaf",
+      "androidAdapter": "s3.compare",
+      "iosAdapter": "s3.compare"
+    },
+    {
+      "id": "s3-comparison-other-student",
+      "path": "s3/comparison/m1b-fr-029__s3-comparison-other-student.json",
+      "sha256": "ca502e4e1fcaa31f98ea9c2977f0c6438de8b9c23cd7fe2ba6d21b178fc5d712",
+      "androidAdapter": "s3.compare",
+      "iosAdapter": "s3.compare"
+    },
+    {
+      "id": "s3-personal-best",
+      "path": "s3/comparison/m1b-fr-029__s3-personal-best.json",
+      "sha256": "44f8b5c0abc7910c37cae3b5498a08d8a79e914813e131c4448103ec7e4c0f7f",
+      "androidAdapter": "s3.records",
+      "iosAdapter": "s3.records"
+    },
+    {
+      "id": "s3-personal-best-assisted",
+      "path": "s3/comparison/m1b-fr-029__s3-personal-best-assisted.json",
+      "sha256": "d5d4b660e6ccb81355122614eec535a21af9aa0d13d99539037b448ebfbbb0e7",
+      "androidAdapter": "s3.records",
+      "iosAdapter": "s3.records"
+    },
+    {
+      "id": "s3-trend-assisted",
+      "path": "s3/comparison/m1b-fr-029__s3-trend-assisted.json",
+      "sha256": "a63d3c4a517b2b16aff2031513a853b0597c6dfc4ea9036e31cdfcbe9b58872b",
+      "androidAdapter": "s3.trend",
+      "iosAdapter": "s3.trend"
+    },
+    {
+      "id": "s3-body-display-conversion",
+      "path": "s3/body/m1b-fr-029__s3-body-display-conversion.json",
+      "sha256": "5080f288794a433e5e9ee6cdb7f590907c38bbc97e47b4ec73a057560f32a5aa",
+      "androidAdapter": "s3.body-display",
+      "iosAdapter": "s3.body-display"
+    },
+    {
+      "id": "s3-body-same-day-upsert",
+      "path": "s3/body/m1b-fr-029__s3-body-same-day-upsert.json",
+      "sha256": "31b7b1d9a2f1bacae36d3a99fb3fbdc90c8a0af1a6fe4752ec79ddcf6cc969d1",
+      "androidAdapter": "s3.body-upsert",
+      "iosAdapter": "s3.body-upsert"
+    },
+    {
+      "id": "s3-body-midnight-dst",
+      "path": "s3/body/m1b-fr-029__s3-body-midnight-dst.json",
+      "sha256": "dbc932b1a89a4f87da72f71753e93a0e3db1dd2f96273011675f599e77752632",
+      "androidAdapter": "s3.body-upsert",
+      "iosAdapter": "s3.body-upsert"
+    }
+  ]
+}

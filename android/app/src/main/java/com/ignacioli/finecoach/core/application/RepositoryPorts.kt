@@ -467,3 +467,15 @@ fun interface AppointmentReminderPort {
     suspend fun reconcile()
     suspend fun appointmentSaved() = reconcile()
 }
+
+/** Body records are local/backup-only; never a report or notification input. */
+interface BodyDataRepositoryPort {
+    suspend fun metrics(studentID: StudentID): ApplicationResult<List<com.ignacioli.finecoach.core.domain.body.BodyMetricDefinition>>
+    suspend fun saveMetric(metric: com.ignacioli.finecoach.core.domain.body.BodyMetricDefinition): ApplicationResult<com.ignacioli.finecoach.core.domain.body.BodyMetricDefinition>
+    suspend fun recordMeasurement(candidate: com.ignacioli.finecoach.core.domain.body.BodyMeasurement): ApplicationResult<com.ignacioli.finecoach.core.domain.body.BodyMeasurement>
+    suspend fun history(studentID: StudentID, metricID: java.util.UUID): ApplicationResult<List<com.ignacioli.finecoach.core.domain.body.BodyMeasurement>>
+    suspend fun latestMeasurements(studentID: StudentID): ApplicationResult<Map<java.util.UUID, com.ignacioli.finecoach.core.domain.body.BodyMeasurement>>
+    suspend fun deleteMeasurement(id: java.util.UUID): ApplicationResult<Unit>
+    suspend fun deleteAllMeasurements(studentID: StudentID, metricID: java.util.UUID): ApplicationResult<Unit>
+    suspend fun deleteCustomMetricIfUnused(id: java.util.UUID): ApplicationResult<Unit>
+}

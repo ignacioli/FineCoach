@@ -49,6 +49,57 @@ import org.robolectric.annotation.GraphicsMode
 @Config(sdk = [36], qualifiers = "zh-rCN-w390dp-h844dp-notnight-xhdpi")
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class P7SideBySideTests {
+    @Test fun s3RecordRow() = measure("D-a-record-row", "ActiveSessionScreen",
+        "虚构历史 24 节；深蹲历史 120 kg，本次 122.5 kg × 6；无分享入口",
+        "使用现有训练页；学员名、时长与画板不同；持有标记来自真实 SessionGains。",
+        designPath = "design/progress-milestones/screens/D-a-record-row.png") {
+        val f = S3GainsCaptureFixture().also { releaseFixture = it::close }
+        show { ActiveSessionScreen(f.active, f.content.session.sessionID, f.exercises, f.templates, {}, {}) }
+        await("set-save")
+        node("session-exercise-${f.squat.sessionExerciseID.value}").performScrollTo().performClick()
+        "session-set-${f.squat.sets.last().trainingSetID.value}-record"
+    }
+
+    @Test fun s3RecordPartialStates() = measure("D-a2-record-partial-states", "FcSetRow states",
+        "虚构深蹲纪录在第三组；第一次动作不标；大字体在单独区块展示",
+        "局部组件状态；说明文字未复制；不触发 haptic 或 float。",
+        designPath = "design/progress-milestones/screens/D-a2-record-partial-states.png") {
+        show { com.ignacioli.finecoach.designsystem.FcPlatformShell({}) {
+            com.ignacioli.finecoach.designsystem.FcSectionLabel("深蹲 · 上次最佳 120 kg × 8")
+            for ((n, weight) in listOf("120", "122.5", "125").withIndex()) {
+                com.ignacioli.finecoach.designsystem.FcSetRow(n + 1, "$weight kg × 5", true, false, {}, {},
+                    tag = "partial-$n", isNewRecord = n == 2)
+            }
+            com.ignacioli.finecoach.designsystem.FcSectionLabel("壶铃摇摆 · 没有历史记录")
+            com.ignacioli.finecoach.designsystem.FcSetRow(1, "16 kg × 15", true, false, {}, {})
+            com.ignacioli.finecoach.designsystem.FcSectionLabel("大字体")
+            CompositionLocalProvider(LocalDensity provides Density(2f, 1.5f)) {
+                com.ignacioli.finecoach.designsystem.FcSetRow(2, "122.5 kg × 6", true, false, {}, {},
+                    tag = "partial-large", isNewRecord = true)
+            }
+        } }
+        "partial-large-record"
+    }
+
+    @Test fun s3SessionGains() = measure("D-b-session-gains-s3", "SessionSummaryScreen",
+        "虚构 25 节；新纪录深蹲、进步卧推、第 25 节；备注为空",
+        "S3 无分享入口；本 fixture 未加入时长动作；其余使用真实 Room 和 ProgressUseCases。",
+        scrollTag = "summary-content", designPath = "design/progress-milestones/screens/D-b-session-gains.png") {
+        val f = S3GainsCaptureFixture().also { releaseFixture = it::close }
+        f.finishForSummary()
+        show { SessionSummaryScreen(f.summary, f.content.session.sessionID, {}, {}) }
+        "summary-gains"
+    }
+
+    @Test fun s3SessionGainsMilestoneOnly() = measure("D-b2-session-gains-states", "SessionSummaryScreen milestone-only",
+        "虚构第 10 节；动作与历史持平，只有里程碑；备注为空",
+        "批量图展示真实总结页的只有里程碑状态；空态和双里程碑另有行为测试。",
+        scrollTag = "summary-content", designPath = "design/progress-milestones/screens/D-b2-session-gains-states.png") {
+        val f = S3GainsCaptureFixture(milestoneOnly = true).also { releaseFixture = it::close }
+        f.finishForSummary()
+        show { SessionSummaryScreen(f.summary, f.content.session.sessionID, {}, {}) }
+        "summary-gains-milestone"
+    }
     // Queue IO resumptions on the test UI scheduler instead of resuming on IO workers.
     @get:Rule val compose = createAndroidComposeRule<ComponentActivity>()
     private var releaseFixture: (() -> Unit)? = null
@@ -81,6 +132,8 @@ class P7SideBySideTests {
     }
 
     private fun measure(id: String, composable: String, fixture: String, mismatches: String, sheetTag: String? = null, scrollTag: String? = null, designPath: String? = null, render: () -> String) {
+        // A failed or non-scrolling capture must not inherit a previous fixture's scroll record.
+        File(p7Output(), "$id.scroll.txt").let { if (it.exists()) check(it.delete()) { "Cannot clear prior scroll evidence for $id" } }
         var reason: String? = null
         val bitmap = try {
             await(render())
@@ -109,7 +162,7 @@ when {
             frames += node("conformance-viewport").captureToImage().asAndroidBitmap()
         }
         check(range.value() >= range.maxValue()) { "Scroll did not reach end: ${range.value()} / ${range.maxValue()}" }
-        File(p7Output(), "$id.scroll.txt").writeText("requested=$viewport px; before=$before; after=${range.value()}; max=${range.maxValue()}; positions=$positions; viewports=${frames.size}; full viewports retain repeated chrome")
+        File(p7Output(), "$id.scroll.txt").writeText("id=$id; fixture=$fixture; requested=$viewport px; before=$before; after=${range.value()}; max=${range.maxValue()}; positions=$positions; viewports=${frames.size}; full viewports retain repeated chrome")
         if (frames.size == 1) first else Bitmap.createBitmap(780, 1688 * frames.size, Bitmap.Config.ARGB_8888).also {
             val canvas = Canvas(it)
             frames.forEachIndexed { n, frame -> canvas.drawBitmap(frame, 0f, n * 1688f, null); frame.recycle() }

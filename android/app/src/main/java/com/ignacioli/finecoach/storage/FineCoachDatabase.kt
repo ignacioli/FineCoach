@@ -10,6 +10,8 @@ import com.ignacioli.finecoach.storage.value.StorageValueConverters
 @Database(
     entities = [
         StoreMetadata::class,
+        BodyMetricDefinitionEntity::class,
+        BodyMeasurementEntity::class,
         AppointmentEntity::class,
         RecurrenceSeriesEntity::class,
         StudentEntity::class,
@@ -30,11 +32,12 @@ import com.ignacioli.finecoach.storage.value.StorageValueConverters
         ExercisePreferenceEntity::class,
         ExerciseNameClaimEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true,
 )
 @TypeConverters(StorageValueConverters::class)
 abstract class FineCoachDatabase : RoomDatabase() {
+    abstract fun bodyDataDao(): com.ignacioli.finecoach.storage.dao.BodyDataDao
     abstract fun appointmentDao(): com.ignacioli.finecoach.storage.dao.AppointmentDao
     abstract fun storeMetadataDao(): StoreMetadataDao
     abstract fun s1Dao(): S1Dao
