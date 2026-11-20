@@ -118,6 +118,8 @@
 
 ### D3. 出口合规怎么回答
 
+> **结论记录（2026-11-20，负责人）**：build 0.3.0 (1) 在 App Store Connect 的 App Encryption Documentation 里选了「None of the algorithms mentioned above」，依据 §4 的事实：加密只用 Apple 系统自带的 CryptoKit（AES-GCM）和 CommonCrypto（PBKDF2），没有私有算法，没有自带加密库，没有网络传输。保存后该 build 状态变为 Ready to Submit。仍未在 Info.plist 里设置 `ITSAppUsesNonExemptEncryption`，所以之后每个 build 都要在页面上重新回答；这是负责人的声明，需要在加密或豁免状态变化时重新审视。
+
 > **负责人决定（2026-11-02）**：首次上传时，在 App Store Connect 的问卷里如实选择「使用加密」，并按 §4 的事实回答（暂按选项 A）。问卷的结论由负责人记录到本文件之后，才在 Info.plist 中写入对应的键。在此之前，不设置 `ITSAppUsesNonExemptEncryption`，也不声称豁免。
 
 - 事实见 §4。按硬约束，本轮**不设置** `ITSAppUsesNonExemptEncryption`，也**不声称豁免**。
