@@ -53,7 +53,7 @@ fun S1Root(activity: MainActivity) {
     }
     graph?.let { value ->
         LaunchedEffect(value) { value.reminders.permissionRequest.collect { if (it) { activity.requestRestNotificationPermission(); value.reminders.permissionRequest.value = false } } }
-        S1App(value, activity.restNotificationSessionID, activity::consumeRestNotificationRoute, activity.notificationPermissionRevision, activity.appointmentNotificationRevision)
+        S1App(value, activity.restNotificationSessionID, activity::consumeRestNotificationRoute, activity.notificationPermissionRevision, activity.appointmentNotificationRevision, activity.permissionProgress.inFlight)
     } ?: if (!failed) FcLaunch(Modifier.testTag("s1-loading")) else FcPlatformShell({}, Modifier.testTag("s1-loading")) {
         if (failed) {
             FcText("没有完成，再试一次。", Modifier.testTag("s1-load-error"),
@@ -95,7 +95,7 @@ private fun AfterStopResume(action: suspend () -> Unit) {
 }
 
 @Composable
-fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNotification: () -> Unit = {}, permissionRevision: Int = 0, appointmentNotificationRevision: Int = 0) {
+fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNotification: () -> Unit = {}, permissionRevision: Int = 0, appointmentNotificationRevision: Int = 0, permissionInFlight: Boolean = false, readSavedReminderStatus: (suspend () -> ReminderSettingsState.Status)? = null) {
     val nav = rememberNavController()
     val navigator = remember(nav) { S1Navigator(nav) }
     var recovered by remember(graph) { mutableStateOf(false) }
@@ -162,15 +162,22 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
     var awaitingNotificationGrant by rememberSaveable { mutableStateOf(false) }
     var grantBaseline by rememberSaveable { mutableIntStateOf(permissionRevision) }
     SideEffect { graph.reminders.observedPermissionRevision = permissionRevision }
-    suspend fun reminderDenied() = withContext(Dispatchers.IO) {
-        readReminderSettingsStatus(graph.reminders::enabled) {
-            graph.database.storeMetadataDao().find(AppointmentReminders.PERMISSION_REQUESTED) != null
+    val savedReminderStatus = remember(graph, readSavedReminderStatus) { ReminderSettingsState {
+        withContext(Dispatchers.IO) {
+            readSavedReminderStatus?.invoke() ?: readReminderSettingsStatus(graph.reminders::enabled) {
+                graph.database.storeMetadataDao().find(AppointmentReminders.PERMISSION_REQUESTED) != null
+            }
         }
-    } == ReminderSettingsState.Status.denied
-    LaunchedEffect(permissionRevision) {
-        if (awaitingNotificationGrant && permissionRevision != grantBaseline) {
+    } }
+    suspend fun refreshSavedReminder() {
+        savedReminderStatus.refresh()
+        savedReminderDenied = savedReminderStatus.error == null && savedReminderStatus.status == ReminderSettingsState.Status.denied
+    }
+    val queuedPermission by graph.reminders.permissionRequest.collectAsState()
+    LaunchedEffect(awaitingNotificationGrant, permissionRevision, permissionInFlight, queuedPermission) {
+        if (awaitingNotificationGrant && (permissionRevision != grantBaseline || (!permissionInFlight && !queuedPermission))) {
+            refreshSavedReminder()
             awaitingNotificationGrant = false
-            savedReminderDenied = reminderDenied()
         }
     }
     val onAppointmentSaved: (AppointmentEditorState) -> Unit = { editor ->
@@ -181,10 +188,10 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
             savedReminderDenied = false
             if (permissionRevision != baseline) {
                 awaitingNotificationGrant = false
-                scope.launch { savedReminderDenied = reminderDenied() }
+                scope.launch { refreshSavedReminder() }
             }
         } else if (editor.reminderEnabled) {
-            scope.launch { savedReminderDenied = reminderDenied() }
+            scope.launch { refreshSavedReminder() }
         } else savedReminderDenied = false
         appointmentRevision++
         back()
@@ -325,6 +332,7 @@ AppointmentEditorScreen(editor, back) { onAppointmentSaved(editor) }
         }, { editID -> selectedAppointment = null; nav.navigate(S2Routes.editAppointment(editID)) },
             { sessionID -> selectedAppointment = null; navigator.open(S1Routes.activeSession(sessionID)) })
     }
+    SavedReminderReadError(savedReminderStatus) { scope.launch { refreshSavedReminder() } }
     if (savedReminderDenied) FcConfirmationDialog("课程安排已保存", "通知权限已拒绝，提醒未开启。可前往系统设置开启。", "前往设置",
         { savedReminderDenied=false; nav.navigate(S2Routes.SETTINGS) }, { savedReminderDenied=false }, cancelTitle="完成",tag="saved-reminder-denied")
     if (notificationMissing) FcConfirmationDialog("训练无法打开", "该训练已结束或不存在。", "知道了", { notificationMissing = false }, { notificationMissing = false }, tag = "notification-unavailable")

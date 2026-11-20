@@ -11,6 +11,7 @@ import com.ignacioli.finecoach.core.domain.template.TemplatePlannedSet
 import com.ignacioli.finecoach.storage.FineCoachDatabase
 import com.ignacioli.finecoach.storage.FineCoachDatabaseFactory
 import com.ignacioli.finecoach.storage.StoreMetadata
+import com.ignacioli.finecoach.core.domain.appointment.*
 import java.io.RandomAccessFile
 import java.time.Instant
 import java.time.LocalDate
@@ -27,7 +28,7 @@ internal object S1DebugSeed {
     const val STATUS_KEY = "${PREFIX}status"
     const val ROWS_KEY = "${PREFIX}rows"
     const val DATASET_KEY = "${PREFIX}dataset"
-    suspend fun load(context: Context, scenario: String = "multi"): SeedResult = withContext(Dispatchers.IO) {
+    suspend fun load(context: Context, scenario: String = "multi", beforeOwnershipTransaction: (FineCoachDatabase) -> Unit = {}): SeedResult = withContext(Dispatchers.IO) {
         val fixture = S1SeedFixture.read(context)
         require(scenario in fixture.records("scenarios").map { it.getString("key") })
         val app = context.applicationContext
@@ -37,11 +38,11 @@ internal object S1DebugSeed {
             val lock = checkNotNull(channel.tryLock()) { "Seed installer is already running" }
             try {
                 val existed = app.getDatabasePath(FineCoachDatabaseFactory.DATABASE_NAME).exists()
-                if (existed) preflight(app, scenario, fixture)
+                val startupEmpty = existed && preflight(app, scenario, fixture)
                 val database = FineCoachDatabaseFactory.create(app)
                 try {
                     val metadata = database.storeMetadataDao()
-                    if (existed) {
+                    if (existed && !startupEmpty) {
                         check(metadata.find("${PREFIX}scenario")?.value == scenario) { "Seed scenario mismatch" }
                         // Even an empty non-seed database belongs to its user. Never adopt or clear it.
                         check(metadata.find(DATASET_KEY)?.value == fixture.dataset) { "Non-seed database rejected" }
@@ -51,7 +52,17 @@ internal object S1DebugSeed {
                     }
                     check(businessRows(database) == 0) { "Non-empty database rejected" }
                     val generation = UUID.fromString(checkNotNull(metadata.find(FineCoachDatabaseFactory.GENERATION_KEY)).value)
+                    // Debug-only deterministic race seam; ownership must be rechecked after this boundary.
+                    beforeOwnershipTransaction(database)
                     database.runInTransaction {
+                        if (startupEmpty) {
+                            check(businessRows(database) == 0) { "Non-empty database rejected" }
+                            val current = mutableMapOf<String, String>()
+                            database.openHelper.readableDatabase.query("SELECT `key`, value FROM store_metadata").use { cursor ->
+                                while (cursor.moveToNext()) current[cursor.getString(0)] = cursor.getString(1)
+                            }
+                            check(database.openHelper.readableDatabase.version == 3 && startupMetadataSet(current)) { "Non-seed database rejected" }
+                        }
                         metadata.insert(StoreMetadata(DATASET_KEY, fixture.dataset))
                         metadata.insert(StoreMetadata(VERSION_KEY, fixture.version.toString()))
                         metadata.insert(StoreMetadata(STATUS_KEY, "installing"))
@@ -79,12 +90,32 @@ internal object S1DebugSeed {
     }
 
     // Inspect ownership before Room can run a migration or otherwise write an existing file.
-    private fun preflight(context: Context, scenario: String, fixture: S1SeedFixture) {
-        android.database.sqlite.SQLiteDatabase.openDatabase(
+    private fun preflight(context: Context, scenario: String, fixture: S1SeedFixture): Boolean {
+        return android.database.sqlite.SQLiteDatabase.openDatabase(
             context.getDatabasePath(FineCoachDatabaseFactory.DATABASE_NAME).absolutePath, null,
             android.database.sqlite.SQLiteDatabase.OPEN_READONLY,
         ).use { raw ->
             check(raw.version == 2 || raw.version == 3) { "Non-seed schema rejected" }
+            val metadata = mutableMapOf<String, String>()
+            raw.rawQuery("SELECT `key`, value FROM store_metadata", null).use { cursor ->
+                while (cursor.moveToNext()) metadata[cursor.getString(0)] = cursor.getString(1)
+            }
+            if (raw.version == 3 && startupMetadataSet(metadata)) {
+                val tables = mutableListOf<String>()
+                raw.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null).use { cursor ->
+                    while (cursor.moveToNext()) {
+                        val table = cursor.getString(0)
+                        if (table !in setOf("store_metadata", "room_master_table", "android_metadata", "sqlite_sequence") && !table.startsWith("sqlite_")) {
+                            check(Regex("[a-z_]+(?:[0-9]+)?").matches(table))
+                            tables += table
+                        }
+                    }
+                }
+                check(tables.isNotEmpty() && tables.all { table ->
+                    raw.rawQuery("SELECT COUNT(*) FROM `$table`", null).use { it.moveToFirst(); it.getInt(0) == 0 }
+                }) { "Non-empty database rejected" }
+                return@use true
+            }
             val expected = mapOf(DATASET_KEY to fixture.dataset, VERSION_KEY to fixture.version.toString(),
                 STATUS_KEY to "complete", "${PREFIX}scenario" to scenario)
             for ((key, value) in expected) {
@@ -92,7 +123,19 @@ internal object S1DebugSeed {
                     check(it.moveToFirst() && it.getString(0) == value) { "Non-seed or incomplete database rejected" }
                 }
             }
+            false
         }
+    }
+
+    private fun startupMetadataSet(metadata: Map<String, String>) =
+        metadata.keys == setOf("created_at", "store_generation", "appointment-reminders-v1") &&
+            metadata.all { (key, value) -> startupMetadata(key, value) }
+
+    private fun startupMetadata(key: String, value: String) = when (key) {
+        "created_at" -> runCatching { Instant.parse(value) }.isSuccess
+        "store_generation" -> runCatching { UUID.fromString(value) }.isSuccess
+        "appointment-reminders-v1" -> value == "{}"
+        else -> false
     }
 
     /** Reopen verification is read-only and permits walkthrough edits/deletions after initialization. */
@@ -231,6 +274,37 @@ internal object S1DebugSeed {
             }
             success(g.templateRepository.saveContent(SaveTemplateContentCommand(template.templateID, template.revision, sections, exercises)))
         }
+        val today = LocalDate.now(java.time.ZoneId.systemDefault())
+        for (row in fixture.selected("appointments", variant)) {
+            val student = StudentID.parse(fixture.uuid(row.getInt("studentID")))
+            val date = today.plusDays(row.getLong("dayOffset"))
+            val time = java.time.LocalTime.parse(row.getString("startTime"))
+            val created = fixture.now
+            val base = com.ignacioli.finecoach.core.domain.appointment.Appointment(
+                UUID.fromString(fixture.uuid(row.getInt("id"))), student, date = date, startTime = time,
+                reminderEnabled = false, createdAtUTC = created, updatedAtUTC = created)
+            val appointments = if (row.has("termination")) {
+                val termination = if (row.getString("termination") == "RepeatCount") RecurrenceTermination.RepeatCount(row.getInt("count"))
+                    else RecurrenceTermination.EndDate(today.plusDays(row.getLong("endDayOffset")))
+                val series = RecurrenceSeries(UUID.fromString(fixture.uuid(row.getInt("seriesID"))), student,
+                    RecurrenceInterval.everyOtherDay, termination, time, defaultReminderEnabled = false,
+                    createdAtUTC = created, updatedAtUTC = created)
+                var next = row.getInt("id")
+                success(g.appointments.createRecurring(series, date, overrideConflict = true) { UUID.fromString(fixture.uuid(next++)) })
+            } else success(g.appointments.createSingle(base, overrideConflict = true))
+            val first = appointments.first()
+            when (row.getString("state")) {
+                "cancelled" -> success(g.appointments.cancel(first.id))
+                "absent" -> {
+                    val choice = AbsentCreditChoice.valueOf(row.getString("absentCreditChoice"))
+                    val result = success(g.appointments.markAbsent(first.id, choice, true))
+                    success(result.settlement)
+                }
+                "inProgress" -> check(success(g.appointments.startTraining(first.id)) is AppointmentTrainingStartResult.Started)
+                "scheduled" -> Unit
+                else -> error("Unsupported seed appointment state")
+            }
+        }
         clock.offsetSeconds = 0
     }
 
@@ -305,7 +379,8 @@ internal object S1DebugSeed {
                 check(actual.totalCredits == row.getLong("totalCredits") && actual.endDate == row.optional("endDate")?.let(LocalDate::parse))
                 if (!ended) {
                     val adjustments = fixture.selected("ledger", scenario).filter { it.getString("packageKey") == row.getString("key") }
-                    val remaining = row.getLong("totalCredits") - adjustments.sumOf { if (it.getString("kind") == "adhocDebit") 1L else it.getLong("amount") * if (it.getString("direction") == "debit") 1 else -1 }
+                    val absenceDebits = fixture.selected("appointments", scenario).count { it.getInt("studentID").let(fixture::uuid) == student.studentID.value && it.optString("absentCreditChoice") == "charged" }
+                    val remaining = row.getLong("totalCredits") - absenceDebits - adjustments.sumOf { if (it.getString("kind") == "adhocDebit") 1L else it.getLong("amount") * if (it.getString("direction") == "debit") 1 else -1 }
                     check(actual.remainingCreditsCache == remaining)
                 }
             }

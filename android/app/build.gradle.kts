@@ -526,7 +526,7 @@ val s1SeedChecks = tasks.register<Test>("s1SeedChecks") {
     outputs.upToDateWhen { false }
     outputs.doNotCacheIf("Seed checks must execute") { true }
     doLast {
-        val expected = mapOf("com.ignacioli.finecoach.S1DebugSeedTests" to 12, "com.ignacioli.finecoach.S1SeedIsolationTests" to 4)
+        val expected = mapOf("com.ignacioli.finecoach.S1DebugSeedTests" to 14, "com.ignacioli.finecoach.S1SeedIsolationTests" to 4)
         val files = reports.junitXml.outputLocation.get().asFile.listFiles { file -> file.name.startsWith("TEST-") && file.extension == "xml" }.orEmpty()
         check(files.size == expected.size) { "S1 seed checks must run nonzero tests without failures or skips" }
         val factory = DocumentBuilderFactory.newInstance().apply {

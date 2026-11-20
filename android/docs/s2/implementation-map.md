@@ -105,3 +105,16 @@ S2Routes 独立定义 Calendar / create(date) / edit(UUID)；S1Routes 的冻结�
 | 结束关联训练 | 丢弃未完成组并结束 | finish-discard | 是，完成并按关联安排扣一次；不出现扣/不扣 | FcButton / finish-content fillMaxWidth | LinkedFinishEntryLayoutTests.linkedCompletionUsesVisibleDiscardAndDeductsOnceWithoutAdhocChoice |
 | 结束关联训练 | 扣课失败后重试 | finish-retry | 是，重试后仍只一笔；无「不扣课」 | FcButton fillMaxWidth | LinkedFinishEntryLayoutTests.linkedDebitFailureHasExplicitRetryAndNoInvalidSkip |
 | 结束关联训练 | 返回继续 | finish-return | 否 | FcSecondaryButton | LinkedFinishEntryLayoutTests.linkedReturnKeepsTrainingAndAppointmentWithoutDebit |
+
+## Phase 6 P3 修复（D；复用现有组件）
+
+分类：D；保存后的 Room 读取失败使用 ReminderSettingsState.refresh 的同一失败文案，复用 DS-CONFIRM-DIALOG（components §4.4 / CG-6），保守「完成」在左、「重试」在右。settings 43 批准画板与既有错误重试语义不变，无新 token、anatomy 或视觉决定。
+范围：移除无兜底 read；保存成功仍保持 durable，失败只表示提醒状态未读到。原 denied dialog 保留。移除仅 revision 差值的无限等待，rotation 保留活动请求，process death 丢失请求则读取当前状态。
+设计决策：无新设计；组件仅使用现有 title/body/actions slots。
+实现与检查：最终writer完整单测1168/0/0/0，含授权状态3、读取错误UI 1、导航11、seed14、alarm evidence6；dispatcher host gate r5 BUILD 0 / UNIT 0 / total1168 / BAD0（含全部p4 conformance、P7、G3/G4/Room、s1SeedChecks等），见T054与交付report。
+结果：T050宿主API31 r7/API36 r6五方法各OK (1 test)，T052两P2修复后限定复核PASS；历史失败与fix4～fix6保留在report。仅T053负责人走查/基线批准及合并后最终gate摘要PENDING，见T050/T054。
+
+| screen | visible control | testTag | mutation | width owner | test |
+|---|---|---|---|---|---|
+| 保存后提醒状态读取失败 | 重试 | saved-reminder-error-accept | 否，重读提醒状态，不重复保存 | FcConfirmationDialog / DS-CONFIRM-DIALOG | SavedReminderReadErrorTests.failedReadShowsSettingsFailureAndVisibleRetryRecoversWithoutCrash / S2NavigationEntryLayoutTests.saveCallbackReadFailurePreservesAppointmentAndVisibleRetryRecovers |
+| 保存后提醒状态读取失败 | 完成／遮罩关闭 | saved-reminder-error-cancel | 否，关闭错误提示 | FcConfirmationDialog / DS-CONFIRM-DIALOG | SavedReminderReadErrorTests |
