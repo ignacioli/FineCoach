@@ -11,8 +11,13 @@ import com.ignacioli.finecoach.core.domain.common.*
 import com.ignacioli.finecoach.designsystem.*
 import com.ignacioli.finecoach.features.history.historyDuration
 import kotlinx.coroutines.launch
+import com.ignacioli.finecoach.core.domain.progress.SessionGains
+import com.ignacioli.finecoach.features.history.*
+import java.time.ZoneId
 
-class SessionSummaryUiState(val history: HistoryUseCases, val clock: AppClock) {
+class SessionSummaryUiState(val history: HistoryUseCases, val clock: AppClock,
+    private val progress: ProgressUseCases? = null, private val zone: ZoneId = ZoneId.systemDefault()) {
+    var gains by mutableStateOf(SessionGains()); private set
     var detail by mutableStateOf<HistoryDetail?>(null); private set
     var error by mutableStateOf<ApplicationError?>(null); private set
     var busy by mutableStateOf(false); private set
@@ -21,13 +26,20 @@ class SessionSummaryUiState(val history: HistoryUseCases, val clock: AppClock) {
     var publicSummary by mutableStateOf("")
     suspend fun load(id: SessionID) {
         busy = true
+        gains = SessionGains()
         when (val result = history.detail(id)) {
             is ApplicationResult.Failure -> error = result.error
             is ApplicationResult.Success -> {
+                val loaded = loadSessionGains(result.value, progress, zone)
+                // Publish the editable content only after all entry reads have completed.
                 error = null; detail = result.value
                 focus = result.value.content.session.trainingFocus
                 privateNote = result.value.content.session.privateCoachNote.orEmpty()
                 publicSummary = result.value.content.session.studentFacingSummary.orEmpty()
+                when (loaded) {
+                    is ApplicationResult.Failure -> error = loaded.error
+                    is ApplicationResult.Success -> gains = loaded.value
+                }
             }
         }; busy = false
     }
@@ -65,6 +77,7 @@ fun SessionSummaryScreen(state: SessionSummaryUiState, id: SessionID, onBack: ()
                             val part = BodyPart.entries[index]; state.focus = if (part in state.focus) state.focus - part else state.focus + part
                         } }, tag = "summary-focus")
                     }
+                    SessionGainsSection(state.gains, "summary-gains")
                     SummaryNoteField("教练私有备注", state.privateNote, { state.privateNote = it }, "summary-private", !state.busy)
                     SummaryNoteField("课后可见总结", state.publicSummary, { state.publicSummary = it }, "summary-public", !state.busy)
                     templateSlot()
