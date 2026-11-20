@@ -4,6 +4,10 @@ Notable changes to FineCoach are recorded here. The format follows [Keep a Chang
 
 ## [Unreleased]
 
+### Changed
+
+- Build configuration: version set to 0.3.0 (1) and the signing team switched to the paid Apple Developer Program team, in preparation for the first TestFlight upload. No product behavior changes.
+
 ## [0.2.0] - 2026-11-02
 
 This version focuses on the training page, progress feedback, and system entry points. Builds before 2026-10-23 carried no version number.

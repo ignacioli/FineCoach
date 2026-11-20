@@ -6,7 +6,7 @@ import XCTest
 /// `FineCoach-Info.plist`, the app and widget entitlements, `PrivacyInfo.xcprivacy`,
 /// the project file and the app and widget sources; it proves what is declared, not
 /// runtime behaviour (that stays a device / binary check in T051).
-/// Specs 006 (research R2, R6) approves only the `group.com.finecoach.app`
+/// Specs 006 (research R2, R6) approves only the `group.com.ignacioli.finecoach`
 /// App Group for widgets to read snapshots containing only allowlisted fields.
 final class CapabilityManifestTests: XCTestCase {
     private var iosRoot: URL {
@@ -43,7 +43,7 @@ final class CapabilityManifestTests: XCTestCase {
             let entitlements = try plist(name, directory: directory)
             XCTAssertEqual(Set(entitlements.keys), ["com.apple.security.application-groups"], name)
             XCTAssertEqual(
-                entitlements["com.apple.security.application-groups"] as? [String], ["group.com.finecoach.app"], name)
+                entitlements["com.apple.security.application-groups"] as? [String], ["group.com.ignacioli.finecoach"], name)
         }
     }
 

@@ -39,7 +39,7 @@ Ask the product owner one targeted question only for a real authority conflict, 
 - A confirmed change must be durably recoverable. Do not report success, completion, delivery, import, restore, or deletion until that result is durable and verified. Restore and other destructive operations keep the last valid state until the candidate has passed integrity checks.
 - FCBK backups and FCPA archives are frozen, bidirectional iOS–Android interoperability formats (ADR-001 D2). The existing iOS formats are the contract. Before changing either format, update the contract and raise its version, then update both platforms.
 - User-visible state, error, selection, and danger must not rely only on color. Touch targets are at least 44 by 44 points. Text scales with Dynamic Type.
-- Store distribution and a manual VoiceOver script are not acceptance gates unless the product owner adds them. Do not add VoiceOver-only features. Personal Team local signing is an accepted install path; that does not authorize setting `ITSAppUsesNonExemptEncryption` to `NO` or claiming an encryption exemption.
+- Store distribution and a manual VoiceOver script are not acceptance gates unless the product owner adds them. Do not add VoiceOver-only features. The signing team is the paid Developer Program team `L5VL8A64P3` (S2-D04); Personal Team local signing remains an accepted install path; that does not authorize setting `ITSAppUsesNonExemptEncryption` to `NO` or claiming an encryption exemption.
 - Simulator or configuration evidence is not physical-device, runtime, or acceptance evidence. Name the environment and its limits.
 - Do not weaken assertions, shrink the agreed scope, or hide known failures to make a check pass.
 

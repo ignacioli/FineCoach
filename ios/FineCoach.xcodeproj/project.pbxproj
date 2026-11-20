@@ -2791,7 +2791,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9Z7427RG9X;
+				DEVELOPMENT_TEAM = L5VL8A64P3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FineCoachApp/FineCoach-Info.plist;
 				INFOPLIST_KEY_CFBundleDevelopmentRegion = "zh-Hans";
@@ -2799,7 +2799,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app;
 				PRODUCT_NAME = FineCoach;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -2815,7 +2815,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9Z7427RG9X;
+				DEVELOPMENT_TEAM = L5VL8A64P3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FineCoachApp/FineCoach-Info.plist;
 				INFOPLIST_KEY_CFBundleDevelopmentRegion = "zh-Hans";
@@ -2823,7 +2823,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app;
 				PRODUCT_NAME = FineCoach;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -2834,7 +2834,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				DEVELOPMENT_TEAM = 9Z7427RG9X;
+				DEVELOPMENT_TEAM = L5VL8A64P3;
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app.tests;
 				PRODUCT_NAME = FineCoachTests;
@@ -2847,7 +2847,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				DEVELOPMENT_TEAM = 9Z7427RG9X;
+				DEVELOPMENT_TEAM = L5VL8A64P3;
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app.tests;
 				PRODUCT_NAME = FineCoachTests;
@@ -2859,7 +2859,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				DEVELOPMENT_TEAM = 9Z7427RG9X;
+				DEVELOPMENT_TEAM = L5VL8A64P3;
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.finecoach.app.integration-tests";
 				PRODUCT_NAME = FineCoachIntegrationTests;
@@ -2872,7 +2872,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				DEVELOPMENT_TEAM = 9Z7427RG9X;
+				DEVELOPMENT_TEAM = L5VL8A64P3;
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.finecoach.app.integration-tests";
 				PRODUCT_NAME = FineCoachIntegrationTests;
@@ -2884,7 +2884,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 9Z7427RG9X;
+				DEVELOPMENT_TEAM = L5VL8A64P3;
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.finecoach.app.ui-tests";
 				PRODUCT_NAME = FineCoachUITests;
@@ -2897,7 +2897,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 9Z7427RG9X;
+				DEVELOPMENT_TEAM = L5VL8A64P3;
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.finecoach.app.ui-tests";
 				PRODUCT_NAME = FineCoachUITests;
@@ -2913,13 +2913,13 @@
 				CODE_SIGN_ENTITLEMENTS = FineCoachWidgets/FineCoachWidgets.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9Z7427RG9X;
+				DEVELOPMENT_TEAM = L5VL8A64P3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FineCoachWidgets/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "精练教练";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", "@executable_path/../../Frameworks", );
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app.widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -2935,13 +2935,13 @@
 				CODE_SIGN_ENTITLEMENTS = FineCoachWidgets/FineCoachWidgets.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9Z7427RG9X;
+				DEVELOPMENT_TEAM = L5VL8A64P3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FineCoachWidgets/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "精练教练";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", "@executable_path/../../Frameworks", );
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.finecoach.app.widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
