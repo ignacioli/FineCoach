@@ -1131,6 +1131,7 @@ registerVisualGate("p4TodayS2Conformance", "TodayS2ConformanceTests", 1)
 registerVisualGate("p4CalendarConformance", "CalendarConformanceTests", 1)
 registerVisualGate("p4AppointmentEditorConformance", "AppointmentEditorConformanceTests", 1)
 registerVisualGate("p4SessionDetailConformance", "SessionDetailConformanceTests", 1)
+registerVisualGate("p4TrendsConformance", "TrendsConformanceTests", 1)
 
 val entryLayoutClasses = listOf("com.ignacioli.finecoach.EntryLayoutHarnessTests")
 val entryLayoutGate = tasks.register<Test>("s0G4") {
