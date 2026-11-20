@@ -3,6 +3,8 @@ layout: default
 title: 精练教练隐私政策
 ---
 
+<p style="text-align:right"><strong>中文</strong> | <a href="en/">English</a></p>
+
 # 精练教练（FineCoach）隐私政策
 
 生效日期：2026-11-20
