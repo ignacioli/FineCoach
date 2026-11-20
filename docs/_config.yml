@@ -1,0 +1,6 @@
+theme: jekyll-theme-minimal
+title: 精练教练
+lang: zh-Hans
+# Only the privacy policy is published; drafts and internal notes stay out of the site.
+exclude:
+  - distribution
