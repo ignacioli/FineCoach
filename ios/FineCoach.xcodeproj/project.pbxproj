@@ -435,6 +435,7 @@
 		FC0060000000000000000006 /* SharedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0060000000000000000005 /* SharedVectorTests.swift */; };
 		FC0170000000000000000002 /* S1SharedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0170000000000000000001 /* S1SharedVectorTests.swift */; };
 		FC0270000000000000000002 /* S2SharedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0270000000000000000001 /* S2SharedVectorTests.swift */; };
+		FC0370000000000000000002 /* S3SharedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0370000000000000000001 /* S3SharedVectorTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -897,6 +898,7 @@
 		FC0060000000000000000005 /* SharedVectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../SharedVectors/SharedVectorTests.swift; sourceTree = "<group>"; };
 		FC0170000000000000000001 /* S1SharedVectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../SharedVectors/S1SharedVectorTests.swift; sourceTree = "<group>"; };
 		FC0270000000000000000001 /* S2SharedVectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../SharedVectors/S2SharedVectorTests.swift; sourceTree = "<group>"; };
+		FC0370000000000000000001 /* S3SharedVectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../SharedVectors/S3SharedVectorTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1829,6 +1831,7 @@
 				FC0060000000000000000005 /* SharedVectorTests.swift */,
 				FC0170000000000000000001 /* S1SharedVectorTests.swift */,
 				FC0270000000000000000001 /* S2SharedVectorTests.swift */,
+				FC0370000000000000000001 /* S3SharedVectorTests.swift */,
 				FC0320000000000000000001 /* PlatformCryptoParityTests.swift */,
 			);
 			path = Backup;
@@ -2620,6 +2623,7 @@
 				FC0060000000000000000006 /* SharedVectorTests.swift in Sources */,
 				FC0170000000000000000002 /* S1SharedVectorTests.swift in Sources */,
 				FC0270000000000000000002 /* S2SharedVectorTests.swift in Sources */,
+				FC0370000000000000000002 /* S3SharedVectorTests.swift in Sources */,
 				FC0320000000000000000002 /* PlatformCryptoParityTests.swift in Sources */,
 				B252 /* ScenePrivacyCoordinatorTests.swift in Sources */,
 				B201 /* FictitiousFixtures.swift in Sources */,

@@ -1,5 +1,12 @@
 package com.ignacioli.finecoach
 
+import com.ignacioli.finecoach.core.domain.common.*
+import com.ignacioli.finecoach.core.domain.training.*
+import com.ignacioli.finecoach.core.domain.progress.*
+import com.ignacioli.finecoach.core.domain.insight.*
+import com.ignacioli.finecoach.core.domain.body.*
+import com.ignacioli.finecoach.core.domain.student.*
+import com.ignacioli.finecoach.core.domain.appointment.*
 import com.ignacioli.finecoach.domain.CreditLedger
 import java.io.File
 import java.math.BigDecimal
@@ -217,5 +224,106 @@ internal object VectorFiles {
             else if (c == '"') quoted = true else if (c == '{') depth++ else if (c == '}' && --depth == 0) return i + 1
         }
         error("Missing meta end")
+    }
+}
+
+/** S3 projections: explicit context/IDs/times from vectors, no device state or random IDs. */
+@Suppress("UNCHECKED_CAST")
+internal class S3VectorAdapter(private val now: Instant, private val zone: ZoneId) {
+    private fun map(value: Any?) = value as Map<String, Any?>
+    private fun rows(value: Any?) = value as List<Map<String, Any?>>
+    private fun date(value: Any?): java.time.LocalDate? = value?.let { map(it).let { d -> java.time.LocalDate.of((d.getValue("year") as Long).toInt(), (d.getValue("month") as Long).toInt(), (d.getValue("day") as Long).toInt()) } }
+    private fun decimal(value: Any?) = (value as? String)?.let { DecimalValue.parse(it) }
+    private fun source(value: Any?) = StableExerciseID.parse(value as String)
+    private fun student(value: Any?) = StudentID.parse(value as String)
+    private fun session(row: Map<String, Any?>, context: Map<String, Any?>): CompletedSession {
+        val id = SessionID.parse(row.getValue("id") as String)
+        val eid = SessionExerciseID.parse(row.getValue("exerciseID") as String)
+        val at = Instant.parse(row.getValue("completedAtUTC") as String)
+        val mode = RecordMode.parse(row.getValue("recordMode") as String)
+        val sets = rows(row.getValue("sets")).map { s ->
+            val input = map(s.getValue("input"))
+            val draft = TrainingSet.makeDraft(
+                TrainingSetID.parse(s.getValue("id") as String), eid, (s.getValue("orderIndex") as Long).toUInt(),
+                TrainingSetInput(
+                    RecordMode.parse(input.getValue("recordMode") as String),
+                    weightValue = input["weightValue"] as? String, repetitionCount = input["repetitionCount"] as? String,
+                    durationSeconds = input["durationSeconds"] as? String,
+                    unit = MeasurementUnit.parse(input.getValue("unit") as String),
+                    side = SetSide.parse(input.getValue("side") as String),
+                    distanceValue = input["distanceValue"] as? String), at)
+            when(s.getValue("state")) { "completed" -> draft.confirmed(at); "pending" -> draft.confirmed(at).undone(at); "draft" -> draft; else -> error("Invalid S3 state") }
+        }
+        val exercise = SessionExercise(eid, id, (context.getValue("exerciseOrder") as Long).toUInt(),
+            ExerciseSourceKind.parse(context.getValue("sourceKind") as String), source(row.getValue("sourceID")),
+            NormalizedName.parse(context.getValue("exerciseName") as String), mode,
+            ValidatedText.optional(context["actionPrivateNote"] as? String), sets = sets)
+        check(context["latestReport"] == null && map(context.getValue("actionPrivateNotes")).isEmpty())
+        return CompletedSession(id, student(row.getValue("studentID")),
+            NormalizedName.parse(context.getValue("studentName") as String), Instant.parse(row.getValue("startedAtUTC") as String), at,
+            (row.getValue("trainingFocus") as List<String>).map { BodyPart.parse(it) }.toSet(),
+            SessionNotes(ValidatedText.optional(context["privateCoachNote"] as? String),
+                ValidatedText.optional(context["studentFacingSummary"] as? String), emptyMap()), listOf(exercise),
+            SessionStatistics(sets.count { it.contributesToStatistics }, decimal(context.getValue("displayedDurationSeconds"))!!, decimal(context["ordinaryTrainingVolume"])),
+            (context.getValue("revision") as Long).toULong())
+    }
+    fun evaluate(op: String, args: Map<String, Any?>): Any {
+        val context = map(args.getValue("context"))
+        fun history() = rows(args.getValue("history")).map { session(it, context) }
+        fun assisted() = (args.getValue("assisted") as List<String>).map(::source).toSet()
+        return when(op) {
+            "s3.gains" -> {
+                val gains = SessionGains.evaluate(session(map(args.getValue("current")), context), history(), zone, assisted())
+                mapOf("holderIDs" to gains.recordHolderSetIDs.map { it.value }.sorted(), "strictIDs" to gains.strictRecordHolderSetIDs.map { it.value }.sorted(),
+                    "recordCount" to gains.records.size.toLong(), "rowCount" to gains.rows.size.toLong(), "progressCount" to gains.progress.size.toLong(),
+                    "milestone" to gains.milestoneSessionNumber?.toLong(), "streak" to gains.attendanceStreakWeeks?.toLong())
+            }
+            "s3.e1rm" -> mapOf("value" to EstimatedOneRepMax.value(decimal(args.getValue("weight"))!!, decimal(args.getValue("reps"))!!, source(args.getValue("exerciseID")))?.canonicalString)
+            "s3.insights" -> {
+                val students = rows(args.getValue("students")).map { s ->
+                    val at = Instant.parse(s.getValue("createdAtUTC") as String)
+                    val value = StudentDraft(s.getValue("name") as String, StudentSex.parse(s.getValue("sex") as String)).makeStudent(student(s.getValue("id")), at)
+                    if (s.getValue("archived") as Boolean) value.archived(now) else value
+                }
+                val packages = rows(args.getValue("packages")).associate { p -> student(p.getValue("studentID")) to InsightEngine.PackageBalance(p.getValue("balance") as Long, date(p["endDate"])) }
+                val appointments = rows(args.getValue("appointments")).map { a -> Appointment(
+                    java.util.UUID.fromString(a.getValue("id") as String), student(a.getValue("studentID")), date = date(a.getValue("date"))!!,
+                    startTime = java.time.LocalTime.of((a.getValue("hour") as Long).toInt(), (a.getValue("minute") as Long).toInt()),
+                    status = AppointmentStatus.valueOf(a.getValue("status") as String), createdAtUTC = now, updatedAtUTC = now) }
+                val input = InsightEngine.Input(students, packages, appointments, history(), (args.getValue("snoozed") as List<String>).toSet(), assisted())
+                mapOf("items" to InsightEngine.evaluate(input, now, zone).map {
+                    mapOf("kind" to it.kind.name, "studentID" to it.studentID.value, "exerciseID" to it.exerciseID?.value, "metric" to it.baselineMetric?.name)
+                })
+            }
+            "s3.compare" -> when (val result = Comparison.compareSessions(session(map(args.getValue("a")), context), session(map(args.getValue("b")), context))) {
+                is Comparison.SessionComparisonResult.Compatible -> mapOf("compatibility" to "compatible", "setsA" to result.detail.totalSetCountA.toLong(), "setsB" to result.detail.totalSetCountB.toLong())
+                Comparison.SessionComparisonResult.DifferentStudent -> mapOf("compatibility" to "differentStudent")
+                else -> mapOf("compatibility" to "incompatible")
+            }
+            "s3.records", "s3.trend" -> {
+                val id = source(args.getValue("exerciseID")); val mode = RecordMode.parse(args.getValue("recordMode") as String)
+                val direction = if (args.getValue("assisted") as Boolean) Comparison.LoadDirection.decreaseIsImprovement else Comparison.LoadDirection.increaseIsImprovement
+                if (op == "s3.records") {
+                    val r = Comparison.personalRecords(id, mode, history(), direction)
+                    mapOf("weight" to r.highestWeight?.value?.canonicalString, "repsWeight" to r.mostRepsAtWeight?.weight?.canonicalString, "reps" to r.mostRepsAtWeight?.reps?.canonicalString, "repsSession" to r.mostRepsAtWeight?.sessionID?.value)
+                } else {
+                    val points = Comparison.exerciseTrend(id, mode, history(), direction)
+                    mapOf("weights" to points.map { it.maxWeight?.canonicalString }, "deltas" to points.map { it.weightDelta?.canonicalString }, "volumes" to points.map { it.volume?.canonicalString }, "density" to Comparison.TrendSampleDensity.classify(points).name)
+                }
+            }
+            "s3.body-display" -> {
+                val v = decimal(args.getValue("value"))!!
+                mapOf("weight" to BuiltInUnitConversion.weight(v, args.getValue("weightUnit") as String).canonicalString,
+                    "length" to BuiltInUnitConversion.length(decimal(args.getValue("centimeters"))!!, args.getValue("lengthUnit") as String).canonicalString, "original" to v.canonicalString)
+            }
+            "s3.body-upsert" -> {
+                val index = BodyMeasurementDayIndex()
+                fun point(prefix: String) = BodyMeasurement.recordedNow(java.util.UUID.fromString(args.getValue(prefix + "ID") as String), student(args.getValue("studentID")), java.util.UUID.fromString(args.getValue("metricID") as String), Instant.parse(args.getValue(prefix + "At") as String), zone, decimal(args.getValue(prefix + "Value"))!!, args.getValue(prefix + "Unit") as String)
+                val a = index.upsert(point("first")); val b = index.upsert(point("second"))
+                val points = index.history(a.studentID, a.metricID)
+                mapOf("count" to points.size.toLong(), "keptFirstID" to (b.id == a.id), "days" to points.map { it.localCalendarDay.toString() }, "units" to points.map { it.enteredUnit })
+            }
+            else -> error("Unmapped S3 operation")
+        }
     }
 }

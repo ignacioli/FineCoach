@@ -1,0 +1,121 @@
+{
+  "id": "s3-gains-delete-recompute",
+  "rule": "M1B-FR-029",
+  "meta": {
+    "requirements": [
+      "S3-FR-001",
+      "S3-FR-004",
+      "D-FR-001",
+      "D-FR-022",
+      "D-FR-023",
+      "D-FR-026"
+    ],
+    "description": "fictional-data: S3 deterministic parity case",
+    "tags": [
+      "fictional-data",
+      "s3",
+      "gains"
+    ]
+  },
+  "given": {
+    "clock": {
+      "now": "2026-03-15T20:00:00Z"
+    },
+    "timeZone": "America/Los_Angeles",
+    "state": {
+      "context": {
+        "studentName": "虚构学员",
+        "exerciseName": "虚构动作",
+        "sourceKind": "builtIn",
+        "exerciseOrder": 0,
+        "revision": 1,
+        "displayedDurationSeconds": "600",
+        "ordinaryTrainingVolume": null,
+        "privateCoachNote": null,
+        "studentFacingSummary": null,
+        "actionPrivateNote": null,
+        "actionPrivateNotes": {
+        },
+        "latestReport": null
+      },
+      "current": {
+        "id": "73000000-0000-4000-8000-000000000064",
+        "studentID": "73000000-0000-4000-8000-000000000001",
+        "startedAtUTC": "2026-03-15T19:50:00Z",
+        "completedAtUTC": "2026-03-15T20:00:00Z",
+        "trainingFocus": [
+
+        ],
+        "exerciseID": "73000000-0000-4000-8000-000000018704",
+        "sourceID": "73000000-0000-4000-8000-000000000002",
+        "recordMode": "weightReps",
+        "sets": [
+          {
+            "id": "73000000-0000-4000-8000-0000000007d1",
+            "orderIndex": 1,
+            "state": "completed",
+            "input": {
+              "recordMode": "weightReps",
+              "unit": "kilograms",
+              "side": "none",
+              "weightValue": "55",
+              "repetitionCount": "5"
+            }
+          }
+        ]
+      },
+      "history": [
+        {
+          "id": "73000000-0000-4000-8000-00000000005a",
+          "studentID": "73000000-0000-4000-8000-000000000001",
+          "startedAtUTC": "2026-03-14T19:50:00Z",
+          "completedAtUTC": "2026-03-14T20:00:00Z",
+          "trainingFocus": [
+
+          ],
+          "exerciseID": "73000000-0000-4000-8000-0000000186fa",
+          "sourceID": "73000000-0000-4000-8000-000000000002",
+          "recordMode": "weightReps",
+          "sets": [
+            {
+              "id": "73000000-0000-4000-8000-0000000007d1",
+              "orderIndex": 1,
+              "state": "completed",
+              "input": {
+                "recordMode": "weightReps",
+                "unit": "kilograms",
+                "side": "none",
+                "weightValue": "50",
+                "repetitionCount": "5"
+              }
+            }
+          ]
+        }
+      ],
+      "assisted": [
+
+      ]
+    }
+  },
+  "when": {
+    "op": "s3.gains",
+    "args": {
+      "$ref": "/given/state"
+    }
+  },
+  "then": {
+    "state": {
+      "holderIDs": [
+        "73000000-0000-4000-8000-0000000007d1"
+      ],
+      "strictIDs": [
+        "73000000-0000-4000-8000-0000000007d1"
+      ],
+      "recordCount": 1,
+      "rowCount": 1,
+      "progressCount": 0,
+      "milestone": null,
+      "streak": null
+    }
+  }
+}

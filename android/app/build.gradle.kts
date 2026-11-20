@@ -238,6 +238,7 @@ val validateEnvironmentSmoke = tasks.register("validateS0EnvironmentSmokeResults
 environmentSmoke.configure { finalizedBy(validateEnvironmentSmoke) }
 
 val roomClasses = listOf(
+    "com.ignacioli.finecoach.RoomMigrationV4Tests",
     "com.ignacioli.finecoach.RoomMigrationV3Tests",
     "com.ignacioli.finecoach.RoomSkeletonTests",
     "com.ignacioli.finecoach.StorageValueTests",
@@ -939,6 +940,7 @@ tasks.withType<Test>().configureEach {
     systemProperty("finecoach.sharedVectorRoot", sharedVectorRoot.asFile.absolutePath)
 }
 val sharedVectorClasses = listOf(
+    "com.ignacioli.finecoach.S3VectorRunnerTests",
     "com.ignacioli.finecoach.S2VectorRunnerTests",
     "com.ignacioli.finecoach.VectorFormatTests",
     "com.ignacioli.finecoach.SharedVectorTests",
@@ -1004,6 +1006,7 @@ val validateSharedVectorGate = tasks.register("validateS0G6Results") {
         val expectedCounts = mapOf(
             "com.ignacioli.finecoach.VectorFormatTests" to 72,
             "com.ignacioli.finecoach.S2VectorRunnerTests" to 10,
+            "com.ignacioli.finecoach.S3VectorRunnerTests" to 5,
             "com.ignacioli.finecoach.SharedVectorTests" to 5,
         )
         check(counts == expectedCounts) { "Unexpected G6 testcase counts: $counts; expected $expectedCounts" }

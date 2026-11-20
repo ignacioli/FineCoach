@@ -1,0 +1,53 @@
+{
+  "id": "s3-e1rm-3",
+  "rule": "M1B-FR-029",
+  "meta": {
+    "requirements": [
+      "S3-FR-009",
+      "E-FR-016"
+    ],
+    "description": "fictional-data: S3 deterministic parity case",
+    "tags": [
+      "fictional-data",
+      "s3",
+      "e1rm"
+    ]
+  },
+  "given": {
+    "clock": {
+      "now": "2026-03-15T20:00:00Z"
+    },
+    "timeZone": "America/Los_Angeles",
+    "state": {
+      "context": {
+        "studentName": "虚构学员",
+        "exerciseName": "虚构动作",
+        "sourceKind": "builtIn",
+        "exerciseOrder": 0,
+        "revision": 1,
+        "displayedDurationSeconds": "600",
+        "ordinaryTrainingVolume": null,
+        "privateCoachNote": null,
+        "studentFacingSummary": null,
+        "actionPrivateNote": null,
+        "actionPrivateNotes": {
+        },
+        "latestReport": null
+      },
+      "weight": "90",
+      "reps": "11",
+      "exerciseID": "a2f5b6ef-b780-49c0-8d96-fdaff23e27ce"
+    }
+  },
+  "when": {
+    "op": "s3.e1rm",
+    "args": {
+      "$ref": "/given/state"
+    }
+  },
+  "then": {
+    "state": {
+      "value": null
+    }
+  }
+}
