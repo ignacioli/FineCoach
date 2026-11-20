@@ -131,7 +131,7 @@
 
 > **负责人决定（2026-11-02）**：用 GitHub Pages（选项 B），先发布中文版。开启 Pages 属于仓库设置改动，由负责人操作或另行授权。
 
-- 草稿：`docs/distribution/privacy-policy.zh.md`。
+- 正文：`docs/privacy/index.md`；事实依据：`docs/distribution/privacy-policy-evidence.md`。站点配置 `docs/_config.yml` 只发布隐私政策，`distribution/` 被排除。
 - 选项 A：仓库内 Markdown，用 GitHub 文件页链接当 URL。最省事。
   - 后果：URL 依赖仓库保持公开，改路径或分支会让链接失效。
 - 选项 B：GitHub Pages（例如 `ignacioli.github.io/FineCoach/privacy`）。URL 更稳定，看起来更正式。
@@ -188,7 +188,7 @@
 ## 6. 本轮产出
 
 - `docs/distribution/testflight-readiness.md`（本文件）
-- `docs/distribution/privacy-policy.zh.md`（隐私政策草稿）
+- `docs/privacy/index.md`（隐私政策正文）、`docs/distribution/privacy-policy-evidence.md`（事实依据）
 - `docs/distribution/app-review-notes.md`（审核备注草稿）
 
 三份草稿已由负责人审阅通过（2026-11-02）。隐私政策的生效日期和联系方式，以及审核备注第 4 节（演示档案的链接和密码），等 D4 的 GitHub Pages 开通后再补。

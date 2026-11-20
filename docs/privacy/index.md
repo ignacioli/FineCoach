@@ -1,21 +1,11 @@
-<!--
-草稿，未发布。发布位置待负责人决定（docs/distribution/testflight-readiness.md D4）。
-每一句都对应一条代码事实，依据写在本注释里，发布时删掉注释：
-- 无网络请求、无第三方 SDK、无遥测：testflight-readiness.md §1
-- 本机存储，排除在设备备份外，并启用文件保护：Core/Platform/ProtectedFileStore.swift:8-25，StoreGeneration.swift:111
-- 通知只在本地触发，只在开启提醒时请求权限：NotificationAdapter.swift:104，Localizable「onboarding.sheet.permission.detail」
-- 备份和档案用用户密码加密（AES-GCM + PBKDF2）：BackupCrypto.swift:44-104，ArchiveFileCodec.swift:201-205
-- 档案永不导出的字段：Localizable「archive.export.exclusion.fullList」
-- 训练报告永不包含的字段：Localizable「onboarding.sheet.private.detail」
-- 文件只通过系统分享面板或「存储到文件」交出：SystemShareAdapter.swift:43-104
-- 外链只用系统浏览器打开：SettingsView.swift:44，ArchiveAboutView.swift:60
-- 隐私清单：FineCoachApp/PrivacyInfo.xcprivacy
-联系方式、生效日期由负责人填写。
--->
+---
+layout: default
+title: 精练教练隐私政策
+---
 
 # 精练教练（FineCoach）隐私政策
 
-生效日期：〔待填写〕
+生效日期：2026-11-20
 
 精练教练是一款私教课堂记录 App。本政策说明 App 怎样处理你的数据。
 
@@ -68,4 +58,4 @@
 
 ## 联系方式
 
-〔待填写，例如 GitHub Issues：https://github.com/ignacioli/FineCoach/issues〕
+如对本政策有疑问，请在 GitHub 提交 Issue：<https://github.com/ignacioli/FineCoach/issues>。
