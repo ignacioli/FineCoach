@@ -1600,3 +1600,27 @@ T052：cursor grok-4.7-medium 只读首轮 FAIL（seed事务复查/rotation测�
 T053 PASS（S2-D24）：负责人走查 1～14 步通过并批准 01 今日 S2、25 日历、23 新建安排三张 baseline，已写入 manifest、APPROVALS.md 与 coreBaselineScreens hash 锁，见 [T053](docs/s2/T053.md)。收尾宿主 gate PASS：BUILD 0、UNIT 0、total 1168、BAD 0，s2BaselineManifest 与 10 张核心屏 baseline-check 全部 PASS；`gate.sh --android` 因无负责人提供的 runlist/manifest 未运行。锁屏外观、API 36 真实授权框、通知点击→Today、channel-off 延后到下一次真机验收。
 
 seed v4 的 multi 增加 15 条预约、两系列（RepeatCount / EndDate）及一笔缺席扣课。dayOffset/endDayOffset 基于首次 seed 时设备本地日期；其余数据确定，重复 seed 不重算日期/覆盖人工编辑。仅 startup metadata 且无任何业务行的 store 可 seed；含用户数据或其他 metadata 仍拒绝。通知锁屏 visibility 保持 Phase 3 的 PUBLIC 决定；正文仍是时间句，不含学员信息。详见 [T050](docs/s2/T050.md)、[T051](docs/s2/T051.md)、[walkthrough](docs/s2/walkthrough.md)、[T054](docs/s2/T054.md)。
+
+## S3：进步与洞察
+
+需求与验收见 specs `FineCoach/007-android-port/s3-progress-insights/spec.md`（S3-D01）；执行记录见 [`docs/s3/`](docs/s3/README.md)。
+
+### T016 / Phase 2 checkpoint：领域、存储与向量
+
+待办。
+
+### T023 / Phase 3 checkpoint：训练页新纪录与本节收获
+
+待办。
+
+### T034 / Phase 4 checkpoint：训练趋势与身体数据
+
+待办。
+
+### T045 / Phase 5 checkpoint：需要留意与核心屏
+
+待办。
+
+### T053 / Phase 6 checkpoint：seed、复核与走查
+
+待办。
