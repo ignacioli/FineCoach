@@ -443,7 +443,7 @@ class ScopeBoundaryTests {
         val expectedConstants = frozenS1RouteConstants()
         expectedConstants.filterKeys { !it.startsWith("ARG_") }.values.forEach { route ->
             assertFalse(route.contains("appointment", ignoreCase = true))
-            assertFalse(route.contains("trend", ignoreCase = true))
+            if (route != "students/{\$ARG_STUDENT_ID}/trends") assertFalse(route.contains("trend", ignoreCase = true))
             assertFalse(route.contains("backup", ignoreCase = true))
             assertFalse(route.contains("archive", ignoreCase = true))
             assertFalse(route.contains("share", ignoreCase = true))
@@ -518,6 +518,8 @@ class ScopeBoundaryTests {
         "STUDENT_EDIT" to "students/{\$ARG_STUDENT_ID}/edit",
         "STUDENT_PACKAGES" to "students/{\$ARG_STUDENT_ID}/packages",
         "STUDENT_HISTORY" to "students/{\$ARG_STUDENT_ID}/history",
+        "STUDENT_TRENDS" to "students/{\$ARG_STUDENT_ID}/trends",
+        "STUDENT_BODY" to "students/{\$ARG_STUDENT_ID}/body",
         "PACKAGE_DETAIL" to "packages/{\$ARG_PACKAGE_ID}",
         "SESSION_ACTIVE" to "session/{\$ARG_SESSION_ID}",
         // T020 fix1: owner-approved student title entry for coach resources.
@@ -546,6 +548,8 @@ class ScopeBoundaryTests {
                     "fun:studentEdit",
                     "fun:studentPackages",
                     "fun:studentHistory",
+                    "fun:studentTrends",
+                    "fun:studentBody",
                     "fun:packageDetail",
                     "fun:activeSession",
                     "fun:templateDetail",
