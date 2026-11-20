@@ -8,12 +8,16 @@ import com.ignacioli.finecoach.features.exercises.*
 import com.ignacioli.finecoach.designsystem.FcSaveState
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import com.ignacioli.finecoach.core.domain.progress.SessionGains
+import java.time.ZoneId
 
 class ActiveSessionUiState(
     val useCases: ActiveSessionUseCases, val clock: AppClock, val ids: StableIDGenerator,
     private val sessions: SessionRepositoryPort, private val history: HistoryRepositoryPort,
     private val exerciseUseCases: ExerciseUseCases,
     val rests: RestTimerStore = RestTimerStore(clock),
+    private val progress: ProgressUseCases = ProgressUseCases(history, sessions),
+    private val zone: ZoneId = ZoneId.systemDefault(),
 ) {
     companion object {
         /** Sections move as blocks; members move only inside their section. */
@@ -73,35 +77,43 @@ class ActiveSessionUiState(
     }
     val previous = mutableStateMapOf<SessionExerciseID, TrainingSetRecord>()
     val previousCounts = mutableStateMapOf<SessionExerciseID, Int>()
+    private var progressSnapshot: ProgressUseCases.Snapshot? = null
+    var gains by mutableStateOf(SessionGains()); private set
+    data class Confirmation(val sequence: Int, val setID: TrainingSetID, val isRecordImprovement: Boolean)
+    private var confirmationSequence = 0
+    val confirmations = mutableStateListOf<Confirmation>()
+    fun consumeConfirmations(): List<Confirmation> = confirmations.toList().also { confirmations.clear() }
+    private fun confirmed(id: TrainingSetID) {
+        confirmations += Confirmation(++confirmationSequence, id, id in gains.strictRecordHolderSetIDs)
+    }
+    private fun recompute() {
+        val current = content ?: return
+        val snapshot = progressSnapshot ?: return
+        gains = progress.gains(current.toDomain().session, snapshot, zone)
+        previous.clear(); previousCounts.clear()
+        current.toDomain().session.exercises.forEach { exercise ->
+            snapshot.last.performanceFor(exercise)?.let {
+                previous[exercise.sessionExerciseID] = it.firstSet.toRecord()
+                previousCounts[exercise.sessionExerciseID] = it.sets.size
+            }
+        }
+    }
 
     suspend fun load(id: SessionID) = perform({ useCases.load(id) }) { loaded ->
-        content = loaded
-        if (loaded == null) error = ApplicationError(ApplicationErrorCode.notFound)
+        confirmations.clear(); progressSnapshot = null; gains = SessionGains()
+        if (loaded == null) { content = null; error = ApplicationError(ApplicationErrorCode.notFound) }
         else loadPrevious(loaded)
     }
     private suspend fun loadPrevious(current: SessionContentRecord) {
         previous.clear()
         previousCounts.clear()
-        when (val rows = history.list(HistoryQuery(studentID = current.session.studentID))) {
-            is ApplicationResult.Failure -> error = rows.error
-            is ApplicationResult.Success -> for (row in rows.value.sortedByDescending { it.completedAtUTC }) {
-                when (val result = sessions.loadContent(row.sessionID)) {
-                    is ApplicationResult.Failure -> { error = result.error; return }
-                    is ApplicationResult.Success -> {
-                        val old = result.value ?: continue
-                        if (old.session.state != SessionState.completed) continue
-                        current.exercises.forEach { exercise ->
-                            if (exercise.sessionExerciseID !in previous) {
-                                old.exercises.firstOrNull { it.recordModeSnapshot == exercise.recordModeSnapshot &&
-                                    it.sourceID == exercise.sourceID && (exercise.sourceID != null || it.displayNameSnapshot == exercise.displayNameSnapshot) &&
-                                    it.sets.any { set -> set.state == SetRecordingState.completed } }
-                                    ?.sets?.filter { it.state == SetRecordingState.completed }
-                                    ?.let { previous[exercise.sessionExerciseID] = it.first(); previousCounts[exercise.sessionExerciseID] = it.size }
-                            }
-                        }
-                    }
-                }
-            }
+        val result = progress.load(current.session.studentID)
+        // Publish entry rows only after the snapshot read, so visible rows do not precede
+        // the end of the busy gate that guards their page's back action.
+        content = current
+        when (result) {
+            is ApplicationResult.Failure -> error = result.error
+            is ApplicationResult.Success -> { progressSnapshot = result.value; recompute() }
         }
     }
     suspend fun <T> perform(action: suspend () -> ApplicationResult<T>, success: suspend (T) -> Unit = {}): ApplicationResult<T> = operationGate.withLock {
@@ -146,15 +158,16 @@ class ActiveSessionUiState(
                             .maxOrNull()?.plus(1u) ?: 0u,
                         selection.sourceKind, selection.sourceID, selection.name, selection.mode, null, null, emptyList())))
             }
-        }) { content = it; loadPrevious(it); result = ApplicationResult.Success(Unit) }
+        }) { content = it; recompute(); result = ApplicationResult.Success(Unit) }
         saveState = if (error == null) FcSaveState.Saved else FcSaveState.Failed
         retryAction = if (error == null) null else ({ addExercise(selection) })
         return error?.let { ApplicationResult.Failure(it) } ?: result
     }
-    fun accept(value: SessionContentRecord) { content = value }
+    fun accept(value: SessionContentRecord) { content = value; recompute() }
     private fun acceptMutation(value: SessionContentRecord) {
         val completed = content?.exercises?.flatMap { it.sets }?.filter { it.state == SetRecordingState.completed }?.map { it.trainingSetID }?.toSet().orEmpty()
         content = value
+        recompute()
         val newlyCompleted = value.exercises.flatMap { it.sets }.lastOrNull { it.state == SetRecordingState.completed && it.trainingSetID !in completed }
         if (newlyCompleted != null) { undoableSetID = newlyCompleted.trainingSetID; rests.start(value.session.sessionID) }
         else if (value.exercises.flatMap { it.sets }.none { it.trainingSetID == undoableSetID && it.state == SetRecordingState.completed }) undoableSetID = null
@@ -258,7 +271,7 @@ class ActiveSessionUiState(
 
     suspend fun confirmSet(id: TrainingSetID): ApplicationResult<Unit> = mutate {
         it.copy(session = it.session.confirmingSet(id, clock.now()))
-    }
+    }.also { if (it is ApplicationResult.Success) confirmed(id) }
 
     suspend fun saveSection(id: SectionID?, name: String): ApplicationResult<Unit> = mutate { original ->
         id?.let { original.renamingSection(it, name, clock.now()) }
@@ -297,7 +310,10 @@ class ActiveSessionUiState(
             it.session.addingSet(exercise, id, input, now).confirmingSet(id, now)
         })
     }.also { result ->
-        if (result is ApplicationResult.Success && target == null) entryPrefill = null
+        if (result is ApplicationResult.Success && target == null) {
+            entryPrefill = null
+            undoableSetID?.let(::confirmed)
+        }
     }
     suspend fun removeExercise(id: SessionExerciseID, confirmed: Boolean): ApplicationResult<Unit> = mutate { original ->
         val removed = original.session.removingExercise(id, confirmed, clock.now())
