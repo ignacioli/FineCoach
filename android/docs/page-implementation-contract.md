@@ -47,7 +47,17 @@
 ## 4. 完成标志（每个核心屏）
 
 1. 设计图层全部映射，没有 MISSING；尺寸、相邻间距、包含内边距与对齐的 Δ 取最近 0.25dp 后比较 ±2dp，绝对坐标 ±8dp 粗界限、颜色精确（S1-D55/D56），适用图标 ICON_PIXELS（S1-D59）全部通过，failed 0。
-2. 手写例外（manual selector、anchor、geometryRule、pendingBoardFix）≤10%（S1-D44）。超出的部分要么是设计稿待改项，要么就是 UI 没按 §3 的约定挂 tag，后者要修。
+2. 手写例外（manual selector、anchor、geometryRule、pendingBoardFix、ownerException）≤10%（S1-D44）。超出的部分要么是设计稿待改项，要么就是 UI 没按 §3 的约定挂 tag，后者要修。
+
+`pendingBoardFix`（S1-D42）只表示画板待改：决策编号必须是 `S1-D`，几何通过后状态是 `BOARD_FIX_PENDING`，不算 PASS，也不算失败。
+
+`ownerException`（S3-D12）表示负责人已经批准的差异，不是画板待改。map 条目可选：
+
+```json
+"ownerException": { "decision": "S3-D12", "reason": "…", "checks": ["GAP"], "maxDeltaDp": 4 }
+```
+
+`decision` 必须匹配 `S<n>-D<n>`，`reason` 和 `checks` 不能空，`maxDeltaDp` 必须大于 0，否则比较器按该层路径抛出错误。只有失败的检查全部在 `checks` 里、并且每一项取整后的 |Δ| 不超过 `maxDeltaDp` 时，状态才是 `OWNER_EXCEPTION`（不算 PASS，也不算失败，报告单独列出决策编号和原因）。还有别的检查失败，或 |Δ| 超过上限，仍是 FAIL。GAP 这类两层检查要两层都登记才豁免。该行全部通过时保持 PASS，并注明「例外登记未被使用」。登记计入上面的 10% 手工例外。容差、取整、锚点和 ICON_PIXELS 阈值不变。
 3. 功能测试、G3、G4、全量宿主门禁全绿；Compose UI 测试覆盖入口与布局（改动数据的控件可见、可点，不能只靠长按；该占满宽度的控件宽度等于父容器）。
 4. 三联图和 SSIM 热力图已生成。SSIM **不是门禁**（S1-D45），只用来帮人在走查时定位问题。
 5. 执行记录里有入口与布局映射表（`components.md` §1.4）。

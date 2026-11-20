@@ -719,4 +719,37 @@ private fun captureSheet(activity: Bitmap, panelTag: String): Bitmap {
             "design/android-differences/screens/AD-02-date-time-picker.png")
         stacked.recycle()
     }
+
+    @Test fun trainingHistoryCompareEntry() = measure(
+        "07-training-history", "HistoryListScreen",
+        "虚构学员；可见「选择」进入两节课比较",
+        "07 是已批准历史画板。课程比较在选择模式里，默认列表只增加可见的「选择」。",
+        scrollTag = "history-list-content",
+        designPath = "design/m1-b-hifi/screens/07-training-history.png",
+    ) {
+        val f = T009Fixture().also { releaseFixture = it::close }
+        lateinit var progress: ProgressUseCases
+        val state = HistoryUiState(f.historyCases, f.studentID)
+        f.test {
+            f.finish(f.content())
+            progress = ProgressUseCases(f.history, f.sessions)
+        }
+        show { HistoryListScreen(state, f.zone, {}, {}, progress) }
+        "history-list-trailing"
+    }
+
+    @Test fun bodyDataList() = measure(
+        "06-body-data", "BodyDataScreen",
+        "虚构学员；内置指标列表，没有录入数值",
+        "06 为已批准身体数据画板。本捕获是空列表，录入和删除在 G4。",
+        scrollTag = "body-list",
+        designPath = "design/m1-b-hifi/screens/06-body-data.png",
+    ) {
+        val f = T009Fixture().also { releaseFixture = it::close }
+        val state = com.ignacioli.finecoach.features.body.BodyDataState(f.studentID,
+            BodyDataUseCases(com.ignacioli.finecoach.storage.repository.BodyDataRepository(f.db, f.clock), f.clock, f.zone) { java.util.UUID.randomUUID() })
+        f.test { state.load() }
+        show { com.ignacioli.finecoach.features.body.BodyDataScreen(state) {} }
+        "body-custom"
+    }
 }

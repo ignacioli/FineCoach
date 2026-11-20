@@ -517,6 +517,18 @@ private fun RecordsSection(
             onClick = { onRoute(S1Routes.studentHistory(studentID)) },
         )
         FcListRowDivider(Modifier.testTag("conformance:Divider"))
+        FcActionRow(
+            title = "训练趋势",
+            modifier = Modifier.testTag("studentDetail.trends"),
+            onClick = { onRoute(S1Routes.studentTrends(studentID)) },
+        )
+        FcListRowDivider(Modifier.testTag("conformance:Divider"))
+        FcActionRow(
+            title = "身体数据",
+            modifier = Modifier.testTag("studentDetail.body"),
+            onClick = { onRoute(S1Routes.studentBody(studentID)) },
+        )
+        FcListRowDivider(Modifier.testTag("conformance:Divider"))
     }
 }
 

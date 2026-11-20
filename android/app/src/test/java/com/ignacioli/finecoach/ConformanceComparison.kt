@@ -48,6 +48,7 @@ internal object ConformanceComparison {
             entry.optJSONObject("pendingBoardFix")?.let { fix ->
                 check(fix.optString("decision").startsWith("S1-D") && fix.optString("reason").isNotBlank()) { "pendingBoardFix needs a decision and reason at ${layer.getString("path")}" }
             }
+            entry.optJSONObject("ownerException")?.let { validateOwnerException(it, layer.getString("path")) }
             val expected = expectedBounds(layer, anchor, offset, entry)
             val row = JSONObject().put("path", layer.getString("path")).put("name", layer.getString("name")).put("layerType", layer.optString("type"))
                 .put("mapping", entry.getString("mapping")).put("anchor", anchor).put("toleranceDp", tolerance).put("topOriginApplied", anchor == "top")
@@ -127,6 +128,7 @@ internal object ConformanceComparison {
                 .put("reason", "不可观测标记前提不成立：本行选择器须命中父图标节点，且须为真实内部path、父group/icon几何通过、同名资产来源hash有效")
         }
         val iconPixels = ConformanceIconPixels.evaluate(layers, rowList, design, android)
+        applyOwnerExceptions(rowList, relative.getJSONArray("checks"))
         val missing = rowList.count { it.getString("status") == "MISSING" }
         val invisible = rowList.count { it.getString("category") == "INVISIBLE_OR_CLIPPED" }
         val uiDeviations = rowList.count { it.getString("category") == "UI_DEVIATION" }
@@ -134,6 +136,7 @@ internal object ConformanceComparison {
         val unobservable = rowList.count { it.getString("status") == "UNOBSERVABLE_VECTOR_INTERNAL" }
         val unobservableColor = rowList.count { it.getString("status") == "UNOBSERVABLE_COLOR" }
         val boardFixPending = rowList.count { it.getString("status") == "BOARD_FIX_PENDING" }
+        val ownerException = rowList.count { it.getString("status") == "OWNER_EXCEPTION" }
         check(design.width == android.width && design.height == android.height)
         val ssim = ConformanceSsim.compare(design, android)
         ImageIO.write(ssim.heatmap(), "png", File(out, "$screen.ssim-heatmap.png"))
@@ -166,14 +169,14 @@ internal object ConformanceComparison {
         ImageIO.write(triptych, "png", File(out, "$screen.triptych.png"))
         val top = rowList.filter { it.has("delta") && it.getString("category") == "UI_DEVIATION" }.sortedByDescending { row -> listOf("x", "y", "w", "h").maxOf { abs(row.getJSONObject("delta").getDouble(it)) } }.take(10)
         val invalidCapture = capture?.optString("status") == "INVALID_CAPTURE"
-        val manualExceptions = exceptions.count { e -> listOf("tag", "scope", "text", "commonLayoutParentOfTags", "anchor", "geometryRule").any(e::has) }
+        val manualExceptions = exceptions.count { e -> listOf("tag", "scope", "text", "commonLayoutParentOfTags", "anchor", "geometryRule", "ownerException").any(e::has) }
         val result = JSONObject().put("screen", screen).put("capture", capture ?: JSONObject.NULL).put("captureFailures", if (invalidCapture) 1 else 0)
             .put("outsideBoardLayers", exportedLayers.size - layers.size).put("partialVisibilityRule", "FULL_LAYOUT_GEOMETRY").put("colorTokenCount", tokens.size).put("colorTokenNames", JSONArray(tokens.map { it.name })).put("manualExceptionEntries", manualExceptions).put("manualExceptionRatio", manualExceptions.toDouble() / layers.size)
             .put("pendingBoardFixEntries", exceptions.count { it.has("pendingBoardFix") })
             .put("automaticMapped", rowList.count { it.getString("mapping").startsWith("AUTO") && it.has("actual") })
             .put("automaticMappingRate", rowList.count { it.getString("mapping").startsWith("AUTO") && it.has("actual") }.toDouble() / layers.size)
             .put("unmappedLayers", JSONArray(rowList.filter { !it.has("actual") }.map { JSONObject().put("path", it.getString("path")).put("name", it.getString("name")).put("reason", it.optString("reason")) }))
-            .put("artifactStatus", if (invalidCapture) "INVALID_CAPTURE" else "VALID_FIXTURE").put("invisible", invisible).put("uiDeviations", uiDeviations).put("total", rows.length()).put("passed", passed).put("failed", rows.length() - passed - unobservable - unobservableColor - boardFixPending).put("boardFixPending", boardFixPending).put("missing", missing)
+            .put("artifactStatus", if (invalidCapture) "INVALID_CAPTURE" else "VALID_FIXTURE").put("invisible", invisible).put("uiDeviations", uiDeviations).put("total", rows.length()).put("passed", passed).put("failed", rows.length() - passed - unobservable - unobservableColor - boardFixPending - ownerException).put("boardFixPending", boardFixPending).put("ownerException", ownerException).put("missing", missing)
             .put("unobservableVectorInternal", unobservable).put("unobservableColor", unobservableColor)
             .put("toleranceDp", tolerance).put("measuredContentTop", contentTop).put("effectiveOriginOffsetY", offset)
             .put("originReason", map.getString("originRule")).put("differentPixelRatio", different.toDouble() / (design.width.toLong() * design.height))
@@ -186,6 +189,72 @@ internal object ConformanceComparison {
         result.put("designPath", designPath)
         result.put("gatePassed", !invalidCapture && result.getInt("failed") == 0)
         return result
+    }
+
+    /** S3-D12. A registered difference is neither PASS nor a failure when every failed check is listed and within maxDeltaDp. */
+    internal fun validateOwnerException(spec: JSONObject, path: String) {
+        check(spec.optString("decision").matches(Regex("S\\d+-D\\d+"))) { "ownerException needs a decision at $path" }
+        check(spec.optString("reason").isNotBlank()) { "ownerException needs a reason at $path" }
+        val listed = spec.optJSONArray("checks")
+        check(listed != null && listed.length() > 0 && (0 until listed.length()).all { listed.optString(it).isNotBlank() }) { "ownerException needs checks at $path" }
+        check(spec.has("maxDeltaDp") && !spec.isNull("maxDeltaDp") && spec.optDouble("maxDeltaDp", -1.0) > 0.0) { "ownerException needs maxDeltaDp at $path" }
+    }
+
+    internal fun applyOwnerExceptions(rows: List<JSONObject>, checks: JSONArray) {
+        val byPath = rows.associateBy { it.getString("path") }
+        rows.forEach { row -> row.optJSONObject("selector")?.optJSONObject("ownerException")?.let { validateOwnerException(it, row.getString("path")) } }
+        for (row in rows) {
+            val spec = row.optJSONObject("selector")?.optJSONObject("ownerException") ?: continue
+            val status = row.optString("status")
+            if (status != "PASS" && status != "FAIL") continue
+            val failed = row.optJSONArray("failedChecks")?.let { names -> (0 until names.length()).map { names.getString(it) } }.orEmpty()
+            if (failed.isEmpty() && status == "PASS") {
+                row.put("ownerExceptionUnused", true)
+                val note = "例外登记未被使用"
+                row.put("reason", row.optString("reason").ifBlank { note }.let { if (it.contains(note)) it else "$it；$note" })
+                continue
+            }
+            if (status != "FAIL" || !exempt(row.getString("path"), failed, spec, byPath, checks)) continue
+            row.put("status", "OWNER_EXCEPTION").put("category", "OWNER_EXCEPTION").put("ownerException", spec)
+                .put("reason", "${spec.getString("decision")}：${spec.getString("reason")}")
+        }
+    }
+
+    private fun exempt(path: String, failed: List<String>, spec: JSONObject, byPath: Map<String, JSONObject>, checks: JSONArray): Boolean {
+        val allowed = spec.getJSONArray("checks").let { names -> (0 until names.length()).map { names.getString(it) }.toSet() }
+        val maxDelta = spec.getDouble("maxDeltaDp")
+        return failed.all { kind ->
+            if (kind !in allowed) return@all false
+            val related = checks.objects().filter { it.optString("check") == kind && it.has("passed") && !it.optBoolean("passed") && membersOf(it).contains(path) }
+            related.isNotEmpty() && related.all { check ->
+                val deltas = roundedDeltas(check)
+                deltas.isNotEmpty() && deltas.all { abs(it) <= maxDelta } && membersOf(check).all { member ->
+                    val other = byPath[member]?.optJSONObject("selector")?.optJSONObject("ownerException") ?: return@all false
+                    val otherChecks = other.optJSONArray("checks") ?: return@all false
+                    (0 until otherChecks.length()).any { otherChecks.optString(it) == kind } &&
+                        deltas.all { abs(it) <= other.optDouble("maxDeltaDp", 0.0) }
+                }
+            }
+        }
+    }
+
+    private fun membersOf(check: JSONObject): List<String> =
+        check.optJSONArray("members")?.let { names -> (0 until names.length()).map { names.getString(it) } }.orEmpty()
+
+    private fun roundedDeltas(node: Any?): List<Double> {
+        val found = mutableListOf<Double>()
+        fun walk(value: Any?) {
+            when (value) {
+                is JSONObject -> {
+                    if (value.has("roundedDelta") && !value.isNull("roundedDelta")) found += value.getDouble("roundedDelta")
+                    val keys = value.keys()
+                    while (keys.hasNext()) walk(value.opt(keys.next()))
+                }
+                is JSONArray -> for (index in 0 until value.length()) walk(value.opt(index))
+            }
+        }
+        walk(node)
+        return found
     }
 
     /** Both rows must have observed a node, and it must be the same node (same id). */
@@ -390,6 +459,16 @@ internal object ConformanceComparison {
                 }
             }
             appendLine("\n画板待改（已登记，S1-D42）：${result.optInt("boardFixPending")}，不计入PASS或偏差；画板修正并重新导出后撤掉登记。")
+            val ownerRows = rows.filter { it.optString("status") == "OWNER_EXCEPTION" }
+            val unusedExceptions = rows.filter { it.optBoolean("ownerExceptionUnused") }
+            if (ownerRows.isNotEmpty() || unusedExceptions.isNotEmpty()) {
+                appendLine("\n负责人批准的例外：${ownerRows.size}，不计入 PASS 或失败。")
+                ownerRows.forEach { row ->
+                    val spec = row.getJSONObject("ownerException")
+                    appendLine("- ${row.getString("path")} ${spec.getString("decision")}：${spec.getString("reason")}")
+                }
+                unusedExceptions.forEach { appendLine("- ${it.getString("path")} 例外登记未被使用") }
+            }
             appendLine("\n不可观测（矢量内部）：${result.getInt("unobservableVectorInternal")}，不计入PASS或偏差。仅父图标几何通过且同名资产来源hash验证通过时成立（S1-D37）。")
             appendLine("\noriginOffsetY=${result.getDouble("effectiveOriginOffsetY")}；Android content top=${result.getDouble("measuredContentTop")}；${result.getString("originReason")}")
             result.optJSONObject("stability")?.let { appendLine("\n双次 fresh Room/composition 渲染：$it") }

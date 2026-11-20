@@ -24,6 +24,9 @@ import com.ignacioli.finecoach.features.exercises.*
 import com.ignacioli.finecoach.features.templates.*
 import com.ignacioli.finecoach.features.session.*
 import com.ignacioli.finecoach.features.history.*
+import com.ignacioli.finecoach.features.trends.*
+import com.ignacioli.finecoach.features.body.*
+import com.ignacioli.finecoach.storage.repository.BodyDataRepository
 import com.ignacioli.finecoach.features.today.*
 import com.ignacioli.finecoach.features.calendar.*
 import com.ignacioli.finecoach.features.settings.*
@@ -290,11 +293,23 @@ AppointmentEditorScreen(editor, back) { onAppointmentSaved(editor) }
                 ManualCreditAdjustmentScreen(id, graph.credits, done, done)
             } else S1PackageTrail(graph, id, back)
         }
+        composable(S1Routes.STUDENT_TRENDS) { entry ->
+            val id = StudentID.parse(requireNotNull(entry.arguments?.getString(S1Routes.ARG_STUDENT_ID)))
+            val trends = remember(id) { TrendsState(id, sessionProgress(graph), graph.zone) }
+            OnResume { trends.load() }
+            TrendsScreen(trends, back)
+        }
+        composable(S1Routes.STUDENT_BODY) { entry ->
+            val id = StudentID.parse(requireNotNull(entry.arguments?.getString(S1Routes.ARG_STUDENT_ID)))
+            val body = remember(id) { BodyDataState(id, BodyDataUseCases(BodyDataRepository(graph.database, graph.clock), graph.clock, graph.zone) { UUID.randomUUID() }) }
+            OnResume { body.load() }
+            BodyDataScreen(body, back)
+        }
         composable(S1Routes.STUDENT_HISTORY) { entry ->
             val id = StudentID.parse(requireNotNull(entry.arguments?.getString(S1Routes.ARG_STUDENT_ID)))
             val state = remember(id) { HistoryUiState(graph.history, id, graph.students) }
             OnResume { state.list() }
-            HistoryListScreen(state, graph.zone, navigator::open, back)
+            HistoryListScreen(state, graph.zone, navigator::open, back, sessionProgress(graph))
         }
         composable(S1Routes.HISTORY_DETAIL) { entry ->
             val id = SessionID.parse(requireNotNull(entry.arguments?.getString(S1Routes.ARG_SESSION_ID)))
