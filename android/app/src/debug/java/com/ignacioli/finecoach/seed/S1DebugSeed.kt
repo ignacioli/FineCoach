@@ -61,7 +61,7 @@ internal object S1DebugSeed {
                             database.openHelper.readableDatabase.query("SELECT `key`, value FROM store_metadata").use { cursor ->
                                 while (cursor.moveToNext()) current[cursor.getString(0)] = cursor.getString(1)
                             }
-                            check(database.openHelper.readableDatabase.version == 3 && startupMetadataSet(current)) { "Non-seed database rejected" }
+                            check(database.openHelper.readableDatabase.version in 3..4 && startupMetadataSet(current)) { "Non-seed database rejected" }
                         }
                         metadata.insert(StoreMetadata(DATASET_KEY, fixture.dataset))
                         metadata.insert(StoreMetadata(VERSION_KEY, fixture.version.toString()))
@@ -95,12 +95,12 @@ internal object S1DebugSeed {
             context.getDatabasePath(FineCoachDatabaseFactory.DATABASE_NAME).absolutePath, null,
             android.database.sqlite.SQLiteDatabase.OPEN_READONLY,
         ).use { raw ->
-            check(raw.version == 2 || raw.version == 3) { "Non-seed schema rejected" }
+            check(raw.version in 2..4) { "Non-seed schema rejected" }
             val metadata = mutableMapOf<String, String>()
             raw.rawQuery("SELECT `key`, value FROM store_metadata", null).use { cursor ->
                 while (cursor.moveToNext()) metadata[cursor.getString(0)] = cursor.getString(1)
             }
-            if (raw.version == 3 && startupMetadataSet(metadata)) {
+            if (raw.version in 3..4 && startupMetadataSet(metadata)) {
                 val tables = mutableListOf<String>()
                 raw.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null).use { cursor ->
                     while (cursor.moveToNext()) {
