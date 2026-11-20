@@ -50,6 +50,27 @@
       "sha256": "2e48c2607cc36aa4c6fe17eb4fc2a07573ff0aa8b425ad57a01046120a1d3bd2",
       "approvedAt": "2026-11-14",
       "decision": "S1-D99"
+    },
+    {
+      "id": "01-today-s2",
+      "png": "01-today-s2.png",
+      "sha256": "3d67156f53c6d2f77cb7a46303984689d5c268b8d06dd2035127e8c6dedf6f17",
+      "approvedAt": "2026-11-19",
+      "decision": "S2-D24"
+    },
+    {
+      "id": "25-calendar-v2",
+      "png": "25-calendar-v2.png",
+      "sha256": "8e45bb3969e6006921c92b7d8da43ae02c372f847404b8b3e03b07b1e48a9939",
+      "approvedAt": "2026-11-19",
+      "decision": "S2-D24"
+    },
+    {
+      "id": "23-new-appointment-v2",
+      "png": "23-new-appointment-v2.png",
+      "sha256": "3ec46d5f2605460703fbfc8dfaa3908074d2e38cd73cf7eb43e436933035e828",
+      "approvedAt": "2026-11-19",
+      "decision": "S2-D24"
     }
   ]
 }

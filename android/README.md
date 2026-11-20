@@ -1593,10 +1593,10 @@ S2-D06 / FR-007a 已落地：第二安排遇到已关联其他安排的 active S
 
 ### T054 / Phase 6 checkpoint：设备证据、复核与走查
 
-**PENDING（2026-11-20），仅剩 T053 与合并后的最终 `.handoff/gate.sh --android` 摘要。** dispatcher 宿主证据：T050 PASS，API 31 emulator r7 与 API 36 emulator r6 各五方法均 `OK (1 test)`，测试前 package alarms 均为0；API31 Settings 总开关由 uiautomator 确认 true→false→true。完整 fingerprints、APK SHA-256、无serial的日志索引与实际fresh-install/重启流程见 [T050](docs/s2/T050.md)；日志为 `.handoff/logs/2026-11-20-s2-t050-r7-*` / `2026-11-20-s2-t050-r6-*`，宿主脚本 `.handoff/bin/s2-device-run.sh`。本 writer 未执行设备。
+**DONE（2026-11-19），S2 关闭。** dispatcher 宿主证据：T050 PASS，API 31 emulator r7 与 API 36 emulator r6 各五方法均 `OK (1 test)`，测试前 package alarms 均为0；API31 Settings 总开关由 uiautomator 确认 true→false→true。完整 fingerprints、APK SHA-256、无serial的日志索引与实际fresh-install/重启流程见 [T050](docs/s2/T050.md)；日志为 `.handoff/logs/2026-11-20-s2-t050-r7-*` / `2026-11-20-s2-t050-r6-*`，宿主脚本 `.handoff/bin/s2-device-run.sh`。本 writer 未执行设备。
 
 T052：cursor grok-4.7-medium 只读首轮 FAIL（seed事务复查/rotation测试两项P2）→ fix3修复 → 2026-11-20限定范围复核 PASS；后续 fix4～fix6 修正 Compose测试同步、ICU裸`}`与dumpsys正时长window解析。host gate r5 PASS：BUILD 0、UNIT 0、total 1168、BAD 0，含 assembleDebugAndroidTest、s0G8、s0G3、s0G4、s0Room、s0Conformance、全部p4 conformance、p7SideBySide、s1SeedChecks，见 [T054](docs/s2/T054.md)。
 
-T053仍待负责人集中走查并批准三核心屏/P7 baseline、写manifest与APPROVALS.md；fresh install上的真实API36 grant dialog、锁屏外观、通知点击→Today、channel-off仍需人眼证据。设备自动化与gate通过不等于owner批准；S2尚未关闭。
+T053 PASS（S2-D24）：负责人走查 1～14 步通过并批准 01 今日 S2、25 日历、23 新建安排三张 baseline，已写入 manifest、APPROVALS.md 与 coreBaselineScreens hash 锁，见 [T053](docs/s2/T053.md)。收尾宿主 gate PASS：BUILD 0、UNIT 0、total 1168、BAD 0，s2BaselineManifest 与 10 张核心屏 baseline-check 全部 PASS；`gate.sh --android` 因无负责人提供的 runlist/manifest 未运行。锁屏外观、API 36 真实授权框、通知点击→Today、channel-off 延后到下一次真机验收。
 
 seed v4 的 multi 增加 15 条预约、两系列（RepeatCount / EndDate）及一笔缺席扣课。dayOffset/endDayOffset 基于首次 seed 时设备本地日期；其余数据确定，重复 seed 不重算日期/覆盖人工编辑。仅 startup metadata 且无任何业务行的 store 可 seed；含用户数据或其他 metadata 仍拒绝。通知锁屏 visibility 保持 Phase 3 的 PUBLIC 决定；正文仍是时间句，不含学员信息。详见 [T050](docs/s2/T050.md)、[T051](docs/s2/T051.md)、[walkthrough](docs/s2/walkthrough.md)、[T054](docs/s2/T054.md)。

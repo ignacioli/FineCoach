@@ -1023,6 +1023,10 @@ val coreBaselineScreens = mapOf(
     "p4SessionDetailConformance" to ("35-session-detail-s1" to "35-session-detail-s1/35-session-detail-s1"),
     "p4StudentListConformance" to ("21-student-list-s1" to "21-student-list-s1/21-student-list-s1"),
     "p4StudentDetailConformance" to ("26-student-detail-s1" to "26-student-detail-s1/26-student-detail-s1"),
+    // S2-D24 (owner, 2026-11-19): S2 core screens locked after the T053 walkthrough.
+    "p4TodayS2Conformance" to ("01-today-s2" to "01-today-s2/01-today-s2"),
+    "p4CalendarConformance" to ("25-calendar-v2" to "25-calendar-v2/25-calendar-v2"),
+    "p4AppointmentEditorConformance" to ("23-new-appointment-v2" to "23-new-appointment-v2/23-new-appointment-v2"),
 )
 val baselineManifestGate = tasks.register<Exec>("s2BaselineManifest") {
     group = "verification"
