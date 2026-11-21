@@ -1,5 +1,36 @@
 import SwiftUI
 
+/// Cell identity. Cases cannot collide: a restored exercise whose raw value is
+/// `title` is still `.recentRow` or `.row`, not `.recentTitle`.
+private enum LibraryCellID: Hashable {
+    case recentTitle
+    case recentRow(StableExerciseID)
+    case sectionTitle(String)
+    case row(StableExerciseID)
+}
+
+/// One lazy row or heading. The page header stays outside this list so it is
+/// not released when it scrolls away.
+private enum LibraryListItem: Identifiable {
+    case recentTitle
+    case recentRow(ExerciseLibraryEntry, isFirst: Bool)
+    case sectionTitle(id: String, title: String)
+    case row(ExerciseLibraryEntry, isFirst: Bool)
+
+    var id: LibraryCellID {
+        switch self {
+        case .recentTitle:
+            return .recentTitle
+        case .recentRow(let entry, _):
+            return .recentRow(entry.id)
+        case .sectionTitle(let id, _):
+            return .sectionTitle(id)
+        case .row(let entry, _):
+            return .row(entry.id)
+        }
+    }
+}
+
 private enum CustomEditorRoute: Hashable, Identifiable {
     case create
     case edit(ExerciseCatalogItem)
@@ -41,38 +72,16 @@ struct ExerciseLibraryView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: FCPrimitives.space4) {
-                header
-                searchRow
-                muscleChips
-
-                if let conflictMessage = viewModel.conflictMessage {
-                    Text(conflictMessage)
-                        .fcFont(.caption)
-                        .foregroundStyle(FCSemanticColors.statusDestructive)
-                        .accessibilityIdentifier(FCAccessibilityID.exerciseLibraryConflict)
-                }
-                if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage)
-                        .fcFont(.caption)
-                        .foregroundStyle(FCSemanticColors.statusDestructive)
-                }
-
-                if viewModel.showsRecentEntries {
-                    recentSection
-                }
-
-                ForEach(viewModel.sections) { section in
-                    VStack(alignment: .leading, spacing: FCPrimitives.space2) {
-                        FCSectionLabel("\(sectionTitle(section.id)) · \(section.entries.count)")
-                            .accessibilityIdentifier(FCAccessibilityID.exerciseLibrarySection(section.id))
-                        VStack(spacing: 0) {
-                            FCListRowDivider()
-                            ForEach(section.entries) { entry in
-                                row(for: entry)
-                                FCListRowDivider()
-                            }
-                        }
+            // spacing 0: the old outer gap was space4 and the label-to-divider gap
+            // was space2. Those stay on the heading cell; row cells stay flush so
+            // the 1pt dividers do not pick up an extra gap.
+            // Header is a plain stack child so it stays mounted and is read first.
+            // Rows stay in the inner lazy stack.
+            VStack(alignment: .leading, spacing: 0) {
+                libraryChrome
+                LazyVStack(alignment: .leading, spacing: 0) {
+                    ForEach(libraryListItems) { item in
+                        libraryListItem(item)
                     }
                 }
             }
@@ -169,24 +178,110 @@ struct ExerciseLibraryView: View {
 
     // MARK: Rows
 
-    private var recentSection: some View {
-        VStack(alignment: .leading, spacing: FCPrimitives.space2) {
-            FCSectionLabel(String(localized: "exercise.library.recent"))
-                .accessibilityIdentifier(FCAccessibilityID.exerciseLibraryRecent)
-            VStack(spacing: 0) {
-                FCListRowDivider()
-                ForEach(viewModel.recentEntries) { entry in
-                    Button {
-                        optionsEntryID = entry.id
-                    } label: {
-                        FCExerciseLibraryRowLabel(entry: entry)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier(FCAccessibilityID.exerciseLibraryRecentRow(entry.id))
-                    FCListRowDivider()
-                }
+    /// One cell per heading or row, after the header slot. Same order as the
+    /// old `VStack`: recent, then catalog sections.
+    private var libraryListItems: [LibraryListItem] {
+        var items: [LibraryListItem] = []
+        if viewModel.showsRecentEntries {
+            items.append(.recentTitle)
+            for (index, entry) in viewModel.recentEntries.enumerated() {
+                items.append(.recentRow(entry, isFirst: index == 0))
             }
         }
+        for section in viewModel.sections {
+            items.append(
+                .sectionTitle(
+                    id: section.id,
+                    title: "\(sectionTitle(section.id)) · \(section.entries.count)"
+                )
+            )
+            for (index, entry) in section.entries.enumerated() {
+                items.append(.row(entry, isFirst: index == 0))
+            }
+        }
+        return items
+    }
+
+    @ViewBuilder
+    private func libraryListItem(_ item: LibraryListItem) -> some View {
+        switch item {
+        case .recentTitle:
+            librarySectionHeading(
+                String(localized: "exercise.library.recent"),
+                identifier: FCAccessibilityID.exerciseLibraryRecent
+            )
+        case .recentRow(let entry, let isFirst):
+            dividedRow(isFirst: isFirst) {
+                Button {
+                    optionsEntryID = entry.id
+                } label: {
+                    FCExerciseLibraryRowLabel(entry: entry)
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier(FCAccessibilityID.exerciseLibraryRecentRow(entry.id))
+            }
+        case .sectionTitle(let id, let title):
+            librarySectionHeading(
+                title,
+                identifier: FCAccessibilityID.exerciseLibrarySection(id)
+            )
+        case .row(let entry, let isFirst):
+            dividedRow(isFirst: isFirst) {
+                row(for: entry)
+            }
+        }
+    }
+
+    private var libraryChrome: some View {
+        VStack(alignment: .leading, spacing: FCPrimitives.space4) {
+            header
+            searchRow
+            muscleChips
+            if let conflictMessage = viewModel.conflictMessage {
+                Text(conflictMessage)
+                    .fcFont(.caption)
+                    .foregroundStyle(FCSemanticColors.statusDestructive)
+                    .accessibilityIdentifier(FCAccessibilityID.exerciseLibraryConflict)
+            }
+            if let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
+                    .fcFont(.caption)
+                    .foregroundStyle(FCSemanticColors.statusDestructive)
+            }
+        }
+    }
+
+    /// `space4` above the label replaces the old outer `VStack` spacing; `space2`
+    /// below it replaces the old section `VStack` spacing before the first divider.
+    private func librarySectionHeading(_ title: String, identifier: String) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            listGap(FCPrimitives.space4)
+            FCSectionLabel(title)
+                .accessibilityIdentifier(identifier)
+            listGap(FCPrimitives.space2)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// Transparent, same as the old `VStack` spacing: the page background shows
+    /// through, and the gap is not an accessibility element.
+    private func listGap(_ height: CGFloat) -> some View {
+        Color.clear
+            .frame(height: height)
+            .accessibilityHidden(true)
+    }
+
+    /// First row keeps the leading divider; every row keeps the trailing one.
+    /// That is the old `divider / row / divider / row / divider` sequence.
+    private func dividedRow<Content: View>(isFirst: Bool, @ViewBuilder content: () -> Content) -> some View {
+        VStack(spacing: 0) {
+            if isFirst {
+                FCListRowDivider()
+            }
+            content()
+            FCListRowDivider()
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func row(for entry: ExerciseLibraryEntry) -> some View {

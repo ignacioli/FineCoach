@@ -1,5 +1,6 @@
 import CoreText
 import XCTest
+import os
 
 @testable import FineCoach
 
@@ -48,6 +49,92 @@ final class TypographyHarnessTests: XCTestCase {
                 "requested wght \(weight) resolved to axis value \(String(describing: resolvedWeight))"
             )
         }
+    }
+
+    /// Each documented style, plus the callout/compact weight variants, keeps the
+    /// same family and `wght` axis, and a second request does not build another font.
+    func testEveryStyleAndAllowedVariantReusesOneCachedFont() {
+        for style in FCTextStyle.allCases {
+            assertCachedFont(size: style.size, weight: style.weight)
+        }
+        assertCachedFont(size: FCTextStyle.callout.size, weight: 400)
+        assertCachedFont(size: FCTextStyle.callout.size, weight: 600)
+        assertCachedFont(size: FCTextStyle.compact.size, weight: 600)
+    }
+
+    /// Sizes outside the design ladder, so this test is the first builder of the pair
+    /// even when other tests have already filled the cache.
+    func testSameSizeAndWeightBuildsTheFontOnce() {
+        assertCachedFont(size: 31, weight: 450)
+        let builds = FCFont.creationCountForTesting(size: 31, weight: 450)
+        XCTAssertEqual(builds, 1, "this pair must be constructed by this test and then reused")
+        let other = FCFont.uiFont(size: 31, weight: 700)
+        XCTAssertEqual(FCFont.creationCountForTesting(size: 31, weight: 700), 1)
+        XCTAssertFalse(FCFont.uiFont(size: 31, weight: 450) === other)
+    }
+
+    /// Same weight, two sizes. A cache key that dropped `size` would return one
+    /// font and the second point size would stay at the first request.
+    func testCacheKeyKeepsSize() {
+        let small = FCFont.uiFont(size: 11, weight: 400)
+        let large = FCFont.uiFont(size: 29, weight: 400)
+        XCTAssertEqual(small.pointSize, 11, accuracy: 0.01)
+        XCTAssertEqual(large.pointSize, 29, accuracy: 0.01)
+        XCTAssertFalse(small === large)
+        XCTAssertEqual(FCFont.creationCountForTesting(size: 11, weight: 400), 1)
+        XCTAssertEqual(FCFont.creationCountForTesting(size: 29, weight: 400), 1)
+        XCTAssertEqual(FCFont.uiFont(size: 11, weight: 400).pointSize, 11, accuracy: 0.01)
+        XCTAssertEqual(FCFont.uiFont(size: 29, weight: 400).pointSize, 29, accuracy: 0.01)
+    }
+
+    func testConcurrentRequestsObserveOneFontInstance() {
+        let size: CGFloat = 41
+        let weight: CGFloat = 550
+        let threads = 24
+        let tokens = OSAllocatedUnfairLock(initialState: [ObjectIdentifier]())
+        let group = DispatchGroup()
+        for _ in 0..<threads {
+            group.enter()
+            DispatchQueue.global(qos: .userInitiated).async {
+                let font = FCFont.uiFont(size: size, weight: weight)
+                tokens.withLock { $0.append(ObjectIdentifier(font)) }
+                group.leave()
+            }
+        }
+        let finished = group.wait(timeout: .now() + 5) == .success
+        let seen = tokens.withLock { $0 }
+        guard finished, let first = seen.first else {
+            XCTFail("font requests did not finish; received \(seen.count) of \(threads)")
+            return
+        }
+        XCTAssertEqual(seen.count, threads)
+        XCTAssertEqual(Set(seen).count, 1, "concurrent callers must observe one cached UIFont")
+        let builds = FCFont.creationCountForTesting(size: size, weight: weight)
+        let again = FCFont.uiFont(size: size, weight: weight)
+        XCTAssertEqual(ObjectIdentifier(again), first)
+        XCTAssertEqual(
+            FCFont.creationCountForTesting(size: size, weight: weight), builds,
+            "a request after the cache is populated must not build again"
+        )
+    }
+
+    private func assertCachedFont(
+        size: CGFloat, weight: CGFloat, file: StaticString = #filePath, line: UInt = #line
+    ) {
+        let first = FCFont.uiFont(size: size, weight: weight)
+        let builds = FCFont.creationCountForTesting(size: size, weight: weight)
+        let second = FCFont.uiFont(size: size, weight: weight)
+        XCTAssertTrue(first === second, "second request must return the cached UIFont", file: file, line: line)
+        XCTAssertEqual(
+            FCFont.creationCountForTesting(size: size, weight: weight), builds,
+            "second request must not construct another font", file: file, line: line
+        )
+        XCTAssertEqual(first.familyName, FCFont.familyName, file: file, line: line)
+        let variation = CTFontCopyVariation(first as CTFont) as? [NSNumber: Double]
+        XCTAssertEqual(
+            variation?[Self.weightAxisTag], Double(weight),
+            "cached font lost the requested wght axis", file: file, line: line
+        )
     }
 
     // MARK: (b) All 14 styles against a literal §3.2/§3.3 table

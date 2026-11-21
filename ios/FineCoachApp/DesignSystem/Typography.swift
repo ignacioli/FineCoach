@@ -1,6 +1,7 @@
 import CoreText
 import SwiftUI
 import UIKit
+import os
 
 /// Loads the approved Noto Sans SC variable font (T055, `design/design-system/README.md`
 /// §3.1) and exposes it as scalable `UIFont`s driven by the font's `wght` axis.
@@ -28,16 +29,69 @@ public enum FCFont {
     /// (via `UIAppFonts` in `FineCoach-Info.plist`). Exposed so tests (T061) can
     /// assert the app is really using Noto Sans SC instead of a silent system-font
     /// fallback going undetected.
-    public static var isFamilyRegistered: Bool {
-        UIFont.familyNames.contains(familyName)
-    }
+    ///
+    /// Resolved once. `UIAppFonts` registration is finished before any view runs and
+    /// does not change for the rest of the process; walking `UIFont.familyNames` on
+    /// every row was the first open-library stall.
+    public static let isFamilyRegistered: Bool = UIFont.familyNames.contains(familyName)
 
     /// Builds a `UIFont` for the family at `size`, with the `wght` variation axis
     /// driven to `weight` (expected range 100–900; design tokens only ever use
     /// 400/500/600/700). Falls back to the closest system weight if the family
     /// failed to register, so a missing font degrades to a legible font rather
     /// than crashing — but `isFamilyRegistered` lets tests catch that condition.
+    ///
+    /// The unscaled font for a `(size, weight)` pair is stored after the first
+    /// construction and then reused. A race on that first construction may build a
+    /// spare that is discarded; every caller still receives the stored instance.
+    /// Dynamic Type scaling stays outside this cache, in `UIFontMetrics`, so a
+    /// content-size change still produces a new point size.
+    /// Safe to call off the main thread (share-card rendering): the map is guarded
+    /// by a lock, and font construction happens outside the lock.
     static func uiFont(size: CGFloat, weight: CGFloat) -> UIFont {
+        let key = CacheKey(size: size, weight: weight)
+        if let cached = fontCache.withLock({ $0.fonts[key] }) {
+            return cached
+        }
+        let created = makeUIFont(size: size, weight: weight)
+        return fontCache.withLock { state in
+            if let existing = state.fonts[key] {
+                return existing
+            }
+            state.fonts[key] = created
+            return created
+        }
+    }
+
+    /// How many times `uiFont` has actually constructed `size`/`weight`. A second
+    /// call for the same pair leaves this unchanged. Test hook; not a product API.
+    static func creationCountForTesting(size: CGFloat, weight: CGFloat) -> Int {
+        let key = CacheKey(size: size, weight: weight)
+        return fontCache.withLock { $0.builds[key] ?? 0 }
+    }
+
+    private struct CacheKey: Hashable, Sendable {
+        let sizeBits: UInt
+        let weightBits: UInt
+
+        init(size: CGFloat, weight: CGFloat) {
+            sizeBits = size.bitPattern
+            weightBits = weight.bitPattern
+        }
+    }
+
+    /// `UIFont` is `Sendable`. The dictionary is the mutable state, and it stays
+    /// inside the lock.
+    private struct CacheState: Sendable {
+        var fonts: [CacheKey: UIFont] = [:]
+        var builds: [CacheKey: Int] = [:]
+    }
+
+    private static let fontCache = OSAllocatedUnfairLock(initialState: CacheState())
+
+    private static func makeUIFont(size: CGFloat, weight: CGFloat) -> UIFont {
+        let key = CacheKey(size: size, weight: weight)
+        fontCache.withLock { $0.builds[key, default: 0] += 1 }
         guard isFamilyRegistered else {
             return .systemFont(ofSize: size, weight: systemWeight(for: weight))
         }
