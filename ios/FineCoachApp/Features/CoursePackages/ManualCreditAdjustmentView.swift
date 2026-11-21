@@ -138,7 +138,7 @@ struct ManualCreditAdjustmentView: View {
         .accessibilityIdentifier(FCAccessibilityID.manualAdjustmentRoot)
         .onChange(of: viewModel.didSave) { _, saved in
             if saved {
-                dismiss()
+                FCNavigation.pop(dismiss)
             }
         }
     }

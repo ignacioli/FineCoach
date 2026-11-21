@@ -68,7 +68,7 @@ struct RootNavigation: View {
     @EnvironmentObject private var environment: AppEnvironment
     @EnvironmentObject private var restNotificationRouter: RestNotificationRouter
     @EnvironmentObject private var systemEntryRouter: SystemEntryRouter
-    @State private var path: [RootDestination] = []
+    @FCInstantState private var path: [RootDestination] = []
     @State private var onboardingCompleted = false
     @State private var didLoadOnboarding = false
     @State private var isNavigationStackMounted = false
@@ -581,5 +581,71 @@ extension Array where Element == RootDestination {
     mutating func returnToToday(tab: inout RootTab) {
         removeAll()
         tab = .today
+    }
+}
+
+/// Page changes commit inside a transaction with animations disabled (S2-D14,
+/// design README §14.1.7). The interactive pop gesture is untouched: this only
+/// wraps the state write, so a finger-tracked swipe still uses the system pop.
+enum FCNavigation {
+    static func transaction() -> Transaction {
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        return transaction
+    }
+
+    static func commit(_ body: () -> Void) {
+        withTransaction(transaction(), body)
+    }
+
+    /// `dismiss()` schedules the pop before the path binding's transaction runs, so that
+    /// transaction does not remove the slide. Turn UIKit animations off for this call only.
+    /// Already-running animations are left alone (`UIView.setAnimationsEnabled`).
+    @MainActor
+    static func pop(_ dismiss: DismissAction) {
+        FCDismissAnimationGate.pop(dismiss)
+    }
+}
+
+@MainActor
+private enum FCDismissAnimationGate {
+    static var depth = 0
+
+    static func pop(_ dismiss: DismissAction) {
+        depth += 1
+        UIView.setAnimationsEnabled(false)
+        dismiss()
+        DispatchQueue.main.async {
+            MainActor.assumeIsolated {
+                depth -= 1
+                if depth == 0 {
+                    UIView.setAnimationsEnabled(true)
+                }
+            }
+        }
+    }
+}
+
+/// `@State` whose writes, including writes through `$value`, do not animate.
+/// Use it for a `NavigationStack` path and for `navigationDestination` bindings.
+/// Do not use it for in-page motion (sheets, rest bar, set feedback).
+@propertyWrapper
+struct FCInstantState<Value>: DynamicProperty {
+    @State private var storage: Value
+
+    init(wrappedValue: Value) {
+        _storage = State(initialValue: wrappedValue)
+    }
+
+    var wrappedValue: Value {
+        get { storage }
+        nonmutating set { FCNavigation.commit { storage = newValue } }
+    }
+
+    var projectedValue: Binding<Value> {
+        Binding(
+            get: { storage },
+            set: { newValue in FCNavigation.commit { storage = newValue } }
+        )
     }
 }

@@ -18,7 +18,7 @@ enum ArchiveViewerDestination: Hashable {
 /// Coach environment or any Coach use case (plan §5); it reads through `ArchiveViewerUseCases`.
 struct ArchiveViewerRoot: View {
     @StateObject private var model: ArchiveViewerModel
-    @State private var path: [ArchiveViewerDestination] = []
+    @FCInstantState private var path: [ArchiveViewerDestination] = []
     private let importUseCases: ArchiveImportUseCases
     private var onArchiveRemoved: () -> Void = {}
 

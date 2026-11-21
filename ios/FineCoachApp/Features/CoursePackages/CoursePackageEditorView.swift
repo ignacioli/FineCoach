@@ -226,7 +226,7 @@ struct CoursePackageEditorView: View {
         .task { await viewModel.loadExistingActivePackage() }
         .onChange(of: viewModel.didSave) { _, saved in
             if saved {
-                dismiss()
+                FCNavigation.pop(dismiss)
             }
         }
         .fcConfirmationDialog(isPresented: $viewModel.isConfirmingEndActive) {
