@@ -27,4 +27,11 @@ final class RootNavigationReturnTests: XCTestCase {
         XCTAssertTrue(path.isEmpty)
         XCTAssertEqual(tab, .today)
     }
+
+    func testNavigationTransactionDisablesAnimationsAndCommitRunsTheWrite() {
+        XCTAssertTrue(FCNavigation.transaction().disablesAnimations)
+        var value = 0
+        FCNavigation.commit { value = 1 }
+        XCTAssertEqual(value, 1)
+    }
 }

@@ -52,7 +52,7 @@ private enum CustomEditorRoute: Hashable, Identifiable {
 /// row opens its options sheet (收藏 / 隐藏 / 辅助器械, 编辑 for custom).
 struct ExerciseLibraryView: View {
     @StateObject private var viewModel: ExerciseLibraryViewModel
-    @State private var editorRoute: CustomEditorRoute?
+    @FCInstantState private var editorRoute: CustomEditorRoute?
     @State private var isFilterSheetPresented = false
     @State private var optionsEntryID: StableExerciseID?
 

@@ -34,7 +34,7 @@ struct AppRoot: View {
     @State private var installState: InstallState?
     @State private var archiveServices: ArchiveServices?
     @State private var firstLaunchRoute: FirstLaunchRoute = .choice
-    @State private var showsImportFromChoice = false
+    @FCInstantState private var showsImportFromChoice = false
     @State private var systemOpen: SystemOpenRequest?
     /// Changes when the installed archive was replaced from a system open, so the viewer reloads.
     @State private var viewerGeneration = UUID()

@@ -28,7 +28,7 @@ struct OnboardingView: View {
     /// Set while the install is still `unselected`: back to the first-launch choice (M2-07).
     /// Nothing is written until the coach adds a first student or skips below.
     var onBack: (() -> Void)?
-    @State private var path: [RootDestination] = []
+    @FCInstantState private var path: [RootDestination] = []
     @State private var isDataSheetPresented = false
     /// Entry animation (welcome-redesign.md §10): plays once; sheet close and returning from
     /// the editor keep this view alive, so it never replays.
