@@ -26,6 +26,9 @@
       "detachedUnchanged": true,
       "resolvedUnchanged": true,
       "oldEnded": true,
+      "totalAppointmentCount": 5,
+      "replacementAppointmentCount": 2,
+      "scheduledOnSkippedDates": 0,
       "times": [
         "11:30",
         "11:30"
