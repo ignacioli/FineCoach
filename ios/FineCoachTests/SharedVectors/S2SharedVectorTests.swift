@@ -154,10 +154,11 @@ final class S2SharedVectorTests: XCTestCase {
                     draft: RecurringAppointmentDraft(
                         intervalDays: .everyOtherDay, termination: .repeatCount(5),
                         firstOccurrenceDate: day.addingDays(-1, calendar: calendar),
-                        startTime: LocalTime(hour: 9, minute: 0), trainingFocus: [.back]), overrideConflict: false)
+                        startTime: LocalTime(hour: 9, minute: 0)), overrideConflict: false)
                 let detached = try await cases.rescheduleSingle(
                     appointmentID: rows[3].id, startTime: LocalTime(hour: 12, minute: 0), overrideConflict: false)
                 let resolved = try await cases.cancel(appointmentID: rows[4].id, reason: nil)
+                _ = try await cases.updateTrainingFocus(appointmentID: rows[2].id, trainingFocus: [.back])
                 let changed = try await cases.applyThisAndFuture(
                     seriesID: XCTUnwrap(rows[0].seriesID), boundaryDate: rows[1].date,
                     startTime: LocalTime(hour: 11, minute: 30), boundaryTrainingFocus: [.thighs], overrideConflict: true
@@ -166,9 +167,18 @@ final class S2SharedVectorTests: XCTestCase {
                 let past = try await cases.appointment(id: rows[0].id)
                 let savedDetached = try await cases.appointment(id: detached.id)
                 let savedResolved = try await cases.appointment(id: resolved.id)
+                let allRows = try await repo.appointments(studentID: student.id)
+                let skippedDates: Set<LocalDate> = [detached.date, resolved.date]
                 actual = [
                     "pastUnchanged": past == rows[0], "detachedUnchanged": savedDetached == detached,
                     "resolvedUnchanged": savedResolved == resolved, "oldEnded": old.status == .ended,
+                    "totalAppointmentCount": allRows.count,
+                    "replacementAppointmentCount": try await repo.appointments(
+                        seriesID: XCTUnwrap(changed.first?.seriesID)
+                    ).count,
+                    "scheduledOnSkippedDates": allRows.filter {
+                        skippedDates.contains($0.date) && $0.status == .scheduled && !$0.isDetachedException
+                    }.count,
                     "times": changed.prefix(2).map {
                         "\($0.startTime.hour):\(String(format: "%02d", $0.startTime.minute))"
                     },

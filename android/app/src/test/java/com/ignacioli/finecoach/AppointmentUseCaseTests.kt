@@ -255,10 +255,15 @@ internal suspend fun S2Environment.s2FutureScenario(): Map<String, Any> {
     cases.updateTrainingFocus(initial[2].id, setOf(BodyPart.back)).requireSuccess()
     val updated = cases.editFuture(seriesID, initial[1].date, FutureAppointmentEdit(startTime = LocalTime.of(11, 30), boundaryTrainingFocus = setOf(BodyPart.thighs)), true).requireSuccess()
     val firstTwo = updated.take(2)
+    val allRows = cases.all().requireSuccess()
+    val skippedDates = setOf(detached.date, resolved.date)
     return mapOf("pastUnchanged" to (cases.find(initial[0].id).requireSuccess() == initial[0]),
         "detachedUnchanged" to (cases.find(detached.id).requireSuccess() == detached),
         "resolvedUnchanged" to (cases.find(resolved.id).requireSuccess() == resolved),
         "oldEnded" to (cases.series(seriesID).requireSuccess()!!.status == RecurrenceSeriesStatus.ended),
+        "totalAppointmentCount" to allRows.size.toLong(),
+        "replacementAppointmentCount" to allRows.count { it.seriesID == updated.first().seriesID }.toLong(),
+        "scheduledOnSkippedDates" to allRows.count { it.date in skippedDates && it.status == AppointmentStatus.scheduled && !it.isDetachedException }.toLong(),
         "times" to firstTwo.map { it.startTime.toString() }, "focus" to firstTwo.map { it.trainingFocus.map { it.name }.sorted() })
 }
 internal suspend fun S2Environment.s2AbsentScenario(): Map<String, Any> {
