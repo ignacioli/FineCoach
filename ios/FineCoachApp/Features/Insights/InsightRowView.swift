@@ -1,4 +1,34 @@
 import SwiftUI
+import UIKit
+
+/// Pre-measurement estimates only; actual text and undo heights come from layout.
+/// S3-D13/S3-D15: space.3 + body + space.1 + caption + space.3,
+/// followed by the standard divider (README §6). Single-line Text uses the
+/// natural font box, not the nominal token line height (README §15.2/§15.5).
+enum InsightRowGeometry {
+    static func estimatedHeight(
+        hasSubtitle: Bool, compatibleWith traits: UITraitCollection? = nil
+    ) -> CGFloat {
+        // FCListRow calls Text.fcFont directly: match its font factory, weight,
+        // scaling base and system-wide Dynamic Type (nil traits), including its
+        // documented lack of support for local dynamicTypeSize overrides.
+        func naturalLineHeight(_ style: FCTextStyle) -> CGFloat {
+            let font = FCFont.uiFont(size: style.size, weight: style.weight)
+            return UIFontMetrics(forTextStyle: style.scalingBase)
+                .scaledFont(for: font, compatibleWith: traits).lineHeight
+        }
+        let titleHeight = naturalLineHeight(.body)
+        let subtitleHeight =
+            hasSubtitle
+            ? FCPrimitives.space1 + naturalLineHeight(.caption)
+            : 0
+        return max(
+            FCListRowGeometry.minHeight,
+            FCPrimitives.space3 + titleHeight + subtitleHeight + FCPrimitives.space3)
+    }
+
+    static let dividerHeight: CGFloat = 1
+}
 
 struct InsightRowView: View {
     let insight: Insight
@@ -8,7 +38,7 @@ struct InsightRowView: View {
     var body: some View {
         FCListRow(
             title: content.title, titleStyle: .body, subtitle: content.subtitle,
-            showsDisclosure: false, action: open
+            showsDisclosure: false, verticalContentPadding: FCPrimitives.space3, action: open
         )
         .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .combine)
@@ -52,7 +82,10 @@ struct InsightSectionView: View {
                                 message: model.undoMessage(for: insight, context: context),
                                 accessibilityIdentifier: FCAccessibilityID.insightUndo(insight.id)
                             ) { Task { await model.undoSnooze(insight) } }
-                            .frame(minHeight: rowHeights[insight.snoozeKey])
+                            .frame(
+                                height: rowHeights[insight.snoozeKey]
+                                    ?? InsightRowGeometry.estimatedHeight(
+                                        hasSubtitle: model.content(for: insight, context: context).subtitle != nil))
                         } else {
                             insightRow(insight)
                                 .onGeometryChange(for: CGFloat.self) { proxy in
@@ -90,7 +123,7 @@ struct InsightSectionView: View {
                 guard height >= 1 else { return }
                 contentHeight = height
             }
-            .frame(height: contentHeight ?? CGFloat(rows.count) * 52)
+            .frame(height: contentHeight ?? estimatedContentHeight)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .task(id: reduceMotion) {
@@ -113,6 +146,15 @@ struct InsightSectionView: View {
                 guard !reduceMotion else { return }
                 hintShown = true
             } catch { hintOffset = 0 }
+        }
+    }
+
+    private var estimatedContentHeight: CGFloat {
+        rows.reduce(CGFloat.zero) { height, insight in
+            height
+                + InsightRowGeometry.estimatedHeight(
+                    hasSubtitle: model.content(for: insight, context: context).subtitle != nil)
+                + InsightRowGeometry.dividerHeight
         }
     }
 
