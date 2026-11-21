@@ -56,6 +56,7 @@ public struct FCListRow: View {
     /// D-b/D-c "本节收获" action row: the shared 「新纪录」 badge after the title.
     /// The containing row still owns the accessible name.
     private let showsNewRecordBadge: Bool
+    private let verticalContentPadding: CGFloat
     private let interaction: Interaction
 
     public init(
@@ -67,11 +68,13 @@ public struct FCListRow: View {
         note: String? = nil,
         showsDisclosure: Bool = true,
         showsNewRecordBadge: Bool = false,
+        verticalContentPadding: CGFloat = 0,
         action: (() -> Void)? = nil
     ) {
         self.init(
             title: title, titleStyle: titleStyle, subtitle: subtitle, leading: leading,
             isIndented: isIndented, note: note, showsNewRecordBadge: showsNewRecordBadge,
+            verticalContentPadding: verticalContentPadding,
             interaction: .plain(showsDisclosure: showsDisclosure, action: action)
         )
     }
@@ -118,6 +121,7 @@ public struct FCListRow: View {
         isIndented: Bool,
         note: String?,
         showsNewRecordBadge: Bool,
+        verticalContentPadding: CGFloat = 0,
         interaction: Interaction
     ) {
         self.title = title
@@ -127,6 +131,7 @@ public struct FCListRow: View {
         self.isIndented = isIndented
         self.note = note
         self.showsNewRecordBadge = showsNewRecordBadge
+        self.verticalContentPadding = verticalContentPadding
         self.interaction = interaction
     }
 
@@ -197,6 +202,9 @@ public struct FCListRow: View {
             }
         }
         .padding(.leading, isIndented ? FCListRowGeometry.indent : 0)
+        // Pad the content before applying the minimum, so title-only rows
+        // retain the standard minimum while multiline rows grow naturally.
+        .padding(.vertical, verticalContentPadding)
         .frame(
             maxWidth: .infinity,
             minHeight: isCompact ? FCListRowGeometry.compactMinHeight : FCListRowGeometry.minHeight

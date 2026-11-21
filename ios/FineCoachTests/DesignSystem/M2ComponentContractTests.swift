@@ -255,6 +255,19 @@ final class M2ComponentContractTests: XCTestCase {
         XCTAssertTrue(source.contains(".padding(.leading, isIndented ? FCListRowGeometry.indent : 0)"))
     }
 
+    func testListRowContentPaddingDefaultsToZeroAndPrecedesMinimumHeight() throws {
+        let source = try componentSource("FCListRow.swift")
+        XCTAssertEqual(source.components(separatedBy: "verticalContentPadding: CGFloat = 0").count - 1, 2)
+        XCTAssertTrue(source.contains("self.verticalContentPadding = verticalContentPadding"))
+        XCTAssertTrue(source.contains("verticalContentPadding: verticalContentPadding,"))
+        let padding = try XCTUnwrap(source.range(of: ".padding(.vertical, verticalContentPadding)"))
+        let minimum = try XCTUnwrap(
+            source.range(of: "minHeight: isCompact ? FCListRowGeometry.compactMinHeight"))
+        XCTAssertLessThan(padding.lowerBound, minimum.lowerBound)
+        XCTAssertEqual(FCListRowGeometry.minHeight, 52)
+        XCTAssertEqual(FCListRowGeometry.compactMinHeight, 44)
+    }
+
     // MARK: - DS-ACTION-ROW
 
     func testActionRowTrashIconIsDecorativeAndMatchesTitleColour() throws {
