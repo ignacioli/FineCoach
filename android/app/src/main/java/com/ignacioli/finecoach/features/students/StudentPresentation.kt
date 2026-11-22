@@ -195,6 +195,15 @@ object StudentPresentation {
         return "$total · 有效期至 ${endDate.monthValue}月${endDate.dayOfMonth}日"
     }
 
+    fun nextClassText(appointment: com.ignacioli.finecoach.core.domain.appointment.Appointment?): String {
+        if (appointment == null) return "暂无安排"
+        val day = java.time.format.DateTimeFormatter.ofPattern("M月d日 EEE", java.util.Locale.SIMPLIFIED_CHINESE).format(appointment.date)
+        val time = java.time.format.DateTimeFormatter.ofPattern("HH:mm", java.util.Locale.ROOT).format(appointment.startTime)
+        val focus = joinedBodyParts(appointment.trainingFocus, separator = "、")
+        val base = "$day $time"
+        return if (focus == null) base else "$base · $focus"
+    }
+
     fun recentTrainingText(summary: StudentRecentSessionSummary?, zoneId: ZoneId): String {
         if (summary == null) return "上完第一节课后会显示在这里"
         val parts = mutableListOf(monthDay(summary.completedAtUTC, zoneId))

@@ -1619,7 +1619,11 @@ seed v4 的 multi 增加 15 条预约、两系列（RepeatCount / EndDate）及�
 
 ### T045 / Phase 5 checkpoint：需要留意与核心屏
 
-待办。
+**自动化证据 PASS；checkpoint PENDING（2026-11-21，R3）。** 宿主 18:44 运行、S3-D18 末尾「全部」行画板修正后：今日 S3 53 层，PASS 46、FAIL/MISSING/outside 均 0，AD-01 矢量内部不可观测 7，手工例外 0%；学员详情 S3 61 层，PASS 61、FAIL/MISSING/outside 均 0，手工 selector 1.64%。R2 的 4 个连带画板失败已消除。S3-D17 的实际板高同时用于比较过滤和 visibility 诊断；A 也修改了 ConformanceComparison.kt。
+
+宿主 18:44：build exit 0，完整单测 **1261/0/0/0**（tests/failures/errors/skips）；s0G1 **39/0**、s0G2 **113/0**、s0G6 **92/0**、s0Room **26/0**、s0G3 **42/0**、s0G4 **12/0**、P7 **28/0**；两张 S3 及 s0Conformance / p4TrendsConformance / p4TodayS2Conformance 各 **1/0**。日志：`.handoff/logs/2026-11-21-s3-p5-host.log`、`/tmp/fc1-android-s3-p5-u.log`。R3 完整单测 **1262/0/0/0**（新增 1 个 visibility 回归），上述 5 个 conformance gate 各 **1/0/0/0**、P7 **28/0/0/0**、s0G3 **42/0/0/0**，diff-check PASS；完整列表入口、撤销重载、TalkBack 文案和后台读取证据见 [T045](docs/s3/T045.md)。
+
+对照页 `.handoff/subagent/2026-11-21-s3-phase5-compare.html` 使用当前 PNG 和捕获；仅生成建议 manifest 条目，未更新基线。未 commit、切分支或委派；设备验证、负责人核心屏视觉验收和独立复核仍 PENDING。
 
 ### T053 / Phase 6 checkpoint：seed、复核与走查
 

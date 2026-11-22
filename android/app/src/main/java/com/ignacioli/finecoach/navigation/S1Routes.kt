@@ -27,6 +27,9 @@ object S1Routes {
     const val TEMPLATE_DETAIL = "templates/{$ARG_TEMPLATE_ID}"
     const val EXERCISES = "exercises"
     const val HISTORY_DETAIL = "history/{$ARG_SESSION_ID}"
+    const val INSIGHTS = "insights"
+    const val INSIGHT_APPOINTMENT = "appointments/create/{date}/student/{$ARG_STUDENT_ID}"
+    const val INSIGHT_TREND = "students/{$ARG_STUDENT_ID}/trends/{exerciseID}"
 
     val allPatterns: Set<String> = setOf(
         TODAY,
@@ -45,6 +48,9 @@ object S1Routes {
         TEMPLATE_DETAIL,
         EXERCISES,
         HISTORY_DETAIL,
+        INSIGHTS,
+        INSIGHT_APPOINTMENT,
+        INSIGHT_TREND,
     )
 
     fun studentDetail(studentID: StudentID): String = "students/${studentID.value}"

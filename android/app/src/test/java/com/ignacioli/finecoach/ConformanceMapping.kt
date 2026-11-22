@@ -17,19 +17,19 @@ internal object ConformanceMapping {
             bindings[match.groupValues[1]] ?: error("Unresolved fixture binding ${match.value}")
         }
 
-    fun entries(layers: List<JSONObject>, exceptions: List<JSONObject>, actual: List<JSONObject>, bindings: Map<String, String>, originOffsetY: Double = 0.0): List<JSONObject> {
+    fun entries(layers: List<JSONObject>, exceptions: List<JSONObject>, actual: List<JSONObject>, bindings: Map<String, String>, originOffsetY: Double = 0.0, viewportHeight: Double = 844.0): List<JSONObject> {
         require(exceptions.map { it.getString("path") }.distinct().size == exceptions.size)
         require(exceptions.all { e -> layers.any { it.getString("path") == e.getString("path") } })
-        val visibleLayers = layers.filter { intersectsViewport(it) }
-        val visibleActual = actual.filter { intersectsViewport(it) && it.getDouble("w") > 0 && it.getDouble("h") > 0 && it.optBoolean("attached", true) && it.optBoolean("placed", true) }
+        val visibleLayers = layers.filter { intersectsViewport(it, viewportHeight) }
+        val visibleActual = actual.filter { intersectsViewport(it, viewportHeight) && it.getDouble("w") > 0 && it.getDouble("h") > 0 && it.optBoolean("attached", true) && it.optBoolean("placed", true) }
         return visibleEntries(visibleLayers, exceptions.filter { e -> visibleLayers.any { it.getString("path") == e.getString("path") } }, visibleActual, bindings, originOffsetY)
     }
 
     /** Geometry, including partial nodes, is compared using the complete layout box. */
-    internal fun intersectsViewport(box: JSONObject): Boolean {
+    internal fun intersectsViewport(box: JSONObject, viewportHeight: Double = 844.0): Boolean {
         val raw = box.optJSONObject("unclipped") ?: box
         return raw.getDouble("w") > 0 && raw.getDouble("h") > 0 &&
-            raw.getDouble("x") < 390 && raw.getDouble("y") < 844 &&
+            raw.getDouble("x") < 390 && raw.getDouble("y") < viewportHeight &&
             raw.getDouble("x") + raw.getDouble("w") > 0 && raw.getDouble("y") + raw.getDouble("h") > 0
     }
 

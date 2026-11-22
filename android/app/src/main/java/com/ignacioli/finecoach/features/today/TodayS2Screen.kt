@@ -12,6 +12,10 @@ import com.ignacioli.finecoach.core.domain.appointment.*
 import com.ignacioli.finecoach.core.domain.common.SessionID
 import com.ignacioli.finecoach.designsystem.*
 import com.ignacioli.finecoach.features.appointments.*
+import com.ignacioli.finecoach.features.insights.InsightBoardState
+import com.ignacioli.finecoach.features.insights.InsightRoutes
+import com.ignacioli.finecoach.features.insights.InsightTodaySection
+import com.ignacioli.finecoach.features.insights.insightDestination
 import com.ignacioli.finecoach.navigation.S1Routes
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -19,10 +23,11 @@ import java.util.UUID
 
 @Composable
 fun TodayS2Screen(training: TodayUiState, state: AppointmentListState, onNavigate: (String) -> Unit,
-    onCalendar: () -> Unit, onCreate: (LocalDate) -> Unit, onAppointment: (UUID) -> Unit, onSettings: () -> Unit = {}) {
+    onCalendar: () -> Unit, onCreate: (LocalDate) -> Unit, onAppointment: (UUID) -> Unit, onSettings: () -> Unit = {},
+    insights: InsightBoardState? = null) {
     val scope = rememberCoroutineScope()
     var expanded by remember { mutableStateOf(false) }
-    LaunchedEffect(state, training) { training.load(); state.load() }
+    LaunchedEffect(state, training, insights) { training.load(); state.load(); if (insights?.snapshot == null) insights?.load() }
     val ordered = TodayOrderingPolicy.order(state.rows, state.today, state.clock.now(), state.zone)
     FcPlatformShell({}) {
         FcPagePrimary("今日", Modifier.fillMaxSize(),
@@ -84,6 +89,9 @@ fun TodayS2Screen(training: TodayUiState, state: AppointmentListState, onNavigat
                     if (expanded) resolved.forEach { item -> FcAppointmentRow(item.appointment.startTime.hourMinute(), state.title(item.appointment),
                         state.status(item.appointment), Modifier.testTag("today-resolved-${item.appointment.id}")) }
                 }
+                if (insights != null) InsightTodaySection(insights, { insight ->
+                    insightDestination(insight, state.today)?.let(onNavigate)
+                }, { onNavigate(InsightRoutes.LIST) })
             }
         }
     }
