@@ -14,6 +14,42 @@ import org.robolectric.annotation.Config
 class ConformanceComparisonTests {
     private fun rect(x: Double = 16.0, y: Double = 760.0, w: Double = 358.0, h: Double = 52.0) =
         JSONObject().put("x", x).put("y", y).put("w", w).put("h", h)
+    @Test fun tallBoardIncludesLowerLayersAndMatchesTheirObservations() {
+        for ((height, y) in listOf(1013.0 to 920.0, 1243.0 to 1160.0)) {
+            val layer = rect(y = y).put("path", "lower").put("name", "testTag:lower").put("type", "rectangle")
+            val node = rect(y = y).put("id", 1).put("tag", "lower").put("text", "")
+            assertTrue(ConformanceMapping.intersectsViewport(layer, height))
+            val entries = ConformanceMapping.entries(listOf(layer), emptyList(), listOf(node), emptyMap(), viewportHeight = height)
+            assertEquals(1, entries.size)
+            assertEquals(1, ConformanceComparison.select(listOf(node), entries.single()).size)
+        }
+    }
+
+    @Test fun standardBoardKeepsItsOriginalViewportIncludingPartialBoxes() {
+        val inside = rect(y = 843.0)
+        val outside = rect(y = 844.0)
+        assertTrue(ConformanceMapping.intersectsViewport(inside, 844.0))
+        assertFalse(ConformanceMapping.intersectsViewport(outside, 844.0))
+        for (box in listOf(inside, outside, rect(y = -52.0), rect(y = -53.0))) {
+            assertEquals(ConformanceMapping.intersectsViewport(box), ConformanceMapping.intersectsViewport(box, 844.0))
+        }
+    }
+
+    @Test fun visibilityUsesBoardHeightAndPreservesStandardViewportStates() {
+        fun node(y: Double) = rect(y = y).put("unclipped", rect(y = y)).put("scrollAncestors", JSONArray())
+        for ((height, y) in listOf(1013.0 to 920.0, 1243.0 to 1160.0)) {
+            assertEquals("VISIBLE", ConformanceComparison.visibility(node(y), height).getString("state"))
+            assertEquals("VISIBLE", ConformanceComparison.visibility(node(820.0), height).getString("state"))
+            assertEquals("PARTIALLY_CLIPPED", ConformanceComparison.visibility(node(height - 1.0), height).getString("state"))
+            assertEquals("OUTSIDE_VIEWPORT", ConformanceComparison.visibility(node(height), height).getString("state"))
+        }
+        for ((y, state) in listOf(760.0 to "VISIBLE", 820.0 to "PARTIALLY_CLIPPED", 844.0 to "OUTSIDE_VIEWPORT")) {
+            val standard = ConformanceComparison.visibility(node(y))
+            assertEquals(state, standard.getString("state"))
+            assertEquals(standard.toString(), ConformanceComparison.visibility(node(y), 844.0).toString())
+        }
+    }
+
     @Test fun textIdentityOnlyNormalizesNbspAndKeepsDifferentValuesDistinct() {
         val board = rect(y = 100.0).put("path", "value").put("name", "set value")
             .put("type", "text").put("text", "60 kg × 12")

@@ -16,14 +16,16 @@ import org.json.JSONObject
 internal object ConformanceComparison {
     fun run(androidRoot: File, out: File, nodes: JSONArray, bindings: Map<String, String>, screen: String = "P0-a2-training", designPath: String = "design/experience-p0/screens/P0-a2-training.png", capture: JSONObject? = null): JSONObject {
         val assets = File(androidRoot, "design-assets/conformance")
-        val exportedLayers = JSONObject(File(assets, "$screen.layers.json").readText()).getJSONArray("layers").objects()
-        val layers = exportedLayers.filter { ConformanceMapping.intersectsViewport(it) }
+        val export = JSONObject(File(assets, "$screen.layers.json").readText())
+        val viewportHeight = export.getJSONObject("board").getDouble("h")
+        val exportedLayers = export.getJSONArray("layers").objects()
+        val layers = exportedLayers.filter { ConformanceMapping.intersectsViewport(it, viewportHeight) }
         val map = JSONObject(File(assets, "$screen.map.json").readText())
         val exceptions = map.getJSONArray("elements").objects()
-        val actual = nodes.objects().filter { ConformanceMapping.intersectsViewport(it) && it.getDouble("w") > 0 && it.getDouble("h") > 0 && it.optBoolean("attached", true) && it.optBoolean("placed", true) }
+        val actual = nodes.objects().filter { ConformanceMapping.intersectsViewport(it, viewportHeight) && it.getDouble("w") > 0 && it.getDouble("h") > 0 && it.optBoolean("attached", true) && it.optBoolean("placed", true) }
         val contentTop = contentTop(actual)
         val offset = map.getDouble("originOffsetY") + contentTop
-        val entries = ConformanceMapping.entries(layers, exceptions, actual, bindings, offset)
+        val entries = ConformanceMapping.entries(layers, exceptions, actual, bindings, offset, viewportHeight)
         val tolerance = map.getDouble("toleranceDp")
         check(tolerance == 2.0) { "Approved tolerance is ±2dp" }
         val android = ImageIO.read(File(out, "$screen.android.png"))
@@ -83,8 +85,8 @@ internal object ConformanceComparison {
                 val observedToken = hexToken(observedHex)
                 val tokenObservable = if (ad01) expectedHex.isNotEmpty() && observedHex != null else expectedHex.isEmpty() || observedHex != null
                 val tokenMatches = tokenObservable && (expectedHex.isEmpty() || (if (ad01) tokens.any { it.hex == expectedHex } else tokens.any { it.hex == layer.optString("fill").ifEmpty { layer.optJSONObject("stroke")?.optString("color").orEmpty() }.lowercase() }) && expectedHex == observedHex)
-                val visibility = visibility(n)
-                val visible = ConformanceMapping.intersectsViewport(n) && n.optBoolean("attached", true) && n.optBoolean("placed", true) && n.getDouble("w") > 0 && n.getDouble("h") > 0
+                val visibility = visibility(n, viewportHeight)
+                val visible = ConformanceMapping.intersectsViewport(n, viewportHeight) && n.optBoolean("attached", true) && n.optBoolean("placed", true) && n.getDouble("w") > 0 && n.getDouble("h") > 0
                 val geometryMatches = geometry.getBoolean("matches")
                 row.put("actual", n).put("delta", deltas).put("geometry", geometry).put("textMatches", textMatches)
                     .put("expectedToken", expectedToken ?: JSONObject.NULL).put("actualToken", observedToken ?: JSONObject.NULL)
@@ -413,7 +415,7 @@ internal object ConformanceComparison {
     }
 
     /** Visibility is geometric only. Sibling overlay occlusion cannot be inferred. */
-    internal fun visibility(node: JSONObject): JSONObject {
+    internal fun visibility(node: JSONObject, viewportHeight: Double = 844.0): JSONObject {
         val raw = node.getJSONObject("unclipped")
         fun positive(rect: JSONObject) = rect.getDouble("w") > 0 && rect.getDouble("h") > 0
         fun outside(a: JSONObject, b: JSONObject) = a.getDouble("x") + a.getDouble("w") <= b.getDouble("x") ||
@@ -421,7 +423,7 @@ internal object ConformanceComparison {
             a.getDouble("y") >= b.getDouble("y") + b.getDouble("h")
         fun contained(a: JSONObject, b: JSONObject) = a.getDouble("x") >= b.getDouble("x") && a.getDouble("y") >= b.getDouble("y") &&
             a.getDouble("x") + a.getDouble("w") <= b.getDouble("x") + b.getDouble("w") && a.getDouble("y") + a.getDouble("h") <= b.getDouble("y") + b.getDouble("h")
-        val viewport = JSONObject().put("x", 0).put("y", 0).put("w", 390).put("h", 844)
+        val viewport = JSONObject().put("x", 0).put("y", 0).put("w", 390).put("h", viewportHeight)
         val scroll = node.getJSONArray("scrollAncestors").objects().firstOrNull { !contained(raw, it) }
         val state: String
         val reason: String
@@ -429,7 +431,7 @@ internal object ConformanceComparison {
             !node.optBoolean("attached", true) || !node.optBoolean("placed", true) -> { state = "NOT_PLACED"; reason = "节点未 attached/placed，不能作为可见元素通过。" }
             !positive(raw) -> { state = "ZERO_LAYOUT"; reason = "节点自身布局为零；不是缺失节点，是否被条件隐藏未确认。" }
             scroll != null -> { state = if (outside(raw, scroll)) "OUTSIDE_SCROLL_VIEWPORT" else "PARTIALLY_CLIPPED_BY_SCROLL"; reason = "超出滚动容器 ${scroll.getString("tag")} 可视区；需要滚动才能完整呈现，本 fixture 未滚动。页面 rest/finish 为滚动容器之后的同级布局，不能据此声称被浮层遮挡。" }
-            outside(raw, viewport) -> { state = "OUTSIDE_VIEWPORT"; reason = "布局位于390×844视口外；是否可滚动到达未确认。" }
+            outside(raw, viewport) -> { state = "OUTSIDE_VIEWPORT"; reason = "布局位于390×${viewportHeight.toInt()}视口外；是否可滚动到达未确认。" }
             !positive(node) -> { state = "ZERO_CLIPPED_BOUNDS"; reason = "自身布局非零但 clipped bounds 为零；祖先裁剪，具体遮挡未确认。" }
             !contained(raw, viewport) || node.getDouble("w") < raw.getDouble("w") - 0.01 || node.getDouble("h") < raw.getDouble("h") - 0.01 -> { state = "PARTIALLY_CLIPPED"; reason = "节点仅部分可见；视口或祖先裁剪。" }
             else -> { state = "VISIBLE"; reason = "布局及 clipped bounds 完整位于视口内；不证明不存在同级绘制遮挡。" }
