@@ -1,0 +1,11 @@
+{
+  "toleranceDp": 2,
+  "originOffsetY": -52,
+  "originRule": "S1-D50 measured platform-content origin; top flow only; S3 student detail board 390×1243",
+  "elements": [
+    {
+      "path": "40",
+      "tag": "studentDetail.startTraining"
+    }
+  ]
+}
