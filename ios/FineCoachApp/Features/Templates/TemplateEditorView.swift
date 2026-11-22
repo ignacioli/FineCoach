@@ -251,7 +251,7 @@ struct TemplateEditorView: View {
                     isConfirmingDelete = false
                     Task {
                         if await viewModel.deleteTemplate() {
-                            dismiss()
+                            FCNavigation.pop(dismiss)
                         }
                     }
                 }

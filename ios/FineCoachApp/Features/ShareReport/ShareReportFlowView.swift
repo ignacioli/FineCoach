@@ -142,7 +142,7 @@ struct ShareReportFlowView: View {
     @StateObject private var viewModel: ShareReportFlowViewModel
     @Binding var rootTab: RootTab
     @Binding var path: [RootDestination]
-    @State private var isShowingPreview = false
+    @FCInstantState private var isShowingPreview = false
 
     init(
         sessionID: StableUUID,

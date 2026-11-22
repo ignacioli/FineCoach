@@ -15,6 +15,9 @@ import com.ignacioli.finecoach.features.exercises.*
 import com.ignacioli.finecoach.features.templates.*
 import com.ignacioli.finecoach.features.session.*
 import com.ignacioli.finecoach.features.history.*
+import com.ignacioli.finecoach.features.insights.InsightBoardState
+import com.ignacioli.finecoach.features.insights.InsightTodaySection
+import com.ignacioli.finecoach.features.insights.InsightsListScreen
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -25,6 +28,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
+import androidx.test.core.app.ApplicationProvider
 import androidx.compose.ui.unit.Density
 import com.ignacioli.finecoach.core.application.*
 import com.ignacioli.finecoach.core.domain.common.*
@@ -33,9 +37,14 @@ import com.ignacioli.finecoach.designsystem.FineCoachTheme
 import com.ignacioli.finecoach.features.packages.*
 import com.ignacioli.finecoach.features.students.*
 import com.ignacioli.finecoach.storage.entity.CreditAdjustmentEntity
+import com.ignacioli.finecoach.storage.FineCoachDatabaseFactory
+import com.ignacioli.finecoach.storage.local.InsightLocalStateStore
+import com.ignacioli.finecoach.storage.repository.AppointmentRepository
+import com.ignacioli.finecoach.storage.repository.CoursePackageRepository
 import com.ignacioli.finecoach.storage.repository.StudentRepository
 import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.util.UUID
 import org.junit.After
 import org.junit.Rule
@@ -49,6 +58,7 @@ import org.robolectric.annotation.GraphicsMode
 @Config(sdk = [36], qualifiers = "zh-rCN-w390dp-h844dp-notnight-xhdpi")
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class P7SideBySideTests {
+    @get:org.junit.Rule(order = 0) val insightPrivacy: org.junit.rules.TestRule = InsightTestPrivacyRule(setOf("insightsList", "insightsSwipe"))
     @Test fun s3RecordRow() = measure("D-a-record-row", "ActiveSessionScreen",
         "虚构历史 24 节；深蹲历史 120 kg，本次 122.5 kg × 6；无分享入口",
         "使用现有训练页；学员名、时长与画板不同；持有标记来自真实 SessionGains。",
@@ -718,5 +728,85 @@ private fun captureSheet(activity: Bitmap, panelTag: String): Bitmap {
             "批准画板宽 2753px，含课包日期与说明；Android 只拼安排页的日期展开和时间弹窗，原始像素并排，不缩放画板。",
             "design/android-differences/screens/AD-02-date-time-picker.png")
         stacked.recycle()
+    }
+
+    @Test fun trainingHistoryCompareEntry() = measure(
+        "07-training-history", "HistoryListScreen",
+        "虚构学员；可见「选择」进入两节课比较",
+        "07 是已批准历史画板。课程比较在选择模式里，默认列表只增加可见的「选择」。",
+        scrollTag = "history-list-content",
+        designPath = "design/m1-b-hifi/screens/07-training-history.png",
+    ) {
+        val f = T009Fixture().also { releaseFixture = it::close }
+        lateinit var progress: ProgressUseCases
+        val state = HistoryUiState(f.historyCases, f.studentID)
+        f.test {
+            f.finish(f.content())
+            progress = ProgressUseCases(f.history, f.sessions)
+        }
+        show { HistoryListScreen(state, f.zone, {}, {}, progress) }
+        "history-list-trailing"
+    }
+
+    @Test fun bodyDataList() = measure(
+        "06-body-data", "BodyDataScreen",
+        "虚构学员；内置指标列表，没有录入数值",
+        "06 为已批准身体数据画板。本捕获是空列表，录入和删除在 G4。",
+        scrollTag = "body-list",
+        designPath = "design/m1-b-hifi/screens/06-body-data.png",
+    ) {
+        val f = T009Fixture().also { releaseFixture = it::close }
+        val state = com.ignacioli.finecoach.features.body.BodyDataState(f.studentID,
+            BodyDataUseCases(com.ignacioli.finecoach.storage.repository.BodyDataRepository(f.db, f.clock), f.clock, f.zone) { java.util.UUID.randomUUID() })
+        f.test { state.load() }
+        show { com.ignacioli.finecoach.features.body.BodyDataScreen(state) {} }
+        "body-custom"
+    }
+
+    @Test fun insightsList() = measure(
+        "E-a2-insights-list", "InsightsListScreen",
+        "虚构学员；课包余额 1；完整列表按课包分组",
+        "E-a2 是需要留意完整列表。这一张是虚构一条课包提示，供负责人并排看，不是严格门禁。",
+        designPath = "design/insights/screens/E-a2-insights-list.png",
+    ) {
+        val board = insightBoard()
+        show { InsightsListScreen(board, {}, {}) }
+        "insights-list-content"
+    }
+
+    @Test fun insightsSwipe() = measure(
+        "E-d-insights-swipe-snooze", "InsightTodaySection",
+        "虚构学员；部分左滑露出暂不提醒胶囊；本测试捕获外观，不断言暂不提醒存储",
+        "E-d 画板高 620dp，P7 视口仍是 844dp。胶囊是左滑露出的可见操作。",
+        designPath = "design/insights/screens/E-d-insights-swipe-snooze.png",
+    ) {
+        val board = insightBoard()
+        val key = "package:${board.visible().single().studentID.value}"
+        show { InsightTodaySection(board, {}, {}) }
+        compose.onNodeWithTag("insights.row.$key").performTouchInput { swipeLeft(startX = right, endX = right - 180f) }
+        "insights.snooze.$key"
+    }
+
+    private fun insightBoard(): InsightBoardState {
+        val f = T009Fixture().also { releaseFixture = it::close }
+        val zone = ZoneId.of("Asia/Shanghai")
+        lateinit var board: InsightBoardState
+        f.test {
+            f.now = Instant.parse("2025-08-31T04:00:00Z")
+            val students = StudentUseCases(StudentRepository(f.db, f.clock), f.clock, f.ids)
+            val student = f.ok(students.create(StudentDraft("虚构甲", StudentSex.undisclosed))).studentID
+            val credits = CreditUseCases(CoursePackageRepository(f.db, f.clock, f.ids, zone), f.clock, f.ids, zone)
+            f.ok(credits.createActivePackage(student, "虚构课包", 1, endDate = LocalDate.of(2025, 11, 2)))
+            val folder = File(ApplicationProvider.getApplicationContext<android.content.Context>().cacheDir, "p7-insights-${UUID.randomUUID()}").apply { mkdirs() }
+            val store = InsightLocalStateStore(folder)
+            store.markFirstNudgePlayed()
+            val generation = UUID.fromString(f.db.storeMetadataDao().find(FineCoachDatabaseFactory.GENERATION_KEY)!!.value)
+            board = InsightBoardState(InsightUseCases(StudentRepository(f.db, f.clock), ProgressUseCases(f.history, f.sessions),
+                AppointmentRepository(f.db, f.clock, f.ids, generation, f.sessions, zone), credits,
+                { ApplicationResult.Success(emptySet()) }, store::activeKeys, store::snooze, store::unsnooze,
+                store::firstNudgePlayed, store::markFirstNudgePlayed), students, { ApplicationResult.Success(emptyList()) }, f.clock, zone)
+            board.load()
+        }
+        return board
     }
 }

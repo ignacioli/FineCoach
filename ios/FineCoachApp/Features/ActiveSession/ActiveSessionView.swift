@@ -321,9 +321,10 @@ struct ActiveSessionView: View {
             return
         }
         didPushSummary = true
-        path.append(.sessionSummary(sessionID.rawValue))
         if let next {
-            path.append(next)
+            path.append(contentsOf: [.sessionSummary(sessionID.rawValue), next])
+        } else {
+            path.append(.sessionSummary(sessionID.rawValue))
         }
     }
 

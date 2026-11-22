@@ -236,6 +236,7 @@
             )
             XCTAssertFalse(replaced.isEmpty)
             XCTAssertTrue(replaced.allSatisfy { $0.startTime == newStartTime })
+            XCTAssertTrue(replaced.map(\.date) == created.dropFirst().map(\.date))
 
             try await env.controller.shutdownForTesting()
             let reopened = try PersistenceController(
@@ -252,6 +253,11 @@
             let newSeriesID = try XCTUnwrap(replaced.first?.seriesID)
             let newInstances = try await repository.appointments(seriesID: newSeriesID)
             XCTAssertEqual(newInstances.count, replaced.count)
+            let newSeries = try await repository.series(id: newSeriesID)
+            let allInstances = try await repository.appointments(studentID: env.studentID)
+            XCTAssertTrue(newSeries.termination == .repeatCount(2))
+            XCTAssertTrue(newInstances == replaced)
+            XCTAssertTrue(allInstances.map(\.date).sorted() == created.map(\.date))
             try await reopened.shutdownForTesting()
         }
 

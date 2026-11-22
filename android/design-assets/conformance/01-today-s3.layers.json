@@ -4,7 +4,7 @@
     "page": "Foundations",
     "boardId": "75fbf40e-01d3-80a0-8008-f9411880f268",
     "boardName": "S3 · 01 今日",
-    "exportedAt": "2026-11-19",
+    "exportedAt": "2026-11-21",
     "exporter": "penpot-mcp execute_code (host)",
     "units": "pt relative to board origin; PNG is 2x",
     "derivedFrom": {
@@ -15,13 +15,13 @@
     "png": "design/m1-b-hifi/screens/01-today-s3.png",
     "pngPixels": [
       780,
-      2020
+      2026
     ],
     "status": "S3 T002 derived board, awaiting owner review"
   },
   "board": {
     "w": 390.00000953674316,
-    "h": 1010,
+    "h": 1013,
     "fill": "#ffffff"
   },
   "layers": [
@@ -32,7 +32,7 @@
       "x": 0,
       "y": 0,
       "w": 390,
-      "h": 844,
+      "h": 1013,
       "fill": "#ffffff"
     },
     {
@@ -445,22 +445,14 @@
       "h": 20
     },
     {
-      "name": "base-background",
-      "type": "rectangle",
-      "path": "30/0",
-      "x": 341,
-      "y": 80,
-      "w": 22,
-      "h": 20
-    },
-    {
       "name": "svg-circle",
       "type": "ellipse",
       "path": "30/1",
       "x": 349.25,
       "y": 87.5,
       "w": 5.5,
-      "h": 5
+      "h": 5,
+      "fill": "#5c5a52"
     },
     {
       "name": "svg-path",
@@ -469,21 +461,13 @@
       "x": 341.92,
       "y": 80.83,
       "w": 20.17,
-      "h": 18.33
+      "h": 18.33,
+      "fill": "#5c5a52"
     },
     {
       "name": "icon / calendar",
       "type": "group",
       "path": "31",
-      "x": 297,
-      "y": 80,
-      "w": 22,
-      "h": 20
-    },
-    {
-      "name": "base-background",
-      "type": "rectangle",
-      "path": "31/0",
       "x": 297,
       "y": 80,
       "w": 22,
@@ -496,7 +480,9 @@
       "x": 299.75,
       "y": 83.33,
       "w": 16.5,
-      "h": 15
+      "h": 15,
+      "radius": 2,
+      "fill": "#5c5a52"
     },
     {
       "name": "svg-path",
@@ -505,7 +491,8 @@
       "x": 299.75,
       "y": 81.67,
       "w": 16.5,
-      "h": 6.67
+      "h": 6.67,
+      "fill": "#5c5a52"
     },
     {
       "name": "icon / plus",
@@ -550,7 +537,7 @@
       "type": "text",
       "path": "33",
       "x": 16,
-      "y": 939,
+      "y": 935,
       "w": 54,
       "h": 17,
       "fill": "#5c5a52",
@@ -565,7 +552,7 @@
       "type": "text",
       "path": "34",
       "x": 16,
-      "y": 689,
+      "y": 685.5,
       "w": 54,
       "h": 17,
       "fill": "#5c5a52",
@@ -580,7 +567,7 @@
       "type": "rectangle",
       "path": "35",
       "x": 16,
-      "y": 717,
+      "y": 710.5,
       "w": 358,
       "h": 1,
       "fill": "#ece9e2"
@@ -590,7 +577,7 @@
       "type": "text",
       "path": "36",
       "x": 16,
-      "y": 729,
+      "y": 723.5,
       "w": 145,
       "h": 24,
       "fill": "#211f1b",
@@ -605,7 +592,7 @@
       "type": "text",
       "path": "37",
       "x": 16,
-      "y": 755,
+      "y": 751.5,
       "w": 104,
       "h": 17,
       "fill": "#5c5a52",
@@ -620,7 +607,7 @@
       "type": "rectangle",
       "path": "38",
       "x": 16,
-      "y": 785,
+      "y": 780.5,
       "w": 358,
       "h": 1,
       "fill": "#ece9e2"
@@ -630,7 +617,7 @@
       "type": "text",
       "path": "39",
       "x": 16,
-      "y": 797,
+      "y": 793.5,
       "w": 134,
       "h": 24,
       "fill": "#211f1b",
@@ -645,7 +632,7 @@
       "type": "text",
       "path": "40",
       "x": 16,
-      "y": 823,
+      "y": 821.5,
       "w": 80,
       "h": 17,
       "fill": "#5c5a52",
@@ -660,7 +647,7 @@
       "type": "rectangle",
       "path": "41",
       "x": 16,
-      "y": 853,
+      "y": 850.5,
       "w": 358,
       "h": 1,
       "fill": "#ece9e2"
@@ -670,7 +657,7 @@
       "type": "text",
       "path": "42",
       "x": 16,
-      "y": 865,
+      "y": 863.5,
       "w": 145,
       "h": 24,
       "fill": "#211f1b",
@@ -685,7 +672,7 @@
       "type": "text",
       "path": "43",
       "x": 16,
-      "y": 891,
+      "y": 891.5,
       "w": 119,
       "h": 17,
       "fill": "#5c5a52",
@@ -700,7 +687,7 @@
       "type": "rectangle",
       "path": "44",
       "x": 16,
-      "y": 921,
+      "y": 920.5,
       "w": 358,
       "h": 1,
       "fill": "#ece9e2"
@@ -710,7 +697,7 @@
       "type": "text",
       "path": "45",
       "x": 368,
-      "y": 934.5,
+      "y": 930.5,
       "w": 6,
       "h": 26,
       "fill": "#5c5a52",

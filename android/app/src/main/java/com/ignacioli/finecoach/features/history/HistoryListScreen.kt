@@ -8,23 +8,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.ignacioli.finecoach.core.application.*
 import com.ignacioli.finecoach.core.domain.common.*
+import com.ignacioli.finecoach.core.domain.progress.Comparison
+import com.ignacioli.finecoach.core.domain.training.CompletedSession
 import com.ignacioli.finecoach.designsystem.*
 import com.ignacioli.finecoach.navigation.S1Routes
 import java.time.ZoneId
 import kotlinx.coroutines.launch
 
 @Composable
-fun HistoryListScreen(state: HistoryUiState, zone: ZoneId, onNavigate: (String) -> Unit, onBack: () -> Unit) {
+fun HistoryListScreen(state: HistoryUiState, zone: ZoneId, onNavigate: (String) -> Unit, onBack: () -> Unit, progress: ProgressUseCases? = null) {
     val scope = rememberCoroutineScope()
     var filter by remember { mutableStateOf<String?>(null) }
     var focusDraft by remember { mutableStateOf<Set<BodyPart>>(emptySet()) }
+    var selecting by remember { mutableStateOf(false) }
+    var picked by remember { mutableStateOf(listOf<SessionID>()) }
+    var compared by remember { mutableStateOf<List<CompletedSession>>(emptyList()) }
+    var comparison by remember { mutableStateOf<Comparison.SessionComparisonResult?>(null) }
     LaunchedEffect(state) { state.list() }
     val hasFilters = state.query.window != null || state.query.trainingFocus.isNotEmpty() || state.query.exerciseIDs.isNotEmpty()
     FcPlatformShell(onBack) {
         Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).testTag("history-list-content"),
             verticalArrangement = Arrangement.spacedBy(FcSpacing.space4)) {
             Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
-                FcPageHeader("训练历史", onBack = onBack, tag = "history-list")
+                FcPageHeader("训练历史", onBack = onBack, tag = "history-list", trailingTitle = if (selecting) "完成" else "选择",
+                    trailingEnabled = !state.busy, onTrailing = {
+                        if (selecting) { selecting = false; picked = emptyList(); compared = emptyList(); comparison = null }
+                        else selecting = true
+                    })
                 if (state.studentName.isNotEmpty()) FcText(state.studentName, Modifier.testTag("history-student-name"),
                     style = FcTypography.headline, color = FcColors.textSecondary)
             }
@@ -68,7 +78,50 @@ fun HistoryListScreen(state: HistoryUiState, zone: ZoneId, onNavigate: (String) 
                                 detail?.statistics?.let { historyDuration(it.displayedDurationSeconds.canonicalString) }).joinToString(" · ")
                             FcListRow(historyDay(row.completedAtUTC, zone), Modifier.testTag("history-open-${row.sessionID.value}"),
                                 subtitle = listOfNotNull(summary, "未扣课 · 无有效课包".takeIf { detail?.creditNote?.note == SessionCreditSettlementNote.noActivePackage }).joinToString("\n"), mode = FcRowMode.Action { onNavigate(S1Routes.historyDetail(row.sessionID)) })
+                            if (selecting) FcButton(if (row.sessionID in picked) "已选" else "选择这节课", Modifier.testTag("history-compare-pick-${row.sessionID.value}"), !state.busy) {
+                                val next = if (row.sessionID in picked) picked - row.sessionID else if (picked.size < 2) picked + row.sessionID else picked
+                                picked = next
+                                val student = state.studentID
+                                if (next.size == 2 && progress != null && student != null) scope.launch {
+                                    when (val loaded = progress.load(student)) {
+                                        is ApplicationResult.Failure -> comparison = null
+                                        is ApplicationResult.Success -> {
+                                            val pair = next.mapNotNull { id -> loaded.value.completed.firstOrNull { it.sessionID == id } }
+                                            compared = pair
+                                            comparison = if (pair.size == 2) Comparison.compareSessions(pair[0], pair[1]) else null
+                                        }
+                                    }
+                                } else { compared = emptyList(); comparison = null }
+                            }
                             FcListRowDivider()
+                        }
+                    }
+                }
+            }
+            comparison?.let { result ->
+                Column(Modifier.fillMaxWidth().testTag("history-compare-panel"), verticalArrangement = Arrangement.spacedBy(FcSpacing.space2)) {
+                    FcSectionLabel("课程比较（已选 ${picked.size} / 2）")
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space4)) {
+                        compared.forEach { session ->
+                            FcText(historyDay(session.completedAtUTC, zone), Modifier.weight(1f), style = FcTypography.headline, color = FcColors.textPrimary)
+                        }
+                    }
+                    when (result) {
+                        Comparison.SessionComparisonResult.IncompatibleTrainingFocus, Comparison.SessionComparisonResult.DifferentStudent ->
+                            FcText("训练重点不同，无法对比，已分别展示。", Modifier.fillMaxWidth().testTag("history-compare-incompatible"),
+                                style = FcTypography.body, color = FcColors.textPrimary)
+                        is Comparison.SessionComparisonResult.Compatible -> Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(FcSpacing.space4)) {
+                            listOf(
+                                Triple(result.detail.totalSetCountA, result.detail.totalRepCountA, result.detail.trainingVolumeA) to result.detail.exercisesOnlyInA,
+                                Triple(result.detail.totalSetCountB, result.detail.totalRepCountB, result.detail.trainingVolumeB) to result.detail.exercisesOnlyInB,
+                            ).forEach { (stats, only) ->
+                                Column(Modifier.weight(1f).testTag("history-compare-column")) {
+                                    FcText("总组数 ${stats.first}", style = FcTypography.body, color = FcColors.textPrimary)
+                                    stats.second?.let { FcText("总次数 ${it.canonicalString}", style = FcTypography.body, color = FcColors.textPrimary) }
+                                    stats.third?.let { FcText("训练容量 ${it.canonicalString} kg", style = FcTypography.body, color = FcColors.textPrimary) }
+                                    FcText(if (only.isEmpty()) "动作相同" else "仅此次 · ${only.joinToString("、")}", style = FcTypography.caption, color = FcColors.textSecondary)
+                                }
+                            }
                         }
                     }
                 }

@@ -335,10 +335,26 @@ public struct AppointmentUseCases: Sendable {
         let calendar = calendarProvider.currentCalendar()
         let now = clock.nowUTC()
         let currentSeries = try await appointmentRepository.series(id: seriesID)
+        guard currentSeries.status == .active else {
+            throw DomainError.incompatibleInput
+        }
+        guard intervalDays == nil || intervalDays == currentSeries.intervalDays else {
+            throw DomainError.incompatibleInput
+        }
         let existing = try await appointmentRepository.appointments(seriesID: seriesID)
+        guard
+            existing.contains(where: {
+                $0.date == boundaryDate && $0.status == .scheduled
+            })
+        else {
+            throw DomainError.incompatibleInput
+        }
 
         let superseded = existing.filter { appointment in
             appointment.date >= boundaryDate && appointment.status == .scheduled && !appointment.isDetachedException
+        }.sorted { $0.date < $1.date }
+        guard !superseded.isEmpty else {
+            throw DomainError.incompatibleInput
         }
 
         // Training focus is per instance and outside D-011's this-and-future
@@ -352,7 +368,6 @@ public struct AppointmentUseCases: Sendable {
             focusByDate[boundaryDate] = boundaryTrainingFocus
         }
 
-        let resolvedIntervalDays = intervalDays ?? currentSeries.intervalDays
         let resolvedStartTime = startTime ?? currentSeries.defaultStartTime
         let resolvedDuration = durationMinutes ?? currentSeries.defaultDurationMinutes
         let resolvedReminderEnabled = reminderEnabled ?? currentSeries.defaultReminderEnabled
@@ -363,11 +378,19 @@ public struct AppointmentUseCases: Sendable {
             firstOccurrenceDate: boundaryDate,
             calendar: calendar
         )
+        // S2-D22: preserve existing dates rather than recounting from the boundary.
+        let termination: RecurrenceTermination
+        switch currentSeries.termination {
+        case .repeatCount:
+            termination = .repeatCount(superseded.count)
+        case .endDate:
+            termination = currentSeries.termination
+        }
         let newSeries = try RecurrenceSeries(
             id: StableUUID(ids.makeID()),
             studentID: currentSeries.studentID,
-            intervalDays: resolvedIntervalDays,
-            termination: currentSeries.termination,
+            intervalDays: currentSeries.intervalDays,
+            termination: termination,
             defaultStartTime: resolvedStartTime,
             defaultDurationMinutes: resolvedDuration,
             defaultReminderEnabled: resolvedReminderEnabled,
@@ -375,20 +398,21 @@ public struct AppointmentUseCases: Sendable {
             createdAtUTC: now,
             updatedAtUTC: now
         )
-        let newAppointments = try materializedAppointments(
-            for: newSeries,
-            intervalDays: resolvedIntervalDays,
-            firstOccurrenceDate: boundaryDate,
-            termination: currentSeries.termination,
-            startTime: resolvedStartTime,
-            durationMinutes: resolvedDuration,
-            reminderEnabled: resolvedReminderEnabled,
-            reminderLeadMinutes: resolvedReminderLeadMinutes,
-            trainingFocus: { focusByDate[$0] ?? [] },
-            studentID: currentSeries.studentID,
-            calendar: calendar,
-            now: now
-        )
+        let newAppointments = try superseded.map { appointment in
+            try Appointment(
+                id: StableUUID(ids.makeID()),
+                studentID: currentSeries.studentID,
+                seriesID: newSeries.id,
+                date: appointment.date,
+                startTime: resolvedStartTime,
+                durationMinutes: resolvedDuration,
+                reminderEnabled: resolvedReminderEnabled,
+                reminderLeadMinutes: resolvedReminderLeadMinutes,
+                trainingFocus: focusByDate[appointment.date] ?? [],
+                createdAtUTC: now,
+                updatedAtUTC: now
+            )
+        }
 
         if !overrideConflict {
             let supersededIDs = Set(superseded.map(\.id))

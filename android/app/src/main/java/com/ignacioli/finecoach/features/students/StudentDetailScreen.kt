@@ -28,6 +28,7 @@ import androidx.compose.ui.semantics.stateDescription
 import com.ignacioli.finecoach.R
 import com.ignacioli.finecoach.core.application.toDomain
 import com.ignacioli.finecoach.core.application.AppClock
+import com.ignacioli.finecoach.core.application.AppointmentUseCases
 import com.ignacioli.finecoach.core.application.ApplicationResult
 import com.ignacioli.finecoach.core.application.CoursePackageRecord
 import com.ignacioli.finecoach.core.application.CreditUseCases
@@ -37,9 +38,15 @@ import com.ignacioli.finecoach.core.application.SessionRepositoryPort
 import com.ignacioli.finecoach.core.application.StartOrOpenSessionCommand
 import com.ignacioli.finecoach.core.application.StudentRecord
 import com.ignacioli.finecoach.core.application.StudentUseCases
+import com.ignacioli.finecoach.core.domain.appointment.Appointment
+import com.ignacioli.finecoach.core.domain.appointment.AppointmentStatus
 import com.ignacioli.finecoach.core.domain.common.SessionID
 import com.ignacioli.finecoach.core.domain.common.StudentID
 import com.ignacioli.finecoach.core.domain.common.StudentLifecycle
+import com.ignacioli.finecoach.features.insights.InsightBoardState
+import com.ignacioli.finecoach.features.insights.InsightRoutes
+import com.ignacioli.finecoach.features.insights.InsightStudentSection
+import com.ignacioli.finecoach.features.insights.insightDestination
 import com.ignacioli.finecoach.designsystem.FcActionRow
 import com.ignacioli.finecoach.designsystem.FcAvatar
 import com.ignacioli.finecoach.designsystem.FcButton
@@ -76,6 +83,8 @@ data class StudentDetailUiState(
     val packageQueried: Boolean = false,
     val recent: StudentRecentSessionSummary? = null,
     val recentQueried: Boolean = false,
+    val nextAppointment: Appointment? = null,
+    val nextQueried: Boolean = false,
     val notesExpanded: Boolean = false,
     val errorMessage: String? = null,
     val isLoading: Boolean = false,
@@ -101,6 +110,7 @@ class StudentDetailViewModel(
     val historyRepository: HistoryRepositoryPort? = null,
     val clock: AppClock = AppClock { Instant.now() },
     val zoneId: ZoneId = ZoneId.systemDefault(),
+    private val appointments: AppointmentUseCases? = null,
 ) {
     var uiState by mutableStateOf(StudentDetailUiState())
         private set
@@ -148,9 +158,10 @@ class StudentDetailViewModel(
                     }
                     val packageRead = readPackage(student.studentID)
                     val recentRead = readRecent()
+                    val nextRead = readNext()
                     val error = when {
                         activeRes is ApplicationResult.Failure -> StudentPresentation.errorMessage(activeRes.error)
-                        packageRead.failed || recentRead.failed -> StudentPresentation.GENERIC_ERROR
+                        packageRead.failed || recentRead.failed || nextRead.failed -> StudentPresentation.GENERIC_ERROR
                         else -> null
                     }
                     uiState = uiState.copy(
@@ -161,6 +172,8 @@ class StudentDetailViewModel(
                         packageQueried = packageRead.queried,
                         recent = recentRead.summary,
                         recentQueried = recentRead.queried,
+                        nextAppointment = nextRead.appointment,
+                        nextQueried = nextRead.queried,
                         isLoading = false,
                         hasLoaded = true,
                         errorMessage = error,
@@ -233,6 +246,8 @@ class StudentDetailViewModel(
         val failed: Boolean,
     )
 
+    private data class NextRead(val appointment: Appointment?, val queried: Boolean, val failed: Boolean)
+
     private suspend fun readPackage(studentID: StudentID): PackageRead {
         val credits = creditUseCases ?: return PackageRead(summary = null, queried = false, failed = false)
         val today = clock.today(zoneId)
@@ -279,6 +294,19 @@ class StudentDetailViewModel(
             }
         }
     }
+
+    private suspend fun readNext(): NextRead {
+        val booked = appointments ?: return NextRead(null, true, false)
+        return when (val res = booked.all()) {
+            is ApplicationResult.Failure -> NextRead(null, false, true)
+            is ApplicationResult.Success -> {
+                val now = clock.now()
+                NextRead(res.value.filter {
+                    it.studentID == studentID && it.status == AppointmentStatus.scheduled && it.startInstant(zoneId) > now
+                }.minByOrNull { it.startInstant(zoneId) }, true, false)
+            }
+        }
+    }
 }
 
 private fun CoursePackageRecord.toSummary(balance: Long) = StudentPackageSummary(
@@ -294,12 +322,15 @@ fun StudentDetailScreen(
     onBack: () -> Unit,
     autoLoad: Boolean = true,
     insets: WindowInsets = WindowInsets.safeDrawing,
+    insights: InsightBoardState? = null,
+    onAppointment: (java.util.UUID) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
-    LaunchedEffect(viewModel, autoLoad) {
+    LaunchedEffect(viewModel, autoLoad, insights) {
         if (autoLoad && !viewModel.uiState.hasLoaded && viewModel.uiState.errorMessage == null) {
             viewModel.reload()
         }
+        if (insights?.snapshot == null) insights?.load()
     }
     val state = viewModel.uiState
     val student = state.student
@@ -374,7 +405,11 @@ fun StudentDetailScreen(
                             onClick = { onRoute(S1Routes.activeSession(summary.sessionID)) },
                         )
                     }
-                    OverviewSection(state = state, zoneId = viewModel.zoneId, onRoute = onRoute)
+                    if (insights != null) InsightStudentSection(insights, student.studentID) { insight ->
+                        insightDestination(insight, viewModel.clock.today(viewModel.zoneId))?.let(onRoute)
+                    }
+                    OverviewSection(state = state, zoneId = viewModel.zoneId, today = viewModel.clock.today(viewModel.zoneId),
+                        onRoute = onRoute, onAppointment = onAppointment)
                     RecordsSection(studentID = student.studentID, onRoute = onRoute)
                     ProfileSection(
                         student = student,
@@ -433,7 +468,9 @@ private fun DetailPrimaryButton(
 private fun OverviewSection(
     state: StudentDetailUiState,
     zoneId: ZoneId,
+    today: LocalDate,
     onRoute: (String) -> Unit,
+    onAppointment: (java.util.UUID) -> Unit,
 ) {
     val student = state.student ?: return
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -441,6 +478,19 @@ private fun OverviewSection(
             title = "概览",
             modifier = Modifier.padding(bottom = FcSpacing.space2),
         )
+        FcListRowDivider(Modifier.testTag("conformance:Divider"))
+        StudentOverviewRow(
+            kicker = "下一节课",
+            modifier = Modifier.testTag("studentDetail.nextClass"),
+            onClick = {
+                val next = state.nextAppointment
+                if (next != null) onAppointment(next.id) else onRoute(InsightRoutes.appointment(today, student.studentID))
+            },
+        ) {
+            if (state.nextQueried) {
+                FcText(StudentPresentation.nextClassText(state.nextAppointment), style = FcTypography.body, color = FcColors.textPrimary)
+            }
+        }
         FcListRowDivider(Modifier.testTag("conformance:Divider"))
         StudentOverviewRow(
             kicker = "课包",
@@ -515,6 +565,18 @@ private fun RecordsSection(
             title = "训练历史",
             modifier = Modifier.testTag(StudentTestTags.DETAIL_HISTORY),
             onClick = { onRoute(S1Routes.studentHistory(studentID)) },
+        )
+        FcListRowDivider(Modifier.testTag("conformance:Divider"))
+        FcActionRow(
+            title = "训练趋势",
+            modifier = Modifier.testTag("studentDetail.trends"),
+            onClick = { onRoute(S1Routes.studentTrends(studentID)) },
+        )
+        FcListRowDivider(Modifier.testTag("conformance:Divider"))
+        FcActionRow(
+            title = "身体数据",
+            modifier = Modifier.testTag("studentDetail.body"),
+            onClick = { onRoute(S1Routes.studentBody(studentID)) },
         )
         FcListRowDivider(Modifier.testTag("conformance:Divider"))
     }

@@ -1,3 +1,4 @@
+import UIKit
 import XCTest
 
 @testable import FineCoach
@@ -5,6 +6,44 @@ import XCTest
 final class InsightPresentationTests: XCTestCase {
     private let studentID = StableUUID(UUID(uuidString: "aaaaaaaa-1111-4111-8111-111111111111")!)
     private let exerciseID = try! StableExerciseID("a2f5b6ef-b780-49c0-8d96-fdaff23e27ce")
+
+    func testRowEstimateMatchesNaturalUIFontBoxesIncludingDivider() {
+        XCTAssertTrue(FCFont.isFamilyRegistered)
+        let systemTitleFont = UIFontMetrics(forTextStyle: .body)
+            .scaledFont(for: FCFont.uiFont(size: 17, weight: 400))
+        let systemSubtitleFont = UIFontMetrics(forTextStyle: .footnote)
+            .scaledFont(for: FCFont.uiFont(size: 13, weight: 400))
+        XCTAssertEqual(
+            InsightRowGeometry.estimatedHeight(hasSubtitle: true) + InsightRowGeometry.dividerHeight,
+            max(52, 12 + systemTitleFont.lineHeight + 4 + systemSubtitleFont.lineHeight + 12) + 1,
+            accuracy: 0.001)
+        // Independent typography inputs from README §3, not the estimate's
+        // nominal line-height tokens; no view rendering or ViewInspector.
+        for category: UIContentSizeCategory in [.large, .extraExtraExtraLarge, .accessibilityExtraExtraExtraLarge] {
+            let traits = UITraitCollection(preferredContentSizeCategory: category)
+            let titleFont = UIFontMetrics(forTextStyle: .body)
+                .scaledFont(for: FCFont.uiFont(size: 17, weight: 400), compatibleWith: traits)
+            let subtitleFont = UIFontMetrics(forTextStyle: .footnote)
+                .scaledFont(for: FCFont.uiFont(size: 13, weight: 400), compatibleWith: traits)
+            XCTAssertEqual(titleFont.familyName, FCFont.familyName)
+            XCTAssertEqual(subtitleFont.familyName, FCFont.familyName)
+            let naturalHeight = max(52, 12 + titleFont.lineHeight + 4 + subtitleFont.lineHeight + 12) + 1
+            XCTAssertEqual(
+                InsightRowGeometry.estimatedHeight(hasSubtitle: true, compatibleWith: traits)
+                    + InsightRowGeometry.dividerHeight,
+                naturalHeight, accuracy: 0.001)
+            XCTAssertEqual(
+                InsightRowGeometry.estimatedHeight(hasSubtitle: false, compatibleWith: traits)
+                    + InsightRowGeometry.dividerHeight,
+                max(52, 12 + titleFont.lineHeight + 12) + 1, accuracy: 0.001)
+            if category == .large {
+                print("Insight default natural two-line pitch (UIFont): \(naturalHeight) pt")
+                XCTAssertEqual(
+                    InsightRowGeometry.estimatedHeight(hasSubtitle: false, compatibleWith: traits),
+                    FCListRowGeometry.minHeight)
+            }
+        }
+    }
 
     func testUndoWindowRetainsSlotsUntilExpiryThenTodayBackfills() {
         let rows = (0..<5).map { _ in Insight(kind: .inactive, studentID: StableUUID(UUID())) }

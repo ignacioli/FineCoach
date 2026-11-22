@@ -24,7 +24,12 @@ import com.ignacioli.finecoach.features.exercises.*
 import com.ignacioli.finecoach.features.templates.*
 import com.ignacioli.finecoach.features.session.*
 import com.ignacioli.finecoach.features.history.*
+import com.ignacioli.finecoach.features.trends.*
+import com.ignacioli.finecoach.features.body.*
+import com.ignacioli.finecoach.storage.repository.BodyDataRepository
+import com.ignacioli.finecoach.features.insights.*
 import com.ignacioli.finecoach.features.today.*
+import com.ignacioli.finecoach.storage.local.InsightLocalStateStore
 import com.ignacioli.finecoach.features.calendar.*
 import com.ignacioli.finecoach.features.settings.*
 import com.ignacioli.finecoach.features.appointments.*
@@ -157,6 +162,16 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
     val back = { navigator.back() }
     val scope = rememberCoroutineScope()
     var selectedAppointment by remember { mutableStateOf<UUID?>(null) }
+    val insightStore = remember(graph) { InsightLocalStateStore(graph.context.filesDir) }
+    val insightBoard = remember(graph) {
+        InsightBoardState(InsightUseCases(graph.studentRepository, sessionProgress(graph), graph.appointmentRepository, graph.credits, {
+            when (val found = graph.exerciseRepository.searchWithPreferences("", includeHidden = true)) {
+                is ApplicationResult.Failure -> found
+                is ApplicationResult.Success -> ApplicationResult.Success(found.value.preferences.values.filter { it.isAssisted }.map { it.exerciseID }.toSet())
+            }
+        }, insightStore::activeKeys, insightStore::snooze, insightStore::unsnooze, insightStore::firstNudgePlayed, insightStore::markFirstNudgePlayed),
+            graph.students, { graph.exerciseRepository.listCatalog() }, graph.clock, graph.zone)
+    }
     var appointmentRevision by remember { mutableIntStateOf(0) }
     var savedReminderDenied by rememberSaveable { mutableStateOf(false) }
     var awaitingNotificationGrant by rememberSaveable { mutableStateOf(false) }
@@ -212,13 +227,35 @@ fun S1App(graph: S1AppGraph, notificationSession: SessionID? = null, consumeNoti
         composable(S1Routes.TODAY) {
             val today = remember { TodayUiState(graph.sessions, graph.students, graph.clock, graph.zone) }
             val appointments = remember { AppointmentListState(graph.appointments, graph.students, graph.clock, graph.zone) }
-            OnResume { today.load(); appointments.load() }
-            LaunchedEffect(appointmentRevision) { today.load(); appointments.load() }
+            OnResume { today.load(); appointments.load(); insightBoard.load() }
+            LaunchedEffect(appointmentRevision) { today.load(); appointments.load(); insightBoard.load() }
             TodayS2Screen(today, appointments, navigator::open,
                 onSettings = { nav.navigate(S2Routes.SETTINGS) },
                 onCalendar = { nav.navigate(S2Routes.CALENDAR) },
                 onCreate = { date -> nav.navigate(S2Routes.createAppointment(date)) },
-                onAppointment = { id -> selectedAppointment = id })
+                onAppointment = { id -> selectedAppointment = id },
+                insights = insightBoard)
+        }
+        composable(S1Routes.INSIGHTS) {
+            OnResume { insightBoard.load() }
+            InsightsListScreen(insightBoard, back) { insight ->
+                insightDestination(insight, graph.clock.today(graph.zone))?.let(navigator::open)
+            }
+        }
+        composable(S1Routes.INSIGHT_APPOINTMENT) { entry ->
+            val date = LocalDate.parse(requireNotNull(entry.arguments?.getString("date")))
+            val studentID = StudentID.parse(requireNotNull(entry.arguments?.getString("studentID")))
+            val editor = remember(date, studentID) {
+                AppointmentEditorState(graph.appointments, graph.students, graph.clock, graph.zone, date).also { it.studentID = studentID }
+            }
+            AppointmentEditorScreen(editor, back) { onAppointmentSaved(editor) }
+        }
+        composable(S1Routes.INSIGHT_TREND) { entry ->
+            val id = StudentID.parse(requireNotNull(entry.arguments?.getString(S1Routes.ARG_STUDENT_ID)))
+            val exerciseID = StableExerciseID.parse(requireNotNull(entry.arguments?.getString("exerciseID")))
+            val trends = remember(id, exerciseID) { TrendsState(id, sessionProgress(graph), graph.zone).also { it.selectExercise(exerciseID) } }
+            OnResume { trends.load() }
+            TrendsScreen(trends, back)
         }
         composable(S2Routes.SETTINGS) {
             val state=remember(graph) { ReminderSettingsState {
@@ -262,9 +299,9 @@ AppointmentEditorScreen(editor, back) { onAppointmentSaved(editor) }
         }
         composable(S1Routes.STUDENT_DETAIL) { entry ->
             val id = StudentID.parse(requireNotNull(entry.arguments?.getString(S1Routes.ARG_STUDENT_ID)))
-            val state = remember(id) { StudentDetailViewModel(id, graph.students, graph.sessions, graph.credits, graph.historyRepository, graph.clock, graph.zone) }
-            OnResume { state.reload() }
-            StudentDetailScreen(state, navigator::open, back, autoLoad = false)
+            val state = remember(id) { StudentDetailViewModel(id, graph.students, graph.sessions, graph.credits, graph.historyRepository, graph.clock, graph.zone, appointments = graph.appointments) }
+            OnResume { state.reload(); insightBoard.load() }
+            StudentDetailScreen(state, navigator::open, back, autoLoad = false, insights = insightBoard, onAppointment = { selectedAppointment = it })
         }
         composable(S1Routes.STUDENT_EDIT) { entry ->
             val id = StudentID.parse(requireNotNull(entry.arguments?.getString(S1Routes.ARG_STUDENT_ID)))
@@ -290,11 +327,23 @@ AppointmentEditorScreen(editor, back) { onAppointmentSaved(editor) }
                 ManualCreditAdjustmentScreen(id, graph.credits, done, done)
             } else S1PackageTrail(graph, id, back)
         }
+        composable(S1Routes.STUDENT_TRENDS) { entry ->
+            val id = StudentID.parse(requireNotNull(entry.arguments?.getString(S1Routes.ARG_STUDENT_ID)))
+            val trends = remember(id) { TrendsState(id, sessionProgress(graph), graph.zone) }
+            OnResume { trends.load() }
+            TrendsScreen(trends, back)
+        }
+        composable(S1Routes.STUDENT_BODY) { entry ->
+            val id = StudentID.parse(requireNotNull(entry.arguments?.getString(S1Routes.ARG_STUDENT_ID)))
+            val body = remember(id) { BodyDataState(id, BodyDataUseCases(BodyDataRepository(graph.database, graph.clock), graph.clock, graph.zone) { UUID.randomUUID() }) }
+            OnResume { body.load() }
+            BodyDataScreen(body, back)
+        }
         composable(S1Routes.STUDENT_HISTORY) { entry ->
             val id = StudentID.parse(requireNotNull(entry.arguments?.getString(S1Routes.ARG_STUDENT_ID)))
             val state = remember(id) { HistoryUiState(graph.history, id, graph.students) }
             OnResume { state.list() }
-            HistoryListScreen(state, graph.zone, navigator::open, back)
+            HistoryListScreen(state, graph.zone, navigator::open, back, sessionProgress(graph))
         }
         composable(S1Routes.HISTORY_DETAIL) { entry ->
             val id = SessionID.parse(requireNotNull(entry.arguments?.getString(S1Routes.ARG_SESSION_ID)))

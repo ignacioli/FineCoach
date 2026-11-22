@@ -1,0 +1,6 @@
+{
+  "toleranceDp": 2,
+  "originOffsetY": -52,
+  "originRule": "S1-D50 measured platform-content origin; top flow only; S3 today board 390×1013",
+  "elements": []
+}

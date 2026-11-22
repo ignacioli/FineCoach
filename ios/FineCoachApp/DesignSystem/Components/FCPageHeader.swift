@@ -115,7 +115,7 @@ public struct FCPageHeader: View {
             .frame(width: Self.backLayoutWidth, alignment: .leading)
             .overlay(alignment: .leading) {
                 let button = Button {
-                    if let handler = back.handler { handler() } else { dismiss() }
+                    if let handler = back.handler { handler() } else { FCNavigation.pop(dismiss) }
                 } label: {
                     Color.clear
                         .frame(width: 44, height: 44)

@@ -16,6 +16,10 @@ class InsightUseCases(
     private val credits: CreditUseCases,
     private val assistedIDs: suspend () -> ApplicationResult<Set<StableExerciseID>>,
     private val activeSnoozes: (Instant, ZoneId) -> Set<String>,
+    private val persistSnooze: ((Insight, Instant, ZoneId) -> ApplicationResult<Unit>)? = null,
+    private val persistUnsnooze: ((Insight) -> ApplicationResult<Unit>)? = null,
+    private val readNudgePlayed: () -> Boolean = { true },
+    private val persistNudgePlayed: () -> ApplicationResult<Unit> = { ApplicationResult.Success(Unit) },
 ) {
     suspend fun load(now: Instant, zone: ZoneId, studentID: StudentID? = null): ApplicationResult<List<Insight>> = withContext(Dispatchers.IO) {
         val records = when (val r = students.list(StudentQuery())) {
@@ -52,5 +56,17 @@ class InsightUseCases(
             is ApplicationResult.Success -> r.value
         }
         ApplicationResult.Success(InsightEngine.evaluate(InsightEngine.Input(domain, packages, booked, history, activeSnoozes(now, zone), assisted), now, zone))
+    }
+
+    suspend fun nudgePlayed(): Boolean = withContext(Dispatchers.IO) { readNudgePlayed() }
+
+    suspend fun markNudgePlayed(): ApplicationResult<Unit> = withContext(Dispatchers.IO) { persistNudgePlayed() }
+
+    suspend fun snooze(insight: Insight, now: Instant, zone: ZoneId): ApplicationResult<Unit> = withContext(Dispatchers.IO) {
+        persistSnooze?.invoke(insight, now, zone) ?: ApplicationResult.Failure(ApplicationError(ApplicationErrorCode.persistenceFailed))
+    }
+
+    suspend fun unsnooze(insight: Insight): ApplicationResult<Unit> = withContext(Dispatchers.IO) {
+        persistUnsnooze?.invoke(insight) ?: ApplicationResult.Failure(ApplicationError(ApplicationErrorCode.persistenceFailed))
     }
 }

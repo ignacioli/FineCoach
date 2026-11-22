@@ -568,7 +568,7 @@ struct AppointmentEditorView: View {
         .task(id: scenePhase) { notificationStatus = await SystemNotificationAdapter().currentStatus() }
         .onChange(of: viewModel.didSave) { _, saved in
             if saved {
-                dismiss()
+                FCNavigation.pop(dismiss)
             }
         }
         .fcConfirmationDialog(isPresented: conflictPresented) {

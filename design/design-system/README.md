@@ -617,7 +617,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
    - 范围：进入下一页、返回（含系统返回手势）、今日/学员根切换，都直接到达，不用淡入淡出、滑动或缩放，不让用户等待。
    - 例外：欢迎页（首次启动引导）的页面内编排。
    - 以后要增加氛围转场：单独设计并审批，必须克制，不得加在训练、记组、今日、学员等效率型核心页面上。
-   - 实施状态：Android 已实施，`S1App.kt` 的 `NavHost` 转场全部为 None，回归测试 `TodayNavigationEntryLayoutTests` 要求 6 帧（约 100 ms）内到达。iOS 仍为系统 push，Android 移植完成后一并改（S2-D15）。
+   - 实施状态：Android 已实施，`S1App.kt` 的 `NavHost` 转场全部为 None，回归测试 `TodayNavigationEntryLayoutTests` 要求 6 帧（约 100 ms）内到达。iOS 已于 2026-11-21 实施（S2-D15 第 2 项）：`NavigationStack` 的 path 写入统一走无动画事务，「‹ 返回」与编辑页返回统一走 `FCNavigation.pop`；边缘 / 内容右滑返回保留跟手，松手后由系统收尾；首次引导欢迎页的错峰出现不变，欢迎页进入编辑页按普通页面切换处理。
 
 ### 14.2 时长与曲线
 

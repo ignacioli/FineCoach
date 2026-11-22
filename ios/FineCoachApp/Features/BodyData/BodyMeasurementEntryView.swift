@@ -445,7 +445,7 @@ struct BodyMeasurementEntryView: View {
         }
         .onChange(of: viewModel.didDeleteMetric) { _, deleted in
             if deleted {
-                dismiss()
+                FCNavigation.pop(dismiss)
             }
         }
         .fcConfirmationDialog(isPresented: $viewModel.showingDeleteMetricConfirm) {
