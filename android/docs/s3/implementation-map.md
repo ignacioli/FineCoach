@@ -24,3 +24,19 @@
 | 身体数据 | 保存 | body-save | Room：同一学员、同一指标、同一本地自然日 upsert；内置单位先换成 kg/cm | body-save 与 platform-content 同宽 | BodyDataEntryLayoutTests.sameDayEditDeleteConfirmationAndDisplayUnitDoNotRewriteStorage；displayedUnitIsConvertedBeforeItIsStored |
 | 身体数据 | 删除 | body-delete-$id，确认 body-delete-accept / 取消 body-delete-cancel | 确认后 Room 删除并重算趋势；取消不删 | 删除按钮在记录行内 | BodyDataEntryLayoutTests.sameDayEditDeleteConfirmationAndDisplayUnitDoNotRewriteStorage |
 | 身体数据 | 单位 | body-unit-kg / body-unit-lb（或 cm / in） | 无，只改显示 | FcFilterChip | BodyDataEntryLayoutTests.sameDayEditDeleteConfirmationAndDisplayUnitDoNotRewriteStorage |
+| 今日 | 提示行 | insights.row.$snoozeKey | 无，进入课包、预填安排或该动作趋势 | 行 Column.fillMaxWidth，与 insight-parent 同宽 | InsightEntryLayoutTests.rowFillsWidthSnoozeUndoAndFullSwipeAndDisappearsAfterFourSeconds；threeDestinationsAndStudentDetailOmitsTheName |
+| 今日 | 全部 · N | today.insights.all | 无，进入完整列表 | FcGroupEntryRow.fillMaxWidth | InsightEntryLayoutTests.allEntryRendersFullListAndRowOpensPrefilledAppointment |
+| 今日 | 左滑暂不提醒 | insights.snooze.$snoozeKey；TalkBack 自定义操作「暂不提醒」 | 是，InsightLocalStateStore 写入不透明 key 和截止日 | 行 Column.fillMaxWidth | InsightEntryLayoutTests.rowFillsWidthSnoozeUndoAndFullSwipeAndDisappearsAfterFourSeconds |
+| 今日 | 撤销 | insights.undo.$snoozeKey-action | 是，删掉这条暂不提醒 | FcUndoRow.fillMaxWidth | InsightEntryLayoutTests.rowFillsWidthSnoozeUndoAndFullSwipeAndDisappearsAfterFourSeconds |
+| 今日 | 首次轻推 | insights.nudge.$snoozeKey（装饰胶囊对无障碍隐藏） | 是，每台设备把 firstNudgePlayed 写成 true；关闭动画时不写 | 行 Column.fillMaxWidth | InsightEntryLayoutTests.nudgePlaysOnceAndIsSkippedWhenMotionIsOff |
+| 完整列表 | 分组提示行 | insights.row.$snoozeKey | 无，与今日同一条跳转 | insights-list-content Column.fillMaxWidth | InsightEntryLayoutTests.allEntryRendersFullListAndRowOpensPrefilledAppointment |
+| 学员详情 | 提示行 | insights.row.$snoozeKey | 无，进入该动作趋势；主文字不带学员名 | studentDetail.insights Column.fillMaxWidth | InsightEntryLayoutTests.threeDestinationsAndStudentDetailOmitsTheName |
+| 学员详情 | 下一节课 | studentDetail.nextClass | 无；有课时打开与今日相同的课程操作，没有课时去预填安排 | StudentOverviewRow 与 platform-content 同宽 | InsightEntryLayoutTests.nextClassRowFillsWidthAndOpensTheScheduledClass |
+
+## R2 执行记录（2026-11-21）
+
+1. 分类：D；修复已批准 E-a1/E-a2/E-b/E-d 行语义与 4 秒撤销行为，复用 DS-SECTION、DS-UNDO-ROW；不增 token 或组件。
+2. 范围：InsightBoard/Copy/Rows、InsightUseCases、入口测试及两张核心屏 mapping；比较器按 S3-D17 传递画板高度。
+3. 保留 / 移除：保留原行结构、token、左滑与路由；移除 load 清空 pending、主线程文件读取、TalkBack 内部 phase、断言整包 JSON；新增剩余撤销时间及安全失败报告。
+4. 检查：入口测试 `allEntryRendersFullListAndRowOpensPrefilledAppointment` 真实渲染完整列表并点击行到预填新建安排；行宽与各自容器相等，Room 安排数不变。其余场景见 T040。
+5. 结果：学员详情严格全绿；今日「全部」行剩画板项，Phase 5 未完成；未在设备上验证，也未进行负责人视觉验收。完整门禁见 T045。
