@@ -10,7 +10,14 @@ Notable changes to FineCoach are recorded here. The format follows [Keep a Chang
 
 ### Changed
 
+- Switching between pages no longer plays a transition; you arrive on the target page directly. Swipe back still works.
 - Build configuration: version set to 0.3.0 (1) and the signing team switched to the paid Apple Developer Program team, in preparation for the first TestFlight upload. No product behavior changes.
+
+### Fixed
+
+- Editing "this and future" classes of a recurring series no longer re-creates classes that were already completed, cancelled, marked absent, in progress or detached; only the replaced dates are reissued.
+- The exercise library opens noticeably faster: fonts are cached and the list rows load lazily.
+- Rows in "Needs attention" use the approved vertical spacing.
 
 ## [0.2.0] - 2026-11-02
 
