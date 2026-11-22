@@ -4,7 +4,7 @@
     "page": "Foundations",
     "boardId": "75fbf40e-01d3-80a0-8008-f94160d2e1b6",
     "boardName": "S3 · 26 学员详情",
-    "exportedAt": "2026-11-19",
+    "exportedAt": "2026-11-21",
     "exporter": "penpot-mcp execute_code (host)",
     "units": "pt relative to board origin; PNG is 2x",
     "derivedFrom": {
@@ -15,7 +15,7 @@
     "png": "design/m1-b-hifi/screens/26-student-detail-s3.png",
     "pngPixels": [
       780,
-      2478
+      2486
     ],
     "status": "S3 T002 derived board, awaiting owner review"
   },
@@ -635,7 +635,7 @@
       "type": "text",
       "path": "45",
       "x": 16,
-      "y": 202.5,
+      "y": 272.5,
       "w": 247,
       "h": 24,
       "fill": "#211f1b",
@@ -650,7 +650,7 @@
       "type": "text",
       "path": "46",
       "x": 16,
-      "y": 230.5,
+      "y": 300.5,
       "w": 109,
       "h": 17,
       "fill": "#5c5a52",
@@ -675,7 +675,7 @@
       "type": "text",
       "path": "48",
       "x": 16,
-      "y": 272.5,
+      "y": 202.5,
       "w": 281,
       "h": 24,
       "fill": "#211f1b",
@@ -690,7 +690,7 @@
       "type": "text",
       "path": "49",
       "x": 16,
-      "y": 300.5,
+      "y": 230.5,
       "w": 73,
       "h": 17,
       "fill": "#5c5a52",
