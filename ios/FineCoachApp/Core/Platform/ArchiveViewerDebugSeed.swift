@@ -163,7 +163,10 @@ import Foundation
             }
             if ArchiveViewerDebugSeed.isRequested {
                 ArchiveViewerDebugSeed.install(into: archiveStore)
-            } else if ArchiveExportDebugSeed.isRequested || arguments.contains("-FineCoachSeedInProgressSession") {
+            } else if ArchiveExportDebugSeed.isRequested
+                || ArchiveExportDebugSeed.storeShotsRequested
+                || arguments.contains("-FineCoachSeedInProgressSession")
+            {
                 await applyUITestSeedingIfNeeded()
             }
         }

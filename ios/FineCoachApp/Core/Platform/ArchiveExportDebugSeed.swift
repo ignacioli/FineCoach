@@ -516,4 +516,172 @@ import os
             }
         }
     }
+
+    // MARK: App Store screenshot roster
+
+    /// DEBUG-only fictional roster used to capture the App Store screenshots. Launch with
+    /// `-FineCoachResetStore -FineCoachSeedStoreShots`. It lives in this file so it can reuse the
+    /// private seed clock and helpers. Today's classes start at 10:00 or later, so capture while the
+    /// device clock is earlier than that, otherwise Today shows them as overdue. All names are
+    /// synthetic. Not compiled into Release.
+    extension ArchiveExportDebugSeed {
+        static let storeShotsLaunchArgument = "-FineCoachSeedStoreShots"
+
+        static var storeShotsRequested: Bool {
+            ProcessInfo.processInfo.arguments.contains(storeShotsLaunchArgument)
+        }
+
+        private static let deadliftID = StableExerciseID(rawValue: "ee8e8db4-2d82-49e1-ab7f-891e9a354934")!
+        private static let overheadID = StableExerciseID(rawValue: "8b0a0371-c0a9-42a7-aab7-68d520542fb2")!
+        private static let pulldownID = StableExerciseID(rawValue: "55b9d286-c4cc-4a29-97ad-58cb13c2bb7e")!
+        private static let rowID = StableExerciseID(rawValue: "4af6dbd9-8991-484b-9810-68f117c21edf")!
+        private static let legPressID = StableExerciseID(rawValue: "66a42396-c207-44da-bc75-758a89d32404")!
+        private static let romanianID = StableExerciseID(rawValue: "2e7ffff9-e603-4b28-98c8-31d1a6ce8cd9")!
+
+        @MainActor
+        @discardableResult
+        static func seedStoreShots(in environment: AppEnvironment) async -> Bool {
+            guard let students = environment.studentUseCases,
+                let sessions = environment.sessionUseCases,
+                let exercises = environment.exerciseUseCases,
+                let body = environment.bodyDataUseCases,
+                let appointments = environment.appointmentUseCases,
+                let credits = environment.creditLedgerUseCases
+            else { return false }
+            defer { setDaysAgo(0) }
+            do {
+                if try await !students.searchActive(query: "").isEmpty {
+                    try await students.completeOnboarding()
+                    return true
+                }
+                try await students.completeOnboarding()
+                try await exercises.seedIfNeeded()
+                let calendar = Calendar.current
+                let today = appointments.todayLocalDate()
+
+                // (exercise, base weight in kg) per session; weights climb each week.
+                func session(
+                    _ student: StableUUID, daysAgo: Int, _ plan: [(StableExerciseID, Int)]
+                ) async throws -> Session {
+                    setDaysAgo(daysAgo)
+                    let active = try await sessions.startOrOpen(studentID: student)
+                    for (exerciseID, base) in plan {
+                        let updated = try await sessions.addCatalogExercise(
+                            sessionID: active.id, itemID: exerciseID)
+                        try await recordSets(updated, base: base, using: sessions)
+                    }
+                    return try await sessions.finish(sessionID: active.id)
+                }
+
+                // 林晓峰: twelve weekly sessions, the last four booked and charged against a package.
+                let main = try await students.create(
+                    draft: StudentDraft(displayName: "林晓峰", sex: .male, trainingGoal: "增肌，力量提升"))
+                let mainPackage = try await credits.createActivePackage(
+                    studentID: main.id, name: "私教 24 次卡", totalCredits: 24, startDate: nil, endDate: nil)
+                for week in 0..<8 {
+                    let upper = week % 2 == 0
+                    _ = try await session(
+                        main.id, daysAgo: 84 - week * 7,
+                        upper
+                            ? [(benchID, 50 + week * 2), (overheadID, 30 + week), (pulldownID, 40 + week * 2)]
+                            : [(squatID, 60 + week * 3), (deadliftID, 70 + week * 3)])
+                }
+                for (index, daysAgo) in [21, 14, 7, 3].enumerated() {
+                    setDaysAgo(daysAgo)
+                    let booked = try await appointments.createSingle(
+                        studentID: main.id, date: today.addingDays(-daysAgo, calendar: calendar),
+                        startTime: LocalTime(hour: 19, minute: 0), reminderEnabled: false,
+                        reminderLeadMinutes: nil, overrideConflict: true)
+                    _ = try await appointments.startTraining(appointmentID: booked.id)
+                    let done = try await trainedSession(
+                        studentID: main.id,
+                        exercises: index % 2 == 0 ? [benchID, inclineID] : [squatID, deadliftID],
+                        base: 62 + index * 4, using: sessions)
+                    _ = try await appointments.completeSession(appointmentID: booked.id)
+                    try await credits.debitOnSessionComplete(packageID: mainPackage.id, sessionID: done.id)
+                }
+                setDaysAgo(0)
+                for (days, value) in [(60, "76.8"), (45, "76.1"), (30, "75.6"), (15, "75.0"), (2, "74.5")] {
+                    try await body.recordMeasurement(
+                        studentID: main.id, metricID: BuiltInBodyMetric.weight.id,
+                        value: value, enteredUnit: "kg", at: Date().addingTimeInterval(-Double(days) * 86_400))
+                }
+                for (days, value) in [(60, "19.5"), (30, "18.6"), (2, "17.8")] {
+                    try await body.recordMeasurement(
+                        studentID: main.id, metricID: BuiltInBodyMetric.bodyFatPercent.id,
+                        value: value, enteredUnit: "%", at: Date().addingTimeInterval(-Double(days) * 86_400))
+                }
+
+                // Other students, each trained within the last two weeks with a healthy package.
+                let roster: [(String, StudentSex, String, Int, [(Int, [(StableExerciseID, Int)])])] = [
+                    (
+                        "陈佳宁", .female, "减脂塑形", 10,
+                        [
+                            (35, [(squatID, 30)]), (28, [(legPressID, 60)]), (21, [(romanianID, 35)]),
+                            (14, [(squatID, 36)]), (8, [(legPressID, 72), (pulldownID, 30)]),
+                        ]
+                    ),
+                    (
+                        "苏明哲", .male, "体态改善", 12,
+                        [(24, [(rowID, 40)]), (17, [(pulldownID, 45)]), (10, [(rowID, 46)])]
+                    ),
+                    (
+                        "周雨桐", .female, "提升体能", 8,
+                        [(13, [(legPressID, 50)]), (6, [(pulldownID, 28), (romanianID, 30)])]
+                    ),
+                    ("何嘉伟", .male, "增肌", 6, [(3, [(benchID, 45), (overheadID, 28)])]),
+                ]
+                var rosterIDs: [StableUUID] = []
+                for (name, sex, goal, total, history) in roster {
+                    let student = try await students.create(
+                        draft: StudentDraft(displayName: name, sex: sex, trainingGoal: goal))
+                    _ = try await credits.createActivePackage(
+                        studentID: student.id, name: nil, totalCredits: total, startDate: nil, endDate: nil)
+                    for (daysAgo, plan) in history {
+                        _ = try await session(student.id, daysAgo: daysAgo, plan)
+                    }
+                    rosterIDs.append(student.id)
+                }
+                setDaysAgo(0)
+
+                // Today (10:00 onwards) and the rest of the week.
+                let todayPlan: [(Int, Int, Int)] = [(10, 0, 0), (11, 30, 1), (14, 0, 2), (16, 0, 3), (18, 30, 4)]
+                let everyone = [main.id] + rosterIDs
+                for (hour, minute, who) in todayPlan {
+                    _ = try await appointments.createSingle(
+                        studentID: everyone[who], date: today,
+                        startTime: LocalTime(hour: hour, minute: minute), reminderEnabled: false,
+                        reminderLeadMinutes: nil, overrideConflict: true)
+                }
+                let week: [(Int, Int, Int, Int)] = [
+                    (1, 9, 0, 1), (1, 15, 0, 0), (2, 10, 0, 2), (2, 17, 0, 4), (3, 9, 30, 0),
+                    (3, 14, 0, 3), (4, 10, 0, 1), (4, 18, 0, 2), (5, 9, 0, 4), (5, 11, 0, 0),
+                ]
+                for (offset, hour, minute, who) in week {
+                    _ = try await appointments.createSingle(
+                        studentID: everyone[who], date: today.addingDays(offset, calendar: calendar),
+                        startTime: LocalTime(hour: hour, minute: minute), reminderEnabled: false,
+                        reminderLeadMinutes: nil, overrideConflict: true)
+                }
+
+                // A session in progress for the training screenshot: two exercises confirmed, one
+                // set still pending.
+                let live = try await sessions.startOrOpen(studentID: main.id)
+                let bench = try await sessions.addCatalogExercise(sessionID: live.id, itemID: benchID)
+                try await recordSets(bench, base: 72, using: sessions)
+                let incline = try await sessions.addCatalogExercise(sessionID: live.id, itemID: inclineID)
+                try await recordSets(incline, base: 58, using: sessions)
+                if let exerciseID = incline.exercises.last?.id {
+                    _ = try await sessions.addSet(
+                        sessionID: live.id, exerciseID: exerciseID,
+                        input: TrainingSetInput(
+                            recordMode: .weightReps, weightValue: "62", repetitionCount: "8",
+                            unit: .kilograms))
+                }
+                return true
+            } catch {
+                return false
+            }
+        }
+    }
 #endif
