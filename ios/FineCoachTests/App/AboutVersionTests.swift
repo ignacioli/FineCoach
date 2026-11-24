@@ -11,7 +11,7 @@ final class AboutVersionTests: XCTestCase {
         // the app bundle rather than the .xctest bundle.
         XCTAssertEqual(Bundle.main.bundleIdentifier, "com.finecoach.app")
         XCTAssertEqual(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String, "1.0.0")
-        XCTAssertEqual(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String, "3")
+        XCTAssertEqual(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String, "4")
     }
 
     func testSourceCodeURLPointsAtThePublicRepository() {
