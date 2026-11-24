@@ -614,16 +614,24 @@ import os
 
                 // Other students, each trained within the last two weeks with a healthy package.
                 let roster: [(String, StudentSex, String, Int, [(Int, [(StableExerciseID, Int)])])] = [
-                    ("陈佳宁", .female, "减脂塑形", 10,
-                        [(35, [(squatID, 30)]), (28, [(legPressID, 60)]), (21, [(romanianID, 35)]),
-                         (14, [(squatID, 36)]), (8, [(legPressID, 72), (pulldownID, 30)])]),
-                    ("苏明哲", .male, "体态改善", 12,
-                        [(24, [(rowID, 40)]), (17, [(pulldownID, 45)]), (10, [(rowID, 46)])]),
-                    ("周雨桐", .female, "提升体能", 8,
-                        [(13, [(legPressID, 50)]), (6, [(pulldownID, 28), (romanianID, 30)])]),
+                    (
+                        "陈佳宁", .female, "减脂塑形", 10,
+                        [
+                            (35, [(squatID, 30)]), (28, [(legPressID, 60)]), (21, [(romanianID, 35)]),
+                            (14, [(squatID, 36)]), (8, [(legPressID, 72), (pulldownID, 30)]),
+                        ]
+                    ),
+                    (
+                        "苏明哲", .male, "体态改善", 12,
+                        [(24, [(rowID, 40)]), (17, [(pulldownID, 45)]), (10, [(rowID, 46)])]
+                    ),
+                    (
+                        "周雨桐", .female, "提升体能", 8,
+                        [(13, [(legPressID, 50)]), (6, [(pulldownID, 28), (romanianID, 30)])]
+                    ),
                     ("何嘉伟", .male, "增肌", 6, [(3, [(benchID, 45), (overheadID, 28)])]),
                 ]
-                var roster_ids: [StableUUID] = []
+                var rosterIDs: [StableUUID] = []
                 for (name, sex, goal, total, history) in roster {
                     let student = try await students.create(
                         draft: StudentDraft(displayName: name, sex: sex, trainingGoal: goal))
@@ -632,13 +640,13 @@ import os
                     for (daysAgo, plan) in history {
                         _ = try await session(student.id, daysAgo: daysAgo, plan)
                     }
-                    roster_ids.append(student.id)
+                    rosterIDs.append(student.id)
                 }
                 setDaysAgo(0)
 
                 // Today (10:00 onwards) and the rest of the week.
                 let todayPlan: [(Int, Int, Int)] = [(10, 0, 0), (11, 30, 1), (14, 0, 2), (16, 0, 3), (18, 30, 4)]
-                let everyone = [main.id] + roster_ids
+                let everyone = [main.id] + rosterIDs
                 for (hour, minute, who) in todayPlan {
                     _ = try await appointments.createSingle(
                         studentID: everyone[who], date: today,
