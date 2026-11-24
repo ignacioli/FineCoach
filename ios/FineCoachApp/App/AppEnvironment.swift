@@ -632,6 +632,7 @@ public final class AppEnvironment: ObservableObject {
             return try AppEnvironment(
                 rootURL: root,
                 clock: ArchiveExportDebugSeed.isRequested || ArchiveExportDebugSeed.insightsRequested
+                    || ArchiveExportDebugSeed.storeShotsRequested
                     ? ArchiveExportDebugSeed.makeClock() : SystemClock()
             )
         }
@@ -640,6 +641,10 @@ public final class AppEnvironment: ObservableObject {
             let arguments = ProcessInfo.processInfo.arguments
             if ArchiveExportDebugSeed.insightsRequested {
                 await ArchiveExportDebugSeed.seedInsightsDemo(in: self)
+                return
+            }
+            if ArchiveExportDebugSeed.storeShotsRequested {
+                await ArchiveExportDebugSeed.seedStoreShots(in: self)
                 return
             }
             if ArchiveExportDebugSeed.isRequested {
