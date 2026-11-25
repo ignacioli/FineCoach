@@ -4,6 +4,10 @@ Notable changes to FineCoach are recorded here. The format follows [Keep a Chang
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-25
+
+First App Store release (Simplified Chinese only; English follows in 1.1). Builds 0.3.0 (1) and (2) went to TestFlight only and were never tagged, so their changes are included here.
+
 ### Added
 
 - About page in Settings now lists the exercise catalog's sources and licenses (counted from `provenance.json`) and the Noto Sans SC font license, with links to the licenses. The student archive viewer no longer shows the same license twice.
@@ -11,7 +15,7 @@ Notable changes to FineCoach are recorded here. The format follows [Keep a Chang
 ### Changed
 
 - Switching between pages no longer plays a transition; you arrive on the target page directly. Swipe back still works.
-- Build configuration: version set to 0.3.0 (1) and the signing team switched to the paid Apple Developer Program team, in preparation for the first TestFlight upload. No product behavior changes.
+- Build configuration: the signing team switched to the paid Apple Developer Program team, and the version is 1.0.0 (4) for the App Store. The backup and archive document types declare `LSSupportsOpeningDocumentsInPlace = NO`, which matches how files are already opened (copied through security-scoped access). No product behavior changes.
 
 ### Fixed
 
@@ -94,5 +98,6 @@ Label added retroactively for the M1 and M2 milestones. These builds carried no 
   - a separate read-only student view imports and browses it offline, with search and filters;
   - first-launch choice between the coach view and the student view.
 
-[Unreleased]: https://github.com/ignacioli/FineCoach/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/ignacioli/FineCoach/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/ignacioli/FineCoach/compare/v0.2.0...v1.0.0
 [0.2.0]: https://github.com/ignacioli/FineCoach/releases/tag/v0.2.0
