@@ -8,12 +8,20 @@ import com.ignacioli.finecoach.core.application.BodyDataUseCases
 import com.ignacioli.finecoach.core.domain.body.*
 import com.ignacioli.finecoach.core.domain.common.StudentID
 import com.ignacioli.finecoach.core.domain.progress.Comparison
-import com.ignacioli.finecoach.features.trends.FcTrendChart
+import com.ignacioli.finecoach.core.application.StudentUseCases
 import java.util.UUID
+import com.ignacioli.finecoach.storage.local.BodyDataUnitPreferences
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-data class BodyRow(val metric: BodyMetricDefinition, val latest: BodyMeasurement?, val shown: String)
+data class BodyRow(val metric: BodyMetricDefinition, val latest: BodyMeasurement?, val value: String, val unit: String) { val shown get() = "$value $unit" }
 
-class BodyDataState(val studentID: StudentID, private val useCases: BodyDataUseCases) {
+class BodyDataState(val studentID: StudentID, private val useCases: BodyDataUseCases,
+    private val unitPreferences: BodyDataUnitPreferences = BodyDataUnitPreferences(),
+    private val students: StudentUseCases? = null) {
+    private var units = BodyDataUnitPreferences.Units()
+    var studentName by mutableStateOf(""); private set
+    val unitSummary get() = "单位 · ${units.weight} / ${units.length}"
     var rows by mutableStateOf<List<BodyRow>>(emptyList()); private set
     var history by mutableStateOf<List<BodyMeasurement>>(emptyList()); private set
     var selected by mutableStateOf<BodyMetricDefinition?>(null); private set
@@ -25,6 +33,12 @@ class BodyDataState(val studentID: StudentID, private val useCases: BodyDataUseC
 
     suspend fun load() {
         busy = true
+        students?.let { cases ->
+            when (val result = cases.displayNames(setOf(studentID))) {
+                is ApplicationResult.Success -> studentName = result.value[studentID].orEmpty()
+                is ApplicationResult.Failure -> { error = true; busy = false; return }
+            }
+        }
         val metrics = when (val result = useCases.metrics(studentID)) {
             is ApplicationResult.Failure -> { error = true; busy = false; return }
             is ApplicationResult.Success -> result.value.filter { it.lifecycle == BodyMetricLifecycle.active }
@@ -34,7 +48,8 @@ class BodyDataState(val studentID: StudentID, private val useCases: BodyDataUseC
             is ApplicationResult.Success -> result.value
         }
         error = false
-        rows = metrics.map { metric -> BodyRow(metric, latest[metric.id], display(metric, latest[metric.id])) }
+        units = withContext(Dispatchers.IO) { unitPreferences.read() }
+        rows = metrics.map { metric -> row(metric, latest[metric.id]) }
         selected?.let { open(it.id) }
         busy = false
     }
@@ -42,7 +57,8 @@ class BodyDataState(val studentID: StudentID, private val useCases: BodyDataUseC
     suspend fun open(id: UUID) {
         val metric = rows.firstOrNull { it.metric.id == id }?.metric ?: return
         selected = metric
-        displayUnit = metric.currentUnit
+        units = withContext(Dispatchers.IO) { unitPreferences.read() }
+        displayUnit = preferredUnit(metric)
         draft = ""
         history = when (val result = useCases.history(studentID, id)) {
             is ApplicationResult.Failure -> { error = true; emptyList() }
@@ -52,12 +68,25 @@ class BodyDataState(val studentID: StudentID, private val useCases: BodyDataUseC
 
     fun close() { selected = null; pendingDelete = null }
 
-    /** Display-only. Stored measurements keep the unit they were entered with. */
-    fun showUnit(unit: String) {
+    /** Display-only; publish the choice only after the local preference is durable. */
+    suspend fun showUnit(unit: String) {
         val metric = selected ?: return
         if (metric.kind == BodyMetricKind.custom) return
+        val result = withContext(Dispatchers.IO) {
+            when (metric.unitRuleKind) {
+                BodyMetricUnitRuleKind.weight -> unitPreferences.saveWeight(unit)
+                BodyMetricUnitRuleKind.length -> unitPreferences.saveLength(unit)
+                else -> ApplicationResult.Failure(com.ignacioli.finecoach.core.application.ApplicationError(
+                    com.ignacioli.finecoach.core.application.ApplicationErrorCode.incompatibleInput))
+            }
+        }
+        when (result) {
+            is ApplicationResult.Failure -> { error = true; return }
+            is ApplicationResult.Success -> units = result.value
+        }
+        error = false
         displayUnit = unit
-        rows = rows.map { row -> if (row.metric.id == metric.id) row.copy(shown = display(row.metric, row.latest)) else row }
+        rows = rows.map { row -> row(row.metric, row.latest) }
     }
 
     suspend fun save() {
@@ -108,12 +137,33 @@ class BodyDataState(val studentID: StudentID, private val useCases: BodyDataUseC
         shownValue(selected, measurement, unit).toFloat()
     }
 
+    fun chartSamples(): List<com.ignacioli.finecoach.features.trends.TrendChartSample> = history.map { measurement ->
+        val metric = selected
+        val unit = if (metric?.kind == BodyMetricKind.custom) measurement.enteredUnit else displayUnit ?: measurement.enteredUnit
+        val day = measurement.localCalendarDay
+        com.ignacioli.finecoach.features.trends.TrendChartSample("${day.monthValue}月${day.dayOfMonth}日",
+            shownValue(metric, measurement, unit), unit, metric?.kind == BodyMetricKind.custom)
+    }
+
     fun density() = when (history.size) { 0 -> Comparison.TrendSampleDensity.empty; 1 -> Comparison.TrendSampleDensity.single; 2 -> Comparison.TrendSampleDensity.sparse; else -> Comparison.TrendSampleDensity.sufficient }
 
-    private fun display(metric: BodyMetricDefinition, measurement: BodyMeasurement?): String {
-        measurement ?: return "还没有记录"
-        val unit = if (metric.id == selected?.id) displayUnit ?: metric.currentUnit else metric.currentUnit
-        return format(shownValue(metric, measurement, unit), unit)
+    private fun row(metric: BodyMetricDefinition, measurement: BodyMeasurement?): BodyRow {
+        val unit = if (metric.kind == BodyMetricKind.custom) measurement?.enteredUnit ?: metric.currentUnit else preferredUnit(metric)
+        return BodyRow(metric, measurement, measurement?.let {
+            BodyDataDisplay.format(shownValue(metric, it, unit), unit, metric.kind == BodyMetricKind.custom)
+        } ?: "—", unit)
+    }
+
+    fun measurementLabel(measurement: BodyMeasurement): String {
+        val metric = selected ?: return "—"
+        return row(metric, measurement).shown
+    }
+
+    private fun preferredUnit(metric: BodyMetricDefinition) = when {
+        metric.kind == BodyMetricKind.custom -> metric.currentUnit
+        metric.unitRuleKind == BodyMetricUnitRuleKind.weight -> units.weight
+        metric.unitRuleKind == BodyMetricUnitRuleKind.length -> units.length
+        else -> metric.currentUnit
     }
 
     private fun shownValue(metric: BodyMetricDefinition?, measurement: BodyMeasurement, unit: String): java.math.BigDecimal {
@@ -127,7 +177,6 @@ class BodyDataState(val studentID: StudentID, private val useCases: BodyDataUseC
         } catch (_: IllegalArgumentException) { measurement.value.decimal }
     }
 
-    private fun format(value: java.math.BigDecimal, unit: String) = "${value.stripTrailingZeros().toPlainString()} $unit"
     private fun BodyMetricDefinition.canonicalUnit() = when (unitRuleKind) {
         BodyMetricUnitRuleKind.weight -> "kg"
         BodyMetricUnitRuleKind.percent -> "%"

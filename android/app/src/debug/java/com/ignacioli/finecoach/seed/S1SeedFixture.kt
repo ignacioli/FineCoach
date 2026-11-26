@@ -6,7 +6,7 @@ import org.json.JSONObject
 import java.time.Instant
 import java.util.UUID
 
-/** JSON is the data authority. Unknown fields fail closed instead of silently ignoring fixture edits. */
+/** Base JSON plus the debug-only S3 extension; unknown fields fail closed. */
 internal class S1SeedFixture private constructor(val json: JSONObject) {
     val version get() = json.getInt("seedVersion")
     val dataset get() = json.getString("dataset")
@@ -18,7 +18,7 @@ internal class S1SeedFixture private constructor(val json: JSONObject) {
 
     companion object {
         const val PATH = "seed/s1-seed.json"
-        fun read(context: Context) = decode(context.assets.open(PATH).bufferedReader().use { it.readText() })
+        fun read(context: Context) = decode(S3SeedFixture.extend(context.assets.open(PATH).bufferedReader().use { it.readText() }))
         fun decode(text: String): S1SeedFixture {
             val root = JSONObject(text)
             root.keysOnly("declaration source seedVersion dataset clockUTC uuidPrefix generatedIDStart catalogCount expectedRows scenarios students packages sessions ledger templates appointments")

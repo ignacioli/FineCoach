@@ -121,8 +121,8 @@ object InsightRoutes {
     const val LIST = "insights"
     const val TREND = "students/{studentID}/trends/{exerciseID}"
     const val APPOINTMENT = "appointments/create/{date}/student/{studentID}"
-    fun trend(studentID: StudentID, exerciseID: StableExerciseID) = "students/${studentID.value}/trends/${exerciseID.value}"
-    fun appointment(date: LocalDate, studentID: StudentID) = "appointments/create/$date/student/${studentID.value}"
+    fun trend(studentID: StudentID, exerciseID: StableExerciseID) = com.ignacioli.finecoach.navigation.S1Routes.insightTrend(studentID, exerciseID)
+    fun appointment(date: LocalDate, studentID: StudentID) = com.ignacioli.finecoach.navigation.S1Routes.insightAppointment(date, studentID)
 }
 
 fun insightDestination(insight: Insight, today: LocalDate): String? = when (insight.kind) {

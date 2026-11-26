@@ -1,3 +1,4 @@
+// fictional-data: design contrast constants only; no business content.
 package com.ignacioli.finecoach
 
 import androidx.compose.ui.graphics.Color
@@ -32,6 +33,7 @@ class ContrastTests {
         if (threshold != null) assertTrue("$foreground on $background: $ratio < $threshold", ratio >= threshold)
     }
 
+    @Test fun chartLineOnPage() = verify("chart.line", "surface.page", 4.93, 3.0)
     @Test fun textPrimaryOnPage() = verify("text.primary", "surface.page", 16.45, 4.5)
     @Test fun textSecondaryOnPage() = verify("text.secondary", "surface.page", 6.91, 4.5)
     @Test fun actionPrimaryOnPage() = verify("action.primary", "surface.page", 14.74, 4.5)

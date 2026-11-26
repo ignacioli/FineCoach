@@ -3,7 +3,7 @@ package com.ignacioli.finecoach.features.trends
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -19,6 +19,7 @@ fun TrendsScreen(state: TrendsState, onBack: () -> Unit) {
             if (state.error) FcText("加载失败，请返回重试", Modifier.testTag("trends-error"), style = FcTypography.caption, color = FcColors.statusDestructive)
             if (content == null && state.busy) FcText("正在加载", Modifier.testTag("trends-loading"), style = FcTypography.caption, color = FcColors.textSecondary)
             content?.let { page ->
+                var inspecting by remember(page) { mutableStateOf(false) }
                 val dateDrop = FcSpacing.space1 / 2
                 Column(Modifier.fillMaxWidth()) {
                     FcListRowDivider(Modifier.testTag("conformance:Divider"))
@@ -50,9 +51,9 @@ fun TrendsScreen(state: TrendsState, onBack: () -> Unit) {
                     else -> Column(verticalArrangement = Arrangement.spacedBy(FcSpacing.space2 + FcSpacing.space1 + dateDrop)) {
                         Box(Modifier.fillMaxWidth().height(FcSpacing.space8 * 4 + FcSpacing.space3 + dateDrop).testTag("trends-chart-block")) {
                             Box(Modifier.fillMaxSize().padding(top = FcSpacing.space4, bottom = FcSpacing.space4 + FcSpacing.space1 + dateDrop)) {
-                                FcTrendChart(page.values, page.dashed, Modifier.fillMaxSize(), page.chartX)
+                                FcTrendChart(page.values, page.dashed, Modifier.fillMaxSize(), page.chartX, page.chartSamples) { inspecting = it }
                             }
-                            page.maxLabel?.let { FcText(it, Modifier.align(Alignment.TopStart).testTag("trends-max"), style = FcTypography.caption, color = FcColors.textSecondary) }
+                            page.maxLabel?.takeUnless { inspecting }?.let { FcText(it, Modifier.align(Alignment.TopStart).testTag("trends-max"), style = FcTypography.caption, color = FcColors.textSecondary) }
                             Row(Modifier.fillMaxWidth().align(Alignment.BottomCenter)) {
                                 page.firstDate?.let { FcText(it, style = FcTypography.caption, color = FcColors.textSecondary) }
                                 Spacer(Modifier.weight(1f))

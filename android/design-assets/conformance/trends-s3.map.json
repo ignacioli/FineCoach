@@ -6,7 +6,8 @@
   "viewport": { "widthDp": 390, "heightDp": 900, "density": 2, "fontScale": 1, "locale": "zh-CN" },
   "elements": [
     { "path": "11/1", "tag": "conformance:svg-line", "source": "1pt surface.divider along the plot bottom; the hairline box stands in for the path." },
-    { "path": "11/2", "tag": "conformance:svg-polyline", "source": "Canvas path bounds; the stroke itself is not a semantics node." },
+    { "path": "11/2", "tag": "conformance:area-fill", "source": "S3-D24 Canvas fill region: plot left to latest point, curve top to baseline; logical 8% chart.line, effective 8-bit alpha 20/255." },
+    { "path": "11/3", "tag": "conformance:svg-polyline", "source": "Canvas path bounds; the stroke itself is not a semantics node." },
     { "path": "12", "ownerException": { "decision": "S3-D12", "reason": "字体光栅宽度：样式与画板一致（13/400/1.3，字距 0），Android 每个日期窄约 2dp，左右两端对齐使间距 +4", "checks": ["GAP"], "maxDeltaDp": 4 } },
     { "path": "13", "ownerException": { "decision": "S3-D12", "reason": "字体光栅宽度：样式与画板一致（13/400/1.3，字距 0），Android 每个日期窄约 2dp，左右两端对齐使间距 +4", "checks": ["GAP"], "maxDeltaDp": 4 } }
   ]

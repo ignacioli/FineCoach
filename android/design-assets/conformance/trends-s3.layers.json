@@ -4,7 +4,7 @@
     "page": "M2 G7 Design",
     "boardId": "75fbf40e-01d3-80a0-8008-f94183e294e1",
     "boardName": "S3 · 训练趋势",
-    "exportedAt": "2026-11-20",
+    "exportedAt": "2026-11-26",
     "exporter": "penpot-mcp execute_code (host)",
     "units": "pt relative to board origin; PNG is 2x",
     "derivedFrom": {
@@ -17,7 +17,7 @@
       780,
       1800
     ],
-    "status": "S3 T002 derived board; S3-D08 text format aligned to app (×N, N 分) and fixed-width text frames set to auto-width; S3-D09 segmented labels centered in 50pt DS-SEGMENTED boxes, selected pill = text + 2×space.2"
+    "status": "S3 T002 derived board; S3-D08 text format aligned to app (×N, N 分) and fixed-width text frames set to auto-width; S3-D09 segmented labels centered in 50pt DS-SEGMENTED boxes, selected pill = text + 2×space.2; S3-D23 owner-approved teal and 8% area fill; S3-D24 area under polyline, explicit white base and effective 8-bit opacity"
   },
   "board": {
     "w": 390.00000953674316,
@@ -191,7 +191,8 @@
       "x": 16,
       "y": 246,
       "w": 358,
-      "h": 104
+      "h": 104,
+      "fill": "#ffffff"
     },
     {
       "name": "svg-line",
@@ -203,9 +204,22 @@
       "h": 0.01
     },
     {
-      "name": "svg-polyline",
+      "name": "area-fill",
       "type": "path",
       "path": "11/2",
+      "x": 16,
+      "y": 254,
+      "w": 340,
+      "h": 96,
+      "fill": "#2e7d6b",
+      "fillOpacity": 0.0784313725490196,
+      "sourceFillOpacity": 0.08,
+      "opacityEncoding": "S3-D24: logical 8%; effective 8-bit raster alpha 20/255 matching approved Penpot PNG"
+    },
+    {
+      "name": "svg-polyline",
+      "type": "path",
+      "path": "11/3",
       "x": 16,
       "y": 254,
       "w": 340,
@@ -214,72 +228,72 @@
     {
       "name": "svg-circle",
       "type": "ellipse",
-      "path": "11/3",
+      "path": "11/4",
       "x": 16,
       "y": 322,
       "w": 8,
       "h": 8,
-      "fill": "#2a2822"
-    },
-    {
-      "name": "svg-circle",
-      "type": "ellipse",
-      "path": "11/4",
-      "x": 72,
-      "y": 310,
-      "w": 8,
-      "h": 8,
-      "fill": "#2a2822"
+      "fill": "#2e7d6b"
     },
     {
       "name": "svg-circle",
       "type": "ellipse",
       "path": "11/5",
-      "x": 132,
-      "y": 306,
+      "x": 72,
+      "y": 310,
       "w": 8,
       "h": 8,
-      "fill": "#2a2822"
+      "fill": "#2e7d6b"
     },
     {
       "name": "svg-circle",
       "type": "ellipse",
       "path": "11/6",
-      "x": 192,
-      "y": 286,
+      "x": 132,
+      "y": 306,
       "w": 8,
       "h": 8,
-      "fill": "#2a2822"
+      "fill": "#2e7d6b"
     },
     {
       "name": "svg-circle",
       "type": "ellipse",
       "path": "11/7",
-      "x": 252,
-      "y": 274,
+      "x": 192,
+      "y": 286,
       "w": 8,
       "h": 8,
-      "fill": "#2a2822"
+      "fill": "#2e7d6b"
     },
     {
       "name": "svg-circle",
       "type": "ellipse",
       "path": "11/8",
-      "x": 312,
-      "y": 256,
+      "x": 252,
+      "y": 274,
       "w": 8,
       "h": 8,
-      "fill": "#2a2822"
+      "fill": "#2e7d6b"
     },
     {
       "name": "svg-circle",
       "type": "ellipse",
       "path": "11/9",
+      "x": 312,
+      "y": 256,
+      "w": 8,
+      "h": 8,
+      "fill": "#2e7d6b"
+    },
+    {
+      "name": "svg-circle",
+      "type": "ellipse",
+      "path": "11/10",
       "x": 352,
       "y": 250,
       "w": 8,
       "h": 8,
-      "fill": "#2a2822"
+      "fill": "#2e7d6b"
     },
     {
       "name": "8月7日",

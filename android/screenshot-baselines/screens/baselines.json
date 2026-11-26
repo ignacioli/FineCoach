@@ -71,6 +71,27 @@
       "sha256": "3ec46d5f2605460703fbfc8dfaa3908074d2e38cd73cf7eb43e436933035e828",
       "approvedAt": "2026-11-19",
       "decision": "S2-D24"
+    },
+    {
+      "id": "trends-s3",
+      "png": "trends-s3.png",
+      "sha256": "7cba6e19d4ba9258678d483af8aea8f4163ae1cbfe099786e5475c926d59dcba",
+      "approvedAt": "2026-11-26",
+      "decision": "S3-D25"
+    },
+    {
+      "id": "01-today-s3",
+      "png": "01-today-s3.png",
+      "sha256": "1196b169470ed9ad8cdf4bffc3a4b5520006bc18b8c5c4feb938712db50ea6ea",
+      "approvedAt": "2026-11-26",
+      "decision": "S3-D25"
+    },
+    {
+      "id": "26-student-detail-s3",
+      "png": "26-student-detail-s3.png",
+      "sha256": "bf38a26bba84b83708a2f82c8c0bdaef75aacf24d765cbee44698a1e9af33043",
+      "approvedAt": "2026-11-26",
+      "decision": "S3-D25"
     }
   ]
 }

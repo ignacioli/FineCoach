@@ -49,6 +49,7 @@ class BodyDataEntryLayoutTests {
             check(stored.single().value.canonicalString == "71") { "edited record was not stored" }
         }
         node("body-unit-lb").assertIsDisplayed().assertHasClickAction().performClick()
+        compose.waitUntil(15_000) { state.displayUnit == "lb" && state.rows.first { it.metric.id == metric }.shown.endsWith(" lb") }
         f.test {
             val stored = (cases.history(f.studentID, metric) as com.ignacioli.finecoach.core.application.ApplicationResult.Success).value.single()
             check(stored.enteredUnit == "kg") { "unit switch changed storage" }
@@ -76,6 +77,7 @@ class BodyDataEntryLayoutTests {
         compose.setContent { FineCoachTheme { BodyDataScreen(state) {} } }
         compose.waitUntil(15_000) { exists("body-unit-lb") }
         node("body-unit-lb").assertIsDisplayed().performClick()
+        compose.waitUntil(15_000) { state.displayUnit == "lb" }
         node("body-value").assertIsDisplayed()
         check(compose.onAllNodesWithText("lb", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty()) { "entry unit is not visible" }
         node("body-value").performTextInput("150")
@@ -89,6 +91,7 @@ class BodyDataEntryLayoutTests {
             check(stored.value.canonicalString == expected.canonicalString) { "built-in weight kept the displayed number" }
         }
         node("body-unit-kg").performClick()
+        compose.waitUntil(15_000) { state.displayUnit == "kg" && state.rows.first { it.metric.id == metric }.shown.endsWith(" kg") }
         f.test {
             val stored = (cases.history(f.studentID, metric) as com.ignacioli.finecoach.core.application.ApplicationResult.Success).value.single()
             check(stored.enteredUnit == "kg") { "switching the display unit rewrote storage" }
@@ -98,15 +101,26 @@ class BodyDataEntryLayoutTests {
 
     @Test fun openMetricAndSaveCustomMetricFromVisibleControls() {
         val cases = BodyDataUseCases(BodyDataRepository(f.db, f.clock), f.clock, f.zone) { UUID.randomUUID() }
-        val state = BodyDataState(f.studentID, cases)
+        val state = BodyDataState(f.studentID, cases, students = com.ignacioli.finecoach.core.application.StudentUseCases(com.ignacioli.finecoach.storage.repository.StudentRepository(f.db, f.clock), f.clock, f.ids))
         f.test { state.load() }
         compose.setContent { FineCoachTheme { BodyDataScreen(state) {} } }
         compose.waitUntil(15_000) { state.rows.isNotEmpty() }
-        val metric = state.rows.first().metric.id
+        node("body-student").assertIsDisplayed()
+        check(node("body-student").fetchSemanticsNode().config[androidx.compose.ui.semantics.SemanticsProperties.Text].joinToString("") { it.text } == state.studentName && state.studentName.isNotEmpty()) { "Student caption mismatch" }
+        node("body-unit-summary").assertIsDisplayed().assertTextEquals("单位 · kg / cm")
+            .assert(SemanticsMatcher.keyNotDefined(androidx.compose.ui.semantics.SemanticsActions.OnClick))
+        check(node("body-footer").getUnclippedBoundsInRoot().width == node("platform-content").getUnclippedBoundsInRoot().width) { "Footer does not fill the page" }
+        val metric = BuiltInBodyMetric.weight.id
+        node("body-number-$metric").assertTextEquals("—")
+        node("body-row-unit-$metric").assertTextEquals("kg")
         node("body-open-$metric").performScrollTo().assertIsDisplayed().assertHasClickAction().performClick()
         compose.waitUntil(15_000) { exists("body-save") }
+        node("body-unit-lb").assertIsDisplayed().assertHasClickAction().performClick()
+        compose.waitUntil(15_000) { state.displayUnit == "lb" }
+        f.test { state.load(); check(state.rows.first { it.metric.id == metric }.unit == "lb") { "Preference was not retained" } }
         compose.runOnUiThread { state.close() }
         compose.waitUntil(15_000) { exists("body-custom") }
+        node("body-unit-summary").assertIsDisplayed().assertTextEquals("单位 · lb / cm")
         node("body-custom").assertIsDisplayed().assertHasClickAction().performClick()
         node("body-custom-name").performTextInput("虚构围度")
         node("body-custom-unit").performTextInput("fist")
