@@ -442,13 +442,7 @@ class ScopeBoundaryTests {
 
         val expectedConstants = frozenS1RouteConstants()
         expectedConstants.filterKeys { !it.startsWith("ARG_") }.values.forEach { route ->
-            // Phase 5 deep links. The scanner only accepts S1Routes constants as composable routes.
-            if (route != "appointments/create/{date}/student/{\$ARG_STUDENT_ID}") assertFalse(route.contains("appointment", ignoreCase = true))
-            if (route != "students/{\$ARG_STUDENT_ID}/trends" && route != "students/{\$ARG_STUDENT_ID}/trends/{exerciseID}") assertFalse(route.contains("trend", ignoreCase = true))
-            assertFalse(route.contains("backup", ignoreCase = true))
-            assertFalse(route.contains("archive", ignoreCase = true))
-            assertFalse(route.contains("share", ignoreCase = true))
-            assertFalse(route.contains("widget", ignoreCase = true))
+            ApprovedRouteContent.validate(route)
         }
 
         assertThrows(IllegalArgumentException::class.java) {
@@ -465,6 +459,14 @@ class ScopeBoundaryTests {
         }
         assertThrows(IllegalArgumentException::class.java) {
             assertS1RoutesMembersAreFrozen(insertMemberBeforeClosingBrace(source, "private companion object Hidden { const val X = \"widget\" }"))
+        }
+    }
+
+    @Test fun routeContentAllowlistRejectsUnregisteredValues() {
+        ApprovedRouteContent.exceptions.values.flatten().forEach(ApprovedRouteContent::validate)
+        listOf("students/{\$ARG_STUDENT_ID}/trends/extra", "students/{\$ARG_STUDENT_ID}/trend",
+            "appointments/create/{date}/student/{\$ARG_STUDENT_ID}/extra", "backup", "archive", "share", "widget").forEach { route ->
+            assertThrows(IllegalArgumentException::class.java) { ApprovedRouteContent.validate(route) }
         }
     }
     @Test fun rejectsS1RoutesExtensionMembersInAnyFile() {
@@ -554,6 +556,8 @@ class ScopeBoundaryTests {
                     "fun:studentHistory",
                     "fun:studentTrends",
                     "fun:studentBody",
+                    "fun:insightTrend",
+                    "fun:insightAppointment",
                     "fun:packageDetail",
                     "fun:activeSession",
                     "fun:templateDetail",
@@ -640,5 +644,18 @@ class ScopeBoundaryTests {
         val fragment = MergedPrivacyInputs.parse("<root xmlns:android=\"${MergedPrivacyInputs.ANDROID}\">$xml</root>")
         parent.appendChild(manifest.ownerDocument.importNode(fragment.firstChild, true))
         assertThrows(IllegalArgumentException::class.java) { ScopeBoundaryPolicy.validateManifest(manifest) }
+    }
+}
+
+/** Only the approved S3 destinations may contain these otherwise deferred route words. */
+private object ApprovedRouteContent {
+    val exceptions = mapOf(
+        "appointment" to setOf("appointments/create/{date}/student/{\$ARG_STUDENT_ID}"),
+        "trend" to setOf("students/{\$ARG_STUDENT_ID}/trends", "students/{\$ARG_STUDENT_ID}/trends/{exerciseID}"),
+    )
+    fun validate(route: String) {
+        for (word in listOf("appointment", "trend", "backup", "archive", "share", "widget")) {
+            require(!route.contains(word, ignoreCase = true) || route in exceptions[word].orEmpty()) { "Unapproved route content" }
+        }
     }
 }

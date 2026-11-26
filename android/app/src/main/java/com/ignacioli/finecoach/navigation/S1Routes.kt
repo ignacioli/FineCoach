@@ -4,6 +4,8 @@ import com.ignacioli.finecoach.core.domain.common.CoursePackageID
 import com.ignacioli.finecoach.core.domain.common.SessionID
 import com.ignacioli.finecoach.core.domain.common.StudentID
 import com.ignacioli.finecoach.core.domain.common.TemplateID
+import com.ignacioli.finecoach.core.domain.common.StableExerciseID
+import java.time.LocalDate
 
 object S1Routes {
     const val ARG_STUDENT_ID = "studentID"
@@ -59,6 +61,8 @@ object S1Routes {
     fun studentHistory(studentID: StudentID): String = "students/${studentID.value}/history"
     fun studentTrends(studentID: StudentID): String = "students/${studentID.value}/trends"
     fun studentBody(studentID: StudentID): String = "students/${studentID.value}/body"
+    fun insightTrend(studentID: StudentID, exerciseID: StableExerciseID): String = "students/${studentID.value}/trends/${exerciseID.value}"
+    fun insightAppointment(date: LocalDate, studentID: StudentID): String = "appointments/create/$date/student/${studentID.value}"
     fun packageDetail(coursePackageID: CoursePackageID): String = "packages/${coursePackageID.value}"
     fun activeSession(sessionID: SessionID): String = "session/${sessionID.value}"
     fun templateDetail(templateID: TemplateID): String = "templates/${templateID.value}"

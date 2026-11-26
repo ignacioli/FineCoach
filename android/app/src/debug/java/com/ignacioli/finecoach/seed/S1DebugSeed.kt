@@ -72,12 +72,23 @@ internal object S1DebugSeed {
                     graph.prepareExerciseCatalog()
                     check(!graph.exerciseRepository.catalogUnavailable) { "Seed catalog unavailable" }
                     if (scenario != "empty") populate(graph, scenario, fixture)
+                    if (scenario == "multi") S3SeedFixture.installBody(graph, fixture)
                     verifyInitial(graph, scenario)
+                    val expectedTables = S1SeedInventory.expected(app, fixture, scenario)
+                    val actualTables = businessRowCounts(database)
+                    check(actualTables.keys == expectedTables.keys) { "Seed inventory table mismatch" }
+                    for ((table, expected) in expectedTables) {
+                        check(actualTables[table] == expected) { "$table $expected ${actualTables[table]}" }
+                    }
+                    val declaredRows = fixture.json.getJSONObject("expectedRows").getInt(scenario)
+                    val derivedRows = expectedTables.values.sum() + S1SeedInventory.METADATA_ROWS
+                    check(declaredRows == derivedRows) { "store_metadata $declaredRows $derivedRows" }
                     val ownedMetadata = database.openHelper.readableDatabase.query(
                         "SELECT COUNT(*) FROM store_metadata WHERE substr(`key`,1,?)=?", arrayOf<Any>(PREFIX.length, PREFIX)
                     ).use { it.moveToFirst(); it.getInt(0) }
-                    val rows = businessRows(database) + ownedMetadata + 1 // include the not-yet-inserted rows key
-                    check(rows == fixture.json.getJSONObject("expectedRows").getInt(scenario)) { "Seed inventory mismatch" }
+                    check(ownedMetadata + 1 == S1SeedInventory.METADATA_ROWS) { "store_metadata ${S1SeedInventory.METADATA_ROWS} ${ownedMetadata + 1}" }
+                    val rows = actualTables.values.sum() + ownedMetadata + 1 // include the not-yet-inserted rows key
+                    check(rows == declaredRows) { "Seed inventory mismatch" }
                     // Success is visible only after all repository writes and integrity reads succeeded.
                     database.runInTransaction {
                         metadata.insert(StoreMetadata(ROWS_KEY, rows.toString()))
@@ -155,7 +166,9 @@ internal object S1DebugSeed {
             S1AppGraph(db, S1FixtureClock(fixture), S1SeedIDs(fixture), generation, context, ZoneOffset.UTC)
         }
 
-    fun businessRows(db: FineCoachDatabase): Int {
+    fun businessRows(db: FineCoachDatabase): Int = businessRowCounts(db).values.sum()
+
+    internal fun businessRowCounts(db: FineCoachDatabase): Map<String, Int> {
         val tables = mutableListOf<String>()
         db.openHelper.readableDatabase.query("SELECT name FROM sqlite_master WHERE type='table'").use { cursor ->
             while (cursor.moveToNext()) {
@@ -166,7 +179,7 @@ internal object S1DebugSeed {
                 }
             }
         }
-        return tables.sumOf { table ->
+        return tables.sorted().associateWith { table ->
             db.openHelper.readableDatabase.query("SELECT COUNT(*) FROM `$table`").use { it.moveToFirst(); it.getInt(0) }
         }
     }

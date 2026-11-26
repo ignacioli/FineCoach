@@ -8,7 +8,6 @@ import com.ignacioli.finecoach.core.domain.progress.SessionGains
 import com.ignacioli.finecoach.core.domain.training.CompletedSession
 import com.ignacioli.finecoach.core.domain.training.DecimalValue
 import com.ignacioli.finecoach.core.domain.training.DurationTextParser
-import java.math.RoundingMode
 import java.time.Instant
 import java.time.ZoneId
 
@@ -56,6 +55,7 @@ data class TrendsContent(
     val rows: List<Pair<String, String>>,
     val bests: List<TrendBestRow>,
     val assisted: Boolean,
+    val chartSamples: List<TrendChartSample> = emptyList(),
 )
 
 object TrendsPresentation {
@@ -92,6 +92,7 @@ object TrendsPresentation {
             caption = if (selected?.mode == RecordMode.weightReps) caption else null,
             density = density,
             dashed = points.size == 2,
+            chartSamples = plotted.map { TrendChartSample(day(it.first, zone), it.second.decimal, resolved.unit) },
             values = plotted.map { it.second.decimal.toFloat() },
             chartX = dateFractions(plotted.map { it.first }),
             maxLabel = plotted.maxOfOrNull { it.second }?.let { quantity(it, resolved.unit) },
@@ -148,7 +149,7 @@ object TrendsPresentation {
         }
 
     fun quantity(value: DecimalValue, unit: String): String {
-        val shown = value.decimal.setScale(1, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
+        val shown = com.ignacioli.finecoach.features.body.BodyDataDisplay.format(value.decimal, unit)
         return "$shown $unit"
     }
 

@@ -556,7 +556,7 @@ roadmap §4 的其他差异（系统壳分类以 S0 spec D09 批准结论为准�
 
 - 系统栏、全面屏、手势返回：D09 已批准按 ADR A/B，在 Penpot 经负责人审；不能直接当作已批准 C 类。安全 Insets、系统返回与 `DS-PAGE-HEADER` 的 `‹` 共用 callback 的实现合同见 §8.4；真实系统栏/手势效果仍待负责人核实。
 - 字体（C 类，S1 核心页走查）：正文与 `‹ › ✓` 都用随包 Noto Sans SC（ADR-001 §7.2，负责人 2026-11-03 确认），token 数值不变，只是渲染引擎不同；由 L3 走查看一次，不画板。
-- 趋势图（D 类，S3）：Swift Charts → Compose Canvas，目标是现有画稿；iOS 位置 `Features/Trends/TrendLineChart.swift`、`Features/Trends/TrendsView.swift`。
+- 趋势图（D 类，S3）：Swift Charts → Compose Canvas，目标是现有画稿；iOS 位置 `Features/Trends/TrendLineChart.swift`、`Features/Trends/TrendsView.swift`。已批准的 S3-D22/D23 B 类扩展 anatomy 见下方「S3 趋势图 anatomy 扩展」。
 - 左滑操作（D 类，S1）：Compose 没有现成控件，按本文 §4.8 自绘；iOS 位置见 §4.8，不重新设计。
   - Android SessionSwipeRow：默认字号 tile 宽保持分区删除 112、移入分区 84、删除 76；大字号宽度取默认宽与单行内容 intrinsic width（含图标、间距及水平 padding）的较大值，reveal 距离跟随实测总宽；删除分区视觉 pill 高 36，外层点击区至少 44（自动：`SessionSwipeRowTests`）。
 
@@ -716,3 +716,12 @@ P4 round 2 drift repair：Search 可见框固定 40dp，由外层 ≥44dp editor
 P4 round 3（S1-D50）：Android FcPageHeader 删除顶部 space.2，直接位于 status inset 下；非 body FcFilterChip 删除44dp最小布局，visual/layout均为文字+2×space.3、高30，触区由Compose向外补到48dp。动作库横向chip row从358dp裁剪容器→390dp edge-to-edge，首尾space.4，搜索与列表仍space.4内边距。body chip与iOS不变；无新视觉决定。ComponentContractTests验证框外tap和layout/touch分离；P4ExerciseLibraryTests验证390dp row与358dp列表；完整结果与未解决的页面组合差异见r3执行记录/报告。
 
 P4 round 4（S1-D51）：动作库 header→search→chips→section 使用 space.4；section label→rows 与 search HStack 使用 space.2，水平 space.4、chips edge-to-edge。Android DS-PAGE-HEADER Back layout 宽 space.4、字形 leading 对齐并与标题首行 baseline 对齐，Compose 扩展点击区≥44，不占 layout；trailing 以 token line box 与标题首行 centerY 对齐，点击区向外扩展。移除 Back/trailing 44dp 布局占位，不新增 offset；行 › 的 glyph advance 右缘等于内容右缘，board 文字框应跟随真实 advance。Penpot 由 dispatcher 根据 proposed-board.json 更新，本轮不改板。
+
+#### S3 趋势图 anatomy 扩展（S3-D22 / S3-D23）
+
+- 分类：已批准 B 类修订；复用并扩展 FcTrendChart，训练趋势与身体数据共用。来源 Penpot「M1-B G5 Design」/「M2 G7 Design」：核心板 `75fbf40e-01d3-80a0-8008-f94183e294e1`，点多板 `051bd336-66e5-801f-8009-00c69ac7fc11`，按住查看板 `051bd336-66e5-801f-8009-00c69aeba4b6`；密集/手势见 S3-D22，负责人定稿配色见 S3-D23。
+- 线与点：2dp 折线，≤8 点逐点 8dp 实心圆；>8 点只保留最后一点的 8dp 实心圆。折线、实心点、查看圈描边用 `color.chart.line`；折线至基线铺同色 8% 面积，画在线下；保留稀疏两点虚线规则与原几何。
+- 查看态：按住或水平拖动吸附最近 x 数据点；1dp textSecondary 参考线贯穿绘图区；12dp 空心圈为 surface.page 填充、2dp chart.line 描边；松手/取消消失。纵向滑动在接管前交给页面，不吞滚动。
+- 气泡：占原最大值标签行，查看时隐藏该标签；actionPrimary 底/actionOn 白字，caption 13/600，radius.sm=8，高 space.6=24，水平 padding space.2=8；显示「日期 · 数值 单位」，中心跟随点并夹在页面左右 space.4 内。kg/cm/% 最多 1 位、lb/in 2 位，HALF_UP 去尾零，自定义保持记录精度，复用 BodyDataDisplay。
+- 无障碍：图表提供首末日期、最小/最大值、最新值摘要；数值还可从个人最佳或身体历史读取，不依赖手势。自动不变量由 TrendChartInteractionTests 覆盖绘制分支、吸附/松手、滚动与摘要；配色由 TokenParityTests / ContrastTests 覆盖。
+- 保留 / 移除：保留原 7 点的布局、路径和日期例外；移除 >8 点逐点密集圆和黑色图形；不增加数据写入、token 以外的颜色、截图基线或 iOS 改动。

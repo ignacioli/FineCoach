@@ -841,7 +841,7 @@ val validateDesignTokenGate = tasks.register("validateS0G1Results") {
         val expectedCounts = mapOf(
             "com.ignacioli.finecoach.TokenParityTests" to 6,
             "com.ignacioli.finecoach.TypographyTests" to 7,
-            "com.ignacioli.finecoach.ContrastTests" to 17,
+            "com.ignacioli.finecoach.ContrastTests" to 18, // S3-D23 chart.line contrast case.
             "com.ignacioli.finecoach.TokenGeneratorTests" to 9,
         )
         check(counts == expectedCounts) { "Unexpected G1 testcase counts: $counts; expected $expectedCounts" }
@@ -1025,9 +1025,10 @@ val coreBaselineScreens = mapOf(
     "p4TodayConformance" to ("01-today-s1" to "01-today-s1/01-today-s1"),
     "p4SessionDetailConformance" to ("35-session-detail-s1" to "35-session-detail-s1/35-session-detail-s1"),
     "p4StudentListConformance" to ("21-student-list-s1" to "21-student-list-s1/21-student-list-s1"),
-    "p4StudentDetailConformance" to ("26-student-detail-s1" to "26-student-detail-s1/26-student-detail-s1"),
-    // S2-D24 (owner, 2026-11-19): S2 core screens locked after the T053 walkthrough.
-    "p4TodayS2Conformance" to ("01-today-s2" to "01-today-s2/01-today-s2"),
+    "p4StudentDetailS3Conformance" to ("26-student-detail-s3" to "26-student-detail-s3/26-student-detail-s3"),
+    // S3-D25 (owner, 2026-11-26): replace Today/Student Detail; retain S2-D24 historical files.
+    "p4TodayS3Conformance" to ("01-today-s3" to "01-today-s3/01-today-s3"),
+    "p4TrendsConformance" to ("trends-s3" to "trends-s3/trends-s3"),
     "p4CalendarConformance" to ("25-calendar-v2" to "25-calendar-v2/25-calendar-v2"),
     "p4AppointmentEditorConformance" to ("23-new-appointment-v2" to "23-new-appointment-v2/23-new-appointment-v2"),
 )

@@ -1,3 +1,4 @@
+// fictional-data: design token constants only; no business content.
 package com.ignacioli.finecoach
 
 import androidx.compose.ui.geometry.Size
@@ -38,7 +39,7 @@ class TokenParityTests {
             "color.text.primary" to 0xFF211F1B, "color.text.secondary" to 0xFF5C5A52,
             "color.text.disabled" to 0xFFA8A39A, "color.text.onActionSecondary" to 0xFFB0ABA2,
             "color.surface.dividerOnAction" to 0xFF4C4A45,
-            "color.status.success" to 0xFF2A2822, "color.status.warning" to 0xFFB45309,
+            "color.chart.line" to 0xFF2E7D6B, "color.status.success" to 0xFF2A2822, "color.status.warning" to 0xFFB45309,
             "color.status.destructive" to 0xFFD4442A, "color.overlay.scrim" to 0x66211F1B,
         )
         // No independent dark palette has been approved; both modes preserve §2.
