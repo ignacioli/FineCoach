@@ -1,8 +1,8 @@
 {
   "declaration": "fictional-data: all people, identifiers, notes and values are invented walkthrough fixtures. Appointment dayOffset/endDayOffset are relative to the device local date at seed time; all other fields remain deterministic.",
   "source": "ios/FineCoachApp/Core/Platform/ArchiveExportDebugSeed.swift（仅借鉴虚构姓名与训练文案风格）",
-  "seedVersion": 4,
-  "dataset": "fictional-s1-coach-core-v4",
+  "seedVersion": 6,
+  "dataset": "fictional-s1-coach-core-v6",
   "clockUTC": "2026-11-09T00:00:00Z",
   "uuidPrefix": "72000000-0000-4000-8000-",
   "generatedIDStart": 1000,
@@ -10,7 +10,7 @@
   "expectedRows": {
     "empty": 1088,
     "single": 1138,
-    "multi": 1167
+    "multi": 1479
   },
   "scenarios": [
     {

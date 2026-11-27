@@ -191,6 +191,7 @@ Phase 6.5 人工审核（T063）发现 8 个核心界面需要结构调整，并
 | `color.status.success` | green.600 | `#2A2822` | 成功/完成状态 |
 | `color.status.warning` | amber.700 | `#B45309` | 逾期、时间冲突图标底 |
 | `color.status.destructive` | red.700 | `#D4442A` | 失败、破坏性操作文字（O1） |
+| `color.chart.line` | —（S3-D23 定稿） | `#2E7D6B` | 数据趋势图折线、点、查看圈描边及同色 8% 面积填充；对白底约 4.9:1（图形 ≥3:1），不用于按钮 |
 | `color.overlay.scrim` | text.primary 40% 不透明度 | `#211F1B` @ 40% | 底部面板与弹窗背后的遮罩（D1、D4b、D8c）。2026-09-26 产品负责人批准新增 |
 
 ### 2.3 插图专用色

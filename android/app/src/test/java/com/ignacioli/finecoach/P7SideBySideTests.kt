@@ -757,7 +757,7 @@ private fun captureSheet(activity: Bitmap, panelTag: String): Bitmap {
     ) {
         val f = T009Fixture().also { releaseFixture = it::close }
         val state = com.ignacioli.finecoach.features.body.BodyDataState(f.studentID,
-            BodyDataUseCases(com.ignacioli.finecoach.storage.repository.BodyDataRepository(f.db, f.clock), f.clock, f.zone) { java.util.UUID.randomUUID() })
+            BodyDataUseCases(com.ignacioli.finecoach.storage.repository.BodyDataRepository(f.db, f.clock), f.clock, f.zone) { java.util.UUID.randomUUID() }, students = StudentUseCases(com.ignacioli.finecoach.storage.repository.StudentRepository(f.db, f.clock), f.clock, f.ids))
         f.test { state.load() }
         show { com.ignacioli.finecoach.features.body.BodyDataScreen(state) {} }
         "body-custom"

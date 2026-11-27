@@ -1619,7 +1619,7 @@ seed v4 的 multi 增加 15 条预约、两系列（RepeatCount / EndDate）及�
 
 ### T045 / Phase 5 checkpoint：需要留意与核心屏
 
-**自动化证据 PASS；checkpoint PENDING（2026-11-21，R3）。** 宿主 18:44 运行、S3-D18 末尾「全部」行画板修正后：今日 S3 53 层，PASS 46、FAIL/MISSING/outside 均 0，AD-01 矢量内部不可观测 7，手工例外 0%；学员详情 S3 61 层，PASS 61、FAIL/MISSING/outside 均 0，手工 selector 1.64%。R2 的 4 个连带画板失败已消除。S3-D17 的实际板高同时用于比较过滤和 visibility 诊断；A 也修改了 ConformanceComparison.kt。
+**自动化证据 PASS；checkpoint PENDING（2026-11-21，R3）。** 宿主 18:44 运行、S3-D18 末尾「全部」行画板修正后：今日 S3 53 层，PASS 46、FAIL/MISSING/outside 均 0，AD-01 矢量内部不可观测 7，手工例外 0%；学员详情 S3 61 层，PASS 61、FAIL/MISSING/outside 均 0，手工 selector 1.64%。R2 的 4 个连带画板失败已消除。S3-D17 的实际板高同时用于比较过滤和 visibility 诊断；ConformanceComparison.kt 从 layers JSON 的 board.h 读取实际画板高度，替换 visibility 内残留的 844 硬编码。
 
 宿主 18:44：build exit 0，完整单测 **1261/0/0/0**（tests/failures/errors/skips）；s0G1 **39/0**、s0G2 **113/0**、s0G6 **92/0**、s0Room **26/0**、s0G3 **42/0**、s0G4 **12/0**、P7 **28/0**；两张 S3 及 s0Conformance / p4TrendsConformance / p4TodayS2Conformance 各 **1/0**。日志：`.handoff/logs/2026-11-21-s3-p5-host.log`、`/tmp/fc1-android-s3-p5-u.log`。R3 完整单测 **1262/0/0/0**（新增 1 个 visibility 回归），上述 5 个 conformance gate 各 **1/0/0/0**、P7 **28/0/0/0**、s0G3 **42/0/0/0**，diff-check PASS；完整列表入口、撤销重载、TalkBack 文案和后台读取证据见 [T045](docs/s3/T045.md)。
 
@@ -1627,4 +1627,28 @@ seed v4 的 multi 增加 15 条预约、两系列（RepeatCount / EndDate）及�
 
 ### T053 / Phase 6 checkpoint：seed、复核与走查
 
-待办。
+**T053 / Phase 6 checkpoint PASS（2026-11-26，S3-D25）。负责人已批准集中走查、三张核心屏及两张 P7 sheet；三屏 baseline 已按批准哈希写入，独立复核 PASS。** R1/R2 的 multi seed 扩展曾用真实 Room + 领域逻辑验证新纪录、进步、第十节、连续四周、三类洞察、清单内外趋势（含估算 1RM）、多单位身体数据与自定义指标；只列 S3 新交互及三张核心屏的 [走查清单](docs/s3/walkthrough.md) 已就绪，见 [T050](docs/s3/T050.md)。seed asset metadata 由调度者按 T050 范围裁决放行（S3-D20），R2 仅同步 seed asset JSON 的 version/dataset/multi expectedRows，扩展器沿用 metadata；新增三场景原始 asset 对真实写库回归，未改 build 配置或安装脚本。实际安装已由宿主完成，负责人走查见 T052。
+
+P3 七项已清理：implementation-map 补 Phase 5 R3；README/T045 技术表述与层数/PASS 分列；T030 更新当前实测；补 kg/lb、cm/in、百分比、自定义测试；单位偏好按 iOS 对齐为教练全局持久化，跨 load/open 不重置，不改 Room；路由例外改显式 allowlist，集合外拒绝。详见 [T053](docs/s3/T053.md) 与 [implementation-map](docs/s3/implementation-map.md)。
+
+R1 均经 agent-test.sh：完整单测 **1271/0/0/0**，s0G3 **42/0/0/0**、s0G4 **12/0/0/0**、p7SideBySide **28/0/0/0**；p4TrendsConformance、p4TodayS3Conformance、p4StudentDetailS3Conformance、s0Conformance、p4TodayS2Conformance 各 **1/0/0/0**（tests/failures/errors/skips）；git diff --check PASS。完整单测日志 `.handoff/logs/agent-test-android-s3-p6-20261121-192531.log`，其他日志见 T053。三张核心屏层分类不变：训练趋势 46 层/PASS 44/OWNER_EXCEPTION 2；今日 S3 53 层/PASS 46/AD-01 7；学员详情 S3 61 层/PASS 61；FAIL/MISSING/outside 均 0，今日和学员详情捕获 hash 与 T044 一致。
+
+T051 cursor 复核 **PASS**（本轮调度输入），本轮修复后独立复验未取得；T052 负责人走查与三屏 manifest/基线批准、宿主全量 gate 均 **PENDING**，不宣称 SC-001～SC-007 全部成立或 S3 关闭。本轮未安装 AVD、手动截图、修改基线/审批文件、specs，未 commit 或委派。
+
+R2 metadata 回归及复跑：完整单测 **1272/0/0/0**（新增一项三场景实际库存校验，DebugSeedTests 15/0），s0G3 **42/0/0/0**、s0G4 **12/0/0/0**，diff-check PASS；日志分别为 `.handoff/logs/agent-test-android-s3-p6-20261121-193242.log`、`193425.log`、`193444.log`（后两者同目录与前缀）。未运行安装脚本或模拟器；其他 conformance/P7 保留上述 R1 结果，R2 当时实际宿主安装与 T051/T052 为 PENDING，后续状态见 R3 记录。
+
+R3 复核修复：T045/T053 依据当前报告纠正 s0 **52 层 / PASS 48 / AD-01 4**、今日 S2 **39 层 / PASS 33 / AD-01 6**；路由 allowlist 在测试侧 ScopeBoundaryTests.kt，无产品行为变化；停滞序列、调度者 metadata 放行主体及 chip 点击后等待均已修正。BodyDataEntryLayoutTests **3/0/0/0**、完整单测 **1272/0/0/0**、s0G3 **42/0/0/0**、s0G4 **12/0/0/0**，diff-check PASS，日志见 T053 R3。cursor T051 PASS 来自本轮调度输入，修复后独立复验未取得；实际宿主安装、T052 与 checkpoint PENDING。
+
+R4（S3-D21）：已用真实 S1App + Room 复现并修复 S1Navigator 漏分发；学员详情趋势/身体、今日洞察趋势、完整列表课包/预填安排、历史对比共 **5/0/0/0**。缺口由 Phase 4 `2de81b9` / Phase 5 `28199ea` 增入口时漏接引入，P3 测试侧 allowlist 不是根因。v6 页面专人 seed 和新版 walkthrough 已编写，但两轮库存同错后停止，**seed FAIL/BLOCKED，不能作为走查就绪交付**。完整单测 **1278/9/0/0**（9 项全为 seed 库存），G3 **42/0/0/0**、G4 **12/0/0/0**、三张 S3 conformance 各 **1/0/0/0**、P7 **28/0/0/0**，diff-check PASS。日志、已知失败、下一轮库存诊断边界见 T053 R4；三屏捕获 hash 不变。未运行安装脚本或模拟器，未 commit；宿主安装、独立复验及负责人入口复查仍 PENDING。
+
+R5：已用失败路径的逐表证据关闭 seed 库存阻塞。旧 multi expectedRows 1478 漏算新课包的 active_package_claims 1 行，实际业务 1474 + seed-owned metadata 5 = **1479**；source/runtime/merged asset 一致，排除旧缓存。新增 S1SeedInventory 按输入逐表推导并由 loader 验证，原总数断言保留，临时输出删除，导航不动。专人趋势/收获/停滞/久未到访/课包/对比及身体数据断言全部通过；seed 定向 **30/0/0/0**、完整单测 **1278/0/0/0**、G3 **42/0/0/0**、G4 **12/0/0/0**、三项 S3 conformance 各 **1/0/0/0**、P7 **28/0/0/0**，diff-check PASS。逐表计数及日志见 T053 R5 和 `.handoff/subagent/2026-11-25-s3-phase6-r5.md`。walkthrough 当前可供宿主安装后复查；R4 失败条目保留为历史，实际宿主安装、R5 独立复验及负责人复查仍 PENDING。未 commit 或运行安装/模拟器。
+
+R6（S3-D22）：身体数据列表按 `06-body-data.png` 恢复 feature 三列行、三组指标、姓名、空值「—」及固定底栏；详情全局偏好与 Room 行为保留。kg/cm/% HALF_UP 最多一位、lb/in 两位、自定义原精度，列表/详情/图表标注共用格式函数，仅改显示。seed v6 保留结构与 1479 库存，身体数据改为直接 kg/cm 样本并保留 lb/in 录入。完整单测 **1283/0/0/0**、G3 **42/0/0/0**、G4 **12/0/0/0**、P7 **28/0/0/0**、三项 S3 conformance 各 **1/0/0/0**；核心三屏 hash 不变，P7 身体页捕获变化属预期，详见 [T032](docs/s3/T032.md)、[T053 R6](docs/s3/T053.md)。iOS 底栏单位摘要为只读 Text，按参照实现；R7 调度者已裁决其只读，原提示「可点」要求作废，入口测试断言无 OnClick。未改基线、Room schema 或共享向量，未 commit；独立复核、宿主安装与负责人视觉复查仍 PENDING。
+
+R7（S3-D22 / S3-D23）：趋势密集态、按住/横拖查看、无障碍摘要和青绿配色已接入训练/身体，图表尺寸精确复用既有 token；新增 chart.line，经生成器和独立颜色/对比度断言验证，面积填充 8%。宿主三张 PNG 和指定 layers/map 已同步，见 [T002](docs/s3/T002.md)、[T030](docs/s3/T030.md)。交互 **5/0/0/0**、token/对比度/身体入口 **27/0/0/0**；完整 **1289/1/0/0**，唯一失败为趋势 conformance；趋势定向 **1/1/0/0**，今日/详情各 **1/0/0/0**、P7 **28/0/0/0**、G3 **42/0/0/0**、G4 **12/0/0/0**，diff-check PASS。**当前 BLOCKED**：新透明面积层在现有导出数据中缺少可观测背景；连续两次同错后停止。末尾面积层也令前六圆颜色观测被遮挡，另有 8-bit alpha 合成差；顺序/背景/透明度 metadata 修正提案尚未应用，待裁决，详见 [T053 R7](docs/s3/T053.md)。R6 单位摘要只读已获裁决并补测试；导航、seed 结构与数据存储保留。未改比较器/容差/基线或 iOS，未 commit；不能将本轮写成 checkpoint PASS。
+
+R8（S3-D24）：按 Penpot 实际图层顺序与新导出同步核心 PNG/layers/map，白底补齐，面积改为 11/2，折线/七圆重编号，有效 alpha=20/255 且保留逻辑 0.08；未改 Android 绘制代码、比较器、容差、基线或日期例外。R7 阻塞解除：完整 **1289/0/0/0**，趋势/今日 S3/详情 S3/s0Conformance/今日 S2 各 **1/0/0/0**，P7 **28/0/0/0**，G3 **42/0/0/0**，G4 **12/0/0/0**；趋势 47 层 / PASS 45 / OWNER_EXCEPTION 2 / UNOBSERVABLE/FAIL/MISSING 0，diff-check PASS。哈希和日志见 [T002](docs/s3/T002.md)、[T030](docs/s3/T030.md)、[T053 R8](docs/s3/T053.md)。独立复核、负责人走查与基线批准仍 PENDING，未 commit。
+
+R9（S3-D24 附记）：S3-D23 新增 chart.line 对比度用例后，G1 当前总数为 **40**（TokenParity 6 + Typography 7 + Contrast 18 + Generator 9）；build.gradle.kts 只同步 Contrast 期望数 17→18 并保留严格校验。s0G1 **40/0/0/0**、s0G6 **92/0/0/0**、s0Room **26/0/0/0**；s0G2 尚未执行，agent-test.sh allowlist 拒绝该 task（exit 2），待调度者补脚本支持。上文 Phase 2/5 的 G1=39 是当时历史实测，保留；本轮证据见 T053 R9。未 commit。
+
+R10 / T052–T053 **PASS（S3-D25，2026-11-26）**：负责人「全部批准」三张核心屏、两张 P7 sheet 与模拟器集中走查；[T051](docs/s3/T051.md) 独立复核、[T052](docs/s3/T052.md) 人工验收、[T053](docs/s3/T053.md) checkpoint 全部 PASS。批准前缀 trends `7cba6e19d4ba`、今日 S3 `1196b169470e`、详情 S3 `bf38a26bba84`，完整 hash 已进入 png/baselines.json/APPROVALS/coreBaselineScreens；旧十条历史锁保留，manifest 13 条、当前核心清单 11 项。现有 baseline-check CLI（与 s2BaselineManifest 内部命令相同）及三项新 baseline finalizer PASS；完整 **1289/0/0/0**，三屏各 **1/0/0/0**，P7 **28/0/0/0**，G3 **42/0/0/0**，G4 **12/0/0/0**，s0Conformance **1/0/0/0**，diff-check PASS。宿主全量证据为 s3-p6-host-r9.log（G2 113/0，补足 R9 写手 wrapper 限制）；R10 不冒称重新运行宿主全量/设备批次。批准原话、走查、旧基线保留规则和逐门日志见上述文档；未 commit 或修改只读 specs/tasks。

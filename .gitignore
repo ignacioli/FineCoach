@@ -42,9 +42,7 @@ blob-report/
 
 # IDE-local settings
 .idea/
-.vscode/*
-!.vscode/extensions.json
-!.vscode/settings.json
+.vscode/
 
 # ignore .specify directory and all its contents
 .specify/**

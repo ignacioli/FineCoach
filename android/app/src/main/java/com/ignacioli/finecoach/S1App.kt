@@ -335,7 +335,8 @@ AppointmentEditorScreen(editor, back) { onAppointmentSaved(editor) }
         }
         composable(S1Routes.STUDENT_BODY) { entry ->
             val id = StudentID.parse(requireNotNull(entry.arguments?.getString(S1Routes.ARG_STUDENT_ID)))
-            val body = remember(id) { BodyDataState(id, BodyDataUseCases(BodyDataRepository(graph.database, graph.clock), graph.clock, graph.zone) { UUID.randomUUID() }) }
+            val body = remember(id) { BodyDataState(id, BodyDataUseCases(BodyDataRepository(graph.database, graph.clock), graph.clock, graph.zone) { UUID.randomUUID() },
+                com.ignacioli.finecoach.storage.local.BodyDataUnitPreferences(graph.context.filesDir), graph.students) }
             OnResume { body.load() }
             BodyDataScreen(body, back)
         }
